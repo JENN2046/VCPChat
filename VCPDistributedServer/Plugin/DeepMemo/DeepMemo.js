@@ -1,10 +1,10 @@
 const fs = require('fs').promises;
 const path = require('path');
-const dotenv = require('dotenv');
 const { Document } = require('flexsearch');
 const jieba = require('node-jieba');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const { parseEnvCascade } = require('../../../envLoader');
 
 // --- 主逻辑 ---
 async function main() {
@@ -135,8 +135,11 @@ async function loadConfig() {
     const VchatDataURL = path.join(__dirname, '..', '..', '..', 'AppData');
     const configPath = path.join(__dirname, 'config.env');
     try {
-        const configContent = await fs.readFile(configPath, 'utf-8');
-        const config = dotenv.parse(configContent);
+        const config = parseEnvCascade(configPath).env;
+
+        if (Object.keys(config).length === 0) {
+            throw Object.assign(new Error(`配置文件 config.env 未找到。`), { code: 'ENOENT' });
+        }
 
         if (!config.MaxMemoTokens) {
             throw new Error("config.env 文件不完整，缺少 MaxMemoTokens。");

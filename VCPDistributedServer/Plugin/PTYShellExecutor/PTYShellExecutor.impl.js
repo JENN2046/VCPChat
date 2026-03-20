@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const { spawn } = require('child_process');
 const { BrowserWindow, ipcMain, clipboard } = require('electron');
 const chokidar = require('chokidar');
+const { parseEnvCascade } = require('../../../envLoader');
 
 // ============================================================================
 // 异步任务管理器 (AsyncTaskManager)
@@ -887,29 +888,18 @@ const defaultConfig = {
 
 try {
     const configPath = path.join(__dirname, 'config.env');
-    if (fs.existsSync(configPath)) {
-        const configContent = fs.readFileSync(configPath, 'utf-8');
-        const returnModeMatch = configContent.match(/^SHELL_RETURN_MODE\s*=\s*(delta|full)/m);
-        if (returnModeMatch) defaultConfig.returnMode = returnModeMatch[1];
-
-        const priorityMatch = configContent.match(/^SHELL_PRIORITY\s*=\s*(.*)/m);
-        if (priorityMatch && priorityMatch[1]) {
-            defaultConfig.shellPriority = priorityMatch[1].split(',').map(s => s.trim()).filter(s => s);
-        }
-
-        const forbiddenMatch = configContent.match(/^FORBIDDEN_COMMANDS\s*=\s*(.*)/m);
-        if (forbiddenMatch && forbiddenMatch[1]) {
-            defaultConfig.forbiddenCommands = forbiddenMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
-        }
-
-        const authMatch = configContent.match(/^AUTH_REQUIRED_COMMANDS\s*=\s*(.*)/m);
-        if (authMatch && authMatch[1]) {
-            defaultConfig.authRequiredCommands = authMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
-        }
-
-        const timeoutMatch = configContent.match(/^COMMAND_TIMEOUT\s*=\s*(\d+)/m);
-        if (timeoutMatch) defaultConfig.commandTimeout = parseInt(timeoutMatch[1], 10);
+    const config = parseEnvCascade(configPath).env;
+    if (config.SHELL_RETURN_MODE === 'full') defaultConfig.returnMode = 'full';
+    if (config.SHELL_PRIORITY) {
+        defaultConfig.shellPriority = config.SHELL_PRIORITY.split(',').map(s => s.trim()).filter(s => s);
     }
+    if (config.FORBIDDEN_COMMANDS) {
+        defaultConfig.forbiddenCommands = config.FORBIDDEN_COMMANDS.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+    }
+    if (config.AUTH_REQUIRED_COMMANDS) {
+        defaultConfig.authRequiredCommands = config.AUTH_REQUIRED_COMMANDS.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+    }
+    if (config.COMMAND_TIMEOUT) defaultConfig.commandTimeout = parseInt(config.COMMAND_TIMEOUT, 10);
 } catch (error) {
     console.error('[PTYShellExecutor] Error reading config.env:', error);
 }

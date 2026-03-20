@@ -5,11 +5,11 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs').promises;
 const fsSync = require('fs');
-const dotenv = require('dotenv');
 const os = require('os');
 const mime = require('mime-types');
  // const { ipcMain } = require('electron'); // This was incorrect. ipcMain should be injected.
  const pluginManager = require('./Plugin.js');
+const { parseEnvCascade } = require('../envLoader');
 
 // DEBUG_MODE is now passed in config
 // const DEBUG_MODE = (process.env.DebugMode || "False").toLowerCase() === "true";
@@ -43,14 +43,12 @@ class DistributedServer {
         // Load server-specific config
         const serverConfigPath = path.join(__dirname, 'config.env');
         try {
-            if (fsSync.existsSync(serverConfigPath)) {
-                const serverEnv = dotenv.parse(fsSync.readFileSync(serverConfigPath));
-                if (serverEnv.DIST_SERVER_PORT) {
-                    const newPort = parseInt(serverEnv.DIST_SERVER_PORT, 10);
-                    if (!isNaN(newPort)) {
-                        this.port = newPort;
-                        console.log(`[${this.serverName}] Port loaded from config.env: ${this.port}`);
-                    }
+            const serverEnv = parseEnvCascade(serverConfigPath).env;
+            if (serverEnv.DIST_SERVER_PORT) {
+                const newPort = parseInt(serverEnv.DIST_SERVER_PORT, 10);
+                if (!isNaN(newPort)) {
+                    this.port = newPort;
+                    console.log(`[${this.serverName}] Port loaded from config.env: ${this.port}`);
                 }
             }
         } catch (e) {

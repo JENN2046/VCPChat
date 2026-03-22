@@ -1502,6 +1502,50 @@ async function syncGlobalSettingsToUI() {
     safeSet('vcpApiKey', globalSettings.vcpApiKey || '');
     safeSet('vcpLogUrl', globalSettings.vcpLogUrl || '');
     safeSet('vcpLogKey', globalSettings.vcpLogKey || '');
+    safeCheck('webdavSyncEnabled', globalSettings.webdavSyncEnabled === true);
+    safeSet('webdavSyncBaseUrl', globalSettings.webdavSyncBaseUrl || '');
+    safeSet('webdavSyncRemoteRoot', globalSettings.webdavSyncRemoteRoot || '/VCPChat');
+    safeSet('webdavSyncUsername', globalSettings.webdavSyncUsername || '');
+    safeSet('webdavSyncPassword', globalSettings.webdavSyncPassword || '');
+    safeCheck('webdavSyncAutoDownload', globalSettings.webdavSyncAutoDownload === true);
+    safeCheck('webdavSyncIncludeVcpChat', globalSettings.webdavSyncIncludeVcpChat !== false);
+    safeCheck('webdavSyncIncludeVcpChatRootFiles', globalSettings.webdavSyncIncludeVcpChatRootFiles !== false);
+    safeCheck('webdavSyncIncludeVcpChatAgents', globalSettings.webdavSyncIncludeVcpChatAgents !== false);
+    safeCheck('webdavSyncIncludeVcpChatUserData', globalSettings.webdavSyncIncludeVcpChatUserData !== false);
+    safeCheck('webdavSyncIncludeVcpChatAssets', globalSettings.webdavSyncIncludeVcpChatAssets !== false);
+    safeCheck('webdavSyncIncludeVcpChatDesktop', globalSettings.webdavSyncIncludeVcpChatDesktop !== false);
+    safeCheck('webdavSyncIncludeVcpChatServerConfig', globalSettings.webdavSyncIncludeVcpChatServerConfig !== false);
+    safeCheck('webdavSyncIncludeVcpToolBox', globalSettings.webdavSyncIncludeVcpToolBox !== false);
+    safeCheck('webdavSyncIncludeVcpToolBoxRootConfig', globalSettings.webdavSyncIncludeVcpToolBoxRootConfig !== false);
+    safeCheck('webdavSyncIncludeVcpToolBoxAgents', globalSettings.webdavSyncIncludeVcpToolBoxAgents !== false);
+    safeCheck('webdavSyncIncludeVcpToolBoxDailyNote', globalSettings.webdavSyncIncludeVcpToolBoxDailyNote !== false);
+    safeCheck('webdavSyncIncludeVcpToolBoxTvstxt', globalSettings.webdavSyncIncludeVcpToolBoxTvstxt !== false);
+    safeCheck('webdavSyncIncludeVcpToolBoxSillyTavern', globalSettings.webdavSyncIncludeVcpToolBoxSillyTavern !== false);
+    safeCheck('webdavSyncIncludeVcpToolBoxPluginConfig', globalSettings.webdavSyncIncludeVcpToolBoxPluginConfig !== false);
+    const syncWebDavScopeDisabledState = (masterId, childIds) => {
+        const master = document.getElementById(masterId);
+        const disabled = !(master?.checked ?? true);
+        childIds.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = disabled;
+        });
+    };
+    syncWebDavScopeDisabledState('webdavSyncIncludeVcpChat', [
+        'webdavSyncIncludeVcpChatRootFiles',
+        'webdavSyncIncludeVcpChatAgents',
+        'webdavSyncIncludeVcpChatUserData',
+        'webdavSyncIncludeVcpChatAssets',
+        'webdavSyncIncludeVcpChatDesktop',
+        'webdavSyncIncludeVcpChatServerConfig',
+    ]);
+    syncWebDavScopeDisabledState('webdavSyncIncludeVcpToolBox', [
+        'webdavSyncIncludeVcpToolBoxRootConfig',
+        'webdavSyncIncludeVcpToolBoxAgents',
+        'webdavSyncIncludeVcpToolBoxDailyNote',
+        'webdavSyncIncludeVcpToolBoxTvstxt',
+        'webdavSyncIncludeVcpToolBoxSillyTavern',
+        'webdavSyncIncludeVcpToolBoxPluginConfig',
+    ]);
     safeSet('topicSummaryModel', globalSettings.topicSummaryModel || '');
     safeSet('continueWritingPrompt', globalSettings.continueWritingPrompt || '请继续');
     safeSet('flowlockContinueDelay', globalSettings.flowlockContinueDelay ?? 5);

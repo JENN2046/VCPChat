@@ -461,6 +461,14 @@
                                 </svg>
                                 <span>服务器连接</span>
                             </li>
+                            <li class="settings-nav-item" data-section="webdav-sync">
+                                <svg class="settings-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M7 18a4 4 0 0 1 .2-8A5 5 0 0 1 17 8a4 4 0 0 1 0 8H7z"></path>
+                                    <path d="M12 12v8"></path>
+                                    <path d="M8.5 16.5 12 20l3.5-3.5"></path>
+                                </svg>
+                                <span>WebDAV 云同步</span>
+                            </li>
                             <li class="settings-nav-item" data-section="render-settings">
                                 <svg class="settings-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="3"></circle>
@@ -580,6 +588,84 @@
                                         <!-- Path inputs will be dynamically added here -->
                                     </div>
                                     <button type="button" id="addNetworkPathBtn" class="sidebar-button small-button" style="margin-top: 8px; width: auto; padding: 4px 10px;">添加路径</button>
+                                </div>
+                            </div>
+
+                            <div class="settings-section" id="section-webdav-sync">
+                                <h3 class="settings-section-title">WebDAV 云同步</h3>
+                                <div class="form-group-inline" style="justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <label for="webdavSyncEnabled">启用云同步</label>
+                                    <label class="switch">
+                                        <input type="checkbox" id="webdavSyncEnabled" name="webdavSyncEnabled">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="settings-form-group">
+                                    <label for="webdavSyncBaseUrl">WebDAV 服务器 URL:</label>
+                                    <input type="url" id="webdavSyncBaseUrl" name="webdavSyncBaseUrl" placeholder="https://dav.example.com/remote.php/dav/files/username/">
+                                </div>
+                                <div class="settings-form-group">
+                                    <label for="webdavSyncRemoteRoot">云端目录:</label>
+                                    <input type="text" id="webdavSyncRemoteRoot" name="webdavSyncRemoteRoot" placeholder="/VCPChat">
+                                </div>
+                                <div class="settings-form-group">
+                                    <label for="webdavSyncUsername">WebDAV 用户名:</label>
+                                    <input type="text" id="webdavSyncUsername" name="webdavSyncUsername" autocomplete="username">
+                                </div>
+                                <div class="settings-form-group">
+                                    <label for="webdavSyncPassword">WebDAV 密码或应用专用密码:</label>
+                                    <input type="password" id="webdavSyncPassword" name="webdavSyncPassword" autocomplete="current-password">
+                                </div>
+                                <div class="form-group-inline" style="justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <label for="webdavSyncAutoDownload">启动时自动从云端下载</label>
+                                    <label class="switch">
+                                        <input type="checkbox" id="webdavSyncAutoDownload" name="webdavSyncAutoDownload">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="settings-form-group">
+                                    <label>同步范围：</label>
+                                    <div style="display: grid; gap: 14px;">
+                                        <div style="border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px;">
+                                                <input type="checkbox" id="webdavSyncIncludeVcpChat" name="webdavSyncIncludeVcpChat">
+                                                <span>VCPChat</span>
+                                            </label>
+                                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px 14px; padding-left: 24px;">
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpChatRootFiles" name="webdavSyncIncludeVcpChatRootFiles"> 根配置文件</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpChatAgents" name="webdavSyncIncludeVcpChatAgents"> Agents / AgentGroups</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpChatUserData" name="webdavSyncIncludeVcpChatUserData"> UserData 聊天与附件</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpChatAssets" name="webdavSyncIncludeVcpChatAssets"> 笔记 / 头像 / 预设 / 翻译模块</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpChatDesktop" name="webdavSyncIncludeVcpChatDesktop"> Desktop / Canvas</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpChatServerConfig" name="webdavSyncIncludeVcpChatServerConfig"> VCPDistributedServer 配置</label>
+                                            </div>
+                                        </div>
+                                        <div style="border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px;">
+                                                <input type="checkbox" id="webdavSyncIncludeVcpToolBox" name="webdavSyncIncludeVcpToolBox">
+                                                <span>VCPToolBox</span>
+                                            </label>
+                                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px 14px; padding-left: 24px;">
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpToolBoxRootConfig" name="webdavSyncIncludeVcpToolBoxRootConfig"> 根配置文件</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpToolBoxAgents" name="webdavSyncIncludeVcpToolBoxAgents"> Agent</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpToolBoxDailyNote" name="webdavSyncIncludeVcpToolBoxDailyNote"> dailynote</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpToolBoxTvstxt" name="webdavSyncIncludeVcpToolBoxTvstxt"> TVStxt</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpToolBoxSillyTavern" name="webdavSyncIncludeVcpToolBoxSillyTavern"> SillyTavernSub</label>
+                                                <label><input type="checkbox" id="webdavSyncIncludeVcpToolBoxPluginConfig" name="webdavSyncIncludeVcpToolBoxPluginConfig"> Plugin / SSH 配置</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="settings-form-group">
+                                    <label>同步操作:</label>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                        <button type="button" id="webdavTestConnectionBtn" class="sidebar-button small-button" style="width: auto;">测试连接</button>
+                                        <button type="button" id="webdavUploadBtn" class="sidebar-button small-button" style="width: auto;">上传到云端</button>
+                                        <button type="button" id="webdavDownloadBtn" class="sidebar-button small-button" style="width: auto;">从云端恢复</button>
+                                    </div>
+                                        <small id="webdavSyncStatusText" style="color: var(--text-secondary); margin-top: 8px; display: block;">
+                                        提示：同步会覆盖核心 AppData 数据、VCPDistributedServer 配置，以及已纳入范围的 VCPToolBox 数据，建议先测试连接，再手动上传或恢复。
+                                        </small>
                                 </div>
                             </div>
 

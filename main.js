@@ -39,6 +39,8 @@ const emoticonHandlers = require('./modules/ipc/emoticonHandlers'); // Import em
 const forumHandlers = require('./modules/ipc/forumHandlers'); // Import forum handlers
 const memoHandlers = require('./modules/ipc/memoHandlers'); // Import memo handlers
 const ragHandlers = require('./modules/ipc/ragHandlers'); // Import RAG handlers
+const webdavSyncHandlers = require('./modules/ipc/webdavSyncHandlers'); // Import WebDAV sync handlers
+const webdavSyncManager = require('./modules/webdavSyncManager'); // WebDAV sync manager
 // speechRecognizer is now lazy-loaded
 const canvasHandlers = require('./modules/ipc/canvasHandlers'); // Import canvas handlers
 const desktopHandlers = require('./modules/ipc/desktopHandlers'); // Import VCPdesktop handlers
@@ -500,6 +502,7 @@ if (!gotTheLock) {
         agentConfigManager.startCleanupTimer(); // Start agent config cleanup
 
         settingsHandlers.initialize({ SETTINGS_FILE, USER_AVATAR_FILE, AGENT_DIR, settingsManager: appSettingsManager, agentConfigManager }); // Initialize settings handlers
+        webdavSyncHandlers.initialize({ projectRoot: PROJECT_ROOT });
         ragHandlers.initialize({ mainWindow, openChildWindows, settingsManager: appSettingsManager, SETTINGS_FILE });
 
         // RAG 独立模式：不创建主窗口，仅初始化 RAG 所需 IPC 并直接打开 RAG 窗口
@@ -949,6 +952,19 @@ if (!gotTheLock) {
         desktopHandlers.initialize({ mainWindow, openChildWindows, settingsManager: appSettingsManager });
         desktopRemoteHandlers.initialize({ mainWindow });
         promptHandlers.initialize({ AGENT_DIR, APP_DATA_ROOT_IN_PROJECT });
+
+        (async () => {
+            try {
+                const settings = await appSettingsManager.readSettings();
+                if (settings.webdavSyncEnabled && settings.webdavSyncAutoDownload && settings.webdavSyncBaseUrl) {
+                    console.log('[Main] WebDAV auto-download enabled. Syncing from cloud...');
+                    const result = await webdavSyncManager.downloadAppData(settings, PROJECT_ROOT);
+                    console.log('[Main] WebDAV auto-download complete:', result.message);
+                }
+            } catch (error) {
+                console.warn('[Main] WebDAV auto-download skipped or failed:', error.message);
+            }
+        })();
 
         ipcMain.on('minimize-to-tray', () => {
             if (mainWindow) {

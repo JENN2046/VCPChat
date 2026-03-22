@@ -111,6 +111,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     saveUserAvatar: (avatarData) => ipcRenderer.invoke('save-user-avatar', avatarData), // New for user avatar
     saveAvatarColor: (data) => ipcRenderer.invoke('save-avatar-color', data), // {type, id, color}
+    webdavSyncTestConnection: (config) => ipcRenderer.invoke('webdav-sync:test-connection', config),
+    webdavSyncUpload: (config) => ipcRenderer.invoke('webdav-sync:upload', config),
+    webdavSyncDownload: (config) => ipcRenderer.invoke('webdav-sync:download', config),
 
     // Agents
     getAgents: () => ipcRenderer.invoke('get-agents'),

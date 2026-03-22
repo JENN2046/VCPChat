@@ -12,7 +12,8 @@ contextBridge.exposeInMainWorld('electron', {
         // whitelist channels
         let validChannels = [
             'open-music-window',
-            'music-track-changed', 'music-renderer-ready'
+            'music-track-changed', 'music-renderer-ready',
+            'music-remote-command'
         ];
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, data);
@@ -94,6 +95,7 @@ contextBridge.exposeInMainWorld('electron', {
             'music-files', 'music-scan-start', 'music-scan-progress', 'music-scan-complete',
             'audio-engine-error', // 用于接收来自主进程的引擎错误通知
             'music-set-track', // 用于从主进程设置当前曲目
+            'music-control', // 跨窗口音乐控制命令（桌面widget → 主进程 → 音乐窗口）
             'webdav-scan-progress' // WebDAV 扫描进度
         ];
         if (validChannels.includes(channel)) {
@@ -236,6 +238,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onVCPLogMessage: (callback) => ipcRenderer.on('vcp-log-message', (_event, value) => callback(value)),
     onVCPLogStatus: (callback) => ipcRenderer.on('vcp-log-status', (_event, value) => callback(value)),
     sendVCPLogMessage: (data) => ipcRenderer.send('send-vcplog-message', data),
+
+    // RAG 悬浮通知窗（附属于监听器窗口）
+    ragOverlayShow: (payload) => ipcRenderer.send('rag-overlay-show', payload),
+    ragOverlayHide: () => ipcRenderer.send('rag-overlay-hide'),
+    ragOverlaySetEnabled: (enabled) => ipcRenderer.send('rag-overlay-set-enabled', enabled),
+    ragOverlaySetOpacity: (opacity) => ipcRenderer.send('rag-overlay-set-opacity', opacity),
+    ragOverlaySetPassThrough: (passThrough) => ipcRenderer.send('rag-overlay-set-pass-through', passThrough),
+    ragOverlayResize: (payload) => ipcRenderer.send('rag-overlay-resize', payload),
+    ragOverlayGetBounds: () => ipcRenderer.invoke('rag-overlay-get-bounds'),
+    ragOverlayGetState: () => ipcRenderer.invoke('rag-overlay-get-state'),
+    sendRagOverlayApprovalAction: (payload) => ipcRenderer.send('rag-overlay-approval-action', payload),
+    onRagOverlayPayload: (callback) => ipcRenderer.on('rag-overlay-payload', (_event, payload) => callback(payload)),
+    onRagOverlayPassThroughChanged: (callback) => ipcRenderer.on('rag-overlay-pass-through-changed', (_event, payload) => callback(payload)),
+    onRagOverlayApprovalAction: (callback) => ipcRenderer.on('rag-overlay-approval-action', (_event, payload) => callback(payload)),
 
     // Clipboard functions
     readImageFromClipboard: async () => {
@@ -384,6 +400,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     loadMemoConfig: () => ipcRenderer.invoke('load-memo-config'),
     saveMemoConfig: (config) => ipcRenderer.invoke('save-memo-config', config),
 
+    // Music Module
+    openMusicWindow: () => ipcRenderer.send('open-music-window'),
+
     // Canvas Module
     openCanvasWindow: () => ipcRenderer.invoke('open-canvas-window'),
     canvasReady: () => ipcRenderer.send('canvas-ready'),
@@ -407,6 +426,61 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Flowlock Control - for AI to control flowlock like a human user
     onFlowlockCommand: (callback) => ipcRenderer.on('flowlock-command', (_event, data) => callback(data)),
     sendFlowlockResponse: (data) => ipcRenderer.send('flowlock-response', data),
+
+    // VCPdesktop - 桌面画布 IPC 通道
+    desktopPush: (data) => ipcRenderer.send('desktop-push', data),
+    onDesktopPush: (callback) => ipcRenderer.on('desktop-push-to-canvas', (_event, data) => callback(data)),
+    onDesktopStatus: (callback) => ipcRenderer.on('desktop-status', (_event, data) => callback(data)),
+    openDesktopWindow: () => ipcRenderer.invoke('open-desktop-window'),
+
+    // VCPdesktop - 桌面远程控制 IPC 通道 (DesktopRemote 插件)
+    onDesktopRemoteSetWallpaper: (callback) => ipcRenderer.on('desktop-remote-set-wallpaper', (_event, data) => callback(data)),
+    onDesktopRemoteQuery: (callback) => ipcRenderer.on('desktop-remote-query', (_event) => callback()),
+    sendDesktopRemoteQueryResponse: (data) => ipcRenderer.send('desktop-remote-query-response', data),
+    onDesktopRemoteViewSource: (callback) => ipcRenderer.on('desktop-remote-view-source', (_event, data) => callback(data)),
+    sendDesktopRemoteViewSourceResponse: (data) => ipcRenderer.send('desktop-remote-view-source-response', data),
+    onDesktopRemoteCreateWidget: (callback) => ipcRenderer.on('desktop-remote-create-widget', (_event, data) => callback(data)),
+    sendDesktopRemoteCreateWidgetResponse: (data) => ipcRenderer.send('desktop-remote-create-widget-response', data),
+
+    // VCPdesktop - 收藏系统 IPC 通道
+    desktopSaveWidget: (data) => ipcRenderer.invoke('desktop-save-widget', data),
+    desktopLoadWidget: (id) => ipcRenderer.invoke('desktop-load-widget', id),
+    desktopDeleteWidget: (id) => ipcRenderer.invoke('desktop-delete-widget', id),
+    desktopListWidgets: () => ipcRenderer.invoke('desktop-list-widgets'),
+    desktopCaptureWidget: (rect) => ipcRenderer.invoke('desktop-capture-widget', rect),
+    desktopGetCredentials: () => ipcRenderer.invoke('desktop-get-credentials'),
+
+    // VCPdesktop - 快捷方式系统 IPC 通道
+    desktopShortcutParse: (filePath) => ipcRenderer.invoke('desktop-shortcut-parse', filePath),
+    desktopShortcutParseBatch: (filePaths) => ipcRenderer.invoke('desktop-shortcut-parse-batch', filePaths),
+    desktopShortcutLaunch: (shortcutData) => ipcRenderer.invoke('desktop-shortcut-launch', shortcutData),
+    desktopScanShortcuts: () => ipcRenderer.invoke('desktop-scan-shortcuts'),
+
+    // VCPdesktop - Dock 持久化 IPC 通道
+    desktopSaveDock: (dockData) => ipcRenderer.invoke('desktop-save-dock', dockData),
+    desktopLoadDock: () => ipcRenderer.invoke('desktop-load-dock'),
+
+    // VCPdesktop - 布局持久化 IPC 通道
+    desktopSaveLayout: (layoutData) => ipcRenderer.invoke('desktop-save-layout', layoutData),
+    desktopLoadLayout: () => ipcRenderer.invoke('desktop-load-layout'),
+
+    // VCPdesktop - 图标集系统 IPC 通道
+    desktopIconsetListPresets: () => ipcRenderer.invoke('desktop-iconset-list-presets'),
+    desktopIconsetListIcons: (params) => ipcRenderer.invoke('desktop-iconset-list-icons', params),
+    desktopIconsetGetIconData: (relativePath) => ipcRenderer.invoke('desktop-iconset-get-icon-data', relativePath),
+
+    // VCPdesktop - VChat 内部应用启动 IPC 通道
+    desktopLaunchVchatApp: (appAction) => ipcRenderer.invoke('desktop-launch-vchat-app', appAction),
+
+    // VCPdesktop - 壁纸系统 IPC 通道
+    desktopSelectWallpaper: () => ipcRenderer.invoke('desktop-select-wallpaper'),
+    desktopReadWallpaperThumbnail: (filePath) => ipcRenderer.invoke('desktop-read-wallpaper-thumbnail', filePath),
+
+    // VCPdesktop - 窗口置底控制
+    setAlwaysOnBottom: (enabled) => ipcRenderer.invoke('desktop-set-always-on-bottom', enabled),
+
+    // VCPdesktop - 打开 Windows 系统工具
+    desktopOpenSystemTool: (cmd) => ipcRenderer.invoke('desktop-open-system-tool', cmd),
 });
 
 // Log the electronAPI object as it's defined in preload.js right after exposing it
@@ -427,7 +501,11 @@ const electronAPIForLogging = {
     saveTopicOrder: "function",
     sendToVCP: "function", onVCPStreamChunk: "function",
     connectVCPLog: "function", disconnectVCPLog: "function", onVCPLogMessage: "function",
-    onVCPLogStatus: "function", readImageFromClipboard: "function", readTextFromClipboard: "function",
+    onVCPLogStatus: "function", ragOverlayShow: "function", ragOverlayHide: "function",
+    ragOverlaySetOpacity: "function", ragOverlaySetPassThrough: "function", ragOverlayResize: "function",
+    ragOverlayGetBounds: "function", sendRagOverlayApprovalAction: "function", onRagOverlayPayload: "function",
+    onRagOverlayPassThroughChanged: "function", onRagOverlayApprovalAction: "function",
+    readImageFromClipboard: "function", readTextFromClipboard: "function",
     minimizeWindow: "function", maximizeWindow: "function", unmaximizeWindow: "function", closeWindow: "function",
     openDevTools: "function",
     openAdminPanel: "function",

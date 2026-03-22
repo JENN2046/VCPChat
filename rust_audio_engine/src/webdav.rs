@@ -19,12 +19,26 @@ pub enum WebDavError {
 }
 
 /// WebDAV server configuration
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+///
+/// FIX for Defect 10: Custom Debug impl to mask password in log output.
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct WebDavConfig {
     /// Base URL, e.g. "https://nas.local/music" (no trailing slash)
     pub base_url: String,
     pub username: Option<String>,
+    /// P1-7 fix: Skip serializing password to prevent accidental exposure in JSON responses/logs
+    #[serde(skip_serializing)]
     pub password: Option<String>,
+}
+
+impl std::fmt::Debug for WebDavConfig {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("WebDavConfig")
+            .field("base_url", &self.base_url)
+            .field("username", &self.username)
+            .field("password", &self.password.as_ref().map(|_| "********"))
+            .finish()
+    }
 }
 
 /// A single entry returned by PROPFIND
@@ -192,7 +206,6 @@ fn parse_propfind_response(xml: &str, base_url: &str) -> Result<Vec<DavEntry>, W
         match reader.read_event_into(&mut buf) {
             Ok(Event::Start(ref e)) => {
                 let local = local_name(e.name().as_ref());
-                current_tag = local.clone();
                 match local.as_str() {
                     "response" => {
                         in_response = true;
@@ -207,6 +220,8 @@ fn parse_propfind_response(xml: &str, base_url: &str) -> Result<Vec<DavEntry>, W
                     }
                     _ => {}
                 }
+                // N-2 fix: move `local` into `current_tag` instead of cloning
+                current_tag = local;
             }
             Ok(Event::Empty(ref e)) => {
                 let local = local_name(e.name().as_ref());

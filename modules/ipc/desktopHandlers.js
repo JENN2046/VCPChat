@@ -16,6 +16,9 @@ let appSettingsManager = null;
 let alwaysOnBottomEnabled = false;
 let alwaysOnBottomInterval = null;
 
+// --- 独立 Electron App 子进程引用（防止重复启动） ---
+const standaloneAppProcesses = new Map(); // appDir -> child_process
+
 // --- VChat 内部子窗口单例引用 ---
 let vchatForumWindow = null;
 let vchatMemoWindow = null;
@@ -29,6 +32,159 @@ const DESKTOP_WIDGETS_DIR = path.join(PROJECT_ROOT, 'AppData', 'DesktopWidgets')
 const DESKTOP_DATA_DIR = path.join(PROJECT_ROOT, 'AppData', 'DesktopData');
 const DOCK_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'dock.json');
 const LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
+const CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
+
+/**
+ * 自动生成 CATALOG.md —— 收藏挂件目录索引
+ *
+ * 遍历 DesktopWidgets 目录中所有子文件夹，读取 meta.json，
+ * 生成一份人类可读的 Markdown 文档，方便 AI 或用户通过 list 指令
+ * 快速了解每个文件夹对应的插件名称和内部文件结构。
+ *
+ * 该函数在以下时机自动调用：
+ *   - 保存/更新收藏后 (desktop-save-widget)
+ *   - 删除收藏后 (desktop-delete-widget)
+ *   - 初始化时 (initialize)
+ */
+async function generateCatalog() {
+    try {
+        await fs.ensureDir(DESKTOP_WIDGETS_DIR);
+        const entries = await fs.readdir(DESKTOP_WIDGETS_DIR, { withFileTypes: true });
+
+        // 收集所有 widget 信息
+        const widgets = [];
+        for (const entry of entries) {
+            if (!entry.isDirectory()) continue;
+
+            const widgetDir = path.join(DESKTOP_WIDGETS_DIR, entry.name);
+            const metaPath = path.join(widgetDir, 'meta.json');
+
+            let meta = { id: entry.name, name: entry.name };
+            if (await fs.pathExists(metaPath)) {
+                try {
+                    meta = await fs.readJson(metaPath);
+                } catch (e) { /* ignore */ }
+            }
+
+            // 递归收集文件树
+            const fileTree = await collectFileTree(widgetDir, '');
+
+            widgets.push({
+                dirName: entry.name,
+                name: meta.name || entry.name,
+                id: meta.id || entry.name,
+                createdAt: meta.createdAt,
+                updatedAt: meta.updatedAt,
+                fileTree,
+            });
+        }
+
+        // 按名称排序
+        widgets.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'zh-CN'));
+
+        // 生成 Markdown 内容
+        const lines = [];
+        lines.push('# 📦 桌面挂件收藏目录 (CATALOG)');
+        lines.push('');
+        lines.push('> 此文件由系统自动生成和维护，请勿手动编辑。');
+        lines.push(`> 最后更新: ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`);
+        lines.push('');
+        lines.push(`共 **${widgets.length}** 个收藏挂件。`);
+        lines.push('');
+
+        if (widgets.length > 0) {
+            // 快速索引表
+            lines.push('## 📋 快速索引');
+            lines.push('');
+            lines.push('| # | 收藏名称 | 文件夹 ID | 创建时间 | 更新时间 |');
+            lines.push('|---|---------|----------|---------|---------|');
+            widgets.forEach((w, i) => {
+                const created = w.createdAt ? new Date(w.createdAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) : '未知';
+                const updated = w.updatedAt ? new Date(w.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) : '未知';
+                lines.push(`| ${i + 1} | **${w.name}** | \`${w.dirName}\` | ${created} | ${updated} |`);
+            });
+            lines.push('');
+
+            // 详细文件树
+            lines.push('## 📂 详细文件树');
+            lines.push('');
+            for (const w of widgets) {
+                lines.push(`### ${w.name}`);
+                lines.push('');
+                lines.push(`- **文件夹**: \`${w.dirName}/\``);
+                lines.push(`- **收藏 ID**: \`${w.id}\``);
+                if (w.createdAt) {
+                    lines.push(`- **创建时间**: ${new Date(w.createdAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`);
+                }
+                if (w.updatedAt) {
+                    lines.push(`- **更新时间**: ${new Date(w.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`);
+                }
+                lines.push('');
+                lines.push('```');
+                lines.push(`${w.dirName}/`);
+                for (const file of w.fileTree) {
+                    lines.push(`  ${file}`);
+                }
+                lines.push('```');
+                lines.push('');
+            }
+        }
+
+        await fs.writeFile(CATALOG_PATH, lines.join('\n'), 'utf-8');
+        console.log(`[DesktopHandlers] CATALOG.md updated (${widgets.length} widgets)`);
+    } catch (err) {
+        console.error('[DesktopHandlers] Failed to generate CATALOG.md:', err);
+    }
+}
+
+/**
+ * 递归收集目录下的文件列表（相对路径）
+ * @param {string} dirPath - 绝对目录路径
+ * @param {string} prefix - 当前递归前缀（用于缩进显示）
+ * @returns {Promise<string[]>} 文件路径列表
+ */
+async function collectFileTree(dirPath, prefix) {
+    const result = [];
+    try {
+        const entries = await fs.readdir(dirPath, { withFileTypes: true });
+        // 排序：目录在前，文件在后
+        entries.sort((a, b) => {
+            if (a.isDirectory() && !b.isDirectory()) return -1;
+            if (!a.isDirectory() && b.isDirectory()) return 1;
+            return a.name.localeCompare(b.name);
+        });
+
+        for (const entry of entries) {
+            if (entry.name === 'CATALOG.md') continue; // 跳过自身
+            if (entry.isDirectory()) {
+                result.push(`${prefix}${entry.name}/`);
+                const subFiles = await collectFileTree(path.join(dirPath, entry.name), prefix + '  ');
+                result.push(...subFiles);
+            } else {
+                // 附加文件大小信息
+                try {
+                    const stat = await fs.stat(path.join(dirPath, entry.name));
+                    const sizeStr = formatFileSize(stat.size);
+                    result.push(`${prefix}${entry.name}  (${sizeStr})`);
+                } catch (e) {
+                    result.push(`${prefix}${entry.name}`);
+                }
+            }
+        }
+    } catch (e) { /* ignore */ }
+    return result;
+}
+
+/**
+ * 格式化文件大小
+ * @param {number} bytes
+ * @returns {string}
+ */
+function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 /**
  * 检测图标是否有效（非空白/非全透明）
@@ -229,6 +385,84 @@ async function launchSystemTool(cmd) {
 }
 
 /**
+ * 启动独立的 Electron App（如人类工具箱、VchatManager）
+ * 这些应用是项目内的独立 Electron 入口，拥有各自的 main.js。
+ * 通过 child_process.spawn 启动一个新的 electron 实例。
+ *
+ * @param {string} appDir - 应用目录名（相对于项目根目录，如 'VCPHumanToolBox'）
+ * @param {string} displayName - 显示名称（用于日志和状态提示）
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+async function launchStandaloneElectronApp(appDir, displayName) {
+    try {
+        const appPath = path.join(PROJECT_ROOT, appDir);
+        const mainJsPath = path.join(appPath, 'main.js');
+
+        // 检查目录和入口文件是否存在
+        if (!await fs.pathExists(mainJsPath)) {
+            console.error(`[DesktopHandlers] Standalone app not found: ${mainJsPath}`);
+            return { success: false, error: `${displayName} 入口文件不存在: ${appDir}/main.js` };
+        }
+
+        // 检查是否已有该应用的进程在运行
+        const existingProcess = standaloneAppProcesses.get(appDir);
+        if (existingProcess && !existingProcess.killed) {
+            // 进程存在，检查是否还活着
+            try {
+                process.kill(existingProcess.pid, 0); // 发送信号 0 检测进程是否存活
+                console.log(`[DesktopHandlers] ${displayName} already running (PID: ${existingProcess.pid})`);
+                return { success: true, alreadyRunning: true };
+            } catch (e) {
+                // 进程已退出，清理引用
+                standaloneAppProcesses.delete(appDir);
+            }
+        }
+
+        // 获取当前 Electron 可执行文件路径
+        const electronExe = process.execPath;
+
+        console.log(`[DesktopHandlers] Launching standalone app: ${displayName}`);
+        console.log(`[DesktopHandlers]   Electron: ${electronExe}`);
+        console.log(`[DesktopHandlers]   App path: ${appPath}`);
+
+        // 使用 spawn 启动独立的 electron 进程
+        const { spawn } = require('child_process');
+        const child = spawn(electronExe, [mainJsPath], {
+            cwd: appPath,
+            detached: true,       // 独立进程，不随父进程退出
+            stdio: 'ignore',      // 不继承标准IO
+            env: {
+                ...process.env,
+                // 确保子进程知道项目根目录
+                VCP_PROJECT_ROOT: PROJECT_ROOT,
+            },
+        });
+
+        // 解除父进程对子进程的引用，允许子进程独立运行
+        child.unref();
+
+        // 记录进程引用（用于防止重复启动）
+        standaloneAppProcesses.set(appDir, child);
+
+        child.on('exit', (code) => {
+            console.log(`[DesktopHandlers] ${displayName} exited with code ${code}`);
+            standaloneAppProcesses.delete(appDir);
+        });
+
+        child.on('error', (err) => {
+            console.error(`[DesktopHandlers] ${displayName} process error:`, err.message);
+            standaloneAppProcesses.delete(appDir);
+        });
+
+        console.log(`[DesktopHandlers] ${displayName} launched successfully (PID: ${child.pid})`);
+        return { success: true };
+    } catch (err) {
+        console.error(`[DesktopHandlers] Failed to launch ${displayName}:`, err);
+        return { success: false, error: err.message };
+    }
+}
+
+/**
  * 初始化桌面处理模块
  */
 function initialize(params) {
@@ -240,6 +474,11 @@ function initialize(params) {
     // 确保目录存在
     fs.ensureDirSync(DESKTOP_WIDGETS_DIR);
     fs.ensureDirSync(DESKTOP_DATA_DIR);
+
+    // 启动时生成/更新 CATALOG.md
+    generateCatalog().catch(err => {
+        console.warn('[DesktopHandlers] Initial CATALOG.md generation failed:', err.message);
+    });
 
     // --- IPC: 打开桌面窗口 ---
     ipcMain.handle('open-desktop-window', async () => {
@@ -304,9 +543,140 @@ function initialize(params) {
             }
 
             console.log(`[DesktopHandlers] Widget saved: ${name} (${id}) to ${widgetDir}`);
+
+            // 保存成功后异步更新 CATALOG.md（不阻塞返回）
+            generateCatalog().catch(err => {
+                console.warn('[DesktopHandlers] CATALOG.md update after save failed:', err.message);
+            });
+
             return { success: true, id };
         } catch (err) {
             console.error('[DesktopHandlers] Save widget error:', err);
+            return { success: false, error: err.message };
+        }
+    });
+
+    /**
+     * 保存额外文件到收藏目录（用于 AI 生成的多文件 widget）
+     * 允许 AI 将外部 JS/CSS/资源文件保存到 widget 收藏目录中。
+     * 参数：{ widgetId, fileName, content, encoding }
+     * - widgetId: 收藏 ID（目录名）
+     * - fileName: 文件名（如 'app.js', 'style.css'，不允许路径穿越）
+     * - content: 文件内容（字符串）
+     * - encoding: 编码方式，默认 'utf-8'，也支持 'base64'
+     */
+    ipcMain.handle('desktop-save-widget-file', async (event, data) => {
+        try {
+            const { widgetId, fileName, content, encoding } = data;
+            if (!widgetId || !fileName || content === undefined) {
+                return { success: false, error: '缺少必要参数 (widgetId, fileName, content)' };
+            }
+
+            // 安全检查：防止路径穿越
+            const safeName = path.basename(fileName);
+            if (safeName !== fileName || fileName.includes('..')) {
+                return { success: false, error: `不安全的文件名: ${fileName}` };
+            }
+
+            // 禁止覆盖核心文件
+            const protectedFiles = ['meta.json', 'widget.html', 'thumbnail.png'];
+            if (protectedFiles.includes(safeName.toLowerCase())) {
+                return { success: false, error: `不允许覆盖核心文件: ${safeName}` };
+            }
+
+            const widgetDir = path.join(DESKTOP_WIDGETS_DIR, widgetId);
+            await fs.ensureDir(widgetDir);
+
+            const filePath = path.join(widgetDir, safeName);
+            const enc = encoding === 'base64' ? 'base64' : 'utf-8';
+            await fs.writeFile(filePath, content, enc);
+
+            console.log(`[DesktopHandlers] Widget file saved: ${widgetId}/${safeName} (${enc})`);
+            return { success: true, filePath: `${widgetId}/${safeName}` };
+        } catch (err) {
+            console.error('[DesktopHandlers] Save widget file error:', err);
+            return { success: false, error: err.message };
+        }
+    });
+
+    /**
+     * 读取收藏目录中的额外文件
+     * 参数：{ widgetId, fileName }
+     * 返回：{ success, content, encoding }
+     */
+    ipcMain.handle('desktop-load-widget-file', async (event, data) => {
+        try {
+            const { widgetId, fileName } = data;
+            if (!widgetId || !fileName) {
+                return { success: false, error: '缺少必要参数' };
+            }
+
+            // 安全检查
+            const safeName = path.basename(fileName);
+            if (safeName !== fileName || fileName.includes('..')) {
+                return { success: false, error: `不安全的文件名: ${fileName}` };
+            }
+
+            const filePath = path.join(DESKTOP_WIDGETS_DIR, widgetId, safeName);
+            if (!await fs.pathExists(filePath)) {
+                return { success: false, error: '文件不存在' };
+            }
+
+            // 根据扩展名判断是否为文本文件
+            const ext = path.extname(safeName).toLowerCase();
+            const textExts = ['.js', '.css', '.html', '.htm', '.json', '.txt', '.md', '.svg', '.xml'];
+            if (textExts.includes(ext)) {
+                const content = await fs.readFile(filePath, 'utf-8');
+                return { success: true, content, encoding: 'utf-8' };
+            } else {
+                // 二进制文件返回 base64
+                const buffer = await fs.readFile(filePath);
+                return { success: true, content: buffer.toString('base64'), encoding: 'base64' };
+            }
+        } catch (err) {
+            console.error('[DesktopHandlers] Load widget file error:', err);
+            return { success: false, error: err.message };
+        }
+    });
+
+    /**
+     * 列出收藏目录中的所有文件
+     * 参数：widgetId
+     * 返回：{ success, files: [{ name, size, isText }] }
+     */
+    ipcMain.handle('desktop-list-widget-files', async (event, widgetId) => {
+        try {
+            if (!widgetId) {
+                return { success: false, error: '缺少 widgetId' };
+            }
+
+            const widgetDir = path.join(DESKTOP_WIDGETS_DIR, widgetId);
+            if (!await fs.pathExists(widgetDir)) {
+                return { success: true, files: [] };
+            }
+
+            const entries = await fs.readdir(widgetDir, { withFileTypes: true });
+            const files = [];
+            const textExts = ['.js', '.css', '.html', '.htm', '.json', '.txt', '.md', '.svg', '.xml'];
+
+            for (const entry of entries) {
+                if (!entry.isFile()) continue;
+                const ext = path.extname(entry.name).toLowerCase();
+                try {
+                    const stat = await fs.stat(path.join(widgetDir, entry.name));
+                    files.push({
+                        name: entry.name,
+                        size: stat.size,
+                        isText: textExts.includes(ext),
+                    });
+                } catch (e) {
+                    files.push({ name: entry.name, size: 0, isText: textExts.includes(ext) });
+                }
+            }
+
+            return { success: true, files };
+        } catch (err) {
+            console.error('[DesktopHandlers] List widget files error:', err);
             return { success: false, error: err.message };
         }
     });
@@ -346,6 +716,12 @@ function initialize(params) {
                 await fs.remove(widgetDir);
                 console.log(`[DesktopHandlers] Widget deleted: ${id}`);
             }
+
+            // 删除成功后异步更新 CATALOG.md（不阻塞返回）
+            generateCatalog().catch(err => {
+                console.warn('[DesktopHandlers] CATALOG.md update after delete failed:', err.message);
+            });
+
             return { success: true };
         } catch (err) {
             console.error('[DesktopHandlers] Delete widget error:', err);
@@ -1320,6 +1696,14 @@ function initialize(params) {
                     return { success: true };
                 }
 
+                case 'launch-human-toolbox': {
+                    return await launchStandaloneElectronApp('VCPHumanToolBox', '人类工具箱');
+                }
+
+                case 'launch-vchat-manager': {
+                    return await launchStandaloneElectronApp('VchatManager', 'VchatManager');
+                }
+
                 default: {
                     // 处理系统工具启动：appAction 格式为 'open-system-tool:命令'
                     if (appAction && appAction.startsWith('open-system-tool:')) {
@@ -1684,4 +2068,5 @@ module.exports = {
     openDesktopWindow,
     pushToDesktop,
     getDesktopWindow,
+    generateCatalog,
 };

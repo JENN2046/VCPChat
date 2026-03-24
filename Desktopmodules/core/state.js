@@ -28,6 +28,8 @@
         // 上次载入的预设ID（用于桌面右键菜单"保存当前预设"功能的检测）
         lastLoadedPresetId: null,
         lastLoadedPresetName: null,
+        // 桌面锁定状态（锁定后挂件不可拖拽、不显示关闭按钮和抓手条）
+        desktopLocked: false,
         // 全局设置
         globalSettings: {
             autoMaximize: false,     // 打开桌面时自动最大化
@@ -39,6 +41,10 @@
                 iconSize: 32,        // Dock 栏图标大小 (px)
                 position: 'bottom',  // Dock 栏位置：'top' | 'bottom' | 'left' | 'right'
                 edgeDistance: 12,     // Dock 栏距边缘距离 (px)
+            },
+            desktopIcon: {
+                gridSnap: false,     // 桌面图标网格对齐
+                iconSize: 40,        // 桌面图标大小 (px)，默认 40
             },
             wallpaper: {
                 enabled: false,          // 是否启用自定义壁纸

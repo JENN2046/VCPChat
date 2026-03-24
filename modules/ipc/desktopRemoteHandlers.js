@@ -190,6 +190,8 @@ async function handleDesktopRemoteControl(commandPayload) {
             return await _handleSetWallpaper(commandPayload, desktopWin);
         } else if (command === 'QueryDesktop') {
             return await _handleQueryDesktop(desktopWin);
+        } else if (command === 'QueryDock') {
+            return await _handleQueryDock(desktopWin);
         } else if (command === 'ViewWidgetSource') {
             return await _handleViewWidgetSource(commandPayload, desktopWin);
         } else if (command === 'CreateWidget') {
@@ -361,6 +363,100 @@ async function _handleQueryDesktop(desktopWin) {
 }
 
 // ============================================================
+// 内部实现：QueryDock
+// ============================================================
+
+async function _handleQueryDock(desktopWin) {
+    if (!desktopWin || desktopWin.isDestroyed()) {
+        const mdReport = `### Dock 应用列表报告\n\n` +
+            `**桌面窗口状态**: ❌ 未打开\n\n` +
+            `桌面画布窗口当前未启动，无法查询 Dock 应用列表。`;
+        return {
+            status: 'success',
+            result: { content: [{ type: 'text', text: mdReport }] }
+        };
+    }
+
+    return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            ipcMain.removeListener('desktop-remote-query-dock-response', responseHandler);
+            reject(new Error('查询 Dock 应用列表超时。'));
+        }, 5000);
+
+        const responseHandler = (event, responseData) => {
+            clearTimeout(timeout);
+            ipcMain.removeListener('desktop-remote-query-dock-response', responseHandler);
+
+            if (responseData.success) {
+                const dockItems = responseData.dockItems || [];
+                const vchatApps = responseData.vchatApps || [];
+                const systemTools = responseData.systemTools || [];
+                const builtinWidgets = responseData.builtinWidgets || [];
+
+                let mdReport = `### Dock 应用列表报告\n\n**桌面窗口状态**: ✅ 已打开\n\n`;
+
+                // Dock 中的用户快捷方式
+                mdReport += `#### Dock 快捷方式 (${dockItems.length}个)\n\n`;
+                if (dockItems.length === 0) {
+                    mdReport += `*Dock 中没有用户添加的快捷方式。*\n\n`;
+                } else {
+                    mdReport += `| 名称 | 类型 | 可见 | 启动方式 |\n|---|---|---|---|\n`;
+                    for (const item of dockItems) {
+                        const visible = item.visible !== false ? '✅' : '❌';
+                        let launchMethod = '';
+                        if (item.type === 'vchat-app') {
+                            launchMethod = `\`dock.launch({type:'vchat-app', appAction:'${item.appAction}'})\``;
+                        } else if (item.type === 'builtin') {
+                            launchMethod = `\`dock.launch({type:'builtin', builtinId:'${item.builtinId}'})\``;
+                        } else {
+                            launchMethod = `\`dock.launch({type:'shortcut', targetPath:'${item.targetPath}'})\``;
+                        }
+                        mdReport += `| ${item.name} | ${item.type || 'shortcut'} | ${visible} | ${launchMethod} |\n`;
+                    }
+                    mdReport += `\n`;
+                }
+
+                // VChat 内部应用（硬编码，始终可用）
+                mdReport += `#### VChat 内部应用 (${vchatApps.length}个，始终可用)\n\n`;
+                mdReport += `| 名称 | emoji | appAction | 启动代码 |\n|---|---|---|---|\n`;
+                for (const app of vchatApps) {
+                    mdReport += `| ${app.name} | ${app.emoji || '-'} | \`${app.appAction}\` | \`dock.launch({type:'vchat-app', appAction:'${app.appAction}'})\` |\n`;
+                }
+                mdReport += `\n`;
+
+                // 系统工具
+                mdReport += `#### Windows 系统工具 (${systemTools.length}个，始终可用)\n\n`;
+                mdReport += `| 名称 | emoji | appAction | 启动代码 |\n|---|---|---|---|\n`;
+                for (const tool of systemTools) {
+                    mdReport += `| ${tool.name} | ${tool.emoji || '-'} | \`${tool.appAction}\` | \`dock.launch({type:'vchat-app', appAction:'${tool.appAction}'})\` |\n`;
+                }
+                mdReport += `\n`;
+
+                // 内置挂件
+                mdReport += `#### 内置桌面挂件 (${builtinWidgets.length}个)\n\n`;
+                mdReport += `| 名称 | builtinId | 启动代码 |\n|---|---|---|\n`;
+                for (const w of builtinWidgets) {
+                    mdReport += `| ${w.name} | \`${w.builtinId}\` | \`dock.launch({type:'builtin', builtinId:'${w.builtinId}'})\` |\n`;
+                }
+                mdReport += `\n`;
+
+                mdReport += `---\n**提示**: 在 Widget 脚本中，所有启动操作都通过 \`window.VCPDesktop.dock.launch(item)\` 调用。`;
+
+                resolve({
+                    status: 'success',
+                    result: { content: [{ type: 'text', text: mdReport }] }
+                });
+            } else {
+                reject(new Error(responseData.error || '查询 Dock 应用列表失败。'));
+            }
+        };
+
+        ipcMain.on('desktop-remote-query-dock-response', responseHandler);
+        desktopWin.webContents.send('desktop-remote-query-dock');
+    });
+}
+
+// ============================================================
 // 内部实现：ViewWidgetSource
 // ============================================================
 
@@ -418,7 +514,7 @@ async function _handleViewWidgetSource(commandPayload, desktopWin) {
 
 /**
  * 远程创建桌面 Widget
- * 
+ *
  * 支持参数：
  *   - htmlContent (必需): Widget 的 HTML 内容
  *   - x (可选): 初始 X 坐标，默认 100
@@ -428,9 +524,10 @@ async function _handleViewWidgetSource(commandPayload, desktopWin) {
  *   - widgetId (可选): 自定义 widget ID，默认自动生成
  *   - autoSave (可选): 是否自动收藏，默认 false
  *   - saveName (可选): 收藏名称（当 autoSave 为 true 时使用）
+ *   - scriptCode (可选): 外部 JS 源码字符串，自动保存为 app.js
  */
 async function _handleCreateWidget(commandPayload, desktopWin) {
-    const { htmlContent, x, y, width, height, widgetId, autoSave, saveName } = commandPayload;
+    const { htmlContent, x, y, width, height, widgetId, autoSave, saveName, scriptCode } = commandPayload;
 
     if (!htmlContent) {
         throw new Error('htmlContent parameter is required for CreateWidget.');
@@ -458,22 +555,81 @@ async function _handleCreateWidget(commandPayload, desktopWin) {
     if (typeof width === 'number') options.width = width;
     if (typeof height === 'number') options.height = height;
 
+    // 如果有 scriptCode，需要先保存为 app.js，再将文件路径信息传递给渲染进程
+    let savedId = null;
+    let finalHtmlContent = htmlContent;
+    const hasScriptCode = typeof scriptCode === 'string' && scriptCode.trim().length > 0;
+
+    if (hasScriptCode) {
+        // 强制 autoSave，生成 savedId
+        savedId = `saved-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+        const widgetDir = path.join(PROJECT_ROOT, 'AppData', 'DesktopWidgets', savedId);
+        await fs.ensureDir(widgetDir);
+
+        // 保存 JS 代码为 app.js
+        const appJsPath = path.join(widgetDir, 'app.js');
+        await fs.writeFile(appJsPath, scriptCode, 'utf-8');
+        console.log(`[DesktopRemoteHandlers] Script file saved: ${savedId}/app.js`);
+
+        // 保存 widget.html
+        await fs.writeFile(path.join(widgetDir, 'widget.html'), htmlContent, 'utf-8');
+
+        // 保存 meta.json
+        const meta = {
+            id: savedId,
+            name: saveName || 'AI Widget',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        };
+        await fs.writeJson(path.join(widgetDir, 'meta.json'), meta, { spaces: 2 });
+
+        console.log(`[DesktopRemoteHandlers] Widget pre-saved with app.js: ${savedId}`);
+
+        // 构建 file:// URL，将 HTML 中 <script src="app.js"> 替换为绝对路径
+        const widgetDirUrl = `file:///${widgetDir.replace(/\\/g, '/')}`;
+        const appJsUrl = `${widgetDirUrl}/app.js`;
+
+        // 替换 <script src="app.js"> 为绝对路径
+        finalHtmlContent = finalHtmlContent.replace(
+            /(<script[^>]*\ssrc\s*=\s*)(["'])app\.js\2/gi,
+            `$1$2${appJsUrl}$2`
+        );
+        // 也处理无引号的情况
+        finalHtmlContent = finalHtmlContent.replace(
+            /(<script[^>]*\ssrc\s*=\s*)app\.js(\s|>)/gi,
+            `$1"${appJsUrl}"$2`
+        );
+
+        // 如果 HTML 中没有 <script src="app.js">，自动追加一个
+        if (!htmlContent.match(/<script[^>]*\ssrc\s*=\s*["']?app\.js/i)) {
+            // 在 </body> 或末尾追加
+            if (finalHtmlContent.includes('</body>')) {
+                finalHtmlContent = finalHtmlContent.replace('</body>', `<script src="${appJsUrl}"></script>\n</body>`);
+            } else {
+                finalHtmlContent += `\n<script src="${appJsUrl}"></script>`;
+            }
+            console.log(`[DesktopRemoteHandlers] Auto-appended <script src="app.js"> to HTML`);
+        }
+    }
+
     // 通过 IPC 向桌面窗口发送创建指令
-    // 使用与流式推送相同的协议：create → append → finalize
     return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
             ipcMain.removeListener('desktop-remote-create-widget-response', responseHandler);
-            // 即使超时也认为可能成功（widget 创建是单向的）
+            let timeoutReport = `### 挂件创建完成\n\n` +
+                `- **挂件ID**: \`${finalWidgetId}\`\n` +
+                `- **位置**: (${options.x || 100}, ${options.y || 100})\n` +
+                `- **尺寸**: ${options.width || 320} × ${options.height || 200}\n` +
+                `- **状态**: 已推送到桌面（响应超时，可能已创建成功）`;
+            if (hasScriptCode) {
+                timeoutReport += `\n- **外部脚本**: \`app.js\` 已保存`;
+            }
             resolve({
                 status: 'success',
                 result: {
                     content: [{
                         type: 'text',
-                        text: `### 挂件创建完成\n\n` +
-                            `- **挂件ID**: \`${finalWidgetId}\`\n` +
-                            `- **位置**: (${options.x || 100}, ${options.y || 100})\n` +
-                            `- **尺寸**: ${options.width || 320} × ${options.height || 200}\n` +
-                            `- **状态**: 已推送到桌面（响应超时，可能已创建成功）`
+                        text: timeoutReport
                     }]
                 }
             });
@@ -489,9 +645,16 @@ async function _handleCreateWidget(commandPayload, desktopWin) {
                     `- **位置**: (${options.x || 100}, ${options.y || 100})\n` +
                     `- **尺寸**: ${options.width || 320} × ${options.height || 200}\n`;
 
-                if (responseData.savedId) {
-                    mdReport += `- **收藏状态**: ⭐ 已自动收藏为 "${responseData.savedName}"\n`;
-                    mdReport += `- **持久化目录**: \`AppData/DesktopWidgets/${responseData.savedId}\`\n`;
+                const finalSavedId = savedId || responseData.savedId;
+                const finalSavedName = saveName || responseData.savedName;
+
+                if (finalSavedId) {
+                    mdReport += `- **收藏状态**: ⭐ 已自动收藏为 "${finalSavedName}"\n`;
+                    mdReport += `- **持久化目录**: \`AppData/DesktopWidgets/${finalSavedId}\`\n`;
+                }
+
+                if (hasScriptCode) {
+                    mdReport += `- **外部脚本**: \`app.js\`\n`;
                 }
 
                 mdReport += `\n*挂件已成功创建并渲染在桌面画布上。*`;
@@ -512,10 +675,11 @@ async function _handleCreateWidget(commandPayload, desktopWin) {
         // 发送创建指令到桌面渲染进程
         targetWin.webContents.send('desktop-remote-create-widget', {
             widgetId: finalWidgetId,
-            htmlContent,
+            htmlContent: finalHtmlContent,
             options,
-            autoSave: !!autoSave,
-            saveName: saveName || null,
+            autoSave: hasScriptCode ? true : !!autoSave,
+            saveName: saveName || (hasScriptCode ? 'AI Widget' : null),
+            preSavedId: savedId || null,
         });
     });
 }

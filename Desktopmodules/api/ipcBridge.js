@@ -157,6 +157,86 @@
             });
         }
 
+        // 远程 Dock 应用列表查询
+        if (window.electronAPI?.onDesktopRemoteQueryDock) {
+            window.electronAPI.onDesktopRemoteQueryDock(() => {
+                console.log('[Desktop IPC] Received remote dock query');
+                try {
+                    // 收集 Dock 中的用户快捷方式列表
+                    const dockItems = [];
+                    if (state.dock && state.dock.items) {
+                        for (const item of state.dock.items) {
+                            const info = {
+                                name: item.name,
+                                type: item.type || 'shortcut',
+                                visible: item.visible !== false,
+                            };
+                            if (item.type === 'vchat-app') {
+                                info.appAction = item.appAction || '';
+                            } else if (item.type === 'builtin') {
+                                info.builtinId = item.builtinId || '';
+                            } else {
+                                info.targetPath = item.targetPath || '';
+                            }
+                            dockItems.push(info);
+                        }
+                    }
+
+                    // 收集 VChat 内部应用列表（硬编码，始终可用）
+                    const vchatApps = [];
+                    if (window.VCPDesktop.vchatApps && window.VCPDesktop.vchatApps.VCHAT_APPS) {
+                        for (const app of window.VCPDesktop.vchatApps.VCHAT_APPS) {
+                            vchatApps.push({
+                                name: app.name,
+                                emoji: app.emoji || '',
+                                appAction: app.appAction,
+                            });
+                        }
+                    }
+
+                    // 收集系统工具列表
+                    const systemTools = [];
+                    if (window.VCPDesktop.vchatApps && window.VCPDesktop.vchatApps.SYSTEM_TOOLS) {
+                        for (const tool of window.VCPDesktop.vchatApps.SYSTEM_TOOLS) {
+                            systemTools.push({
+                                name: tool.name,
+                                emoji: tool.emoji || '',
+                                appAction: tool.appAction,
+                            });
+                        }
+                    }
+
+                    // 收集内置挂件列表
+                    const builtinWidgets = [
+                        { name: '天气挂件', builtinId: 'builtinWeather' },
+                        { name: '音乐播放条', builtinId: 'builtinMusic' },
+                        { name: '应用托盘', builtinId: 'builtinAppTray' },
+                    ];
+
+                    // 发送响应
+                    if (window.electronAPI?.sendDesktopRemoteQueryDockResponse) {
+                        window.electronAPI.sendDesktopRemoteQueryDockResponse({
+                            success: true,
+                            dockItems,
+                            vchatApps,
+                            systemTools,
+                            builtinWidgets,
+                        });
+                    }
+
+                    console.log(`[Desktop IPC] Dock query response: ${dockItems.length} dock items, ${vchatApps.length} vchat apps, ${systemTools.length} system tools`);
+                } catch (err) {
+                    console.error('[Desktop IPC] Dock query error:', err);
+                    if (window.electronAPI?.sendDesktopRemoteQueryDockResponse) {
+                        window.electronAPI.sendDesktopRemoteQueryDockResponse({
+                            success: false,
+                            error: err.message,
+                        });
+                    }
+                }
+            });
+        }
+
         // 远程查看挂件源码
         if (window.electronAPI?.onDesktopRemoteViewSource) {
             window.electronAPI.onDesktopRemoteViewSource((data) => {
@@ -203,8 +283,8 @@
         // 远程创建挂件
         if (window.electronAPI?.onDesktopRemoteCreateWidget) {
             window.electronAPI.onDesktopRemoteCreateWidget((data) => {
-                const { widgetId, htmlContent, options, autoSave, saveName } = data;
-                console.log(`[Desktop IPC] Received remote create widget: ${widgetId}`, options);
+                const { widgetId, htmlContent, options, autoSave, saveName, preSavedId } = data;
+                console.log(`[Desktop IPC] Received remote create widget: ${widgetId}`, options, preSavedId ? `(pre-saved: ${preSavedId})` : '');
                 try {
                     // 使用 widgetManager 创建挂件
                     const widgetData = widget.create(widgetId, {
@@ -213,6 +293,14 @@
                         width: options.width || 320,
                         height: options.height || 200,
                     });
+
+                    // 如果有预保存的 ID（说明主进程已经保存了文件到收藏目录），
+                    // 直接在 widgetData 上标记收藏信息，这样 processInlineScripts 中的
+                    // widgetFS 等 API 也能正常工作
+                    if (preSavedId) {
+                        widgetData.savedId = preSavedId;
+                        widgetData.savedName = saveName || 'AI Widget';
+                    }
 
                     // 设置内容
                     widget.appendContent(widgetId, htmlContent);
@@ -224,10 +312,31 @@
                     status.show();
                     setTimeout(() => status.hide(), 3000);
 
-                    // 如果需要自动收藏
-                    if (autoSave && saveName) {
+                    // 如果已经预保存（有 scriptFiles 的情况），直接返回成功
+                    if (preSavedId) {
+                        // 文件已由主进程预保存，补充截图缩略图（异步，不阻塞响应）
+                        _captureAndUpdateThumbnail(preSavedId, widgetData).catch((e) => {
+                            console.warn('[Desktop IPC] Thumbnail capture for pre-saved widget failed:', e.message);
+                        });
+
+                        // 刷新侧栏
+                        if (window.VCPDesktop?.sidebar?.refresh) {
+                            window.VCPDesktop.sidebar.refresh();
+                        } else if (window.VCPDesktop?.favorites?.loadList) {
+                            window.VCPDesktop.favorites.loadList();
+                        }
+
+                        if (window.electronAPI?.sendDesktopRemoteCreateWidgetResponse) {
+                            window.electronAPI.sendDesktopRemoteCreateWidgetResponse({
+                                success: true,
+                                widgetId,
+                                savedId: preSavedId,
+                                savedName: saveName || 'AI Widget',
+                            });
+                        }
+                    } else if (autoSave && saveName) {
+                        // 普通的自动收藏流程
                         _autoSaveWidget(widgetId, saveName, widgetData).then((savedResult) => {
-                            // 发送成功响应
                             if (window.electronAPI?.sendDesktopRemoteCreateWidgetResponse) {
                                 window.electronAPI.sendDesktopRemoteCreateWidgetResponse({
                                     success: true,
@@ -337,6 +446,46 @@
         } catch (err) {
             console.error('[Desktop IPC] Auto-save error:', err);
             return null;
+        }
+    }
+
+    /**
+     * 为预保存的 widget 补充缩略图（内部辅助函数）
+     * 当 scriptFiles 场景下，主进程已经预保存了目录和文件，
+     * 但缩略图需要等 widget 渲染完成后从渲染进程截取。
+     * @param {string} savedId - 收藏 ID
+     * @param {object} widgetData - 挂件数据
+     */
+    async function _captureAndUpdateThumbnail(savedId, widgetData) {
+        try {
+            // 等待 widget 渲染稳定
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const rect = widgetData.element.getBoundingClientRect();
+            if (window.electronAPI?.desktopCaptureWidget) {
+                const captureResult = await window.electronAPI.desktopCaptureWidget({
+                    x: Math.round(rect.x),
+                    y: Math.round(rect.y),
+                    width: Math.round(rect.width),
+                    height: Math.round(rect.height),
+                });
+                if (captureResult?.success && captureResult.thumbnail) {
+                    // 将缩略图保存到已有的收藏目录
+                    // 通过 desktopSaveWidget 更新（会保留 createdAt）
+                    const htmlContent = widgetData.contentBuffer || widgetData.contentContainer?.innerHTML || '';
+                    if (window.electronAPI?.desktopSaveWidget) {
+                        await window.electronAPI.desktopSaveWidget({
+                            id: savedId,
+                            name: widgetData.savedName || 'AI Widget',
+                            html: htmlContent,
+                            thumbnail: captureResult.thumbnail,
+                        });
+                        console.log(`[Desktop IPC] Thumbnail updated for pre-saved widget: ${savedId}`);
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('[Desktop IPC] _captureAndUpdateThumbnail error:', e.message);
         }
     }
 

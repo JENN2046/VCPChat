@@ -559,10 +559,29 @@
             }
         }
 
-        // 恢复桌面图标
+        // 恢复桌面图标（使用精确坐标，不触发自动保存）
+        // 使用 Dock 当前的图标数据来更新预设中可能过时的图标信息（用户可能已通过右键菜单更换了图标）
         if (preset.desktopIcons && preset.desktopIcons.length > 0 && D.dock) {
             for (const icon of preset.desktopIcons) {
-                D.dock.createDesktopIcon(icon, icon.x + 32, icon.y + 32);
+                // 从当前 Dock items 中查找匹配的项，同步最新的图标数据
+                const dockItem = state.dock.items.find(i =>
+                    (icon.targetPath && i.targetPath === icon.targetPath) ||
+                    (icon.type === 'vchat-app' && i.id === icon.id)
+                );
+                if (dockItem) {
+                    // 同步 Dock 中最新的图标数据（用户可能已更换图标）
+                    icon.icon = dockItem.icon;
+                    icon.htmlIcon = dockItem.htmlIcon || null;
+                    icon.svgIcon = dockItem.svgIcon || null;
+                    icon.animatedIcon = dockItem.animatedIcon || null;
+                    icon.emoji = dockItem.emoji || null;
+                }
+                icon._exactPos = true;
+                D.dock.createDesktopIcon(icon, icon.x || 100, icon.y || 100);
+            }
+            // 预设恢复后，手动保存一次桌面图标到 currentDesktopIcons
+            if (D.dock.saveDesktopIcons) {
+                setTimeout(() => D.dock.saveDesktopIcons(), 500);
             }
         }
 

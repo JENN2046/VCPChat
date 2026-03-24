@@ -150,7 +150,7 @@ let networkNotesTreeCache = null; // In-memory cache for the network notes
 let cachedModels = []; // Cache for models fetched from VCP server
 const NOTES_MODULE_DIR = path.join(APP_DATA_ROOT_IN_PROJECT, 'Notemodules');
 const isRagObserverOnlyMode = process.argv.includes('--rag-observer-only');
-const isDesktopOnlyMode = process.argv.includes('--desktop-only');
+const isAutoOpenDesktop = process.argv.includes('--desktop-only');
 
 // --- Audio Engine Management ---
 // Now uses the Rust native audio engine instead of Python
@@ -255,15 +255,31 @@ function createWindow() {
         }
     });
 
-    // 当主窗口关闭时，退出整个应用程序
-    // 这将触发 'will-quit' 事件，用于执行所有清理操作
+    // 当主窗口关闭时的处理逻辑：
+    // 1. macOS 上始终隐藏而非关闭
+    // 2. 当桌面窗口存在时，隐藏到托盘而非退出（偷天换日！）
+    // 3. 其他情况正常退出
     mainWindow.on('close', (event) => {
-        // On macOS, closing the window should hide it and keep the app alive.
-        // The 'activate' event will handle re-opening it.
-        if (process.platform === 'darwin' && !app.isQuitting) {
+        if (app.isQuitting) {
+            // 应用正在退出，允许关闭
+            return;
+        }
+
+        // macOS 始终隐藏
+        if (process.platform === 'darwin') {
             event.preventDefault();
             mainWindow.hide();
+            return;
         }
+
+        // Windows/Linux：如果桌面窗口存在，隐藏到托盘
+        const dw = desktopHandlers.getDesktopWindow();
+        if (dw && !dw.isDestroyed()) {
+            event.preventDefault();
+            mainWindow.hide();
+            console.log('[Main] Desktop window active — main window hidden to tray instead of closing.');
+        }
+        // 否则允许正常关闭（触发 closed 事件）
     });
 
     // This will be triggered when the app is quitting, after the window is closed.
@@ -422,7 +438,7 @@ if (!gotTheLock) {
 } else {
     app.on('second-instance', async (event, commandLine, workingDirectory) => {
         const wantsRagOnly = commandLine.includes('--rag-observer-only');
-        const wantsDesktopOnly = commandLine.includes('--desktop-only');
+        const wantsDesktop = commandLine.includes('--desktop-only');
 
         // 如果第二实例请求的是 RAG 独立模式，则直接打开/聚焦 RAG 窗口
         if (wantsRagOnly) {
@@ -430,9 +446,14 @@ if (!gotTheLock) {
             return;
         }
 
-        // 如果第二实例请求的是 Desktop 独立模式，则直接打开/聚焦桌面窗口
-        if (wantsDesktopOnly) {
+        // 如果第二实例带 --desktop-only 参数，打开/聚焦桌面窗口
+        if (wantsDesktop) {
             await desktopHandlers.openDesktopWindow();
+            // 同时确保主窗口也显示出来
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                if (!mainWindow.isVisible()) mainWindow.show();
+                mainWindow.focus();
+            }
             return;
         }
 
@@ -519,27 +540,8 @@ if (!gotTheLock) {
             return;
         }
 
-        // VCPdesktop 独立模式：不创建主窗口，仅初始化桌面所需 IPC 并直接打开桌面画布窗口
-        if (isDesktopOnlyMode) {
-            console.log('[Main] Starting in Desktop only mode.');
-            windowHandlers.initialize(mainWindow, openChildWindows);
-            themeHandlers.initialize({ mainWindow, openChildWindows, projectRoot: PROJECT_ROOT, APP_DATA_ROOT_IN_PROJECT, settingsManager: appSettingsManager });
-            desktopHandlers.initialize({ mainWindow, openChildWindows, settingsManager: appSettingsManager });
-            ipcMain.handle('get-platform', () => process.platform);
-
-            createTray();
-
-            // 独立模式也需要注册 DevTools 快捷键
-            globalShortcut.register('Control+Shift+I', () => {
-                const focusedWindow = BrowserWindow.getFocusedWindow();
-                if (focusedWindow && focusedWindow.webContents && !focusedWindow.webContents.isDestroyed()) {
-                    focusedWindow.webContents.toggleDevTools();
-                }
-            });
-
-            await desktopHandlers.openDesktopWindow();
-            return;
-        }
+        // 注意：原 desktop-only 模式已移除。--desktop-only 参数现在仅作为
+        // "启动后自动打开桌面窗口"的标志，所有 IPC 始终完整初始化。
 
         // Function to fetch and cache models from the VCP server
         async function fetchAndCacheModels() {
@@ -1038,6 +1040,17 @@ if (!gotTheLock) {
         ipcMain.handle('get-platform', () => {
             return process.platform;
         });
+
+        // --- 自动打开桌面窗口 ---
+        // 当使用 --desktop-only 参数启动时，在所有 IPC 初始化完成后自动打开桌面窗口
+        if (isAutoOpenDesktop) {
+            console.log('[Main] --desktop-only flag detected. Auto-opening desktop window after full initialization.');
+            // 延迟打开，确保主窗口已完全就绪
+            setTimeout(async () => {
+                await desktopHandlers.openDesktopWindow();
+                console.log('[Main] Desktop window auto-opened.');
+            }, 1000);
+        }
     });
 
     // --- Python Execution IPC Handler ---

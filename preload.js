@@ -440,6 +440,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onDesktopRemoteSetWallpaper: (callback) => ipcRenderer.on('desktop-remote-set-wallpaper', (_event, data) => callback(data)),
     onDesktopRemoteQuery: (callback) => ipcRenderer.on('desktop-remote-query', (_event) => callback()),
     sendDesktopRemoteQueryResponse: (data) => ipcRenderer.send('desktop-remote-query-response', data),
+    onDesktopRemoteQueryDock: (callback) => ipcRenderer.on('desktop-remote-query-dock', (_event) => callback()),
+    sendDesktopRemoteQueryDockResponse: (data) => ipcRenderer.send('desktop-remote-query-dock-response', data),
     onDesktopRemoteViewSource: (callback) => ipcRenderer.on('desktop-remote-view-source', (_event, data) => callback(data)),
     sendDesktopRemoteViewSourceResponse: (data) => ipcRenderer.send('desktop-remote-view-source-response', data),
     onDesktopRemoteCreateWidget: (callback) => ipcRenderer.on('desktop-remote-create-widget', (_event, data) => callback(data)),
@@ -450,6 +452,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     desktopLoadWidget: (id) => ipcRenderer.invoke('desktop-load-widget', id),
     desktopDeleteWidget: (id) => ipcRenderer.invoke('desktop-delete-widget', id),
     desktopListWidgets: () => ipcRenderer.invoke('desktop-list-widgets'),
+
+    // VCPdesktop - 收藏多文件系统 IPC 通道（支持 AI 生成多文件 widget）
+    desktopSaveWidgetFile: (data) => ipcRenderer.invoke('desktop-save-widget-file', data),
+    desktopLoadWidgetFile: (data) => ipcRenderer.invoke('desktop-load-widget-file', data),
+    desktopListWidgetFiles: (widgetId) => ipcRenderer.invoke('desktop-list-widget-files', widgetId),
     desktopCaptureWidget: (rect) => ipcRenderer.invoke('desktop-capture-widget', rect),
     desktopGetCredentials: () => ipcRenderer.invoke('desktop-get-credentials'),
 

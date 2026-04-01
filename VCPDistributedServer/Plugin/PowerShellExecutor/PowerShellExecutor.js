@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const { BrowserWindow, ipcMain, clipboard } = require('electron');
 const tmp = require('tmp');
 const chokidar = require('chokidar');
-const { parseEnvCascade } = require('../../../envLoader');
 
 // --- GUI Window Management ---
 let guiWindow = null;
@@ -191,15 +190,23 @@ const defaultConfig = {
 
 try {
     const configPath = path.join(__dirname, 'config.env');
-    const config = parseEnvCascade(configPath).env;
-    if (config.POWERSHELL_RETURN_MODE === 'full') {
-        defaultConfig.returnMode = 'full';
-    }
-    if (config.FORBIDDEN_COMMANDS) {
-        defaultConfig.forbiddenCommands = config.FORBIDDEN_COMMANDS.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
-    }
-    if (config.AUTH_REQUIRED_COMMANDS) {
-        defaultConfig.authRequiredCommands = config.AUTH_REQUIRED_COMMANDS.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+    if (fs.existsSync(configPath)) {
+        const configContent = fs.readFileSync(configPath, 'utf-8');
+
+        const returnModeMatch = configContent.match(/^POWERSHELL_RETURN_MODE\s*=\s*(delta|full)/m);
+        if (returnModeMatch) {
+            defaultConfig.returnMode = returnModeMatch[1];
+        }
+
+        const forbiddenMatch = configContent.match(/^FORBIDDEN_COMMANDS\s*=\s*(.*)/m);
+        if (forbiddenMatch && forbiddenMatch[1]) {
+            defaultConfig.forbiddenCommands = forbiddenMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        }
+
+        const authRequiredMatch = configContent.match(/^AUTH_REQUIRED_COMMANDS\s*=\s*(.*)/m);
+        if (authRequiredMatch && authRequiredMatch[1]) {
+            defaultConfig.authRequiredCommands = authRequiredMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        }
     }
 } catch (error) {
     console.error('[PowerShellExecutor] Error reading config.env:', error);

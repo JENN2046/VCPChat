@@ -39,26 +39,6 @@ export async function handleSaveGlobalSettings(e, deps) {
         vcpApiKey: document.getElementById('vcpApiKey').value,
         vcpLogUrl: document.getElementById('vcpLogUrl').value.trim(),
         vcpLogKey: document.getElementById('vcpLogKey').value.trim(),
-        webdavSyncEnabled: document.getElementById('webdavSyncEnabled')?.checked || false,
-        webdavSyncBaseUrl: document.getElementById('webdavSyncBaseUrl')?.value.trim() || '',
-        webdavSyncRemoteRoot: document.getElementById('webdavSyncRemoteRoot')?.value.trim() || '/VCPChat',
-        webdavSyncUsername: document.getElementById('webdavSyncUsername')?.value.trim() || '',
-        webdavSyncPassword: document.getElementById('webdavSyncPassword')?.value || '',
-        webdavSyncAutoDownload: document.getElementById('webdavSyncAutoDownload')?.checked || false,
-        webdavSyncIncludeVcpChat: document.getElementById('webdavSyncIncludeVcpChat')?.checked ?? true,
-        webdavSyncIncludeVcpChatRootFiles: document.getElementById('webdavSyncIncludeVcpChatRootFiles')?.checked ?? true,
-        webdavSyncIncludeVcpChatAgents: document.getElementById('webdavSyncIncludeVcpChatAgents')?.checked ?? true,
-        webdavSyncIncludeVcpChatUserData: document.getElementById('webdavSyncIncludeVcpChatUserData')?.checked ?? true,
-        webdavSyncIncludeVcpChatAssets: document.getElementById('webdavSyncIncludeVcpChatAssets')?.checked ?? true,
-        webdavSyncIncludeVcpChatDesktop: document.getElementById('webdavSyncIncludeVcpChatDesktop')?.checked ?? true,
-        webdavSyncIncludeVcpChatServerConfig: document.getElementById('webdavSyncIncludeVcpChatServerConfig')?.checked ?? true,
-        webdavSyncIncludeVcpToolBox: document.getElementById('webdavSyncIncludeVcpToolBox')?.checked ?? true,
-        webdavSyncIncludeVcpToolBoxRootConfig: document.getElementById('webdavSyncIncludeVcpToolBoxRootConfig')?.checked ?? true,
-        webdavSyncIncludeVcpToolBoxAgents: document.getElementById('webdavSyncIncludeVcpToolBoxAgents')?.checked ?? true,
-        webdavSyncIncludeVcpToolBoxDailyNote: document.getElementById('webdavSyncIncludeVcpToolBoxDailyNote')?.checked ?? true,
-        webdavSyncIncludeVcpToolBoxTvstxt: document.getElementById('webdavSyncIncludeVcpToolBoxTvstxt')?.checked ?? true,
-        webdavSyncIncludeVcpToolBoxSillyTavern: document.getElementById('webdavSyncIncludeVcpToolBoxSillyTavern')?.checked ?? true,
-        webdavSyncIncludeVcpToolBoxPluginConfig: document.getElementById('webdavSyncIncludeVcpToolBoxPluginConfig')?.checked ?? true,
         topicSummaryModel: document.getElementById('topicSummaryModel').value.trim(),
         networkNotesPaths: networkNotesPaths,
         sidebarWidth: refs.globalSettings.get().sidebarWidth,
@@ -160,6 +140,26 @@ export async function handleSaveGlobalSettings(e, deps) {
             }
         } catch (readError) {
             uiHelperFunctions.showToastNotification(`读取用户头像文件失败: ${readError.message}`, 'error');
+        }
+    }
+
+    // 保存论坛配置 (forum.config.json)
+    const adminUsername = document.getElementById('adminUsername')?.value?.trim() || '';
+    const adminPassword = document.getElementById('adminPassword')?.value || '';
+    if (adminUsername || adminPassword) {
+        try {
+            const forumConfig = {
+                username: adminUsername,
+                password: adminPassword,
+                replyUsername: newSettings.userName || '用户',
+                rememberCredentials: true
+            };
+            const forumResult = await window.electronAPI.saveForumConfig(forumConfig);
+            if (!forumResult?.success) {
+                console.warn('[GlobalSettings] Failed to save forum config:', forumResult?.error);
+            }
+        } catch (forumErr) {
+            console.warn('[GlobalSettings] Error saving forum config:', forumErr);
         }
     }
 

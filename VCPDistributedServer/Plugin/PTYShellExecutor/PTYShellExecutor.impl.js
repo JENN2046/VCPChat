@@ -6,10 +6,48 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const { EventEmitter } = require('events');
 const { spawn } = require('child_process');
 const { BrowserWindow, ipcMain, clipboard } = require('electron');
 const chokidar = require('chokidar');
-const { parseEnvCascade } = require('../../../envLoader');
+
+// --- Pager 兼容性：默认禁用常见分页器，避免命令进入 less/more 导致边界标记永远无法输出 ---
+function withPagerDisabledEnv(baseEnv) {
+    return {
+        ...baseEnv,
+        // 通用
+        PAGER: 'cat',
+        LESS: 'FRX',
+        // Git / GitHub CLI
+        GIT_PAGER: 'cat',
+        GH_PAGER: 'cat',
+        // systemd
+        SYSTEMD_PAGER: 'cat',
+        SYSTEMD_LESS: 'FRX',
+        SYSTEMD_PAGERSECURE: '1',
+        // man
+        MANPAGER: 'cat',
+        // awscli
+        AWS_PAGER: '',
+        // bat / delta（常见 pager 依赖）
+        BAT_PAGER: 'cat',
+        DELTA_PAGER: 'cat'
+    };
+}
+
+function killProcessGroup(pid, signal = 'SIGTERM') {
+    if (!pid || typeof pid !== 'number') return;
+    // POSIX 下可用负 pid 代表进程组
+    if (process.platform !== 'win32') {
+        try {
+            process.kill(-pid, signal);
+            return;
+        } catch (e) {
+            // 回退到单进程 kill
+        }
+    }
+    try { process.kill(pid, signal); } catch (_) { /* ignore */ }
+}
 
 // ============================================================================
 // 异步任务管理器 (AsyncTaskManager)
@@ -140,7 +178,7 @@ class AsyncTaskManager {
             const proc = spawn(shell, ['-c', command], {
                 cwd: options.cwd || process.env.HOME || '/home',
                 env: {
-                    ...process.env,
+                    ...withPagerDisabledEnv(process.env),
                     TERM: 'xterm-256color',
                     LANG: 'en_US.UTF-8',
                     LC_ALL: 'en_US.UTF-8',
@@ -605,12 +643,18 @@ if (ipcMain) {
         // 如果 PTY 尚未启动，则主动启动一个默认会话
         if (!ptyProcess) {
             console.log('[PTYShellExecutor] GUI ready but no PTY session. Starting default session...');
-            createNewPtySession();
+            try {
+                createNewShellSession();
+            } catch (e) {
+                console.error('[PTYShellExecutor] Failed to start shell session on GUI ready:', e);
+            }
         }
         
         // 通知 GUI PTY 连接状态
         if (ptyProcess) {
-            event.sender.send('pty-status', { connected: true });
+            event.sender.send('pty-status', { connected: true, mode: activeSessionMode || 'unknown' });
+        } else {
+            event.sender.send('pty-status', { connected: false });
         }
     });
 
@@ -876,6 +920,7 @@ function cleanOutput(str) {
 let ptyProcess = null;
 const childProcesses = new Set();
 let isExecutingCommand = false;
+let activeSessionMode = null; // 'pty' | 'pipe' | null
 let executionQueue = Promise.resolve();
 let executionQueueLength = 0;
 const MAX_EXECUTION_QUEUE_LENGTH = 50;
@@ -886,25 +931,47 @@ const defaultConfig = {
     shellPriority: ['fish', 'zsh', 'bash'],
     forbiddenCommands: [],
     authRequiredCommands: [],
-    commandTimeout: 60000
+    commandTimeout: 60000,
+    ptyMode: 'auto' // auto | pty | pipe
 };
 
 try {
     const configPath = path.join(__dirname, 'config.env');
-    const config = parseEnvCascade(configPath).env;
-    if (config.SHELL_RETURN_MODE === 'full') defaultConfig.returnMode = 'full';
-    if (config.SHELL_PRIORITY) {
-        defaultConfig.shellPriority = config.SHELL_PRIORITY.split(',').map(s => s.trim()).filter(s => s);
+    if (fs.existsSync(configPath)) {
+        const configContent = fs.readFileSync(configPath, 'utf-8');
+        const returnModeMatch = configContent.match(/^SHELL_RETURN_MODE\s*=\s*(delta|full)/m);
+        if (returnModeMatch) defaultConfig.returnMode = returnModeMatch[1];
+
+        const ptyModeMatch = configContent.match(/^PTY_MODE\s*=\s*(auto|pty|pipe)/m);
+        if (ptyModeMatch) defaultConfig.ptyMode = ptyModeMatch[1];
+
+        const priorityMatch = configContent.match(/^SHELL_PRIORITY\s*=\s*(.*)/m);
+        if (priorityMatch && priorityMatch[1]) {
+            defaultConfig.shellPriority = priorityMatch[1].split(',').map(s => s.trim()).filter(s => s);
+        }
+
+        const forbiddenMatch = configContent.match(/^FORBIDDEN_COMMANDS\s*=\s*(.*)/m);
+        if (forbiddenMatch && forbiddenMatch[1]) {
+            defaultConfig.forbiddenCommands = forbiddenMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        }
+
+        const authMatch = configContent.match(/^AUTH_REQUIRED_COMMANDS\s*=\s*(.*)/m);
+        if (authMatch && authMatch[1]) {
+            defaultConfig.authRequiredCommands = authMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        }
+
+        const timeoutMatch = configContent.match(/^COMMAND_TIMEOUT\s*=\s*(\d+)/m);
+        if (timeoutMatch) defaultConfig.commandTimeout = parseInt(timeoutMatch[1], 10);
     }
-    if (config.FORBIDDEN_COMMANDS) {
-        defaultConfig.forbiddenCommands = config.FORBIDDEN_COMMANDS.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
-    }
-    if (config.AUTH_REQUIRED_COMMANDS) {
-        defaultConfig.authRequiredCommands = config.AUTH_REQUIRED_COMMANDS.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
-    }
-    if (config.COMMAND_TIMEOUT) defaultConfig.commandTimeout = parseInt(config.COMMAND_TIMEOUT, 10);
 } catch (error) {
     console.error('[PTYShellExecutor] Error reading config.env:', error);
+}
+
+function getEffectivePtyMode() {
+    const raw = defaultConfig.ptyMode || 'auto';
+    const mode = String(raw).trim().toLowerCase();
+    if (mode === 'pty' || mode === 'pipe' || mode === 'auto') return mode;
+    return 'auto';
 }
 
 // --- Shell 检测 ---
@@ -975,14 +1042,15 @@ function createNewPtySession(preferredShell) {
     ptyProcess = pty.spawn(shell, args, {
         name: 'xterm-256color',
         cwd: process.env.HOME || '/home',
-        env: {
+        env: withPagerDisabledEnv({
             ...process.env,
             TERM: 'xterm-256color',
             LANG: 'en_US.UTF-8',
             LC_ALL: 'en_US.UTF-8'
-        }
+        })
     });
     childProcesses.add(ptyProcess);
+    activeSessionMode = 'pty';
 
     // 数据监听 - 转发到 GUI
     ptyProcess.onData((data) => {
@@ -996,12 +1064,137 @@ function createNewPtySession(preferredShell) {
         childProcesses.delete(ptyProcess);
         ptyProcess = null;
         isExecutingCommand = false;
+        activeSessionMode = null;
         if (guiWindow && !guiWindow.isDestroyed()) {
             guiWindow.webContents.send('pty-status', { connected: false });
         }
     });
 
     return shellName;
+}
+
+function createNewPipeSession(preferredShell) {
+    if (ptyProcess) {
+        childProcesses.delete(ptyProcess);
+        try { ptyProcess.kill(); } catch (_) { /* ignore */ }
+        if (guiWindow && !guiWindow.isDestroyed()) {
+            guiWindow.webContents.send('shell-clear');
+        }
+        ptyProcess = null;
+    }
+
+    const shell = detectShell(preferredShell);
+    const shellName = path.basename(shell);
+
+    let args = [];
+    if (shellName === 'bash') args = ['--login'];
+    else if (shellName === 'zsh') args = ['--login'];
+    else if (shellName === 'fish') args = ['-l'];
+
+    console.log(`[PTYShellExecutor] Starting pipe shell: ${shell} with args: ${args.join(' ')}`);
+
+    const child = spawn(shell, args, {
+        cwd: process.env.HOME || '/home',
+        env: withPagerDisabledEnv({
+            ...process.env,
+            TERM: 'xterm-256color',
+            LANG: 'en_US.UTF-8',
+            LC_ALL: 'en_US.UTF-8'
+        }),
+        detached: process.platform !== 'win32',
+        stdio: ['pipe', 'pipe', 'pipe']
+    });
+
+    if (child.stdout) child.stdout.setEncoding('utf8');
+    if (child.stderr) child.stderr.setEncoding('utf8');
+
+    const session = new EventEmitter();
+    session.pid = child.pid;
+    session._child = child;
+    session._mode = 'pipe';
+
+    session.write = (data) => {
+        try {
+            if (child.stdin && !child.stdin.destroyed) {
+                child.stdin.write(data);
+            }
+        } catch (_) { /* ignore */ }
+    };
+    session.resize = () => { /* no-op for pipe mode */ };
+    session.kill = (signal = 'SIGTERM') => {
+        if (child.pid) {
+            killProcessGroup(child.pid, signal);
+        } else {
+            try { child.kill(signal); } catch (_) { /* ignore */ }
+        }
+    };
+
+    // node-pty 风格事件别名（便于复用现有逻辑）
+    session.onData = (listener) => {
+        session.on('data', listener);
+        return { dispose: () => session.off('data', listener) };
+    };
+    session.onExit = (listener) => {
+        session.on('exit', listener);
+        return { dispose: () => session.off('exit', listener) };
+    };
+
+    const forward = (chunk) => {
+        if (!chunk) return;
+        session.emit('data', chunk);
+    };
+
+    if (child.stdout) child.stdout.on('data', forward);
+    if (child.stderr) child.stderr.on('data', forward);
+
+    child.on('exit', (code, signal) => {
+        session.emit('exit', code, signal);
+    });
+    child.on('error', (err) => {
+        session.emit('exit', -1, err && err.message ? err.message : 'spawn_error');
+    });
+
+    ptyProcess = session;
+    childProcesses.add(session);
+    activeSessionMode = 'pipe';
+
+    // 数据监听 - 转发到 GUI（复用与 PTY 一致的 gating 逻辑）
+    session.onData((data) => {
+        if (isExecutingCommand) return;
+        if (guiWindow && !guiWindow.isDestroyed()) {
+            guiWindow.webContents.send('shell-data', typeof data === 'string' ? data : data.toString('utf-8'));
+        }
+    });
+
+    session.onExit(() => {
+        childProcesses.delete(session);
+        if (ptyProcess === session) {
+            ptyProcess = null;
+        }
+        activeSessionMode = null;
+        isExecutingCommand = false;
+        if (guiWindow && !guiWindow.isDestroyed()) {
+            guiWindow.webContents.send('pty-status', { connected: false });
+        }
+    });
+
+    return shellName;
+}
+
+function createNewShellSession(preferredShell) {
+    const mode = getEffectivePtyMode();
+    if (mode === 'pipe') {
+        return { shellName: createNewPipeSession(preferredShell), mode: 'pipe' };
+    }
+
+    try {
+        return { shellName: createNewPtySession(preferredShell), mode: 'pty' };
+    } catch (err) {
+        if (mode === 'pty') throw err;
+        console.warn(`[PTYShellExecutor] PTY unavailable, falling back to pipe mode: ${err && err.message ? err.message : String(err)}`);
+        reporter.capture('ptyFallbackToPipe', err instanceof Error ? err : new Error(String(err)), { preferredShell });
+        return { shellName: createNewPipeSession(preferredShell), mode: 'pipe' };
+    }
 }
 
 // --- 执行单条命令 ---
@@ -1038,8 +1231,9 @@ function executeSingleCommand(ptyProcess, singleCommand) {
             if (dataStr.includes(boundary)) {
                 // 快速路径：当前数据包直接包含完整边界标记
                 setTimeout(() => {
+                    const text = getCleanTextFromBuffer(term);
                     cleanup();
-                    resolve(getCleanTextFromBuffer(term));
+                    resolve(text);
                 }, 50);
             } else if (dataStr.includes('__VCP_BOUNDARY_') || dataStr.includes('__VCP_')) {
                 // 慢速路径：检测到部分边界（数据分片），延迟扫描 buffer
@@ -1048,8 +1242,9 @@ function executeSingleCommand(ptyProcess, singleCommand) {
                     for (let i = buffer.length - 1; i >= Math.max(0, buffer.length - 30); i--) {
                         const line = buffer.getLine(i);
                         if (line && line.translateToString(true).includes(boundary)) {
+                            const text = getCleanTextFromBuffer(term);
                             cleanup();
-                            resolve(getCleanTextFromBuffer(term));
+                            resolve(text);
                             return;
                         }
                     }
@@ -1078,10 +1273,16 @@ function executeSingleCommand(ptyProcess, singleCommand) {
         ptyProcess.on('data', dataListener);
         
         // 发送指令
-        ptyProcess.write('\x03');
-        setTimeout(() => {
-            ptyProcess.write(`${singleCommand}\necho "${boundary}"\n`);
-        }, 100);
+        if (activeSessionMode === 'pty') {
+            // 只有 PTY 才能通过写入 Ctrl+C 可靠中断前台任务；pipe 模式下写入 \x03 只是普通字符
+            try { ptyProcess.write('\x03'); } catch (_) { /* ignore */ }
+            setTimeout(() => {
+                try { ptyProcess.write(`${singleCommand}\necho "${boundary}"\n`); } catch (_) { /* ignore */ }
+            }, 100);
+        } else {
+            // pipe 模式：不写入 Ctrl+C，直接发送命令
+            try { ptyProcess.write(`${singleCommand}\necho "${boundary}"\n`); } catch (_) { /* ignore */ }
+        }
     });
 }
 
@@ -1226,9 +1427,9 @@ async function handleSyncExecute(args) {
 
         // 创建或复用会话
         if (newSession || !ptyProcess) {
-            const shellName = createNewPtySession(preferredShell);
+            const created = createNewShellSession(preferredShell);
             await new Promise(resolve => setTimeout(resolve, 800)); // 等待 shell 初始化
-            console.log(`[PTYShellExecutor] Session started with ${shellName}`);
+            console.log(`[PTYShellExecutor] Session started with ${created.shellName} (mode=${created.mode})`);
         }
 
         // 执行命令
@@ -1307,6 +1508,7 @@ function cleanup() {
     }
 
     ptyProcess = null;
+    activeSessionMode = null;
 }
 
 module.exports = { processToolCall, cleanup };

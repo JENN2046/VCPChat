@@ -489,87 +489,6 @@ export function setupEventListeners(deps) {
 
             // 绑定全局设置导航切换
             setupGlobalSettingsNavigation();
-            const getWebDavSyncConfig = () => ({
-                enabled: document.getElementById('webdavSyncEnabled')?.checked || false,
-                baseUrl: document.getElementById('webdavSyncBaseUrl')?.value.trim() || '',
-                remoteRoot: document.getElementById('webdavSyncRemoteRoot')?.value.trim() || '/VCPChat',
-                username: document.getElementById('webdavSyncUsername')?.value.trim() || '',
-                password: document.getElementById('webdavSyncPassword')?.value || '',
-                autoDownload: document.getElementById('webdavSyncAutoDownload')?.checked || false,
-                webdavSyncIncludeVcpChat: document.getElementById('webdavSyncIncludeVcpChat')?.checked ?? true,
-                webdavSyncIncludeVcpChatRootFiles: document.getElementById('webdavSyncIncludeVcpChatRootFiles')?.checked ?? true,
-                webdavSyncIncludeVcpChatAgents: document.getElementById('webdavSyncIncludeVcpChatAgents')?.checked ?? true,
-                webdavSyncIncludeVcpChatUserData: document.getElementById('webdavSyncIncludeVcpChatUserData')?.checked ?? true,
-                webdavSyncIncludeVcpChatAssets: document.getElementById('webdavSyncIncludeVcpChatAssets')?.checked ?? true,
-                webdavSyncIncludeVcpChatDesktop: document.getElementById('webdavSyncIncludeVcpChatDesktop')?.checked ?? true,
-                webdavSyncIncludeVcpChatServerConfig: document.getElementById('webdavSyncIncludeVcpChatServerConfig')?.checked ?? true,
-                webdavSyncIncludeVcpToolBox: document.getElementById('webdavSyncIncludeVcpToolBox')?.checked ?? true,
-                webdavSyncIncludeVcpToolBoxRootConfig: document.getElementById('webdavSyncIncludeVcpToolBoxRootConfig')?.checked ?? true,
-                webdavSyncIncludeVcpToolBoxAgents: document.getElementById('webdavSyncIncludeVcpToolBoxAgents')?.checked ?? true,
-                webdavSyncIncludeVcpToolBoxDailyNote: document.getElementById('webdavSyncIncludeVcpToolBoxDailyNote')?.checked ?? true,
-                webdavSyncIncludeVcpToolBoxTvstxt: document.getElementById('webdavSyncIncludeVcpToolBoxTvstxt')?.checked ?? true,
-                webdavSyncIncludeVcpToolBoxSillyTavern: document.getElementById('webdavSyncIncludeVcpToolBoxSillyTavern')?.checked ?? true,
-                webdavSyncIncludeVcpToolBoxPluginConfig: document.getElementById('webdavSyncIncludeVcpToolBoxPluginConfig')?.checked ?? true,
-            });
-            const setWebDavSyncStatus = (message) => {
-                const statusEl = document.getElementById('webdavSyncStatusText');
-                if (statusEl) statusEl.textContent = message;
-            };
-            const bindScopeToggle = (masterId, childIds) => {
-                const master = document.getElementById(masterId);
-                const syncState = () => {
-                    const disabled = !(master?.checked ?? true);
-                    childIds.forEach((id) => {
-                        const input = document.getElementById(id);
-                        if (input) input.disabled = disabled;
-                    });
-                };
-                if (master && !master.dataset.boundScopeToggle) {
-                    master.addEventListener('change', syncState);
-                    master.dataset.boundScopeToggle = 'true';
-                }
-                syncState();
-            };
-            const bindWebDavButton = (id, handler) => {
-                const button = document.getElementById(id);
-                if (!button || button.dataset.bound) return;
-                button.dataset.bound = 'true';
-                button.addEventListener('click', handler);
-            };
-            bindScopeToggle('webdavSyncIncludeVcpChat', [
-                'webdavSyncIncludeVcpChatRootFiles',
-                'webdavSyncIncludeVcpChatAgents',
-                'webdavSyncIncludeVcpChatUserData',
-                'webdavSyncIncludeVcpChatAssets',
-                'webdavSyncIncludeVcpChatDesktop',
-                'webdavSyncIncludeVcpChatServerConfig',
-            ]);
-            bindScopeToggle('webdavSyncIncludeVcpToolBox', [
-                'webdavSyncIncludeVcpToolBoxRootConfig',
-                'webdavSyncIncludeVcpToolBoxAgents',
-                'webdavSyncIncludeVcpToolBoxDailyNote',
-                'webdavSyncIncludeVcpToolBoxTvstxt',
-                'webdavSyncIncludeVcpToolBoxSillyTavern',
-                'webdavSyncIncludeVcpToolBoxPluginConfig',
-            ]);
-            bindWebDavButton('webdavTestConnectionBtn', async () => {
-                const result = await window.electronAPI?.webdavSyncTestConnection?.(getWebDavSyncConfig());
-                const message = result?.message || (result?.success ? 'WebDAV 连接成功' : 'WebDAV 连接失败');
-                setWebDavSyncStatus(message);
-                uiHelperFunctions.showToastNotification(message, result?.success ? 'success' : 'error');
-            });
-            bindWebDavButton('webdavUploadBtn', async () => {
-                const result = await window.electronAPI?.webdavSyncUpload?.(getWebDavSyncConfig());
-                const message = result?.message || (result?.success ? '已上传到云端' : '上传失败');
-                setWebDavSyncStatus(message);
-                uiHelperFunctions.showToastNotification(message, result?.success ? 'success' : 'error');
-            });
-            bindWebDavButton('webdavDownloadBtn', async () => {
-                const result = await window.electronAPI?.webdavSyncDownload?.(getWebDavSyncConfig());
-                const message = result?.message || (result?.success ? '已从云端恢复' : '恢复失败');
-                setWebDavSyncStatus(message);
-                uiHelperFunctions.showToastNotification(message, result?.success ? 'success' : 'error');
-            });
 
             // continueWritingPrompt 使用 CSS field-sizing: content 自动调整高度，无需 JS 处理
         }
@@ -1002,7 +921,18 @@ export function setupEventListeners(deps) {
     }
 
     if (createNewAgentBtn) {
-        createNewAgentBtn.textContent = '创建 Agent';
+        createNewAgentBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2 21a8 8 0 0 1 13.292-6"></path>
+                <circle cx="10" cy="8" r="5"></circle>
+                <path d="M19 16v6"></path>
+                <path d="M22 19h-6"></path>
+            </svg>
+            <span class="sidebar-button-label">
+                <span class="sidebar-button-prefix">&#21019;&#24314;</span>
+                <span class="sidebar-button-keyword">Agent</span>
+            </span>
+        `;
         createNewAgentBtn.style.width = 'auto';
         createNewAgentBtn.addEventListener('click', async () => {
             const defaultAgentName = `新Agent_${Date.now()}`;
@@ -1018,7 +948,7 @@ export function setupEventListeners(deps) {
     }
 
     if (createNewGroupBtn) {
-        createNewGroupBtn.style.display = 'inline-block';
+        createNewGroupBtn.style.display = 'inline-flex';
     }
 
     currentItemActionBtn.addEventListener('click', async () => {

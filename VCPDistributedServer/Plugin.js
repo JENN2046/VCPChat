@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { spawn } = require('child_process');
 const schedule = require('node-schedule');
-const { parseEnvCascade } = require('../envLoader');
+const dotenv = require('dotenv');
 
 const PLUGIN_DIR = path.join(__dirname, 'Plugin');
 const manifestFileName = 'plugin-manifest.json';
@@ -86,13 +86,14 @@ class PluginManager {
                         }
                         manifest.basePath = pluginPath;
                         
-                        try {
-                            manifest.pluginSpecificEnvConfig = parseEnvCascade(path.join(pluginPath, 'config.env')).env;
+                        // Load plugin-specific config.env
+                        manifest.pluginSpecificEnvConfig = {};
+                         try {
+                            await fs.access(path.join(pluginPath, 'config.env'));
+                            const pluginEnvContent = await fs.readFile(path.join(pluginPath, 'config.env'), 'utf-8');
+                            manifest.pluginSpecificEnvConfig = dotenv.parse(pluginEnvContent);
                         } catch (envError) {
-                            manifest.pluginSpecificEnvConfig = {};
-                            if (this.debugMode) {
-                                console.warn(`[DistPluginManager] Error reading config.env for ${manifest.name}: ${envError.message}`);
-                            }
+                            // Ignore if config.env doesn't exist
                         }
 
                         // 加载所有类型的插件

@@ -45,7 +45,10 @@ const chatMessagesDiv = document.getElementById('chatMessages');
 const messageInput = document.getElementById('messageInput');
 const sendMessageBtn = document.getElementById('sendMessageBtn');
 const attachFileBtn = document.getElementById('attachFileBtn');
+const emoticonTriggerBtn = document.getElementById('emoticonTriggerBtn');
+const quickNewTopicBtn = document.getElementById('quickNewTopicBtn');
 const attachmentPreviewArea = document.getElementById('attachmentPreviewArea');
+const chatInputCard = document.querySelector('.chat-input-card');
 
 const globalSettingsBtn = document.getElementById('globalSettingsBtn');
 // 模态框及其内部元素现在延迟加载，不再在顶层缓存引用
@@ -315,6 +318,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
     if (window.inputEnhancer) {
         window.inputEnhancer.initializeInputEnhancer({
             messageInput: messageInput,
+            dropTargetElement: chatInputCard,
             electronAPI: window.electronAPI,
             attachedFiles: { get: () => attachedFiles, set: (val) => attachedFiles = val },
             updateAttachmentPreview: () => uiHelperFunctions.updateAttachmentPreview(attachedFiles, attachmentPreviewArea),
@@ -954,15 +958,72 @@ import { setupEventListeners } from './modules/event-listeners.js';
         });
 
         // Emoticon panel event listener
-        if (attachFileBtn && window.emoticonManager) {
-            attachFileBtn.addEventListener('contextmenu', (e) => {
+        if (attachFileBtn && emoticonTriggerBtn && window.emoticonManager) {
+            const syncEmoticonTriggerButton = () => {
+                emoticonTriggerBtn.disabled = attachFileBtn.disabled;
+            };
+
+            const openEmoticonPanel = (e) => {
                 e.preventDefault();
-                window.emoticonManager.togglePanel(attachFileBtn);
+                if (emoticonTriggerBtn.disabled) return;
+                window.emoticonManager.togglePanel(emoticonTriggerBtn);
+            };
+
+            emoticonTriggerBtn.addEventListener('click', openEmoticonPanel);
+            emoticonTriggerBtn.addEventListener('contextmenu', openEmoticonPanel);
+
+            const emoticonTriggerObserver = new MutationObserver(syncEmoticonTriggerButton);
+            emoticonTriggerObserver.observe(attachFileBtn, {
+                attributes: true,
+                attributeFilter: ['disabled']
             });
+
+            syncEmoticonTriggerButton();
         }
 
         window.topicListManager.setupTopicSearch(); // Ensure this is called after DOM for topic search input is ready
         if(messageInput) uiHelperFunctions.autoResizeTextarea(messageInput);
+
+        if (quickNewTopicBtn && currentItemActionBtn) {
+            const syncQuickNewTopicButton = () => {
+                const isVisible = window.getComputedStyle(currentItemActionBtn).display !== 'none';
+                const buttonLabel = currentItemActionBtn.querySelector('.button-label')?.textContent?.trim();
+
+                quickNewTopicBtn.style.display = 'inline-flex';
+                quickNewTopicBtn.disabled = !isVisible;
+                quickNewTopicBtn.title = currentItemActionBtn.title || '新建聊天话题';
+
+                if (buttonLabel) {
+                    quickNewTopicBtn.setAttribute('aria-label', buttonLabel);
+                }
+            };
+
+            const forwardCurrentItemAction = (eventName) => {
+                if (quickNewTopicBtn.disabled) return;
+                currentItemActionBtn.dispatchEvent(new MouseEvent(eventName, {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                }));
+            };
+
+            quickNewTopicBtn.addEventListener('click', () => forwardCurrentItemAction('click'));
+            quickNewTopicBtn.addEventListener('contextmenu', (event) => {
+                event.preventDefault();
+                forwardCurrentItemAction('contextmenu');
+            });
+
+            const quickTopicObserver = new MutationObserver(syncQuickNewTopicButton);
+            quickTopicObserver.observe(currentItemActionBtn, {
+                attributes: true,
+                attributeFilter: ['style', 'title'],
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+
+            syncQuickNewTopicButton();
+        }
 
         // Set default view if no item is selected
         if (!currentSelectedItem.id) {
@@ -1502,50 +1563,6 @@ async function syncGlobalSettingsToUI() {
     safeSet('vcpApiKey', globalSettings.vcpApiKey || '');
     safeSet('vcpLogUrl', globalSettings.vcpLogUrl || '');
     safeSet('vcpLogKey', globalSettings.vcpLogKey || '');
-    safeCheck('webdavSyncEnabled', globalSettings.webdavSyncEnabled === true);
-    safeSet('webdavSyncBaseUrl', globalSettings.webdavSyncBaseUrl || '');
-    safeSet('webdavSyncRemoteRoot', globalSettings.webdavSyncRemoteRoot || '/VCPChat');
-    safeSet('webdavSyncUsername', globalSettings.webdavSyncUsername || '');
-    safeSet('webdavSyncPassword', globalSettings.webdavSyncPassword || '');
-    safeCheck('webdavSyncAutoDownload', globalSettings.webdavSyncAutoDownload === true);
-    safeCheck('webdavSyncIncludeVcpChat', globalSettings.webdavSyncIncludeVcpChat !== false);
-    safeCheck('webdavSyncIncludeVcpChatRootFiles', globalSettings.webdavSyncIncludeVcpChatRootFiles !== false);
-    safeCheck('webdavSyncIncludeVcpChatAgents', globalSettings.webdavSyncIncludeVcpChatAgents !== false);
-    safeCheck('webdavSyncIncludeVcpChatUserData', globalSettings.webdavSyncIncludeVcpChatUserData !== false);
-    safeCheck('webdavSyncIncludeVcpChatAssets', globalSettings.webdavSyncIncludeVcpChatAssets !== false);
-    safeCheck('webdavSyncIncludeVcpChatDesktop', globalSettings.webdavSyncIncludeVcpChatDesktop !== false);
-    safeCheck('webdavSyncIncludeVcpChatServerConfig', globalSettings.webdavSyncIncludeVcpChatServerConfig !== false);
-    safeCheck('webdavSyncIncludeVcpToolBox', globalSettings.webdavSyncIncludeVcpToolBox !== false);
-    safeCheck('webdavSyncIncludeVcpToolBoxRootConfig', globalSettings.webdavSyncIncludeVcpToolBoxRootConfig !== false);
-    safeCheck('webdavSyncIncludeVcpToolBoxAgents', globalSettings.webdavSyncIncludeVcpToolBoxAgents !== false);
-    safeCheck('webdavSyncIncludeVcpToolBoxDailyNote', globalSettings.webdavSyncIncludeVcpToolBoxDailyNote !== false);
-    safeCheck('webdavSyncIncludeVcpToolBoxTvstxt', globalSettings.webdavSyncIncludeVcpToolBoxTvstxt !== false);
-    safeCheck('webdavSyncIncludeVcpToolBoxSillyTavern', globalSettings.webdavSyncIncludeVcpToolBoxSillyTavern !== false);
-    safeCheck('webdavSyncIncludeVcpToolBoxPluginConfig', globalSettings.webdavSyncIncludeVcpToolBoxPluginConfig !== false);
-    const syncWebDavScopeDisabledState = (masterId, childIds) => {
-        const master = document.getElementById(masterId);
-        const disabled = !(master?.checked ?? true);
-        childIds.forEach((id) => {
-            const el = document.getElementById(id);
-            if (el) el.disabled = disabled;
-        });
-    };
-    syncWebDavScopeDisabledState('webdavSyncIncludeVcpChat', [
-        'webdavSyncIncludeVcpChatRootFiles',
-        'webdavSyncIncludeVcpChatAgents',
-        'webdavSyncIncludeVcpChatUserData',
-        'webdavSyncIncludeVcpChatAssets',
-        'webdavSyncIncludeVcpChatDesktop',
-        'webdavSyncIncludeVcpChatServerConfig',
-    ]);
-    syncWebDavScopeDisabledState('webdavSyncIncludeVcpToolBox', [
-        'webdavSyncIncludeVcpToolBoxRootConfig',
-        'webdavSyncIncludeVcpToolBoxAgents',
-        'webdavSyncIncludeVcpToolBoxDailyNote',
-        'webdavSyncIncludeVcpToolBoxTvstxt',
-        'webdavSyncIncludeVcpToolBoxSillyTavern',
-        'webdavSyncIncludeVcpToolBoxPluginConfig',
-    ]);
     safeSet('topicSummaryModel', globalSettings.topicSummaryModel || '');
     safeSet('continueWritingPrompt', globalSettings.continueWritingPrompt || '请继续');
     safeSet('flowlockContinueDelay', globalSettings.flowlockContinueDelay ?? 5);
@@ -1580,6 +1597,17 @@ async function syncGlobalSettingsToUI() {
             userAvatarPreview.style.display = 'none';
             userAvatarWrapper?.classList.add('no-avatar');
         }
+    }
+
+    // 加载论坛配置并填充管理员账号/密码
+    try {
+        const forumConfig = await window.electronAPI.loadForumConfig();
+        if (forumConfig && !forumConfig.error) {
+            safeSet('adminUsername', forumConfig.username || '');
+            safeSet('adminPassword', forumConfig.password || '');
+        }
+    } catch (err) {
+        console.warn('[Renderer] Failed to load forum config for global settings:', err);
     }
 
     // Assistant Select

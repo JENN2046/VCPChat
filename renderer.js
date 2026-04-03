@@ -929,6 +929,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
             notificationsSidebar, agentSearchInput, minimizeToTrayBtn, leftSidebar,
             openTranslatorBtn: document.getElementById('openTranslatorBtn'),
             openNotesBtn: document.getElementById('openNotesBtn'),
+            openSheetBtn: document.getElementById('openSheetBtn'),
             openMusicBtn: document.getElementById('openMusicBtn'),
             openCanvasBtn: document.getElementById('openCanvasBtn'),
             toggleAssistantBtn,

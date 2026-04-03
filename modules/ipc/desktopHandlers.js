@@ -1566,7 +1566,7 @@ function initialize(params) {
      * 对于只有 ipcMain.on 注册的模块（forum, memo, music, themes），
      * 在这里直接实现窗口创建逻辑（与 windowHandlers.js 保持一致的单例管理）。
      */
-    ipcMain.handle('desktop-launch-vchat-app', async (event, appAction) => {
+    ipcMain.handle('desktop-launch-vchat-app', async (event, appAction, payload) => {
         try {
             console.log(`[DesktopHandlers] Launching VChat app: ${appAction}`);
 
@@ -1596,6 +1596,11 @@ function initialize(params) {
                 case 'open-notes-window': {
                     const notesHandlers = require('./notesHandlers');
                     notesHandlers.createOrFocusNotesWindow();
+                    return { success: true };
+                }
+                case 'open-sheet-window': {
+                    const sheetHandlers = require('./sheetHandlers');
+                    sheetHandlers.createOrFocusSheetWindow(payload || {});
                     return { success: true };
                 }
 

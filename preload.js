@@ -192,6 +192,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     // Open Notes Window
     openNotesWindow: (theme) => ipcRenderer.invoke('open-notes-window', theme),
+    openSheetWindow: (payload) => ipcRenderer.invoke('open-sheet-window', payload),
     // For sharing content to a new notes window
     openNotesWithContent: (data) => ipcRenderer.invoke('open-notes-with-content', data), // data: { title, content, theme }
     onSharedNoteData: (callback) => ipcRenderer.on('shared-note-data', (_event, data) => callback(data)), // New listener for shared data
@@ -481,7 +482,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     desktopIconsetGetIconData: (relativePath) => ipcRenderer.invoke('desktop-iconset-get-icon-data', relativePath),
 
     // VCPdesktop - VChat 内部应用启动 IPC 通道
-    desktopLaunchVchatApp: (appAction) => ipcRenderer.invoke('desktop-launch-vchat-app', appAction),
+    desktopLaunchVchatApp: (appAction, payload) => ipcRenderer.invoke('desktop-launch-vchat-app', appAction, payload),
+    onSheetOpenWorkbook: (callback) => ipcRenderer.on('sheet-open-workbook', (_event, payload) => callback(payload)),
 
     // VCPdesktop - 壁纸系统 IPC 通道
     desktopSelectWallpaper: () => ipcRenderer.invoke('desktop-select-wallpaper'),
@@ -511,6 +513,8 @@ const electronAPIForLogging = {
     writeTxtNote: "function",
     deleteTxtNote: "function",
     openNotesWindow: "function",
+    openSheetWindow: "function",
+    onSheetOpenWorkbook: "function",
     openNotesWithContent: "function",
     saveAgentOrder: "function",
     saveTopicOrder: "function",

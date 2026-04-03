@@ -118,6 +118,15 @@
             <path d="M20 14l20-6v-2l-20 6z" fill="currentColor" opacity="0.6"/>
             <line x1="20" y1="12" x2="40" y2="6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
         </svg>`,
+        sheet: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="36" height="36" rx="5" fill="currentColor" opacity="0.08"/>
+            <rect x="6" y="6" width="36" height="36" rx="5" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="2" opacity="0.35"/>
+            <line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="2" opacity="0.35"/>
+            <line x1="28" y1="16" x2="28" y2="42" stroke="currentColor" stroke-width="2" opacity="0.22"/>
+            <line x1="6" y1="28" x2="42" y2="28" stroke="currentColor" stroke-width="2" opacity="0.22"/>
+            <path d="M22 23l3 3 7-8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`,
         themes: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="24" cy="24" r="18" fill="currentColor" opacity="0.08"/>
             <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2.5" fill="none"/>
@@ -226,6 +235,16 @@
             emoji: '📝',
             description: '打开用户笔记管理窗口',
             appAction: 'open-notes-window',
+        },
+        {
+            id: 'vchat-app-sheetai',
+            name: 'SheetAI',
+            icon: null,
+            animatedIcon: null,
+            svgIcon: SVG_ICONS.sheet,
+            emoji: '馃搳',
+            description: '鎵撳紑 VCP SheetAI 琛ㄦ牸宸ヤ綔鍙帮紝鐢ㄤ簬涓汉宸ヤ綔绯荤粺鐨勬暟鎹鐞嗕笌 AI 鍒嗘瀽',
+            appAction: 'open-sheet-window',
         },
         {
             id: 'vchat-app-memo',

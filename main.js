@@ -31,6 +31,7 @@ const groupChatHandlers = require('./modules/ipc/groupChatHandlers'); // Import 
 const sovitsHandlers = require('./modules/ipc/sovitsHandlers'); // Import SovitsTTS IPC handlers
 const promptHandlers = require('./modules/ipc/promptHandlers'); // Import prompt handlers
 const notesHandlers = require('./modules/ipc/notesHandlers'); // Import notes handlers
+const sheetHandlers = require('./modules/ipc/sheetHandlers'); // Import SheetAI handlers
 const assistantHandlers = require('./modules/ipc/assistantHandlers'); // Import assistant handlers
 const musicHandlers = require('./modules/ipc/musicHandlers'); // Import music handlers
 const diceHandlers = require('./modules/ipc/diceHandlers'); // Import dice handlers
@@ -773,6 +774,9 @@ if (!gotTheLock) {
             openChildWindows,
             APP_DATA_ROOT_IN_PROJECT,
             SETTINGS_FILE
+        });
+        sheetHandlers.initialize({
+            openChildWindows
         });
 
         // Translator IPC Handlers

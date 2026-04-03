@@ -44,6 +44,11 @@
                     window.VCPDesktop.builtinTranslate.spawn();
                 }
             },
+            spawnSheetWidget: () => {
+                if (window.VCPDesktop.builtinSheet) {
+                    window.VCPDesktop.builtinSheet.spawn();
+                }
+            },
             spawnMetricWidget: (component, options) => {
                 if (window.VCPDesktop.metricWidgets) {
                     return window.VCPDesktop.metricWidgets.spawn(component, options);

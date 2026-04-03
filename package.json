@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@3d-dice/dice-box": "^1.1.4",
+    "@xterm/headless": "^6.0.0",
     "animejs": "^4.0.2",
     "axios": "^1.10.0",
     "cheerio": "^1.1.2",

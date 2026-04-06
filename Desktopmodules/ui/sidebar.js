@@ -6,6 +6,7 @@
 'use strict';
 
 (function () {
+    const desktopApi = window.desktopAPI || window.electronAPI;
     const { state, domRefs } = window.VCPDesktop;
 
     let currentTab = 'widgets';
@@ -19,6 +20,7 @@
         { id: 'builtinSheet', name: 'SheetAI 工作台', icon: '📊', description: '最近工作簿、快速新建与表格入口', spawnKey: 'builtinSheet' },
         { id: 'builtinMusic', name: '音乐播放条', icon: '🎵', description: '迷你音乐控制器', spawnKey: 'builtinMusic' },
         { id: 'builtinAppTray', name: '应用托盘', icon: '📦', description: '网格浏览全部应用，拖拽到桌面', spawnKey: 'builtinAppTray' },
+        { id: 'builtinPerformanceMonitor', name: '性能监视器', icon: '⚡', description: '实时监控挂件与系统负载', spawnKey: 'builtinPerformanceMonitor' },
     ];
 
     const THIRD_PARTY_WIDGETS = [
@@ -415,7 +417,7 @@
         };
 
         // 保存到磁盘
-        if (window.electronAPI?.desktopSaveLayout) {
+        if (desktopApi?.desktopSaveLayout) {
             try {
                 // 加载已有预设
                 const existing = await loadPresetsFromDisk();
@@ -467,7 +469,7 @@
         };
 
         // 保存到磁盘
-        if (window.electronAPI?.desktopSaveLayout) {
+        if (desktopApi?.desktopSaveLayout) {
             try {
                 const existing = await loadPresetsFromDisk();
                 existing.push(preset);
@@ -491,9 +493,9 @@
      * 从磁盘加载预设列表
      */
     async function loadPresetsFromDisk() {
-        if (!window.electronAPI?.desktopLoadLayout) return [];
+        if (!desktopApi?.desktopLoadLayout) return [];
         try {
-            const result = await window.electronAPI.desktopLoadLayout();
+            const result = await desktopApi.desktopLoadLayout();
             if (result?.success && result.data && result.data.presets) {
                 return result.data.presets;
             }
@@ -507,19 +509,19 @@
      * 保存预设列表，同时保留 layout.json 中的 globalSettings 等其他字段
      */
     async function savePresetsAndKeepSettings(presets) {
-        if (!window.electronAPI?.desktopSaveLayout) return;
+        if (!desktopApi?.desktopSaveLayout) return;
         try {
             // 读取现有数据以保留 globalSettings 等字段
             let existingData = {};
-            if (window.electronAPI?.desktopLoadLayout) {
-                const result = await window.electronAPI.desktopLoadLayout();
+            if (desktopApi?.desktopLoadLayout) {
+                const result = await desktopApi.desktopLoadLayout();
                 if (result?.success && result.data) {
                     existingData = result.data;
                 }
             }
             // 更新预设列表，保留其他字段
             existingData.presets = presets;
-            await window.electronAPI.desktopSaveLayout(existingData);
+            await desktopApi.desktopSaveLayout(existingData);
         } catch (err) {
             console.error('[Sidebar] Save presets error:', err);
         }
@@ -715,7 +717,7 @@
      * 删除预设
      */
     async function deletePreset(presetId) {
-        if (!window.electronAPI?.desktopSaveLayout) return;
+        if (!desktopApi?.desktopSaveLayout) return;
 
         try {
             const presets = await loadPresetsFromDisk();

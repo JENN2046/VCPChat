@@ -35,3 +35,4 @@ styles/themes.css
 vendor/LibreHardwareMonitor/*
 !vendor/LibreHardwareMonitor/README.md
 VCPDistributedServer/Plugin/DistImageServer/config.env
+VCPDistributedServer/Plugin/FileOperator/.env

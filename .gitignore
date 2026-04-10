@@ -36,3 +36,6 @@ vendor/LibreHardwareMonitor/*
 !vendor/LibreHardwareMonitor/README.md
 VCPDistributedServer/Plugin/DistImageServer/config.env
 VCPDistributedServer/Plugin/FileOperator/.env
+
+# 忽略 WebIndexTTS2 生成输出目录
+/WebIndexTTS2/tmp-output/

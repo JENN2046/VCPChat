@@ -9,6 +9,11 @@ if (process.platform === 'win32') {
     }
 }
 
+const initWindowsConsoleUtf8 = require('../modules/utils/initWindowsConsoleUtf8');
+initWindowsConsoleUtf8();
+const patchConsoleForUnicodeSafeLogging = require('../modules/utils/patchConsoleForUnicodeSafeLogging');
+patchConsoleForUnicodeSafeLogging();
+
 const WebSocket = require('ws');
 const express = require('express');
 const http = require('http');

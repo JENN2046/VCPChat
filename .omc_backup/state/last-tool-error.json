@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"git checkout .claude/settings.local.json\",\"description\":\"尝试恢复 .claude/settings.local.json（如果它在工作区中）\"}",
+  "error": "Exit code 1\nerror: pathspec '.claude/settings.local.json' did not match any file(s) known to git",
+  "timestamp": "2026-04-10T11:05:02.911Z",
+  "retry_count": 2
+}

@@ -1,6 +1,11 @@
 // main.js - Electron 主窗口
 
 // --- 模块加载性能诊断 ---
+const initWindowsConsoleUtf8 = require('./modules/utils/initWindowsConsoleUtf8');
+initWindowsConsoleUtf8();
+const patchConsoleForUnicodeSafeLogging = require('./modules/utils/patchConsoleForUnicodeSafeLogging');
+patchConsoleForUnicodeSafeLogging();
+
 const originalRequire = require;
 require = function (id) {
     const start = Date.now();

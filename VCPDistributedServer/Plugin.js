@@ -9,14 +9,42 @@ if (process.platform === 'win32') {
     }
 }
 
+const initWindowsConsoleUtf8 = require('../modules/utils/initWindowsConsoleUtf8');
+initWindowsConsoleUtf8();
+
 const fs = require('fs').promises;
 const path = require('path');
 const { spawn } = require('child_process');
 const schedule = require('node-schedule');
 const dotenv = require('dotenv');
+const repairManifestMojibake = require('../modules/utils/repairManifestMojibake');
 
 const PLUGIN_DIR = path.join(__dirname, 'Plugin');
 const manifestFileName = 'plugin-manifest.json';
+
+function formatAsciiSafeLogText(value) {
+    const text = value == null ? '' : String(value);
+    if (!/[^\x20-\x7E]/.test(text)) {
+        return text;
+    }
+
+    const escaped = Array.from(text).map((char) => {
+        const codePoint = char.codePointAt(0);
+        if (codePoint >= 0x20 && codePoint <= 0x7E) {
+            return char;
+        }
+        if (codePoint <= 0xFFFF) {
+            return `\\u${codePoint.toString(16).padStart(4, '0')}`;
+        }
+
+        const adjusted = codePoint - 0x10000;
+        const high = 0xD800 + (adjusted >> 10);
+        const low = 0xDC00 + (adjusted & 0x3FF);
+        return `\\u${high.toString(16).padStart(4, '0')}\\u${low.toString(16).padStart(4, '0')}`;
+    }).join('');
+
+    return `${text} [${escaped}]`;
+}
 
 class PluginManager {
     constructor() {
@@ -85,7 +113,7 @@ class PluginManager {
                     const manifestPath = path.join(pluginPath, manifestFileName);
                     try {
                         const manifestContent = await fs.readFile(manifestPath, 'utf-8');
-                        const manifest = JSON.parse(manifestContent);
+                        const manifest = repairManifestMojibake(JSON.parse(manifestContent));
                         if (!manifest.name || !manifest.pluginType || !manifest.entryPoint) {
                             if (this.debugMode) console.warn(`[DistPluginManager] Invalid manifest in ${folder.name}. Skipping.`);
                             continue;
@@ -108,7 +136,8 @@ class PluginManager {
 
                         // 加载所有类型的插件
                         this.plugins.set(manifest.name, manifest);
-                        console.log(`[DistPluginManager] Loaded manifest: ${manifest.displayName} (${manifest.name}, Type: ${manifest.pluginType})`);
+                        const displayNameForLog = formatAsciiSafeLogText(manifest.displayName || manifest.name);
+                        console.log(`[DistPluginManager] Loaded manifest: ${displayNameForLog} (${manifest.name}, Type: ${manifest.pluginType})`);
 
                         // 如果是服务类或混合服务类插件，则加载其模块以备初始化
                         if ((manifest.pluginType === 'service' || manifest.pluginType === 'hybridservice') && manifest.entryPoint.script && manifest.communication?.protocol === 'direct') {

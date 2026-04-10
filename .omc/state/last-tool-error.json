@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"git stash pop\",\"description\":\"再次尝试恢复暂存的本地修改\"}",
+  "error": "Exit code 1\nerror: Your local changes to the following files would be overwritten by merge:\n\tVCPDistributedServer/Plugin.js\n\tVCPDistributedServer/VCPDistributedServer.js\n\tmain.js\nPlease commit your changes or stash them before you merge.\nAborting\nOn branch custom\nYour branch is ahead of 'origin/custom' by 18 commits.\n  (use \"git push\" to publish your local commits)\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to disca...",
+  "timestamp": "2026-04-10T11:11:41.201Z",
+  "retry_count": 1
+}

@@ -129,13 +129,13 @@ function runTests() {
     const testCases = [
         {
             name: '误报案例：路径中包含rm',
-            command: '$env:PATH += ";H:\\Down\\APK\\platform-tools-latest-windows\\platform-tools"',
+            command: '$env:PATH += ";A:\\Down\\APK\\platform-tools-latest-windows\\platform-tools"',
             expectedForbidden: false,
             expectedAuth: false
         },
         {
             name: '误报案例：设置环境变量到包含rm的路径',
-            command: 'Set-Item -Path "Env:ANDROID_HOME" -Value "H:\\Down\\APK\\platform-tools-latest-windows\\platform-tools"',
+            command: 'Set-Item -Path "Env:ANDROID_HOME" -Value "A:\\Down\\APK\\platform-tools-latest-windows\\platform-tools"',
             expectedForbidden: false,
             expectedAuth: true // Set-Item需要授权
         },
@@ -171,7 +171,7 @@ function runTests() {
         },
         {
             name: '复杂路径测试',
-            command: 'Copy-Item -Path "H:\\Projects\\network-tools\\bin\\netstat.exe" -Destination "C:\\Tools\\"',
+            command: 'Copy-Item -Path "A:\\Projects\\network-tools\\bin\\netstat.exe" -Destination "C:\\Tools\\"',
             expectedForbidden: false,
             expectedAuth: false // Copy-Item不在当前授权列表中
         }

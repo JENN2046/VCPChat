@@ -9,9 +9,9 @@
 ### 编译命令 (Windows CMD)
 
 ```cmd
-cd H:\VCP\VCPChat\rust_audio_engine
-set PATH=H:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;%PATH%
-set "PKG_CONFIG_PATH=H:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig"
+cd A:\VCP\VCPChat\rust_audio_engine
+set PATH=A:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;%PATH%
+set "PKG_CONFIG_PATH=A:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig"
 set RUSTFLAGS=-C target-cpu=native
 py -3.13 -m maturin build --release --interpreter python3.13
 ```
@@ -25,14 +25,14 @@ py -3.13 -m pip install target/wheels/rust_audio_resampler-0.1.0-cp313-cp313-win
 ### 一键编译安装 (Windows CMD)
 
 ```cmd
-cd H:\VCP\VCPChat\rust_audio_engine && set PATH=H:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;%PATH% && set "PKG_CONFIG_PATH=H:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig" && set RUSTFLAGS=-C target-cpu=native && py -3.13 -m maturin build --release --interpreter python3.13 && py -3.13 -m pip install target/wheels/rust_audio_resampler-0.1.0-cp313-cp313-win_amd64.whl --force-reinstall
+cd A:\VCP\VCPChat\rust_audio_engine && set PATH=A:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;%PATH% && set "PKG_CONFIG_PATH=A:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig" && set RUSTFLAGS=-C target-cpu=native && py -3.13 -m maturin build --release --interpreter python3.13 && py -3.13 -m pip install target/wheels/rust_audio_resampler-0.1.0-cp313-cp313-win_amd64.whl --force-reinstall
 ```
 
 ```cmd
-cd rust_audio_engine && set PATH=H:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;%PATH% && set "PKG_CONFIG_PATH=H:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig" && set RUSTFLAGS=-C target-cpu=native && cargo build --release
+cd rust_audio_engine && set PATH=A:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;%PATH% && set "PKG_CONFIG_PATH=A:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig" && set RUSTFLAGS=-C target-cpu=native && cargo build --release
 ```
 ```
-$env:PATH = "H:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;$env:PATH"; $env:PKG_CONFIG_PATH = "H:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig"; $env:RUSTFLAGS = "-C target-cpu=native"; cargo build --release
+$env:PATH = "A:\VCP\vcpkg\installed\x64-windows-static\tools\pkgconf;$env:PATH"; $env:PKG_CONFIG_PATH = "A:\VCP\vcpkg\installed\x64-windows-static\lib\pkgconfig"; $env:RUSTFLAGS = "-C target-cpu=native"; cargo build --release
 ```
 
 

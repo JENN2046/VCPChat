@@ -1,9 +1,9 @@
 # Audio Engine Dual-Build Script (AVX2 & AVX-512)
 # vcpkg path detection - Prefer static-md for stability
-$VcpkgBase = "H:\VCP\vcpkg\installed\x64-windows-static-md"
+$VcpkgBase = "A:\VCP\vcpkg\installed\x64-windows-static-md"
 if (!(Test-Path $VcpkgBase)) {
     Write-Host ">>> Info: static-md not found. Falling back to x64-windows-static." -ForegroundColor Yellow
-    $VcpkgBase = "H:\VCP\vcpkg\installed\x64-windows-static"
+    $VcpkgBase = "A:\VCP\vcpkg\installed\x64-windows-static"
 }
 
 # Inject environment variables for pkg-config discovery
@@ -11,7 +11,7 @@ $env:PATH = "$VcpkgBase\tools\pkgconf;$env:PATH"
 $env:PKG_CONFIG_PATH = "$VcpkgBase\lib\pkgconfig;$(Join-Path (Get-Location) 'pkgconfig')"
 
 # Force vcpkg root and triplet for cargo vcpkg-crate
-$env:VCPKG_ROOT = "H:\VCP\vcpkg"
+$env:VCPKG_ROOT = "A:\VCP\vcpkg"
 if ($VcpkgBase -match "static-md") {
     $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-static-md"
 } else {

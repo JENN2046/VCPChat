@@ -20,7 +20,7 @@ const os = require('os');
 const { spawn } = require('child_process'); // For executing local python
 const { Worker } = require('worker_threads');
 const fileManager = require('./modules/fileManager'); // Import the new file manager
-const groupChat = require('./Groupmodules/groupchat'); // Import the group chat module
+const groupChat = require('./Desktopmodules/legacy/Groupmodules/groupchat'); // Import the group chat module
 const windowHandlers = require('./modules/ipc/windowHandlers'); // Import window IPC handlers
 const settingsHandlers = require('./modules/ipc/settingsHandlers'); // Import settings IPC handlers
 const fileDialogHandlers = require('./modules/ipc/fileDialogHandlers'); // Import file dialog handlers
@@ -1401,7 +1401,7 @@ ipcMain.on('open-voice-chat-window', (event, { agentId }) => {
         voiceChatWindow.webContents.send('voice-chat-data', { agentId, theme });
     });
     
-    voiceChatWindow.loadFile(path.join(__dirname, 'Voicechatmodules/voicechat.html'));
+    voiceChatWindow.loadFile(path.join(__dirname, 'Desktopmodules/legacy/Voicechatmodules/voicechat.html'));
 
     voiceChatWindow.once('ready-to-show', () => {
         voiceChatWindow.show();
@@ -1427,7 +1427,7 @@ ipcMain.on('start-speech-recognition', async (event) => {
         const settings = await appSettingsManager.readSettings();
         speechConfig = {
             browserPath: settings?.speechRecognizerBrowserPath || '',
-            recognizerPagePath: settings?.speechRecognizerPagePath || 'Voicechatmodules/recognizer.html'
+    recognizerPagePath: settings?.speechRecognizerPagePath || 'Desktopmodules/legacy/Voicechatmodules/recognizer.html'
         };
     } catch (error) {
         console.warn('[Main] Failed to read speech recognition settings, using defaults:', error.message);

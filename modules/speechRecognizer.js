@@ -8,13 +8,13 @@ let textCallback = null; // Store the callback function globally within the modu
 let lastResolvedConfigSignature = '';
 let recognizerConfig = {
     browserPath: '',
-    recognizerPagePath: path.join(__dirname, '..', 'Voicechatmodules', 'recognizer.html')
+    recognizerPagePath: path.join(__dirname, '..', 'Desktopmodules', 'legacy', 'Voicechatmodules', 'recognizer.html')
 };
 
 // --- Private Functions ---
 
 function getDefaultRecognizerPagePath() {
-    return path.join(__dirname, '..', 'Voicechatmodules', 'recognizer.html');
+    return path.join(__dirname, '..', 'Desktopmodules', 'legacy', 'Voicechatmodules', 'recognizer.html');
 }
 
 function resolveRecognizerPagePath(customPagePath = '') {

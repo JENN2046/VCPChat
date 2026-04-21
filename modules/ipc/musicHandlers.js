@@ -80,7 +80,7 @@ function createOrFocusMusicWindow() {
             show: false
         });
 
-        musicWindow.loadFile(path.join(__dirname, '..', '..', 'Musicmodules', 'music.html'));
+        musicWindow.loadFile(path.join(__dirname, '..', '..', 'Desktopmodules/legacy/Musicmodules', 'music.html'));
         windowService.attachWindow(WINDOW_APP_IDS.MUSIC, musicWindow);
 
         openChildWindows.push(musicWindow);

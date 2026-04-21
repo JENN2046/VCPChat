@@ -2,7 +2,7 @@
 const { ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs-extra');
-const groupChat = require('../../Groupmodules/groupchat');
+const groupChat = require('../../Desktopmodules/legacy/Groupmodules/groupchat');
 
 /**
  * Initializes group chat related IPC handlers.

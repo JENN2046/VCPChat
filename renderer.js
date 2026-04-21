@@ -13,7 +13,6 @@ let globalSettings = {
     enableRegenerateConfirmation: true, // 重新回复确认机制开关
     flowlockContinueDelay: 5, // 心流锁续写延迟（秒）
     enableThoughtChainInjection: false, // 元思考注入上下文开关
-    fileKey: '',
     enableWideChatLayout: false,
     chatBubbleMaxWidthDefault: 82,
     chatBubbleMaxWidthNotifications: 90,
@@ -33,13 +32,13 @@ let globalSettings = {
     showUserMetaInChatBubbleUi: true,
     voiceMode: 'local',
     speechRecognizerBrowserPath: '',
-    speechRecognizerPagePath: 'Voicechatmodules/recognizer.html',
-    voiceLocalSettings: {
-        sovitsUrl: '',
+    speechRecognizerPagePath: 'Desktopmodules/legacy/Voicechatmodules/recognizer.html',
+    voiceNetworkSettings: {
+        sovitsUrl: 'https://api.siliconflow.cn',
         sovitsKey: ''
     },
-    voiceNetworkSettings: {
-        providerUrl: 'https://api.siliconflow.cn',
+    voiceLocalSettings: {
+        providerUrl: '',
         providerKey: ''
     }
 };
@@ -1103,6 +1102,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
             notificationsSidebar, agentSearchInput, minimizeToTrayBtn, leftSidebar,
             openTranslatorBtn: document.getElementById('openTranslatorBtn'),
             openNotesBtn: document.getElementById('openNotesBtn'),
+            openSheetBtn: document.getElementById('openSheetBtn'),
             openMusicBtn: document.getElementById('openMusicBtn'),
             openCanvasBtn: document.getElementById('openCanvasBtn'),
             toggleAssistantBtn,
@@ -1992,7 +1992,6 @@ async function syncGlobalSettingsToUI() {
     const completedUrl = window.settingsManager.completeVcpUrl(globalSettings.vcpServerUrl || '');
     safeSet('vcpServerUrl', completedUrl);
     safeSet('vcpApiKey', globalSettings.vcpApiKey || '');
-    safeSet('fileKey', globalSettings.fileKey || '');
     safeSet('vcpLogUrl', globalSettings.vcpLogUrl || '');
     safeSet('vcpLogKey', globalSettings.vcpLogKey || '');
     safeSet('topicSummaryModel', globalSettings.topicSummaryModel || '');
@@ -2001,11 +2000,11 @@ async function syncGlobalSettingsToUI() {
     safeCheck('voiceModeLocal', (globalSettings.voiceMode || 'local') !== 'network');
     safeCheck('voiceModeNetwork', (globalSettings.voiceMode || 'local') === 'network');
     safeSet('speechRecognizerBrowserPath', globalSettings.speechRecognizerBrowserPath || '');
-    safeSet('speechRecognizerPagePath', globalSettings.speechRecognizerPagePath || 'Voicechatmodules/recognizer.html');
-    safeSet('voiceLocalSovitsUrl', globalSettings.voiceLocalSettings?.sovitsUrl || '');
-    safeSet('voiceLocalSovitsKey', globalSettings.voiceLocalSettings?.sovitsKey || '');
-    safeSet('voiceNetworkProviderUrl', globalSettings.voiceNetworkSettings?.providerUrl || '');
-    safeSet('voiceNetworkProviderKey', globalSettings.voiceNetworkSettings?.providerKey || '');
+    safeSet('speechRecognizerPagePath', globalSettings.speechRecognizerPagePath || 'Desktopmodules/legacy/Voicechatmodules/recognizer.html');
+    safeSet('voiceNetworkSovitsUrl', globalSettings.voiceNetworkSettings?.sovitsUrl || '');
+    safeSet('voiceNetworkSovitsKey', globalSettings.voiceNetworkSettings?.sovitsKey || '');
+    safeSet('voiceLocalProviderUrl', globalSettings.voiceLocalSettings?.providerUrl || '');
+    safeSet('voiceLocalProviderKey', globalSettings.voiceLocalSettings?.providerKey || '');
     
     // Network Notes Paths
     const networkNotesPathsContainer = document.getElementById('networkNotesPathsContainer');

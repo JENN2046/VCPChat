@@ -402,7 +402,7 @@ class DistributedServer {
     // 新增：检查是否应该记录静态插件日志
     async shouldLogStaticPlugins() {
         try {
-            const settingsPath = path.join(__dirname, '..', 'AppData', 'settings.json');
+            const settingsPath = path.join(serverRoots.runtimeDataRoot, 'settings.json');
             if (!fsSync.existsSync(settingsPath)) {
                 return true; // 默认启用日志
             }

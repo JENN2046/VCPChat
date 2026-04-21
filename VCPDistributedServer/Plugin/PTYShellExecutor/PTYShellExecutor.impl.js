@@ -10,6 +10,7 @@ const { EventEmitter } = require('events');
 const { spawn } = require('child_process');
 const { BrowserWindow, ipcMain, clipboard } = require('electron');
 const chokidar = require('chokidar');
+const { createPluginRoots } = require('../../../modules/utils/vcpPathRoots');
 
 // --- Pager 兼容性：默认禁用常见分页器，避免命令进入 less/more 导致边界标记永远无法输出 ---
 function withPagerDisabledEnv(baseEnv) {
@@ -579,8 +580,8 @@ function ensureGuiWindow() {
 }
 
 // --- 主题管理 ---
-const settingsPath = path.join(__dirname, '..', '..', '..', 'AppData', 'settings.json');
-const rootSettingsPath = path.join(__dirname, '..', '..', '..', 'settings.json');
+const settingsPath = path.join(createPluginRoots(__dirname).runtimeDataRoot, 'settings.json');
+const rootSettingsPath = path.join(createPluginRoots(__dirname).workspaceRoot, 'settings.json');
 let settingsWatcher = null;
 let lastSentTheme = null;
 

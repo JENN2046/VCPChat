@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { BrowserWindow, ipcMain, clipboard } = require('electron');
 const tmp = require('tmp');
 const chokidar = require('chokidar');
+const { createPluginRoots } = require('../../../modules/utils/vcpPathRoots');
 
 // --- GUI Window Management ---
 let guiWindow = null;
@@ -52,7 +53,7 @@ function ensureGuiWindow() {
 }
 
 // --- 主题管理与文件监视 ---
-const settingsPath = path.join(__dirname, '..', '..', '..', 'AppData', 'settings.json');
+const settingsPath = path.join(createPluginRoots(__dirname).runtimeDataRoot, 'settings.json');
 let settingsWatcher = null;
 let lastSentTheme = null; // 用于存储上一次发送的主题名称
 

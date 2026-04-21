@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
-const path = require('path');
 const dotenv = require('dotenv');
+const { createPluginRoots } = require('../../../modules/utils/vcpPathRoots');
 
 // --- 主逻辑 ---
 async function main() {
@@ -9,7 +9,7 @@ async function main() {
         const args = parseToolArgs(input);
 
         // 1. 动态计算 VchatDataURL 路径
-        const VchatDataURL = path.join(__dirname, '..', '..', '..', 'AppData');
+        const VchatDataURL = createPluginRoots(__dirname).runtimeDataRoot;
 
         // 2. 获取命令名称（优先使用 command，兼容旧版 tool_name）
         const commandName = args.command || args.tool_name;

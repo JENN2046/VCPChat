@@ -8,9 +8,11 @@ const fsSync = require('fs');
 const dotenv = require('dotenv');
 const os = require('os');
 const mime = require('mime-types');
+const { createServerRoots } = require('../modules/utils/vcpPathRoots');
  // const { ipcMain } = require('electron'); // This was incorrect. ipcMain should be injected.
  const pluginManager = require('./Plugin.js');
-const GENERATED_LISTS_CONFIG_PATH = path.join(__dirname, '..', 'AppData', 'generated_lists', 'config.env');
+const serverRoots = createServerRoots(__dirname);
+const GENERATED_LISTS_CONFIG_PATH = path.join(serverRoots.runtimeDataRoot, 'generated_lists', 'config.env');
 
 // DEBUG_MODE is now passed in config
 // const DEBUG_MODE = (process.env.DebugMode || "False").toLowerCase() === "true";

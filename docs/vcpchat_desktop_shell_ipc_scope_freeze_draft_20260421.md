@@ -9,6 +9,7 @@
 This draft narrows the first potentially countable `VCPChat` module down to the desktop shell and IPC layer.
 
 It intentionally excludes the distributed server, media engines, product-specific submodules, runtime state, and dependency trees.
+The AI image experiment slice has its own draft and is not part of this boundary.
 
 ## Candidate Surface
 
@@ -60,6 +61,8 @@ This draft does not count:
 - `VCPChat_ANALYSIS.md`
 - `VCP_Plugin_Validator.ps1`
 
+The author-official `VCPDistributedServer/Plugin/EmojiListGenerator/` plugin is not part of this first slice. It should be frozen later as its own official plugin boundary.
+
 ## Why This Slice Comes First
 
 This slice is the smallest source surface that still looks like a coherent product unit:
@@ -81,9 +84,10 @@ Before this slice can become a frozen module, the following should be true:
 ## Proposed Next Steps
 
 1. Clean and classify only the files in this slice.
-2. Review whether the AI image desktop experiment belongs here or should become its own module.
-3. Freeze this slice as the first `VCPChat` countable module only after the clean split is real.
-4. Leave distributed server and engine families for later freezes.
+2. Use the dedicated AI image experiment scope draft for `Desktopmodules/aiImageGen.html` and its support files.
+3. Keep the author-official `EmojiListGenerator` plugin out of this slice and freeze it later as its own module boundary.
+4. Freeze this slice as the first `VCPChat` countable module only after the clean split is real.
+5. Leave distributed server and engine families for later freezes.
 
 ## Recommendation
 

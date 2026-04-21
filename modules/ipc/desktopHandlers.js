@@ -29,6 +29,7 @@ let vchatMemoWindow = null;
 let vchatTranslatorWindow = null;
 let vchatMusicWindow = null;
 let vchatThemesWindow = null;
+let vchatAIImageGenWindow = null;
 
 // --- 鏀惰棌绯荤粺璺緞 - 浣跨敤椤圭洰鏍圭洰褰曠殑 AppData ---
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -515,6 +516,19 @@ function registerManagedWindows() {
             return vchatThemesWindow;
         },
     });
+
+    windowService.register(WINDOW_APP_IDS.AI_IMAGE_GEN, {
+        owner: 'desktopHandlers',
+        getWindow: () => vchatAIImageGenWindow,
+        open: async () => {
+            vchatAIImageGenWindow = createOrFocusChildWindow(vchatAIImageGenWindow, {
+                width: 1200, height: 800, minWidth: 800, minHeight: 600,
+                title: 'AI 生图工作流',
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'aiImageGen.html'),
+            });
+            return vchatAIImageGenWindow;
+        },
+    });
 }
 
 function resolveAppActionToAppId(appAction) {
@@ -539,6 +553,8 @@ function resolveAppActionToAppId(appAction) {
             return WINDOW_APP_IDS.MUSIC;
         case 'open-themes-window':
             return WINDOW_APP_IDS.THEMES;
+        case 'open-ai-image-gen-window':
+            return WINDOW_APP_IDS.AI_IMAGE_GEN;
         default:
             return null;
     }

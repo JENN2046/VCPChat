@@ -157,6 +157,7 @@ function createCatalog(ops) {
         openMusicWindow: command(() => ops.send('open-music-window')),
         openDiceWindow: query(() => ops.invoke('open-dice-window')),
         openCanvasWindow: query(() => ops.invoke('open-canvas-window')),
+        openSheetWindow: query(() => ops.invoke('open-sheet-window')),
         openDesktopWindow: query(() => ops.invoke('open-desktop-window')),
 
         // Chat/app shell APIs
@@ -461,6 +462,7 @@ const ALLOWED_KEYS = [
     "openMemoWindow",
     "openMusicWindow",
     "openCanvasWindow",
+    "openSheetWindow",
     "openDesktopWindow",
     "loadForumConfig",
     "saveForumConfig",

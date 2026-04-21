@@ -54,30 +54,16 @@ These need manual review before any staging decision:
 
 If these are product-required defaults, they should be replaced with sanitized templates before any freeze. If they are purely local, they should remain excluded from the count.
 
-## Official Separate Plugin Surface
+## Experiment / Ad Hoc Files
 
-These files are author-official plugin surfaces, but they are not part of the first desktop shell / IPC slice:
-
-- `VCPDistributedServer/Plugin/EmojiListGenerator/`
-
-They should be evaluated as a separate module boundary later.
-
-## AI Image Experiment Slice
-
-These files belong to a separate AI image experiment boundary, not the first desktop shell / IPC slice:
+These files look like feature experiments or side paths that may or may not belong in the first slice:
 
 - `Desktopmodules/aiImageGen.html`
 - `Desktopmodules/builtinWidgets/AIImageGenWidget.js`
 - `Desktopmodules/test_AIImageGenWidget.js`
 - `modules/image-viewer-rating.html`
+- `VCPDistributedServer/Plugin/EmojiListGenerator/`
 - `assets/iconset/ImageAutoRegister/`
-
-They should be reviewed with the dedicated AI image experiment scope draft.
-
-## Experiment / Ad Hoc Files
-
-These files are still side paths or support files that may or may not belong in any freeze:
-
 - `VCPChat_ANALYSIS.md`
 - `VCP_Plugin_Validator.ps1`
 
@@ -98,7 +84,6 @@ However, the current worktree is not yet clean enough to freeze it because:
 Proceed in this order:
 
 1. Review the source-bearing files as one module boundary.
-2. Keep the AI image experiment files out of this module; use the dedicated AI image experiment scope draft for that boundary.
-3. Keep `VCPDistributedServer/Plugin/EmojiListGenerator/` out of the first slice; treat it as a separate official plugin boundary for a later freeze.
-4. Sanitize or replace the env files if they are intended as committed defaults.
-5. Only then consider freezing the desktop shell / IPC slice.
+2. Decide whether the AI image experiment files belong to that module or should become a separate module.
+3. Sanitize or replace the env files if they are intended as committed defaults.
+4. Only then consider freezing the desktop shell / IPC slice.

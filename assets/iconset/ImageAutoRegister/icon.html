@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>ImageRating Icon</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.icon-wrap {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-inner {
+  width: 56px;
+  height: 56px;
+  position: relative;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.star {
+  fill: #ffc107;
+  filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.6));
+}
+
+.circle {
+  fill: none;
+  stroke: #64b5f6;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(100, 180, 255, 0.4));
+  animation: rotate 4s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+<div class="icon-wrap">
+  <div class="icon-inner">
+    <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+      <circle class="circle" cx="28" cy="28" r="24" stroke-dasharray="4 4"/>
+      <polygon class="star" points="28,8 32,20 44,20 34,28 38,40 28,32 18,40 22,28 12,20 24,20"/>
+    </svg>
+  </div>
+</div>
+</body>
+</html>

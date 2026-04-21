@@ -751,7 +751,6 @@ fn read_stdin() -> Result<String> {
 
 fn load_config() -> Result<Config> {
     let exe_dir = std::env::current_exe()?.parent().unwrap().to_path_buf();
-    let roots = create_plugin_roots(&exe_dir);
     let candidates = vec![
         exe_dir.join("config.env"),
         exe_dir.join("..").join("config.env"),
@@ -761,12 +760,17 @@ fn load_config() -> Result<Config> {
         .into_iter()
         .find(|p| p.exists())
         .ok_or_else(|| anyhow!("config.env not found in search paths"))?;
+    let plugin_root = config_path
+        .parent()
+        .ok_or_else(|| anyhow!("Failed to determine plugin root from config path"))?;
+    let roots = create_plugin_roots(plugin_root);
     
     dotenv::from_path(&config_path).with_context(|| format!("Failed to load .env file from {:?}", config_path))?;
 
     let vchat_data_url = resolve_configured_path(
         std::env::var("VchatDataURL").ok().as_deref(),
         &roots,
+        &roots.plugin_root,
         roots.runtime_data_root.join(""),
     );
 

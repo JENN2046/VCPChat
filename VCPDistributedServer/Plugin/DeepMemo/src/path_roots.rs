@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 #[derive(Debug, Clone)]
 pub struct PathRoots {
@@ -53,22 +53,71 @@ pub fn expand_template_path(raw_value: &str, roots: &PathRoots) -> PathBuf {
     PathBuf::from(trimmed)
 }
 
+fn normalize_path(path: impl AsRef<Path>) -> PathBuf {
+    let mut normalized = PathBuf::new();
+
+    for component in path.as_ref().components() {
+        match component {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                normalized.pop();
+            }
+            other => normalized.push(other.as_os_str()),
+        }
+    }
+
+    normalized
+}
+
 pub fn resolve_configured_path(
     raw_value: Option<&str>,
     roots: &PathRoots,
+    base_root: impl AsRef<Path>,
     fallback: impl AsRef<Path>,
 ) -> PathBuf {
+    let base_root = base_root.as_ref().to_path_buf();
     let fallback = fallback.as_ref().to_path_buf();
 
     match raw_value {
         Some(value) if !value.trim().is_empty() => {
             let candidate = expand_template_path(value, roots);
             if candidate.is_absolute() {
-                candidate
+                normalize_path(candidate)
             } else {
-                roots.workspace_root.join(candidate)
+                normalize_path(base_root.join(candidate))
             }
         }
         _ => fallback,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn relative_paths_resolve_from_plugin_root() {
+        let roots = create_plugin_roots("A:/VCP/VCPChat/VCPDistributedServer/Plugin/DeepMemo");
+        let resolved = resolve_configured_path(
+            Some("../../AppData"),
+            &roots,
+            &roots.plugin_root,
+            &roots.runtime_data_root,
+        );
+
+        assert_eq!(resolved, PathBuf::from("A:/VCP/VCPChat/VCPDistributedServer/AppData"));
+    }
+
+    #[test]
+    fn placeholder_paths_still_expand_from_workspace_root() {
+        let roots = create_plugin_roots("A:/VCP/VCPChat/VCPDistributedServer/Plugin/DeepMemo");
+        let resolved = resolve_configured_path(
+            Some("<workspace>/Downloads"),
+            &roots,
+            &roots.plugin_root,
+            &roots.runtime_data_root,
+        );
+
+        assert_eq!(resolved, PathBuf::from("A:/VCP/VCPChat/Downloads"));
     }
 }

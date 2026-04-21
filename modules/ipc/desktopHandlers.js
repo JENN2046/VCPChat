@@ -30,6 +30,7 @@ let vchatTranslatorWindow = null;
 let vchatMusicWindow = null;
 let vchatThemesWindow = null;
 let vchatTaskWindow = null;
+let vchatAIImageGenWindow = null;
 
 // --- 收藏系统路径 - 使用项目根目录的 AppData ---
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -331,6 +332,8 @@ function createOrFocusChildWindow(existingWindow, options) {
         if (win === vchatMemoWindow) vchatMemoWindow = null;
         if (win === vchatTranslatorWindow) vchatTranslatorWindow = null;
         if (win === vchatThemesWindow) vchatThemesWindow = null;
+        if (win === vchatTaskWindow) vchatTaskWindow = null;
+        if (win === vchatAIImageGenWindow) vchatAIImageGenWindow = null;
     });
 
     console.log(`[DesktopHandlers] Created child window: ${options.title}`);
@@ -536,6 +539,19 @@ function registerManagedWindows() {
             return vchatTaskWindow;
         },
     });
+
+    windowService.register(WINDOW_APP_IDS.AI_IMAGE_GEN, {
+        owner: 'desktopHandlers',
+        getWindow: () => vchatAIImageGenWindow,
+        open: async () => {
+            vchatAIImageGenWindow = createOrFocusChildWindow(vchatAIImageGenWindow, {
+                width: 1200, height: 800, minWidth: 800, minHeight: 600,
+                title: 'AI 生图工作流',
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'aiImageGen.html'),
+            });
+            return vchatAIImageGenWindow;
+        },
+    });
 }
 
 function resolveAppActionToAppId(appAction) {
@@ -562,6 +578,8 @@ function resolveAppActionToAppId(appAction) {
             return WINDOW_APP_IDS.THEMES;
         case 'open-task-window':
             return WINDOW_APP_IDS.TASK;
+        case 'open-ai-image-gen-window':
+            return WINDOW_APP_IDS.AI_IMAGE_GEN;
         case 'open-desktop-window':
             return WINDOW_APP_IDS.DESKTOP;
         default:

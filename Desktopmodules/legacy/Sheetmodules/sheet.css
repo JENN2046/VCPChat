@@ -1,0 +1,170 @@
+:root {
+    color-scheme: dark;
+    --bg: #0d1117;
+    --panel: #151b23;
+    --panel-strong: #1b2430;
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #e6edf3;
+    --muted: #8b9aad;
+    --accent: #4fc3a1;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background:
+        radial-gradient(circle at top left, rgba(79, 195, 161, 0.18), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(70, 130, 180, 0.16), transparent 22%),
+        var(--bg);
+    color: var(--text);
+}
+
+.sheet-shell {
+    padding: 24px;
+}
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.sheet-header h1 {
+    margin: 6px 0 4px;
+    font-size: 34px;
+}
+
+.subtitle {
+    margin: 0;
+    color: var(--muted);
+}
+
+.status-card,
+.sidebar-card,
+.workspace-card,
+.ai-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    backdrop-filter: blur(8px);
+}
+
+.status-card {
+    min-width: 160px;
+    padding: 16px;
+}
+
+.status-label,
+.muted {
+    color: var(--muted);
+}
+
+.sheet-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    gap: 16px;
+    min-height: calc(100vh - 140px);
+}
+
+.sidebar-card,
+.workspace-card,
+.ai-card {
+    padding: 16px;
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.card-title-row h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+button {
+    border: 1px solid rgba(79, 195, 161, 0.35);
+    background: rgba(79, 195, 161, 0.12);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.workbook-list,
+.action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.placeholder-item {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--panel);
+    border: 1px dashed var(--line);
+    color: var(--muted);
+}
+
+.grid-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: calc(100% - 40px);
+}
+
+.formula-bar {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: #c7d2df;
+    font-family: Consolas, "Courier New", monospace;
+}
+
+.fake-grid {
+    flex: 1;
+    min-height: 420px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background:
+        linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        var(--panel-strong);
+    background-size: 120px 100%, 100% 40px, auto;
+    overflow: hidden;
+}
+
+.action-list button {
+    text-align: left;
+}
+
+@media (max-width: 1180px) {
+    .sheet-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sheet-header {
+        flex-direction: column;
+    }
+}

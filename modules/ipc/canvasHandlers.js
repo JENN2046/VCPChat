@@ -87,7 +87,7 @@ async function createCanvasWindow(eventOrFilePath = null, maybeFilePath = null) 
         show: false,
     });
 
-    await canvasWindow.loadFile(path.join(__dirname, '..', '..', 'Canvasmodules', 'canvas.html'));
+    await canvasWindow.loadFile(path.join(__dirname, '..', '..', 'Desktopmodules', 'legacy', 'Canvasmodules', 'canvas.html'));
     windowService.attachWindow(WINDOW_APP_IDS.CANVAS, canvasWindow);
 
     openChildWindows.push(canvasWindow);

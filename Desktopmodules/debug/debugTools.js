@@ -34,6 +34,11 @@
                     window.VCPDesktop.builtinMusic.spawn();
                 }
             },
+            spawnAIImageGenWidget: () => {
+                if (window.VCPDesktop.builtinAIImageGen) {
+                    window.VCPDesktop.builtinAIImageGen.spawn();
+                }
+            },
             spawnNewsWidget: () => {
                 if (window.VCPDesktop.builtinNews) {
                     window.VCPDesktop.builtinNews.spawn();

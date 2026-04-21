@@ -924,7 +924,7 @@ if (!gotTheLock) {
             const vcpServerUrl = settings.vcpServerUrl || '';
             const vcpApiKey = settings.vcpApiKey || '';
 
-            const translatorUrl = `file://${path.join(__dirname, 'Translatormodules', 'translator.html')}?vcpServerUrl=${encodeURIComponent(vcpServerUrl)}&vcpApiKey=${encodeURIComponent(vcpApiKey)}`;
+                const translatorUrl = `file://${path.join(__dirname, 'Desktopmodules', 'legacy', 'Translatormodules', 'translator.html')}?vcpServerUrl=${encodeURIComponent(vcpServerUrl)}&vcpApiKey=${encodeURIComponent(vcpApiKey)}`;
             console.log(`[Main Process] Attempting to load URL in translator window: ${translatorUrl.substring(0, 200)}...`);
 
             translatorWindow.webContents.on('did-start-loading', () => {

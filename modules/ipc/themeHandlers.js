@@ -118,7 +118,7 @@ const handleGetWallpaperThumbnail = async (event, rawPath) => {
     const match = rawPath.match(/url\(['"]?(.*?)['"]?\)/);
     const cleanedPath = match ? match[1] : rawPath;
 
-    const absolutePath = path.resolve(PROJECT_ROOT, 'Themesmodules', cleanedPath);
+    const absolutePath = path.resolve(PROJECT_ROOT, 'Desktopmodules', 'legacy', 'Themesmodules', cleanedPath);
 
     const hash = crypto.createHash('md5').update(absolutePath).digest('hex');
     const thumbnailFilename = `${hash}.jpeg`;
@@ -175,7 +175,7 @@ function createThemesWindow() {
         show: false,
     });
 
-    themesWindow.loadFile(path.join(PROJECT_ROOT, 'Themesmodules/themes.html'));
+    themesWindow.loadFile(path.join(PROJECT_ROOT, 'Desktopmodules', 'legacy', 'Themesmodules', 'themes.html'));
     themesWindow.setMenu(null);
     openChildWindows.push(themesWindow);
     

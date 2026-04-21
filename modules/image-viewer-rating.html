@@ -1,0 +1,245 @@
+<!-- 评分按钮添加到图片查看器工具栏 -->
+<!-- 在 image-viewer.html 的 toolbar 区域添加以下按钮 -->
+
+<!-- 添加评分按钮 (在 toolbar 区域的合适位置) -->
+<div id="ratingSection" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--image-viewer-border-transparent);">
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+    <label style="font-size: 12px;">评分:</label>
+    <select id="ratingScore" style="padding: 4px 8px; background: var(--bg-card); border: 1px solid #333; border-radius: 4px; color: var(--text-primary); font-size: 12px;">
+      <option value="10">10 - 完美</option>
+      <option value="9">9 - 优秀</option>
+      <option value="8">8 - 很好</option>
+      <option value="7">7 - 好</option>
+      <option value="6">6 - 不错</option>
+      <option value="5">5 - 一般</option>
+      <option value="4">4 - 需改进</option>
+      <option value="3">3 - 较差</option>
+      <option value="2">2 - 差</option>
+      <option value="1">1 - 很差</option>
+    </select>
+    <button id="saveRatingBtn" style="padding: 4px 8px; font-size: 11px; background: var(--success);">保存评分</button>
+  </div>
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+    <label style="font-size: 12px;">标签:</label>
+    <input id="ratingTags" type="text" placeholder="标签 1, 标签 2" style="flex: 1; padding: 4px 8px; background: var(--bg-card); border: 1px solid #333; border-radius: 4px; color: var(--text-primary); font-size: 12px;">
+    <button id="addTagsBtn" style="padding: 4px 8px; font-size: 11px;">添加标签</button>
+  </div>
+  <div id="currentTags" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;"></div>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <button id="favoriteToggleBtn" style="padding: 4px 8px; font-size: 11px; background: transparent; border: 1px solid var(--favorite); color: var(--favorite);">☆ 收藏</button>
+    <span id="ratingStatus" style="font-size: 11px; color: var(--text-secondary);"></span>
+  </div>
+</div>
+
+<script>
+// 图片评分功能模块
+(function() {
+  let currentImageId = null;
+  let currentImagePath = null;
+  let currentRating = null;
+  let currentTags = [];
+
+  // 从 URL 获取图片路径
+  const params = new URLSearchParams(window.location.search);
+  currentImagePath = params.get('src') || '';
+
+  // 初始化评分区域
+  async function initRatingSection() {
+    const ratingSection = document.getElementById('ratingSection');
+    if (!ratingSection) return;
+
+    if (currentImagePath) {
+      // 显示评分区域
+      ratingSection.style.display = 'block';
+
+      // 尝试加载现有评分
+      await loadRating();
+    }
+  }
+
+  // 加载评分
+  async function loadRating() {
+    try {
+      const res = await fetch(`/api/image-rating/image?path=${encodeURIComponent(currentImagePath)}`);
+      const data = await res.json();
+
+      if (data.success && data.image) {
+        currentImageId = data.image.id;
+        currentRating = data.rating;
+        currentTags = data.tags || [];
+
+        // 设置评分值
+        if (currentRating && currentRating.score) {
+          document.getElementById('ratingScore').value = currentRating.score;
+          document.getElementById('ratingStatus').textContent = `已评分：${currentRating.score}/10`;
+        }
+
+        // 设置收藏状态
+        const favBtn = document.getElementById('favoriteToggleBtn');
+        if (currentRating && currentRating.is_favorite) {
+          favBtn.textContent = '★ 已收藏';
+          favBtn.classList.add('active');
+        } else {
+          favBtn.textContent = '☆ 收藏';
+          favBtn.classList.remove('active');
+        }
+
+        // 显示标签
+        renderTags();
+      }
+    } catch (e) {
+      console.error('Failed to load rating:', e);
+    }
+  }
+
+  // 渲染标签
+  function renderTags() {
+    const container = document.getElementById('currentTags');
+    container.innerHTML = currentTags.map(tag =>
+      `<span class="tag" style="padding: 2px 8px; background: var(--bg-card); border-radius: 12px; font-size: 11px; display: flex; align-items: center; gap: 4px;">
+        ${tag}
+        <button onclick="window.removeTag('${tag}')" style="width: 14px; height: 14px; padding: 0; font-size: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">×</button>
+      </span>`
+    ).join('');
+  }
+
+  // 保存评分
+  async function saveRating() {
+    if (!currentImageId) {
+      // 先注册图片
+      await registerImage();
+    }
+
+    const score = parseInt(document.getElementById('ratingScore').value);
+    const comment = ''; // 可以在 modal 中添加评论输入
+
+    try {
+      const res = await fetch(`/api/image-rating/image/${currentImageId}/rating`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score, comment })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('ratingStatus').textContent = `评分已保存：${score}/10`;
+      }
+    } catch (e) {
+      console.error('Failed to save rating:', e);
+    }
+  }
+
+  // 添加标签
+  async function addTags() {
+    if (!currentImageId) {
+      await registerImage();
+    }
+
+    const tagsInput = document.getElementById('ratingTags').value;
+    if (!tagsInput) return;
+
+    const tags = tagsInput.split(',').map(t => t.trim()).filter(t => t);
+    if (tags.length === 0) return;
+
+    try {
+      const res = await fetch(`/api/image-rating/image/${currentImageId}/tags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        currentTags = [...new Set([...currentTags, ...tags])];
+        renderTags();
+        document.getElementById('ratingTags').value = '';
+      }
+    } catch (e) {
+      console.error('Failed to add tags:', e);
+    }
+  }
+
+  // 移除标签
+  window.removeTag = async function(tagName) {
+    if (!currentImageId) return;
+
+    try {
+      const res = await fetch(`/api/image-rating/image/${currentImageId}/tags`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags: [tagName] })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        currentTags = currentTags.filter(t => t !== tagName);
+        renderTags();
+      }
+    } catch (e) {
+      console.error('Failed to remove tag:', e);
+    }
+  }
+
+  // 切换收藏
+  async function toggleFavorite() {
+    if (!currentImageId) {
+      await registerImage();
+    }
+
+    const isFavorite = !currentRating?.is_favorite;
+
+    try {
+      const res = await fetch(`/api/image-rating/image/${currentImageId}/favorite`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isFavorite })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        const favBtn = document.getElementById('favoriteToggleBtn');
+        if (isFavorite) {
+          favBtn.textContent = '★ 已收藏';
+          favBtn.classList.add('active');
+        } else {
+          favBtn.textContent = '☆ 收藏';
+          favBtn.classList.remove('active');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to toggle favorite:', e);
+    }
+  }
+
+  // 注册图片
+  async function registerImage() {
+    try {
+      const res = await fetch('/api/image-rating/image/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imagePath: currentImagePath,
+          pluginSource: 'ImageViewer'
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        currentImageId = data.id;
+      }
+    } catch (e) {
+      console.error('Failed to register image:', e);
+    }
+  }
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    initRatingSection();
+
+    // 绑定事件
+    document.getElementById('saveRatingBtn')?.addEventListener('click', saveRating);
+    document.getElementById('addTagsBtn')?.addEventListener('click', addTags);
+    document.getElementById('favoriteToggleBtn')?.addEventListener('click', toggleFavorite);
+  });
+})();
+</script>

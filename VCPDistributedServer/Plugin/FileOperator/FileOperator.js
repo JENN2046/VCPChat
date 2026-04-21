@@ -234,7 +234,7 @@ async function runValidationAndAttachResults(result, filePath, fileContent) {
 // File operation functions
 async function webReadFile(fileUrl) {
   try {
-    const fileDir = path.join(__dirname, '..', '..', '..', 'AppData', 'file');
+    const fileDir = path.join(roots.runtimeDataRoot, 'file');
     await fs.mkdir(fileDir, { recursive: true }); // Ensure directory exists
 
     // Extract filename from URL, handling potential query strings

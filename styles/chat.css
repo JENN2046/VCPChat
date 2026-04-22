@@ -8,6 +8,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    min-width: 0;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     min-height: 32px;
@@ -26,6 +28,11 @@ body.light-theme .chat-header {
 }
 .chat-header h3 {
     margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 1.08em;
     color: var(--highlight-text);
     font-weight: 500;
@@ -60,6 +67,7 @@ body.light-theme #moon-icon {
     display: flex;
     flex-direction: column-reverse;
     position: relative;
+    min-height: 0;
     z-index: 0;
     -webkit-mask-image: none;
     mask-image: none;
@@ -694,6 +702,7 @@ body.light-theme .message-item.system.welcome-bubble {
     flex-shrink: 0; /* Prevent input area from shrinking */
     position: relative;
     z-index: 2;
+    margin-top: auto;
 }
 
 .chat-input-card {
@@ -758,6 +767,7 @@ body.light-theme .message-item.system.welcome-bubble {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    flex-wrap: nowrap;
     gap: 0;
     min-height: 32px;
 }

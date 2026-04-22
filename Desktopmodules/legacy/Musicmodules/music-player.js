@@ -13,7 +13,7 @@ function setupPlayer(app) {
             app.trackTitle.textContent = '未选择歌曲';
             app.trackArtist.textContent = '未知艺术家';
             app.trackBitrate.textContent = '';
-            const defaultArtUrl = `url('../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
+            const defaultArtUrl = `url('../../../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
             app.albumArt.style.backgroundImage = defaultArtUrl;
             app.updateBlurredBackground('none');
             app.renderPlaylist(app.currentFilteredTracks);
@@ -29,7 +29,7 @@ function setupPlayer(app) {
         app.trackArtist.textContent = track.artist || '未知艺术家';
         app.trackBitrate.textContent = track.bitrate ? `${Math.round(track.bitrate / 1000)} kbps` : '';
 
-        const defaultArtUrl = `url('../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
+        const defaultArtUrl = `url('../../../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
         if (track.albumArt) {
             const albumArtUrl = `url('file://${track.albumArt.replace(/\\/g, '/')}')`;
             app.albumArt.style.backgroundImage = albumArtUrl;
@@ -258,7 +258,7 @@ function setupPlayer(app) {
             app.trackArtist.textContent = track.artist || '未知艺术家';
             app.trackBitrate.textContent = track.bitrate ? `${Math.round(track.bitrate / 1000)} kbps` : '';
             
-            const defaultArtUrl = `url('../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
+            const defaultArtUrl = `url('../../../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
             if (track.albumArt) {
                 const albumArtUrl = `url('file://${track.albumArt.replace(/\\/g, '/')}')`;
                 app.albumArt.style.backgroundImage = albumArtUrl;
@@ -305,7 +305,7 @@ function setupPlayer(app) {
                     app.trackArtist.textContent = track.artist || '未知艺术家';
                     app.trackBitrate.textContent = track.bitrate ? `${Math.round(track.bitrate / 1000)} kbps` : '';
                     
-                    const defaultArtUrl = `url('../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
+                    const defaultArtUrl = `url('../../../assets/${app.currentTheme === 'light' ? 'musiclight.jpeg' : 'musicdark.jpeg'}')`;
                     if (track.albumArt) {
                         const albumArtUrl = `url('file://${track.albumArt.replace(/\\/g, '/')}')`;
                         app.albumArt.style.backgroundImage = albumArtUrl;

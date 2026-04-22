@@ -24,10 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
-   // Function to clean up duplicated path segments
-   const fixWallpaperPath = (path) => {
-       if (typeof path !== 'string') return path;
-       return path.replace(/wallpaper\/wallpaper\//g, 'wallpaper/');
+   // Normalize CSS url(...) values back to plain relative paths.
+   const fixWallpaperPath = (rawValue) => {
+       if (typeof rawValue !== 'string') return rawValue;
+       const trimmed = rawValue.trim();
+       const match = trimmed.match(/^url\((.*)\)$/i);
+       const unwrapped = match ? match[1].trim().replace(/^['"]|['"]$/g, '') : trimmed;
+       return unwrapped.replace(/wallpaper\/wallpaper\//g, 'wallpaper/');
    };
 
    // Helper to escape single quotes and backslashes for CSS url()
@@ -47,11 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
            
            // Request the thumbnail from the main process. If it fails, fallback to full image.
             api.getWallpaperThumbnail(fixedPath).then(thumbnailUrl => {
-                const previewUrl = thumbnailUrl || fixedPath;
-                element.style.backgroundImage = `url('${escapeCssUrl(previewUrl)}')`;
+                if (thumbnailUrl) {
+                    element.style.backgroundImage = `url('${escapeCssUrl(thumbnailUrl)}')`;
+                    return;
+                }
+                element.style.backgroundImage = 'none';
             }).catch(err => {
                 console.error(`Failed to generate or load thumbnail for ${fixedPath}:`, err);
-                element.style.backgroundImage = `url('${escapeCssUrl(fixedPath)}')`;
+                element.style.backgroundImage = 'none';
             });
        } else {
            element.style.backgroundImage = 'none';

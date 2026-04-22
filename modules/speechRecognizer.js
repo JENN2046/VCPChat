@@ -24,10 +24,26 @@ function resolveRecognizerPagePath(customPagePath = '') {
     }
 
     if (path.isAbsolute(candidate)) {
-        return candidate;
+        if (fs.existsSync(candidate)) {
+            return candidate;
+        }
+        return getDefaultRecognizerPagePath();
     }
 
-    return path.join(__dirname, '..', candidate);
+    const normalizedCandidate = candidate.replace(/\\/g, '/');
+    if (normalizedCandidate.endsWith('Voicechatmodules/recognizer.html')) {
+        const legacyPath = getDefaultRecognizerPagePath();
+        if (fs.existsSync(legacyPath)) {
+            return legacyPath;
+        }
+    }
+
+    const resolvedCandidate = path.join(__dirname, '..', candidate);
+    if (fs.existsSync(resolvedCandidate)) {
+        return resolvedCandidate;
+    }
+
+    return getDefaultRecognizerPagePath();
 }
 
 function resolveRecognizerPageUrl(customPagePath = '') {

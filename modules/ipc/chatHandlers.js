@@ -747,10 +747,10 @@ function initialize(mainWindow, context) {
             }
             // --- End of Context Sanitizer Integration ---
 
-            console.log(`发送到VCP服务器: ${finalVcpUrl} for messageId: ${messageId}`);
-            console.log('VCP API Key:', vcpApiKey ? '已设置' : '未设置');
-            console.log('模型配置:', modelConfig);
-            if (context) console.log('上下文:', context);
+            console.log(`Sending request to VCP server: ${finalVcpUrl} for messageId: ${messageId}`);
+            console.log('VCP API Key status:', vcpApiKey ? 'set' : 'unset');
+            console.log('Model config:', modelConfig);
+            if (context) console.log('Context:', context);
 
             // 🔧 在发送前验证请求体
             const requestBody = {
@@ -775,7 +775,7 @@ function initialize(mainWindow, context) {
             try {
                 serializedBody = JSON.stringify(requestBody);
                 // 调试：记录前100个字符
-                console.log('[Main - sendToVCP] Request body preview:', serializedBody.substring(0, 100) + '...');
+                console.log('[Main - sendToVCP] Request body summary:', { messageCount: Array.isArray(requestBody.messages) ? requestBody.messages.length : 0, model: requestBody.model || null, stream: requestBody.stream === true, serializedLength: serializedBody.length });
             } catch (serializeError) {
                 console.error('[Main - sendToVCP] Failed to serialize request body:', serializeError);
                 console.error('[Main - sendToVCP] Problematic request body:', requestBody);
@@ -793,7 +793,7 @@ function initialize(mainWindow, context) {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error(`[Main - sendToVCP] VCP请求失败. Status: ${response.status}, Response Text:`, errorText);
+                console.error(`[Main - sendToVCP] VCP request failed. Status: ${response.status}, Response Text:`, errorText);
                 let errorData = { message: `服务器返回状态 ${response.status}`, details: errorText };
                 try {
                     const parsedError = JSON.parse(errorText);
@@ -850,7 +850,7 @@ function initialize(mainWindow, context) {
             }
 
             if (modelConfig.stream === true) {
-                console.log(`VCP响应: 开始流式处理 for ${messageId} on channel ${streamChannel}`);
+                console.log(`VCP response: starting stream processing for ${messageId} on channel ${streamChannel}`);
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
 
@@ -877,7 +877,7 @@ function initialize(mainWindow, context) {
                                 if (line.startsWith('data: ')) {
                                     const jsonData = line.substring(5).trim();
                                     if (jsonData === '[DONE]') {
-                                        console.log(`VCP流明确[DONE] for messageId: ${messageId}`);
+                                        console.log(`VCP stream received [DONE] for messageId: ${messageId}`);
                                         const donePayload = { type: 'end', messageId: messageId, context };
                                         event.sender.send(streamChannel, donePayload);
                                         return; // [DONE] 是明确的结束信号，退出函数
@@ -891,7 +891,7 @@ function initialize(mainWindow, context) {
                                         const dataPayload = { type: 'data', chunk: parsedChunk, messageId: messageId, context };
                                         event.sender.send(streamChannel, dataPayload);
                                     } catch (e) {
-                                        console.error(`解析VCP流数据块JSON失败 for messageId: ${messageId}:`, e, '原始数据:', jsonData);
+                                        console.error(`Failed to parse VCP stream JSON chunk for messageId: ${messageId}:`, e, 'Raw data:', jsonData);
                                         const errorChunkPayload = { type: 'data', chunk: { raw: jsonData, error: 'json_parse_error' }, messageId: messageId, context };
                                         event.sender.send(streamChannel, errorChunkPayload);
                                     }
@@ -901,14 +901,14 @@ function initialize(mainWindow, context) {
                             if (done) {
                                 // 流因连接关闭而结束，而不是[DONE]消息。
                                 // 缓冲区已被处理，现在发送最终的 'end' 信号。
-                                console.log(`VCP流结束 for messageId: ${messageId}`);
+                                console.log(`VCP stream ended for messageId: ${messageId}`);
                                 const endPayload = { type: 'end', messageId: messageId, context };
                                 event.sender.send(streamChannel, endPayload);
                                 break; // 退出 while 循环
                             }
                         }
                     } catch (streamError) {
-                        console.error(`VCP流读取错误 for messageId: ${messageId}:`, streamError);
+                        console.error(`VCP stream read error for messageId: ${messageId}:`, streamError);
                         const streamErrPayload = { type: 'error', error: `VCP流读取错误: ${streamError.message}`, messageId: messageId };
                         if (context) streamErrPayload.context = context;
                         event.sender.send(streamChannel, streamErrPayload);
@@ -921,14 +921,14 @@ function initialize(mainWindow, context) {
                 // 将 reader 和 decoder 作为参数传递给 processStream
                 // 并且我们依然需要 await 来等待流处理完成
                 processStream(reader, decoder).then(() => {
-                    console.log(`[Main - sendToVCP] 流处理函数 processStream 已正常结束 for ${messageId}`);
+                    console.log(`[Main - sendToVCP] processStream completed successfully for ${messageId}`);
                 }).catch(err => {
-                    console.error(`[Main - sendToVCP] processStream 内部抛出未捕获的错误 for ${messageId}:`, err);
+                    console.error(`[Main - sendToVCP] processStream threw an uncaught error for ${messageId}:`, err);
                 });
 
                 return { streamingStarted: true };
             } else { // Non-streaming
-                console.log('VCP响应: 非流式处理');
+                console.log('VCP response: handling non-streaming payload');
                 const vcpResponse = await response.json();
                 // For non-streaming, wrap the response with the original context
                 // so the renderer knows where to save the history.
@@ -936,7 +936,7 @@ function initialize(mainWindow, context) {
             }
 
         } catch (error) {
-            console.error('VCP请求错误 (catch block):', error);
+            console.error('VCP request error (catch block):', error);
             if (modelConfig.stream === true && event && event.sender && !event.sender.isDestroyed()) {
                 const catchErrorPayload = { type: 'error', error: `VCP请求错误: ${error.message}`, messageId: messageId, context };
                 event.sender.send(streamChannel, catchErrorPayload);

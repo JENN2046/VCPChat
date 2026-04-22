@@ -138,17 +138,17 @@ class SovitsTTS {
         if (!forceRefresh) {
             try {
                 const cachedModels = await fs.readFile(cachePath, 'utf-8');
-                console.log(`从缓存加载 ${isNetwork ? '网络' : '本地'} Sovits模型列表。`);
+                console.log(`Loaded ${isNetwork ? 'network' : 'local'} Sovits model list from cache.`);
                 const parsedCache = JSON.parse(cachedModels);
                 return isNetwork ? this._extractNetworkModelsFromCache(parsedCache) : parsedCache;
             } catch (error) {
-                console.log(`${isNetwork ? '网络' : '本地'} Sovits模型缓存不存在或读取失败，将从API获取。`);
+                console.log(`${isNetwork ? 'Network' : 'Local'} Sovits model cache is missing or unreadable. Falling back to API.`);
             }
         }
 
         try {
             if (isNetwork) {
-                console.log(`正在从 ${runtimeConfig.baseUrl}/api/voice/list 获取网络音色列表...`);
+                console.log(`Fetching network voice list from ${runtimeConfig.baseUrl}/api/voice/list ...`);
                 const response = await axios.get(`${runtimeConfig.baseUrl}/api/voice/list`, {
                     headers: this.buildHeaders(runtimeConfig.apiKey)
                 });
@@ -171,25 +171,25 @@ class SovitsTTS {
                     mergedVoiceOptions,
                     updatedAt: new Date().toISOString()
                 }, null, 2));
-                console.log('网络音色列表已获取并缓存。');
+                console.log('Network voice list fetched and cached.');
                 return mergedVoiceOptions;
             } else {
-                console.log(`正在从 ${runtimeConfig.baseUrl}/models 获取本地模型列表...`);
+                console.log(`Fetching local Sovits model list from ${runtimeConfig.baseUrl}/models ...`);
                 const response = await axios.post(`${runtimeConfig.baseUrl}/models`, { version: "v2ProPlus" }, {
                     headers: this.buildHeaders(runtimeConfig.apiKey)
                 });
 
                 if (response.data && response.data.msg === "获取成功" && response.data.models) {
                     await fs.writeFile(LOCAL_MODELS_CACHE_PATH, JSON.stringify(response.data.models, null, 2));
-                    console.log('本地Sovits模型列表已获取并缓存。');
+                    console.log('Local Sovits model list fetched and cached.');
                     return response.data.models;
                 } else {
-                    console.error("获取本地Sovits模型列表失败: ", response.data);
+                    console.error('Failed to fetch local Sovits model list:', response.data);
                     return null;
                 }
             }
         } catch (error) {
-            console.error(`请求 ${isNetwork ? '网络' : '本地'} Sovits模型列表API时出错: `, error.message);
+            console.error(`Error while requesting ${isNetwork ? 'network' : 'local'} Sovits model list API:`, error.message);
             try {
                 const cachedModels = await fs.readFile(cachePath, 'utf-8');
                 const parsedCache = JSON.parse(cachedModels);

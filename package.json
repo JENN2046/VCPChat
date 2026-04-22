@@ -7,6 +7,9 @@
     "start": "electron .",
     "start:desktop": "electron . --desktop-only",
     "start:rag-observer": "electron . --rag-observer-only",
+    "start:utf8": "start-vcpchat-utf8.cmd",
+    "start:desktop:utf8": "start-vcpchat-utf8.cmd --desktop-only",
+    "start:rag-observer:utf8": "start-vcpchat-utf8.cmd --rag-observer-only",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },

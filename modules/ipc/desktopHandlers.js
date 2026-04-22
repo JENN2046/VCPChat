@@ -1095,38 +1095,6 @@ function initialize(params) {
         }
     });
 
-    ipcMain.removeHandler('desktop-launch-vchat-app');
-    ipcMain.handle('desktop-launch-vchat-app', async (event, appAction) => {
-        try {
-            console.log(`[DesktopHandlers] Launching VChat app via WindowService: ${appAction}`);
-
-            const appId = resolveAppActionToAppId(appAction);
-            if (appId) {
-                await windowService.open(appId);
-                return { success: true, appId };
-            }
-
-            if (appAction === 'launch-human-toolbox') {
-                return await launchStandaloneElectronApp('VCPHumanToolBox', 'Human Toolbox');
-            }
-
-            if (appAction === 'launch-vchat-manager') {
-                return await launchStandaloneElectronApp('VchatManager', 'VchatManager');
-            }
-
-            if (appAction && appAction.startsWith('open-system-tool:')) {
-                const cmd = appAction.substring('open-system-tool:'.length);
-                return await launchSystemTool(cmd);
-            }
-
-            console.warn(`[DesktopHandlers] Unknown VChat app action: ${appAction}`);
-            return { success: false, error: `Unknown app action: ${appAction}` };
-        } catch (err) {
-            console.error(`[DesktopHandlers] VChat app launch error (${appAction}):`, err);
-            return { success: false, error: err.message };
-        }
-    });
-
     // ============================================================
     // --- IPC: 蹇嵎鏂瑰紡瑙ｆ瀽 & 鍚姩 ---
     // ============================================================

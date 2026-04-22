@@ -13,18 +13,44 @@ const { createServerRoots } = require('../modules/utils/vcpPathRoots');
  const pluginManager = require('./Plugin.js');
 const serverRoots = createServerRoots(__dirname);
 const GENERATED_LISTS_CONFIG_PATH = path.join(serverRoots.runtimeDataRoot, 'generated_lists', 'config.env');
+const TOOLBOX_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'VCPToolBox', 'config.env');
 
 // DEBUG_MODE is now passed in config
 // const DEBUG_MODE = (process.env.DebugMode || "False").toLowerCase() === "true";
+
+function normalizeEnvKeyAliases(config = {}) {
+    const normalized = { ...config };
+    const fileKey = normalized.file_key || normalized.File_Key || normalized.FILE_KEY;
+
+    if (fileKey) {
+        normalized.file_key = fileKey;
+        normalized.File_Key = fileKey;
+        normalized.FILE_KEY = fileKey;
+    }
+
+    return normalized;
+}
 
 function loadGeneratedListsConfig() {
     try {
         if (!fsSync.existsSync(GENERATED_LISTS_CONFIG_PATH)) {
             return {};
         }
-        return dotenv.parse(fsSync.readFileSync(GENERATED_LISTS_CONFIG_PATH));
+        return normalizeEnvKeyAliases(dotenv.parse(fsSync.readFileSync(GENERATED_LISTS_CONFIG_PATH, 'utf8')));
     } catch (error) {
         console.error('[DistributedServer] Failed to read generated_lists/config.env:', error.message);
+        return {};
+    }
+}
+
+function loadToolBoxConfig() {
+    try {
+        if (!fsSync.existsSync(TOOLBOX_CONFIG_PATH)) {
+            return {};
+        }
+        return normalizeEnvKeyAliases(dotenv.parse(fsSync.readFileSync(TOOLBOX_CONFIG_PATH, 'utf8')));
+    } catch (error) {
+        console.error('[DistributedServer] Failed to read VCPToolBox/config.env:', error.message);
         return {};
     }
 }
@@ -134,12 +160,24 @@ class DistributedServer {
 
     registerDiagnosticRoutes() {
         const generatedConfig = loadGeneratedListsConfig();
-        const fileKey = generatedConfig.file_key;
+        const toolboxConfig = loadToolBoxConfig();
+        const fileKey =
+            generatedConfig.file_key
+            || generatedConfig.File_Key
+            || generatedConfig.FILE_KEY
+            || toolboxConfig.file_key
+            || toolboxConfig.File_Key
+            || toolboxConfig.FILE_KEY
+            || process.env.file_key
+            || process.env.File_Key
+            || process.env.FILE_KEY;
 
         if (!fileKey) {
-            console.error(`[${this.serverName}] DesktopRemote test route disabled: missing file_key in AppData/generated_lists/config.env.`);
+            console.error(`[${this.serverName}] DesktopRemote test route disabled: missing file_key/File_Key in AppData/generated_lists/config.env and VCPToolBox/config.env.`);
             return;
         }
+
+        console.log(`[${this.serverName}] DesktopRemote test route enabled using file_key from generated_lists/config.env, VCPToolBox/config.env, or process.env.`);
 
         this.app.post(/\/pw=([^\/]+)\/desktop-remote-test/, async (req, res) => {
             const requestKey = req.params[0];

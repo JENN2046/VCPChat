@@ -132,6 +132,8 @@ function extractTextContent(response) {
 async function main() {
     const cliOptions = parseArgs(process.argv.slice(2));
     const config = resolveConfig(cliOptions);
+    let cleanupRequired = false;
+    let primaryError = null;
 
     console.log(`[smoke] DesktopRemote HTTP target: http://${config.host}:${config.port}/pw=<key>/desktop-remote-test`);
 
@@ -152,6 +154,7 @@ async function main() {
         const createdWidgetId = createResponse?.result?.result?.content
             ? TEST_WIDGET_ID
             : (createResponse?.commandPayload?.widgetId || TEST_WIDGET_ID);
+        cleanupRequired = true;
         console.log(`[smoke] CreateWidget PASS: ${createdWidgetId}`);
 
         const queryResponse = await postJson(config, { command: 'QueryDesktop' });
@@ -172,8 +175,20 @@ async function main() {
         console.log('[smoke] ViewWidgetSource PASS');
 
         console.log('[smoke] DesktopRemote HTTP smoke test passed.');
+    } catch (error) {
+        primaryError = error;
+        throw error;
     } finally {
-        await cleanupSmokeWidget(config);
+        if (cleanupRequired) {
+            try {
+                await cleanupSmokeWidget(config);
+            } catch (error) {
+                if (!primaryError) {
+                    throw error;
+                }
+                console.warn(`[smoke] DeleteWidget cleanup failed after smoke failure: ${error.message}`);
+            }
+        }
     }
 }
 
@@ -186,10 +201,10 @@ async function cleanupSmokeWidget(config) {
         if (deleteResponse?.success && deleteResponse?.result?.status === 'success') {
             console.log('[smoke] DeleteWidget cleanup PASS');
         } else {
-            console.warn('[smoke] DeleteWidget cleanup did not report success.');
+            throw new Error('DeleteWidget cleanup did not report success.');
         }
     } catch (error) {
-        console.warn(`[smoke] DeleteWidget cleanup skipped: ${error.message}`);
+        throw new Error(`DeleteWidget cleanup failed: ${error.message}`);
     }
 }
 

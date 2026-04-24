@@ -209,6 +209,40 @@ function createTag(content, extraClass = '') {
     return `<span class="pill ${extraClass}">${escapeHtml(content)}</span>`;
 }
 
+function getPhotoStudioLabel(value) {
+    const normalized = String(value || '').trim();
+    const labelMap = {
+        local_shadow: '本地影子',
+        no_live_write: '无外部写入',
+        sync_external: '外部同步',
+        pending: '待处理',
+        draft: '草稿',
+        lead: '新线索',
+        quoted: '已报价',
+        confirmed: '已确认',
+        preparing: '筹备中',
+        shot: '已拍摄',
+        selection_pending: '待选片',
+        retouching: '后期中',
+        delivering: '交付中',
+        completed: '已完成',
+        archived: '已归档',
+        cancelled: '已取消',
+        scheduled: '已排期',
+        in_progress: '进行中',
+        quotation: '报价',
+        delivery: '交付',
+        general: '通用',
+        booking: '预约',
+        unknown: '未知',
+    };
+    return labelMap[normalized] || normalized || '-';
+}
+
+function renderStatusTag(value, extraClass = '') {
+    return createTag(getPhotoStudioLabel(value), extraClass);
+}
+
 function canCreateDeliveryTasks(project) {
     return ['retouching', 'delivering', 'completed'].includes(project?.status);
 }
@@ -697,7 +731,7 @@ function createProjectCard(project) {
                     <h3>${escapeHtml(project.project_name)}</h3>
                     <p class="muted">${escapeHtml(project.customer_name || '未关联客户')}</p>
                 </div>
-                ${createTag(project.status)}
+                ${renderStatusTag(project.status)}
             </div>
             <div class="project-meta">
                 ${createTag(`风险 ${riskLevel}`, getRiskTone(riskLevel))}
@@ -772,7 +806,7 @@ function createDeliveryCard(project) {
                     <h3>${escapeHtml(project.project_name)}</h3>
                     <p class="muted">${escapeHtml(project.customer_name || '未关联客户')}</p>
                 </div>
-                ${createTag(project.status)}
+                ${renderStatusTag(project.status)}
             </div>
             <div class="project-meta">
                 ${createTag(project.project_type || 'unknown')}
@@ -907,8 +941,8 @@ function renderDeliveryOpsPanel(metrics) {
                 <h2>外部同步控制区</h2>
                 <p>每张项目卡都可以生成本地外部同步记录。这个动作会先确认，再写入本地影子队列，避免误同步真实外部系统。</p>
                 <div class="inline-tags">
-                    ${createTag('sync_external')}
-                    ${createTag('local_shadow')}
+                    ${renderStatusTag('sync_external')}
+                    ${renderStatusTag('local_shadow')}
                     ${createTag(`${metrics.total} 个候选项目`)}
                 </div>
                 <div class="card-actions">
@@ -1044,7 +1078,7 @@ function renderDeliveryPackageList(packages) {
                     <div class="compact-side">
                         <div class="inline-tags">
                             ${createTag(getDeliveryPackageStatusLabel(deliveryPackage.status))}
-                            ${createTag(deliveryPackage.sync_state || 'local_shadow')}
+                            ${renderStatusTag(deliveryPackage.sync_state || 'local_shadow')}
                         </div>
                         <span class="muted">${escapeHtml(formatDate(deliveryPackage.updated_at))}</span>
                         <div class="card-actions">
@@ -1092,7 +1126,7 @@ function renderDeliveryPackagePanel(reports = {}) {
                         ${createTag(`${summary.ready_count || 0} 个可交付`)}
                         ${createTag(`${summary.sent_count || 0} 个已发送`)}
                         ${createTag(`${summary.acknowledged_count || 0} 个已确认`)}
-                        ${createTag('local_shadow')}
+                        ${renderStatusTag('local_shadow')}
                     </div>
                 </div>
                 <div class="card-actions">
@@ -1476,10 +1510,10 @@ function renderScheduleTimeline(entries) {
                             <p class="muted">${escapeHtml(entry.project.project_name)} · ${escapeHtml(entry.project.customer_name || '未关联客户')}</p>
                         </div>
                         <div class="compact-side">
-                            <div class="inline-tags">
-                                ${createTag(entry.project.status || 'unknown')}
-                                ${createTag(toneLabel, toneClass)}
-                            </div>
+                        <div class="inline-tags">
+                            ${renderStatusTag(entry.project.status || 'unknown')}
+                            ${createTag(toneLabel, toneClass)}
+                        </div>
                             <button class="ghost-btn" type="button" data-open-project="${escapeHtml(entry.project.project_id)}">打开</button>
                         </div>
                     </article>
@@ -1516,9 +1550,9 @@ function renderLocalBookingList(bookings) {
                     </div>
                     <div class="compact-side">
                         <div class="inline-tags">
-                            ${createTag(booking.event_type || 'booking')}
-                            ${createTag(booking.status || 'scheduled')}
-                            ${createTag(booking.sync_state || 'local_shadow')}
+                            ${renderStatusTag(booking.event_type || 'booking')}
+                            ${renderStatusTag(booking.status || 'scheduled')}
+                            ${renderStatusTag(booking.sync_state || 'local_shadow')}
                         </div>
                         <div class="card-actions">
                             <button class="ghost-btn" type="button" data-booking-action="start_booking" data-project-id="${escapeHtml(booking.project_id)}" data-event-key="${escapeHtml(booking.event_key)}" ${booking.status === 'completed' ? 'disabled' : ''}>开始</button>
@@ -2052,8 +2086,8 @@ function renderExternalPulse(deliverySchedule) {
             </div>
             <div class="inline-tags home-pulse-tags">
                 ${createTag(`${rows.length} 条排程记录`)}
-                ${createTag('local_shadow')}
-                ${createTag('no_live_write')}
+                ${renderStatusTag('local_shadow')}
+                ${renderStatusTag('no_live_write')}
             </div>
         </article>
     `;
@@ -2074,10 +2108,10 @@ function renderStatusMix(statusCounts) {
                 return `
                     <div class="status-mix-row">
                         <div>
-                            <strong>${escapeHtml(status)}</strong>
+                            <strong>${escapeHtml(getPhotoStudioLabel(status))}</strong>
                             <span>${escapeHtml(count)} 项</span>
                         </div>
-                        <div class="status-meter" aria-label="${escapeHtml(`${status} ${percent}%`)}">
+                        <div class="status-meter" aria-label="${escapeHtml(`${getPhotoStudioLabel(status)} ${percent}%`)}">
                             <span style="width: ${escapeHtml(percent)}%"></span>
                         </div>
                     </div>

@@ -194,7 +194,9 @@ function pickActionSummary(result) {
     }
 
     const data = result.data || {};
-    if (data.project || data.customer || data.tasks) {
+    const action = result.action_context?.action || '';
+
+    if (action === 'create_project_draft' || action === 'create_project_with_tasks') {
         return {
             title: '项目已创建',
             description: '客户、项目和任务已经写入工作台。',
@@ -207,7 +209,19 @@ function pickActionSummary(result) {
         };
     }
 
-    if (data.draft_text || data.reply_draft || data.message) {
+    if (action === 'create_customer') {
+        return {
+            title: '客户已创建',
+            description: '客户信息已经写入工作台。',
+            rows: [
+                ['客户', data.customer_name || data.customer_id || '-'],
+                ['来源', data.source || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'generate_draft' || data.draft_text || data.reply_draft || data.message) {
         return {
             title: '回复草稿已生成',
             description: data.draft_text || data.reply_draft || data.message,
@@ -219,7 +233,7 @@ function pickActionSummary(result) {
         };
     }
 
-    if (data.task_count || data.created_tasks || data.tasks) {
+    if (action === 'create_tasks' || action === 'create_delivery_tasks' || data.task_count || data.created_tasks || data.tasks) {
         return {
             title: '任务已更新',
             description: '项目任务已经生成或补齐。',
@@ -231,11 +245,47 @@ function pickActionSummary(result) {
         };
     }
 
-    if (data.notice_text || data.selection_notice) {
+    if (action === 'create_selection_notice' || data.notice_text || data.selection_notice) {
         return {
             title: '选片通知已生成',
             description: data.notice_text || data.selection_notice,
             rows: [['项目', data.project_id || '-']],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'advance_status') {
+        return {
+            title: '项目状态已推进',
+            description: '项目已经进入新的业务状态。',
+            rows: [
+                ['项目', data.project_id || '-'],
+                ['新状态', data.new_status || data.status || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'archive_project') {
+        return {
+            title: '项目已归档',
+            description: '项目归档动作已经完成。',
+            rows: [
+                ['项目', data.project_id || '-'],
+                ['模式', data.archive_mode || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (data.project || data.customer) {
+        return {
+            title: '资料已更新',
+            description: '工作台资料已经写入。',
+            rows: [
+                ['客户', data.customer?.customer_name || data.customer?.customer_id || '-'],
+                ['项目', data.project?.project_name || data.project?.project_id || '-'],
+            ],
             tone: 'success',
         };
     }
@@ -990,7 +1040,11 @@ async function runActionAndSync(scene, action, payload) {
     try {
         setStatusChip(`Running ${action}...`);
         const result = await window.PhotoStudioApi.runAction(scene, action, payload);
-        getState().setLastActionResult(result);
+        const actionResult = {
+            ...result,
+            action_context: { scene, action },
+        };
+        getState().setLastActionResult(actionResult);
 
         if (!result.success && result.error?.message) {
             showToast(result.error.message);
@@ -1013,7 +1067,7 @@ async function runActionAndSync(scene, action, payload) {
             await renderSceneByName('delivery');
         }
 
-        return result;
+        return actionResult;
     } catch (error) {
         const result = {
             success: false,
@@ -1023,6 +1077,7 @@ async function runActionAndSync(scene, action, payload) {
                 message: getErrorMessage(error),
             },
             ui_hints: {},
+            action_context: { scene, action },
         };
         getState().setLastActionResult(result);
         showToast(`动作执行失败：${result.error.message}`);

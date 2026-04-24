@@ -1,0 +1,93 @@
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ps-space-4);
+}
+
+.form-field {
+    display: grid;
+    gap: var(--ps-space-2);
+    color: var(--ps-text-secondary);
+    font-size: var(--ps-font-size-md);
+}
+
+.form-field span {
+    color: var(--ps-text-primary);
+    font-weight: var(--ps-font-weight-semibold);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    min-height: 40px;
+    padding: 10px 12px;
+    color: var(--ps-text-primary);
+    background: var(--ps-bg-control);
+    border: 1px solid var(--ps-border-soft);
+    border-radius: var(--ps-radius-md);
+    outline: none;
+    resize: vertical;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+    color: var(--ps-text-muted);
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    border-color: var(--ps-border-accent);
+    box-shadow: 0 0 0 3px rgba(143, 199, 255, 0.10);
+    background: rgba(24, 37, 54, 0.92);
+}
+
+.form-field-wide {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    justify-content: flex-end;
+}
+
+.followup-form {
+    margin-top: var(--ps-space-4);
+}
+
+.booking-reschedule-form {
+    display: grid;
+    grid-template-columns: minmax(130px, 1fr) minmax(96px, 0.8fr) minmax(96px, 0.8fr) minmax(120px, 1fr) auto;
+    gap: var(--ps-space-2);
+    margin-top: var(--ps-space-3);
+}
+
+.booking-reschedule-form input,
+.booking-reschedule-form select {
+    min-height: 34px;
+    padding: 7px 9px;
+    color: var(--ps-text-primary);
+    background: var(--ps-bg-control);
+    border: 1px solid var(--ps-border-soft);
+    border-radius: var(--ps-radius-md);
+}
+
+@media (max-width: 760px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-reschedule-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        justify-content: stretch;
+    }
+
+    .form-actions .primary-btn,
+    .form-actions .ghost-btn {
+        width: 100%;
+    }
+}

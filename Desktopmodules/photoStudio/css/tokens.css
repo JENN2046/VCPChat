@@ -1,0 +1,82 @@
+:root {
+    --ps-bg-base: #05080d;
+    --ps-bg-deep: #020408;
+    --ps-bg-elevated: #0a1018;
+    --ps-bg-panel: rgba(9, 15, 24, 0.86);
+    --ps-bg-panel-strong: rgba(12, 19, 30, 0.94);
+    --ps-bg-control: rgba(18, 29, 43, 0.82);
+    --ps-bg-control-hover: rgba(28, 43, 62, 0.92);
+
+    --ps-surface-1: #0b121c;
+    --ps-surface-2: #101925;
+    --ps-surface-3: #172233;
+    --ps-surface-active: rgba(92, 138, 185, 0.18);
+
+    --ps-border-soft: rgba(171, 205, 238, 0.10);
+    --ps-border-medium: rgba(171, 205, 238, 0.18);
+    --ps-border-strong: rgba(210, 229, 245, 0.30);
+    --ps-border-accent: rgba(164, 203, 235, 0.44);
+    --ps-border-danger: rgba(255, 130, 130, 0.38);
+
+    --ps-text-primary: #edf6ff;
+    --ps-text-secondary: rgba(237, 246, 255, 0.72);
+    --ps-text-tertiary: rgba(237, 246, 255, 0.52);
+    --ps-text-muted: rgba(237, 246, 255, 0.36);
+    --ps-text-dark: #071018;
+
+    --ps-accent-blue: #8fc7ff;
+    --ps-accent-blue-strong: #c3e2ff;
+    --ps-accent-gold: #d7c6a0;
+    --ps-accent-copper: #b9825f;
+    --ps-success: #7ce0b4;
+    --ps-warning: #ffc470;
+    --ps-danger: #ff8a8a;
+    --ps-purple: #b99cff;
+    --ps-neutral: #a8b0ba;
+
+    --ps-radius-xs: 4px;
+    --ps-radius-sm: 8px;
+    --ps-radius-md: 12px;
+    --ps-radius-lg: 18px;
+    --ps-radius-xl: 26px;
+    --ps-radius-full: 999px;
+
+    --ps-space-1: 4px;
+    --ps-space-2: 8px;
+    --ps-space-3: 12px;
+    --ps-space-4: 16px;
+    --ps-space-5: 20px;
+    --ps-space-6: 24px;
+    --ps-space-8: 32px;
+
+    --ps-font-sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --ps-font-size-xs: 12px;
+    --ps-font-size-sm: 13px;
+    --ps-font-size-md: 14px;
+    --ps-font-size-lg: 16px;
+    --ps-font-size-xl: 22px;
+    --ps-font-size-2xl: 30px;
+    --ps-line-height-normal: 1.55;
+    --ps-line-height-relaxed: 1.72;
+    --ps-font-weight-medium: 500;
+    --ps-font-weight-semibold: 650;
+    --ps-font-weight-bold: 760;
+
+    --ps-shadow-sm: 0 12px 28px rgba(0, 0, 0, 0.28);
+    --ps-shadow-md: 0 24px 58px rgba(0, 0, 0, 0.42);
+    --ps-shadow-lg: 0 36px 90px rgba(0, 0, 0, 0.58);
+    --ps-shadow-glow-blue: 0 0 34px rgba(101, 169, 235, 0.18);
+    --ps-shadow-glow-gold: 0 0 28px rgba(215, 198, 160, 0.14);
+
+    --bg: var(--ps-bg-base);
+    --panel: var(--ps-bg-panel);
+    --panel-strong: var(--ps-bg-panel-strong);
+    --ink: var(--ps-text-primary);
+    --muted: var(--ps-text-tertiary);
+    --line: var(--ps-border-soft);
+    --accent: var(--ps-accent-blue);
+    --accent-soft: rgba(143, 199, 255, 0.12);
+    --nav-active: var(--ps-accent-blue-strong);
+    --nav-active-soft: rgba(143, 199, 255, 0.12);
+    --shadow: var(--ps-shadow-md);
+}

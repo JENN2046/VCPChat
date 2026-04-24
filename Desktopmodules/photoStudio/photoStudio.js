@@ -1,5 +1,5 @@
 function escapeHtml(value) {
-    return String(value || '')
+    return String(value ?? '')
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
@@ -7,8 +7,65 @@ function escapeHtml(value) {
         .replaceAll("'", '&#39;');
 }
 
+const SCENE_ALIASES = Object.freeze({
+    dashboard: 'home',
+    projects: 'project_command',
+    project_board: 'project_command',
+    inquiry: 'client_leads',
+    delivery: 'delivery_assets',
+    delivery_panel: 'delivery_assets',
+});
+
+const HIGH_RISK_ACTION_CONFIRMATIONS = Object.freeze({
+    archive_project: '归档项目素材属于高风险动作，请确认后再执行。',
+    archive_project_assets: '归档项目素材属于高风险动作，请确认后再执行。',
+    sync_external: '外部同步属于高风险动作，请确认目标和范围后再执行。',
+});
+
+const PROJECT_LANES = Object.freeze([
+    {
+        key: 'lead_quote',
+        title: '意向 / 报价',
+        hint: '客户进入、需求确认、报价推进',
+        statuses: ['lead', 'quoted'],
+    },
+    {
+        key: 'prepare_shoot',
+        title: '筹备 / 拍摄',
+        hint: '档期、人员、拍摄执行',
+        statuses: ['confirmed', 'preparing', 'shot'],
+    },
+    {
+        key: 'selection_retouch',
+        title: '选片 / 后期',
+        hint: '选片确认、修图生产',
+        statuses: ['selection_pending', 'retouching'],
+    },
+    {
+        key: 'delivery_archive',
+        title: '交付 / 归档',
+        hint: '交付准备、客户确认、归档',
+        statuses: ['delivering', 'completed', 'archived'],
+    },
+    {
+        key: 'exception',
+        title: '异常 / 已取消',
+        hint: '取消、阻塞或需要人工处理',
+        statuses: ['cancelled'],
+    },
+]);
+
+function normalizeScene(scene) {
+    return SCENE_ALIASES[scene] || scene || 'home';
+}
+
 function getState() {
     return window.PhotoStudioState;
+}
+
+function isCurrentScene(...scenes) {
+    const currentScene = normalizeScene(getState().currentScene);
+    return scenes.map(normalizeScene).includes(currentScene);
 }
 
 function setStatusChip(message) {
@@ -221,7 +278,48 @@ function pickActionSummary(result) {
         };
     }
 
-    if (action === 'generate_draft' || data.draft_text || data.reply_draft || data.message) {
+    if (action === 'create_followup_reminder') {
+        return {
+            title: data.is_new === false ? '跟进提醒已存在' : '跟进提醒已创建',
+            description: data.is_new === false ? '系统已找到同项目同类型的待处理提醒。' : '跟进提醒已经写入本地影子提醒记录。',
+            rows: [
+                ['项目', data.project_id || '-'],
+                ['类型', data.reminder_type || '-'],
+                ['日期', data.due_date || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'create_lead') {
+        return {
+            title: data.is_new === false ? '本地线索已更新' : '本地线索已创建',
+            description: '线索已经写入本地影子记录，没有同步外部 CRM 或表格。',
+            rows: [
+                ['客户', data.customer_name || '-'],
+                ['来源', data.source_channel || '-'],
+                ['意向', data.intent_type || '-'],
+                ['状态', data.status || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'create_quote') {
+        return {
+            title: data.is_new === false ? '本地报价已更新' : '本地报价已创建',
+            description: '报价已经写入本地影子记录，没有发送给客户或写入外部系统。',
+            rows: [
+                ['项目', data.project_name || data.project_id || '-'],
+                ['金额', `${data.currency || 'CNY'} ${data.amount || 0}`],
+                ['状态', data.status || '-'],
+                ['有效期', data.valid_until || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'generate_draft' || action === 'generate_client_reply_draft' || data.draft_text || data.reply_draft || data.message) {
         return {
             title: '回复草稿已生成',
             description: data.draft_text || data.reply_draft || data.message,
@@ -233,7 +331,7 @@ function pickActionSummary(result) {
         };
     }
 
-    if (action === 'create_tasks' || action === 'create_delivery_tasks' || data.task_count || data.created_tasks || data.tasks) {
+    if (action === 'create_tasks' || action === 'create_project_tasks' || action === 'create_delivery_tasks' || data.task_count || data.created_tasks || data.tasks) {
         return {
             title: '任务已更新',
             description: '项目任务已经生成或补齐。',
@@ -254,7 +352,186 @@ function pickActionSummary(result) {
         };
     }
 
-    if (action === 'advance_status') {
+    if (action === 'check_missing_project_fields') {
+        return {
+            title: '缺失字段检查完成',
+            description: data.audit_text || '字段检查已经完成。',
+            rows: [
+                ['检查项目数', data.summary?.total_projects_checked || '-'],
+                ['有问题项目', data.summary?.projects_with_issues || '-'],
+            ],
+            tone: data.summary?.projects_with_issues ? 'error' : 'success',
+        };
+    }
+
+    if (action === 'check_schedule_conflicts') {
+        return {
+            title: '排期冲突检查完成',
+            description: data.audit_text || '排期检查已经完成。',
+            rows: [
+                ['检查项目数', data.summary?.total_projects_checked || '-'],
+                ['同日冲突', data.summary?.same_day_conflict_count || 0],
+                ['缺日期', data.summary?.missing_date_count || 0],
+                ['过期未闭环', data.summary?.overdue_count || 0],
+            ],
+            tone: data.summary?.same_day_conflict_count || data.summary?.missing_date_count || data.summary?.overdue_count ? 'error' : 'success',
+        };
+    }
+
+    if (action === 'list_bookings') {
+        return {
+            title: '排期记录读取完成',
+            description: data.audit_text || '本地排期影子记录已经读取完成。',
+            rows: [
+                ['检查项目数', data.summary?.total_projects_checked || '-'],
+                ['排期记录', data.summary?.total_bookings || 0],
+                ['本地影子', data.summary?.local_shadow_count || 0],
+                ['来源面板', data.summary?.surface_count || 0],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'create_booking') {
+        return {
+            title: data.is_new === false ? '本地预约已更新' : '本地预约已创建',
+            description: '预约已经写入本地 calendar_events 影子记录，没有同步外部日历。',
+            rows: [
+                ['项目', data.project_name || data.project_id || '-'],
+                ['类型', data.event_type || '-'],
+                ['日期', data.event_date || '-'],
+                ['时间', data.start_time || '全天'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'start_booking' || action === 'complete_booking') {
+        return {
+            title: action === 'complete_booking' ? '本地预约已完成' : '本地预约已开始',
+            description: '预约状态已经更新到本地影子记录，没有同步外部日历。',
+            rows: [
+                ['预约', data.calendar_event_id || '-'],
+                ['项目', data.project_id || '-'],
+                ['状态', data.status || '-'],
+                ['日期', data.event_date || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'update_booking_time') {
+        return {
+            title: '本地预约已改期',
+            description: '预约时间已经更新到本地影子记录，没有同步外部日历。',
+            rows: [
+                ['预约', data.calendar_event_id || '-'],
+                ['项目', data.project_id || '-'],
+                ['日期', data.event_date || '-'],
+                ['时间', data.start_time || '全天'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'sync_external') {
+        return {
+            title: '外部同步记录已生成',
+            description: data.export_text || '同步记录已经写入本地影子队列。',
+            rows: [
+                ['目标', data.target_name || '-'],
+                ['范围', data.export_scope || '-'],
+                ['项目数', data.export_row_count || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'list_delivery_packages') {
+        return {
+            title: '交付包读取完成',
+            description: data.audit_text || '本地交付包影子记录已经读取完成。',
+            rows: [
+                ['交付包', data.summary?.total_packages || 0],
+                ['本地影子', data.summary?.local_shadow_count || 0],
+                ['可交付', data.summary?.ready_count || 0],
+                ['已发送', data.summary?.sent_count || 0],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'create_delivery_package') {
+        return {
+            title: data.is_new === false ? '本地交付包已更新' : '本地交付包已创建',
+            description: '交付包已经写入本地影子记录，没有同步外部网盘或客户系统。',
+            rows: [
+                ['项目', data.project_name || data.project_id || '-'],
+                ['类型', data.package_type || '-'],
+                ['状态', data.status || '-'],
+                ['渠道', data.delivery_channel || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'update_delivery_package_status') {
+        return {
+            title: '本地交付包状态已推进',
+            description: '交付包状态只在本地影子记录中更新，没有真实发送客户链接。',
+            rows: [
+                ['交付包', data.package_label || data.delivery_package_id || '-'],
+                ['原状态', data.previous_status || '-'],
+                ['新状态', data.new_status || data.status || '-'],
+                ['项目', data.project_name || data.project_id || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'prioritize_pending_delivery_actions') {
+        return {
+            title: '交付优先队列已生成',
+            description: data.priority_text || '已读取本地外部同步影子记录并生成优先级队列。',
+            rows: [
+                ['记录数', data.summary?.total_records || 0],
+                ['优先事项', data.summary?.priority_items || 0],
+                ['高优先级', data.summary?.high_count || 0],
+                ['可发布', data.summary?.ready_to_publish_count || 0],
+            ],
+            tone: data.summary?.critical_count || data.summary?.failed_count ? 'error' : 'success',
+        };
+    }
+
+    if (action === 'generate_delivery_queue_schedule') {
+        return {
+            title: '交付排程已生成',
+            description: data.schedule_text || '已生成本地交付同步队列排程。',
+            rows: [
+                ['记录数', data.summary?.total_records || 0],
+                ['可处理', data.summary?.actionable_records || 0],
+                ['立即动作', data.summary?.immediate_actions_count || 0],
+                ['失败', data.summary?.failed_count || 0],
+            ],
+            tone: data.summary?.failed_count ? 'error' : 'success',
+        };
+    }
+
+    if (action === 'inspect_delivery_audit_trail') {
+        return {
+            title: '交付审计轨迹已读取',
+            description: data.audit_text || '已读取本地外部同步影子记录的审计轨迹。',
+            rows: [
+                ['记录数', data.audit_summary?.total_records || 0],
+                ['事件数', data.audit_summary?.total_events || 0],
+                ['创建事件', data.audit_summary?.record_created_count || 0],
+                ['错误事件', data.audit_summary?.error_count || 0],
+            ],
+            tone: data.audit_summary?.error_count ? 'error' : 'success',
+        };
+    }
+
+    if (action === 'advance_status' || action === 'advance_project_status') {
         return {
             title: '项目状态已推进',
             description: '项目已经进入新的业务状态。',
@@ -266,7 +543,7 @@ function pickActionSummary(result) {
         };
     }
 
-    if (action === 'archive_project') {
+    if (action === 'archive_project' || action === 'archive_project_assets') {
         return {
             title: '项目已归档',
             description: '项目归档动作已经完成。',
@@ -326,6 +603,31 @@ function renderLastActionResult() {
 
 }
 
+function renderDrawerActionResult(projectId) {
+    const result = getState().lastActionResult;
+    if (!result || result.action_context?.scene !== 'project_drawer') {
+        return '';
+    }
+
+    const dataProjectId = result.data?.project_id || result.data?.checked_project_id || '';
+    if (dataProjectId && dataProjectId !== projectId) {
+        return '';
+    }
+
+    const summary = pickActionSummary(result);
+    return `
+        <div class="result-card result-${escapeHtml(summary.tone)}">
+            <p class="drawer-label">${escapeHtml(summary.title)}</p>
+            <p class="result-description">${escapeHtml(summary.description)}</p>
+            <div class="result-rows">
+                ${summary.rows.map(([label, value]) => `
+                    <div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value || '-')}</span></div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
 function renderDrawer(result) {
     const root = document.getElementById('drawer-root');
     if (!root) {
@@ -370,10 +672,12 @@ function renderDrawer(result) {
             <p class="muted">允许推进: ${escapeHtml(allowedTransitions.join(' / ') || '无')}</p>
             <div class="drawer-actions">
                 <button class="ghost-btn" type="button" data-drawer-action="generate_draft" data-project-id="${escapeHtml(project.project_id)}">生成回复草稿</button>
+                <button class="ghost-btn" type="button" data-drawer-action="check_missing_project_fields" data-project-id="${escapeHtml(project.project_id)}">检查缺失字段</button>
                 <button class="ghost-btn" type="button" data-drawer-action="create_tasks" data-project-id="${escapeHtml(project.project_id)}">补建任务</button>
                 <button class="primary-btn" type="button" data-drawer-action="advance_status" data-project-id="${escapeHtml(project.project_id)}" data-next-status="${escapeHtml(nextStatus)}" ${nextStatus ? '' : 'disabled'}>推进到下一状态</button>
                 <button class="ghost-btn danger-btn" type="button" data-drawer-action="archive_project" data-project-id="${escapeHtml(project.project_id)}">归档项目</button>
             </div>
+            ${renderDrawerActionResult(project.project_id)}
             <p class="drawer-label">Tasks</p>
             <ul class="drawer-list">${taskItems || '<li>暂无任务</li>'}</ul>
             <p class="drawer-label">Logs</p>
@@ -385,6 +689,7 @@ function renderDrawer(result) {
 function createProjectCard(project) {
     const riskLevel = project.risk?.level || 'low';
     const missing = project.risk?.missing || [];
+    const nextStatus = project.allowed_transitions?.[0] || '';
     return `
         <article class="project-card">
             <div class="card-header">
@@ -402,9 +707,58 @@ function createProjectCard(project) {
             <p class="muted">交付日期: ${escapeHtml(formatDate(project.delivery_deadline))}</p>
             <div class="card-actions">
                 <button class="ghost-btn" type="button" data-open-project="${escapeHtml(project.project_id)}">查看详情</button>
-                <button class="primary-btn" type="button" data-advance-project="${escapeHtml(project.project_id)}">推进状态</button>
+                <button class="primary-btn" type="button" data-advance-project="${escapeHtml(project.project_id)}" data-next-status="${escapeHtml(nextStatus)}" ${nextStatus ? '' : 'disabled'}>推进状态</button>
             </div>
         </article>
+    `;
+}
+
+function groupProjectsByLane(projects) {
+    const lanes = PROJECT_LANES.map((lane) => ({
+        ...lane,
+        projects: [],
+    }));
+    const laneByStatus = new Map();
+
+    lanes.forEach((lane) => {
+        lane.statuses.forEach((status) => {
+            laneByStatus.set(status, lane);
+        });
+    });
+
+    projects.forEach((project) => {
+        const targetLane = laneByStatus.get(project.status) || lanes[lanes.length - 1];
+        targetLane.projects.push(project);
+    });
+
+    return lanes;
+}
+
+function renderProjectBoard(projects) {
+    if (!projects.length) {
+        return '<div class="empty-state">当前还没有项目，先创建一个试试。</div>';
+    }
+
+    return `
+        <section class="project-board" aria-label="项目状态看板">
+            ${groupProjectsByLane(projects).map((lane) => `
+                <article class="project-lane">
+                    <div class="project-lane-header">
+                        <div>
+                            <p class="eyebrow">${escapeHtml(lane.key)}</p>
+                            <h3>${escapeHtml(lane.title)}</h3>
+                            <p class="muted">${escapeHtml(lane.hint)}</p>
+                        </div>
+                        <span class="summary-chip">${escapeHtml(lane.projects.length)} 项</span>
+                    </div>
+                    <div class="project-lane-body">
+                        ${lane.projects.length
+                            ? lane.projects.map(createProjectCard).join('')
+                            : '<div class="empty-state">暂无项目落在这个阶段。</div>'}
+                    </div>
+                </article>
+            `).join('')}
+        </section>
     `;
 }
 
@@ -429,6 +783,8 @@ function createDeliveryCard(project) {
                 <button class="ghost-btn" type="button" data-open-project="${escapeHtml(project.project_id)}">打开抽屉</button>
                 <button class="ghost-btn" type="button" data-delivery-action="create_selection_notice" data-project-id="${escapeHtml(project.project_id)}" ${canSelect ? '' : 'disabled'}>生成选片通知</button>
                 <button class="primary-btn" type="button" data-delivery-action="create_delivery_tasks" data-project-id="${escapeHtml(project.project_id)}" ${canDeliver ? '' : 'disabled'}>生成交付任务</button>
+                <button class="ghost-btn" type="button" data-delivery-action="create_delivery_package" data-project-id="${escapeHtml(project.project_id)}" ${canDeliver || canSelect ? '' : 'disabled'}>创建交付包</button>
+                <button class="ghost-btn danger-btn" type="button" data-delivery-action="sync_external" data-project-id="${escapeHtml(project.project_id)}">外部同步</button>
                 <button class="ghost-btn danger-btn" type="button" data-delivery-action="archive_project" data-project-id="${escapeHtml(project.project_id)}">归档</button>
             </div>
         </article>
@@ -519,6 +875,221 @@ function groupDeliveryProjects(projects) {
     };
 }
 
+function getDeliveryMetrics(projects, grouped) {
+    return {
+        total: projects.length,
+        readyForSelection: grouped.readyForSelection.length,
+        readyForDelivery: grouped.readyForDelivery.length,
+        blocked: grouped.blocked.length,
+        archived: projects.filter((project) => project.status === 'archived').length,
+        highRisk: projects.filter((project) => project.risk?.level === 'high').length,
+    };
+}
+
+function renderDeliveryMetricGrid(metrics) {
+    return `
+        <section class="card-grid">
+            ${renderMetricCard('交付相关项目', metrics.total, '当前进入交付视角的全部项目')}
+            ${renderMetricCard('选片就绪', metrics.readyForSelection, '可生成选片通知的项目')}
+            ${renderMetricCard('交付就绪', metrics.readyForDelivery, '可创建交付任务的项目')}
+            ${renderMetricCard('待推进', metrics.blocked, '仍需项目状态推进')}
+            ${renderMetricCard('已归档', metrics.archived, '完成后可沉淀复盘')}
+            ${renderMetricCard('高风险', metrics.highRisk, '建议先打开抽屉检查')}
+        </section>
+    `;
+}
+
+function renderDeliveryOpsPanel(metrics) {
+    return `
+        <section class="report-grid">
+            <article class="hero-card">
+                <p class="eyebrow">External Sync</p>
+                <h2>外部同步控制区</h2>
+                <p>每张项目卡都可以生成本地外部同步记录。这个动作会先确认，再写入本地影子队列，避免误同步真实外部系统。</p>
+                <div class="inline-tags">
+                    ${createTag('sync_external')}
+                    ${createTag('local_shadow')}
+                    ${createTag(`${metrics.total} 个候选项目`)}
+                </div>
+                <div class="card-actions">
+                    <button class="ghost-btn" type="button" data-delivery-action="prioritize_pending_delivery_actions">生成优先队列</button>
+                    <button class="ghost-btn" type="button" data-delivery-action="generate_delivery_queue_schedule">生成同步排程</button>
+                    <button class="primary-btn" type="button" data-delivery-action="inspect_delivery_audit_trail">查看审计轨迹</button>
+                </div>
+            </article>
+            <article class="hero-card">
+                <p class="eyebrow">Archive Guardrail</p>
+                <h2>归档高风险区</h2>
+                <p>归档会改变项目与素材状态，当前已加入确认弹窗。建议先检查缺失字段、交付任务和同步记录，再执行归档。</p>
+                <div class="inline-tags">
+                    ${createTag('archive_project_assets', 'risk-medium')}
+                    ${createTag('需要确认', 'risk-high')}
+                </div>
+            </article>
+        </section>
+    `;
+}
+
+function getDeliveryReportData(reports, action) {
+    const result = reports?.[action];
+    return result?.success ? result.data || {} : {};
+}
+
+function renderDeliveryReportFailure(reports, action) {
+    const result = reports?.[action];
+    if (!result || result.success) {
+        return '';
+    }
+    const message = result.error?.message || '读取失败';
+    return `<p class="muted risk-high">读取失败：${escapeHtml(message)}</p>`;
+}
+
+function renderDeliveryReportRows(items, options = {}) {
+    if (!items.length) {
+        return '<div class="empty-state">当前没有本地影子记录。</div>';
+    }
+
+    return `
+        <div class="compact-list">
+            ${items.slice(0, 4).map((item) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(item.display_name || item.project_name || item.project_id || '未命名项目')}</strong>
+                        <p class="muted">${escapeHtml(item.target_name || item.event_type || item.delivery_state || '-')}</p>
+                    </div>
+                    <div class="compact-side">
+                        <span>${escapeHtml(item.schedule_date || formatDate(item.timestamp) || '-')}</span>
+                        ${item.project_id ? `<button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">${escapeHtml(options.openLabel || '打开')}</button>` : ''}
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderDeliveryReportDashboard(reports = {}) {
+    const priority = getDeliveryReportData(reports, 'prioritize_pending_delivery_actions');
+    const schedule = getDeliveryReportData(reports, 'generate_delivery_queue_schedule');
+    const audit = getDeliveryReportData(reports, 'inspect_delivery_audit_trail');
+    const prioritySummary = priority.summary || {};
+    const scheduleSummary = schedule.summary || {};
+    const auditSummary = audit.audit_summary || {};
+
+    return `
+        <section class="hero-card hero-card-wide">
+            <div class="hero-grid">
+                <div>
+                    <p class="eyebrow">Delivery Pulse</p>
+                    <h2>外部同步脉搏</h2>
+                    <p>进入交付页时自动读取本地外部同步影子队列，显示优先级、排程和审计轨迹。这里仍然只是本地可视化，不会写入真实外部系统。</p>
+                </div>
+                <div class="hero-summary">
+                    <div class="summary-chip">优先事项 ${escapeHtml(prioritySummary.priority_items || 0)}</div>
+                    <div class="summary-chip">立即动作 ${escapeHtml(scheduleSummary.immediate_actions_count || 0)}</div>
+                    <div class="summary-chip">审计事件 ${escapeHtml(auditSummary.total_events || 0)}</div>
+                </div>
+            </div>
+        </section>
+        <section class="report-grid delivery-grid">
+            <article class="hero-card">
+                <p class="eyebrow">Priority Queue</p>
+                <h2>优先队列</h2>
+                <div class="inline-tags">
+                    ${createTag(`${prioritySummary.total_records || 0} 条记录`)}
+                    ${createTag(`${prioritySummary.high_count || 0} 个高优先级`, prioritySummary.high_count ? 'risk-medium' : '')}
+                    ${createTag(`${prioritySummary.failed_count || 0} 个失败`, prioritySummary.failed_count ? 'risk-high' : '')}
+                </div>
+                ${renderDeliveryReportFailure(reports, 'prioritize_pending_delivery_actions')}
+                ${renderDeliveryReportRows(priority.priority_queue || [])}
+            </article>
+            <article class="hero-card">
+                <p class="eyebrow">Queue Schedule</p>
+                <h2>同步排程</h2>
+                <div class="inline-tags">
+                    ${createTag(`${scheduleSummary.actionable_records || 0} 个可处理`)}
+                    ${createTag(`${scheduleSummary.ready_to_publish_count || 0} 个待发布`)}
+                    ${createTag(`${scheduleSummary.queued_count || 0} 个已排队`)}
+                </div>
+                ${renderDeliveryReportFailure(reports, 'generate_delivery_queue_schedule')}
+                ${renderDeliveryReportRows(schedule.schedule_rows || [])}
+            </article>
+            <article class="hero-card">
+                <p class="eyebrow">Audit Trail</p>
+                <h2>审计轨迹</h2>
+                <div class="inline-tags">
+                    ${createTag(`${auditSummary.total_records || 0} 条记录`)}
+                    ${createTag(`${auditSummary.total_events || 0} 个事件`)}
+                    ${createTag(`${auditSummary.failed_records || 0} 个失败`, auditSummary.failed_records ? 'risk-high' : '')}
+                </div>
+                ${renderDeliveryReportFailure(reports, 'inspect_delivery_audit_trail')}
+                ${renderDeliveryReportRows(audit.audit_rows || [], { openLabel: '定位' })}
+            </article>
+        </section>
+    `;
+}
+
+function renderDeliveryPackageList(packages) {
+    if (!packages.length) {
+        return '<div class="empty-state">当前没有本地交付包。可以在下方项目卡上点击“创建交付包”。</div>';
+    }
+
+    return `
+        <div class="compact-list">
+            ${packages.slice(0, 6).map((deliveryPackage) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(deliveryPackage.package_label || deliveryPackage.project_name || deliveryPackage.delivery_package_id)}</strong>
+                        <p class="muted">${escapeHtml(deliveryPackage.project_name || deliveryPackage.project_id)} · ${escapeHtml(deliveryPackage.package_type || '-')}</p>
+                    </div>
+                    <div class="compact-side">
+                        <div class="inline-tags">
+                            ${createTag(deliveryPackage.status || '-')}
+                            ${createTag(deliveryPackage.sync_state || 'local_shadow')}
+                        </div>
+                        <span class="muted">${escapeHtml(formatDate(deliveryPackage.updated_at))}</span>
+                        <div class="card-actions">
+                            ${(deliveryPackage.allowed_transitions || []).map((nextStatus) => `
+                                <button class="ghost-btn" type="button" data-delivery-action="update_delivery_package_status" data-delivery-package-id="${escapeHtml(deliveryPackage.delivery_package_id)}" data-project-id="${escapeHtml(deliveryPackage.project_id)}" data-next-status="${escapeHtml(nextStatus)}">
+                                    ${nextStatus === 'sent' ? '标记发送' : '标记确认'}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button class="ghost-btn" type="button" data-open-project="${escapeHtml(deliveryPackage.project_id)}">打开</button>
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderDeliveryPackagePanel(reports = {}) {
+    const packageResult = reports.list_delivery_packages;
+    const packageData = packageResult?.success ? packageResult.data || {} : {};
+    const summary = packageData.summary || {};
+    return `
+        <article class="hero-card hero-card-wide">
+            <div class="hero-grid">
+                <div>
+                    <p class="eyebrow">Delivery Packages</p>
+                    <h2>本地交付包</h2>
+                    <p>交付包是项目进入客户交付前的本地影子记录，用来承接选片通知、交付任务和外部同步前的核对清单。</p>
+                    <div class="inline-tags">
+                        ${createTag(`${summary.total_packages || 0} 个交付包`)}
+                        ${createTag(`${summary.ready_count || 0} 个可交付`)}
+                        ${createTag(`${summary.sent_count || 0} 个已发送`)}
+                        ${createTag('local_shadow')}
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="ghost-btn" type="button" data-delivery-action="list_delivery_packages">刷新交付包</button>
+                </div>
+            </div>
+            ${renderDeliveryReportFailure(reports, 'list_delivery_packages')}
+            ${renderDeliveryPackageList(packageData.packages || [])}
+        </article>
+    `;
+}
+
 function renderDeliveryGroup(title, eyebrow, projects) {
     return `
         <article class="hero-card">
@@ -527,6 +1098,515 @@ function renderDeliveryGroup(title, eyebrow, projects) {
             <div class="project-list">
                 ${projects.length ? projects.map(createDeliveryCard).join('') : '<div class="empty-state">当前没有项目落在这个分区。</div>'}
             </div>
+        </article>
+    `;
+}
+
+function getClientLeadMetrics(projects) {
+    const uniqueCustomers = new Set(projects.map((project) => project.customer_id).filter(Boolean));
+    const projectsWithMissingFields = projects.filter((project) => project.risk?.missing?.length > 0);
+    const quotedProjects = projects.filter((project) => project.status === 'quoted');
+    return {
+        customers: uniqueCustomers.size,
+        leads: projects.filter((project) => project.status === 'lead').length,
+        quoted: quotedProjects.length,
+        booked: projects.filter((project) => ['confirmed', 'preparing', 'shot'].includes(project.status)).length,
+        highIntent: projects.filter((project) => ['quoted', 'confirmed'].includes(project.status)).length,
+        followups: new Set([...projectsWithMissingFields, ...quotedProjects].map((project) => project.project_id)).size,
+    };
+}
+
+function renderClientLeadMetricGrid(metrics) {
+    return `
+        <section class="card-grid">
+            ${renderMetricCard('客户数', metrics.customers, '来自当前项目关联客户')}
+            ${renderMetricCard('新咨询', metrics.leads, '项目状态为意向')}
+            ${renderMetricCard('已报价', metrics.quoted, '需要继续跟进')}
+            ${renderMetricCard('已预约', metrics.booked, '已确认或进入筹备拍摄')}
+            ${renderMetricCard('高意向', metrics.highIntent, '报价或已确认客户')}
+            ${renderMetricCard('待跟进', metrics.followups, '存在缺字段或信息不完整')}
+        </section>
+    `;
+}
+
+function renderLeadPipeline(metrics) {
+    const stages = [
+        ['新咨询', metrics.leads, '接住来源、补全需求'],
+        ['沟通中', metrics.followups, '需要跟进或补字段'],
+        ['已报价', metrics.quoted, '等待客户确认'],
+        ['已预约', metrics.booked, '进入项目执行'],
+        ['高意向', metrics.highIntent, '优先推进成交'],
+    ];
+
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">Lead Pipeline</p>
+            <h2>客户关系管道</h2>
+            <div class="pipeline-list">
+                ${stages.map(([label, count, hint]) => `
+                    <div class="pipeline-stage">
+                        <strong>${escapeHtml(label)}</strong>
+                        <span>${escapeHtml(count)}</span>
+                        <p class="muted">${escapeHtml(hint)}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </article>
+    `;
+}
+
+function renderProjectSelectOptions(projects, selectedProjectId) {
+    if (!projects.length) {
+        return '<option value="">暂无项目</option>';
+    }
+
+    return projects.map((project) => `
+        <option value="${escapeHtml(project.project_id)}" ${project.project_id === selectedProjectId ? 'selected' : ''}>
+            ${escapeHtml(project.project_name || project.project_id)} · ${escapeHtml(project.status || 'unknown')}
+        </option>
+    `).join('');
+}
+
+function renderFollowupPanel(metrics, projects, selectedProjectId) {
+    const hasProjects = projects.length > 0;
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">Followup</p>
+            <h2>跟进提醒</h2>
+            <p>先接入本地影子提醒：报价后跟进、交付后跟进、回访提醒都可以在这里创建，不会写入外部系统。</p>
+            <div class="inline-tags">
+                ${createTag(`${metrics.followups} 条待补信息`)}
+                ${createTag(`${metrics.quoted} 个报价跟进`)}
+                ${createTag('create_followup_reminder')}
+            </div>
+            <form class="form-grid followup-form" id="followup-reminder-form">
+                <label class="form-field">
+                    <span>项目</span>
+                    <select name="project_id" required ${hasProjects ? '' : 'disabled'}>
+                        ${renderProjectSelectOptions(projects, selectedProjectId)}
+                    </select>
+                </label>
+                <label class="form-field">
+                    <span>提醒类型</span>
+                    <select name="reminder_type">
+                        <option value="quotation_followup">报价跟进</option>
+                        <option value="delivery_followup">交付跟进</option>
+                        <option value="revisit">回访提醒</option>
+                    </select>
+                </label>
+                <label class="form-field">
+                    <span>提醒日期</span>
+                    <input name="due_date" type="date">
+                </label>
+                <label class="form-field form-field-wide">
+                    <span>备注</span>
+                    <textarea name="note" rows="3" placeholder="例如：明天上午确认报价、交付后 3 天回访体验"></textarea>
+                </label>
+                <div class="form-actions form-field-wide">
+                    <button class="primary-btn" type="submit" ${hasProjects ? '' : 'disabled'}>创建提醒</button>
+                </div>
+            </form>
+        </article>
+    `;
+}
+
+function renderClientLeadShadowList(items, emptyText) {
+    if (!items.length) {
+        return `<div class="empty-state">${escapeHtml(emptyText)}</div>`;
+    }
+
+    return `
+        <div class="compact-list">
+            ${items.slice(0, 5).map((item) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(item.customer_name || item.project_name || item.lead_id || item.quote_id)}</strong>
+                        <p class="muted">${escapeHtml(item.project_name || item.source_channel || item.quote_type || '-')}</p>
+                    </div>
+                    <div class="compact-side">
+                        <span>${escapeHtml(item.status || '-')}</span>
+                        ${item.project_id ? `<button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">打开</button>` : ''}
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderClientLeadShadowPanel(reports = {}) {
+    const leadData = reports.list_leads?.success ? reports.list_leads.data || {} : {};
+    const quoteData = reports.list_quotes?.success ? reports.list_quotes.data || {} : {};
+    const leadSummary = leadData.summary || {};
+    const quoteSummary = quoteData.summary || {};
+
+    return `
+        <section class="report-grid">
+            <article class="hero-card">
+                <p class="eyebrow">Local Leads</p>
+                <h2>本地线索</h2>
+                <div class="inline-tags">
+                    ${createTag(`${leadSummary.total_leads || 0} 条线索`)}
+                    ${createTag(`${leadSummary.new_count || 0} 条新线索`)}
+                    ${createTag('local_shadow')}
+                </div>
+                ${renderDeliveryReportFailure(reports, 'list_leads')}
+                ${renderClientLeadShadowList(leadData.leads || [], '当前没有本地线索影子记录。')}
+            </article>
+            <article class="hero-card">
+                <p class="eyebrow">Local Quotes</p>
+                <h2>本地报价</h2>
+                <div class="inline-tags">
+                    ${createTag(`${quoteSummary.total_quotes || 0} 条报价`)}
+                    ${createTag(`${quoteSummary.draft_count || 0} 条草稿`)}
+                    ${createTag(`${quoteSummary.accepted_count || 0} 条接受`)}
+                </div>
+                ${renderDeliveryReportFailure(reports, 'list_quotes')}
+                ${renderClientLeadShadowList(quoteData.quotes || [], '当前没有本地报价影子记录。')}
+            </article>
+        </section>
+    `;
+}
+
+function renderLeadQuoteForms(projects, selectedProjectId) {
+    const hasProjects = projects.length > 0;
+    return `
+        <section class="split-grid">
+            <article class="hero-card">
+                <p class="eyebrow">Create Lead / Local Shadow</p>
+                <form class="form-grid" id="lead-create-form">
+                    <label class="form-field">
+                        <span>关联项目</span>
+                        <select name="project_id">
+                            <option value="">不关联项目</option>
+                            ${renderProjectSelectOptions(projects, selectedProjectId)}
+                        </select>
+                    </label>
+                    <label class="form-field">
+                        <span>客户名</span>
+                        <input name="customer_name" type="text" placeholder="例如 王小姐">
+                    </label>
+                    <label class="form-field">
+                        <span>来源</span>
+                        <select name="source_channel">
+                            <option value="social_media">social_media</option>
+                            <option value="referral">referral</option>
+                            <option value="walk_in">walk_in</option>
+                            <option value="manual">manual</option>
+                        </select>
+                    </label>
+                    <label class="form-field">
+                        <span>意向类型</span>
+                        <select name="intent_type">
+                            <option value="portrait">portrait</option>
+                            <option value="wedding">wedding</option>
+                            <option value="commercial">commercial</option>
+                            <option value="family">family</option>
+                            <option value="general">general</option>
+                        </select>
+                    </label>
+                    <label class="form-field">
+                        <span>预算</span>
+                        <input name="budget_range" type="text" placeholder="例如 3000-5000">
+                    </label>
+                    <label class="form-field form-field-wide">
+                        <span>备注</span>
+                        <textarea name="note" rows="3" placeholder="记录来源、需求、偏好、下一步"></textarea>
+                    </label>
+                    <div class="form-actions form-field-wide">
+                        <button class="primary-btn" type="submit">创建线索</button>
+                    </div>
+                </form>
+            </article>
+            <article class="hero-card">
+                <p class="eyebrow">Create Quote / Local Shadow</p>
+                <form class="form-grid" id="quote-create-form">
+                    <label class="form-field">
+                        <span>项目</span>
+                        <select name="project_id" required ${hasProjects ? '' : 'disabled'}>
+                            ${renderProjectSelectOptions(projects, selectedProjectId)}
+                        </select>
+                    </label>
+                    <label class="form-field">
+                        <span>报价类型</span>
+                        <select name="quote_type">
+                            <option value="standard">standard</option>
+                            <option value="premium">premium</option>
+                            <option value="custom">custom</option>
+                        </select>
+                    </label>
+                    <label class="form-field">
+                        <span>金额</span>
+                        <input name="amount" type="number" min="0" step="1" placeholder="例如 3999">
+                    </label>
+                    <label class="form-field">
+                        <span>有效期</span>
+                        <input name="valid_until" type="date">
+                    </label>
+                    <label class="form-field form-field-wide">
+                        <span>备注</span>
+                        <textarea name="note" rows="3" placeholder="记录报价包含项、优惠、限制"></textarea>
+                    </label>
+                    <div class="form-actions form-field-wide">
+                        <button class="primary-btn" type="submit" ${hasProjects ? '' : 'disabled'}>创建报价</button>
+                    </div>
+                </form>
+            </article>
+        </section>
+    `;
+}
+
+function getScheduleDate(project) {
+    const dateValue = project.delivery_deadline || project.due_date || '';
+    if (!dateValue) {
+        return null;
+    }
+
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    return date;
+}
+
+function getDateKey(date) {
+    return date.toISOString().slice(0, 10);
+}
+
+function getScheduleEntries(projects) {
+    return projects
+        .map((project) => {
+            const date = getScheduleDate(project);
+            if (!date) {
+                return null;
+            }
+            return {
+                project,
+                date,
+                dateKey: getDateKey(date),
+            };
+        })
+        .filter(Boolean)
+        .sort((left, right) => left.date.getTime() - right.date.getTime());
+}
+
+function getScheduleMetrics(projects, entries) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateBuckets = entries.reduce((bucket, entry) => {
+        bucket.set(entry.dateKey, (bucket.get(entry.dateKey) || 0) + 1);
+        return bucket;
+    }, new Map());
+
+    return {
+        scheduled: entries.length,
+        unscheduled: projects.length - entries.length,
+        thisWeek: entries.filter((entry) => {
+            const diffDays = Math.ceil((entry.date.getTime() - today.getTime()) / 86400000);
+            return diffDays >= 0 && diffDays <= 7;
+        }).length,
+        overdue: entries.filter((entry) => entry.date.getTime() < today.getTime()).length,
+        conflicts: [...dateBuckets.values()].filter((count) => count > 1).length,
+        inProduction: projects.filter((project) => ['confirmed', 'preparing', 'shot'].includes(project.status)).length,
+    };
+}
+
+function getScheduleTone(entry, dateBuckets) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if ((dateBuckets.get(entry.dateKey) || 0) > 1) {
+        return ['同日冲突', 'risk-high'];
+    }
+    if (entry.date.getTime() < today.getTime()) {
+        return ['已过期', 'risk-high'];
+    }
+    const diffDays = Math.ceil((entry.date.getTime() - today.getTime()) / 86400000);
+    if (diffDays <= 3) {
+        return ['临近', 'risk-medium'];
+    }
+    return ['正常', ''];
+}
+
+function renderScheduleMetricGrid(metrics) {
+    return `
+        <section class="card-grid">
+            ${renderMetricCard('已排期项目', metrics.scheduled, '以交付日期作为临时排期代理')}
+            ${renderMetricCard('本周窗口', metrics.thisWeek, '未来 7 天内需要关注')}
+            ${renderMetricCard('同日冲突', metrics.conflicts, '同一天存在多个项目')}
+            ${renderMetricCard('未设日期', metrics.unscheduled, '建议先补齐交付日期')}
+            ${renderMetricCard('执行中', metrics.inProduction, '确认、筹备或拍摄阶段')}
+            ${renderMetricCard('已过期', metrics.overdue, '需要复核状态或交付日期')}
+        </section>
+    `;
+}
+
+function renderScheduleTimeline(entries) {
+    if (!entries.length) {
+        return '<div class="empty-state">暂无可推导的排期数据。先在项目里补齐交付日期，这里就会出现时间线。</div>';
+    }
+
+    const dateBuckets = entries.reduce((bucket, entry) => {
+        bucket.set(entry.dateKey, (bucket.get(entry.dateKey) || 0) + 1);
+        return bucket;
+    }, new Map());
+
+    return `
+        <div class="compact-list schedule-timeline">
+            ${entries.slice(0, 8).map((entry) => {
+                const [toneLabel, toneClass] = getScheduleTone(entry, dateBuckets);
+                return `
+                    <article class="compact-row schedule-row">
+                        <div>
+                            <strong>${escapeHtml(formatDate(entry.project.delivery_deadline || entry.project.due_date))}</strong>
+                            <p class="muted">${escapeHtml(entry.project.project_name)} · ${escapeHtml(entry.project.customer_name || '未关联客户')}</p>
+                        </div>
+                        <div class="compact-side">
+                            <div class="inline-tags">
+                                ${createTag(entry.project.status || 'unknown')}
+                                ${createTag(toneLabel, toneClass)}
+                            </div>
+                            <button class="ghost-btn" type="button" data-open-project="${escapeHtml(entry.project.project_id)}">打开</button>
+                        </div>
+                    </article>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function renderLocalBookingList(bookings) {
+    if (!bookings.length) {
+        return '<div class="empty-state">当前没有本地预约影子记录。创建本地预约后会显示在这里。</div>';
+    }
+
+    return `
+        <div class="compact-list schedule-booking-list">
+            ${bookings.map((booking) => `
+                <article class="compact-row schedule-row">
+                    <div>
+                        <strong>${escapeHtml(formatDate(booking.event_date || booking.booking_date || booking.date))} ${escapeHtml(booking.start_time || '全天')}</strong>
+                        <p class="muted">${escapeHtml(booking.project_name || booking.project_id || '未知项目')} · ${escapeHtml(booking.customer_name || '未关联客户')}</p>
+                        <form class="booking-reschedule-form" data-booking-reschedule-form data-project-id="${escapeHtml(booking.project_id)}" data-event-key="${escapeHtml(booking.event_key)}">
+                            <input name="booking_date" type="date" value="${escapeHtml(booking.event_date || '')}" aria-label="预约日期">
+                            <input name="start_time" type="time" value="${escapeHtml(booking.start_time || '')}" aria-label="开始时间">
+                            <select name="duration_minutes" aria-label="时长">
+                                <option value="60" ${Number(booking.duration_minutes) === 60 ? 'selected' : ''}>1 小时</option>
+                                <option value="120" ${Number(booking.duration_minutes || 120) === 120 ? 'selected' : ''}>2 小时</option>
+                                <option value="180" ${Number(booking.duration_minutes) === 180 ? 'selected' : ''}>3 小时</option>
+                                <option value="240" ${Number(booking.duration_minutes) === 240 ? 'selected' : ''}>4 小时</option>
+                            </select>
+                            <input name="location" type="text" value="${escapeHtml(booking.location || '')}" placeholder="地点" aria-label="地点">
+                            <button class="ghost-btn" type="submit">改期</button>
+                        </form>
+                    </div>
+                    <div class="compact-side">
+                        <div class="inline-tags">
+                            ${createTag(booking.event_type || 'booking')}
+                            ${createTag(booking.status || 'scheduled')}
+                            ${createTag(booking.sync_state || 'local_shadow')}
+                        </div>
+                        <div class="card-actions">
+                            <button class="ghost-btn" type="button" data-booking-action="start_booking" data-project-id="${escapeHtml(booking.project_id)}" data-event-key="${escapeHtml(booking.event_key)}" ${booking.status === 'completed' ? 'disabled' : ''}>开始</button>
+                            <button class="primary-btn" type="button" data-booking-action="complete_booking" data-project-id="${escapeHtml(booking.project_id)}" data-event-key="${escapeHtml(booking.event_key)}" ${booking.status === 'completed' ? 'disabled' : ''}>完成</button>
+                        </div>
+                        <button class="ghost-btn" type="button" data-open-project="${escapeHtml(booking.project_id)}">打开</button>
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderResourceReadiness(projects) {
+    const preparation = projects.filter((project) => ['confirmed', 'preparing'].includes(project.status)).length;
+    const shooting = projects.filter((project) => project.status === 'shot').length;
+    const postProduction = projects.filter((project) => ['selection_pending', 'retouching'].includes(project.status)).length;
+    const delivery = projects.filter((project) => ['delivering', 'completed'].includes(project.status)).length;
+
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">Resource Readiness</p>
+            <h2>资源准备度</h2>
+            <div class="mini-metrics">
+                <div><strong>${escapeHtml(preparation)}</strong><span>筹备资源</span></div>
+                <div><strong>${escapeHtml(shooting)}</strong><span>拍摄后待转选片</span></div>
+                <div><strong>${escapeHtml(postProduction)}</strong><span>后期资源</span></div>
+                <div><strong>${escapeHtml(delivery)}</strong><span>交付资源</span></div>
+            </div>
+        </article>
+    `;
+}
+
+function renderScheduleGuardrail(metrics) {
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">Conflict Guardrail</p>
+            <h2>冲突护栏</h2>
+            <p>当前只做只读风险提示，不自动创建、调整或取消预约。真实 Booking 接入后，创建预约和改期会进入确认流程。</p>
+            <div class="inline-tags">
+                ${createTag(`${metrics.conflicts} 个同日冲突`, metrics.conflicts ? 'risk-high' : '')}
+                ${createTag(`${metrics.unscheduled} 个未设日期`, metrics.unscheduled ? 'risk-medium' : '')}
+                ${createTag('check_schedule_conflicts')}
+            </div>
+            <div class="card-actions">
+                <button class="primary-btn" type="button" data-schedule-action="check_schedule_conflicts">检查冲突</button>
+            </div>
+        </article>
+    `;
+}
+
+function renderCreateBookingPanel(projects, selectedProjectId) {
+    const hasProjects = projects.length > 0;
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">Create Booking</p>
+            <h2>创建本地预约</h2>
+            <p>先写入本地影子排期记录，不会同步外部日历。相同项目、类型、日期和时间会更新同一条记录。</p>
+            <form class="form-grid followup-form" id="schedule-booking-form">
+                <label class="form-field">
+                    <span>项目</span>
+                    <select name="project_id" required ${hasProjects ? '' : 'disabled'}>
+                        ${renderProjectSelectOptions(projects, selectedProjectId)}
+                    </select>
+                </label>
+                <label class="form-field">
+                    <span>预约类型</span>
+                    <select name="booking_type">
+                        <option value="shoot">拍摄</option>
+                        <option value="consultation">咨询</option>
+                        <option value="selection">选片</option>
+                        <option value="delivery">交付</option>
+                    </select>
+                </label>
+                <label class="form-field">
+                    <span>日期</span>
+                    <input name="booking_date" type="date" required>
+                </label>
+                <label class="form-field">
+                    <span>开始时间</span>
+                    <input name="start_time" type="time">
+                </label>
+                <label class="form-field">
+                    <span>时长</span>
+                    <select name="duration_minutes">
+                        <option value="60">1 小时</option>
+                        <option value="120" selected>2 小时</option>
+                        <option value="180">3 小时</option>
+                        <option value="240">4 小时</option>
+                    </select>
+                </label>
+                <label class="form-field">
+                    <span>地点</span>
+                    <input name="location" type="text" placeholder="影棚 / 外景 / 线上">
+                </label>
+                <label class="form-field form-field-wide">
+                    <span>备注</span>
+                    <textarea name="note" rows="3" placeholder="记录人员、设备、注意事项"></textarea>
+                </label>
+                <div class="form-actions form-field-wide">
+                    <button class="primary-btn" type="submit" ${hasProjects ? '' : 'disabled'}>创建本地预约</button>
+                </div>
+            </form>
         </article>
     `;
 }
@@ -553,11 +1633,20 @@ function bindProjectActions() {
             try {
                 const projectId = button.dataset.advanceProject;
                 const project = getProjectById(projectId);
-                const nextStatus = project?.allowed_transitions?.[0] || 'preparing';
-                await runActionAndSync('project_board', 'advance_status', {
+                const nextStatus = button.dataset.nextStatus || project?.allowed_transitions?.[0] || '';
+                if (!nextStatus) {
+                    showToast('当前项目没有可推进的下一状态。');
+                    setStatusChip('advance_status unavailable');
+                    return;
+                }
+                const result = await runActionAndSync('project_board', 'advance_status', {
                     project_id: projectId,
                     new_status: nextStatus,
                 });
+                if (result.success) {
+                    await switchScene('project_command');
+                    await loadProjectIntoDrawer(projectId);
+                }
             } finally {
                 setButtonBusy(button, false);
             }
@@ -580,7 +1669,11 @@ function bindDrawerActions() {
                     payload.new_status = button.dataset.nextStatus;
                 }
 
-                await runActionAndSync('project_drawer', action, payload);
+                const result = await runActionAndSync('project_drawer', action, payload);
+                if (action === 'advance_status' && result.success) {
+                    await switchScene('project_command');
+                    await loadProjectIntoDrawer(projectId);
+                }
             } finally {
                 setButtonBusy(button, false);
             }
@@ -597,12 +1690,108 @@ function bindDeliveryActions() {
             try {
                 await runActionAndSync('delivery_panel', button.dataset.deliveryAction, {
                     project_id: button.dataset.projectId,
+                    delivery_package_id: button.dataset.deliveryPackageId,
+                    status: button.dataset.nextStatus,
                 });
             } finally {
                 setButtonBusy(button, false);
             }
         });
     });
+}
+
+function bindScheduleActions() {
+    document.querySelectorAll('[data-schedule-action]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            if (!setButtonBusy(button, true, '检查中...')) {
+                return;
+            }
+            try {
+                await runActionAndSync('schedule_board', button.dataset.scheduleAction, {});
+            } finally {
+                setButtonBusy(button, false);
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-booking-action]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            if (!setButtonBusy(button, true)) {
+                return;
+            }
+            try {
+                await runActionAndSync('schedule_board', button.dataset.bookingAction, {
+                    project_id: button.dataset.projectId,
+                    event_key: button.dataset.eventKey,
+                });
+            } finally {
+                setButtonBusy(button, false);
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-booking-reschedule-form]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (form.dataset.busy === 'true') {
+                return;
+            }
+
+            const formData = new FormData(form);
+            form.dataset.busy = 'true';
+            setFormBusy(form, true);
+            try {
+                await runActionAndSync('schedule_board', 'update_booking_time', {
+                    project_id: form.dataset.projectId,
+                    event_key: form.dataset.eventKey,
+                    booking_date: formData.get('booking_date'),
+                    start_time: formData.get('start_time'),
+                    duration_minutes: formData.get('duration_minutes'),
+                    location: formData.get('location'),
+                });
+            } finally {
+                form.dataset.busy = 'false';
+                setFormBusy(form, false);
+            }
+        });
+    });
+
+    const bookingForm = document.getElementById('schedule-booking-form');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (bookingForm.dataset.busy === 'true') {
+                return;
+            }
+
+            const formData = new FormData(bookingForm);
+            const projectId = toProjectId(formData.get('project_id')) || getSelectedProjectId();
+            if (!projectId) {
+                showToast('请先选择项目。');
+                return;
+            }
+
+            bookingForm.dataset.busy = 'true';
+            setFormBusy(bookingForm, true);
+            try {
+                const result = await runActionAndSync('schedule_board', 'create_booking', {
+                    project_id: projectId,
+                    booking_type: formData.get('booking_type'),
+                    booking_date: formData.get('booking_date'),
+                    start_time: formData.get('start_time'),
+                    duration_minutes: formData.get('duration_minutes'),
+                    location: formData.get('location'),
+                    note: formData.get('note'),
+                });
+                if (result.success) {
+                    bookingForm.reset();
+                }
+            } finally {
+                bookingForm.dataset.busy = 'false';
+                setFormBusy(bookingForm, false);
+            }
+        });
+    }
 }
 
 function bindProjectCreateForm() {
@@ -691,6 +1880,213 @@ function bindInquiryForms() {
             }
         });
     }
+
+    const followupForm = document.getElementById('followup-reminder-form');
+    if (followupForm) {
+        followupForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (followupForm.dataset.busy === 'true') {
+                return;
+            }
+            const formData = new FormData(followupForm);
+            const projectId = toProjectId(formData.get('project_id')) || getSelectedProjectId();
+            if (!projectId) {
+                showToast('请先选择项目。');
+                return;
+            }
+
+            followupForm.dataset.busy = 'true';
+            setFormBusy(followupForm, true);
+            try {
+                const result = await runActionAndSync('inquiry', 'create_followup_reminder', {
+                    project_id: projectId,
+                    reminder_type: formData.get('reminder_type'),
+                    due_date: formData.get('due_date'),
+                    note: formData.get('note'),
+                });
+                if (result.success) {
+                    followupForm.reset();
+                }
+            } finally {
+                followupForm.dataset.busy = 'false';
+                setFormBusy(followupForm, false);
+            }
+        });
+    }
+
+    const leadForm = document.getElementById('lead-create-form');
+    if (leadForm) {
+        leadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (leadForm.dataset.busy === 'true') {
+                return;
+            }
+            const formData = new FormData(leadForm);
+            leadForm.dataset.busy = 'true';
+            setFormBusy(leadForm, true);
+            try {
+                const result = await runActionAndSync('client_leads', 'create_lead', {
+                    project_id: toProjectId(formData.get('project_id')),
+                    customer_name: formData.get('customer_name'),
+                    source_channel: formData.get('source_channel'),
+                    intent_type: formData.get('intent_type'),
+                    budget_range: formData.get('budget_range'),
+                    note: formData.get('note'),
+                });
+                if (result.success) {
+                    leadForm.reset();
+                }
+            } finally {
+                leadForm.dataset.busy = 'false';
+                setFormBusy(leadForm, false);
+            }
+        });
+    }
+
+    const quoteForm = document.getElementById('quote-create-form');
+    if (quoteForm) {
+        quoteForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (quoteForm.dataset.busy === 'true') {
+                return;
+            }
+            const formData = new FormData(quoteForm);
+            const projectId = toProjectId(formData.get('project_id')) || getSelectedProjectId();
+            if (!projectId) {
+                showToast('请先选择项目。');
+                return;
+            }
+
+            quoteForm.dataset.busy = 'true';
+            setFormBusy(quoteForm, true);
+            try {
+                const result = await runActionAndSync('client_leads', 'create_quote', {
+                    project_id: projectId,
+                    quote_type: formData.get('quote_type'),
+                    amount: formData.get('amount'),
+                    valid_until: formData.get('valid_until'),
+                    note: formData.get('note'),
+                });
+                if (result.success) {
+                    quoteForm.reset();
+                }
+            } finally {
+                quoteForm.dataset.busy = 'false';
+                setFormBusy(quoteForm, false);
+            }
+        });
+    }
+}
+
+function renderHomeMetricGrid(metrics, reporting) {
+    const prioritySummary = reporting.prioritize_pending?.summary || {};
+    const scheduleSummary = reporting.delivery_schedule?.summary || {};
+
+    return `
+        <section class="card-grid">
+            ${renderMetricCard('项目总数', metrics.total_projects ?? 0, '所有已落入工作台的项目')}
+            ${renderMetricCard('风险项目', metrics.risk_projects_count ?? 0, '存在缺字段或交付风险')}
+            ${renderMetricCard('缺字段项目', metrics.missing_fields_count ?? 0, '需要先补齐数据')}
+            ${renderMetricCard('临近交付', metrics.upcoming_delivery_count ?? 0, '需要优先关注交期')}
+            ${renderMetricCard('优先事项', prioritySummary.priority_items ?? 0, '外部同步或待处理队列')}
+            ${renderMetricCard('立即动作', scheduleSummary.immediate_actions_count ?? 0, '今天应处理的队列项')}
+        </section>
+    `;
+}
+
+function renderPriorityQueue(priorityReport) {
+    const queue = priorityReport?.priority_queue || [];
+    if (!queue.length) {
+        return '<div class="empty-state">当前没有需要立即处理的优先队列。</div>';
+    }
+
+    return `
+        <div class="compact-list">
+            ${queue.slice(0, 5).map((item) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(item.display_name || item.project_id || '未命名项目')}</strong>
+                        <p class="muted">${escapeHtml(item.schedule_reason || item.recommended_action || '等待处理')}</p>
+                    </div>
+                    <div class="compact-side">
+                        <div class="inline-tags">
+                            ${createTag(item.delivery_state || 'pending')}
+                            ${createTag(`P${item.priority_rank ?? '-'}`, item.priority_rank <= 2 ? 'risk-high' : 'risk-medium')}
+                        </div>
+                        ${item.project_id ? `<button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">打开</button>` : ''}
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderExternalPulse(deliverySchedule) {
+    const summary = deliverySchedule?.summary || {};
+    const rows = deliverySchedule?.schedule_rows || [];
+
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">External Sync Pulse</p>
+            <h2>外部同步脉搏</h2>
+            <div class="mini-metrics">
+                <div><strong>${escapeHtml(summary.actionable_records ?? 0)}</strong><span>可处理记录</span></div>
+                <div><strong>${escapeHtml(summary.ready_to_publish_count ?? 0)}</strong><span>可发布</span></div>
+                <div><strong>${escapeHtml(summary.queued_count ?? 0)}</strong><span>已入队</span></div>
+                <div><strong>${escapeHtml(summary.failed_count ?? 0)}</strong><span>失败</span></div>
+            </div>
+            <div class="inline-tags home-pulse-tags">
+                ${createTag(`${rows.length} 条排程记录`)}
+                ${createTag('local_shadow')}
+                ${createTag('no_live_write')}
+            </div>
+        </article>
+    `;
+}
+
+function renderStatusMix(statusCounts) {
+    const rows = Object.entries(statusCounts || {}).filter(([, count]) => Number(count) > 0);
+    const total = rows.reduce((sum, [, count]) => sum + Number(count || 0), 0);
+
+    if (!rows.length) {
+        return '<div class="empty-state">当前没有状态分布数据。</div>';
+    }
+
+    return `
+        <div class="status-mix-list">
+            ${rows.map(([status, count]) => {
+                const percent = total ? Math.round((Number(count) / total) * 100) : 0;
+                return `
+                    <div class="status-mix-row">
+                        <div>
+                            <strong>${escapeHtml(status)}</strong>
+                            <span>${escapeHtml(count)} 项</span>
+                        </div>
+                        <div class="status-meter" aria-label="${escapeHtml(`${status} ${percent}%`)}">
+                            <span style="width: ${escapeHtml(percent)}%"></span>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function renderDataQualityGuardrail(data, weeklyDigest) {
+    const quality = weeklyDigest.data_quality || {};
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">Data Quality Guardrail</p>
+            <h2>数据质量护栏</h2>
+            <div class="mini-metrics">
+                <div><strong>${escapeHtml(quality.missing_due_date_count ?? 0)}</strong><span>缺日期</span></div>
+                <div><strong>${escapeHtml(quality.missing_customer_count ?? 0)}</strong><span>缺客户</span></div>
+                <div><strong>${escapeHtml(quality.missing_project_reference_count ?? 0)}</strong><span>缺项目引用</span></div>
+                <div><strong>${escapeHtml((data.missing_fields || []).length)}</strong><span>字段缺失项</span></div>
+            </div>
+            ${renderDataQualityList(data.missing_fields || [])}
+        </article>
+    `;
 }
 
 function renderDashboard(result) {
@@ -700,46 +2096,42 @@ function renderDashboard(result) {
     const weeklyDigest = reporting.weekly_digest || {};
     const summary = weeklyDigest.summary || {};
     const recentTransitions = weeklyDigest.recent_transitions || [];
+    const prioritySummary = reporting.prioritize_pending?.summary || {};
 
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
             <article class="hero-card hero-card-wide">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">Scene / dashboard</p>
-                        <h2>本周工作台总览</h2>
+                        <p class="eyebrow">首页 / Home</p>
+                        <h2>今日驾驶舱</h2>
                         <p>把项目风险、即将交付、最近状态流转和数据质量放在同一屏，方便你先看清楚今天该处理什么。</p>
                     </div>
                     <div class="hero-summary">
                         <div class="summary-chip">活跃项目 ${escapeHtml(summary.active_projects ?? metrics.total_projects ?? 0)}</div>
-                        <div class="summary-chip">最近流转 ${escapeHtml(summary.recent_transition_count ?? 0)}</div>
+                        <div class="summary-chip">优先事项 ${escapeHtml(prioritySummary.priority_items ?? 0)}</div>
                         <div class="summary-chip">临近交付 ${escapeHtml(summary.due_soon_projects ?? metrics.upcoming_delivery_count ?? 0)}</div>
                     </div>
                 </div>
             </article>
 
-            <section class="card-grid">
-                ${renderMetricCard('项目总数', metrics.total_projects ?? 0, '所有已落入工作台的项目')}
-                ${renderMetricCard('风险项目', metrics.risk_projects_count ?? 0, '存在缺字段或交付风险')}
-                ${renderMetricCard('临近交付', metrics.upcoming_delivery_count ?? 0, '需要优先关注交期')}
-            </section>
+            ${renderHomeMetricGrid(metrics, reporting)}
 
             <section class="report-grid">
                 <article class="hero-card">
-                    <p class="eyebrow">Reporting / Weekly Digest</p>
-                    <h2>本周摘要</h2>
-                    <div class="mini-metrics">
-                        <div><strong>${escapeHtml(summary.active_projects ?? 0)}</strong><span>活跃项目</span></div>
-                        <div><strong>${escapeHtml(summary.closed_projects ?? 0)}</strong><span>已关闭</span></div>
-                        <div><strong>${escapeHtml(summary.overdue_projects ?? 0)}</strong><span>已逾期</span></div>
-                        <div><strong>${escapeHtml(summary.due_soon_projects ?? 0)}</strong><span>即将到期</span></div>
-                    </div>
+                    <p class="eyebrow">Today Priority</p>
+                    <h2>今天先处理</h2>
+                    ${renderPriorityQueue(reporting.prioritize_pending)}
                 </article>
+                ${renderExternalPulse(reporting.delivery_schedule)}
+            </section>
 
+            <section class="report-grid">
+                ${renderDataQualityGuardrail(data, weeklyDigest)}
                 <article class="hero-card">
-                    <p class="eyebrow">Data Quality</p>
-                    <h2>字段缺失</h2>
-                    ${renderDataQualityList(data.missing_fields || [])}
+                    <p class="eyebrow">Status Mix</p>
+                    <h2>项目状态分布</h2>
+                    ${renderStatusMix(weeklyDigest.status_counts)}
                 </article>
             </section>
 
@@ -778,12 +2170,12 @@ function renderProjects(result) {
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
             <article class="hero-card">
-                <p class="eyebrow">Scene / projects</p>
-                <h2>项目看板</h2>
+                <p class="eyebrow">项目指挥台 / Project Command</p>
+                <h2>项目推进主战场</h2>
                 <p>这里保留“快速建项目 + 项目卡片 + 右抽屉”的主链，适合处理创建、推进状态和补齐信息这三类工作。</p>
             </article>
             <article class="hero-card">
-                <p class="eyebrow">Quick Create</p>
+                <p class="eyebrow">Quick Create / Project</p>
                 <form class="form-grid" id="project-create-form">
                     <label class="form-field">
                         <span>客户名</span>
@@ -819,9 +2211,7 @@ function renderProjects(result) {
                     </div>
                 </form>
             </article>
-            <div class="project-list">
-                ${projects.length ? projects.map(createProjectCard).join('') : '<div class="empty-state">当前还没有项目，先创建一个试试。</div>'}
-            </div>
+            ${renderProjectBoard(projects)}
             ${renderLastActionResult()}
         </section>
     `;
@@ -829,18 +2219,37 @@ function renderProjects(result) {
     bindProjectActions();
 }
 
-function renderInquiry() {
+function renderInquiry(reports = {}) {
     const selectedProjectId = getSelectedProjectId();
+    const projects = getProjectCollection();
+    const metrics = getClientLeadMetrics(projects);
+
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
-            <article class="hero-card">
-                <p class="eyebrow">Scene / inquiry</p>
-                <h2>询单收口区</h2>
-                <p>这里适合先落客户、再生成沟通草稿。草稿支持直接填项目 ID，也支持沿用当前抽屉选中的项目。</p>
+            <article class="hero-card hero-card-wide">
+                <div class="hero-grid">
+                    <div>
+                        <p class="eyebrow">客户与线索 / Client Leads</p>
+                        <h2>成交推进器</h2>
+                        <p>这里承接客户、线索、报价、跟进提醒和沟通草稿，所有新增线索与报价先落本地影子记录。</p>
+                    </div>
+                    <div class="hero-summary">
+                        <div class="summary-chip">客户 ${escapeHtml(metrics.customers)}</div>
+                        <div class="summary-chip">新咨询 ${escapeHtml(metrics.leads)}</div>
+                        <div class="summary-chip">待跟进 ${escapeHtml(metrics.followups)}</div>
+                    </div>
+                </div>
             </article>
+            ${renderClientLeadMetricGrid(metrics)}
+            <section class="report-grid">
+                ${renderLeadPipeline(metrics)}
+                ${renderFollowupPanel(metrics, projects, selectedProjectId)}
+            </section>
+            ${renderClientLeadShadowPanel(reports)}
+            ${renderLeadQuoteForms(projects, selectedProjectId)}
             <section class="split-grid">
                 <article class="hero-card">
-                    <p class="eyebrow">Create Customer</p>
+                    <p class="eyebrow">Create Customer / Client</p>
                     <form class="form-grid" id="inquiry-customer-form">
                         <label class="form-field">
                             <span>客户名</span>
@@ -850,7 +2259,10 @@ function renderInquiry() {
                             <span>客户类型</span>
                             <select name="customer_type">
                                 <option value="individual">individual</option>
-                                <option value="business">business</option>
+                                <option value="company">company</option>
+                                <option value="brand">brand</option>
+                                <option value="agency">agency</option>
+                                <option value="organization">organization</option>
                             </select>
                         </label>
                         <label class="form-field">
@@ -881,7 +2293,7 @@ function renderInquiry() {
                     </form>
                 </article>
                 <article class="hero-card">
-                    <p class="eyebrow">Generate Reply Draft</p>
+                    <p class="eyebrow">Generate Reply Draft / Client</p>
                     <form class="form-grid" id="inquiry-draft-form">
                         <label class="form-field">
                             <span>项目 ID</span>
@@ -891,7 +2303,7 @@ function renderInquiry() {
                             <span>场景</span>
                             <select name="context_type">
                                 <option value="general">general</option>
-                                <option value="pricing">pricing</option>
+                                <option value="quotation">quotation</option>
                                 <option value="delivery">delivery</option>
                             </select>
                         </label>
@@ -920,26 +2332,98 @@ function renderInquiry() {
     bindInquiryForms();
 }
 
-function renderDelivery(result) {
-    const projects = result?.data || getProjectCollection();
-    const grouped = groupDeliveryProjects(projects);
+function renderScheduleBoard(bookingsResult = null) {
+    const projects = getProjectCollection();
+    const entries = getScheduleEntries(projects);
+    const metrics = getScheduleMetrics(projects, entries);
+    const bookings = bookingsResult?.data?.bookings || [];
 
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
             <article class="hero-card hero-card-wide">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">Scene / delivery</p>
-                        <h2>交付工作台</h2>
-                        <p>把“可以发选片通知”“可以建交付任务”“仍需继续推进”的项目拆开，减少误点和来回筛选。</p>
+                        <p class="eyebrow">日程排期 / Schedule Board</p>
+                        <h2>资源与时间冲突中心</h2>
+                        <p>先用项目交付日期形成只读排期视角，帮助判断本周窗口、同日冲突和资源压力。当前不会写入任何 Booking 数据。</p>
                     </div>
                     <div class="hero-summary">
-                        <div class="summary-chip">选片就绪 ${escapeHtml(grouped.readyForSelection.length)}</div>
-                        <div class="summary-chip">交付就绪 ${escapeHtml(grouped.readyForDelivery.length)}</div>
-                        <div class="summary-chip">待推进 ${escapeHtml(grouped.blocked.length)}</div>
+                        <div class="summary-chip">已排期 ${escapeHtml(metrics.scheduled)}</div>
+                        <div class="summary-chip">本周 ${escapeHtml(metrics.thisWeek)}</div>
+                        <div class="summary-chip">本地预约 ${escapeHtml(bookings.length)}</div>
+                        <div class="summary-chip">冲突 ${escapeHtml(metrics.conflicts)}</div>
                     </div>
                 </div>
             </article>
+            ${renderScheduleMetricGrid(metrics)}
+
+            <section class="report-grid">
+                <article class="hero-card">
+                    <p class="eyebrow">Upcoming Timeline</p>
+                    <h2>近期时间线</h2>
+                    ${renderScheduleTimeline(entries)}
+                </article>
+                <article class="hero-card">
+                    <p class="eyebrow">Local Bookings</p>
+                    <h2>本地预约</h2>
+                    ${renderLocalBookingList(bookings)}
+                </article>
+            </section>
+
+            <section class="report-grid">
+                ${renderResourceReadiness(projects)}
+                ${renderScheduleGuardrail(metrics)}
+            </section>
+
+            <section class="report-grid">
+                ${renderCreateBookingPanel(projects, getSelectedProjectId())}
+                <article class="hero-card">
+                        <p class="eyebrow">Next Wiring</p>
+                        <h2>后续接线动作</h2>
+                        <div class="inline-tags">
+                            ${createTag('list_bookings')}
+                            ${createTag('create_booking')}
+                            ${createTag('update_booking_time')}
+                            ${createTag('start_booking')}
+                        </div>
+                        <div class="card-actions">
+                            <button class="ghost-btn" type="button" data-schedule-action="list_bookings">读取预约</button>
+                        </div>
+                </article>
+            </section>
+            ${renderLastActionResult()}
+        </section>
+    `;
+
+    bindProjectActions();
+    bindScheduleActions();
+}
+
+function renderDelivery(result, reports = {}) {
+    const projects = result?.data || getProjectCollection();
+    const grouped = groupDeliveryProjects(projects);
+    const metrics = getDeliveryMetrics(projects, grouped);
+
+    document.getElementById('scene-root').innerHTML = `
+        <section class="scene-panel">
+            <article class="hero-card hero-card-wide">
+                <div class="hero-grid">
+                    <div>
+                        <p class="eyebrow">交付与素材 / Delivery Assets</p>
+                        <h2>客户体验门面</h2>
+                        <p>把“可以发选片通知”“可以建交付任务”“仍需继续推进”的项目拆开，减少误点和来回筛选。</p>
+                    </div>
+                    <div class="hero-summary">
+                        <div class="summary-chip">选片就绪 ${escapeHtml(metrics.readyForSelection)}</div>
+                        <div class="summary-chip">交付就绪 ${escapeHtml(metrics.readyForDelivery)}</div>
+                        <div class="summary-chip">待推进 ${escapeHtml(metrics.blocked)}</div>
+                    </div>
+                </div>
+            </article>
+            ${renderDeliveryMetricGrid(metrics)}
+            ${renderDeliveryOpsPanel(metrics)}
+            ${renderDeliveryReportDashboard(reports)}
+            ${renderDeliveryPackagePanel(reports)}
             <section class="report-grid delivery-grid">
                 ${renderDeliveryGroup('可发选片通知', 'Delivery / Selection Notice', grouped.readyForSelection)}
                 ${renderDeliveryGroup('可建交付任务', 'Delivery / Delivery Tasks', grouped.readyForDelivery)}
@@ -951,6 +2435,45 @@ function renderDelivery(result) {
 
     bindProjectActions();
     bindDeliveryActions();
+}
+
+async function loadDeliveryReports() {
+    const actions = [
+        'list_delivery_packages',
+        'prioritize_pending_delivery_actions',
+        'generate_delivery_queue_schedule',
+        'inspect_delivery_audit_trail',
+    ];
+    const entries = await Promise.all(actions.map(async (action) => {
+        try {
+            const result = await window.PhotoStudioApi.runAction('delivery_assets', action, {});
+            return [action, result];
+        } catch (error) {
+            return [action, {
+                success: false,
+                data: null,
+                error: { message: getErrorMessage(error) },
+            }];
+        }
+    }));
+    return Object.fromEntries(entries);
+}
+
+async function loadClientLeadReports() {
+    const actions = ['list_leads', 'list_quotes'];
+    const entries = await Promise.all(actions.map(async (action) => {
+        try {
+            const result = await window.PhotoStudioApi.runAction('client_leads', action, {});
+            return [action, result];
+        } catch (error) {
+            return [action, {
+                success: false,
+                data: null,
+                error: { message: getErrorMessage(error) },
+            }];
+        }
+    }));
+    return Object.fromEntries(entries);
 }
 
 async function loadProjectIntoDrawer(projectId) {
@@ -968,76 +2491,110 @@ async function loadProjectIntoDrawer(projectId) {
 }
 
 async function renderSceneByName(scene) {
+    const normalizedScene = normalizeScene(scene);
     try {
-        setStatusChip(`Loading ${scene}...`);
+        setStatusChip(`Loading ${normalizedScene}...`);
 
-        if (scene === 'dashboard') {
+        if (normalizedScene === 'home') {
             const result = await window.PhotoStudioApi.getDashboard();
             getState().setDashboard(result);
             renderDashboard(result);
-            setStatusChip('Dashboard synced');
+            setStatusChip('Home synced');
             return;
         }
 
-        if (scene === 'projects') {
+        if (normalizedScene === 'project_command') {
             const result = await window.PhotoStudioApi.listProjects({});
             getState().setProjects(result);
             renderProjects(result);
-            setStatusChip('Projects synced');
+            setStatusChip('Project command synced');
             return;
         }
 
-        if (scene === 'inquiry') {
-            renderInquiry();
-            setStatusChip('Inquiry ready');
-            return;
-        }
-
-        if (scene === 'delivery') {
+        if (normalizedScene === 'schedule_board') {
             if (!getState().projects) {
                 getState().setProjects(await window.PhotoStudioApi.listProjects({}));
             }
-            renderDelivery(getState().projects);
-            setStatusChip('Delivery ready');
+            const bookingsResult = await window.PhotoStudioApi.runAction('schedule_board', 'list_bookings', {});
+            renderScheduleBoard(bookingsResult);
+            setStatusChip('Schedule board ready');
+            return;
         }
+
+        if (normalizedScene === 'client_leads') {
+            if (!getState().projects) {
+                getState().setProjects(await window.PhotoStudioApi.listProjects({}));
+            }
+            const clientLeadReports = await loadClientLeadReports();
+            renderInquiry(clientLeadReports);
+            setStatusChip('Client leads ready');
+            return;
+        }
+
+        if (normalizedScene === 'delivery_assets') {
+            if (!getState().projects) {
+                getState().setProjects(await window.PhotoStudioApi.listProjects({}));
+            }
+            const deliveryReports = await loadDeliveryReports();
+            renderDelivery(getState().projects, deliveryReports);
+            setStatusChip('Delivery assets ready');
+            return;
+        }
+
+        renderSceneError(normalizedScene, new Error(`unsupported scene: ${normalizedScene}`));
+        setStatusChip(`${normalizedScene} failed`);
     } catch (error) {
-        renderSceneError(scene, error);
+        renderSceneError(normalizedScene, error);
         showToast(`场景加载失败：${getErrorMessage(error)}`);
-        setStatusChip(`${scene} failed`);
+        setStatusChip(`${normalizedScene} failed`);
     }
 }
 
 async function switchScene(sceneName) {
-    getState().currentScene = sceneName;
+    const normalizedScene = normalizeScene(sceneName);
+    getState().currentScene = normalizedScene;
     document.querySelectorAll('.nav-item').forEach((button) => {
-        button.classList.toggle('active', button.dataset.scene === sceneName);
+        button.classList.toggle('active', normalizeScene(button.dataset.scene) === normalizedScene);
     });
-    await renderSceneByName(sceneName);
+    await renderSceneByName(normalizedScene);
 }
 
 async function refreshScene(scene) {
-    if (scene === 'project_board') {
-        await renderSceneByName('projects');
-        return;
-    }
+    const normalizedScene = normalizeScene(scene);
 
-    if (scene === 'project_drawer' && getSelectedProjectId()) {
+    if (normalizedScene === 'project_drawer' && getSelectedProjectId()) {
         await loadProjectIntoDrawer(getSelectedProjectId());
         return;
     }
 
-    if (scene === 'delivery_panel') {
-        await renderSceneByName('delivery');
+    if (normalizedScene === 'home'
+        || normalizedScene === 'project_command'
+        || normalizedScene === 'schedule_board'
+        || normalizedScene === 'client_leads'
+        || normalizedScene === 'delivery_assets') {
+        await renderSceneByName(normalizedScene);
         return;
-    }
-
-    if (scene === 'dashboard' || scene === 'delivery') {
-        await renderSceneByName(scene);
     }
 }
 
 async function runActionAndSync(scene, action, payload) {
     try {
+        const confirmationMessage = HIGH_RISK_ACTION_CONFIRMATIONS[action];
+        if (confirmationMessage && !window.confirm(confirmationMessage)) {
+            showToast('已取消操作');
+            setStatusChip(`${action} cancelled`);
+            return {
+                success: false,
+                data: null,
+                error: {
+                    code: 'USER_CANCELLED',
+                    message: '用户已取消高风险动作。',
+                },
+                ui_hints: {},
+                action_context: { scene, action },
+            };
+        }
+
         setStatusChip(`Running ${action}...`);
         const result = await window.PhotoStudioApi.runAction(scene, action, payload);
         const actionResult = {
@@ -1055,16 +2612,16 @@ async function runActionAndSync(scene, action, payload) {
 
         window.PhotoStudioEvents.applyUiHints(result.ui_hints);
 
-        if (scene === 'project_board' && getState().currentScene === 'projects') {
-            await renderSceneByName('projects');
+        if (normalizeScene(scene) === 'project_command' && isCurrentScene('project_command')) {
+            await renderSceneByName('project_command');
         }
 
-        if (scene === 'inquiry' && getState().currentScene === 'inquiry') {
-            renderInquiry();
+        if (normalizeScene(scene) === 'client_leads' && isCurrentScene('client_leads')) {
+            await renderSceneByName('client_leads');
         }
 
-        if (scene === 'delivery_panel' && getState().currentScene === 'delivery') {
-            await renderSceneByName('delivery');
+        if (normalizeScene(scene) === 'delivery_assets' && isCurrentScene('delivery_assets')) {
+            await renderSceneByName('delivery_assets');
         }
 
         return actionResult;
@@ -1098,7 +2655,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('btn-new-project')?.addEventListener('click', async () => {
-        await switchScene('projects');
+        await switchScene('project_command');
         document.getElementById('project-create-form')?.querySelector('input[name="customer_name"]')?.focus();
     });
 
@@ -1108,6 +2665,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.PhotoStudioEvents.on('project:selected', (projectId) => {
         void loadProjectIntoDrawer(projectId);
+    });
+
+    window.PhotoStudioEvents.on('scene:focus', (scene) => {
+        void switchScene(scene);
     });
 
     window.PhotoStudioEvents.on('scene:refresh', (scene) => {
@@ -1120,5 +2681,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.desktopAPI.windowReady('photo-studio');
     }
 
-    await switchScene('dashboard');
+    await switchScene('home');
 });

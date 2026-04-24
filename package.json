@@ -10,6 +10,7 @@
     "start:utf8": "start-vcpchat-utf8.cmd",
     "start:desktop:utf8": "start-vcpchat-utf8.cmd --desktop-only",
     "start:rag-observer:utf8": "start-vcpchat-utf8.cmd --rag-observer-only",
+    "test:photo-studio": "node scripts/photo-studio-closeout-smoke.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
@@ -92,6 +93,7 @@
       "text-viewer.html",
       "style.css",
       "assets/",
+      "Desktopmodules/**/*",
       "modules/**/*",
       "vendor/**/*",
       "node_modules/**/*"

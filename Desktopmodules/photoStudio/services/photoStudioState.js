@@ -1,6 +1,6 @@
 (function initPhotoStudioState() {
     const state = {
-        currentScene: 'dashboard',
+        currentScene: 'home',
         selectedProjectId: null,
         refreshing: new Set(),
         dashboard: null,

@@ -99,6 +99,13 @@ button {
     padding: 11px 16px;
 }
 
+.ghost-btn:disabled,
+.primary-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+}
+
 .ghost-btn {
     background: rgba(255, 255, 255, 0.62);
     border-color: var(--line);
@@ -169,6 +176,12 @@ button {
     gap: 16px;
 }
 
+.split-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
 .hero-card,
 .card-grid,
 .drawer-card,
@@ -229,6 +242,45 @@ button {
     padding-left: 18px;
     color: var(--ink);
     line-height: 1.8;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.form-field {
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink);
+}
+
+.form-field span {
+    font-weight: 600;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid rgba(111, 84, 59, 0.16);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--ink);
+    resize: vertical;
+}
+
+.form-field-wide {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 .project-list {
@@ -293,6 +345,11 @@ button {
     padding: 9px 12px;
 }
 
+.danger-btn {
+    border-color: rgba(191, 90, 54, 0.24);
+    color: var(--accent);
+}
+
 .drawer-card {
     padding: 20px;
     display: grid;
@@ -312,6 +369,13 @@ button {
     padding-left: 18px;
     color: var(--ink);
     line-height: 1.7;
+}
+
+.drawer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 6px 0 4px;
 }
 
 .drawer-kv {
@@ -335,6 +399,22 @@ button {
     border: 1px dashed rgba(111, 84, 59, 0.24);
     border-radius: 18px;
     background: rgba(255, 250, 242, 0.55);
+}
+
+.result-card {
+    padding: 18px 20px;
+    border: 1px solid rgba(111, 84, 59, 0.12);
+    border-radius: 18px;
+    background: rgba(255, 250, 242, 0.74);
+}
+
+.result-card pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink);
 }
 
 .toast-root {
@@ -364,6 +444,10 @@ button {
     .right-drawer {
         grid-column: 1 / -1;
     }
+
+    .split-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 760px) {
@@ -392,5 +476,18 @@ button {
     .card-grid {
         grid-template-columns: 1fr;
         padding: 0;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        justify-content: stretch;
+    }
+
+    .form-actions .primary-btn,
+    .form-actions .ghost-btn {
+        width: 100%;
     }
 }

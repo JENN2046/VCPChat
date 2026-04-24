@@ -6,6 +6,7 @@
         dashboard: null,
         projects: null,
         projectDetail: null,
+        lastActionResult: null,
         markRefreshing(scene) {
             this.refreshing.add(scene);
         },
@@ -23,6 +24,9 @@
         },
         setProjectDetail(result) {
             this.projectDetail = result;
+        },
+        setLastActionResult(result) {
+            this.lastActionResult = result;
         },
     };
 

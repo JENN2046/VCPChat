@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Studio</title>
+    <link rel="stylesheet" href="./photoStudio.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">VCP Workbench</p>
+                <h1>Photo Studio</h1>
+            </div>
+            <div class="topbar-actions">
+                <div class="status-chip" id="status-chip">Static shell</div>
+                <button class="ghost-btn" id="btn-refresh" type="button">刷新</button>
+                <button class="primary-btn" id="btn-new-project" type="button">新建项目</button>
+            </div>
+        </header>
+
+        <div class="workspace">
+            <aside class="left-nav">
+                <button class="nav-item active" data-scene="dashboard" type="button">Dashboard</button>
+                <button class="nav-item" data-scene="inquiry" type="button">Inquiry</button>
+                <button class="nav-item" data-scene="projects" type="button">Projects</button>
+                <button class="nav-item" data-scene="delivery" type="button">Delivery</button>
+            </aside>
+
+            <main class="scene-root" id="scene-root" aria-live="polite"></main>
+
+            <aside class="right-drawer" id="drawer-root">
+                <div class="drawer-card">
+                    <p class="drawer-label">Project Context</p>
+                    <h2>等待选择项目</h2>
+                    <p class="muted">
+                        PR1 只建立窗口和工作台壳。后续批次会把项目详情、风险、草稿和动作结果接进这里。
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="toast-root" id="toast-root"></div>
+
+    <script src="./services/photoStudioApi.js"></script>
+    <script src="./services/photoStudioState.js"></script>
+    <script src="./services/photoStudioEvents.js"></script>
+    <script src="./photoStudio.js"></script>
+</body>
+</html>

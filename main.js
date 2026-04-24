@@ -43,6 +43,7 @@ const ragHandlers = require('./modules/ipc/ragHandlers'); // Import RAG handlers
 const canvasHandlers = require('./modules/ipc/canvasHandlers'); // Import canvas handlers
 const desktopHandlers = require('./modules/ipc/desktopHandlers'); // Import VCPdesktop handlers
 const desktopRemoteHandlers = require('./modules/ipc/desktopRemoteHandlers'); // Import desktop remote control handlers
+const photoStudioHandlers = require('./modules/ipc/photoStudioHandlers'); // Import Photo Studio handlers
 const { PRELOAD_ROLES, resolveProjectPreload } = require('./modules/services/preloadPaths');
 // chokidar is now lazy-loaded
 
@@ -1057,6 +1058,7 @@ if (!gotTheLock) {
         emoticonHandlers.setupEmoticonHandlers();
         canvasHandlers.initialize({ mainWindow, openChildWindows, CANVAS_CACHE_DIR });
         desktopHandlers.initialize({ mainWindow, openChildWindows, settingsManager: appSettingsManager });
+        photoStudioHandlers.initialize();
         desktopRemoteHandlers.initialize({ mainWindow });
         ipcMain.handle('codex-router-host:control', async (event, commandPayload) => {
             return desktopRemoteHandlers.handleCodexRouterHostControl(commandPayload || {});

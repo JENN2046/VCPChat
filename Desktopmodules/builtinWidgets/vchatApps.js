@@ -111,6 +111,15 @@
             <circle cx="14" cy="34" r="4" fill="#7c3aed" opacity="0.4"/>
             <circle cx="20" cy="36" r="3" fill="#c084fc" opacity="0.5"/>
         </svg>`,
+        photoStudio: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="10" width="36" height="28" rx="6" fill="currentColor" opacity="0.08"/>
+            <rect x="6" y="10" width="36" height="28" rx="6" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <path d="M16 10l3-4h10l3 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24" cy="24" r="8" fill="currentColor" opacity="0.14"/>
+            <circle cx="24" cy="24" r="8" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <circle cx="24" cy="24" r="3" fill="currentColor"/>
+            <circle cx="35" cy="17" r="2" fill="currentColor" opacity="0.7"/>
+        </svg>`,
         translator: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="24" cy="24" r="18" fill="currentColor" opacity="0.08"/>
             <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2.5" fill="none"/>
@@ -295,6 +304,16 @@
             emoji: '🎨',
             description: '打开 AI 生图工作流，支持电商/人像/营销/二次元等场景',
             appAction: 'open-ai-image-gen-window',
+        },
+        {
+            id: 'vchat-app-photo-studio',
+            name: 'Photo Studio',
+            icon: null,
+            animatedIcon: null,
+            svgIcon: SVG_ICONS.photoStudio,
+            emoji: '📳',
+            description: '打开 Photo Studio 工作台，用于 inquiry / projects / delivery 三栏业务推进',
+            appAction: 'open-photo-studio-window',
         },
         {
             id: 'vchat-app-translator',

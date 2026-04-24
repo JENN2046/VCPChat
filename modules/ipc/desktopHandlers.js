@@ -30,6 +30,7 @@ let vchatTranslatorWindow = null;
 let vchatMusicWindow = null;
 let vchatThemesWindow = null;
 let vchatAIImageGenWindow = null;
+let vchatPhotoStudioWindow = null;
 
 // --- 鏀惰棌绯荤粺璺緞 - 浣跨敤椤圭洰鏍圭洰褰曠殑 AppData ---
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -331,6 +332,7 @@ function createOrFocusChildWindow(existingWindow, options) {
         if (win === vchatMemoWindow) vchatMemoWindow = null;
         if (win === vchatTranslatorWindow) vchatTranslatorWindow = null;
         if (win === vchatThemesWindow) vchatThemesWindow = null;
+        if (win === vchatPhotoStudioWindow) vchatPhotoStudioWindow = null;
     });
 
     console.log(`[DesktopHandlers] Created child window: ${options.title}`);
@@ -369,6 +371,21 @@ function registerManagedWindows() {
         owner: 'desktopHandlers',
         getWindow: () => desktopWindow,
         open: async () => openDesktopWindow(),
+    });
+
+    windowService.register(WINDOW_APP_IDS.PHOTO_STUDIO, {
+        owner: 'desktopHandlers',
+        getWindow: () => vchatPhotoStudioWindow,
+        open: async () => {
+            vchatPhotoStudioWindow = createOrFocusChildWindow(vchatPhotoStudioWindow, {
+                width: 1380, height: 860, minWidth: 1024, minHeight: 680,
+                title: 'Photo Studio',
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'photoStudio', 'photoStudio.html'),
+                preloadPath: resolveAppPreload(app.getAppPath(), PRELOAD_ROLES.DESKTOP),
+            });
+            return vchatPhotoStudioWindow;
+        },
+        readyTimeoutMs: 10000,
     });
 
     windowService.register(WINDOW_APP_IDS.NOTES, {
@@ -535,6 +552,8 @@ function resolveAppActionToAppId(appAction) {
     switch (appAction) {
         case 'show-main-window':
             return WINDOW_APP_IDS.MAIN;
+        case 'open-photo-studio-window':
+            return WINDOW_APP_IDS.PHOTO_STUDIO;
         case 'open-notes-window':
             return WINDOW_APP_IDS.NOTES;
         case 'open-memo-window':
@@ -1825,6 +1844,10 @@ function initialize(params) {
                     const notesHandlers = require('./notesHandlers');
                     notesHandlers.createOrFocusNotesWindow();
                     return { success: true };
+                }
+                case 'open-photo-studio-window': {
+                    await windowService.open(WINDOW_APP_IDS.PHOTO_STUDIO);
+                    return { success: true, appId: WINDOW_APP_IDS.PHOTO_STUDIO };
                 }
                 case 'open-sheet-window': {
                     const sheetHandlers = require('./sheetHandlers');

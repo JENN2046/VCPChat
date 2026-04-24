@@ -1,6 +1,7 @@
 module.exports = Object.freeze({
     MAIN: 'main-shell',
     DESKTOP: 'desktop-platform',
+    PHOTO_STUDIO: 'photo-studio',
     NOTES: 'notes',
     MEMO: 'memo',
     FORUM: 'forum',

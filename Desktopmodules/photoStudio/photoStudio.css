@@ -176,10 +176,47 @@ button {
     gap: 16px;
 }
 
+.hero-card-wide {
+    overflow: hidden;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.hero-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.summary-chip {
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(31, 71, 54, 0.08);
+    color: var(--nav-active);
+    font-size: 13px;
+    font-weight: 700;
+}
+
 .split-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
+}
+
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.delivery-grid {
+    align-items: start;
 }
 
 .hero-card,
@@ -235,6 +272,35 @@ button {
     font-size: 28px;
     font-weight: 700;
     color: var(--ink);
+}
+
+.metric-hint {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.mini-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.mini-metrics div {
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(31, 71, 54, 0.06);
+    display: grid;
+    gap: 4px;
+}
+
+.mini-metrics strong {
+    font-size: 24px;
+    color: var(--nav-active);
+}
+
+.mini-metrics span {
+    font-size: 13px;
+    color: var(--muted);
 }
 
 .scene-list {
@@ -300,6 +366,13 @@ button {
     margin: 0;
 }
 
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
 .project-card h3 {
     font-size: 18px;
     margin-bottom: 8px;
@@ -343,6 +416,12 @@ button {
 .card-actions .ghost-btn,
 .card-actions .primary-btn {
     padding: 9px 12px;
+}
+
+.inline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .danger-btn {
@@ -401,6 +480,35 @@ button {
     background: rgba(255, 250, 242, 0.55);
 }
 
+.compact-list {
+    display: grid;
+    gap: 10px;
+}
+
+.compact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid rgba(111, 84, 59, 0.12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.56);
+}
+
+.compact-row strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.compact-side {
+    display: grid;
+    justify-items: end;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
 .result-card {
     padding: 18px 20px;
     border: 1px solid rgba(111, 84, 59, 0.12);
@@ -448,6 +556,15 @@ button {
     .split-grid {
         grid-template-columns: 1fr;
     }
+
+    .report-grid,
+    .hero-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-summary {
+        justify-content: flex-start;
+    }
 }
 
 @media (max-width: 760px) {
@@ -476,6 +593,10 @@ button {
     .card-grid {
         grid-template-columns: 1fr;
         padding: 0;
+    }
+
+    .mini-metrics {
+        grid-template-columns: 1fr;
     }
 
     .form-grid {

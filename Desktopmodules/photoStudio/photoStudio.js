@@ -50,6 +50,21 @@ function getProjectById(projectId) {
     return getProjectCollection().find((item) => item.project_id === projectId) || null;
 }
 
+function formatDate(value) {
+    if (!value) {
+        return '未设置';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return String(value);
+    }
+    return date.toLocaleDateString('zh-CN');
+}
+
+function createTag(content, extraClass = '') {
+    return `<span class="pill ${extraClass}">${escapeHtml(content)}</span>`;
+}
+
 function canCreateDeliveryTasks(project) {
     return ['retouching', 'delivering', 'completed'].includes(project?.status);
 }
@@ -60,12 +75,22 @@ function canCreateSelectionNotice(project) {
 
 function getDeliveryStatusHint(project) {
     if (canCreateSelectionNotice(project)) {
-        return '当前状态可生成选片通知。';
+        return '当前状态可以发送选片通知。';
     }
     if (canCreateDeliveryTasks(project)) {
-        return '当前状态可直接创建交付任务。';
+        return '当前状态可以生成交付任务。';
     }
-    return `当前状态是 ${project?.status || 'unknown'}，选片通知要求 shot / selection_pending，交付任务要求 retouching / delivering / completed。`;
+    return `当前状态是 ${project?.status || 'unknown'}，需要继续推进后才能进入交付动作。`;
+}
+
+function getRiskTone(level) {
+    if (level === 'high') {
+        return 'risk-high';
+    }
+    if (level === 'medium') {
+        return 'risk-medium';
+    }
+    return '';
 }
 
 function renderLastActionResult() {
@@ -74,7 +99,7 @@ function renderLastActionResult() {
         return '';
     }
 
-    const title = result.success ? 'Latest Action' : 'Latest Error';
+    const title = result.success ? '最近一次动作结果' : '最近一次错误';
     const body = result.success ? result.data : result.error;
     return `
         <article class="result-card">
@@ -107,6 +132,7 @@ function renderDrawer(result) {
 
     const allowedTransitions = project.allowed_transitions || [];
     const nextStatus = allowedTransitions[0] || '';
+    const riskMissing = project.risk?.missing || [];
     const taskItems = tasks.map((task) => `<li>${escapeHtml(task.name)} · ${escapeHtml(task.status)}</li>`).join('');
     const logItems = logs.map((item) => `<li>${escapeHtml(item.at)} · ${escapeHtml(item.message)}</li>`).join('');
 
@@ -117,10 +143,14 @@ function renderDrawer(result) {
             <div class="drawer-kv">
                 <div><strong>客户</strong><span>${escapeHtml(project.customer_name || '-')}</span></div>
                 <div><strong>状态</strong><span>${escapeHtml(project.status)}</span></div>
-                <div><strong>交付日期</strong><span>${escapeHtml(project.delivery_deadline || '-')}</span></div>
+                <div><strong>交付日期</strong><span>${escapeHtml(formatDate(project.delivery_deadline))}</span></div>
             </div>
-            <p class="muted">允许推进: ${escapeHtml(allowedTransitions.join(', ') || '-')}</p>
-            <p class="muted">风险等级: ${escapeHtml(project.risk?.level || 'unknown')}</p>
+            <div class="inline-tags">
+                ${createTag(project.project_type || 'unknown')}
+                ${createTag(`风险 ${project.risk?.level || 'unknown'}`, getRiskTone(project.risk?.level))}
+                ${riskMissing.length ? createTag(`缺字段 ${riskMissing.join(', ')}`) : ''}
+            </div>
+            <p class="muted">允许推进: ${escapeHtml(allowedTransitions.join(' / ') || '无')}</p>
             <div class="drawer-actions">
                 <button class="ghost-btn" type="button" data-drawer-action="generate_draft" data-project-id="${escapeHtml(project.project_id)}">生成回复草稿</button>
                 <button class="ghost-btn" type="button" data-drawer-action="create_tasks" data-project-id="${escapeHtml(project.project_id)}">补建任务</button>
@@ -137,16 +167,22 @@ function renderDrawer(result) {
 
 function createProjectCard(project) {
     const riskLevel = project.risk?.level || 'low';
+    const missing = project.risk?.missing || [];
     return `
         <article class="project-card">
-            <h3>${escapeHtml(project.project_name)}</h3>
-            <p class="muted">${escapeHtml(project.customer_name || '')}</p>
-            <div class="project-meta">
-                <span class="pill">${escapeHtml(project.status)}</span>
-                <span class="pill risk-${escapeHtml(riskLevel)}">risk: ${escapeHtml(riskLevel)}</span>
-                <span class="pill">${escapeHtml(project.project_type || 'unknown')}</span>
+            <div class="card-header">
+                <div>
+                    <h3>${escapeHtml(project.project_name)}</h3>
+                    <p class="muted">${escapeHtml(project.customer_name || '未关联客户')}</p>
+                </div>
+                ${createTag(project.status)}
             </div>
-            <p class="muted">交付日期: ${escapeHtml(project.delivery_deadline || '-')}</p>
+            <div class="project-meta">
+                ${createTag(`风险 ${riskLevel}`, getRiskTone(riskLevel))}
+                ${createTag(project.project_type || 'unknown')}
+                ${missing.length ? createTag(`缺 ${missing.join(', ')}`) : ''}
+            </div>
+            <p class="muted">交付日期: ${escapeHtml(formatDate(project.delivery_deadline))}</p>
             <div class="card-actions">
                 <button class="ghost-btn" type="button" data-open-project="${escapeHtml(project.project_id)}">查看详情</button>
                 <button class="primary-btn" type="button" data-advance-project="${escapeHtml(project.project_id)}">推进状态</button>
@@ -160,11 +196,16 @@ function createDeliveryCard(project) {
     const canSelect = canCreateSelectionNotice(project);
     return `
         <article class="project-card">
-            <h3>${escapeHtml(project.project_name)}</h3>
-            <p class="muted">${escapeHtml(project.customer_name || '')}</p>
+            <div class="card-header">
+                <div>
+                    <h3>${escapeHtml(project.project_name)}</h3>
+                    <p class="muted">${escapeHtml(project.customer_name || '未关联客户')}</p>
+                </div>
+                ${createTag(project.status)}
+            </div>
             <div class="project-meta">
-                <span class="pill">${escapeHtml(project.status)}</span>
-                <span class="pill">${escapeHtml(project.delivery_deadline || '-')}</span>
+                ${createTag(project.project_type || 'unknown')}
+                ${createTag(formatDate(project.delivery_deadline))}
             </div>
             <p class="muted">${escapeHtml(getDeliveryStatusHint(project))}</p>
             <div class="card-actions">
@@ -172,6 +213,102 @@ function createDeliveryCard(project) {
                 <button class="ghost-btn" type="button" data-delivery-action="create_selection_notice" data-project-id="${escapeHtml(project.project_id)}" ${canSelect ? '' : 'disabled'}>生成选片通知</button>
                 <button class="primary-btn" type="button" data-delivery-action="create_delivery_tasks" data-project-id="${escapeHtml(project.project_id)}" ${canDeliver ? '' : 'disabled'}>生成交付任务</button>
                 <button class="ghost-btn danger-btn" type="button" data-delivery-action="archive_project" data-project-id="${escapeHtml(project.project_id)}">归档</button>
+            </div>
+        </article>
+    `;
+}
+
+function renderMetricCard(label, value, hint) {
+    return `
+        <article class="metric-card">
+            <div class="metric-label">${escapeHtml(label)}</div>
+            <div class="metric-value">${escapeHtml(value)}</div>
+            <p class="metric-hint">${escapeHtml(hint || '')}</p>
+        </article>
+    `;
+}
+
+function renderDataQualityList(items) {
+    if (!items.length) {
+        return '<div class="empty-state">当前没有字段缺失项。</div>';
+    }
+
+    return `
+        <div class="compact-list">
+            ${items.map((item) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(item.project_name)}</strong>
+                        <p class="muted">缺失字段: ${escapeHtml((item.missing || []).join(', '))}</p>
+                    </div>
+                    <button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">查看</button>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderUpcomingList(items) {
+    if (!items.length) {
+        return '<div class="empty-state">当前没有临近交付项目。</div>';
+    }
+
+    return `
+        <div class="compact-list">
+            ${items.map((item) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(item.project_name)}</strong>
+                        <p class="muted">${escapeHtml(item.customer_name || '未关联客户')} · ${escapeHtml(item.status)}</p>
+                    </div>
+                    <div class="compact-side">
+                        <span>${escapeHtml(formatDate(item.delivery_deadline))}</span>
+                        <button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">打开</button>
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderTransitionsList(items) {
+    if (!items.length) {
+        return '<div class="empty-state">当前没有最近状态变更。</div>';
+    }
+
+    return `
+        <div class="compact-list">
+            ${items.map((item) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(item.project_name)}</strong>
+                        <p class="muted">${escapeHtml(item.customer_name || '未关联客户')}</p>
+                    </div>
+                    <div class="compact-side">
+                        <span>${escapeHtml(`${item.old_status} -> ${item.new_status}`)}</span>
+                        <span class="muted">${escapeHtml(formatDate(item.changed_at))}</span>
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
+function groupDeliveryProjects(projects) {
+    return {
+        readyForSelection: projects.filter((project) => canCreateSelectionNotice(project)),
+        readyForDelivery: projects.filter((project) => canCreateDeliveryTasks(project)),
+        blocked: projects.filter((project) => !canCreateSelectionNotice(project) && !canCreateDeliveryTasks(project)),
+    };
+}
+
+function renderDeliveryGroup(title, eyebrow, projects) {
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">${escapeHtml(eyebrow)}</p>
+            <h2>${escapeHtml(title)}</h2>
+            <div class="project-list">
+                ${projects.length ? projects.map(createDeliveryCard).join('') : '<div class="empty-state">当前没有项目落在这个分区。</div>'}
             </div>
         </article>
     `;
@@ -280,29 +417,74 @@ function bindInquiryForms() {
 function renderDashboard(result) {
     const data = result?.data || {};
     const metrics = data.metrics || {};
-    const riskProjects = data.risk_projects || [];
     const reporting = data.reporting || {};
+    const weeklyDigest = reporting.weekly_digest || {};
+    const summary = weeklyDigest.summary || {};
+    const recentTransitions = weeklyDigest.recent_transitions || [];
 
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
-            <article class="hero-card">
-                <p class="eyebrow">Scene / dashboard</p>
-                <h2>Photo Studio 工作台已接入统一 contract</h2>
-                <p>这块现在走真实 orchestrator adapter，Dashboard、项目列表、抽屉动作都能沿同一条业务链刷新。</p>
+            <article class="hero-card hero-card-wide">
+                <div class="hero-grid">
+                    <div>
+                        <p class="eyebrow">Scene / dashboard</p>
+                        <h2>本周工作台总览</h2>
+                        <p>把项目风险、即将交付、最近状态流转和数据质量放在同一屏，方便你先看清楚今天该处理什么。</p>
+                    </div>
+                    <div class="hero-summary">
+                        <div class="summary-chip">活跃项目 ${escapeHtml(summary.active_projects ?? metrics.total_projects ?? 0)}</div>
+                        <div class="summary-chip">最近流转 ${escapeHtml(summary.recent_transition_count ?? 0)}</div>
+                        <div class="summary-chip">临近交付 ${escapeHtml(summary.due_soon_projects ?? metrics.upcoming_delivery_count ?? 0)}</div>
+                    </div>
+                </div>
             </article>
+
             <section class="card-grid">
-                <article class="metric-card"><div class="metric-label">项目总数</div><div class="metric-value">${metrics.total_projects ?? 0}</div></article>
-                <article class="metric-card"><div class="metric-label">风险项目</div><div class="metric-value">${metrics.risk_projects_count ?? 0}</div></article>
-                <article class="metric-card"><div class="metric-label">即将交付</div><div class="metric-value">${metrics.upcoming_delivery_count ?? 0}</div></article>
+                ${renderMetricCard('项目总数', metrics.total_projects ?? 0, '所有已落入工作台的项目')}
+                ${renderMetricCard('风险项目', metrics.risk_projects_count ?? 0, '存在缺字段或交付风险')}
+                ${renderMetricCard('临近交付', metrics.upcoming_delivery_count ?? 0, '需要优先关注交期')}
             </section>
-            <article class="hero-card">
-                <p class="eyebrow">Prioritized</p>
-                <ul class="scene-list">${(reporting.prioritize_pending?.items || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('') || '<li>当前没有待处理动作</li>'}</ul>
-            </article>
+
+            <section class="report-grid">
+                <article class="hero-card">
+                    <p class="eyebrow">Reporting / Weekly Digest</p>
+                    <h2>本周摘要</h2>
+                    <div class="mini-metrics">
+                        <div><strong>${escapeHtml(summary.active_projects ?? 0)}</strong><span>活跃项目</span></div>
+                        <div><strong>${escapeHtml(summary.closed_projects ?? 0)}</strong><span>已关闭</span></div>
+                        <div><strong>${escapeHtml(summary.overdue_projects ?? 0)}</strong><span>已逾期</span></div>
+                        <div><strong>${escapeHtml(summary.due_soon_projects ?? 0)}</strong><span>即将到期</span></div>
+                    </div>
+                </article>
+
+                <article class="hero-card">
+                    <p class="eyebrow">Data Quality</p>
+                    <h2>字段缺失</h2>
+                    ${renderDataQualityList(data.missing_fields || [])}
+                </article>
+            </section>
+
+            <section class="report-grid">
+                <article class="hero-card">
+                    <p class="eyebrow">Upcoming Delivery</p>
+                    <h2>即将交付</h2>
+                    ${renderUpcomingList(data.upcoming_delivery || [])}
+                </article>
+
+                <article class="hero-card">
+                    <p class="eyebrow">Recent Transitions</p>
+                    <h2>最近状态流转</h2>
+                    ${renderTransitionsList(recentTransitions)}
+                </article>
+            </section>
+
             <article class="hero-card">
                 <p class="eyebrow">Risk Projects</p>
+                <h2>优先关注项目</h2>
                 <div class="project-list">
-                    ${riskProjects.length ? riskProjects.map(createProjectCard).join('') : '<div class="empty-state">当前没有风险项目</div>'}
+                    ${(data.risk_projects || []).length
+                        ? data.risk_projects.map(createProjectCard).join('')
+                        : '<div class="empty-state">当前没有高风险项目。</div>'}
                 </div>
             </article>
             ${renderLastActionResult()}
@@ -319,7 +501,7 @@ function renderProjects(result) {
             <article class="hero-card">
                 <p class="eyebrow">Scene / projects</p>
                 <h2>项目看板</h2>
-                <p>这里已经连到 <code>photo-studio-list-projects</code> 和真实动作执行。首版先用“快速建项目 + 项目卡片 + 右抽屉”跑主链。</p>
+                <p>这里保留“快速建项目 + 项目卡片 + 右抽屉”的主链，适合处理创建、推进状态和补齐信息这三类工作。</p>
             </article>
             <article class="hero-card">
                 <p class="eyebrow">Quick Create</p>
@@ -351,7 +533,7 @@ function renderProjects(result) {
                     </label>
                     <label class="form-field form-field-wide">
                         <span>备注</span>
-                        <textarea name="project_notes" rows="3" placeholder="可选：记录客户诉求或交付要求"></textarea>
+                        <textarea name="project_notes" rows="3" placeholder="记录客户诉求、交付要求或档期信息"></textarea>
                     </label>
                     <div class="form-actions form-field-wide">
                         <button class="primary-btn" type="submit">创建项目与任务</button>
@@ -375,7 +557,7 @@ function renderInquiry() {
             <article class="hero-card">
                 <p class="eyebrow">Scene / inquiry</p>
                 <h2>询单收口区</h2>
-                <p>首版先把“创建客户”和“生成回复草稿”接进来。草稿支持直接填项目 ID，也支持沿用当前抽屉选中的项目。</p>
+                <p>这里适合先落客户、再生成沟通草稿。草稿支持直接填项目 ID，也支持沿用当前抽屉选中的项目。</p>
             </article>
             <section class="split-grid">
                 <article class="hero-card">
@@ -461,19 +643,29 @@ function renderInquiry() {
 
 function renderDelivery(result) {
     const projects = result?.data || getProjectCollection();
+    const grouped = groupDeliveryProjects(projects);
+
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
-            <article class="hero-card">
-                <p class="eyebrow">Scene / delivery</p>
-                <h2>交付闭环区</h2>
-                <p>首版把选片通知、交付任务和归档接进来，后续再补同步外部表格与 reporting 细节。</p>
-            </article>
-            <article class="hero-card">
-                <p class="eyebrow">Ready For Delivery</p>
-                <div class="project-list">
-                    ${projects.length ? projects.map(createDeliveryCard).join('') : '<div class="empty-state">先创建项目，交付动作才有对象可跑。</div>'}
+            <article class="hero-card hero-card-wide">
+                <div class="hero-grid">
+                    <div>
+                        <p class="eyebrow">Scene / delivery</p>
+                        <h2>交付工作台</h2>
+                        <p>把“可以发选片通知”“可以建交付任务”“仍需继续推进”的项目拆开，减少误点和来回筛选。</p>
+                    </div>
+                    <div class="hero-summary">
+                        <div class="summary-chip">选片就绪 ${escapeHtml(grouped.readyForSelection.length)}</div>
+                        <div class="summary-chip">交付就绪 ${escapeHtml(grouped.readyForDelivery.length)}</div>
+                        <div class="summary-chip">待推进 ${escapeHtml(grouped.blocked.length)}</div>
+                    </div>
                 </div>
             </article>
+            <section class="report-grid delivery-grid">
+                ${renderDeliveryGroup('可发选片通知', 'Delivery / Selection Notice', grouped.readyForSelection)}
+                ${renderDeliveryGroup('可建交付任务', 'Delivery / Delivery Tasks', grouped.readyForDelivery)}
+            </section>
+            ${renderDeliveryGroup('还需继续推进', 'Delivery / Needs Progress', grouped.blocked)}
             ${renderLastActionResult()}
         </section>
     `;

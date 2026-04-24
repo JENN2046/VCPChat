@@ -54,11 +54,18 @@ function canCreateDeliveryTasks(project) {
     return ['retouching', 'delivering', 'completed'].includes(project?.status);
 }
 
+function canCreateSelectionNotice(project) {
+    return ['shot', 'selection_pending'].includes(project?.status);
+}
+
 function getDeliveryStatusHint(project) {
+    if (canCreateSelectionNotice(project)) {
+        return '当前状态可生成选片通知。';
+    }
     if (canCreateDeliveryTasks(project)) {
         return '当前状态可直接创建交付任务。';
     }
-    return `当前状态是 ${project?.status || 'unknown'}，需要先推进到 retouching / delivering / completed。`;
+    return `当前状态是 ${project?.status || 'unknown'}，选片通知要求 shot / selection_pending，交付任务要求 retouching / delivering / completed。`;
 }
 
 function renderLastActionResult() {
@@ -150,6 +157,7 @@ function createProjectCard(project) {
 
 function createDeliveryCard(project) {
     const canDeliver = canCreateDeliveryTasks(project);
+    const canSelect = canCreateSelectionNotice(project);
     return `
         <article class="project-card">
             <h3>${escapeHtml(project.project_name)}</h3>
@@ -161,7 +169,7 @@ function createDeliveryCard(project) {
             <p class="muted">${escapeHtml(getDeliveryStatusHint(project))}</p>
             <div class="card-actions">
                 <button class="ghost-btn" type="button" data-open-project="${escapeHtml(project.project_id)}">打开抽屉</button>
-                <button class="ghost-btn" type="button" data-delivery-action="create_selection_notice" data-project-id="${escapeHtml(project.project_id)}">生成选片通知</button>
+                <button class="ghost-btn" type="button" data-delivery-action="create_selection_notice" data-project-id="${escapeHtml(project.project_id)}" ${canSelect ? '' : 'disabled'}>生成选片通知</button>
                 <button class="primary-btn" type="button" data-delivery-action="create_delivery_tasks" data-project-id="${escapeHtml(project.project_id)}" ${canDeliver ? '' : 'disabled'}>生成交付任务</button>
                 <button class="ghost-btn danger-btn" type="button" data-delivery-action="archive_project" data-project-id="${escapeHtml(project.project_id)}">归档</button>
             </div>

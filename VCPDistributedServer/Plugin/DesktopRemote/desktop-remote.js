@@ -22,7 +22,7 @@ process.stdin.on('end', () => {
         const command = args.command || args.Command || args.action || args.Action;
 
         if (!command) {
-            throw new Error("The 'command' parameter is required. Valid commands: 'SetWallpaper', 'QueryDesktop', 'QueryDock', 'ViewWidgetSource', 'CreateWidget', 'SetStyleAutomation', 'GetStyleAutomationStatus'.");
+            throw new Error("The 'command' parameter is required. Valid commands: 'SetWallpaper', 'QueryDesktop', 'QueryDock', 'ViewWidgetSource', 'CreateWidget', 'DeleteWidget', 'SetStyleAutomation', 'GetStyleAutomationStatus'.");
         }
 
         const normalizedCommand = command.toLowerCase();
@@ -124,6 +124,21 @@ process.stdin.on('end', () => {
 
             console.log(JSON.stringify(commandPayload));
 
+        } else if (normalizedCommand === 'deletewidget' || normalizedCommand === 'delete_widget' || normalizedCommand === 'removewidget' || normalizedCommand === 'remove_widget') {
+            // DeleteWidget command
+            const widgetId = args.widgetId || args.widgetid || args.WidgetId || args.widget_id || args.id || args.Id;
+
+            if (!widgetId) {
+                throw new Error("The 'widgetId' parameter is required for DeleteWidget command.");
+            }
+
+            const commandPayload = {
+                command: 'DeleteWidget',
+                widgetId: widgetId
+            };
+
+            console.log(JSON.stringify(commandPayload));
+
         } else if (
             normalizedCommand === 'setstyleautomation' ||
             normalizedCommand === 'set_style_automation' ||
@@ -184,7 +199,7 @@ process.stdin.on('end', () => {
             console.log(JSON.stringify(commandPayload));
 
         } else {
-            throw new Error(`Unknown command: '${command}'. Valid commands: 'SetWallpaper', 'QueryDesktop', 'QueryDock', 'ViewWidgetSource', 'CreateWidget', 'SetStyleAutomation', 'GetStyleAutomationStatus'.`);
+            throw new Error(`Unknown command: '${command}'. Valid commands: 'SetWallpaper', 'QueryDesktop', 'QueryDock', 'ViewWidgetSource', 'CreateWidget', 'DeleteWidget', 'SetStyleAutomation', 'GetStyleAutomationStatus'.`);
         }
 
     } catch (error) {

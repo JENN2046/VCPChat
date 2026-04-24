@@ -29,6 +29,9 @@ Validation posture:
 - Fresh Electron renderer control-path smoke passed for `inspect/run/resume`;
   `run/resume` returned blocked-preflight/not-ready as intended to avoid live
   primitive side effects.
+- Local DesktopRemote dispatch smoke passed for
+  `CreateWidget/QueryDesktop/ViewWidgetSource`, followed by `DeleteWidget`
+  cleanup and a post-cleanup query confirming the smoke widget was gone.
 
 ## LGTM + Caveats
 
@@ -41,6 +44,8 @@ LGTM, no blocker found; the main inspect/run/resume path is wired. Caveats: defa
 - Review threads are clear.
 - Merge set excludes unrelated churn.
 - Validation recovery notes are included in the PR body or final comment.
+- DesktopRemote dispatch-smoke notes are included in the PR body or final
+  comment if the cleanup change is part of the merge set.
 - Post-merge 24h regression checklist is linked.
 
 ## Closing Artifacts

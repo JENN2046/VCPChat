@@ -22,8 +22,13 @@ Validation posture:
 - Code review pass: no blocker found.
 - Prior live acceptance: Electron renderer smoke passed for `inspect/run/resume`.
 - Memory audit overview confirms prior VCPChat live acceptance checkpoints.
-- Shell validation is pending because local PowerShell executor currently fails before project commands start (`8009001d`).
-- Memory recall search is temporarily degraded (`unable to open database file`), while memory overview/audit remains readable.
+- Shell validation recovered: targeted native host `node --check` commands pass.
+- Memory recall recovered: `search_memory` can recall the prior caveat checkpoint.
+- Fresh Electron startup smoke passed in the isolated worktree after
+  `node_modules` junction setup.
+- Fresh Electron renderer control-path smoke passed for `inspect/run/resume`;
+  `run/resume` returned blocked-preflight/not-ready as intended to avoid live
+  primitive side effects.
 
 ## LGTM + Caveats
 
@@ -35,7 +40,7 @@ LGTM, no blocker found; the main inspect/run/resume path is wired. Caveats: defa
 
 - Review threads are clear.
 - Merge set excludes unrelated churn.
-- Validation caveats are included in the PR body or final comment.
+- Validation recovery notes are included in the PR body or final comment.
 - Post-merge 24h regression checklist is linked.
 
 ## Closing Artifacts
@@ -52,4 +57,3 @@ LGTM, no blocker found; the main inspect/run/resume path is wired. Caveats: defa
 After merge, run the 24h watchdog from:
 
 - `A:\VCP\VCPChat\docs\vcpchat_v1_native_host_post_merge_regression_20260423.md`
-

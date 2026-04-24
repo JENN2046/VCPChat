@@ -4,16 +4,9 @@ const { pathToFileURL } = require('url');
 const os = require('os');
 const { spawn } = require('child_process');
 
-const DEFAULT_CODEX_ROUTER_ROOT = path.resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    'codex-router'
-);
 const DEFAULT_VCPCHAT_ROOT = path.resolve(__dirname, '..', '..');
 const DEFAULT_VCP_WORKSPACE_ROOT = path.resolve(DEFAULT_VCPCHAT_ROOT, '..');
+const DEFAULT_CODEX_ROUTER_ROOT = path.join(DEFAULT_VCP_WORKSPACE_ROOT, 'codex-router');
 const DEFAULT_VCP_TOOLBOX_ROOT = path.join(DEFAULT_VCP_WORKSPACE_ROOT, 'VCPToolBox');
 const HOST_CLIENT_EXAMPLE_ENTRY = [
     'dist',
@@ -263,10 +256,18 @@ async function callVcpToolBoxMemoryTool(baseUrl, toolName, args, authToken = nul
         }),
     });
 
-    const payload = await response.json().catch(async () => ({
-        status: response.status,
-        raw: await response.text(),
-    }));
+    const responseText = await response.text();
+    let payload = null;
+    if (responseText) {
+        try {
+            payload = JSON.parse(responseText);
+        } catch (error) {
+            payload = {
+                status: response.status,
+                raw: responseText,
+            };
+        }
+    }
 
     if (!response.ok) {
         throw new Error(

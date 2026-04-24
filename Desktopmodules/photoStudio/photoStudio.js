@@ -34,6 +34,43 @@ function showToast(message) {
     }, 2400);
 }
 
+function getErrorMessage(error) {
+    if (!error) {
+        return '未知错误';
+    }
+    if (error.error?.message) {
+        return error.error.message;
+    }
+    if (error.message) {
+        return error.message;
+    }
+    return String(error);
+}
+
+function renderSceneError(scene, error) {
+    const root = document.getElementById('scene-root');
+    if (!root) {
+        return;
+    }
+
+    root.innerHTML = `
+        <section class="scene-panel">
+            <article class="error-panel">
+                <p class="eyebrow">Scene / ${escapeHtml(scene)}</p>
+                <h2>这个场景暂时没加载成功</h2>
+                <p>${escapeHtml(getErrorMessage(error))}</p>
+                <div class="card-actions">
+                    <button class="primary-btn" type="button" data-retry-scene="${escapeHtml(scene)}">重试</button>
+                </div>
+            </article>
+        </section>
+    `;
+
+    root.querySelector('[data-retry-scene]')?.addEventListener('click', (event) => {
+        void renderSceneByName(event.currentTarget.dataset.retryScene);
+    });
+}
+
 function toProjectId(value) {
     return String(value || '').trim();
 }
@@ -675,45 +712,56 @@ function renderDelivery(result) {
 }
 
 async function loadProjectIntoDrawer(projectId) {
-    getState().selectedProjectId = projectId;
-    const result = await window.PhotoStudioApi.getProject(projectId);
-    getState().setProjectDetail(result);
-    renderDrawer(result);
-    bindDrawerActions();
-    setStatusChip(`Drawer: ${projectId}`);
+    try {
+        getState().selectedProjectId = projectId;
+        const result = await window.PhotoStudioApi.getProject(projectId);
+        getState().setProjectDetail(result);
+        renderDrawer(result);
+        bindDrawerActions();
+        setStatusChip(`Drawer: ${projectId}`);
+    } catch (error) {
+        showToast(`项目详情加载失败：${getErrorMessage(error)}`);
+        setStatusChip('Drawer load failed');
+    }
 }
 
 async function renderSceneByName(scene) {
-    setStatusChip(`Loading ${scene}...`);
+    try {
+        setStatusChip(`Loading ${scene}...`);
 
-    if (scene === 'dashboard') {
-        const result = await window.PhotoStudioApi.getDashboard();
-        getState().setDashboard(result);
-        renderDashboard(result);
-        setStatusChip('Dashboard synced');
-        return;
-    }
-
-    if (scene === 'projects') {
-        const result = await window.PhotoStudioApi.listProjects({});
-        getState().setProjects(result);
-        renderProjects(result);
-        setStatusChip('Projects synced');
-        return;
-    }
-
-    if (scene === 'inquiry') {
-        renderInquiry();
-        setStatusChip('Inquiry ready');
-        return;
-    }
-
-    if (scene === 'delivery') {
-        if (!getState().projects) {
-            getState().setProjects(await window.PhotoStudioApi.listProjects({}));
+        if (scene === 'dashboard') {
+            const result = await window.PhotoStudioApi.getDashboard();
+            getState().setDashboard(result);
+            renderDashboard(result);
+            setStatusChip('Dashboard synced');
+            return;
         }
-        renderDelivery(getState().projects);
-        setStatusChip('Delivery ready');
+
+        if (scene === 'projects') {
+            const result = await window.PhotoStudioApi.listProjects({});
+            getState().setProjects(result);
+            renderProjects(result);
+            setStatusChip('Projects synced');
+            return;
+        }
+
+        if (scene === 'inquiry') {
+            renderInquiry();
+            setStatusChip('Inquiry ready');
+            return;
+        }
+
+        if (scene === 'delivery') {
+            if (!getState().projects) {
+                getState().setProjects(await window.PhotoStudioApi.listProjects({}));
+            }
+            renderDelivery(getState().projects);
+            setStatusChip('Delivery ready');
+        }
+    } catch (error) {
+        renderSceneError(scene, error);
+        showToast(`场景加载失败：${getErrorMessage(error)}`);
+        setStatusChip(`${scene} failed`);
     }
 }
 
@@ -747,28 +795,48 @@ async function refreshScene(scene) {
 }
 
 async function runActionAndSync(scene, action, payload) {
-    const result = await window.PhotoStudioApi.runAction(scene, action, payload);
-    getState().setLastActionResult(result);
+    try {
+        setStatusChip(`Running ${action}...`);
+        const result = await window.PhotoStudioApi.runAction(scene, action, payload);
+        getState().setLastActionResult(result);
 
-    if (!result.success && result.error?.message) {
-        showToast(result.error.message);
+        if (!result.success && result.error?.message) {
+            showToast(result.error.message);
+            setStatusChip(`${action} failed`);
+        } else {
+            setStatusChip(`${action} done`);
+        }
+
+        window.PhotoStudioEvents.applyUiHints(result.ui_hints);
+
+        if (scene === 'project_board' && getState().currentScene === 'projects') {
+            await renderSceneByName('projects');
+        }
+
+        if (scene === 'inquiry' && getState().currentScene === 'inquiry') {
+            renderInquiry();
+        }
+
+        if (scene === 'delivery_panel' && getState().currentScene === 'delivery') {
+            await renderSceneByName('delivery');
+        }
+
+        return result;
+    } catch (error) {
+        const result = {
+            success: false,
+            data: null,
+            error: {
+                code: 'RENDERER_ACTION_ERROR',
+                message: getErrorMessage(error),
+            },
+            ui_hints: {},
+        };
+        getState().setLastActionResult(result);
+        showToast(`动作执行失败：${result.error.message}`);
+        setStatusChip(`${action} failed`);
+        return result;
     }
-
-    window.PhotoStudioEvents.applyUiHints(result.ui_hints);
-
-    if (scene === 'project_board' && getState().currentScene === 'projects') {
-        await renderSceneByName('projects');
-    }
-
-    if (scene === 'inquiry' && getState().currentScene === 'inquiry') {
-        renderInquiry();
-    }
-
-    if (scene === 'delivery_panel' && getState().currentScene === 'delivery') {
-        await renderSceneByName('delivery');
-    }
-
-    return result;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

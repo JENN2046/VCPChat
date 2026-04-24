@@ -250,6 +250,32 @@ async function handleSendButtonAction() {
     }
 }
 
+function createCodexRouterHostClient(runtime = window) {
+    const controlApi =
+        runtime?.chatAPI?.codexRouterHostControl
+        || runtime?.desktopAPI?.codexRouterHostControl
+        || runtime?.electronAPI?.codexRouterHostControl;
+
+    if (typeof controlApi !== 'function') {
+        return null;
+    }
+
+    return {
+        inspect() {
+            return controlApi({ action: 'inspect' });
+        },
+        status() {
+            return controlApi({ action: 'status' });
+        },
+        run(task) {
+            return controlApi({ action: 'run', task });
+        },
+        resume(task, options = {}) {
+            return controlApi({ action: 'resume', task, options });
+        },
+    };
+}
+
 window.updateSendButtonState = updateSendButtonState;
 window.handleSendButtonAction = handleSendButtonAction;
 updateSendButtonState();
@@ -2431,6 +2457,7 @@ async function handleConfirmForward() {
 // These are no longer needed as uiHelperFunctions handles them directly
 window.ensureAudioContext = () => { /* Placeholder, will be defined in setupTtsListeners */ };
 window.showForwardModal = showForwardModal;
+window.codexRouterHostClient = createCodexRouterHostClient(window);
 
 // Make globalSettings accessible for notification renderer
 window.applyChatBubbleLayoutSettings = applyChatBubbleLayoutSettings;

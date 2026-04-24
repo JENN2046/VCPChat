@@ -925,6 +925,10 @@ let activeSessionMode = null; // 'pty' | 'pipe' | null
 let executionQueue = Promise.resolve();
 let executionQueueLength = 0;
 const MAX_EXECUTION_QUEUE_LENGTH = 50;
+let activeInteractiveSessionId = null;
+let activeInteractiveShellName = null;
+let activeInteractiveSessionStartedAt = null;
+let activeInteractiveSessionTerm = null;
 
 // --- 配置加载 ---
 const defaultConfig = {
@@ -973,6 +977,150 @@ function getEffectivePtyMode() {
     const mode = String(raw).trim().toLowerCase();
     if (mode === 'pty' || mode === 'pipe' || mode === 'auto') return mode;
     return 'auto';
+}
+
+function getShellStartupCwd() {
+    const candidates = [
+        process.env.HOME,
+        process.env.USERPROFILE,
+        typeof os.homedir === 'function' ? os.homedir() : null,
+        process.cwd(),
+        __dirname
+    ];
+
+    for (const candidate of candidates) {
+        if (typeof candidate !== 'string' || candidate.trim() === '') {
+            continue;
+        }
+
+        try {
+            const resolved = path.resolve(candidate);
+            if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+                return resolved;
+            }
+        } catch (_) {
+            // ignore invalid candidate
+        }
+    }
+
+    return __dirname;
+}
+
+function createInteractiveSessionId() {
+    const timestamp = Date.now().toString(36);
+    const random = crypto.randomBytes(4).toString('hex');
+    return `pty_session_${timestamp}_${random}`;
+}
+
+function resetInteractiveSessionState() {
+    activeInteractiveSessionId = null;
+    activeInteractiveShellName = null;
+    activeInteractiveSessionStartedAt = null;
+    if (activeInteractiveSessionTerm) {
+        try { activeInteractiveSessionTerm.dispose(); } catch (_) { /* ignore */ }
+    }
+    activeInteractiveSessionTerm = null;
+}
+
+function beginInteractiveSession(shellName) {
+    resetInteractiveSessionState();
+    activeInteractiveSessionId = createInteractiveSessionId();
+    activeInteractiveShellName = shellName;
+    activeInteractiveSessionStartedAt = new Date().toISOString();
+    activeInteractiveSessionTerm = new Terminal({
+        cols: 120,
+        rows: 200,
+        scrollback: 5000,
+        allowProposedApi: true
+    });
+}
+
+function appendInteractiveSessionData(data) {
+    if (!activeInteractiveSessionTerm || isExecutingCommand) {
+        return;
+    }
+
+    const text = typeof data === 'string' ? data : data.toString('utf-8');
+    if (!text) return;
+    activeInteractiveSessionTerm.write(text);
+}
+
+function getInteractiveSessionState() {
+    return {
+        sessionId: activeInteractiveSessionId,
+        connected: Boolean(ptyProcess),
+        mode: activeSessionMode,
+        pid: ptyProcess && typeof ptyProcess.pid === 'number' ? ptyProcess.pid : null,
+        shellName: activeInteractiveShellName,
+        startedAt: activeInteractiveSessionStartedAt,
+        isExecutingCommand,
+        output: activeInteractiveSessionTerm ? getCleanTextFromBuffer(activeInteractiveSessionTerm) : ''
+    };
+}
+
+function ensureInteractiveSession(options = {}) {
+    const preferredShell = options.shell || null;
+    const newSession = options.newSession === true || options.newSession === 'true';
+
+    if (newSession || !ptyProcess) {
+        const created = createNewShellSession(preferredShell);
+        return {
+            ...getInteractiveSessionState(),
+            shellName: created.shellName,
+            mode: created.mode,
+            connected: true
+        };
+    }
+
+    return getInteractiveSessionState();
+}
+
+function sendInteractiveInput(data) {
+    if (!ptyProcess) {
+        throw new Error('interactive session is not available');
+    }
+
+    const input = typeof data === 'string' ? data : String(data || '');
+    if (!input) {
+        throw new Error('interactive input must not be empty');
+    }
+
+    ptyProcess.write(input);
+    return getInteractiveSessionState();
+}
+
+function closeInteractiveSession(options = {}) {
+    const requestedSessionId = typeof options.sessionId === 'string' ? options.sessionId.trim() : '';
+
+    if (requestedSessionId && activeInteractiveSessionId && requestedSessionId !== activeInteractiveSessionId) {
+        return {
+            sessionId: requestedSessionId,
+            status: 'not_found',
+            message: `interactive session ${requestedSessionId} is not active`
+        };
+    }
+
+    if (!ptyProcess) {
+        return {
+            sessionId: requestedSessionId || activeInteractiveSessionId,
+            status: 'closed',
+            message: 'interactive session is already closed'
+        };
+    }
+
+    const closingSessionId = activeInteractiveSessionId;
+
+    try {
+        ptyProcess.kill();
+    } catch (error) {
+        throw new Error(`failed to close interactive session: ${error.message}`);
+    }
+
+    return {
+        sessionId: closingSessionId,
+        status: 'closing',
+        message: `interactive session ${closingSessionId} is closing`
+    };
 }
 
 // --- Shell 检测 ---
@@ -1042,7 +1190,7 @@ function createNewPtySession(preferredShell) {
 
     ptyProcess = pty.spawn(shell, args, {
         name: 'xterm-256color',
-        cwd: process.env.HOME || '/home',
+        cwd: getShellStartupCwd(),
         env: withPagerDisabledEnv({
             ...process.env,
             TERM: 'xterm-256color',
@@ -1052,9 +1200,11 @@ function createNewPtySession(preferredShell) {
     });
     childProcesses.add(ptyProcess);
     activeSessionMode = 'pty';
+    beginInteractiveSession(shellName);
 
     // 数据监听 - 转发到 GUI
     ptyProcess.onData((data) => {
+        appendInteractiveSessionData(data);
         if (isExecutingCommand) return;
         if (guiWindow && !guiWindow.isDestroyed()) {
             guiWindow.webContents.send('shell-data', data);
@@ -1066,6 +1216,7 @@ function createNewPtySession(preferredShell) {
         ptyProcess = null;
         isExecutingCommand = false;
         activeSessionMode = null;
+        resetInteractiveSessionState();
         if (guiWindow && !guiWindow.isDestroyed()) {
             guiWindow.webContents.send('pty-status', { connected: false });
         }
@@ -1095,7 +1246,7 @@ function createNewPipeSession(preferredShell) {
     console.log(`[PTYShellExecutor] Starting pipe shell: ${shell} with args: ${args.join(' ')}`);
 
     const child = spawn(shell, args, {
-        cwd: process.env.HOME || '/home',
+        cwd: getShellStartupCwd(),
         env: withPagerDisabledEnv({
             ...process.env,
             TERM: 'xterm-256color',
@@ -1158,9 +1309,11 @@ function createNewPipeSession(preferredShell) {
     ptyProcess = session;
     childProcesses.add(session);
     activeSessionMode = 'pipe';
+    beginInteractiveSession(shellName);
 
     // 数据监听 - 转发到 GUI（复用与 PTY 一致的 gating 逻辑）
     session.onData((data) => {
+        appendInteractiveSessionData(data);
         if (isExecutingCommand) return;
         if (guiWindow && !guiWindow.isDestroyed()) {
             guiWindow.webContents.send('shell-data', typeof data === 'string' ? data : data.toString('utf-8'));
@@ -1174,6 +1327,7 @@ function createNewPipeSession(preferredShell) {
         }
         activeSessionMode = null;
         isExecutingCommand = false;
+        resetInteractiveSessionState();
         if (guiWindow && !guiWindow.isDestroyed()) {
             guiWindow.webContents.send('pty-status', { connected: false });
         }
@@ -1510,6 +1664,14 @@ function cleanup() {
 
     ptyProcess = null;
     activeSessionMode = null;
+    resetInteractiveSessionState();
 }
 
-module.exports = { processToolCall, cleanup };
+module.exports = {
+    processToolCall,
+    cleanup,
+    ensureInteractiveSession,
+    getInteractiveSessionState,
+    sendInteractiveInput,
+    closeInteractiveSession
+};

@@ -1058,6 +1058,9 @@ if (!gotTheLock) {
         canvasHandlers.initialize({ mainWindow, openChildWindows, CANVAS_CACHE_DIR });
         desktopHandlers.initialize({ mainWindow, openChildWindows, settingsManager: appSettingsManager });
         desktopRemoteHandlers.initialize({ mainWindow });
+        ipcMain.handle('codex-router-host:control', async (event, commandPayload) => {
+            return desktopRemoteHandlers.handleCodexRouterHostControl(commandPayload || {});
+        });
 
         ipcMain.on('minimize-to-tray', () => {
             if (mainWindow) {
@@ -1082,7 +1085,8 @@ if (!gotTheLock) {
                         handleDiceControl: diceHandlers.handleDiceControl, // Inject the dice control handler
                         handleCanvasControl: desktopRemoteHandlers.handleCanvasControl, // Inject the canvas control handler
                         handleFlowlockControl: desktopRemoteHandlers.handleFlowlockControl, // Inject the flowlock control handler
-                        handleDesktopRemoteControl: desktopRemoteHandlers.handleDesktopRemoteControl // Inject the desktop remote control handler
+                        handleDesktopRemoteControl: desktopRemoteHandlers.handleDesktopRemoteControl, // Inject the desktop remote control handler
+                        handleCodexRouterHostControl: desktopRemoteHandlers.handleCodexRouterHostControl
                     };
                     distributedServer = new DistributedServer(config);
                     await distributedServer.initialize();

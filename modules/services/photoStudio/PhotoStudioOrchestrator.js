@@ -370,6 +370,7 @@ class PhotoStudioOrchestrator {
                 local_shadow_count: packages.filter((deliveryPackage) => deliveryPackage.sync_state === 'local_shadow').length,
                 ready_count: packages.filter((deliveryPackage) => deliveryPackage.status === 'ready').length,
                 sent_count: packages.filter((deliveryPackage) => deliveryPackage.status === 'sent').length,
+                acknowledged_count: packages.filter((deliveryPackage) => deliveryPackage.status === 'acknowledged').length,
             },
             packages: packages.slice(0, 30),
             by_status: byStatus,

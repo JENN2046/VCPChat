@@ -1043,7 +1043,7 @@ function renderDeliveryPackageList(packages) {
                     </div>
                     <div class="compact-side">
                         <div class="inline-tags">
-                            ${createTag(deliveryPackage.status || '-')}
+                            ${createTag(getDeliveryPackageStatusLabel(deliveryPackage.status))}
                             ${createTag(deliveryPackage.sync_state || 'local_shadow')}
                         </div>
                         <span class="muted">${escapeHtml(formatDate(deliveryPackage.updated_at))}</span>
@@ -1053,6 +1053,7 @@ function renderDeliveryPackageList(packages) {
                                     ${nextStatus === 'sent' ? '标记发送' : '标记确认'}
                                 </button>
                             `).join('')}
+                            ${deliveryPackage.status === 'acknowledged' ? '<button class="ghost-btn" type="button" disabled>已确认</button>' : ''}
                         </div>
                         <button class="ghost-btn" type="button" data-open-project="${escapeHtml(deliveryPackage.project_id)}">打开</button>
                     </div>
@@ -1060,6 +1061,19 @@ function renderDeliveryPackageList(packages) {
             `).join('')}
         </div>
     `;
+}
+
+function getDeliveryPackageStatusLabel(status) {
+    if (status === 'ready') {
+        return '待发送';
+    }
+    if (status === 'sent') {
+        return '已发送，待确认';
+    }
+    if (status === 'acknowledged') {
+        return '已确认';
+    }
+    return status || '-';
 }
 
 function renderDeliveryPackagePanel(reports = {}) {
@@ -1077,6 +1091,7 @@ function renderDeliveryPackagePanel(reports = {}) {
                         ${createTag(`${summary.total_packages || 0} 个交付包`)}
                         ${createTag(`${summary.ready_count || 0} 个可交付`)}
                         ${createTag(`${summary.sent_count || 0} 个已发送`)}
+                        ${createTag(`${summary.acknowledged_count || 0} 个已确认`)}
                         ${createTag('local_shadow')}
                     </div>
                 </div>

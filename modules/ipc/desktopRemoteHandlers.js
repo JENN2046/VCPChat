@@ -2,10 +2,14 @@ const { ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs-extra');
 const { CHANNELS } = require('./ipcContracts');
+const codexRouterHost = require('../services/codexRouterHost');
+const codexRouterDirectives = require('../services/codexRouterDirectives');
 
 let desktopHandlersRef = null;
 let canvasHandlersRef = null;
 let mainWindowRef = null;
+let codexRouterHostStarterPromise = null;
+let codexRouterHostBundlePromise = null;
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const pendingDesktopRemoteRequests = new Map();
@@ -264,11 +268,109 @@ async function handleDesktopRemoteControl(commandPayload) {
                 return await _handleGetStyleAutomationStatus(desktopWin);
             case 'CreateWidget':
                 return await _handleCreateWidget(commandPayload, desktopWin);
+            case 'CodexRouterHost':
+                return await handleCodexRouterHostControl(commandPayload);
             default:
                 throw new Error(`Unknown desktop remote command: ${command}`);
         }
     } catch (error) {
         console.error('[DesktopRemoteHandlers] handleDesktopRemoteControl error:', error);
+        return { status: 'error', message: error.message };
+    }
+}
+
+async function ensureCodexRouterHostStarter() {
+    if (!codexRouterHostStarterPromise) {
+        codexRouterHostStarterPromise = (async () => {
+            const policy = await codexRouterHost.loadVcpChatCodexRouterPolicy();
+            const bindings = codexRouterHost.createVcpChatRecommendedBindings({
+                defaultWorkdir: PROJECT_ROOT
+            });
+            const directiveBuilders = codexRouterDirectives.createVcpChatCodexRouterDirectiveBuilders({
+                shellCommand: codexRouterDirectives.buildVcpChatShellCommandDirective,
+                applyPatch: codexRouterDirectives.buildVcpChatApplyPatchDirective,
+                automationUpdate: codexRouterDirectives.buildVcpChatAutomationUpdateDirective
+            });
+
+            return codexRouterHost.createVcpChatCodexRouterHostSkeleton({
+                policy,
+                anchor: 'vcpchat-main-process@codex-router',
+                bindings,
+                directiveBuilders
+            });
+        })().catch((error) => {
+            codexRouterHostStarterPromise = null;
+            throw error;
+        });
+    }
+
+    return codexRouterHostStarterPromise;
+}
+
+async function ensureCodexRouterHostBundle() {
+    if (!codexRouterHostBundlePromise) {
+        codexRouterHostBundlePromise = (async () => {
+            const starter = await ensureCodexRouterHostStarter();
+            starter.assertReady();
+            return starter.createBundle();
+        })().catch((error) => {
+            codexRouterHostBundlePromise = null;
+            throw error;
+        });
+    }
+
+    return codexRouterHostBundlePromise;
+}
+
+async function handleCodexRouterHostControl(commandPayload = {}) {
+    try {
+        const action = typeof commandPayload.action === 'string' ? commandPayload.action.trim() : '';
+        if (!action) {
+            throw new Error('CodexRouterHost action is required.');
+        }
+
+        switch (action) {
+            case 'inspect':
+            case 'status': {
+                const starter = await ensureCodexRouterHostStarter();
+                return {
+                    status: 'success',
+                    result: {
+                        inspection: starter.inspect(),
+                        status: starter.getStatus(),
+                        coverage: codexRouterHost.summarizeVcpChatCodexRouterBindingCoverage(
+                            codexRouterHost.createVcpChatRecommendedBindings({
+                                defaultWorkdir: PROJECT_ROOT
+                            })
+                        )
+                    }
+                };
+            }
+            case 'run': {
+                const task = commandPayload.task;
+                if (!task || typeof task !== 'object') {
+                    throw new Error('CodexRouterHost run requires task.');
+                }
+
+                const bundle = await ensureCodexRouterHostBundle();
+                const result = await bundle.hostClient.run(task);
+                return { status: 'success', result };
+            }
+            case 'resume': {
+                const task = commandPayload.task;
+                if (!task || typeof task !== 'object') {
+                    throw new Error('CodexRouterHost resume requires task.');
+                }
+
+                const bundle = await ensureCodexRouterHostBundle();
+                const result = await bundle.hostClient.resume(task, commandPayload.options || {});
+                return { status: 'success', result };
+            }
+            default:
+                throw new Error(`Unknown CodexRouterHost action: ${action}`);
+        }
+    } catch (error) {
+        console.error('[DesktopRemoteHandlers] handleCodexRouterHostControl error:', error);
         return { status: 'error', message: error.message };
     }
 }
@@ -702,4 +804,5 @@ module.exports = {
     handleDesktopRemoteControl,
     handleCanvasControl,
     handleFlowlockControl,
+    handleCodexRouterHostControl,
 };

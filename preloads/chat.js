@@ -261,6 +261,7 @@ function createCatalog(ops) {
         onFlowlockCommand: subscription(ops.subscribe('flowlock-command', (_event, data) => data)),
         onFlowlockRequest: subscription(ops.subscribe('flowlock:request', (_event, data) => data)),
         sendFlowlockRpcResponse: command((data) => ops.send('flowlock:response', data)),
+        codexRouterHostControl: query((commandPayload) => ops.invoke('codex-router-host:control', commandPayload)),
 
         // Utility APIs
         readNotesTree: query(() => ops.invoke('read-notes-tree')),
@@ -571,6 +572,7 @@ const ALLOWED_KEYS = [
     "onFlowlockCommand",
     "onFlowlockRequest",
     "sendFlowlockRpcResponse",
+    "codexRouterHostControl",
     "desktopPush",
     "onDesktopPush",
     "onDesktopStatus",

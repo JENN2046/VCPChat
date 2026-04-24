@@ -64,4 +64,72 @@ function cleanup() {
     }
 }
 
-module.exports = { processToolCall, cleanup };
+function ensureInteractiveSession(args = {}) {
+    if (!impl || typeof impl.ensureInteractiveSession !== 'function') {
+        throw new Error('PTYShellExecutor interactive session API is unavailable');
+    }
+
+    try {
+        return impl.ensureInteractiveSession(args);
+    } catch (err) {
+        reporter.capture('ensureInteractiveSession', err, { args });
+        throw err;
+    }
+}
+
+function getInteractiveSessionState() {
+    if (!impl || typeof impl.getInteractiveSessionState !== 'function') {
+        return {
+            sessionId: null,
+            connected: false,
+            mode: null,
+            pid: null,
+            shellName: null,
+            startedAt: null,
+            isExecutingCommand: false,
+            output: ''
+        };
+    }
+
+    try {
+        return impl.getInteractiveSessionState();
+    } catch (err) {
+        reporter.capture('getInteractiveSessionState', err);
+        throw err;
+    }
+}
+
+function sendInteractiveInput(data) {
+    if (!impl || typeof impl.sendInteractiveInput !== 'function') {
+        throw new Error('PTYShellExecutor sendInteractiveInput API is unavailable');
+    }
+
+    try {
+        return impl.sendInteractiveInput(data);
+    } catch (err) {
+        reporter.capture('sendInteractiveInput', err, { data });
+        throw err;
+    }
+}
+
+function closeInteractiveSession(args = {}) {
+    if (!impl || typeof impl.closeInteractiveSession !== 'function') {
+        throw new Error('PTYShellExecutor closeInteractiveSession API is unavailable');
+    }
+
+    try {
+        return impl.closeInteractiveSession(args);
+    } catch (err) {
+        reporter.capture('closeInteractiveSession', err, { args });
+        throw err;
+    }
+}
+
+module.exports = {
+    processToolCall,
+    cleanup,
+    ensureInteractiveSession,
+    getInteractiveSessionState,
+    sendInteractiveInput,
+    closeInteractiveSession
+};

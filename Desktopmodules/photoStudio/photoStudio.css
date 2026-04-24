@@ -540,6 +540,57 @@ button {
     background: rgba(255, 250, 242, 0.74);
 }
 
+.result-success {
+    border-color: rgba(31, 71, 54, 0.18);
+    background: rgba(31, 71, 54, 0.06);
+}
+
+.result-error {
+    border-color: rgba(191, 90, 54, 0.24);
+    background: rgba(191, 90, 54, 0.08);
+}
+
+.result-description {
+    margin: 0 0 12px;
+    color: var(--ink);
+    line-height: 1.6;
+}
+
+.result-rows {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.result-rows div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.58);
+    font-size: 13px;
+}
+
+.result-rows strong {
+    color: var(--ink);
+}
+
+.result-rows span {
+    color: var(--muted);
+    text-align: right;
+}
+
+.result-card details {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.result-card summary {
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
 .result-card pre {
     margin: 0;
     white-space: pre-wrap;

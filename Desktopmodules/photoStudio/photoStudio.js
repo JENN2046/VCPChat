@@ -180,20 +180,100 @@ function getRiskTone(level) {
     return '';
 }
 
+function pickActionSummary(result) {
+    if (!result.success) {
+        return {
+            title: '最近一次动作失败',
+            description: result.error?.message || '动作没有完成。',
+            rows: [
+                ['错误码', result.error?.code || '-'],
+                ['字段', result.error?.field || '-'],
+            ],
+            tone: 'error',
+        };
+    }
+
+    const data = result.data || {};
+    if (data.project || data.customer || data.tasks) {
+        return {
+            title: '项目已创建',
+            description: '客户、项目和任务已经写入工作台。',
+            rows: [
+                ['客户', data.customer?.customer_name || data.customer?.customer_id || '-'],
+                ['项目', data.project?.project_name || data.project?.project_id || '-'],
+                ['任务数', Array.isArray(data.tasks) ? data.tasks.length : (data.tasks?.tasks?.length || '-')],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (data.draft_text || data.reply_draft || data.message) {
+        return {
+            title: '回复草稿已生成',
+            description: data.draft_text || data.reply_draft || data.message,
+            rows: [
+                ['项目', data.project_id || '-'],
+                ['语气', data.tone || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (data.task_count || data.created_tasks || data.tasks) {
+        return {
+            title: '任务已更新',
+            description: '项目任务已经生成或补齐。',
+            rows: [
+                ['项目', data.project_id || '-'],
+                ['任务数', data.task_count || data.created_tasks?.length || data.tasks?.length || '-'],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (data.notice_text || data.selection_notice) {
+        return {
+            title: '选片通知已生成',
+            description: data.notice_text || data.selection_notice,
+            rows: [['项目', data.project_id || '-']],
+            tone: 'success',
+        };
+    }
+
+    return {
+        title: '动作已完成',
+        description: '后端已返回成功结果。',
+        rows: Object.entries(data).slice(0, 4).map(([key, value]) => [
+            key,
+            typeof value === 'object' ? JSON.stringify(value) : value,
+        ]),
+        tone: 'success',
+    };
+}
+
 function renderLastActionResult() {
     const result = getState().lastActionResult;
     if (!result) {
         return '';
     }
 
-    const title = result.success ? '最近一次动作结果' : '最近一次错误';
-    const body = result.success ? result.data : result.error;
+    const summary = pickActionSummary(result);
     return `
-        <article class="result-card">
-            <p class="eyebrow">${escapeHtml(title)}</p>
-            <pre>${escapeHtml(JSON.stringify(body, null, 2))}</pre>
+        <article class="result-card result-${escapeHtml(summary.tone)}">
+            <p class="eyebrow">${escapeHtml(summary.title)}</p>
+            <p class="result-description">${escapeHtml(summary.description)}</p>
+            <div class="result-rows">
+                ${summary.rows.map(([label, value]) => `
+                    <div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value || '-')}</span></div>
+                `).join('')}
+            </div>
+            <details>
+                <summary>查看原始返回</summary>
+                <pre>${escapeHtml(JSON.stringify(result.success ? result.data : result.error, null, 2))}</pre>
+            </details>
         </article>
     `;
+
 }
 
 function renderDrawer(result) {

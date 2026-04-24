@@ -15,6 +15,8 @@ Validate that the first native `codex-router` host path remains stable after mer
 - `inspect`
 - `run`
 - `resume`
+- DesktopRemote `CreateWidget -> QueryDesktop -> ViewWidgetSource`
+- DesktopRemote `DeleteWidget` cleanup for transient smoke widgets
 - host startup / readiness signal behavior
 - preload ↔ IPC ↔ renderer call path
 
@@ -38,6 +40,12 @@ Validate that the first native `codex-router` host path remains stable after mer
      - `status = success`
      - `decisionResult` and `executionResult` are present
      - `ready = true` for inspect path
+   - Execute the local DesktopRemote HTTP smoke:
+     `node scripts\desktopremote-http-smoke.js`
+   - Expectation:
+     - `CreateWidget`, `QueryDesktop`, and `ViewWidgetSource` pass
+     - `DeleteWidget cleanup PASS`
+     - a follow-up query does not report `desktopremote-http-smoke`
 
 4. 4-hour stability check
    - Repeat `inspect/run/resume` pair once.

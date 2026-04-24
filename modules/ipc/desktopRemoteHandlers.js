@@ -268,6 +268,8 @@ async function handleDesktopRemoteControl(commandPayload) {
                 return await _handleGetStyleAutomationStatus(desktopWin);
             case 'CreateWidget':
                 return await _handleCreateWidget(commandPayload, desktopWin);
+            case 'DeleteWidget':
+                return await _handleDeleteWidget(commandPayload, desktopWin);
             case 'CodexRouterHost':
                 return await handleCodexRouterHostControl(commandPayload);
             default:
@@ -796,6 +798,32 @@ async function _handleCreateWidget(commandPayload, desktopWin) {
     return {
         status: 'success',
         result: { content: [{ type: 'text', text: mdReport }] },
+    };
+}
+
+async function _handleDeleteWidget(commandPayload, desktopWin) {
+    const { widgetId } = commandPayload;
+    if (!widgetId) {
+        throw new Error('widgetId parameter is required for DeleteWidget.');
+    }
+
+    if (!desktopWin || desktopWin.isDestroyed()) {
+        throw new Error('Desktop window is not available.');
+    }
+
+    const responseData = await requestDesktopRemote(desktopWin, 'DeleteWidget', { widgetId }, {
+        timeoutMs: 5000,
+        timeoutMessage: 'Timed out while deleting widget.',
+    });
+
+    return {
+        status: 'success',
+        result: {
+            content: [{
+                type: 'text',
+                text: `### Widget Deleted\n\n- widgetId: \`${responseData?.widgetId || widgetId}\``,
+            }],
+        },
     };
 }
 

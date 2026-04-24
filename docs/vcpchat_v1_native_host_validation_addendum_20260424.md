@@ -22,6 +22,8 @@ temporarily unavailable.
   `resume` through the real `VCPChat` renderer. The `run/resume` task was
   intentionally approval/preflight-blocked to avoid dispatching live desktop
   primitives.
+- Side-effecting DesktopRemote dispatch smoke: pass for local
+  `CreateWidget -> QueryDesktop -> ViewWidgetSource -> DeleteWidget cleanup`.
 
 ## Shell Validation Recovery
 
@@ -172,6 +174,37 @@ This validates the renderer -> preload -> main IPC -> native host control path
 for all three public client methods. It does not validate a side-effecting
 desktop primitive dispatch.
 
+## DesktopRemote Dispatch Smoke
+
+After explicit approval, a bounded local DesktopRemote HTTP smoke was run
+against the isolated worktree Electron runtime:
+
+```text
+electron . --desktop-only --remote-debugging-port=9233
+node scripts\desktopremote-http-smoke.js
+```
+
+The distributed server reported the DesktopRemote test route enabled and
+listening on `127.0.0.1:5974`. The smoke script did not print the file key; it
+resolved the key through the same local config aliases used by the server.
+
+Observed result:
+
+- `CreateWidget`: pass for widget `desktopremote-http-smoke`
+- `QueryDesktop`: pass; the smoke widget was visible
+- `ViewWidgetSource`: pass; the expected smoke marker was present
+- `DeleteWidget`: pass; the smoke widget cleanup succeeded
+- post-cleanup `QueryDesktop`: pass; `containsSmokeWidget = false`
+
+This validates a real local DesktopRemote dispatch path and verifies that the
+test artifact is removed after the smoke run.
+
+Observed non-blocking local-data caveats remained unchanged:
+
+- `AppData/settings.json` was missing in the isolated worktree
+- VCP server URL was not configured, so model fetch was skipped
+- distributed server could not connect without `mainServerUrl` / `vcpKey`
+
 ## PR Validation Text
 
 ```md
@@ -183,11 +216,11 @@ Validation:
 - Memory recall recovered: `search_memory` can recall the prior caveat checkpoint.
 - Fresh Electron startup smoke passed in the isolated worktree after `node_modules` junction setup.
 - Fresh Electron renderer control-path smoke passed for inspect/run/resume; run/resume returned blocked-preflight/not-ready as intended to avoid live primitive side effects.
+- Local DesktopRemote dispatch smoke passed for CreateWidget/QueryDesktop/ViewWidgetSource with DeleteWidget cleanup; post-cleanup query confirmed the smoke widget was gone.
 ```
 
 ## Next Action
 
-Proceed with PR preparation using this addendum as the validation recovery
-record. Before final merge confidence, decide whether a side-effecting desktop
-primitive dispatch smoke is needed, and if so run it with explicit approval and
-a bounded task envelope.
+Proceed with PR preparation using this addendum as the validation recovery and
+dispatch-smoke record. Remaining work is PR/diff review, merge-set hygiene, and
+any branch or release action only after an explicit decision.

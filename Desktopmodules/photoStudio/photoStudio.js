@@ -71,6 +71,56 @@ function renderSceneError(scene, error) {
     });
 }
 
+function setButtonBusy(button, busy, busyText = '执行中...') {
+    if (!button) {
+        return false;
+    }
+
+    if (busy) {
+        if (button.dataset.busy === 'true') {
+            return false;
+        }
+        button.dataset.busy = 'true';
+        button.dataset.originalText = button.textContent;
+        button.textContent = busyText;
+        button.disabled = true;
+        button.classList.add('is-busy');
+        return true;
+    }
+
+    button.dataset.busy = 'false';
+    if (button.dataset.originalText) {
+        button.textContent = button.dataset.originalText;
+        delete button.dataset.originalText;
+    }
+    button.disabled = false;
+    button.classList.remove('is-busy');
+    return true;
+}
+
+function setFormBusy(form, busy) {
+    if (!form) {
+        return;
+    }
+
+    form.querySelectorAll('input, select, textarea, button').forEach((control) => {
+        if (busy) {
+            control.dataset.wasDisabled = control.disabled ? 'true' : 'false';
+            control.disabled = true;
+            if (control.tagName === 'BUTTON') {
+                setButtonBusy(control, true);
+            }
+            return;
+        }
+
+        if (control.tagName === 'BUTTON') {
+            setButtonBusy(control, false);
+        }
+        control.disabled = control.dataset.wasDisabled === 'true';
+        delete control.dataset.wasDisabled;
+    });
+}
+
 function toProjectId(value) {
     return String(value || '').trim();
 }
@@ -353,20 +403,34 @@ function renderDeliveryGroup(title, eyebrow, projects) {
 
 function bindProjectActions() {
     document.querySelectorAll('[data-open-project]').forEach((button) => {
-        button.addEventListener('click', () => {
-            window.PhotoStudioEvents.emit('project:selected', button.dataset.openProject);
+        button.addEventListener('click', async () => {
+            if (!setButtonBusy(button, true, '打开中...')) {
+                return;
+            }
+            try {
+                await loadProjectIntoDrawer(button.dataset.openProject);
+            } finally {
+                setButtonBusy(button, false);
+            }
         });
     });
 
     document.querySelectorAll('[data-advance-project]').forEach((button) => {
         button.addEventListener('click', async () => {
-            const projectId = button.dataset.advanceProject;
-            const project = getProjectById(projectId);
-            const nextStatus = project?.allowed_transitions?.[0] || 'preparing';
-            await runActionAndSync('project_board', 'advance_status', {
-                project_id: projectId,
-                new_status: nextStatus,
-            });
+            if (!setButtonBusy(button, true, '推进中...')) {
+                return;
+            }
+            try {
+                const projectId = button.dataset.advanceProject;
+                const project = getProjectById(projectId);
+                const nextStatus = project?.allowed_transitions?.[0] || 'preparing';
+                await runActionAndSync('project_board', 'advance_status', {
+                    project_id: projectId,
+                    new_status: nextStatus,
+                });
+            } finally {
+                setButtonBusy(button, false);
+            }
         });
     });
 }
@@ -374,15 +438,22 @@ function bindProjectActions() {
 function bindDrawerActions() {
     document.querySelectorAll('[data-drawer-action]').forEach((button) => {
         button.addEventListener('click', async () => {
-            const action = button.dataset.drawerAction;
-            const projectId = button.dataset.projectId;
-            const payload = { project_id: projectId };
-
-            if (action === 'advance_status') {
-                payload.new_status = button.dataset.nextStatus;
+            if (!setButtonBusy(button, true)) {
+                return;
             }
+            try {
+                const action = button.dataset.drawerAction;
+                const projectId = button.dataset.projectId;
+                const payload = { project_id: projectId };
 
-            await runActionAndSync('project_drawer', action, payload);
+                if (action === 'advance_status') {
+                    payload.new_status = button.dataset.nextStatus;
+                }
+
+                await runActionAndSync('project_drawer', action, payload);
+            } finally {
+                setButtonBusy(button, false);
+            }
         });
     });
 }
@@ -390,9 +461,16 @@ function bindDrawerActions() {
 function bindDeliveryActions() {
     document.querySelectorAll('[data-delivery-action]').forEach((button) => {
         button.addEventListener('click', async () => {
-            await runActionAndSync('delivery_panel', button.dataset.deliveryAction, {
-                project_id: button.dataset.projectId,
-            });
+            if (!setButtonBusy(button, true)) {
+                return;
+            }
+            try {
+                await runActionAndSync('delivery_panel', button.dataset.deliveryAction, {
+                    project_id: button.dataset.projectId,
+                });
+            } finally {
+                setButtonBusy(button, false);
+            }
         });
     });
 }
@@ -405,16 +483,28 @@ function bindProjectCreateForm() {
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (form.dataset.busy === 'true') {
+            return;
+        }
         const formData = new FormData(form);
-        await runActionAndSync('project_board', 'create_project_draft', {
-            customer_name: formData.get('customer_name'),
-            project_name: formData.get('project_name'),
-            project_type: formData.get('project_type'),
-            delivery_deadline: formData.get('delivery_deadline'),
-            location: formData.get('location'),
-            project_notes: formData.get('project_notes'),
-        });
-        form.reset();
+        form.dataset.busy = 'true';
+        setFormBusy(form, true);
+        try {
+            const result = await runActionAndSync('project_board', 'create_project_draft', {
+                customer_name: formData.get('customer_name'),
+                project_name: formData.get('project_name'),
+                project_type: formData.get('project_type'),
+                delivery_deadline: formData.get('delivery_deadline'),
+                location: formData.get('location'),
+                project_notes: formData.get('project_notes'),
+            });
+            if (result.success) {
+                form.reset();
+            }
+        } finally {
+            form.dataset.busy = 'false';
+            setFormBusy(form, false);
+        }
     });
 }
 
@@ -423,16 +513,28 @@ function bindInquiryForms() {
     if (createCustomerForm) {
         createCustomerForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            if (createCustomerForm.dataset.busy === 'true') {
+                return;
+            }
             const formData = new FormData(createCustomerForm);
-            await runActionAndSync('inquiry', 'create_customer', {
-                customer_name: formData.get('customer_name'),
-                customer_type: formData.get('customer_type'),
-                source: formData.get('source'),
-                contact_phone: formData.get('contact_phone'),
-                contact_wechat: formData.get('contact_wechat'),
-                notes: formData.get('notes'),
-            });
-            createCustomerForm.reset();
+            createCustomerForm.dataset.busy = 'true';
+            setFormBusy(createCustomerForm, true);
+            try {
+                const result = await runActionAndSync('inquiry', 'create_customer', {
+                    customer_name: formData.get('customer_name'),
+                    customer_type: formData.get('customer_type'),
+                    source: formData.get('source'),
+                    contact_phone: formData.get('contact_phone'),
+                    contact_wechat: formData.get('contact_wechat'),
+                    notes: formData.get('notes'),
+                });
+                if (result.success) {
+                    createCustomerForm.reset();
+                }
+            } finally {
+                createCustomerForm.dataset.busy = 'false';
+                setFormBusy(createCustomerForm, false);
+            }
         });
     }
 
@@ -440,13 +542,23 @@ function bindInquiryForms() {
     if (draftForm) {
         draftForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            if (draftForm.dataset.busy === 'true') {
+                return;
+            }
             const formData = new FormData(draftForm);
-            await runActionAndSync('inquiry', 'generate_draft', {
-                project_id: toProjectId(formData.get('project_id')) || getSelectedProjectId(),
-                context_type: formData.get('context_type'),
-                tone: formData.get('tone'),
-                key_points: formData.get('key_points'),
-            });
+            draftForm.dataset.busy = 'true';
+            setFormBusy(draftForm, true);
+            try {
+                await runActionAndSync('inquiry', 'generate_draft', {
+                    project_id: toProjectId(formData.get('project_id')) || getSelectedProjectId(),
+                    context_type: formData.get('context_type'),
+                    tone: formData.get('tone'),
+                    key_points: formData.get('key_points'),
+                });
+            } finally {
+                draftForm.dataset.busy = 'false';
+                setFormBusy(draftForm, false);
+            }
         });
     }
 }

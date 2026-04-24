@@ -106,6 +106,12 @@ button {
     transform: none;
 }
 
+.ghost-btn.is-busy,
+.primary-btn.is-busy {
+    cursor: progress;
+    opacity: 0.72;
+}
+
 .ghost-btn {
     background: rgba(255, 255, 255, 0.62);
     border-color: var(--line);

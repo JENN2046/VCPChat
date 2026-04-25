@@ -266,6 +266,32 @@ function findWindowByUrl(urlKeyword) {
     }) || null;
 }
 
+function getPreferredDisplay() {
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    if (focusedWindow && !focusedWindow.isDestroyed()) {
+        return screen.getDisplayMatching(focusedWindow.getBounds());
+    }
+    return screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+}
+
+function getNearFullscreenBounds(options = {}) {
+    const display = getPreferredDisplay();
+    const workArea = display?.workArea || screen.getPrimaryDisplay().workArea;
+    const minWidth = options.minWidth || 600;
+    const minHeight = options.minHeight || 400;
+    const horizontalInset = Math.max(32, Math.round(workArea.width * 0.035));
+    const verticalInset = Math.max(32, Math.round(workArea.height * 0.05));
+    const width = Math.max(minWidth, workArea.width - (horizontalInset * 2));
+    const height = Math.max(minHeight, workArea.height - (verticalInset * 2));
+
+    return {
+        x: workArea.x + Math.max(0, Math.round((workArea.width - width) / 2)),
+        y: workArea.y + Math.max(0, Math.round((workArea.height - height) / 2)),
+        width,
+        height,
+    };
+}
+
 /**
  * 鍒涘缓鎴栬仛鐒︿竴涓€氱敤瀛愮獥鍙ｏ紙鐢ㄤ簬 VChat 鍐呴儴搴旂敤锛?
  * @param {BrowserWindow|null} existingWindow - 鐜版湁绐楀彛寮曠敤
@@ -279,11 +305,18 @@ function createOrFocusChildWindow(existingWindow, options) {
         return existingWindow;
     }
 
+    const preferredBounds = options.launchLayout === 'near-fullscreen'
+        ? getNearFullscreenBounds(options)
+        : null;
+
     const win = new BrowserWindow({
-        width: options.width || 1000,
-        height: options.height || 700,
+        width: preferredBounds?.width || options.width || 1000,
+        height: preferredBounds?.height || options.height || 700,
+        x: preferredBounds?.x,
+        y: preferredBounds?.y,
         minWidth: options.minWidth || 600,
         minHeight: options.minHeight || 400,
+        center: preferredBounds ? false : options.center !== false,
         title: options.title || 'VChat',
         frame: false,
         ...(process.platform === 'darwin' ? {} : { titleBarStyle: 'hidden' }),
@@ -378,7 +411,8 @@ function registerManagedWindows() {
         getWindow: () => vchatPhotoStudioWindow,
         open: async () => {
             vchatPhotoStudioWindow = createOrFocusChildWindow(vchatPhotoStudioWindow, {
-                width: 1380, height: 860, minWidth: 1024, minHeight: 680,
+                width: 1380, height: 860, minWidth: 1100, minHeight: 720,
+                launchLayout: 'near-fullscreen',
                 title: 'Photo Studio',
                 htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'photoStudio', 'photoStudio.html'),
                 preloadPath: resolveAppPreload(app.getAppPath(), PRELOAD_ROLES.DESKTOP),

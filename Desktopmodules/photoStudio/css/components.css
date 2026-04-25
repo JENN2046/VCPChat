@@ -26,8 +26,8 @@
 
 .ghost-btn,
 .primary-btn {
-    min-height: 38px;
-    padding: 10px 15px;
+    min-height: 34px;
+    padding: 8px 13px;
 }
 
 .ghost-btn {
@@ -69,11 +69,18 @@
 }
 
 .nav-item {
-    min-height: 43px;
-    padding: 12px 14px;
+    min-height: 41px;
+    padding: 11px 13px;
     color: var(--ps-text-secondary);
     background: transparent;
+    font-size: var(--ps-font-size-sm);
     text-align: left;
+}
+
+.topbar .ghost-btn,
+.topbar .primary-btn {
+    min-height: 38px;
+    padding: 10px 15px;
 }
 
 .nav-item.active {
@@ -103,7 +110,7 @@
 .drawer-card,
 .result-card {
     border-radius: var(--ps-radius-lg);
-    padding: var(--ps-space-5);
+    padding: var(--ps-space-4);
 }
 
 .hero-card h2,
@@ -152,6 +159,23 @@
     padding: 11px 13px;
 }
 
+.search-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ps-space-3);
+    padding: var(--ps-space-3) var(--ps-space-4);
+    color: var(--ps-text-secondary);
+    background: rgba(143, 199, 255, 0.08);
+    border: 1px solid rgba(143, 199, 255, 0.14);
+    border-radius: var(--ps-radius-md);
+}
+
+.search-summary strong {
+    color: var(--ps-accent-blue-strong);
+    white-space: nowrap;
+}
+
 .pill.risk-high {
     color: var(--ps-danger);
     background: rgba(255, 138, 138, 0.12);
@@ -167,7 +191,7 @@
 .card-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--ps-space-3);
+    gap: var(--ps-space-2);
     padding: 0;
     border: 0;
     background: transparent;
@@ -175,8 +199,8 @@
 }
 
 .metric-card {
-    min-height: 112px;
-    padding: var(--ps-space-4);
+    min-height: 96px;
+    padding: var(--ps-space-3);
     border-radius: var(--ps-radius-lg);
 }
 
@@ -190,7 +214,7 @@
 
 .metric-value {
     color: var(--ps-text-primary);
-    font-size: 30px;
+    font-size: 26px;
     font-weight: var(--ps-font-weight-bold);
 }
 

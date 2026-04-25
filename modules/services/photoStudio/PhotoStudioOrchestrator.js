@@ -51,7 +51,6 @@ class PhotoStudioOrchestrator {
             .filter((project) => !!project.delivery_deadline)
             .sort((left, right) => String(left.delivery_deadline).localeCompare(String(right.delivery_deadline)))
             .slice(0, 5);
-
         return this.#success({
             metrics: {
                 total_projects: projectCards.length,
@@ -62,6 +61,7 @@ class PhotoStudioOrchestrator {
             risk_projects: riskProjects,
             missing_fields: missingFields,
             upcoming_delivery: upcomingDelivery,
+            all_projects: projectCards,
             projects: projectCards.slice(0, 8),
             reporting: {
                 weekly_digest: await this.#pluginData('generate_weekly_project_digest', {}),
@@ -77,10 +77,66 @@ class PhotoStudioOrchestrator {
         return this.#success(projects, createUiHints({ refresh: ['project_board'] }));
     }
 
+    async #updateProject(payload) {
+        const projectId = String(payload.project_id || payload.projectId || '').trim();
+        if (!projectId) {
+            return this.#failure('MISSING_REQUIRED_FIELD', '缺少项目编号', 'project_id');
+        }
+
+        const currentProject = this.store.getProject(projectId);
+        if (!currentProject) {
+            return this.#failure('NOT_FOUND', '未找到对应项目', 'project_id', { project_id: projectId });
+        }
+
+        const nextProjectName = String(payload.project_name || payload.projectName || currentProject.project_name || '').trim();
+        if (!nextProjectName) {
+            return this.#failure('MISSING_REQUIRED_FIELD', 'project_name is required', 'project_name');
+        }
+
+        const nextProjectType = String(payload.project_type || payload.projectType || currentProject.project_type || 'portrait').trim();
+        const nextDeliveryDeadline = String((payload.delivery_deadline ?? payload.due_date ?? currentProject.delivery_deadline) || '').trim();
+        const nextShootDate = String((payload.shoot_date ?? currentProject.shoot_date) || '').trim();
+        const nextLocation = String((payload.location ?? currentProject.location) || '').trim();
+        const nextNotes = String((payload.project_notes ?? payload.notes ?? payload.remark ?? currentProject.notes ?? currentProject.remark) || '').trim();
+
+        const updatedProject = this.store.updateProject(projectId, {
+            project_name: nextProjectName,
+            project_type: nextProjectType,
+            shoot_date: nextShootDate,
+            delivery_deadline: nextDeliveryDeadline,
+            due_date: nextDeliveryDeadline,
+            location: nextLocation,
+            notes: nextNotes,
+            remark: nextNotes,
+        });
+
+        if (!updatedProject) {
+            return this.#failure('NOT_FOUND', '未找到对应项目', 'project_id', { project_id: projectId });
+        }
+
+        this.store.appendStatusLog({
+            project_id: projectId,
+            old_status: currentProject.status,
+            new_status: currentProject.status,
+            reason: '项目基础信息已更新',
+            changed_by: 'photo_studio',
+        });
+
+        const refreshed = await this.getProject(projectId);
+        if (!refreshed.success) {
+            return refreshed;
+        }
+
+        return this.#success({
+            project_id: projectId,
+            ...refreshed.data,
+        }, hintsForProject(projectId, ['project_command', 'project_drawer'], '项目已更新'));
+    }
+
     async getProject(projectId) {
         const project = this.store.getProject(projectId);
         if (!project) {
-            return this.#failure('NOT_FOUND', 'project not found', 'projectId', { projectId });
+            return this.#failure('NOT_FOUND', '未找到对应项目', 'projectId', { projectId });
         }
 
         return this.#success({
@@ -109,7 +165,7 @@ class PhotoStudioOrchestrator {
 
         const sceneConfig = actionCatalog.actions[scene];
         if (!sceneConfig || !sceneConfig[action]) {
-            return this.#failure('INVALID_ACTION', 'unsupported action', 'action', { scene, action });
+            return this.#failure('INVALID_ACTION', '当前动作暂不支持', 'action', { scene, action });
         }
 
         const definition = sceneConfig[action];
@@ -172,6 +228,9 @@ class PhotoStudioOrchestrator {
         }
         if (method === 'getProject') {
             return this.getProject(payload.project_id || payload.projectId);
+        }
+        if (method === 'updateProject') {
+            return this.#updateProject(payload);
         }
         if (method === 'listBookings') {
             return this.#listBookings();
@@ -236,7 +295,7 @@ class PhotoStudioOrchestrator {
                 quoted_count: leads.filter((lead) => lead.status === 'quoted').length,
             },
             leads: leads.slice(0, 30),
-            audit_text: leads.length ? `读取到 ${leads.length} 条本地线索影子记录。` : '当前没有读取到本地线索影子记录。',
+            audit_text: leads.length ? `读取到 ${leads.length} 条本地线索记录。` : '当前没有读取到本地线索记录。',
         }, createUiHints({ refresh: ['client_leads'], toast: '线索读取完成' }));
     }
 
@@ -244,14 +303,14 @@ class PhotoStudioOrchestrator {
         const projectId = String(payload.project_id || payload.projectId || '').trim();
         const project = projectId ? this.store.getProject(projectId) : null;
         if (projectId && !project) {
-            return this.#failure('NOT_FOUND', 'project not found', 'project_id', { project_id: projectId });
+            return this.#failure('NOT_FOUND', '未找到对应项目', 'project_id', { project_id: projectId });
         }
 
         const customerId = String(payload.customer_id || payload.customerId || project?.customer_id || '').trim();
         const customer = customerId ? this.store.getCustomer(customerId) : null;
         const customerName = String(payload.customer_name || customer?.customer_name || project?.project_name || '').trim();
         if (!customerName && !projectId) {
-            return this.#failure('MISSING_REQUIRED_FIELD', 'customer_name or project_id is required', 'customer_name');
+            return this.#failure('MISSING_REQUIRED_FIELD', '客户名或项目编号至少要提供一个', 'customer_name');
         }
 
         const sourceChannel = String(payload.source_channel || payload.source || 'manual').trim();
@@ -306,19 +365,19 @@ class PhotoStudioOrchestrator {
                 accepted_count: quotes.filter((quote) => quote.status === 'accepted').length,
             },
             quotes: quotes.slice(0, 30),
-            audit_text: quotes.length ? `读取到 ${quotes.length} 条本地报价影子记录。` : '当前没有读取到本地报价影子记录。',
+            audit_text: quotes.length ? `读取到 ${quotes.length} 条本地报价记录。` : '当前没有读取到本地报价记录。',
         }, createUiHints({ refresh: ['client_leads'], toast: '报价读取完成' }));
     }
 
     async #createQuote(payload = {}) {
         const projectId = String(payload.project_id || payload.projectId || '').trim();
         if (!projectId) {
-            return this.#failure('MISSING_REQUIRED_FIELD', 'project_id is required', 'project_id');
+            return this.#failure('MISSING_REQUIRED_FIELD', '缺少项目编号', 'project_id');
         }
 
         const project = this.store.getProject(projectId);
         if (!project) {
-            return this.#failure('NOT_FOUND', 'project not found', 'project_id', { project_id: projectId });
+            return this.#failure('NOT_FOUND', '未找到对应项目', 'project_id', { project_id: projectId });
         }
 
         const quoteType = String(payload.quote_type || 'standard').trim();
@@ -384,8 +443,8 @@ class PhotoStudioOrchestrator {
             packages: packages.slice(0, 30),
             by_status: byStatus,
             audit_text: packages.length
-                ? `读取到 ${packages.length} 个本地交付包影子记录。`
-                : '当前没有读取到本地交付包影子记录。',
+            ? `读取到 ${packages.length} 个本地交付包记录。`
+            : '当前没有读取到本地交付包记录。',
         }, createUiHints({
             refresh: ['delivery_assets'],
             toast: '交付包读取完成',
@@ -395,12 +454,12 @@ class PhotoStudioOrchestrator {
     async #getDeliveryPackage(payload = {}) {
         const deliveryPackageId = String(payload.delivery_package_id || payload.deliveryPackageId || '').trim();
         if (!deliveryPackageId) {
-            return this.#failure('MISSING_REQUIRED_FIELD', 'delivery_package_id is required', 'delivery_package_id');
+            return this.#failure('MISSING_REQUIRED_FIELD', '缺少交付包编号', 'delivery_package_id');
         }
 
         const deliveryPackage = this.#readDeliveryPackages()[deliveryPackageId];
         if (!deliveryPackage) {
-            return this.#failure('NOT_FOUND', 'delivery package not found', 'delivery_package_id', { delivery_package_id: deliveryPackageId });
+            return this.#failure('NOT_FOUND', '未找到对应交付包', 'delivery_package_id', { delivery_package_id: deliveryPackageId });
         }
 
         return this.#success(this.#toDeliveryPackageCard(deliveryPackage), createUiHints({
@@ -413,12 +472,12 @@ class PhotoStudioOrchestrator {
     async #createDeliveryPackage(payload = {}) {
         const projectId = String(payload.project_id || payload.projectId || '').trim();
         if (!projectId) {
-            return this.#failure('MISSING_REQUIRED_FIELD', 'project_id is required', 'project_id');
+            return this.#failure('MISSING_REQUIRED_FIELD', '缺少项目编号', 'project_id');
         }
 
         const project = this.store.getProject(projectId);
         if (!project) {
-            return this.#failure('NOT_FOUND', 'project not found', 'project_id', { project_id: projectId });
+            return this.#failure('NOT_FOUND', '未找到对应项目', 'project_id', { project_id: projectId });
         }
 
         const packageType = String(payload.package_type || 'client_delivery').trim();
@@ -467,7 +526,7 @@ class PhotoStudioOrchestrator {
             : Object.values(deliveryPackages).find((item) => item.project_id === projectId);
 
         if (!deliveryPackage) {
-            return this.#failure('NOT_FOUND', 'delivery package not found', deliveryPackageId ? 'delivery_package_id' : 'project_id', {
+            return this.#failure('NOT_FOUND', '未找到对应交付包', deliveryPackageId ? 'delivery_package_id' : 'project_id', {
                 delivery_package_id: deliveryPackageId,
                 project_id: projectId,
             });
@@ -476,7 +535,7 @@ class PhotoStudioOrchestrator {
         const currentStatus = deliveryPackage.status || 'ready';
         const nextStatus = String(payload.status || payload.next_status || DELIVERY_PACKAGE_TRANSITIONS[currentStatus]?.[0] || '').trim();
         if (!nextStatus) {
-            return this.#failure('INVALID_TRANSITION', 'delivery package has no next status', 'status', {
+            return this.#failure('INVALID_TRANSITION', '当前交付包没有可推进的下一个状态', 'status', {
                 current_status: currentStatus,
                 allowed_transitions: DELIVERY_PACKAGE_TRANSITIONS[currentStatus] || [],
             });
@@ -484,7 +543,7 @@ class PhotoStudioOrchestrator {
 
         const allowedTransitions = DELIVERY_PACKAGE_TRANSITIONS[currentStatus] || [];
         if (!allowedTransitions.includes(nextStatus)) {
-            return this.#failure('INVALID_TRANSITION', `cannot move delivery package from ${currentStatus} to ${nextStatus}`, 'status', {
+            return this.#failure('INVALID_TRANSITION', `交付包状态不能从 ${currentStatus} 推进到 ${nextStatus}`, 'status', {
                 current_status: currentStatus,
                 requested_status: nextStatus,
                 allowed_transitions: allowedTransitions,
@@ -545,8 +604,8 @@ class PhotoStudioOrchestrator {
             bookings: bookings.slice(0, 20),
             by_surface: bySurface,
             audit_text: bookings.length
-                ? `读取到 ${bookings.length} 条本地排期影子记录。`
-                : '当前没有读取到本地排期影子记录。',
+            ? `读取到 ${bookings.length} 条本地排期记录。`
+            : '当前没有读取到本地排期记录。',
         }, createUiHints({
             refresh: ['schedule_board'],
             toast: '排期记录读取完成',
@@ -556,12 +615,12 @@ class PhotoStudioOrchestrator {
     async #createBooking(payload = {}) {
         const projectId = String(payload.project_id || payload.projectId || '').trim();
         if (!projectId) {
-            return this.#failure('MISSING_REQUIRED_FIELD', 'project_id is required', 'project_id');
+            return this.#failure('MISSING_REQUIRED_FIELD', '缺少项目编号', 'project_id');
         }
 
         const project = this.store.getProject(projectId);
         if (!project) {
-            return this.#failure('NOT_FOUND', 'project not found', 'project_id', { project_id: projectId });
+            return this.#failure('NOT_FOUND', '未找到对应项目', 'project_id', { project_id: projectId });
         }
 
         const bookingType = String(payload.booking_type || 'shoot').trim();
@@ -609,7 +668,7 @@ class PhotoStudioOrchestrator {
         const projectId = String(payload.project_id || payload.projectId || '').trim();
         const eventKey = String(payload.event_key || '').trim();
         if (!projectId) {
-            return this.#failure('MISSING_REQUIRED_FIELD', 'project_id is required', 'project_id');
+            return this.#failure('MISSING_REQUIRED_FIELD', '缺少项目编号', 'project_id');
         }
         if (!eventKey) {
             return this.#failure('MISSING_REQUIRED_FIELD', 'event_key is required', 'event_key');
@@ -652,7 +711,7 @@ class PhotoStudioOrchestrator {
         const projectId = String(payload.project_id || payload.projectId || '').trim();
         const eventKey = String(payload.event_key || '').trim();
         if (!projectId) {
-            return this.#failure('MISSING_REQUIRED_FIELD', 'project_id is required', 'project_id');
+            return this.#failure('MISSING_REQUIRED_FIELD', '缺少项目编号', 'project_id');
         }
         if (!eventKey) {
             return this.#failure('MISSING_REQUIRED_FIELD', 'event_key is required', 'event_key');
@@ -760,8 +819,8 @@ class PhotoStudioOrchestrator {
     }
 
     async #createProjectWithTasks(payload) {
-        const customerName = payload.customer_name || payload.customerName || 'Walk-in Customer';
-        const projectName = payload.project_name || payload.projectName || `New Project ${new Date().toISOString().slice(0, 16)}`;
+        const customerName = payload.customer_name || payload.customerName || '到店客户';
+        const projectName = payload.project_name || payload.projectName || `新项目 ${new Date().toISOString().slice(0, 16)}`;
         const projectType = payload.project_type || payload.projectType || 'portrait';
 
         const customerResult = await this.#invokePlugin('create_customer_record', {
@@ -887,19 +946,27 @@ class PhotoStudioOrchestrator {
 
     #fromPluginResult(result, pluginName = '', pluginPayload = {}) {
         if (!result || typeof result !== 'object') {
-            return this.#failure('PLUGIN_ERROR', 'plugin returned invalid result');
+            return this.#failure('PLUGIN_ERROR', '插件返回结果无效');
         }
 
         if (!result.success) {
+            const localizedError = this.#normalizePluginErrorForUi(pluginName, result.error || {});
             return this.#failure(
-                result.error?.code || 'PLUGIN_ERROR',
-                result.error?.message || 'plugin execution failed',
-                result.error?.field || null,
-                result.error?.details || {}
+                localizedError.code || 'PLUGIN_ERROR',
+                localizedError.message || '插件执行失败',
+                localizedError.field || null,
+                localizedError.details || {}
             );
         }
 
-        const projectId = result.data?.project_id || pluginPayload.project_id || null;
+        const localizedData = this.#normalizeDraftDataForUi(
+            pluginName,
+            this.#normalizeProjectAuditDataForUi(
+                pluginName,
+                this.#localizeDeliveryReportData(pluginName, result.data)
+            )
+        );
+        const projectId = localizedData?.project_id || pluginPayload.project_id || null;
         let toast = '操作已完成';
         let refresh = ['home'];
 
@@ -943,8 +1010,11 @@ class PhotoStudioOrchestrator {
         if (pluginName === 'update_project_status') {
             uiHints.focus_scene = 'project_command';
         }
+        if (pluginName === 'create_project_tasks') {
+            uiHints.focus_scene = 'project_command';
+        }
 
-        return this.#success(result.data, uiHints);
+        return this.#success(localizedData, uiHints);
     }
 
     async #invokePlugin(pluginName, payload) {
@@ -954,7 +1024,15 @@ class PhotoStudioOrchestrator {
 
     async #pluginData(pluginName, payload) {
         const result = await this.#invokePlugin(pluginName, payload);
-        return result && result.success ? result.data : {};
+        return result && result.success
+            ? this.#normalizeDraftDataForUi(
+                pluginName,
+                this.#normalizeProjectAuditDataForUi(
+                    pluginName,
+                    this.#localizeDeliveryReportData(pluginName, result.data)
+                )
+            )
+            : {};
     }
 
     async #loadPlugin(pluginName) {
@@ -964,7 +1042,7 @@ class PhotoStudioOrchestrator {
 
         const pluginEntry = this.registry.plugins.find((entry) => entry.name === pluginName);
         if (!pluginEntry) {
-            throw new Error(`Photo Studio plugin "${pluginName}" is not registered.`);
+            throw new Error(`影像工作台插件“${pluginName}”尚未注册。`);
         }
 
         const pluginPath = path.join(this.toolboxRoot, 'plugins', pluginEntry.path, 'src', 'index.js');
@@ -1042,6 +1120,227 @@ class PhotoStudioOrchestrator {
         return analyzeShadowData(this.dataRoot);
     }
 
+    #localizeSystemGeneratedText(value) {
+        const text = String(value || '');
+        return text
+            .replace(/Walk-in Customer/g, '到店客户')
+            .replace(/PR4 Smoke Customer/g, 'PR4 冒烟客户')
+            .replace(/PR4 Delivery Customer/g, 'PR4 交付客户')
+            .replace(/PR5 Inquiry Customer/g, 'PR5 跟进客户')
+            .replace(/PR5 Delivery Customer/g, 'PR5 交付客户')
+            .replace(/PR5 Delivery Flow Customer/g, 'PR5 交付流程客户')
+            .replace(/PR4 Smoke Project/g, 'PR4 冒烟项目')
+            .replace(/PR4 Delivery Project/g, 'PR4 交付项目')
+            .replace(/PR5 Delivery Project/g, 'PR5 交付项目')
+            .replace(/PR5 Delivery Flow Project/g, 'PR5 交付流程项目')
+            .replace(/New Project/g, '新项目');
+    }
+
+    #localizeDeliveryToken(value) {
+        const token = String(value || '').trim();
+        const tokenMap = {
+            ready_to_publish: '待发布',
+            mark_queued: '标记入队',
+            immediate: '立即处理',
+            future: '后续处理',
+            priority_queue: '优先队列',
+            current_state_snapshot: '当前状态快照',
+            record_created: '记录创建',
+            missing_due_date: '缺少交付日期',
+        };
+        return tokenMap[token] || token;
+    }
+
+    #localizeDeliveryText(value) {
+        return this.#localizeSystemGeneratedText(String(value || ''))
+            .replace(/Photo Studio delivery queue schedule/g, '影像工作台交付排程预览')
+            .replace(/Photo Studio delivery audit trail/g, '影像工作台交付日志')
+            .replace(/Reference date:/g, '参考日期：')
+            .replace(/Total records:/g, '记录总数：')
+            .replace(/Actionable records:/g, '可处理记录：')
+            .replace(/Immediate actions:/g, '立即处理：')
+            .replace(/Future actions:/g, '后续处理：')
+            .replace(/Failed:/g, '失败：')
+            .replace(/Retry due:/g, '待重试：')
+            .replace(/Ready to publish:/g, '待发布：')
+            .replace(/Queued:/g, '已入队：')
+            .replace(/Schedule windows:/g, '排程窗口：')
+            .replace(/Scope: all exports/g, '范围：全部导出记录')
+            .replace(/Records:/g, '记录数：')
+            .replace(/Events:/g, '事件数：')
+            .replace(/Timeline:/g, '时间线：')
+            .replace(/Record is ready to be queued\./g, '该记录已满足入队条件。')
+            .replace(/Current state is ready_to_publish\./g, '当前状态为待发布。')
+            .replace(/Local shadow export record created\./g, '已创建本地同步记录。')
+            .replace(/\bmark_queued\b/g, '标记入队')
+            .replace(/\bready_to_publish\b/g, '待发布')
+            .replace(/\bcurrent_state_snapshot\b/g, '当前状态快照')
+            .replace(/\brecord_created\b/g, '记录创建')
+            .replace(/\bimmediate\b/g, '立即处理')
+            .replace(/\bfuture\b/g, '后续处理')
+            .replace(/\bpriority_queue\b/g, '优先队列')
+            .replace(/item\(s\)/g, '项');
+    }
+
+    #localizeDeliveryReportData(pluginName, data) {
+        if (!data || typeof data !== 'object') {
+            return data;
+        }
+
+        const normalizeRow = (row) => ({
+            ...row,
+            display_name: this.#localizeSystemGeneratedText(row.display_name || ''),
+            project_name: this.#localizeSystemGeneratedText(row.project_name || ''),
+            customer_name: this.#localizeSystemGeneratedText(row.customer_name || ''),
+            package_label: this.#localizeSystemGeneratedText(row.package_label || ''),
+            delivery_state: this.#localizeDeliveryToken(row.delivery_state || ''),
+            recommended_action: this.#localizeDeliveryToken(row.recommended_action || ''),
+            schedule_bucket: this.#localizeDeliveryToken(row.schedule_bucket || ''),
+            window_label: this.#localizeDeliveryToken(row.window_label || ''),
+            event_type: this.#localizeDeliveryToken(row.event_type || ''),
+            attention_state: this.#localizeDeliveryToken(row.attention_state || ''),
+            schedule_reason: this.#localizeDeliveryText(row.schedule_reason || ''),
+            details: this.#localizeDeliveryText(row.details || ''),
+        });
+
+        if (pluginName === 'prioritize_pending_delivery_actions') {
+            return {
+                ...data,
+                priority_queue: Array.isArray(data.priority_queue) ? data.priority_queue.map(normalizeRow) : [],
+                priority_text: this.#localizeDeliveryText(data.priority_text || ''),
+            };
+        }
+
+        if (pluginName === 'generate_delivery_queue_schedule') {
+            return {
+                ...data,
+                schedule_rows: Array.isArray(data.schedule_rows) ? data.schedule_rows.map(normalizeRow) : [],
+                schedule_windows: Array.isArray(data.schedule_windows)
+                    ? data.schedule_windows.map((window) => ({
+                        ...window,
+                        window_label: this.#localizeDeliveryToken(window.window_label || ''),
+                        items: Array.isArray(window.items) ? window.items.map(normalizeRow) : [],
+                    }))
+                    : [],
+                schedule_text: this.#localizeDeliveryText(data.schedule_text || ''),
+            };
+        }
+
+        if (pluginName === 'inspect_delivery_audit_trail') {
+            return {
+                ...data,
+                audit_rows: Array.isArray(data.audit_rows) ? data.audit_rows.map(normalizeRow) : [],
+                audit_text: this.#localizeDeliveryText(data.audit_text || ''),
+            };
+        }
+
+        if (pluginName === 'sync_to_external_sheet_or_notion') {
+            return {
+                ...data,
+                export_text: this.#localizeDeliveryText(data.export_text || ''),
+                note: this.#localizeDeliveryText(data.note || ''),
+                export_rows: Array.isArray(data.export_rows) ? data.export_rows.map(normalizeRow) : data.export_rows,
+            };
+        }
+
+        return data;
+    }
+
+    #normalizeProjectAuditDataForUi(pluginName, data) {
+        if (!data || typeof data !== 'object' || pluginName !== 'check_missing_project_fields') {
+            return data;
+        }
+
+        const fieldLabel = (field) => {
+            if (field === 'delivery_deadline' || field === 'due_date') return '\u4ea4\u4ed8\u65e5\u671f';
+            if (field === 'shoot_date') return '\u62cd\u6444\u65e5\u671f';
+            if (field === 'project_name') return '\u9879\u76ee\u540d\u79f0';
+            if (field === 'project_type') return '\u9879\u76ee\u7c7b\u578b';
+            if (field === 'customer_name') return '\u5ba2\u6237\u540d\u79f0';
+            return field;
+        };
+
+        const projectRows = Array.isArray(data.project_rows) ? data.project_rows.map((row) => ({
+            ...row,
+            project_name: this.#localizeSystemGeneratedText(row.project_name || ''),
+            missing_required_fields: Array.isArray(row.missing_required_fields) ? row.missing_required_fields : [],
+            missing_recommended_fields: Array.isArray(row.missing_recommended_fields) ? row.missing_recommended_fields : [],
+        })) : [];
+
+        const lines = [
+            '\u5f71\u50cf\u5de5\u4f5c\u53f0\u9879\u76ee\u5b57\u6bb5\u68c0\u67e5',
+            `\u6a21\u5f0f\uff1a${data.audit_mode === 'single_project' ? '\u5355\u9879\u76ee' : (data.audit_mode || '\u672a\u6307\u5b9a')}`,
+            `\u9879\u76ee\u7f16\u53f7\uff1a${data.checked_project_id || '-'}`,
+            `\u68c0\u67e5\u9879\u76ee\u6570\uff1a${data.summary?.total_projects_checked ?? 0}`,
+            `\u6709\u95ee\u9898\u9879\u76ee\uff1a${data.summary?.projects_with_issues ?? 0}`,
+            `\u5fc5\u586b\u7f3a\u5931\uff1a${data.summary?.required_field_gap_count ?? 0}`,
+            `\u5efa\u8bae\u8865\u9f50\uff1a${data.summary?.recommended_field_gap_count ?? 0}`,
+            `\u5ba2\u6237\u5f15\u7528\u5f02\u5e38\uff1a${data.summary?.invalid_customer_reference_count ?? 0}`,
+        ];
+
+        if (projectRows.length) {
+            lines.push('', '\u95ee\u9898\u9879\u76ee\uff1a');
+            projectRows.forEach((row) => {
+                const pieces = [];
+                if (row.missing_required_fields.length) {
+                    pieces.push(`\u5fc5\u586b\u7f3a\u5931\uff1a${row.missing_required_fields.map(fieldLabel).join('\u3001')}`);
+                }
+                if (row.missing_recommended_fields.length) {
+                    pieces.push(`\u5efa\u8bae\u8865\u9f50\uff1a${row.missing_recommended_fields.map(fieldLabel).join('\u3001')}`);
+                }
+                lines.push(`- ${row.project_name}\uff08${row.project_id}\uff09${pieces.length ? `\uff1a${pieces.join('\uff1b')}` : ''}`);
+            });
+        }
+
+        return {
+            ...data,
+            project_rows: projectRows,
+            audit_text: lines.join('\n'),
+        };
+    }
+
+    #normalizeDraftDataForUi(pluginName, data) {
+        if (!data || typeof data !== 'object' || pluginName !== 'generate_client_reply_draft') {
+            return data;
+        }
+
+        const draftText = data.draft_text || data.reply_draft || data.draft_content || data.draft_body || data.message || '';
+        return {
+            ...data,
+            customer_name: this.#localizeSystemGeneratedText(data.customer_name || ''),
+            project_name: this.#localizeSystemGeneratedText(data.project_name || ''),
+            draft_title: this.#localizeSystemGeneratedText(data.draft_title || ''),
+            draft_body: this.#localizeSystemGeneratedText(data.draft_body || draftText),
+            draft_content: this.#localizeSystemGeneratedText(data.draft_content || draftText),
+            subject: this.#localizeSystemGeneratedText(data.subject || data.draft_title || ''),
+            draft_text: this.#localizeSystemGeneratedText(draftText),
+        };
+    }
+
+    #normalizePluginErrorForUi(pluginName, error) {
+        if (!error || typeof error !== 'object') {
+            return error;
+        }
+
+        if (pluginName === 'archive_project_assets'
+            && error.code === 'CONFLICT'
+            && Array.isArray(error.details?.allowed_statuses)) {
+            const statusLabels = {
+                completed: '已完成',
+                archived: '已归档',
+                shot: '已拍摄',
+            };
+            const allowed = error.details.allowed_statuses.map((status) => statusLabels[status] || status).join(' 或 ');
+            const received = statusLabels[error.details.project_status] || error.details.project_status || '未知状态';
+            return {
+                ...error,
+                message: `归档项目仅支持 ${allowed} 状态，当前项目状态是 ${received}。请先继续推进项目状态后再归档。`,
+            };
+        }
+
+        return error;
+    }
+
     #toLeadCard(lead) {
         const project = lead.project_id ? this.store.getProject(lead.project_id) : null;
         const projectCard = project ? this.#toProjectCard(project) : null;
@@ -1049,7 +1348,7 @@ class PhotoStudioOrchestrator {
             ...lead,
             project_name: projectCard?.project_name || '',
             project_status: projectCard?.status || '',
-            customer_name: lead.customer_name || projectCard?.customer_name || '',
+            customer_name: this.#localizeSystemGeneratedText(lead.customer_name || projectCard?.customer_name || ''),
         };
     }
 
@@ -1058,8 +1357,8 @@ class PhotoStudioOrchestrator {
         const projectCard = project ? this.#toProjectCard(project) : null;
         return {
             ...quote,
-            project_name: projectCard?.project_name || quote.project_id || '',
-            customer_name: projectCard?.customer_name || '',
+            project_name: this.#localizeSystemGeneratedText(projectCard?.project_name || quote.project_id || ''),
+            customer_name: this.#localizeSystemGeneratedText(projectCard?.customer_name || ''),
             project_status: projectCard?.status || '',
         };
     }
@@ -1069,8 +1368,9 @@ class PhotoStudioOrchestrator {
         const projectCard = project ? this.#toProjectCard(project) : null;
         return {
             ...deliveryPackage,
-            project_name: projectCard?.project_name || deliveryPackage.project_id || '',
-            customer_name: projectCard?.customer_name || '',
+            project_name: this.#localizeSystemGeneratedText(projectCard?.project_name || deliveryPackage.project_id || ''),
+            customer_name: this.#localizeSystemGeneratedText(projectCard?.customer_name || ''),
+            package_label: this.#localizeSystemGeneratedText(deliveryPackage.package_label || projectCard?.project_name || ''),
             project_status: projectCard?.status || '',
             delivery_deadline: projectCard?.delivery_deadline || '',
             allowed_transitions: DELIVERY_PACKAGE_TRANSITIONS[deliveryPackage.status || 'ready'] || [],
@@ -1083,15 +1383,18 @@ class PhotoStudioOrchestrator {
         return {
             project_id: project.project_id,
             customer_id: project.customer_id,
-            customer_name: customer?.customer_name || '',
-            project_name: project.project_name,
+            customer_name: this.#localizeSystemGeneratedText(customer?.customer_name || ''),
+            project_name: this.#localizeSystemGeneratedText(project.project_name),
             project_type: project.project_type,
+            shoot_date: project.shoot_date || project.start_date || '',
+            location: project.location || '',
             status: project.status,
             delivery_deadline: project.delivery_deadline || project.due_date || '',
             progress: project.progress || 0,
             risk_level: project.risk_level || risk.level,
             risk_score: project.risk_score || null,
             thumbnail_url: project.thumbnail_url || '',
+            notes: project.notes || project.remark || '',
             allowed_transitions: getAllowedTransitions(project.status),
             risk,
         };

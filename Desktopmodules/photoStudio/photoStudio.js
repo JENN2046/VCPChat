@@ -128,6 +128,38 @@ function renderSceneError(scene, error) {
     });
 }
 
+function renderSceneLoading(scene) {
+    const root = document.getElementById('scene-root');
+    if (!root) {
+        return;
+    }
+
+    root.innerHTML = `
+        <section class="scene-panel">
+            <article class="hero-card hero-card-wide">
+                <p class="eyebrow">场景 / ${escapeHtml(getSceneLabel(scene))}</p>
+                <h2>正在加载工作台内容</h2>
+                <p class="muted">如果后台数据正在生成报表，这里会先显示加载壳，避免你看到空白页面。</p>
+            </article>
+        </section>
+    `;
+}
+
+function renderDrawerLoading() {
+    const root = document.getElementById('drawer-root');
+    if (!root) {
+        return;
+    }
+
+    root.innerHTML = `
+        <div class="drawer-card">
+            <p class="drawer-label">项目上下文</p>
+            <h2>正在加载项目</h2>
+            <p class="muted">正在读取项目详情与右侧动作。</p>
+        </div>
+    `;
+}
+
 function setButtonBusy(button, busy, busyText = '执行中...') {
     if (!button) {
         return false;
@@ -190,6 +222,62 @@ function getProjectCollection() {
     return getState().projects?.data || [];
 }
 
+function getSearchQuery() {
+    return String(getState().searchQuery || '').trim();
+}
+
+function normalizeSearchText(value) {
+    return localizeSystemGeneratedText(getPhotoStudioLabel(value || ''))
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function getProjectSearchText(project) {
+    const searchable = [
+        project.project_id,
+        project.customer_id,
+        project.customer_name,
+        project.project_name,
+        project.project_type,
+        getPhotoStudioLabel(project.project_type),
+        project.status,
+        getPhotoStudioLabel(project.status),
+        project.location,
+        project.shoot_date,
+        project.delivery_deadline,
+        project.notes,
+    ];
+    return searchable.map(normalizeSearchText).join(' ');
+}
+
+function filterProjectsBySearch(projects) {
+    const query = normalizeSearchText(getSearchQuery());
+    if (!query) {
+        return projects;
+    }
+
+    const terms = query.split(' ').filter(Boolean);
+    return projects.filter((project) => {
+        const haystack = getProjectSearchText(project);
+        return terms.every((term) => haystack.includes(term));
+    });
+}
+
+function renderSearchSummary(allProjects, visibleProjects) {
+    const query = getSearchQuery();
+    if (!query) {
+        return '';
+    }
+
+    return `
+        <div class="search-summary">
+            <span>搜索：${escapeHtml(query)}</span>
+            <strong>${escapeHtml(visibleProjects.length)} / ${escapeHtml(allProjects.length)} 个项目</strong>
+        </div>
+    `;
+}
+
 function getProjectById(projectId) {
     return getProjectCollection().find((item) => item.project_id === projectId) || null;
 }
@@ -209,12 +297,80 @@ function createTag(content, extraClass = '') {
     return `<span class="pill ${extraClass}">${escapeHtml(content)}</span>`;
 }
 
+function localizeSystemGeneratedText(value) {
+    const text = String(value || '');
+    return text
+        .replace(/Walk-in Customer/g, '到店客户')
+        .replace(/PR4 Smoke Customer/g, 'PR4 冒烟客户')
+        .replace(/PR4 Delivery Customer/g, 'PR4 交付客户')
+        .replace(/PR5 Inquiry Customer/g, 'PR5 跟进客户')
+        .replace(/PR5 Delivery Customer/g, 'PR5 交付客户')
+        .replace(/PR5 Delivery Flow Customer/g, 'PR5 交付流程客户')
+        .replace(/PR4 Smoke Project/g, 'PR4 冒烟项目')
+        .replace(/PR4 Delivery Project/g, 'PR4 交付项目')
+        .replace(/PR5 Delivery Project/g, 'PR5 交付项目')
+        .replace(/PR5 Delivery Flow Project/g, 'PR5 交付流程项目')
+        .replace(/New Project/g, '新项目');
+}
+
+function getFieldLabel(fieldName) {
+    const fieldMap = {
+        delivery_deadline: '交付日期',
+        due_date: '交付日期',
+        shoot_date: '拍摄日期',
+        project_name: '项目名称',
+        project_type: '项目类型',
+        customer_name: '客户名称',
+        customer_id: '客户编号',
+        project_id: '项目编号',
+        location: '地点',
+        notes: '备注',
+        remark: '备注',
+        budget: '预算',
+        source_channel: '来源渠道',
+        contact_phone: '手机号',
+        contact_wechat: '微信',
+    };
+    return fieldMap[String(fieldName || '').trim()] || String(fieldName || '').trim() || '-';
+}
+
+function formatFieldList(fields) {
+    return (Array.isArray(fields) ? fields : [])
+        .map((field) => getFieldLabel(field))
+        .join('、');
+}
+
+function localizeReportText(value) {
+    return localizeSystemGeneratedText(String(value || ''))
+        .replace(/Record is ready to be queued\./g, '该记录已满足入队条件。')
+        .replace(/Current state is ready_to_publish\./g, '当前状态为待发布。')
+        .replace(/Local shadow export record created\./g, '已创建本地同步记录。')
+        .replace(/\bmark_queued\b/g, '标记入队')
+        .replace(/\bready_to_publish\b/g, '待发布')
+        .replace(/\bcurrent_state_snapshot\b/g, '当前状态快照')
+        .replace(/\brecord_created\b/g, '记录创建')
+        .replace(/\bimmediate\b/g, '立即处理')
+        .replace(/\bfuture\b/g, '后续处理');
+}
+
+function renderStatusTag(value, extraClass = '') {
+    return createTag(getPhotoStudioLabel(value), extraClass);
+}
+
 function getPhotoStudioLabel(value) {
     const normalized = String(value || '').trim();
     const labelMap = {
-        local_shadow: '本地影子',
+        local_shadow: '本地记录',
         no_live_write: '无外部写入',
         sync_external: '外部同步',
+        ready_to_publish: '待发布',
+        mark_queued: '标记入队',
+        current_state_snapshot: '当前状态快照',
+        record_created: '记录创建',
+        immediate: '立即处理',
+        future: '后续处理',
+        priority_queue: '优先队列',
+        missing_due_date: '缺少交付日期',
         pending: '待处理',
         new: '新建',
         contacted: '已联系',
@@ -273,10 +429,6 @@ function getPhotoStudioLabel(value) {
     return labelMap[normalized] || normalized || '-';
 }
 
-function renderStatusTag(value, extraClass = '') {
-    return createTag(getPhotoStudioLabel(value), extraClass);
-}
-
 function getSceneLabel(scene) {
     const labelMap = {
         home: '首页',
@@ -298,6 +450,7 @@ function getSceneLabel(scene) {
 function getActionLabel(action) {
     const labelMap = {
         create_project: '创建项目',
+        update_project: '编辑项目',
         advance_status: '推进项目状态',
         advance_project_status: '推进项目状态',
         get_project: '读取项目',
@@ -305,21 +458,23 @@ function getActionLabel(action) {
         create_tasks: '补建任务',
         create_project_tasks: '补建任务',
         archive_project: '归档项目',
-        generate_draft: '生成回复草稿',
-        generate_client_reply_draft: '生成回复草稿',
+        archive_project_assets: '归档项目',
+        generate_draft: '生成沟通草稿',
+        generate_client_reply_draft: '生成沟通草稿',
         create_customer: '创建客户',
         create_customer_record: '创建客户',
         create_lead: '创建跟进线索',
         convert_lead_to_project: '线索转项目',
         list_leads: '读取线索',
         create_quote: '创建报价单',
-        list_quotes: '读取报价',
+        list_quotes: '读取报价单',
         create_followup_reminder: '创建跟进提醒',
         list_bookings: '读取预约',
         create_booking: '创建预约',
         update_booking_time: '改期预约',
         start_booking: '开始预约',
         complete_booking: '完成预约',
+        check_schedule_conflicts: '检查排期冲突',
         create_selection_notice: '创建选片通知',
         create_delivery_tasks: '创建交付任务',
         list_delivery_packages: '读取交付包',
@@ -327,10 +482,10 @@ function getActionLabel(action) {
         create_delivery_package: '创建交付包',
         update_delivery_package_status: '推进交付包状态',
         sync_external: '外部同步',
-        prioritize_pending_delivery_actions: '生成优先队列',
-        generate_delivery_queue_schedule: '生成同步排程',
-        inspect_delivery_audit_trail: '查看审计轨迹',
-        inspect_shadow_data_hygiene: '刷新影子卫生',
+        prioritize_pending_delivery_actions: '生成待处理清单',
+        generate_delivery_queue_schedule: '生成交付预览',
+        inspect_delivery_audit_trail: '查看交付日志',
+        inspect_shadow_data_hygiene: '本地数据自检',
     };
     return labelMap[action] || action || '-';
 }
@@ -341,6 +496,10 @@ function canCreateDeliveryTasks(project) {
 
 function canCreateSelectionNotice(project) {
     return ['shot', 'selection_pending'].includes(project?.status);
+}
+
+function canArchiveProject(project) {
+    return ['completed', 'archived'].includes(project?.status);
 }
 
 function getDeliveryStatusHint(project) {
@@ -384,9 +543,25 @@ function pickActionSummary(result) {
             title: action === 'convert_lead_to_project' ? '线索已转为项目' : '项目已创建',
             description: action === 'convert_lead_to_project' ? '线索信息已经转成项目与任务，并写入工作台。' : '客户、项目和任务已经写入工作台。',
             rows: [
-                ['客户', data.customer?.customer_name || data.customer?.customer_id || '-'],
-                ['项目', data.project?.project_name || data.project?.project_id || '-'],
+                ['客户', localizeSystemGeneratedText(data.customer?.customer_name || data.customer?.customer_id || '-')],
+                ['项目', localizeSystemGeneratedText(data.project?.project_name || data.project?.project_id || '-')],
                 ['任务数', Array.isArray(data.tasks) ? data.tasks.length : (data.tasks?.tasks?.length || '-')],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'update_project') {
+        const project = data.project || data;
+        return {
+            title: '项目已更新',
+            description: '项目基础信息已经保存，可以继续再次编辑。',
+            rows: [
+                ['项目', localizeSystemGeneratedText(project.project_name || project.project_id || '-')],
+                ['类型', getPhotoStudioLabel(project.project_type || '-')],
+                ['拍摄日期', project.shoot_date || '-'],
+                ['交付日期', project.delivery_deadline || '-'],
+                ['地点', project.location || '-'],
             ],
             tone: 'success',
         };
@@ -407,7 +582,7 @@ function pickActionSummary(result) {
     if (action === 'create_followup_reminder') {
         return {
             title: data.is_new === false ? '跟进提醒已存在' : '跟进提醒已创建',
-            description: data.is_new === false ? '系统已找到同项目同类型的待处理提醒。' : '跟进提醒已经写入本地影子提醒记录。',
+            description: data.is_new === false ? '系统已找到同项目同类型的待处理提醒。' : '跟进提醒已经写入本地提醒记录。',
             rows: [
                 ['项目', data.project_id || '-'],
                 ['类型', getPhotoStudioLabel(data.reminder_type || '-')],
@@ -420,9 +595,9 @@ function pickActionSummary(result) {
     if (action === 'create_lead') {
         return {
             title: data.is_new === false ? '跟进线索已更新' : '跟进线索已创建',
-            description: '线索已经写入本地影子记录，没有同步外部 CRM 或表格。',
+            description: '线索已经写入本地记录，没有同步外部 CRM 或表格。',
             rows: [
-                ['客户', data.customer_name || '-'],
+                ['客户', localizeSystemGeneratedText(data.customer_name || '-')],
                 ['来源', getPhotoStudioLabel(data.source_channel || '-')],
                 ['项目类型 / 意向分类', getPhotoStudioLabel(data.intent_type || '-')],
                 ['状态', getPhotoStudioLabel(data.status || '-')],
@@ -434,9 +609,9 @@ function pickActionSummary(result) {
     if (action === 'create_quote') {
         return {
             title: data.is_new === false ? '报价单已更新' : '报价单已创建',
-            description: '报价已经写入本地影子记录，没有发送给客户或写入外部系统。',
+            description: '报价已经写入本地记录，没有发送给客户或写入外部系统。',
             rows: [
-                ['项目', data.project_name || data.project_id || '-'],
+                ['项目', localizeSystemGeneratedText(data.project_name || data.project_id || '-')],
                 ['金额', `${data.currency || 'CNY'} ${data.amount || 0}`],
                 ['状态', getPhotoStudioLabel(data.status || '-')],
                 ['有效期', data.valid_until || '-'],
@@ -506,8 +681,8 @@ function pickActionSummary(result) {
 
     if (action === 'inspect_shadow_data_hygiene') {
         return {
-            title: '影子数据卫生已刷新',
-            description: '已重新扫描本地 shadow 数据中的冒烟测试和旧演示候选记录。',
+            title: '本地数据自检已完成',
+            description: '已重新扫描本地数据中的冒烟测试和旧演示候选记录。',
             rows: [
                 ['冒烟项目', data.closeout?.summary?.projects || 0],
                 ['冒烟客户', data.closeout?.summary?.customers || 0],
@@ -521,11 +696,11 @@ function pickActionSummary(result) {
     if (action === 'list_bookings') {
         return {
             title: '排期记录读取完成',
-            description: data.audit_text || '本地排期影子记录已经读取完成。',
+            description: data.audit_text || '本地排期记录已经读取完成。',
             rows: [
                 ['检查项目数', data.summary?.total_projects_checked || '-'],
                 ['排期记录', data.summary?.total_bookings || 0],
-                ['本地影子', data.summary?.local_shadow_count || 0],
+                ['本地记录', data.summary?.local_shadow_count || 0],
                 ['来源面板', data.summary?.surface_count || 0],
             ],
             tone: 'success',
@@ -535,9 +710,9 @@ function pickActionSummary(result) {
     if (action === 'create_booking') {
         return {
             title: data.is_new === false ? '本地预约已更新' : '本地预约已创建',
-            description: '预约已经写入本地 calendar_events 影子记录，没有同步外部日历。',
+            description: '预约已经写入本地日程记录，没有同步外部日历。',
             rows: [
-                ['项目', data.project_name || data.project_id || '-'],
+                ['项目', localizeSystemGeneratedText(data.project_name || data.project_id || '-')],
                 ['类型', getPhotoStudioLabel(data.event_type || '-')],
                 ['日期', data.event_date || '-'],
                 ['时间', data.start_time || '全天'],
@@ -549,7 +724,7 @@ function pickActionSummary(result) {
     if (action === 'start_booking' || action === 'complete_booking') {
         return {
             title: action === 'complete_booking' ? '本地预约已完成' : '本地预约已开始',
-            description: '预约状态已经更新到本地影子记录，没有同步外部日历。',
+            description: '预约状态已经更新到本地记录，没有同步外部日历。',
             rows: [
                 ['预约', data.calendar_event_id || '-'],
                 ['项目', data.project_id || '-'],
@@ -563,7 +738,7 @@ function pickActionSummary(result) {
     if (action === 'update_booking_time') {
         return {
             title: '本地预约已改期',
-            description: '预约时间已经更新到本地影子记录，没有同步外部日历。',
+            description: '预约时间已经更新到本地记录，没有同步外部日历。',
             rows: [
                 ['预约', data.calendar_event_id || '-'],
                 ['项目', data.project_id || '-'],
@@ -576,8 +751,8 @@ function pickActionSummary(result) {
 
     if (action === 'sync_external') {
         return {
-            title: '外部同步记录已生成',
-            description: data.export_text || '同步记录已经写入本地影子队列。',
+            title: '交付记录已生成',
+            description: data.export_text || '交付记录已经写入本地队列。',
             rows: [
                 ['目标', data.target_name || '-'],
                 ['范围', data.export_scope || '-'],
@@ -590,10 +765,10 @@ function pickActionSummary(result) {
     if (action === 'list_delivery_packages') {
         return {
             title: '交付包读取完成',
-            description: data.audit_text || '本地交付包影子记录已经读取完成。',
+            description: data.audit_text || '本地交付包记录已经读取完成。',
             rows: [
                 ['交付包', data.summary?.total_packages || 0],
-                ['本地影子', data.summary?.local_shadow_count || 0],
+                ['本地记录', data.summary?.local_shadow_count || 0],
                 ['可交付', data.summary?.ready_count || 0],
                 ['已发送', data.summary?.sent_count || 0],
             ],
@@ -604,7 +779,7 @@ function pickActionSummary(result) {
     if (action === 'create_delivery_package') {
         return {
             title: data.is_new === false ? '本地交付包已更新' : '本地交付包已创建',
-            description: '交付包已经写入本地影子记录，没有同步外部网盘或客户系统。',
+            description: '交付包已经写入本地记录，没有同步外部网盘或客户系统。',
             rows: [
                 ['项目', data.project_name || data.project_id || '-'],
                 ['类型', getPhotoStudioLabel(data.package_type || '-')],
@@ -618,7 +793,7 @@ function pickActionSummary(result) {
     if (action === 'update_delivery_package_status') {
         return {
             title: '本地交付包状态已推进',
-            description: '交付包状态只在本地影子记录中更新，没有真实发送客户链接。',
+            description: '交付包状态只在本地记录中更新，没有真实发送客户链接。',
             rows: [
                 ['交付包', data.package_label || data.delivery_package_id || '-'],
                 ['原状态', getPhotoStudioLabel(data.previous_status || '-')],
@@ -631,8 +806,8 @@ function pickActionSummary(result) {
 
     if (action === 'prioritize_pending_delivery_actions') {
         return {
-            title: '交付优先队列已生成',
-            description: data.priority_text || '已读取本地外部同步影子记录并生成优先级队列。',
+            title: '待处理清单已生成',
+            description: data.priority_text || '已读取本地交付记录并生成优先级队列。',
             rows: [
                 ['记录数', data.summary?.total_records || 0],
                 ['优先事项', data.summary?.priority_items || 0],
@@ -659,8 +834,8 @@ function pickActionSummary(result) {
 
     if (action === 'inspect_delivery_audit_trail') {
         return {
-            title: '交付审计轨迹已读取',
-            description: data.audit_text || '已读取本地外部同步影子记录的审计轨迹。',
+            title: '交付日志已读取',
+            description: data.audit_text || '已读取本地交付记录的操作日志。',
             rows: [
                 ['记录数', data.audit_summary?.total_records || 0],
                 ['事件数', data.audit_summary?.total_events || 0],
@@ -718,13 +893,83 @@ function pickActionSummary(result) {
     };
 }
 
+function normalizeActionSummary(summary, result) {
+    const action = result?.action_context?.action || '';
+    const data = result?.success ? (result.data || {}) : (result.error || {});
+
+    if (action === 'generate_draft' || action === 'generate_client_reply_draft') {
+        return {
+            ...summary,
+            title: '沟通草稿已生成',
+            description: data.draft_text || data.reply_draft || data.draft_content || data.draft_body || data.message || '草稿内容已生成。',
+            rows: [
+                ['项目', localizeSystemGeneratedText(data.project_id || '-')],
+                ['标题', localizeSystemGeneratedText(data.subject || data.draft_title || '-')],
+                ['客户', localizeSystemGeneratedText(data.customer_name || '-')],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'check_missing_project_fields') {
+        return {
+            ...summary,
+            title: '缺失字段检查完成',
+            description: data.audit_text || '字段检查已经完成。',
+            rows: [
+                ['检查项目数', data.summary?.total_projects_checked || '-'],
+                ['有问题项目', data.summary?.projects_with_issues || '-'],
+                ['建议补齐', data.summary?.recommended_field_gap_count || 0],
+            ],
+            tone: data.summary?.projects_with_issues ? 'error' : 'success',
+        };
+    }
+
+    return summary;
+}
+
+function normalizeActionSummaryForUi(summary, result) {
+    const action = result?.action_context?.action || '';
+    const data = result?.success ? (result.data || {}) : (result.error || {});
+
+    if (action === 'generate_draft' || action === 'generate_client_reply_draft') {
+        return {
+            ...summary,
+            title: '\u6c9f\u901a\u8349\u7a3f\u5df2\u751f\u6210',
+            description: data.draft_text || data.reply_draft || data.draft_content || data.draft_body || data.message || '\u8349\u7a3f\u5185\u5bb9\u5df2\u751f\u6210\u3002',
+            rows: [
+                ['\u9879\u76ee\u7f16\u53f7', localizeSystemGeneratedText(data.project_id || '-')],
+                ['\u6807\u9898', localizeSystemGeneratedText(data.subject || data.draft_title || '-')],
+                ['\u5ba2\u6237', localizeSystemGeneratedText(data.customer_name || '-')],
+            ],
+            tone: 'success',
+        };
+    }
+
+    if (action === 'check_missing_project_fields') {
+        return {
+            ...summary,
+            title: '\u7f3a\u5931\u5b57\u6bb5\u68c0\u67e5\u5b8c\u6210',
+            description: data.audit_text || '\u5b57\u6bb5\u68c0\u67e5\u5df2\u7ecf\u5b8c\u6210\u3002',
+            rows: [
+                ['\u68c0\u67e5\u9879\u76ee\u6570', data.summary?.total_projects_checked || '-'],
+                ['\u6709\u95ee\u9898\u9879\u76ee', data.summary?.projects_with_issues || '-'],
+                ['\u5efa\u8bae\u8865\u9f50', data.summary?.recommended_field_gap_count || 0],
+            ],
+            tone: data.summary?.projects_with_issues ? 'error' : 'success',
+        };
+    }
+
+    return normalizeActionSummary(summary, result);
+}
+
 function renderLastActionResult() {
     const result = getState().lastActionResult;
     if (!result) {
         return '';
     }
 
-    const summary = pickActionSummary(result);
+    const summary = normalizeActionSummaryForUi(pickActionSummary(result), result);
     return `
         <article class="result-card result-${escapeHtml(summary.tone)}">
             <p class="eyebrow">${escapeHtml(summary.title)}</p>
@@ -749,12 +994,12 @@ function renderDrawerActionResult(projectId) {
         return '';
     }
 
-    const dataProjectId = result.data?.project_id || result.data?.checked_project_id || '';
+    const dataProjectId = result.data?.project_id || result.data?.checked_project_id || result.data?.project?.project_id || '';
     if (dataProjectId && dataProjectId !== projectId) {
         return '';
     }
 
-    const summary = pickActionSummary(result);
+    const summary = normalizeActionSummaryForUi(pickActionSummary(result), result);
     return `
         <div class="result-card result-${escapeHtml(summary.tone)}">
             <p class="drawer-label">${escapeHtml(summary.title)}</p>
@@ -802,20 +1047,59 @@ function renderDrawer(result) {
             <div class="drawer-kv">
                 <div><strong>客户</strong><span>${escapeHtml(project.customer_name || '-')}</span></div>
                 <div><strong>状态</strong><span>${escapeHtml(getPhotoStudioLabel(project.status))}</span></div>
+                <div><strong>拍摄日期</strong><span>${escapeHtml(formatDate(project.shoot_date))}</span></div>
                 <div><strong>交付日期</strong><span>${escapeHtml(formatDate(project.delivery_deadline))}</span></div>
             </div>
             <div class="inline-tags">
                 ${renderStatusTag(project.project_type || 'unknown')}
                 ${createTag(`风险 ${getPhotoStudioLabel(project.risk?.level || 'unknown')}`, getRiskTone(project.risk?.level))}
-                ${riskMissing.length ? createTag(`缺字段 ${riskMissing.join(', ')}`) : ''}
+${riskMissing.length ? createTag(`缺字段 ${formatFieldList(riskMissing)}`) : ''}
             </div>
-            <p class="muted">允许推进: ${escapeHtml(allowedTransitions.map(getPhotoStudioLabel).join(' / ') || '无')}</p>
+            <p class="muted">可推进到：${escapeHtml(allowedTransitions.map(getPhotoStudioLabel).join(' / ') || '无')}</p>
+            <p class="drawer-label">项目编辑</p>
+            <p class="muted">基础信息可以反复修改，保存后会同步到当前项目卡和右侧摘要。</p>
+            <form class="form-grid" id="project-edit-form" data-project-id="${escapeHtml(project.project_id)}">
+                <input type="hidden" name="project_id" value="${escapeHtml(project.project_id)}">
+                <label class="form-field">
+                    <span>项目名</span>
+                    <input name="project_name" type="text" value="${escapeHtml(project.project_name || '')}" required>
+                </label>
+                <label class="form-field">
+                    <span>项目类型</span>
+                    <select name="project_type">
+                        <option value="portrait" ${project.project_type === 'portrait' ? 'selected' : ''}>人像</option>
+                        <option value="wedding" ${project.project_type === 'wedding' ? 'selected' : ''}>婚礼</option>
+                        <option value="family" ${project.project_type === 'family' ? 'selected' : ''}>家庭</option>
+                        <option value="commercial" ${project.project_type === 'commercial' ? 'selected' : ''}>商业</option>
+                        <option value="general" ${project.project_type === 'general' ? 'selected' : ''}>通用</option>
+                    </select>
+                </label>
+                <label class="form-field">
+                    <span>拍摄日期</span>
+                    <input name="shoot_date" type="date" value="${escapeHtml(project.shoot_date || '')}">
+                </label>
+                <label class="form-field">
+                    <span>交付日期</span>
+                    <input name="delivery_deadline" type="date" value="${escapeHtml(project.delivery_deadline || '')}">
+                </label>
+                <label class="form-field">
+                    <span>拍摄地点</span>
+                    <input name="location" type="text" value="${escapeHtml(project.location || '')}">
+                </label>
+                <label class="form-field form-field-wide">
+                    <span>备注</span>
+                    <textarea name="project_notes" rows="3">${escapeHtml(project.notes || project.remark || '')}</textarea>
+                </label>
+                <div class="form-actions form-field-wide">
+                    <button class="primary-btn" type="submit">保存项目修改</button>
+                </div>
+            </form>
             <div class="drawer-actions">
-                <button class="ghost-btn" type="button" data-drawer-action="generate_draft" data-project-id="${escapeHtml(project.project_id)}">生成回复草稿</button>
+                <button class="ghost-btn" type="button" data-drawer-action="generate_draft" data-project-id="${escapeHtml(project.project_id)}">生成沟通草稿</button>
                 <button class="ghost-btn" type="button" data-drawer-action="check_missing_project_fields" data-project-id="${escapeHtml(project.project_id)}">检查缺失字段</button>
                 <button class="ghost-btn" type="button" data-drawer-action="create_tasks" data-project-id="${escapeHtml(project.project_id)}">补建任务</button>
                 <button class="primary-btn" type="button" data-drawer-action="advance_status" data-project-id="${escapeHtml(project.project_id)}" data-next-status="${escapeHtml(nextStatus)}" ${nextStatus ? '' : 'disabled'}>推进到下一状态</button>
-                <button class="ghost-btn danger-btn" type="button" data-drawer-action="archive_project" data-project-id="${escapeHtml(project.project_id)}">归档项目</button>
+                <button class="ghost-btn danger-btn" type="button" data-drawer-action="archive_project" data-project-id="${escapeHtml(project.project_id)}" ${canArchiveProject(project) ? '' : 'disabled'}>归档项目</button>
             </div>
             ${renderDrawerActionResult(project.project_id)}
             <p class="drawer-label">任务</p>
@@ -842,11 +1126,11 @@ function createProjectCard(project) {
             <div class="project-meta">
                 ${createTag(`风险 ${getPhotoStudioLabel(riskLevel)}`, getRiskTone(riskLevel))}
                 ${renderStatusTag(project.project_type || 'unknown')}
-                ${missing.length ? createTag(`缺 ${missing.join(', ')}`) : ''}
+${missing.length ? createTag(`缺 ${formatFieldList(missing)}`) : ''}
             </div>
             <p class="muted">交付日期: ${escapeHtml(formatDate(project.delivery_deadline))}</p>
             <div class="card-actions">
-                <button class="ghost-btn" type="button" data-open-project="${escapeHtml(project.project_id)}">查看详情</button>
+                <button class="ghost-btn" type="button" data-open-project="${escapeHtml(project.project_id)}">查看 / 编辑</button>
                 <button class="primary-btn" type="button" data-advance-project="${escapeHtml(project.project_id)}" data-next-status="${escapeHtml(nextStatus)}" ${nextStatus ? '' : 'disabled'}>推进状态</button>
             </div>
         </article>
@@ -875,6 +1159,9 @@ function groupProjectsByLane(projects) {
 }
 
 function renderProjectBoard(projects) {
+    if (!projects.length && getSearchQuery()) {
+        return '<div class="empty-state">没有匹配当前搜索的项目。</div>';
+    }
     if (!projects.length) {
         return '<div class="empty-state">当前还没有项目，先创建一个试试。</div>';
     }
@@ -905,6 +1192,7 @@ function renderProjectBoard(projects) {
 function createDeliveryCard(project) {
     const canDeliver = canCreateDeliveryTasks(project);
     const canSelect = canCreateSelectionNotice(project);
+    const canArchive = canArchiveProject(project);
     return `
         <article class="project-card">
             <div class="card-header">
@@ -925,7 +1213,7 @@ function createDeliveryCard(project) {
                 <button class="primary-btn" type="button" data-delivery-action="create_delivery_tasks" data-project-id="${escapeHtml(project.project_id)}" ${canDeliver ? '' : 'disabled'}>生成交付任务</button>
                 <button class="ghost-btn" type="button" data-delivery-action="create_delivery_package" data-project-id="${escapeHtml(project.project_id)}" ${canDeliver || canSelect ? '' : 'disabled'}>创建交付包</button>
                 <button class="ghost-btn danger-btn" type="button" data-delivery-action="sync_external" data-project-id="${escapeHtml(project.project_id)}">外部同步</button>
-                <button class="ghost-btn danger-btn" type="button" data-delivery-action="archive_project" data-project-id="${escapeHtml(project.project_id)}">归档</button>
+                <button class="ghost-btn danger-btn" type="button" data-delivery-action="archive_project" data-project-id="${escapeHtml(project.project_id)}" ${canArchive ? '' : 'disabled'}>归档</button>
             </div>
         </article>
     `;
@@ -938,26 +1226,6 @@ function renderMetricCard(label, value, hint) {
             <div class="metric-value">${escapeHtml(value)}</div>
             <p class="metric-hint">${escapeHtml(hint || '')}</p>
         </article>
-    `;
-}
-
-function renderDataQualityList(items) {
-    if (!items.length) {
-        return '<div class="empty-state">当前没有字段缺失项。</div>';
-    }
-
-    return `
-        <div class="compact-list">
-            ${items.map((item) => `
-                <article class="compact-row">
-                    <div>
-                        <strong>${escapeHtml(item.project_name)}</strong>
-                        <p class="muted">缺失字段: ${escapeHtml((item.missing || []).join(', '))}</p>
-                    </div>
-                    <button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">查看</button>
-                </article>
-            `).join('')}
-        </div>
     `;
 }
 
@@ -1039,37 +1307,6 @@ function renderDeliveryMetricGrid(metrics) {
     `;
 }
 
-function renderDeliveryOpsPanel(metrics) {
-    return `
-        <section class="report-grid">
-            <article class="hero-card">
-                <p class="eyebrow">外部同步</p>
-                <h2>外部同步控制区</h2>
-                <p>每张项目卡都可以生成本地外部同步记录。这个动作会先确认，再写入本地影子队列，避免误同步真实外部系统。</p>
-                <div class="inline-tags">
-                    ${renderStatusTag('sync_external')}
-                    ${renderStatusTag('local_shadow')}
-                    ${createTag(`${metrics.total} 个候选项目`)}
-                </div>
-                <div class="card-actions">
-                    <button class="ghost-btn" type="button" data-delivery-action="prioritize_pending_delivery_actions">生成优先队列</button>
-                    <button class="ghost-btn" type="button" data-delivery-action="generate_delivery_queue_schedule">生成同步排程</button>
-                    <button class="primary-btn" type="button" data-delivery-action="inspect_delivery_audit_trail">查看审计轨迹</button>
-                </div>
-            </article>
-            <article class="hero-card">
-                <p class="eyebrow">归档护栏</p>
-                <h2>归档高风险区</h2>
-                <p>归档会改变项目与素材状态，当前已加入确认弹窗。建议先检查缺失字段、交付任务和同步记录，再执行归档。</p>
-                <div class="inline-tags">
-                    ${createTag('archive_project_assets', 'risk-medium')}
-                    ${createTag('需要确认', 'risk-high')}
-                </div>
-            </article>
-        </section>
-    `;
-}
-
 function getDeliveryReportData(reports, action) {
     const result = reports?.[action];
     return result?.success ? result.data || {} : {};
@@ -1086,7 +1323,7 @@ function renderDeliveryReportFailure(reports, action) {
 
 function renderDeliveryReportRows(items, options = {}) {
     if (!items.length) {
-        return '<div class="empty-state">当前没有本地影子记录。</div>';
+        return '<div class="empty-state">当前没有本地记录。</div>';
     }
 
     return `
@@ -1094,8 +1331,8 @@ function renderDeliveryReportRows(items, options = {}) {
             ${items.slice(0, 4).map((item) => `
                 <article class="compact-row">
                     <div>
-                        <strong>${escapeHtml(item.display_name || item.project_name || item.project_id || '未命名项目')}</strong>
-                        <p class="muted">${escapeHtml(item.target_name || getPhotoStudioLabel(item.event_type || item.delivery_state || '-'))}</p>
+                        <strong>${escapeHtml(localizeSystemGeneratedText(item.display_name || item.project_name || item.project_id || '未命名项目'))}</strong>
+                        <p class="muted">${escapeHtml(localizeReportText(item.schedule_reason || item.details || item.target_name || getPhotoStudioLabel(item.event_type || item.delivery_state || '-')))}</p>
                     </div>
                     <div class="compact-side">
                         <span>${escapeHtml(item.schedule_date || formatDate(item.timestamp) || '-')}</span>
@@ -1119,21 +1356,21 @@ function renderDeliveryReportDashboard(reports = {}) {
         <section class="hero-card hero-card-wide">
             <div class="hero-grid">
                 <div>
-                    <p class="eyebrow">交付脉搏</p>
-                    <h2>外部同步脉搏</h2>
-                    <p>进入交付页时自动读取本地外部同步影子队列，显示优先级、排程和审计轨迹。这里仍然只是本地可视化，不会写入真实外部系统。</p>
+                    <p class="eyebrow">交付概览</p>
+                    <h2>交付概览</h2>
+                <p>进入交付页时自动读取本地交付清单，显示待处理事项、排程预览和操作日志。这里仍然只是本地可视化，不会写入真实外部系统。</p>
                 </div>
                 <div class="hero-summary">
-                    <div class="summary-chip">优先事项 ${escapeHtml(prioritySummary.priority_items || 0)}</div>
+                    <div class="summary-chip">待处理事项 ${escapeHtml(prioritySummary.priority_items || 0)}</div>
                     <div class="summary-chip">立即动作 ${escapeHtml(scheduleSummary.immediate_actions_count || 0)}</div>
-                    <div class="summary-chip">审计事件 ${escapeHtml(auditSummary.total_events || 0)}</div>
+                    <div class="summary-chip">操作日志 ${escapeHtml(auditSummary.total_events || 0)}</div>
                 </div>
             </div>
         </section>
         <section class="report-grid delivery-grid">
             <article class="hero-card">
-                <p class="eyebrow">优先队列</p>
-                <h2>优先队列</h2>
+                <p class="eyebrow">待处理清单</p>
+                <h2>待处理清单</h2>
                 <div class="inline-tags">
                     ${createTag(`${prioritySummary.total_records || 0} 条记录`)}
                     ${createTag(`${prioritySummary.high_count || 0} 个高优先级`, prioritySummary.high_count ? 'risk-medium' : '')}
@@ -1143,8 +1380,8 @@ function renderDeliveryReportDashboard(reports = {}) {
                 ${renderDeliveryReportRows(priority.priority_queue || [])}
             </article>
             <article class="hero-card">
-                <p class="eyebrow">同步排程</p>
-                <h2>同步排程</h2>
+                <p class="eyebrow">排程预览</p>
+                <h2>排程预览</h2>
                 <div class="inline-tags">
                     ${createTag(`${scheduleSummary.actionable_records || 0} 个可处理`)}
                     ${createTag(`${scheduleSummary.ready_to_publish_count || 0} 个待发布`)}
@@ -1154,8 +1391,8 @@ function renderDeliveryReportDashboard(reports = {}) {
                 ${renderDeliveryReportRows(schedule.schedule_rows || [])}
             </article>
             <article class="hero-card">
-                <p class="eyebrow">审计轨迹</p>
-                <h2>审计轨迹</h2>
+                <p class="eyebrow">操作日志</p>
+                <h2>操作日志</h2>
                 <div class="inline-tags">
                     ${createTag(`${auditSummary.total_records || 0} 条记录`)}
                     ${createTag(`${auditSummary.total_events || 0} 个事件`)}
@@ -1226,7 +1463,7 @@ function renderDeliveryPackagePanel(reports = {}) {
                 <div>
                     <p class="eyebrow">交付包</p>
                     <h2>本地交付包</h2>
-                    <p>交付包是项目进入客户交付前的本地影子记录，用来承接选片通知、交付任务和外部同步前的核对清单。</p>
+                    <p>交付包是项目进入客户交付前的本地记录，用来承接选片通知、交付任务和外部同步前的核对清单。</p>
                     <div class="inline-tags">
                         ${createTag(`${summary.total_packages || 0} 个交付包`)}
                         ${createTag(`${summary.ready_count || 0} 个可交付`)}
@@ -1275,7 +1512,7 @@ function renderClientLeadMetricGrid(metrics) {
     return `
         <section class="card-grid">
             ${renderMetricCard('客户数', metrics.customers, '来自当前项目关联客户')}
-            ${renderMetricCard('新线索', metrics.leads, '项目处于初步跟进阶段')}
+            ${renderMetricCard('待转线索', metrics.leads, '线索已进入跟进启动阶段')}
             ${renderMetricCard('已报价', metrics.quoted, '需要继续跟进')}
             ${renderMetricCard('已预约', metrics.booked, '已确认或进入筹备拍摄')}
             ${renderMetricCard('高优先线索', metrics.highIntent, '报价或已确认项目')}
@@ -1286,7 +1523,7 @@ function renderClientLeadMetricGrid(metrics) {
 
 function renderLeadPipeline(metrics) {
     const stages = [
-        ['新线索', metrics.leads, '接住来源、补全需求'],
+        ['待转线索', metrics.leads, '先确认来源并补全需求'],
         ['沟通中', metrics.followups, '需要跟进或补字段'],
         ['已报价', metrics.quoted, '等待客户确认'],
         ['已预约', metrics.booked, '进入项目执行'],
@@ -1295,8 +1532,8 @@ function renderLeadPipeline(metrics) {
 
     return `
         <article class="hero-card">
-            <p class="eyebrow">项目跟进管道</p>
-            <h2>项目跟进总览</h2>
+            <p class="eyebrow">跟进概览</p>
+            <h2>项目进展概览</h2>
             <div class="pipeline-list">
                 ${stages.map(([label, count, hint]) => `
                     <div class="pipeline-stage">
@@ -1328,7 +1565,7 @@ function renderFollowupPanel(metrics, projects, selectedProjectId) {
         <article class="hero-card">
             <p class="eyebrow">跟进提醒</p>
             <h2>跟进提醒</h2>
-            <p>先接入本地影子提醒：报价后跟进、交付后跟进、回访提醒都可以在这里创建，不会写入外部系统。</p>
+    <p>先接入本地提醒：报价后跟进、交付后跟进、回访提醒都可以在这里创建，不会写入外部系统。</p>
             <div class="inline-tags">
                 ${createTag(`${metrics.followups} 条待补信息`)}
                 ${createTag(`${metrics.quoted} 个报价跟进`)}
@@ -1413,11 +1650,11 @@ function renderClientLeadShadowPanel(reports = {}) {
                 <h2>跟进线索</h2>
                 <div class="inline-tags">
                     ${createTag(`${leadSummary.total_leads || 0} 条线索`)}
-                    ${createTag(`${leadSummary.new_count || 0} 条新线索`)}
+                ${createTag(`${leadSummary.new_count || 0} 条待转线索`)}
                     ${renderStatusTag('local_shadow')}
                 </div>
                 ${renderDeliveryReportFailure(reports, 'list_leads')}
-                ${renderClientLeadShadowList(leadData.leads || [], '当前没有跟进线索影子记录。', { enableLeadConversion: true })}
+                ${renderClientLeadShadowList(leadData.leads || [], '当前没有跟进线索记录。', { enableLeadConversion: true })}
             </article>
             <article class="hero-card">
                 <p class="eyebrow">报价单</p>
@@ -1428,7 +1665,7 @@ function renderClientLeadShadowPanel(reports = {}) {
                     ${createTag(`${quoteSummary.accepted_count || 0} 条接受`)}
                 </div>
                 ${renderDeliveryReportFailure(reports, 'list_quotes')}
-                ${renderClientLeadShadowList(quoteData.quotes || [], '当前没有报价单影子记录。')}
+                ${renderClientLeadShadowList(quoteData.quotes || [], '当前没有报价单记录。')}
             </article>
         </section>
     `;
@@ -1643,7 +1880,7 @@ function renderScheduleTimeline(entries) {
 
 function renderLocalBookingList(bookings) {
     if (!bookings.length) {
-        return '<div class="empty-state">当前没有本地预约影子记录。创建本地预约后会显示在这里。</div>';
+        return '<div class="empty-state">当前没有本地预约记录。创建本地预约后会显示在这里。</div>';
     }
 
     return `
@@ -1704,31 +1941,13 @@ function renderResourceReadiness(projects) {
     `;
 }
 
-function renderScheduleGuardrail(metrics) {
-    return `
-        <article class="hero-card">
-            <p class="eyebrow">冲突护栏</p>
-            <h2>冲突护栏</h2>
-            <p>当前只做只读风险提示，不自动创建、调整或取消预约。真实 Booking 接入后，创建预约和改期会进入确认流程。</p>
-            <div class="inline-tags">
-                ${createTag(`${metrics.conflicts} 个同日冲突`, metrics.conflicts ? 'risk-high' : '')}
-                ${createTag(`${metrics.unscheduled} 个未设日期`, metrics.unscheduled ? 'risk-medium' : '')}
-                ${createTag('check_schedule_conflicts')}
-            </div>
-            <div class="card-actions">
-                <button class="primary-btn" type="button" data-schedule-action="check_schedule_conflicts">检查冲突</button>
-            </div>
-        </article>
-    `;
-}
-
 function renderCreateBookingPanel(projects, selectedProjectId) {
     const hasProjects = projects.length > 0;
     return `
         <article class="hero-card">
             <p class="eyebrow">创建预约</p>
             <h2>创建本地预约</h2>
-            <p>先写入本地影子排期记录，不会同步外部日历。相同项目、类型、日期和时间会更新同一条记录。</p>
+            <p>先写入本地排期记录，不会同步外部日历。相同项目、类型、日期和时间会更新同一条记录。</p>
             <form class="form-grid followup-form" id="schedule-booking-form">
                 <label class="form-field">
                     <span>项目</span>
@@ -1831,9 +2050,16 @@ function bindDrawerActions() {
                 const action = button.dataset.drawerAction;
                 const projectId = button.dataset.projectId;
                 const payload = { project_id: projectId };
+                const project = getProjectById(projectId);
 
                 if (action === 'advance_status') {
                     payload.new_status = button.dataset.nextStatus;
+                }
+
+                if (action === 'archive_project' && !canArchiveProject(project)) {
+                    showToast('归档项目仅支持已完成或已归档状态，请先推进项目状态。');
+                    setStatusChip('当前项目暂不可归档');
+                    return;
                 }
 
                 const result = await runActionAndSync('project_drawer', action, payload);
@@ -1848,6 +2074,120 @@ function bindDrawerActions() {
     });
 }
 
+function bindDrawerEditForm() {
+    const form = document.getElementById('project-edit-form');
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (form.dataset.busy === 'true') {
+            return;
+        }
+
+        const formData = new FormData(form);
+        const projectId = toProjectId(formData.get('project_id')) || form.dataset.projectId || getSelectedProjectId();
+        if (!projectId) {
+            showToast('请先选择项目。');
+            return;
+        }
+
+        form.dataset.busy = 'true';
+        setFormBusy(form, true);
+        try {
+            const result = await runActionAndSync('project_drawer', 'update_project', {
+                project_id: projectId,
+                project_name: formData.get('project_name'),
+                project_type: formData.get('project_type'),
+                shoot_date: formData.get('shoot_date'),
+                delivery_deadline: formData.get('delivery_deadline'),
+                location: formData.get('location'),
+                notes: formData.get('project_notes'),
+                project_notes: formData.get('project_notes'),
+            });
+            if (result.success) {
+                if (isCurrentScene('project_command')) {
+                    await renderSceneByName('project_command');
+                }
+                await loadProjectIntoDrawer(projectId);
+            }
+        } finally {
+            form.dataset.busy = 'false';
+            setFormBusy(form, false);
+        }
+    });
+}
+
+function renderScheduleGuardrail(metrics) {
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">排期护栏</p>
+            <h2>排期冲突护栏</h2>
+            <p>当前只做只读风险提示，不自动创建、调整或取消预约。后续接入真实预约能力后，创建预约和改期会进入确认流程。</p>
+            <div class="inline-tags">
+                ${createTag(`${metrics.conflicts} 个同日冲突`, metrics.conflicts ? 'risk-high' : '')}
+                ${createTag(`${metrics.unscheduled} 个未设日期`, metrics.unscheduled ? 'risk-medium' : '')}
+                ${createTag(getActionLabel('check_schedule_conflicts'))}
+            </div>
+            <div class="card-actions">
+                <button class="primary-btn" type="button" data-schedule-action="check_schedule_conflicts">检查冲突</button>
+            </div>
+        </article>
+    `;
+}
+
+function renderDeliveryOpsPanel(metrics) {
+    return `
+        <section class="report-grid">
+            <article class="hero-card">
+                <p class="eyebrow">交付核对</p>
+                <h2>交付核对区</h2>
+                <p>每张项目卡都可以生成本地交付记录。这个动作会先确认，再写入本地队列，避免误同步到真实外部系统。</p>
+                <div class="inline-tags">
+                    ${renderStatusTag('sync_external')}
+                    ${renderStatusTag('local_shadow')}
+                    ${createTag(`${metrics.total} 个候选项目`)}
+                </div>
+                <div class="card-actions">
+                    <button class="ghost-btn" type="button" data-delivery-action="prioritize_pending_delivery_actions">生成待处理交付清单</button>
+                    <button class="ghost-btn" type="button" data-delivery-action="generate_delivery_queue_schedule">生成交付预览</button>
+                    <button class="primary-btn" type="button" data-delivery-action="inspect_delivery_audit_trail">查看交付日志</button>
+                </div>
+            </article>
+            <article class="hero-card">
+                <p class="eyebrow">归档护栏</p>
+                <h2>归档确认区</h2>
+                <p>归档会改变项目与素材状态，当前已加入确认弹窗。建议先检查缺失字段、交付任务和交付记录，再执行归档。</p>
+                <div class="inline-tags">
+                    ${createTag(getActionLabel('archive_project_assets'), 'risk-medium')}
+                    ${createTag('需要确认', 'risk-high')}
+                </div>
+            </article>
+        </section>
+    `;
+}
+
+function renderDataQualityList(items) {
+    if (!items.length) {
+        return '<div class="empty-state">当前没有字段缺失项。</div>';
+    }
+
+    return `
+        <div class="compact-list">
+            ${items.map((item) => `
+                <article class="compact-row">
+                    <div>
+                        <strong>${escapeHtml(localizeSystemGeneratedText(item.project_name))}</strong>
+                        <p class="muted">缺失字段：${escapeHtml(formatFieldList(item.missing || []))}</p>
+                    </div>
+                    <button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">查看</button>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
 function bindDeliveryActions() {
     document.querySelectorAll('[data-delivery-action]').forEach((button) => {
         button.addEventListener('click', async () => {
@@ -1855,6 +2195,13 @@ function bindDeliveryActions() {
                 return;
             }
             try {
+                const action = button.dataset.deliveryAction;
+                const project = getProjectById(button.dataset.projectId);
+                if (action === 'archive_project' && !canArchiveProject(project)) {
+                    showToast('归档项目仅支持已完成或已归档状态，请先推进项目状态。');
+                    setStatusChip('当前项目暂不可归档');
+                    return;
+                }
                 await runActionAndSync('delivery_panel', button.dataset.deliveryAction, {
                     project_id: button.dataset.projectId,
                     delivery_package_id: button.dataset.deliveryPackageId,
@@ -1874,7 +2221,7 @@ function bindClientLeadActions() {
                 return;
             }
             try {
-                const customerName = button.dataset.customerName || 'Walk-in Customer';
+        const customerName = button.dataset.customerName || '到店客户';
                 const intentType = button.dataset.intentType || 'general';
                 const sourceChannel = button.dataset.sourceChannel || 'manual';
                 const note = button.dataset.note || '';
@@ -2030,6 +2377,7 @@ function bindProjectCreateForm() {
                 customer_name: formData.get('customer_name'),
                 project_name: formData.get('project_name'),
                 project_type: formData.get('project_type'),
+                shoot_date: formData.get('shoot_date'),
                 delivery_deadline: formData.get('delivery_deadline'),
                 location: formData.get('location'),
                 project_notes: formData.get('project_notes'),
@@ -2214,7 +2562,7 @@ function renderHomeMetricGrid(metrics, reporting) {
 function renderPriorityQueue(priorityReport) {
     const queue = priorityReport?.priority_queue || [];
     if (!queue.length) {
-        return '<div class="empty-state">当前没有需要立即处理的优先队列。</div>';
+        return '<div class="empty-state">当前没有需要立即处理的待处理清单。</div>';
     }
 
     return `
@@ -2223,7 +2571,7 @@ function renderPriorityQueue(priorityReport) {
                 <article class="compact-row">
                     <div>
                         <strong>${escapeHtml(item.display_name || item.project_id || '未命名项目')}</strong>
-                        <p class="muted">${escapeHtml(item.schedule_reason || item.recommended_action || '等待处理')}</p>
+                        <p class="muted">${escapeHtml(localizeReportText(item.schedule_reason || item.recommended_action || '等待处理'))}</p>
                     </div>
                     <div class="compact-side">
                         <div class="inline-tags">
@@ -2244,8 +2592,8 @@ function renderExternalPulse(deliverySchedule) {
 
     return `
         <article class="hero-card">
-            <p class="eyebrow">外部同步脉搏</p>
-            <h2>外部同步脉搏</h2>
+            <p class="eyebrow">交付概览</p>
+            <h2>交付概览</h2>
             <div class="mini-metrics">
                 <div><strong>${escapeHtml(summary.actionable_records ?? 0)}</strong><span>可处理记录</span></div>
                 <div><strong>${escapeHtml(summary.ready_to_publish_count ?? 0)}</strong><span>可发布</span></div>
@@ -2320,9 +2668,9 @@ function renderShadowHygienePanel(shadowHygiene) {
 
     return `
         <article class="hero-card">
-            <p class="eyebrow">影子卫生</p>
-            <h2>影子数据卫生</h2>
-            <p>只读体检，用来看冒烟测试或旧演示 shadow 记录是否还留在当前工作台里。这里不会自动清理数据。</p>
+            <p class="eyebrow">本地数据自检</p>
+            <h2>本地数据卫生</h2>
+            <p>只读检查，用来看冒烟测试或旧演示记录是否还留在当前工作台里。这里不会自动清理数据。</p>
             <div class="mini-metrics">
                 <div><strong>${escapeHtml(closeoutSummary.projects ?? 0)}</strong><span>冒烟项目</span></div>
                 <div><strong>${escapeHtml(closeoutSummary.customers ?? 0)}</strong><span>冒烟客户</span></div>
@@ -2343,12 +2691,12 @@ function renderShadowHygienePanel(shadowHygiene) {
                         <article class="compact-row">
                             <div>
                                 <strong>${escapeHtml(projectId)}</strong>
-                                <p class="muted">影子卫生样本</p>
+                                <p class="muted">自检样本</p>
                             </div>
                         </article>
                     `).join('')}
                 </div>
-            ` : '<div class="empty-state">当前没有识别到冒烟测试或旧演示 shadow 记录。</div>'}
+            ` : '<div class="empty-state">当前没有识别到冒烟测试或旧演示记录。</div>'}
         </article>
     `;
 }
@@ -2360,7 +2708,105 @@ function renderDashboard(result) {
     const weeklyDigest = reporting.weekly_digest || {};
     const summary = weeklyDigest.summary || {};
     const recentTransitions = weeklyDigest.recent_transitions || [];
-    const prioritySummary = reporting.prioritize_pending?.summary || {};
+    const allProjects = Array.isArray(data.all_projects)
+        ? data.all_projects
+        : (Array.isArray(data.projects) ? data.projects : []);
+    const projects = filterProjectsBySearch(allProjects);
+    const searchActive = Boolean(getSearchQuery());
+    const visibleProjectIds = new Set(projects.map((project) => project.project_id).filter(Boolean));
+    const filterByVisibleProject = (items) => (Array.isArray(items) ? items : [])
+        .filter((item) => visibleProjectIds.has(item.project_id));
+    const visibleRiskProjects = searchActive
+        ? projects.filter((project) => (project.risk?.level || 'low') !== 'low')
+        : (data.risk_projects || []);
+    const visibleMissingFields = searchActive
+        ? projects
+            .filter((project) => Array.isArray(project.risk?.missing) && project.risk.missing.length > 0)
+            .map((project) => ({
+                project_id: project.project_id,
+                project_name: project.project_name,
+                missing: project.risk.missing,
+            }))
+        : (data.missing_fields || []);
+    const visibleUpcomingDelivery = searchActive
+        ? projects
+            .filter((project) => !!project.delivery_deadline)
+            .sort((left, right) => String(left.delivery_deadline).localeCompare(String(right.delivery_deadline)))
+            .slice(0, 5)
+        : (data.upcoming_delivery || []);
+    const visibleRecentTransitions = searchActive ? filterByVisibleProject(recentTransitions) : recentTransitions;
+    const visibleStatusCounts = searchActive
+        ? projects.reduce((counts, project) => {
+            const status = project.status || 'unknown';
+            counts[status] = (counts[status] || 0) + 1;
+            return counts;
+        }, {})
+        : weeklyDigest.status_counts;
+    const visibleDataQuality = searchActive
+        ? {
+            ...(weeklyDigest.data_quality || {}),
+            missing_due_date_count: projects.filter((project) => {
+                const missing = project.risk?.missing || [];
+                return missing.includes('shoot_date') || missing.includes('delivery_deadline');
+            }).length,
+            missing_customer_count: projects.filter((project) => {
+                const missing = project.risk?.missing || [];
+                return missing.includes('customer_id') || missing.includes('customer_name') || (!project.customer_id && !project.customer_name);
+            }).length,
+            missing_project_reference_count: projects.filter((project) => (project.risk?.missing || []).includes('project_id')).length,
+        }
+        : weeklyDigest.data_quality;
+    const visibleWeeklyDigest = searchActive
+        ? {
+            ...weeklyDigest,
+            data_quality: visibleDataQuality,
+            status_counts: visibleStatusCounts,
+        }
+        : weeklyDigest;
+    const visibleMetrics = searchActive
+        ? {
+            ...metrics,
+            total_projects: projects.length,
+            risk_projects_count: visibleRiskProjects.length,
+            missing_fields_count: visibleMissingFields.length,
+            upcoming_delivery_count: visibleUpcomingDelivery.length,
+        }
+        : metrics;
+    const priorityQueue = searchActive
+        ? filterByVisibleProject(reporting.prioritize_pending?.priority_queue || [])
+        : (reporting.prioritize_pending?.priority_queue || []);
+    const visiblePriorityReport = searchActive
+        ? {
+            ...(reporting.prioritize_pending || {}),
+            priority_queue: priorityQueue,
+            summary: {
+                ...(reporting.prioritize_pending?.summary || {}),
+                priority_items: priorityQueue.length,
+            },
+        }
+        : reporting.prioritize_pending;
+    const visibleReporting = searchActive
+        ? {
+            ...reporting,
+            prioritize_pending: visiblePriorityReport,
+        }
+        : reporting;
+    const visibleDashboardData = searchActive
+        ? {
+            ...data,
+            risk_projects: visibleRiskProjects,
+            missing_fields: visibleMissingFields,
+            upcoming_delivery: visibleUpcomingDelivery,
+        }
+        : data;
+    const visibleSummary = searchActive
+        ? {
+            ...summary,
+            active_projects: projects.length,
+            due_soon_projects: visibleUpcomingDelivery.length,
+        }
+        : summary;
+    const prioritySummary = visibleReporting.prioritize_pending?.summary || {};
 
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
@@ -2372,31 +2818,44 @@ function renderDashboard(result) {
                         <p>把项目风险、即将交付、最近状态流转和数据质量放在同一屏，方便你先看清楚今天该处理什么。</p>
                     </div>
                     <div class="hero-summary">
-                        <div class="summary-chip">活跃项目 ${escapeHtml(summary.active_projects ?? metrics.total_projects ?? 0)}</div>
+                        <div class="summary-chip">活跃项目 ${escapeHtml(visibleSummary.active_projects ?? visibleMetrics.total_projects ?? 0)}</div>
                         <div class="summary-chip">优先事项 ${escapeHtml(prioritySummary.priority_items ?? 0)}</div>
-                        <div class="summary-chip">临近交付 ${escapeHtml(summary.due_soon_projects ?? metrics.upcoming_delivery_count ?? 0)}</div>
+                        <div class="summary-chip">临近交付 ${escapeHtml(visibleSummary.due_soon_projects ?? visibleMetrics.upcoming_delivery_count ?? 0)}</div>
                     </div>
                 </div>
             </article>
 
-            ${renderHomeMetricGrid(metrics, reporting)}
+            ${renderSearchSummary(allProjects, projects)}
+            ${searchActive ? `
+                <article class="hero-card">
+                    <p class="eyebrow">搜索结果</p>
+                    <h2>匹配项目</h2>
+                    <div class="project-list">
+                        ${projects.length
+                            ? projects.map(createProjectCard).join('')
+                            : '<div class="empty-state">没有匹配当前搜索的项目。</div>'}
+                    </div>
+                </article>
+            ` : ''}
+
+            ${renderHomeMetricGrid(visibleMetrics, visibleReporting)}
 
             <section class="report-grid">
                 <article class="hero-card">
                     <p class="eyebrow">今日优先</p>
                     <h2>今天先处理</h2>
-                    ${renderPriorityQueue(reporting.prioritize_pending)}
+                    ${renderPriorityQueue(visibleReporting.prioritize_pending)}
                 </article>
-                ${renderExternalPulse(reporting.delivery_schedule)}
+                ${renderExternalPulse(visibleReporting.delivery_schedule)}
             </section>
 
             <section class="report-grid">
-                ${renderDataQualityGuardrail(data, weeklyDigest)}
-                ${renderShadowHygienePanel(reporting.shadow_hygiene)}
+                ${renderDataQualityGuardrail(visibleDashboardData, visibleWeeklyDigest)}
+                ${renderShadowHygienePanel(visibleReporting.shadow_hygiene)}
                 <article class="hero-card">
                     <p class="eyebrow">状态分布</p>
                     <h2>项目状态分布</h2>
-                    ${renderStatusMix(weeklyDigest.status_counts)}
+                    ${renderStatusMix(visibleWeeklyDigest.status_counts)}
                 </article>
             </section>
 
@@ -2404,13 +2863,13 @@ function renderDashboard(result) {
                 <article class="hero-card">
                     <p class="eyebrow">即将交付</p>
                     <h2>即将交付</h2>
-                    ${renderUpcomingList(data.upcoming_delivery || [])}
+                    ${renderUpcomingList(visibleUpcomingDelivery)}
                 </article>
 
                 <article class="hero-card">
                     <p class="eyebrow">最近流转</p>
                     <h2>最近状态流转</h2>
-                    ${renderTransitionsList(recentTransitions)}
+                    ${renderTransitionsList(visibleRecentTransitions)}
                 </article>
             </section>
 
@@ -2418,8 +2877,8 @@ function renderDashboard(result) {
                 <p class="eyebrow">风险项目</p>
                 <h2>优先关注项目</h2>
                 <div class="project-list">
-                    ${(data.risk_projects || []).length
-                        ? data.risk_projects.map(createProjectCard).join('')
+                    ${visibleRiskProjects.length
+                        ? visibleRiskProjects.map(createProjectCard).join('')
                         : '<div class="empty-state">当前没有高风险项目。</div>'}
                 </div>
             </article>
@@ -2432,16 +2891,17 @@ function renderDashboard(result) {
 }
 
 function renderProjects(result) {
-    const projects = result?.data || [];
+    const allProjects = result?.data || [];
+    const projects = filterProjectsBySearch(allProjects);
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
             <article class="hero-card">
                 <p class="eyebrow">项目指挥台</p>
-                <h2>项目推进主战场</h2>
-                <p>这里保留“快速建项目 + 项目卡片 + 右抽屉”的主链，适合处理创建、推进状态和补齐信息这三类工作。</p>
+                <h2>项目管理中心</h2>
+                <p>这里保留快速建项目、项目卡片和右侧详情抽屉，适合处理创建、推进状态和补齐信息这三类工作。</p>
             </article>
             <article class="hero-card">
-                <p class="eyebrow">快速创建项目</p>
+                <p class="eyebrow">创建项目</p>
                 <form class="form-grid" id="project-create-form">
                     <label class="form-field">
                         <span>客户名</span>
@@ -2461,6 +2921,10 @@ function renderProjects(result) {
                         </select>
                     </label>
                     <label class="form-field">
+                        <span>拍摄日期</span>
+                        <input name="shoot_date" type="date">
+                    </label>
+                    <label class="form-field">
                         <span>交付日期</span>
                         <input name="delivery_deadline" type="date">
                     </label>
@@ -2477,6 +2941,7 @@ function renderProjects(result) {
                     </div>
                 </form>
             </article>
+            ${renderSearchSummary(allProjects, projects)}
             ${renderProjectBoard(projects)}
             ${renderLastActionResult()}
         </section>
@@ -2487,7 +2952,8 @@ function renderProjects(result) {
 
 function renderInquiry(reports = {}) {
     const selectedProjectId = getSelectedProjectId();
-    const projects = getProjectCollection();
+    const allProjects = getProjectCollection();
+    const projects = filterProjectsBySearch(allProjects);
     const metrics = getClientLeadMetrics(projects);
 
     document.getElementById('scene-root').innerHTML = `
@@ -2496,16 +2962,17 @@ function renderInquiry(reports = {}) {
                 <div class="hero-grid">
                     <div>
                         <p class="eyebrow">跟进与报价</p>
-                        <h2>成交推进器</h2>
-                        <p>这里承接客户、线索、报价、跟进提醒和沟通草稿，所有新增线索与报价先落本地影子记录。</p>
+                        <h2>跟进与报价中心</h2>
+            <p>这里承接客户、线索、报价、跟进提醒和沟通草稿，所有新增线索与报价先落本地记录。</p>
                     </div>
                     <div class="hero-summary">
                         <div class="summary-chip">客户 ${escapeHtml(metrics.customers)}</div>
-                        <div class="summary-chip">新线索 ${escapeHtml(metrics.leads)}</div>
+                        <div class="summary-chip">待转线索 ${escapeHtml(metrics.leads)}</div>
                         <div class="summary-chip">待跟进 ${escapeHtml(metrics.followups)}</div>
                     </div>
                 </div>
             </article>
+            ${renderSearchSummary(allProjects, projects)}
             ${renderClientLeadMetricGrid(metrics)}
             <section class="report-grid">
                 ${renderLeadPipeline(metrics)}
@@ -2559,10 +3026,10 @@ function renderInquiry(reports = {}) {
                     </form>
                 </article>
                 <article class="hero-card">
-                    <p class="eyebrow">生成回复草稿</p>
+                    <p class="eyebrow">生成沟通草稿</p>
                     <form class="form-grid" id="inquiry-draft-form">
                         <label class="form-field">
-                            <span>项目 ID</span>
+                            <span>项目编号</span>
                             <input name="project_id" type="text" value="${escapeHtml(selectedProjectId)}" placeholder="为空则使用当前抽屉项目">
                         </label>
                         <label class="form-field">
@@ -2601,7 +3068,8 @@ function renderInquiry(reports = {}) {
 }
 
 function renderScheduleBoard(bookingsResult = null) {
-    const projects = getProjectCollection();
+    const allProjects = getProjectCollection();
+    const projects = filterProjectsBySearch(allProjects);
     const entries = getScheduleEntries(projects);
     const metrics = getScheduleMetrics(projects, entries);
     const bookings = bookingsResult?.data?.bookings || [];
@@ -2623,6 +3091,7 @@ function renderScheduleBoard(bookingsResult = null) {
                     </div>
                 </div>
             </article>
+            ${renderSearchSummary(allProjects, projects)}
             ${renderScheduleMetricGrid(metrics)}
 
             <section class="report-grid">
@@ -2649,10 +3118,10 @@ function renderScheduleBoard(bookingsResult = null) {
                         <p class="eyebrow">后续接线</p>
                         <h2>后续接线动作</h2>
                         <div class="inline-tags">
-                            ${createTag('list_bookings')}
-                            ${createTag('create_booking')}
-                            ${createTag('update_booking_time')}
-                            ${createTag('start_booking')}
+                            ${createTag(getActionLabel('list_bookings'))}
+                            ${createTag(getActionLabel('create_booking'))}
+                            ${createTag(getActionLabel('update_booking_time'))}
+                            ${createTag(getActionLabel('start_booking'))}
                         </div>
                         <div class="card-actions">
                             <button class="ghost-btn" type="button" data-schedule-action="list_bookings">读取预约</button>
@@ -2668,7 +3137,8 @@ function renderScheduleBoard(bookingsResult = null) {
 }
 
 function renderDelivery(result, reports = {}) {
-    const projects = result?.data || getProjectCollection();
+    const allProjects = result?.data || getProjectCollection();
+    const projects = filterProjectsBySearch(allProjects);
     const grouped = groupDeliveryProjects(projects);
     const metrics = getDeliveryMetrics(projects, grouped);
 
@@ -2688,6 +3158,7 @@ function renderDelivery(result, reports = {}) {
                     </div>
                 </div>
             </article>
+            ${renderSearchSummary(allProjects, projects)}
             ${renderDeliveryMetricGrid(metrics)}
             ${renderDeliveryOpsPanel(metrics)}
             ${renderDeliveryReportDashboard(reports)}
@@ -2747,10 +3218,12 @@ async function loadClientLeadReports() {
 async function loadProjectIntoDrawer(projectId) {
     try {
         getState().selectedProjectId = projectId;
+        renderDrawerLoading();
         const result = await window.PhotoStudioApi.getProject(projectId);
         getState().setProjectDetail(result);
         renderDrawer(result);
         bindDrawerActions();
+        bindDrawerEditForm();
         setStatusChip(`项目抽屉：${projectId}`);
     } catch (error) {
         showToast(`项目详情加载失败：${getErrorMessage(error)}`);
@@ -2761,6 +3234,7 @@ async function loadProjectIntoDrawer(projectId) {
 async function renderSceneByName(scene) {
     const normalizedScene = normalizeScene(scene);
     try {
+        renderSceneLoading(normalizedScene);
         setStatusChip(`正在加载：${getSceneLabel(normalizedScene)}`);
 
         if (normalizedScene === 'home') {
@@ -2872,8 +3346,14 @@ async function runActionAndSync(scene, action, payload) {
         getState().setLastActionResult(actionResult);
 
         if (!result.success && result.error?.message) {
-            showToast(result.error.message);
-            setStatusChip(`${getActionLabel(action)}失败`);
+            if (result.error.code === 'INVALID_ACTION'
+                && (result.error.message === 'unsupported action' || result.error.message === '当前动作暂不支持')) {
+                showToast('当前窗口还没加载到最新代码，请完全关闭后重新打开影像工作台再试。');
+                setStatusChip('需要重启工作台');
+            } else {
+                showToast(result.error.message);
+                setStatusChip(`${getActionLabel(action)}失败`);
+            }
         } else {
             setStatusChip(`${getActionLabel(action)}完成`);
         }
@@ -2919,6 +3399,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('btn-refresh')?.addEventListener('click', () => {
+        void refreshScene(getState().currentScene);
+    });
+
+    const searchInput = document.getElementById('global-search-input');
+    const clearSearchButton = document.getElementById('btn-clear-search');
+    let searchTimer = null;
+    const refreshSearchView = () => {
+        window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(() => {
+            void refreshScene(getState().currentScene);
+        }, 140);
+    };
+
+    if (searchInput) {
+        searchInput.value = getSearchQuery();
+        searchInput.addEventListener('input', () => {
+            getState().setSearchQuery(searchInput.value);
+            refreshSearchView();
+        });
+    }
+
+    clearSearchButton?.addEventListener('click', () => {
+        getState().setSearchQuery('');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
         void refreshScene(getState().currentScene);
     });
 

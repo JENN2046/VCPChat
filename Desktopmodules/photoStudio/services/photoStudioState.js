@@ -7,6 +7,7 @@
         projects: null,
         projectDetail: null,
         lastActionResult: null,
+        searchQuery: '',
         markRefreshing(scene) {
             this.refreshing.add(scene);
         },
@@ -27,6 +28,9 @@
         },
         setLastActionResult(result) {
             this.lastActionResult = result;
+        },
+        setSearchQuery(query) {
+            this.searchQuery = String(query || '');
         },
     };
 

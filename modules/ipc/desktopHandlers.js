@@ -328,7 +328,7 @@ function createOrFocusChildWindow(existingWindow, options) {
             devTools: true,
         },
         icon: path.join(app.getAppPath(), 'assets', 'icon.png'),
-        show: false,
+        show: options.showImmediately === true,
     });
 
     // 鏋勫缓 URL
@@ -344,9 +344,11 @@ function createOrFocusChildWindow(existingWindow, options) {
         openChildWindows.push(win);
     }
 
-    win.once('ready-to-show', () => {
-        win.show();
-    });
+    if (options.showImmediately !== true) {
+        win.once('ready-to-show', () => {
+            win.show();
+        });
+    }
 
     win.on('close', (evt) => {
         if (process.platform === 'darwin' && !app.isQuitting) {
@@ -413,7 +415,8 @@ function registerManagedWindows() {
             vchatPhotoStudioWindow = createOrFocusChildWindow(vchatPhotoStudioWindow, {
                 width: 1380, height: 860, minWidth: 1100, minHeight: 720,
                 launchLayout: 'near-fullscreen',
-                title: 'Photo Studio',
+                showImmediately: true,
+                title: '影像工作台',
                 htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'photoStudio', 'photoStudio.html'),
                 preloadPath: resolveAppPreload(app.getAppPath(), PRELOAD_ROLES.DESKTOP),
             });

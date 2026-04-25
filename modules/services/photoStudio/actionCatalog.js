@@ -35,6 +35,7 @@ const ACTIONS = {
     project_command: {
         list_projects: selector('listProjects'),
         get_project: selector('getProject'),
+        update_project: selector('updateProject'),
         create_project: composite('createProjectWithTasks'),
         create_project_with_tasks: composite('createProjectWithTasks'),
         create_project_draft: composite('createProjectWithTasks'),
@@ -49,6 +50,7 @@ const ACTIONS = {
     project_board: {
         list_projects: selector('listProjects'),
         get_project: selector('getProject'),
+        update_project: selector('updateProject'),
         create_project: composite('createProjectWithTasks'),
         create_project_with_tasks: composite('createProjectWithTasks'),
         create_project_draft: composite('createProjectWithTasks'),
@@ -68,6 +70,7 @@ const ACTIONS = {
     project_drawer: {
         get_project: selector('getProject'),
         analyze_project_risk: selector('getProject'),
+        update_project: selector('updateProject'),
         check_missing_project_fields: plugin(plugins.check_missing_project_fields),
         generate_client_reply_draft: plugin(plugins.generate_client_reply_draft),
         generate_draft: plugin(plugins.generate_client_reply_draft),

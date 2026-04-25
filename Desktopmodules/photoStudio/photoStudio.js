@@ -25,7 +25,7 @@ const HIGH_RISK_ACTION_CONFIRMATIONS = Object.freeze({
 const PROJECT_LANES = Object.freeze([
     {
         key: 'lead_quote',
-        title: '意向 / 报价',
+        title: '项目类型 / 报价',
         hint: '客户进入、需求确认、报价推进',
         statuses: ['lead', 'quoted'],
     },
@@ -424,7 +424,7 @@ function pickActionSummary(result) {
             rows: [
                 ['客户', data.customer_name || '-'],
                 ['来源', getPhotoStudioLabel(data.source_channel || '-')],
-                ['意向', getPhotoStudioLabel(data.intent_type || '-')],
+                ['项目类型 / 意向分类', getPhotoStudioLabel(data.intent_type || '-')],
                 ['状态', getPhotoStudioLabel(data.status || '-')],
             ],
             tone: 'success',
@@ -1462,7 +1462,7 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
                         </select>
                     </label>
                     <label class="form-field">
-                        <span>意向类型</span>
+                        <span>项目类型 / 意向分类</span>
                         <select name="intent_type">
                             <option value="portrait">人像</option>
                             <option value="wedding">婚礼</option>

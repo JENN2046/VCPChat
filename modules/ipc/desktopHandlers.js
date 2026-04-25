@@ -279,8 +279,8 @@ function getNearFullscreenBounds(options = {}) {
     const workArea = display?.workArea || screen.getPrimaryDisplay().workArea;
     const minWidth = options.minWidth || 600;
     const minHeight = options.minHeight || 400;
-    const horizontalInset = Math.max(32, Math.round(workArea.width * 0.035));
-    const verticalInset = Math.max(32, Math.round(workArea.height * 0.05));
+    const horizontalInset = Math.max(20, Math.round(workArea.width * 0.02));
+    const verticalInset = Math.max(24, Math.round(workArea.height * 0.035));
     const width = Math.max(minWidth, workArea.width - (horizontalInset * 2));
     const height = Math.max(minHeight, workArea.height - (verticalInset * 2));
 

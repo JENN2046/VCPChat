@@ -4,6 +4,7 @@ const actionCatalog = require('./actionCatalog');
 const { getAllowedTransitions } = require('./projectStateMachine');
 const { analyzeProjectRisk } = require('./riskAnalyzer');
 const { createUiHints, hintsForProject } = require('./uiHints');
+const { analyzeShadowData } = require('./shadowDataHygiene');
 
 const DEFAULT_TOOLBOX_ROOT = 'A:\\VCP\\VCPToolBox-photo-studio-next';
 const DEFAULT_VCPCHAT_ROOT = 'A:\\VCP\\VCPChat';
@@ -66,6 +67,7 @@ class PhotoStudioOrchestrator {
                 weekly_digest: await this.#pluginData('generate_weekly_project_digest', {}),
                 prioritize_pending: await this.#pluginData('prioritize_pending_delivery_actions', {}),
                 delivery_schedule: await this.#pluginData('generate_delivery_queue_schedule', {}),
+                shadow_hygiene: this.#buildShadowDataHygieneReport(),
             },
         }, createUiHints({ refresh: ['dashboard'] }));
     }
@@ -200,6 +202,9 @@ class PhotoStudioOrchestrator {
         }
         if (method === 'createQuote') {
             return this.#createQuote(payload);
+        }
+        if (method === 'inspectShadowDataHygiene') {
+            return this.inspectShadowDataHygiene(payload);
         }
         if (method === 'listDeliveryPackages') {
             return this.#listDeliveryPackages(payload);
@@ -350,6 +355,10 @@ class PhotoStudioOrchestrator {
             open_drawer_id: projectId,
             toast: existing ? '本地报价已更新' : '本地报价已创建',
         }));
+    }
+
+    async inspectShadowDataHygiene(_payload = {}) {
+        return this.#success(this.#buildShadowDataHygieneReport(), createUiHints({ refresh: ['home'] }));
     }
 
     async #listDeliveryPackages(payload = {}) {
@@ -1027,6 +1036,10 @@ class PhotoStudioOrchestrator {
 
     #writeDeliveryPackages(deliveryPackages) {
         this.#writeShadowObjectFile(DELIVERY_PACKAGES_FILENAME, deliveryPackages);
+    }
+
+    #buildShadowDataHygieneReport() {
+        return analyzeShadowData(this.dataRoot);
     }
 
     #toLeadCard(lead) {

@@ -24,10 +24,12 @@ const todo = (reason) => ({ type: 'todo', reason });
 const ACTIONS = {
     home: {
         get_home_dashboard: selector('getDashboard'),
+        inspect_shadow_data_hygiene: selector('inspectShadowDataHygiene'),
         create_followup_reminder: plugin(plugins.create_followup_reminder),
     },
     dashboard: {
         get_home_dashboard: selector('getDashboard'),
+        inspect_shadow_data_hygiene: selector('inspectShadowDataHygiene'),
     },
 
     project_command: {

@@ -2228,6 +2228,50 @@ function renderDataQualityGuardrail(data, weeklyDigest) {
     `;
 }
 
+function renderShadowHygienePanel(shadowHygiene) {
+    const closeout = shadowHygiene?.closeout || {};
+    const legacy = shadowHygiene?.legacy || {};
+    const closeoutSummary = closeout.summary || {};
+    const legacySummary = legacy.summary || {};
+    const sampleProjectIds = [
+        ...(closeout.samples?.projects || []),
+        ...(legacy.samples?.projects || []),
+    ]
+        .filter(Boolean)
+        .slice(0, 6);
+
+    return `
+        <article class="hero-card">
+            <p class="eyebrow">褰卞瓙鍗敓</p>
+            <h2>褰卞瓙鏁版嵁鍗敓</h2>
+            <p>鍙浣撴锛岀敤鏉ョ湅鍐掔儫娴嬭瘯鎴栨棫婕旂ず褰卞瓙璁板綍鏄惁杩樼暀鍦ㄥ綋鍓嶅伐浣滃彴閲屻€傝繖閲屼笉浼氳嚜鍔ㄦ竻鐞嗘暟鎹€?/p>
+            <div class="mini-metrics">
+                <div><strong>${escapeHtml(closeoutSummary.projects ?? 0)}</strong><span>鍐掔儫椤圭洰</span></div>
+                <div><strong>${escapeHtml(closeoutSummary.customers ?? 0)}</strong><span>鍐掔儫瀹㈡埛</span></div>
+                <div><strong>${escapeHtml(closeoutSummary.leads ?? 0)}</strong><span>鍐掔儫绾跨储</span></div>
+                <div><strong>${escapeHtml(legacySummary.projects ?? 0)}</strong><span>鏃ф紨绀洪」鐩?/span></div>
+            </div>
+            <div class="inline-tags">
+                ${createTag(`${closeoutSummary.total ?? 0} 鏉″€欓€夋竻鐞嗚褰?`)}
+                ${createTag(`${legacySummary.total ?? 0} 鏉℃棫婕旂ず璁板綍`, legacySummary.total ? 'risk-medium' : '')}
+                ${renderStatusTag('local_shadow')}
+            </div>
+            ${sampleProjectIds.length ? `
+                <div class="compact-list">
+                    ${sampleProjectIds.map((projectId) => `
+                        <article class="compact-row">
+                            <div>
+                                <strong>${escapeHtml(projectId)}</strong>
+                                <p class="muted">褰卞瓙鍗敓鏍锋湰</p>
+                            </div>
+                        </article>
+                    `).join('')}
+                </div>
+            ` : '<div class="empty-state">褰撳墠娌℃湁璇嗗埆鍒板啋鐑熸祴璇曟垨鏃ф紨绀哄奖瀛愯褰曘€?/div>'}
+        </article>
+    `;
+}
+
 function renderDashboard(result) {
     const data = result?.data || {};
     const metrics = data.metrics || {};
@@ -2267,6 +2311,7 @@ function renderDashboard(result) {
 
             <section class="report-grid">
                 ${renderDataQualityGuardrail(data, weeklyDigest)}
+                ${renderShadowHygienePanel(reporting.shadow_hygiene)}
                 <article class="hero-card">
                     <p class="eyebrow">状态分布</p>
                     <h2>项目状态分布</h2>

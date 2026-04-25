@@ -284,8 +284,8 @@ function getSceneLabel(scene) {
         project_command: '项目指挥台',
         project_board: '项目指挥台',
         projects: '项目指挥台',
-        client_leads: '客户与线索',
-        inquiry: '客户与线索',
+        client_leads: '跟进与报价',
+        inquiry: '跟进与报价',
         schedule_board: '日程排期',
         delivery_assets: '交付与素材',
         delivery: '交付与素材',
@@ -309,10 +309,10 @@ function getActionLabel(action) {
         generate_client_reply_draft: '生成回复草稿',
         create_customer: '创建客户',
         create_customer_record: '创建客户',
-        create_lead: '创建线索',
+        create_lead: '创建跟进线索',
         convert_lead_to_project: '线索转项目',
         list_leads: '读取线索',
-        create_quote: '创建报价',
+        create_quote: '创建报价单',
         list_quotes: '读取报价',
         create_followup_reminder: '创建跟进提醒',
         list_bookings: '读取预约',
@@ -419,7 +419,7 @@ function pickActionSummary(result) {
 
     if (action === 'create_lead') {
         return {
-            title: data.is_new === false ? '本地线索已更新' : '本地线索已创建',
+            title: data.is_new === false ? '跟进线索已更新' : '跟进线索已创建',
             description: '线索已经写入本地影子记录，没有同步外部 CRM 或表格。',
             rows: [
                 ['客户', data.customer_name || '-'],
@@ -433,7 +433,7 @@ function pickActionSummary(result) {
 
     if (action === 'create_quote') {
         return {
-            title: data.is_new === false ? '本地报价已更新' : '本地报价已创建',
+            title: data.is_new === false ? '报价单已更新' : '报价单已创建',
             description: '报价已经写入本地影子记录，没有发送给客户或写入外部系统。',
             rows: [
                 ['项目', data.project_name || data.project_id || '-'],
@@ -1409,26 +1409,26 @@ function renderClientLeadShadowPanel(reports = {}) {
     return `
         <section class="report-grid">
             <article class="hero-card">
-                <p class="eyebrow">本地线索</p>
-                <h2>本地线索</h2>
+                <p class="eyebrow">跟进线索</p>
+                <h2>跟进线索</h2>
                 <div class="inline-tags">
                     ${createTag(`${leadSummary.total_leads || 0} 条线索`)}
                     ${createTag(`${leadSummary.new_count || 0} 条新线索`)}
                     ${renderStatusTag('local_shadow')}
                 </div>
                 ${renderDeliveryReportFailure(reports, 'list_leads')}
-                ${renderClientLeadShadowList(leadData.leads || [], '当前没有本地线索影子记录。', { enableLeadConversion: true })}
+                ${renderClientLeadShadowList(leadData.leads || [], '当前没有跟进线索影子记录。', { enableLeadConversion: true })}
             </article>
             <article class="hero-card">
-                <p class="eyebrow">本地报价</p>
-                <h2>本地报价</h2>
+                <p class="eyebrow">报价单</p>
+                <h2>报价单</h2>
                 <div class="inline-tags">
                     ${createTag(`${quoteSummary.total_quotes || 0} 条报价`)}
                     ${createTag(`${quoteSummary.draft_count || 0} 条草稿`)}
                     ${createTag(`${quoteSummary.accepted_count || 0} 条接受`)}
                 </div>
                 ${renderDeliveryReportFailure(reports, 'list_quotes')}
-                ${renderClientLeadShadowList(quoteData.quotes || [], '当前没有本地报价影子记录。')}
+                ${renderClientLeadShadowList(quoteData.quotes || [], '当前没有报价单影子记录。')}
             </article>
         </section>
     `;
@@ -1439,7 +1439,7 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
     return `
         <section class="split-grid">
             <article class="hero-card">
-                <p class="eyebrow">创建线索</p>
+                <p class="eyebrow">创建跟进线索</p>
                 <form class="form-grid" id="lead-create-form">
                     <label class="form-field">
                         <span>关联项目</span>
@@ -1480,12 +1480,12 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
                         <textarea name="note" rows="3" placeholder="记录来源、需求、偏好、下一步"></textarea>
                     </label>
                     <div class="form-actions form-field-wide">
-                        <button class="primary-btn" type="submit">创建线索</button>
+                        <button class="primary-btn" type="submit">创建跟进线索</button>
                     </div>
                 </form>
             </article>
             <article class="hero-card">
-                <p class="eyebrow">创建报价</p>
+                <p class="eyebrow">创建报价单</p>
                 <form class="form-grid" id="quote-create-form">
                     <label class="form-field">
                         <span>项目</span>
@@ -1514,7 +1514,7 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
                         <textarea name="note" rows="3" placeholder="记录报价包含项、优惠、限制"></textarea>
                     </label>
                     <div class="form-actions form-field-wide">
-                        <button class="primary-btn" type="submit" ${hasProjects ? '' : 'disabled'}>创建报价</button>
+                        <button class="primary-btn" type="submit" ${hasProjects ? '' : 'disabled'}>创建报价单</button>
                     </div>
                 </form>
             </article>
@@ -2495,7 +2495,7 @@ function renderInquiry(reports = {}) {
             <article class="hero-card hero-card-wide">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">客户与线索</p>
+                        <p class="eyebrow">跟进与报价</p>
                         <h2>成交推进器</h2>
                         <p>这里承接客户、线索、报价、跟进提醒和沟通草稿，所有新增线索与报价先落本地影子记录。</p>
                     </div>
@@ -2795,7 +2795,7 @@ async function renderSceneByName(scene) {
             }
             const clientLeadReports = await loadClientLeadReports();
             renderInquiry(clientLeadReports);
-            setStatusChip('客户与线索已就绪');
+            setStatusChip('跟进与报价已就绪');
             return;
         }
 

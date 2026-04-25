@@ -25,6 +25,8 @@
   - `node --check Desktopmodules/photoStudio/services/photoStudioEvents.js`
 - 动作冒烟：
   - `npm run test:photo-studio` 已通过，当前结果为 25/25 passed。
+  - 默认使用系统临时目录中的隔离 shadow 数据根，跑完自动清理，不再向真实 `AppData/PhotoStudioShadowData` 追加冒烟记录。
+  - 如需在真实本地数据上复现，可显式运行 `node scripts/photo-studio-closeout-smoke.js --live-data`。
   - dashboard 读取成功。
   - 项目创建、合法推进、抽屉读取成功。
   - 非法状态推进返回 `INVALID_TRANSITION`，没有静默失败。
@@ -48,6 +50,6 @@
 
 ## 剩余风险
 
-- 当前本地 shadow 数据已有冒烟记录，适合验证链路，但不代表真实业务数据。
+- 历史本地 shadow 数据里仍保留早期冒烟记录，适合验证链路，但不代表真实业务数据；新的默认冒烟不会继续追加这些记录。
 - 视觉只是结构可用状态，后续会按新视觉方向重做。
 - 线索、报价、交付包都是本地影子实体，还没有对接外部 CRM、表格、网盘或客户交付系统。

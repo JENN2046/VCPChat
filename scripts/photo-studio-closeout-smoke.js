@@ -1,11 +1,33 @@
 #!/usr/bin/env node
 'use strict';
 
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const PhotoStudioOrchestrator = require('../modules/services/photoStudio/PhotoStudioOrchestrator');
 
-const orchestrator = new PhotoStudioOrchestrator();
+const useLiveData = process.argv.includes('--live-data');
+const keepData = process.argv.includes('--keep-data');
+const tempRoot = useLiveData ? '' : fs.mkdtempSync(path.join(os.tmpdir(), 'photo-studio-smoke-'));
+const orchestrator = new PhotoStudioOrchestrator(useLiveData ? {} : { vcpChatRoot: tempRoot });
 const stamp = Date.now().toString(36);
 const results = [];
+
+function cleanupTempRoot() {
+    if (useLiveData || keepData || !tempRoot) {
+        return;
+    }
+
+    const resolvedTempRoot = path.resolve(tempRoot);
+    const resolvedOsTemp = path.resolve(os.tmpdir());
+    const safePrefix = path.join(resolvedOsTemp, 'photo-studio-smoke-');
+    if (!resolvedTempRoot.startsWith(safePrefix)) {
+        console.warn(`skip cleanup for unexpected temp root: ${resolvedTempRoot}`);
+        return;
+    }
+
+    fs.rmSync(resolvedTempRoot, { recursive: true, force: true });
+}
 
 function record(name, result, detail = '') {
     const success = Boolean(result?.success);
@@ -46,13 +68,19 @@ async function ensureDeliveryCandidate(fallbackProjectId) {
             new_status: nextStatus,
             reason: 'photo studio closeout smoke delivery candidate',
         });
-        record(`delivery_candidate_${nextStatus}`, result, result.data?.new_status || result.data?.status || '');
-        if (!result.success) break;
+        if (!result.success) {
+            record(`delivery_candidate_${nextStatus}`, result, result.data?.new_status || result.data?.status || '');
+            break;
+        }
     }
     return currentProjectId;
 }
 
 async function main() {
+    console.log(useLiveData
+        ? 'Photo Studio closeout smoke data root: live AppData/PhotoStudioShadowData'
+        : `Photo Studio closeout smoke data root: temp ${tempRoot}`);
+
     const dashboard = await orchestrator.getDashboard();
     record('dashboard', dashboard, `projects=${dashboard.data?.metrics?.total_projects ?? 0}`);
 
@@ -214,4 +242,6 @@ async function main() {
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
+}).finally(() => {
+    cleanupTempRoot();
 });

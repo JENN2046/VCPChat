@@ -1275,10 +1275,10 @@ function renderClientLeadMetricGrid(metrics) {
     return `
         <section class="card-grid">
             ${renderMetricCard('客户数', metrics.customers, '来自当前项目关联客户')}
-            ${renderMetricCard('新咨询', metrics.leads, '项目状态为意向')}
+            ${renderMetricCard('新线索', metrics.leads, '项目处于意向阶段')}
             ${renderMetricCard('已报价', metrics.quoted, '需要继续跟进')}
             ${renderMetricCard('已预约', metrics.booked, '已确认或进入筹备拍摄')}
-            ${renderMetricCard('高意向', metrics.highIntent, '报价或已确认客户')}
+            ${renderMetricCard('高优先线索', metrics.highIntent, '报价或已确认项目')}
             ${renderMetricCard('待跟进', metrics.followups, '存在缺字段或信息不完整')}
         </section>
     `;
@@ -1286,11 +1286,11 @@ function renderClientLeadMetricGrid(metrics) {
 
 function renderLeadPipeline(metrics) {
     const stages = [
-        ['新咨询', metrics.leads, '接住来源、补全需求'],
+        ['新线索', metrics.leads, '接住来源、补全需求'],
         ['沟通中', metrics.followups, '需要跟进或补字段'],
         ['已报价', metrics.quoted, '等待客户确认'],
         ['已预约', metrics.booked, '进入项目执行'],
-        ['高意向', metrics.highIntent, '优先推进成交'],
+        ['高优先线索', metrics.highIntent, '优先推进成交'],
     ];
 
     return `
@@ -2501,7 +2501,7 @@ function renderInquiry(reports = {}) {
                     </div>
                     <div class="hero-summary">
                         <div class="summary-chip">客户 ${escapeHtml(metrics.customers)}</div>
-                        <div class="summary-chip">新咨询 ${escapeHtml(metrics.leads)}</div>
+                        <div class="summary-chip">新线索 ${escapeHtml(metrics.leads)}</div>
                         <div class="summary-chip">待跟进 ${escapeHtml(metrics.followups)}</div>
                     </div>
                 </div>

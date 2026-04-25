@@ -27,6 +27,7 @@
   - `npm run test:photo-studio` 已通过，当前结果为 25/25 passed。
   - 默认使用系统临时目录中的隔离 shadow 数据根，跑完自动清理，不再向真实 `AppData/PhotoStudioShadowData` 追加冒烟记录。
   - 如需在真实本地数据上复现，可显式运行 `node scripts/photo-studio-closeout-smoke.js --live-data`。
+  - 如需清点历史 smoke/demo 影子记录，可运行 `npm run photo-studio:prune-smoke` 做 dry-run；显式加 `-- --apply` 才会落盘，`-- --include-legacy-demo` 会把早期 `PR4/PR5` 演示记录也纳入候选。
   - dashboard 读取成功。
   - 项目创建、合法推进、抽屉读取成功。
   - 非法状态推进返回 `INVALID_TRANSITION`，没有静默失败。

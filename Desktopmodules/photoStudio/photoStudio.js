@@ -216,7 +216,11 @@ function getPhotoStudioLabel(value) {
         no_live_write: '无外部写入',
         sync_external: '外部同步',
         pending: '待处理',
+        new: '新建',
+        contacted: '已联系',
         draft: '草稿',
+        sent: '已发送',
+        accepted: '已接受',
         lead: '新线索',
         quoted: '已报价',
         confirmed: '已确认',
@@ -232,8 +236,28 @@ function getPhotoStudioLabel(value) {
         in_progress: '进行中',
         quotation: '报价',
         delivery: '交付',
+        selection: '选片',
         general: '通用',
         booking: '预约',
+        consultation: '咨询',
+        social_media: '社媒来源',
+        referral: '转介绍',
+        walk_in: '到店咨询',
+        manual: '手动录入',
+        returning: '复购客户',
+        other: '其他',
+        individual: '个人客户',
+        company: '企业客户',
+        brand: '品牌客户',
+        agency: '代理机构',
+        organization: '组织客户',
+        portrait: '人像',
+        wedding: '婚礼',
+        commercial: '商业',
+        family: '家庭',
+        standard: '标准报价',
+        premium: '高级报价',
+        custom: '定制报价',
         unknown: '未知',
     };
     return labelMap[normalized] || normalized || '-';
@@ -1270,10 +1294,10 @@ function renderClientLeadShadowList(items, emptyText) {
                 <article class="compact-row">
                     <div>
                         <strong>${escapeHtml(item.customer_name || item.project_name || item.lead_id || item.quote_id)}</strong>
-                        <p class="muted">${escapeHtml(item.project_name || item.source_channel || item.quote_type || '-')}</p>
+                        <p class="muted">${escapeHtml(item.project_name || getPhotoStudioLabel(item.source_channel || item.quote_type || '-'))}</p>
                     </div>
                     <div class="compact-side">
-                        <span>${escapeHtml(item.status || '-')}</span>
+                        <span>${escapeHtml(getPhotoStudioLabel(item.status || '-'))}</span>
                         ${item.project_id ? `<button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">打开</button>` : ''}
                     </div>
                 </article>
@@ -1296,7 +1320,7 @@ function renderClientLeadShadowPanel(reports = {}) {
                 <div class="inline-tags">
                     ${createTag(`${leadSummary.total_leads || 0} 条线索`)}
                     ${createTag(`${leadSummary.new_count || 0} 条新线索`)}
-                    ${createTag('local_shadow')}
+                    ${renderStatusTag('local_shadow')}
                 </div>
                 ${renderDeliveryReportFailure(reports, 'list_leads')}
                 ${renderClientLeadShadowList(leadData.leads || [], '当前没有本地线索影子记录。')}
@@ -1337,20 +1361,20 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
                     <label class="form-field">
                         <span>来源</span>
                         <select name="source_channel">
-                            <option value="social_media">social_media</option>
-                            <option value="referral">referral</option>
-                            <option value="walk_in">walk_in</option>
-                            <option value="manual">manual</option>
+                            <option value="social_media">社媒来源</option>
+                            <option value="referral">转介绍</option>
+                            <option value="walk_in">到店咨询</option>
+                            <option value="manual">手动录入</option>
                         </select>
                     </label>
                     <label class="form-field">
                         <span>意向类型</span>
                         <select name="intent_type">
-                            <option value="portrait">portrait</option>
-                            <option value="wedding">wedding</option>
-                            <option value="commercial">commercial</option>
-                            <option value="family">family</option>
-                            <option value="general">general</option>
+                            <option value="portrait">人像</option>
+                            <option value="wedding">婚礼</option>
+                            <option value="commercial">商业</option>
+                            <option value="family">家庭</option>
+                            <option value="general">通用</option>
                         </select>
                     </label>
                     <label class="form-field">
@@ -1378,9 +1402,9 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
                     <label class="form-field">
                         <span>报价类型</span>
                         <select name="quote_type">
-                            <option value="standard">standard</option>
-                            <option value="premium">premium</option>
-                            <option value="custom">custom</option>
+                            <option value="standard">标准报价</option>
+                            <option value="premium">高级报价</option>
+                            <option value="custom">定制报价</option>
                         </select>
                     </label>
                     <label class="form-field">
@@ -2059,7 +2083,7 @@ function renderPriorityQueue(priorityReport) {
                     </div>
                     <div class="compact-side">
                         <div class="inline-tags">
-                            ${createTag(item.delivery_state || 'pending')}
+                            ${renderStatusTag(item.delivery_state || 'pending')}
                             ${createTag(`P${item.priority_rank ?? '-'}`, item.priority_rank <= 2 ? 'risk-high' : 'risk-medium')}
                         </div>
                         ${item.project_id ? `<button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">打开</button>` : ''}
@@ -2307,21 +2331,21 @@ function renderInquiry(reports = {}) {
                         <label class="form-field">
                             <span>客户类型</span>
                             <select name="customer_type">
-                                <option value="individual">individual</option>
-                                <option value="company">company</option>
-                                <option value="brand">brand</option>
-                                <option value="agency">agency</option>
-                                <option value="organization">organization</option>
+                                <option value="individual">个人客户</option>
+                                <option value="company">企业客户</option>
+                                <option value="brand">品牌客户</option>
+                                <option value="agency">代理机构</option>
+                                <option value="organization">组织客户</option>
                             </select>
                         </label>
                         <label class="form-field">
                             <span>来源</span>
                             <select name="source">
-                                <option value="social_media">social_media</option>
-                                <option value="referral">referral</option>
-                                <option value="returning">returning</option>
-                                <option value="walk_in">walk_in</option>
-                                <option value="other">other</option>
+                                <option value="social_media">社媒来源</option>
+                                <option value="referral">转介绍</option>
+                                <option value="returning">复购客户</option>
+                                <option value="walk_in">到店咨询</option>
+                                <option value="other">其他</option>
                             </select>
                         </label>
                         <label class="form-field">
@@ -2351,9 +2375,9 @@ function renderInquiry(reports = {}) {
                         <label class="form-field">
                             <span>场景</span>
                             <select name="context_type">
-                                <option value="general">general</option>
-                                <option value="quotation">quotation</option>
-                                <option value="delivery">delivery</option>
+                                <option value="general">通用</option>
+                                <option value="quotation">报价</option>
+                                <option value="delivery">交付</option>
                             </select>
                         </label>
                         <label class="form-field">

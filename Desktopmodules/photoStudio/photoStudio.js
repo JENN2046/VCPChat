@@ -396,7 +396,7 @@ function pickActionSummary(result) {
             description: '客户信息已经写入工作台。',
             rows: [
                 ['客户', data.customer_name || data.customer_id || '-'],
-                ['来源', data.source || '-'],
+                ['来源', getPhotoStudioLabel(data.source || '-')],
             ],
             tone: 'success',
         };
@@ -408,7 +408,7 @@ function pickActionSummary(result) {
             description: data.is_new === false ? '系统已找到同项目同类型的待处理提醒。' : '跟进提醒已经写入本地影子提醒记录。',
             rows: [
                 ['项目', data.project_id || '-'],
-                ['类型', data.reminder_type || '-'],
+                ['类型', getPhotoStudioLabel(data.reminder_type || '-')],
                 ['日期', data.due_date || '-'],
             ],
             tone: 'success',
@@ -421,9 +421,9 @@ function pickActionSummary(result) {
             description: '线索已经写入本地影子记录，没有同步外部 CRM 或表格。',
             rows: [
                 ['客户', data.customer_name || '-'],
-                ['来源', data.source_channel || '-'],
-                ['意向', data.intent_type || '-'],
-                ['状态', data.status || '-'],
+                ['来源', getPhotoStudioLabel(data.source_channel || '-')],
+                ['意向', getPhotoStudioLabel(data.intent_type || '-')],
+                ['状态', getPhotoStudioLabel(data.status || '-')],
             ],
             tone: 'success',
         };
@@ -436,7 +436,7 @@ function pickActionSummary(result) {
             rows: [
                 ['项目', data.project_name || data.project_id || '-'],
                 ['金额', `${data.currency || 'CNY'} ${data.amount || 0}`],
-                ['状态', data.status || '-'],
+                ['状态', getPhotoStudioLabel(data.status || '-')],
                 ['有效期', data.valid_until || '-'],
             ],
             tone: 'success',
@@ -449,7 +449,7 @@ function pickActionSummary(result) {
             description: data.draft_text || data.reply_draft || data.message,
             rows: [
                 ['项目', data.project_id || '-'],
-                ['语气', data.tone || '-'],
+                ['语气', getPhotoStudioLabel(data.tone || '-')],
             ],
             tone: 'success',
         };
@@ -522,7 +522,7 @@ function pickActionSummary(result) {
             description: '预约已经写入本地 calendar_events 影子记录，没有同步外部日历。',
             rows: [
                 ['项目', data.project_name || data.project_id || '-'],
-                ['类型', data.event_type || '-'],
+                ['类型', getPhotoStudioLabel(data.event_type || '-')],
                 ['日期', data.event_date || '-'],
                 ['时间', data.start_time || '全天'],
             ],
@@ -537,7 +537,7 @@ function pickActionSummary(result) {
             rows: [
                 ['预约', data.calendar_event_id || '-'],
                 ['项目', data.project_id || '-'],
-                ['状态', data.status || '-'],
+                ['状态', getPhotoStudioLabel(data.status || '-')],
                 ['日期', data.event_date || '-'],
             ],
             tone: 'success',
@@ -1079,7 +1079,7 @@ function renderDeliveryReportRows(items, options = {}) {
                 <article class="compact-row">
                     <div>
                         <strong>${escapeHtml(item.display_name || item.project_name || item.project_id || '未命名项目')}</strong>
-                        <p class="muted">${escapeHtml(item.target_name || item.event_type || item.delivery_state || '-')}</p>
+                        <p class="muted">${escapeHtml(item.target_name || getPhotoStudioLabel(item.event_type || item.delivery_state || '-'))}</p>
                     </div>
                     <div class="compact-side">
                         <span>${escapeHtml(item.schedule_date || formatDate(item.timestamp) || '-')}</span>

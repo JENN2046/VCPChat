@@ -329,6 +329,7 @@ function getActionLabel(action) {
         prioritize_pending_delivery_actions: '生成优先队列',
         generate_delivery_queue_schedule: '生成同步排程',
         inspect_delivery_audit_trail: '查看审计轨迹',
+        inspect_shadow_data_hygiene: '刷新影子卫生',
     };
     return labelMap[action] || action || '-';
 }
@@ -499,6 +500,20 @@ function pickActionSummary(result) {
                 ['过期未闭环', data.summary?.overdue_count || 0],
             ],
             tone: data.summary?.same_day_conflict_count || data.summary?.missing_date_count || data.summary?.overdue_count ? 'error' : 'success',
+        };
+    }
+
+    if (action === 'inspect_shadow_data_hygiene') {
+        return {
+            title: '影子数据卫生已刷新',
+            description: '已重新扫描本地 shadow 数据中的冒烟测试和旧演示候选记录。',
+            rows: [
+                ['冒烟项目', data.closeout?.summary?.projects || 0],
+                ['冒烟客户', data.closeout?.summary?.customers || 0],
+                ['冒烟线索', data.closeout?.summary?.leads || 0],
+                ['旧演示项目', data.legacy?.summary?.projects || 0],
+            ],
+            tone: (data.closeout?.summary?.total || 0) || (data.legacy?.summary?.total || 0) ? 'error' : 'success',
         };
     }
 
@@ -1839,6 +1854,21 @@ function bindDeliveryActions() {
     });
 }
 
+function bindHomeActions() {
+    document.querySelectorAll('[data-home-action]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            if (!setButtonBusy(button, true, '体检中...')) {
+                return;
+            }
+            try {
+                await runActionAndSync('home', button.dataset.homeAction, {});
+            } finally {
+                setButtonBusy(button, false);
+            }
+        });
+    });
+}
+
 function bindScheduleActions() {
     document.querySelectorAll('[data-schedule-action]').forEach((button) => {
         button.addEventListener('click', async () => {
@@ -2256,6 +2286,9 @@ function renderShadowHygienePanel(shadowHygiene) {
                 ${createTag(`${legacySummary.total ?? 0} 鏉℃棫婕旂ず璁板綍`, legacySummary.total ? 'risk-medium' : '')}
                 ${renderStatusTag('local_shadow')}
             </div>
+            <div class="card-actions">
+                <button class="ghost-btn" type="button" data-home-action="inspect_shadow_data_hygiene">閲嶆柊浣撴</button>
+            </div>
             ${sampleProjectIds.length ? `
                 <div class="compact-list">
                     ${sampleProjectIds.map((projectId) => `
@@ -2347,6 +2380,7 @@ function renderDashboard(result) {
     `;
 
     bindProjectActions();
+    bindHomeActions();
 }
 
 function renderProjects(result) {

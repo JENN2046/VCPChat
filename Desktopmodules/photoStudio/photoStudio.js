@@ -310,6 +310,7 @@ function getActionLabel(action) {
         create_customer: '创建客户',
         create_customer_record: '创建客户',
         create_lead: '创建线索',
+        convert_lead_to_project: '线索转项目',
         list_leads: '读取线索',
         create_quote: '创建报价',
         list_quotes: '读取报价',
@@ -378,10 +379,10 @@ function pickActionSummary(result) {
     const data = result.data || {};
     const action = result.action_context?.action || '';
 
-    if (action === 'create_project_draft' || action === 'create_project_with_tasks') {
+    if (action === 'create_project_draft' || action === 'create_project_with_tasks' || action === 'convert_lead_to_project') {
         return {
-            title: '项目已创建',
-            description: '客户、项目和任务已经写入工作台。',
+            title: action === 'convert_lead_to_project' ? '线索已转为项目' : '项目已创建',
+            description: action === 'convert_lead_to_project' ? '线索信息已经转成项目与任务，并写入工作台。' : '客户、项目和任务已经写入工作台。',
             rows: [
                 ['客户', data.customer?.customer_name || data.customer?.customer_id || '-'],
                 ['项目', data.project?.project_name || data.project?.project_id || '-'],
@@ -1364,7 +1365,7 @@ function renderFollowupPanel(metrics, projects, selectedProjectId) {
     `;
 }
 
-function renderClientLeadShadowList(items, emptyText) {
+function renderClientLeadShadowList(items, emptyText, options = {}) {
     if (!items.length) {
         return `<div class="empty-state">${escapeHtml(emptyText)}</div>`;
     }
@@ -1379,6 +1380,18 @@ function renderClientLeadShadowList(items, emptyText) {
                     </div>
                     <div class="compact-side">
                         <span>${escapeHtml(getPhotoStudioLabel(item.status || '-'))}</span>
+                        ${options.enableLeadConversion && item.lead_id ? `
+                            <button
+                                class="ghost-btn"
+                                type="button"
+                                data-lead-action="convert"
+                                data-lead-id="${escapeHtml(item.lead_id)}"
+                                data-customer-name="${escapeHtml(item.customer_name || '')}"
+                                data-source-channel="${escapeHtml(item.source_channel || 'manual')}"
+                                data-intent-type="${escapeHtml(item.intent_type || 'general')}"
+                                data-note="${escapeHtml(item.note || '')}"
+                            >转项目</button>
+                        ` : ''}
                         ${item.project_id ? `<button class="ghost-btn" type="button" data-open-project="${escapeHtml(item.project_id)}">打开</button>` : ''}
                     </div>
                 </article>
@@ -1404,7 +1417,7 @@ function renderClientLeadShadowPanel(reports = {}) {
                     ${renderStatusTag('local_shadow')}
                 </div>
                 ${renderDeliveryReportFailure(reports, 'list_leads')}
-                ${renderClientLeadShadowList(leadData.leads || [], '当前没有本地线索影子记录。')}
+                ${renderClientLeadShadowList(leadData.leads || [], '当前没有本地线索影子记录。', { enableLeadConversion: true })}
             </article>
             <article class="hero-card">
                 <p class="eyebrow">本地报价</p>
@@ -1847,6 +1860,41 @@ function bindDeliveryActions() {
                     delivery_package_id: button.dataset.deliveryPackageId,
                     status: button.dataset.nextStatus,
                 });
+            } finally {
+                setButtonBusy(button, false);
+            }
+        });
+    });
+}
+
+function bindClientLeadActions() {
+    document.querySelectorAll('[data-lead-action="convert"]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            if (!setButtonBusy(button, true, '转换中...')) {
+                return;
+            }
+            try {
+                const customerName = button.dataset.customerName || 'Walk-in Customer';
+                const intentType = button.dataset.intentType || 'general';
+                const sourceChannel = button.dataset.sourceChannel || 'manual';
+                const note = button.dataset.note || '';
+                const leadId = button.dataset.leadId || '';
+                const projectName = `${customerName} ${getPhotoStudioLabel(intentType)}项目`;
+                const result = await runActionAndSync('client_leads', 'convert_lead_to_project', {
+                    customer_name: customerName,
+                    project_name: projectName,
+                    project_type: intentType,
+                    source: sourceChannel,
+                    source_channel: sourceChannel,
+                    project_notes: [note, leadId ? `来源线索: ${leadId}` : ''].filter(Boolean).join('\n'),
+                });
+                if (result.success) {
+                    const projectId = result.data?.project?.project_id;
+                    await switchScene('project_command');
+                    if (projectId) {
+                        await loadProjectIntoDrawer(projectId);
+                    }
+                }
             } finally {
                 setButtonBusy(button, false);
             }
@@ -2547,6 +2595,8 @@ function renderInquiry(reports = {}) {
         </section>
     `;
 
+    bindProjectActions();
+    bindClientLeadActions();
     bindInquiryForms();
 }
 

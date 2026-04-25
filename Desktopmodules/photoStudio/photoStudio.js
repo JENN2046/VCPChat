@@ -113,7 +113,7 @@ function renderSceneError(scene, error) {
     root.innerHTML = `
         <section class="scene-panel">
             <article class="error-panel">
-                <p class="eyebrow">Scene / ${escapeHtml(scene)}</p>
+                <p class="eyebrow">场景 / ${escapeHtml(getSceneLabel(scene))}</p>
                 <h2>这个场景暂时没加载成功</h2>
                 <p>${escapeHtml(getErrorMessage(error))}</p>
                 <div class="card-actions">
@@ -240,6 +240,7 @@ function getPhotoStudioLabel(value) {
         general: '通用',
         booking: '预约',
         consultation: '咨询',
+        shoot: '拍摄',
         social_media: '社媒来源',
         referral: '转介绍',
         walk_in: '到店咨询',
@@ -258,6 +259,15 @@ function getPhotoStudioLabel(value) {
         standard: '标准报价',
         premium: '高级报价',
         custom: '定制报价',
+        client_delivery: '客户交付',
+        selection_notice: '选片通知',
+        delivery_tasks: '交付任务',
+        warm: '温和',
+        concise: '简洁',
+        professional: '专业',
+        low: '低',
+        medium: '中',
+        high: '高',
         unknown: '未知',
     };
     return labelMap[normalized] || normalized || '-';
@@ -265,6 +275,62 @@ function getPhotoStudioLabel(value) {
 
 function renderStatusTag(value, extraClass = '') {
     return createTag(getPhotoStudioLabel(value), extraClass);
+}
+
+function getSceneLabel(scene) {
+    const labelMap = {
+        home: '首页',
+        dashboard: '首页',
+        project_command: '项目指挥台',
+        project_board: '项目指挥台',
+        projects: '项目指挥台',
+        client_leads: '客户与线索',
+        inquiry: '客户与线索',
+        schedule_board: '日程排期',
+        delivery_assets: '交付与素材',
+        delivery: '交付与素材',
+        delivery_panel: '交付与素材',
+        project_drawer: '项目抽屉',
+    };
+    return labelMap[normalizeScene(scene)] || scene || '-';
+}
+
+function getActionLabel(action) {
+    const labelMap = {
+        create_project: '创建项目',
+        advance_status: '推进项目状态',
+        advance_project_status: '推进项目状态',
+        get_project: '读取项目',
+        check_missing_project_fields: '检查缺失字段',
+        create_tasks: '补建任务',
+        create_project_tasks: '补建任务',
+        archive_project: '归档项目',
+        generate_draft: '生成回复草稿',
+        generate_client_reply_draft: '生成回复草稿',
+        create_customer: '创建客户',
+        create_customer_record: '创建客户',
+        create_lead: '创建线索',
+        list_leads: '读取线索',
+        create_quote: '创建报价',
+        list_quotes: '读取报价',
+        create_followup_reminder: '创建跟进提醒',
+        list_bookings: '读取预约',
+        create_booking: '创建预约',
+        update_booking_time: '改期预约',
+        start_booking: '开始预约',
+        complete_booking: '完成预约',
+        create_selection_notice: '创建选片通知',
+        create_delivery_tasks: '创建交付任务',
+        list_delivery_packages: '读取交付包',
+        get_delivery_package: '读取交付包',
+        create_delivery_package: '创建交付包',
+        update_delivery_package_status: '推进交付包状态',
+        sync_external: '外部同步',
+        prioritize_pending_delivery_actions: '生成优先队列',
+        generate_delivery_queue_schedule: '生成同步排程',
+        inspect_delivery_audit_trail: '查看审计轨迹',
+    };
+    return labelMap[action] || action || '-';
 }
 
 function canCreateDeliveryTasks(project) {
@@ -525,9 +591,9 @@ function pickActionSummary(result) {
             description: '交付包已经写入本地影子记录，没有同步外部网盘或客户系统。',
             rows: [
                 ['项目', data.project_name || data.project_id || '-'],
-                ['类型', data.package_type || '-'],
-                ['状态', data.status || '-'],
-                ['渠道', data.delivery_channel || '-'],
+                ['类型', getPhotoStudioLabel(data.package_type || '-')],
+                ['状态', getPhotoStudioLabel(data.status || '-')],
+                ['渠道', getPhotoStudioLabel(data.delivery_channel || '-')],
             ],
             tone: 'success',
         };
@@ -539,8 +605,8 @@ function pickActionSummary(result) {
             description: '交付包状态只在本地影子记录中更新，没有真实发送客户链接。',
             rows: [
                 ['交付包', data.package_label || data.delivery_package_id || '-'],
-                ['原状态', data.previous_status || '-'],
-                ['新状态', data.new_status || data.status || '-'],
+                ['原状态', getPhotoStudioLabel(data.previous_status || '-')],
+                ['新状态', getPhotoStudioLabel(data.new_status || data.status || '-')],
                 ['项目', data.project_name || data.project_id || '-'],
             ],
             tone: 'success',
@@ -595,7 +661,7 @@ function pickActionSummary(result) {
             description: '项目已经进入新的业务状态。',
             rows: [
                 ['项目', data.project_id || '-'],
-                ['新状态', data.new_status || data.status || '-'],
+                ['新状态', getPhotoStudioLabel(data.new_status || data.status || '-')],
             ],
             tone: 'success',
         };
@@ -699,7 +765,7 @@ function renderDrawer(result) {
     if (!project) {
         root.innerHTML = `
             <div class="drawer-card">
-                <p class="drawer-label">Project Context</p>
+                <p class="drawer-label">项目上下文</p>
                 <h2>等待选择项目</h2>
                 <p class="muted">点击项目卡片后，这里会展示项目详情、任务、状态日志和可执行动作。</p>
             </div>
@@ -710,24 +776,24 @@ function renderDrawer(result) {
     const allowedTransitions = project.allowed_transitions || [];
     const nextStatus = allowedTransitions[0] || '';
     const riskMissing = project.risk?.missing || [];
-    const taskItems = tasks.map((task) => `<li>${escapeHtml(task.name)} · ${escapeHtml(task.status)}</li>`).join('');
+    const taskItems = tasks.map((task) => `<li>${escapeHtml(task.name)} · ${escapeHtml(getPhotoStudioLabel(task.status))}</li>`).join('');
     const logItems = logs.map((item) => `<li>${escapeHtml(item.at)} · ${escapeHtml(item.message)}</li>`).join('');
 
     root.innerHTML = `
         <div class="drawer-card">
-            <p class="drawer-label">Project Context</p>
+            <p class="drawer-label">项目上下文</p>
             <h2>${escapeHtml(project.project_name)}</h2>
             <div class="drawer-kv">
                 <div><strong>客户</strong><span>${escapeHtml(project.customer_name || '-')}</span></div>
-                <div><strong>状态</strong><span>${escapeHtml(project.status)}</span></div>
+                <div><strong>状态</strong><span>${escapeHtml(getPhotoStudioLabel(project.status))}</span></div>
                 <div><strong>交付日期</strong><span>${escapeHtml(formatDate(project.delivery_deadline))}</span></div>
             </div>
             <div class="inline-tags">
-                ${createTag(project.project_type || 'unknown')}
-                ${createTag(`风险 ${project.risk?.level || 'unknown'}`, getRiskTone(project.risk?.level))}
+                ${renderStatusTag(project.project_type || 'unknown')}
+                ${createTag(`风险 ${getPhotoStudioLabel(project.risk?.level || 'unknown')}`, getRiskTone(project.risk?.level))}
                 ${riskMissing.length ? createTag(`缺字段 ${riskMissing.join(', ')}`) : ''}
             </div>
-            <p class="muted">允许推进: ${escapeHtml(allowedTransitions.join(' / ') || '无')}</p>
+            <p class="muted">允许推进: ${escapeHtml(allowedTransitions.map(getPhotoStudioLabel).join(' / ') || '无')}</p>
             <div class="drawer-actions">
                 <button class="ghost-btn" type="button" data-drawer-action="generate_draft" data-project-id="${escapeHtml(project.project_id)}">生成回复草稿</button>
                 <button class="ghost-btn" type="button" data-drawer-action="check_missing_project_fields" data-project-id="${escapeHtml(project.project_id)}">检查缺失字段</button>
@@ -736,9 +802,9 @@ function renderDrawer(result) {
                 <button class="ghost-btn danger-btn" type="button" data-drawer-action="archive_project" data-project-id="${escapeHtml(project.project_id)}">归档项目</button>
             </div>
             ${renderDrawerActionResult(project.project_id)}
-            <p class="drawer-label">Tasks</p>
+            <p class="drawer-label">任务</p>
             <ul class="drawer-list">${taskItems || '<li>暂无任务</li>'}</ul>
-            <p class="drawer-label">Logs</p>
+            <p class="drawer-label">日志</p>
             <ul class="drawer-list">${logItems || '<li>暂无日志</li>'}</ul>
         </div>
     `;
@@ -758,8 +824,8 @@ function createProjectCard(project) {
                 ${renderStatusTag(project.status)}
             </div>
             <div class="project-meta">
-                ${createTag(`风险 ${riskLevel}`, getRiskTone(riskLevel))}
-                ${createTag(project.project_type || 'unknown')}
+                ${createTag(`风险 ${getPhotoStudioLabel(riskLevel)}`, getRiskTone(riskLevel))}
+                ${renderStatusTag(project.project_type || 'unknown')}
                 ${missing.length ? createTag(`缺 ${missing.join(', ')}`) : ''}
             </div>
             <p class="muted">交付日期: ${escapeHtml(formatDate(project.delivery_deadline))}</p>
@@ -803,7 +869,7 @@ function renderProjectBoard(projects) {
                 <article class="project-lane">
                     <div class="project-lane-header">
                         <div>
-                            <p class="eyebrow">${escapeHtml(lane.key)}</p>
+                            <p class="eyebrow">项目阶段</p>
                             <h3>${escapeHtml(lane.title)}</h3>
                             <p class="muted">${escapeHtml(lane.hint)}</p>
                         </div>
@@ -833,7 +899,7 @@ function createDeliveryCard(project) {
                 ${renderStatusTag(project.status)}
             </div>
             <div class="project-meta">
-                ${createTag(project.project_type || 'unknown')}
+                ${renderStatusTag(project.project_type || 'unknown')}
                 ${createTag(formatDate(project.delivery_deadline))}
             </div>
             <p class="muted">${escapeHtml(getDeliveryStatusHint(project))}</p>
@@ -890,7 +956,7 @@ function renderUpcomingList(items) {
                 <article class="compact-row">
                     <div>
                         <strong>${escapeHtml(item.project_name)}</strong>
-                        <p class="muted">${escapeHtml(item.customer_name || '未关联客户')} · ${escapeHtml(item.status)}</p>
+                        <p class="muted">${escapeHtml(item.customer_name || '未关联客户')} · ${escapeHtml(getPhotoStudioLabel(item.status))}</p>
                     </div>
                     <div class="compact-side">
                         <span>${escapeHtml(formatDate(item.delivery_deadline))}</span>
@@ -916,7 +982,7 @@ function renderTransitionsList(items) {
                         <p class="muted">${escapeHtml(item.customer_name || '未关联客户')}</p>
                     </div>
                     <div class="compact-side">
-                        <span>${escapeHtml(`${item.old_status} -> ${item.new_status}`)}</span>
+                        <span>${escapeHtml(`${getPhotoStudioLabel(item.old_status)} -> ${getPhotoStudioLabel(item.new_status)}`)}</span>
                         <span class="muted">${escapeHtml(formatDate(item.changed_at))}</span>
                     </div>
                 </article>
@@ -961,7 +1027,7 @@ function renderDeliveryOpsPanel(metrics) {
     return `
         <section class="report-grid">
             <article class="hero-card">
-                <p class="eyebrow">External Sync</p>
+                <p class="eyebrow">外部同步</p>
                 <h2>外部同步控制区</h2>
                 <p>每张项目卡都可以生成本地外部同步记录。这个动作会先确认，再写入本地影子队列，避免误同步真实外部系统。</p>
                 <div class="inline-tags">
@@ -976,7 +1042,7 @@ function renderDeliveryOpsPanel(metrics) {
                 </div>
             </article>
             <article class="hero-card">
-                <p class="eyebrow">Archive Guardrail</p>
+                <p class="eyebrow">归档护栏</p>
                 <h2>归档高风险区</h2>
                 <p>归档会改变项目与素材状态，当前已加入确认弹窗。建议先检查缺失字段、交付任务和同步记录，再执行归档。</p>
                 <div class="inline-tags">
@@ -1037,7 +1103,7 @@ function renderDeliveryReportDashboard(reports = {}) {
         <section class="hero-card hero-card-wide">
             <div class="hero-grid">
                 <div>
-                    <p class="eyebrow">Delivery Pulse</p>
+                    <p class="eyebrow">交付脉搏</p>
                     <h2>外部同步脉搏</h2>
                     <p>进入交付页时自动读取本地外部同步影子队列，显示优先级、排程和审计轨迹。这里仍然只是本地可视化，不会写入真实外部系统。</p>
                 </div>
@@ -1050,7 +1116,7 @@ function renderDeliveryReportDashboard(reports = {}) {
         </section>
         <section class="report-grid delivery-grid">
             <article class="hero-card">
-                <p class="eyebrow">Priority Queue</p>
+                <p class="eyebrow">优先队列</p>
                 <h2>优先队列</h2>
                 <div class="inline-tags">
                     ${createTag(`${prioritySummary.total_records || 0} 条记录`)}
@@ -1061,7 +1127,7 @@ function renderDeliveryReportDashboard(reports = {}) {
                 ${renderDeliveryReportRows(priority.priority_queue || [])}
             </article>
             <article class="hero-card">
-                <p class="eyebrow">Queue Schedule</p>
+                <p class="eyebrow">同步排程</p>
                 <h2>同步排程</h2>
                 <div class="inline-tags">
                     ${createTag(`${scheduleSummary.actionable_records || 0} 个可处理`)}
@@ -1072,7 +1138,7 @@ function renderDeliveryReportDashboard(reports = {}) {
                 ${renderDeliveryReportRows(schedule.schedule_rows || [])}
             </article>
             <article class="hero-card">
-                <p class="eyebrow">Audit Trail</p>
+                <p class="eyebrow">审计轨迹</p>
                 <h2>审计轨迹</h2>
                 <div class="inline-tags">
                     ${createTag(`${auditSummary.total_records || 0} 条记录`)}
@@ -1097,7 +1163,7 @@ function renderDeliveryPackageList(packages) {
                 <article class="compact-row">
                     <div>
                         <strong>${escapeHtml(deliveryPackage.package_label || deliveryPackage.project_name || deliveryPackage.delivery_package_id)}</strong>
-                        <p class="muted">${escapeHtml(deliveryPackage.project_name || deliveryPackage.project_id)} · ${escapeHtml(deliveryPackage.package_type || '-')}</p>
+                        <p class="muted">${escapeHtml(deliveryPackage.project_name || deliveryPackage.project_id)} · ${escapeHtml(getPhotoStudioLabel(deliveryPackage.package_type || '-'))}</p>
                     </div>
                     <div class="compact-side">
                         <div class="inline-tags">
@@ -1142,7 +1208,7 @@ function renderDeliveryPackagePanel(reports = {}) {
         <article class="hero-card hero-card-wide">
             <div class="hero-grid">
                 <div>
-                    <p class="eyebrow">Delivery Packages</p>
+                    <p class="eyebrow">交付包</p>
                     <h2>本地交付包</h2>
                     <p>交付包是项目进入客户交付前的本地影子记录，用来承接选片通知、交付任务和外部同步前的核对清单。</p>
                     <div class="inline-tags">
@@ -1213,7 +1279,7 @@ function renderLeadPipeline(metrics) {
 
     return `
         <article class="hero-card">
-            <p class="eyebrow">Lead Pipeline</p>
+            <p class="eyebrow">线索管道</p>
             <h2>客户关系管道</h2>
             <div class="pipeline-list">
                 ${stages.map(([label, count, hint]) => `
@@ -1244,13 +1310,13 @@ function renderFollowupPanel(metrics, projects, selectedProjectId) {
     const hasProjects = projects.length > 0;
     return `
         <article class="hero-card">
-            <p class="eyebrow">Followup</p>
+            <p class="eyebrow">跟进提醒</p>
             <h2>跟进提醒</h2>
             <p>先接入本地影子提醒：报价后跟进、交付后跟进、回访提醒都可以在这里创建，不会写入外部系统。</p>
             <div class="inline-tags">
                 ${createTag(`${metrics.followups} 条待补信息`)}
                 ${createTag(`${metrics.quoted} 个报价跟进`)}
-                ${createTag('create_followup_reminder')}
+                ${createTag(getActionLabel('create_followup_reminder'))}
             </div>
             <form class="form-grid followup-form" id="followup-reminder-form">
                 <label class="form-field">
@@ -1315,7 +1381,7 @@ function renderClientLeadShadowPanel(reports = {}) {
     return `
         <section class="report-grid">
             <article class="hero-card">
-                <p class="eyebrow">Local Leads</p>
+                <p class="eyebrow">本地线索</p>
                 <h2>本地线索</h2>
                 <div class="inline-tags">
                     ${createTag(`${leadSummary.total_leads || 0} 条线索`)}
@@ -1326,7 +1392,7 @@ function renderClientLeadShadowPanel(reports = {}) {
                 ${renderClientLeadShadowList(leadData.leads || [], '当前没有本地线索影子记录。')}
             </article>
             <article class="hero-card">
-                <p class="eyebrow">Local Quotes</p>
+                <p class="eyebrow">本地报价</p>
                 <h2>本地报价</h2>
                 <div class="inline-tags">
                     ${createTag(`${quoteSummary.total_quotes || 0} 条报价`)}
@@ -1345,7 +1411,7 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
     return `
         <section class="split-grid">
             <article class="hero-card">
-                <p class="eyebrow">Create Lead / Local Shadow</p>
+                <p class="eyebrow">创建线索</p>
                 <form class="form-grid" id="lead-create-form">
                     <label class="form-field">
                         <span>关联项目</span>
@@ -1391,7 +1457,7 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
                 </form>
             </article>
             <article class="hero-card">
-                <p class="eyebrow">Create Quote / Local Shadow</p>
+                <p class="eyebrow">创建报价</p>
                 <form class="form-grid" id="quote-create-form">
                     <label class="form-field">
                         <span>项目</span>
@@ -1598,7 +1664,7 @@ function renderResourceReadiness(projects) {
 
     return `
         <article class="hero-card">
-            <p class="eyebrow">Resource Readiness</p>
+            <p class="eyebrow">资源准备</p>
             <h2>资源准备度</h2>
             <div class="mini-metrics">
                 <div><strong>${escapeHtml(preparation)}</strong><span>筹备资源</span></div>
@@ -1613,7 +1679,7 @@ function renderResourceReadiness(projects) {
 function renderScheduleGuardrail(metrics) {
     return `
         <article class="hero-card">
-            <p class="eyebrow">Conflict Guardrail</p>
+            <p class="eyebrow">冲突护栏</p>
             <h2>冲突护栏</h2>
             <p>当前只做只读风险提示，不自动创建、调整或取消预约。真实 Booking 接入后，创建预约和改期会进入确认流程。</p>
             <div class="inline-tags">
@@ -1632,7 +1698,7 @@ function renderCreateBookingPanel(projects, selectedProjectId) {
     const hasProjects = projects.length > 0;
     return `
         <article class="hero-card">
-            <p class="eyebrow">Create Booking</p>
+            <p class="eyebrow">创建预约</p>
             <h2>创建本地预约</h2>
             <p>先写入本地影子排期记录，不会同步外部日历。相同项目、类型、日期和时间会更新同一条记录。</p>
             <form class="form-grid followup-form" id="schedule-booking-form">
@@ -1709,7 +1775,7 @@ function bindProjectActions() {
                 const nextStatus = button.dataset.nextStatus || project?.allowed_transitions?.[0] || '';
                 if (!nextStatus) {
                     showToast('当前项目没有可推进的下一状态。');
-                    setStatusChip('advance_status unavailable');
+                    setStatusChip('当前项目不可推进');
                     return;
                 }
                 const result = await runActionAndSync('project_board', 'advance_status', {
@@ -2100,7 +2166,7 @@ function renderExternalPulse(deliverySchedule) {
 
     return `
         <article class="hero-card">
-            <p class="eyebrow">External Sync Pulse</p>
+            <p class="eyebrow">外部同步脉搏</p>
             <h2>外部同步脉搏</h2>
             <div class="mini-metrics">
                 <div><strong>${escapeHtml(summary.actionable_records ?? 0)}</strong><span>可处理记录</span></div>
@@ -2149,7 +2215,7 @@ function renderDataQualityGuardrail(data, weeklyDigest) {
     const quality = weeklyDigest.data_quality || {};
     return `
         <article class="hero-card">
-            <p class="eyebrow">Data Quality Guardrail</p>
+            <p class="eyebrow">数据质量护栏</p>
             <h2>数据质量护栏</h2>
             <div class="mini-metrics">
                 <div><strong>${escapeHtml(quality.missing_due_date_count ?? 0)}</strong><span>缺日期</span></div>
@@ -2176,7 +2242,7 @@ function renderDashboard(result) {
             <article class="hero-card hero-card-wide">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">首页 / Home</p>
+                        <p class="eyebrow">首页</p>
                         <h2>今日驾驶舱</h2>
                         <p>把项目风险、即将交付、最近状态流转和数据质量放在同一屏，方便你先看清楚今天该处理什么。</p>
                     </div>
@@ -2192,7 +2258,7 @@ function renderDashboard(result) {
 
             <section class="report-grid">
                 <article class="hero-card">
-                    <p class="eyebrow">Today Priority</p>
+                    <p class="eyebrow">今日优先</p>
                     <h2>今天先处理</h2>
                     ${renderPriorityQueue(reporting.prioritize_pending)}
                 </article>
@@ -2202,7 +2268,7 @@ function renderDashboard(result) {
             <section class="report-grid">
                 ${renderDataQualityGuardrail(data, weeklyDigest)}
                 <article class="hero-card">
-                    <p class="eyebrow">Status Mix</p>
+                    <p class="eyebrow">状态分布</p>
                     <h2>项目状态分布</h2>
                     ${renderStatusMix(weeklyDigest.status_counts)}
                 </article>
@@ -2210,20 +2276,20 @@ function renderDashboard(result) {
 
             <section class="report-grid">
                 <article class="hero-card">
-                    <p class="eyebrow">Upcoming Delivery</p>
+                    <p class="eyebrow">即将交付</p>
                     <h2>即将交付</h2>
                     ${renderUpcomingList(data.upcoming_delivery || [])}
                 </article>
 
                 <article class="hero-card">
-                    <p class="eyebrow">Recent Transitions</p>
+                    <p class="eyebrow">最近流转</p>
                     <h2>最近状态流转</h2>
                     ${renderTransitionsList(recentTransitions)}
                 </article>
             </section>
 
             <article class="hero-card">
-                <p class="eyebrow">Risk Projects</p>
+                <p class="eyebrow">风险项目</p>
                 <h2>优先关注项目</h2>
                 <div class="project-list">
                     ${(data.risk_projects || []).length
@@ -2243,12 +2309,12 @@ function renderProjects(result) {
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
             <article class="hero-card">
-                <p class="eyebrow">项目指挥台 / Project Command</p>
+                <p class="eyebrow">项目指挥台</p>
                 <h2>项目推进主战场</h2>
                 <p>这里保留“快速建项目 + 项目卡片 + 右抽屉”的主链，适合处理创建、推进状态和补齐信息这三类工作。</p>
             </article>
             <article class="hero-card">
-                <p class="eyebrow">Quick Create / Project</p>
+                <p class="eyebrow">快速创建项目</p>
                 <form class="form-grid" id="project-create-form">
                     <label class="form-field">
                         <span>客户名</span>
@@ -2261,10 +2327,10 @@ function renderProjects(result) {
                     <label class="form-field">
                         <span>项目类型</span>
                         <select name="project_type">
-                            <option value="portrait">portrait</option>
-                            <option value="wedding">wedding</option>
-                            <option value="family">family</option>
-                            <option value="commercial">commercial</option>
+                            <option value="portrait">人像</option>
+                            <option value="wedding">婚礼</option>
+                            <option value="family">家庭</option>
+                            <option value="commercial">商业</option>
                         </select>
                     </label>
                     <label class="form-field">
@@ -2302,7 +2368,7 @@ function renderInquiry(reports = {}) {
             <article class="hero-card hero-card-wide">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">客户与线索 / Client Leads</p>
+                        <p class="eyebrow">客户与线索</p>
                         <h2>成交推进器</h2>
                         <p>这里承接客户、线索、报价、跟进提醒和沟通草稿，所有新增线索与报价先落本地影子记录。</p>
                     </div>
@@ -2322,7 +2388,7 @@ function renderInquiry(reports = {}) {
             ${renderLeadQuoteForms(projects, selectedProjectId)}
             <section class="split-grid">
                 <article class="hero-card">
-                    <p class="eyebrow">Create Customer / Client</p>
+                    <p class="eyebrow">创建客户</p>
                     <form class="form-grid" id="inquiry-customer-form">
                         <label class="form-field">
                             <span>客户名</span>
@@ -2366,7 +2432,7 @@ function renderInquiry(reports = {}) {
                     </form>
                 </article>
                 <article class="hero-card">
-                    <p class="eyebrow">Generate Reply Draft / Client</p>
+                    <p class="eyebrow">生成回复草稿</p>
                     <form class="form-grid" id="inquiry-draft-form">
                         <label class="form-field">
                             <span>项目 ID</span>
@@ -2383,9 +2449,9 @@ function renderInquiry(reports = {}) {
                         <label class="form-field">
                             <span>语气</span>
                             <select name="tone">
-                                <option value="warm">warm</option>
-                                <option value="concise">concise</option>
-                                <option value="professional">professional</option>
+                                <option value="warm">温和</option>
+                                <option value="concise">简洁</option>
+                                <option value="professional">专业</option>
                             </select>
                         </label>
                         <label class="form-field form-field-wide">
@@ -2416,7 +2482,7 @@ function renderScheduleBoard(bookingsResult = null) {
             <article class="hero-card hero-card-wide">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">日程排期 / Schedule Board</p>
+                        <p class="eyebrow">日程排期</p>
                         <h2>资源与时间冲突中心</h2>
                         <p>先用项目交付日期形成只读排期视角，帮助判断本周窗口、同日冲突和资源压力。当前不会写入任何 Booking 数据。</p>
                     </div>
@@ -2432,12 +2498,12 @@ function renderScheduleBoard(bookingsResult = null) {
 
             <section class="report-grid">
                 <article class="hero-card">
-                    <p class="eyebrow">Upcoming Timeline</p>
+                    <p class="eyebrow">近期时间线</p>
                     <h2>近期时间线</h2>
                     ${renderScheduleTimeline(entries)}
                 </article>
                 <article class="hero-card">
-                    <p class="eyebrow">Local Bookings</p>
+                    <p class="eyebrow">本地预约</p>
                     <h2>本地预约</h2>
                     ${renderLocalBookingList(bookings)}
                 </article>
@@ -2451,7 +2517,7 @@ function renderScheduleBoard(bookingsResult = null) {
             <section class="report-grid">
                 ${renderCreateBookingPanel(projects, getSelectedProjectId())}
                 <article class="hero-card">
-                        <p class="eyebrow">Next Wiring</p>
+                        <p class="eyebrow">后续接线</p>
                         <h2>后续接线动作</h2>
                         <div class="inline-tags">
                             ${createTag('list_bookings')}
@@ -2482,7 +2548,7 @@ function renderDelivery(result, reports = {}) {
             <article class="hero-card hero-card-wide">
                 <div class="hero-grid">
                     <div>
-                        <p class="eyebrow">交付与素材 / Delivery Assets</p>
+                        <p class="eyebrow">交付与素材</p>
                         <h2>客户体验门面</h2>
                         <p>把“可以发选片通知”“可以建交付任务”“仍需继续推进”的项目拆开，减少误点和来回筛选。</p>
                     </div>
@@ -2498,10 +2564,10 @@ function renderDelivery(result, reports = {}) {
             ${renderDeliveryReportDashboard(reports)}
             ${renderDeliveryPackagePanel(reports)}
             <section class="report-grid delivery-grid">
-                ${renderDeliveryGroup('可发选片通知', 'Delivery / Selection Notice', grouped.readyForSelection)}
-                ${renderDeliveryGroup('可建交付任务', 'Delivery / Delivery Tasks', grouped.readyForDelivery)}
+                ${renderDeliveryGroup('可发选片通知', '选片通知', grouped.readyForSelection)}
+                ${renderDeliveryGroup('可建交付任务', '交付任务', grouped.readyForDelivery)}
             </section>
-            ${renderDeliveryGroup('还需继续推进', 'Delivery / Needs Progress', grouped.blocked)}
+            ${renderDeliveryGroup('还需继续推进', '待推进', grouped.blocked)}
             ${renderLastActionResult()}
         </section>
     `;
@@ -2556,23 +2622,23 @@ async function loadProjectIntoDrawer(projectId) {
         getState().setProjectDetail(result);
         renderDrawer(result);
         bindDrawerActions();
-        setStatusChip(`Drawer: ${projectId}`);
+        setStatusChip(`项目抽屉：${projectId}`);
     } catch (error) {
         showToast(`项目详情加载失败：${getErrorMessage(error)}`);
-        setStatusChip('Drawer load failed');
+        setStatusChip('项目抽屉加载失败');
     }
 }
 
 async function renderSceneByName(scene) {
     const normalizedScene = normalizeScene(scene);
     try {
-        setStatusChip(`Loading ${normalizedScene}...`);
+        setStatusChip(`正在加载：${getSceneLabel(normalizedScene)}`);
 
         if (normalizedScene === 'home') {
             const result = await window.PhotoStudioApi.getDashboard();
             getState().setDashboard(result);
             renderDashboard(result);
-            setStatusChip('Home synced');
+            setStatusChip('首页已同步');
             return;
         }
 
@@ -2580,7 +2646,7 @@ async function renderSceneByName(scene) {
             const result = await window.PhotoStudioApi.listProjects({});
             getState().setProjects(result);
             renderProjects(result);
-            setStatusChip('Project command synced');
+            setStatusChip('项目指挥台已同步');
             return;
         }
 
@@ -2590,7 +2656,7 @@ async function renderSceneByName(scene) {
             }
             const bookingsResult = await window.PhotoStudioApi.runAction('schedule_board', 'list_bookings', {});
             renderScheduleBoard(bookingsResult);
-            setStatusChip('Schedule board ready');
+            setStatusChip('日程排期已就绪');
             return;
         }
 
@@ -2600,7 +2666,7 @@ async function renderSceneByName(scene) {
             }
             const clientLeadReports = await loadClientLeadReports();
             renderInquiry(clientLeadReports);
-            setStatusChip('Client leads ready');
+            setStatusChip('客户与线索已就绪');
             return;
         }
 
@@ -2610,16 +2676,16 @@ async function renderSceneByName(scene) {
             }
             const deliveryReports = await loadDeliveryReports();
             renderDelivery(getState().projects, deliveryReports);
-            setStatusChip('Delivery assets ready');
+            setStatusChip('交付与素材已就绪');
             return;
         }
 
         renderSceneError(normalizedScene, new Error(`unsupported scene: ${normalizedScene}`));
-        setStatusChip(`${normalizedScene} failed`);
+        setStatusChip(`${getSceneLabel(normalizedScene)}加载失败`);
     } catch (error) {
         renderSceneError(normalizedScene, error);
         showToast(`场景加载失败：${getErrorMessage(error)}`);
-        setStatusChip(`${normalizedScene} failed`);
+        setStatusChip(`${getSceneLabel(normalizedScene)}加载失败`);
     }
 }
 
@@ -2655,7 +2721,7 @@ async function runActionAndSync(scene, action, payload) {
         const confirmationMessage = HIGH_RISK_ACTION_CONFIRMATIONS[action];
         if (confirmationMessage && !window.confirm(confirmationMessage)) {
             showToast('已取消操作');
-            setStatusChip(`${action} cancelled`);
+            setStatusChip(`${getActionLabel(action)}已取消`);
             return {
                 success: false,
                 data: null,
@@ -2668,7 +2734,7 @@ async function runActionAndSync(scene, action, payload) {
             };
         }
 
-        setStatusChip(`Running ${action}...`);
+        setStatusChip(`正在执行：${getActionLabel(action)}`);
         const result = await window.PhotoStudioApi.runAction(scene, action, payload);
         const actionResult = {
             ...result,
@@ -2678,9 +2744,9 @@ async function runActionAndSync(scene, action, payload) {
 
         if (!result.success && result.error?.message) {
             showToast(result.error.message);
-            setStatusChip(`${action} failed`);
+            setStatusChip(`${getActionLabel(action)}失败`);
         } else {
-            setStatusChip(`${action} done`);
+            setStatusChip(`${getActionLabel(action)}完成`);
         }
 
         window.PhotoStudioEvents.applyUiHints(result.ui_hints);
@@ -2711,7 +2777,7 @@ async function runActionAndSync(scene, action, payload) {
         };
         getState().setLastActionResult(result);
         showToast(`动作执行失败：${result.error.message}`);
-        setStatusChip(`${action} failed`);
+        setStatusChip(`${getActionLabel(action)}失败`);
         return result;
     }
 }

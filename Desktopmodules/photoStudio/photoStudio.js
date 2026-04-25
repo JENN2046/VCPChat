@@ -239,11 +239,11 @@ function getPhotoStudioLabel(value) {
         selection: '选片',
         general: '通用',
         booking: '预约',
-        consultation: '咨询',
+        consultation: '商谈',
         shoot: '拍摄',
         social_media: '社媒来源',
         referral: '转介绍',
-        walk_in: '到店咨询',
+        walk_in: '到店接待',
         manual: '手动录入',
         returning: '复购客户',
         other: '其他',
@@ -1275,7 +1275,7 @@ function renderClientLeadMetricGrid(metrics) {
     return `
         <section class="card-grid">
             ${renderMetricCard('客户数', metrics.customers, '来自当前项目关联客户')}
-            ${renderMetricCard('新线索', metrics.leads, '项目处于意向阶段')}
+            ${renderMetricCard('新线索', metrics.leads, '项目处于初步跟进阶段')}
             ${renderMetricCard('已报价', metrics.quoted, '需要继续跟进')}
             ${renderMetricCard('已预约', metrics.booked, '已确认或进入筹备拍摄')}
             ${renderMetricCard('高优先线索', metrics.highIntent, '报价或已确认项目')}
@@ -1295,7 +1295,7 @@ function renderLeadPipeline(metrics) {
 
     return `
         <article class="hero-card">
-            <p class="eyebrow">线索管道</p>
+            <p class="eyebrow">项目跟进管道</p>
             <h2>客户关系管道</h2>
             <div class="pipeline-list">
                 ${stages.map(([label, count, hint]) => `
@@ -1457,7 +1457,7 @@ function renderLeadQuoteForms(projects, selectedProjectId) {
                         <select name="source_channel">
                             <option value="social_media">社媒来源</option>
                             <option value="referral">转介绍</option>
-                            <option value="walk_in">到店咨询</option>
+                            <option value="walk_in">到店接待</option>
                             <option value="manual">手动录入</option>
                         </select>
                     </label>
@@ -1740,7 +1740,7 @@ function renderCreateBookingPanel(projects, selectedProjectId) {
                     <span>预约类型</span>
                     <select name="booking_type">
                         <option value="shoot">拍摄</option>
-                        <option value="consultation">咨询</option>
+                        <option value="consultation">商谈</option>
                         <option value="selection">选片</option>
                         <option value="delivery">交付</option>
                     </select>
@@ -2537,7 +2537,7 @@ function renderInquiry(reports = {}) {
                                 <option value="social_media">社媒来源</option>
                                 <option value="referral">转介绍</option>
                                 <option value="returning">复购客户</option>
-                                <option value="walk_in">到店咨询</option>
+                                <option value="walk_in">到店接待</option>
                                 <option value="other">其他</option>
                             </select>
                         </label>

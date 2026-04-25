@@ -1296,7 +1296,7 @@ function renderLeadPipeline(metrics) {
     return `
         <article class="hero-card">
             <p class="eyebrow">项目跟进管道</p>
-            <h2>客户关系管道</h2>
+            <h2>项目跟进总览</h2>
             <div class="pipeline-list">
                 ${stages.map(([label, count, hint]) => `
                     <div class="pipeline-stage">

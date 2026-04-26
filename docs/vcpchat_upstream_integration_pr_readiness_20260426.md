@@ -75,8 +75,8 @@ Photo Studio 冒烟：
 - 没有执行 `npm run pack` 或 `npm run dist`。
 - 没有 push。
 - 没有创建 PR。
-- 没有合入生产线。
-- 没有触碰 `A:\VCP\VCPToolBox-prod-stable`。
+- 没有合入 VCPChat 生产线。
+- 没有修改 `A:\VCP\VCPToolBox-prod-stable`；该路径属于 VCPToolBox 后端项目稳定生产线，不是 VCPChat 生产线。
 
 ## PR 前建议
 
@@ -92,7 +92,7 @@ Photo Studio 冒烟：
 
 生产推广必须另开步骤：
 
-- 以 `A:\VCP\VCPToolBox-prod-stable` 为生产稳定线对照。
+- 以 VCPChat 的目标线 `custom` 或后续明确命名的 VCPChat 生产分支为生产预检对照。
 - 先做生产级预检。
 - 再确认合并策略。
-- 不从当前整合线直接替换生产线。
+- 不从当前整合线直接替换 VCPChat 生产线。

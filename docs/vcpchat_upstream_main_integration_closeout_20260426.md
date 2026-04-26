@@ -8,7 +8,9 @@
 
 底座：`upstream/main`，提交 `c329146`
 
-稳定生产对照：`A:\VCP\VCPToolBox-prod-stable`
+VCPChat 当前拆分/稳定整合目标：`custom`
+
+口径修正：`A:\VCP\VCPToolBox-prod-stable` 是 VCPToolBox 后端项目稳定生产线，不是 VCPChat 生产线。
 
 ## 当前结论
 
@@ -21,7 +23,7 @@
 - 已补齐 Photo Studio 收尾修复，包括窗口尺寸、入口、IPC、preload API、中文文案、沟通草稿、日期输入年份限制、首页 Plan 任务列表。
 - 已确认 Photo Studio 手工验收没有发现异常。
 
-这条线仍然是候选整合线，不是生产线。当前不自动替换 `custom`、`main` 或 `A:\VCP\VCPToolBox-prod-stable`。
+这条线仍然是候选整合线，不是生产线。当前不自动替换 `custom`、`main` 或后续单独定义的 VCPChat 生产线。
 
 ## 已完成批次
 
@@ -31,7 +33,7 @@
 - 没有在原工作区直接操作。
 - 使用独立 worktree：`A:\VCP\VCPChat_integration_upstream_vcp_20260425`。
 
-### 2. 稳定生产线批次
+### 2. VCPChat 稳定整合目标批次
 
 - 已合入 `origin/custom`。
 - 提交：`f4e03c0 merge: integrate custom stable baseline`
@@ -118,8 +120,8 @@
 
 - 没有把整合线 push 到远端。
 - 没有创建 PR。
-- 没有合入生产线。
-- 没有触碰 `A:\VCP\VCPToolBox-prod-stable`。
+- 没有合入 VCPChat 生产线。
+- 没有修改 `A:\VCP\VCPToolBox-prod-stable`；该路径属于 VCPToolBox 后端项目稳定生产线，不是 VCPChat 生产线。
 - 没有执行真实生产发布。
 - 没有执行 live DesktopRemote HTTP smoke，因为需要当前 DesktopRemote 服务和桌面环境配合。
 - `.vcp_ready` 已按 readiness artifact 决策恢复。
@@ -134,4 +136,4 @@
 
 1. 如果要做宿主更完整验收，单独运行 DesktopRemote live smoke。
 2. 如果整合线准备进入远端协作，再执行 push / PR 前检查。
-3. 生产推广必须另开步骤，从 `A:\VCP\VCPToolBox-prod-stable` 做生产级预检，不能从当前整合线直接替换。
+3. VCPChat 生产推广必须另开步骤，先明确 VCPChat 生产线命名、目标分支、生产级预检和回滚路径，不能从当前整合线直接替换。

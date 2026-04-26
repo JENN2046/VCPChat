@@ -129,7 +129,7 @@ git diff --shortstat origin/custom...HEAD
 
 - 当前 PR 是 Draft，不会误认为 ready to merge。
 - 当前目标分支是 `custom`，不是生产稳定线。
-- 当前没有触碰 `A:\VCP\VCPToolBox-prod-stable`。
+- 当前没有修改 `A:\VCP\VCPToolBox-prod-stable`；该路径属于 VCPToolBox 后端项目稳定生产线，不是 VCPChat 生产线。
 - Photo Studio 关键语法检查和 `npm run test:photo-studio` 已通过。
 - 用户已手工确认 Photo Studio 主体没有发现异常。
 

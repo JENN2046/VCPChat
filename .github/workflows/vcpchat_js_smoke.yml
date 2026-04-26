@@ -1,0 +1,54 @@
+name: VCPChat JS Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Desktopmodules/photoStudio/**'
+      - 'modules/ipc/desktopHandlers.js'
+      - 'modules/renderer/**'
+      - 'modules/services/photoStudio/**'
+      - 'scripts/photo-studio-closeout-smoke.js'
+      - 'package.json'
+      - '.github/workflows/vcpchat_js_smoke.yml'
+  pull_request:
+    paths:
+      - 'Desktopmodules/photoStudio/**'
+      - 'modules/ipc/desktopHandlers.js'
+      - 'modules/renderer/**'
+      - 'modules/services/photoStudio/**'
+      - 'scripts/photo-studio-closeout-smoke.js'
+      - 'package.json'
+      - '.github/workflows/vcpchat_js_smoke.yml'
+
+jobs:
+  js-smoke:
+    name: JS syntax and Photo Studio smoke
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        shell: pwsh
+        run: |
+          node --check main.js
+          node --check preload.js
+          node --check modules/ipc/desktopHandlers.js
+          node --check modules/renderer/contentPipeline.js
+          node --check Desktopmodules/photoStudio/photoStudio.js
+          node --check Desktopmodules/photoStudio/services/photoStudioEvents.js
+          node --check Desktopmodules/photoStudio/services/photoStudioState.js
+          node --check modules/services/photoStudio/PhotoStudioOrchestrator.js
+          node --check modules/services/photoStudio/actionCatalog.js
+          node --check modules/services/photoStudio/uiHints.js
+
+      - name: Photo Studio closeout smoke
+        shell: pwsh
+        run: npm run test:photo-studio

@@ -191,6 +191,14 @@ DesktopRemote live smoke 追加验证通过：
 [smoke] DeleteWidget cleanup PASS
 ```
 
+CI / 自动检查追加收口：
+
+- 已新增 `.github/workflows/vcpchat_js_smoke.yml`。
+- 该 workflow 只覆盖轻量自动检查：关键 JS 文件 `node --check` 和 `npm run test:photo-studio`。
+- 该 workflow 不执行 `npm install`、不执行 Electron 打包、不触碰生产线。
+- 本地等价验证已通过：关键 JS 文件语法检查通过，Photo Studio closeout smoke 为 `25/25 passed`。
+- 打包验证仍按上面的本地阻塞记录单独处理。
+
 ## 未验证 / 未执行
 
 本轮已尝试但未通过：
@@ -263,7 +271,7 @@ PR12 是独立候选分支：
 - [ ] 配置卫生治理：逐插件补齐 `.example` 模板，移出基线中仍被 Git 跟踪的真实 `.env` / `config.env`。
 - [x] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
 - [-] 打包验证：`npm run pack` 已尝试，但被本机 `winCodeSign` 符号链接权限与依赖卫生阻塞；`npm run dist` 暂不继续执行。
-- [ ] CI / 自动检查：为 PR 或后续拆分 PR 补 GitHub checks 或等价自动验证。
+- [x] CI / 自动检查：新增轻量 GitHub Actions workflow，覆盖关键 JS 语法检查和 Photo Studio closeout smoke。
 - [ ] 生产预检：如需推广到 `A:\VCP\VCPToolBox-prod-stable`，单独做生产线预检、合并策略和回滚方案。
 
 说明：

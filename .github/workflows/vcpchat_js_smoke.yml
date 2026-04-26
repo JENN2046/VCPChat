@@ -1,0 +1,64 @@
+name: VCPChat JS Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Desktopmodules/photoStudio/**'
+      - 'modules/ipc/desktopHandlers.js'
+      - 'modules/renderer/**'
+      - 'modules/services/photoStudio/**'
+      - 'scripts/photo-studio-closeout-smoke.js'
+      - 'package.json'
+      - '.github/workflows/vcpchat_js_smoke.yml'
+  pull_request:
+    paths:
+      - 'Desktopmodules/photoStudio/**'
+      - 'modules/ipc/desktopHandlers.js'
+      - 'modules/renderer/**'
+      - 'modules/services/photoStudio/**'
+      - 'scripts/photo-studio-closeout-smoke.js'
+      - 'package.json'
+      - '.github/workflows/vcpchat_js_smoke.yml'
+
+jobs:
+  js-smoke:
+    name: JS syntax and optional Photo Studio smoke
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check existing files
+        shell: pwsh
+        run: |
+          $files = @(
+            'main.js',
+            'preload.js',
+            'modules/ipc/desktopHandlers.js',
+            'modules/renderer/contentPipeline.js',
+            'Desktopmodules/photoStudio/photoStudio.js',
+            'Desktopmodules/photoStudio/services/photoStudioEvents.js',
+            'Desktopmodules/photoStudio/services/photoStudioState.js',
+            'modules/services/photoStudio/PhotoStudioOrchestrator.js',
+            'modules/services/photoStudio/actionCatalog.js',
+            'modules/services/photoStudio/uiHints.js'
+          )
+
+          foreach ($file in $files) {
+            if (Test-Path -LiteralPath $file) {
+              node --check $file
+            } else {
+              Write-Host "skip missing file: $file"
+            }
+          }
+
+      - name: Optional Photo Studio closeout smoke
+        shell: pwsh
+        run: npm run test:photo-studio --if-present

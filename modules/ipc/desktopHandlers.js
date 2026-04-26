@@ -30,6 +30,7 @@ let vchatTranslatorWindow = null;
 let vchatMusicWindow = null;
 let vchatThemesWindow = null;
 let vchatAIImageGenWindow = null;
+let vchatPhotoStudioWindow = null;
 
 // --- 鏀惰棌绯荤粺璺緞 - 浣跨敤椤圭洰鏍圭洰褰曠殑 AppData ---
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -294,7 +295,7 @@ function createOrFocusChildWindow(existingWindow, options) {
             devTools: true,
         },
         icon: path.join(app.getAppPath(), 'assets', 'icon.png'),
-        show: false,
+        show: options.showImmediately === true,
     });
 
     // 鏋勫缓 URL
@@ -310,9 +311,11 @@ function createOrFocusChildWindow(existingWindow, options) {
         openChildWindows.push(win);
     }
 
-    win.once('ready-to-show', () => {
-        win.show();
-    });
+    if (options.showImmediately !== true) {
+        win.once('ready-to-show', () => {
+            win.show();
+        });
+    }
 
     win.on('close', (evt) => {
         if (process.platform === 'darwin' && !app.isQuitting) {
@@ -331,6 +334,7 @@ function createOrFocusChildWindow(existingWindow, options) {
         if (win === vchatMemoWindow) vchatMemoWindow = null;
         if (win === vchatTranslatorWindow) vchatTranslatorWindow = null;
         if (win === vchatThemesWindow) vchatThemesWindow = null;
+        if (win === vchatPhotoStudioWindow) vchatPhotoStudioWindow = null;
     });
 
     console.log(`[DesktopHandlers] Created child window: ${options.title}`);
@@ -369,6 +373,23 @@ function registerManagedWindows() {
         owner: 'desktopHandlers',
         getWindow: () => desktopWindow,
         open: async () => openDesktopWindow(),
+    });
+
+    windowService.register(WINDOW_APP_IDS.PHOTO_STUDIO, {
+        owner: 'desktopHandlers',
+        getWindow: () => vchatPhotoStudioWindow,
+        open: async () => {
+            vchatPhotoStudioWindow = createOrFocusChildWindow(vchatPhotoStudioWindow, {
+                width: 1380, height: 860, minWidth: 1100, minHeight: 720,
+                launchLayout: 'near-fullscreen',
+                showImmediately: true,
+                title: '影像工作台',
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'photoStudio', 'photoStudio.html'),
+                preloadPath: resolveAppPreload(app.getAppPath(), PRELOAD_ROLES.DESKTOP),
+            });
+            return vchatPhotoStudioWindow;
+        },
+        readyTimeoutMs: 10000,
     });
 
     windowService.register(WINDOW_APP_IDS.NOTES, {
@@ -553,6 +574,8 @@ function resolveAppActionToAppId(appAction) {
             return WINDOW_APP_IDS.MUSIC;
         case 'open-themes-window':
             return WINDOW_APP_IDS.THEMES;
+        case 'open-photo-studio-window':
+            return WINDOW_APP_IDS.PHOTO_STUDIO;
         case 'open-ai-image-gen-window':
             return WINDOW_APP_IDS.AI_IMAGE_GEN;
         default:
@@ -1928,6 +1951,11 @@ function initialize(params) {
                         htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Themesmodules', 'themes.html'),
                     });
                     return { success: true };
+                }
+
+                case 'open-photo-studio-window': {
+                    await windowService.open(WINDOW_APP_IDS.PHOTO_STUDIO);
+                    return { success: true, appId: WINDOW_APP_IDS.PHOTO_STUDIO };
                 }
 
                 case 'launch-human-toolbox': {

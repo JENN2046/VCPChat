@@ -233,6 +233,27 @@ git diff --shortstat origin/custom...HEAD
 - 如果拆 PR，应先判断这些改动是否已经属于 `custom` 应保留能力，还是整合线带入的额外范围。
 - 不建议把它们作为 Photo Studio PR 的评审重点。
 
+### 8. `.vcp_ready` readiness artifact
+
+PR12 中 `.vcp_ready` 是新增文件。
+
+内容：
+
+```text
+V1 native host line: ready-for-review-closeout
+```
+
+当前判断：
+
+- 这是 V1 native host 线的 readiness artifact。
+- 它不是运行时代码，也不包含配置、密钥或本地环境值。
+- 它此前已按用户确认恢复，应在 PR 评审中作为“准备状态标记”理解，不应误判为误加的业务文件。
+
+建议：
+
+- 若 PR12 保持为整合快照，可保留该文件，并在 PR 说明中明确它的定位。
+- 若后续拆 PR，可把它放入 native host / 宿主收口 PR，不建议放进纯 Photo Studio 业务 PR。
+
 ## 推荐拆分路线
 
 如果后续决定拆 PR，推荐顺序是：
@@ -264,6 +285,6 @@ git diff --shortstat origin/custom...HEAD
 
 继续做减风险收口：
 
-1. 单独审计 `VCPDistributedServer/Plugin/DistImageServer/config.env` 是否应该从 PR 移除或替换为模板。
-2. 复核 `.vcp_ready` 在 PR 中的定位说明是否足够清楚。
+1. `VCPDistributedServer/Plugin/DistImageServer/config.env` 已移出 Git 并替换为安全模板。
+2. `.vcp_ready` 已补充 readiness artifact 定位说明。
 3. 决定 PR12 是继续作为“大整合快照”，还是拆出小 PR。

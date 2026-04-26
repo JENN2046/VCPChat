@@ -176,6 +176,11 @@ Codex TODO 面板转换验证通过：
 codex todo panel transform: ok
 ```
 
+桌面端视觉验收：
+
+- 用户已确认 Codex TODO / Plan 面板桌面端视觉验收完成。
+- 当前记录只确认视觉验收结果，不代表生产发布或生产合并。
+
 ## 未验证 / 未执行
 
 本轮没有执行：

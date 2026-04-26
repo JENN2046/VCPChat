@@ -293,6 +293,78 @@
     margin-top: var(--ps-space-4);
 }
 
+.plan-task-panel {
+    display: grid;
+    gap: var(--ps-space-4);
+}
+
+.plan-task-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--ps-space-4);
+}
+
+.plan-task-list {
+    display: grid;
+    gap: var(--ps-space-3);
+}
+
+.plan-task-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--ps-space-3);
+    align-items: center;
+    padding: var(--ps-space-3) var(--ps-space-4);
+    border: 1px solid var(--ps-border-soft);
+    border-radius: var(--ps-radius-md);
+    background:
+        linear-gradient(90deg, rgba(143, 199, 255, 0.08), transparent 62%),
+        rgba(255, 255, 255, 0.035);
+    overflow: hidden;
+}
+
+.plan-task-row::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--ps-accent-blue), rgba(143, 199, 255, 0.12));
+}
+
+.plan-task-row.plan-task-high::before {
+    background: linear-gradient(180deg, var(--ps-danger), var(--ps-accent-gold));
+}
+
+.plan-task-row.plan-task-medium::before {
+    background: linear-gradient(180deg, var(--ps-accent-gold), var(--ps-accent-blue));
+}
+
+.plan-task-main {
+    display: grid;
+    gap: var(--ps-space-2);
+    min-width: 0;
+}
+
+.plan-task-titleline,
+.plan-task-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--ps-space-2);
+}
+
+.plan-task-titleline strong {
+    color: var(--ps-text-primary);
+    font-size: var(--ps-font-size-md);
+}
+
+.plan-task-main p {
+    margin: 0;
+    color: var(--ps-text-secondary);
+}
+
 .status-mix-list {
     display: grid;
     gap: var(--ps-space-3);
@@ -374,6 +446,21 @@
     border: 1px solid var(--ps-border-medium);
     border-radius: var(--ps-radius-md);
     box-shadow: var(--ps-shadow-md);
+}
+
+@media (max-width: 760px) {
+    .plan-task-header,
+    .plan-task-row {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-task-header {
+        display: grid;
+    }
+
+    .plan-task-actions {
+        justify-content: flex-start;
+    }
 }
 
 @media (max-width: 760px) {

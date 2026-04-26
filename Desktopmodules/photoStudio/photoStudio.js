@@ -2371,6 +2371,26 @@ function bindHomeActions() {
     });
 }
 
+function bindPlanTaskActions() {
+    document.querySelectorAll('[data-plan-scene]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            if (!setButtonBusy(button, true, '切换中...')) {
+                return;
+            }
+            try {
+                const scene = button.dataset.planScene || 'project_command';
+                const projectId = button.dataset.planProject || '';
+                await switchScene(scene);
+                if (projectId) {
+                    await loadProjectIntoDrawer(projectId);
+                }
+            } finally {
+                setButtonBusy(button, false);
+            }
+        });
+    });
+}
+
 function bindScheduleActions() {
     document.querySelectorAll('[data-schedule-action]').forEach((button) => {
         button.addEventListener('click', async () => {
@@ -2666,6 +2686,185 @@ function renderHomeMetricGrid(metrics, reporting) {
     `;
 }
 
+function buildPlanTasks(projects, priorityReport) {
+    const projectById = new Map(projects.map((project) => [project.project_id, project]));
+    const tasks = [];
+    const seen = new Set();
+
+    const addTask = (project, key, task) => {
+        const projectId = project?.project_id || task.project_id || '';
+        if (!projectId) {
+            return;
+        }
+
+        const taskId = `${projectId}:${key}`;
+        if (seen.has(taskId)) {
+            return;
+        }
+
+        seen.add(taskId);
+        tasks.push({
+            project_id: projectId,
+            project_name: localizeSystemGeneratedText(project?.project_name || task.project_name || task.display_name || projectId),
+            customer_name: localizeSystemGeneratedText(project?.customer_name || task.customer_name || ''),
+            status: project?.status || task.status || task.delivery_state || 'pending',
+            priority: task.priority || 3,
+            tone: task.tone || 'normal',
+            title: task.title,
+            description: task.description,
+            scene: task.scene || 'project_command',
+            next_status: task.next_status || '',
+            action_label: task.action_label || '打开项目',
+        });
+    };
+
+    projects.forEach((project) => {
+        const missing = Array.isArray(project.risk?.missing) ? project.risk.missing : [];
+        const nextStatus = project.allowed_transitions?.[0] || '';
+
+        if (missing.length) {
+            addTask(project, 'missing-fields', {
+                priority: 1,
+                tone: 'high',
+                title: '补齐项目资料',
+                description: `缺少 ${formatFieldList(missing)}，建议先打开项目抽屉补齐。`,
+                action_label: '打开补齐',
+            });
+        }
+
+        if (['lead', 'quoted'].includes(project.status) && nextStatus) {
+            addTask(project, 'advance-commercial', {
+                priority: 2,
+                tone: 'medium',
+                title: '推进报价确认',
+                description: `当前停在 ${getPhotoStudioLabel(project.status)}，可推进到 ${getPhotoStudioLabel(nextStatus)}。`,
+                next_status: nextStatus,
+                action_label: `推进到${getPhotoStudioLabel(nextStatus)}`,
+            });
+        }
+
+        if (['confirmed', 'preparing'].includes(project.status) && !project.shoot_date) {
+            addTask(project, 'shoot-date', {
+                priority: 2,
+                tone: 'medium',
+                title: '确认拍摄日期',
+                description: '项目已经进入筹备区，建议先补拍摄日期，方便排期页接住。',
+                action_label: '打开项目',
+            });
+        }
+
+        if (!project.delivery_deadline && !['archived', 'cancelled'].includes(project.status)) {
+            addTask(project, 'delivery-date', {
+                priority: 3,
+                tone: 'medium',
+                title: '补交付日期',
+                description: '交付日期为空，会影响首页、排期和交付视图的判断。',
+                action_label: '打开项目',
+            });
+        }
+
+        if (canCreateSelectionNotice(project)) {
+            addTask(project, 'selection-notice', {
+                priority: 3,
+                tone: 'normal',
+                title: '准备选片通知',
+                description: '当前状态适合进入选片通知准备，可去交付页继续处理。',
+                scene: 'delivery_assets',
+                action_label: '去交付页',
+            });
+        }
+
+        if (canCreateDeliveryTasks(project)) {
+            addTask(project, 'delivery-tasks', {
+                priority: 3,
+                tone: 'normal',
+                title: '准备交付任务',
+                description: '当前状态可以创建交付任务或交付包，建议去交付页核对。',
+                scene: 'delivery_assets',
+                action_label: '去交付页',
+            });
+        }
+
+        if (project.status === 'completed') {
+            addTask(project, 'archive-review', {
+                priority: 4,
+                tone: 'low',
+                title: '归档前复盘',
+                description: '项目已完成，归档前建议检查交付记录、任务和缺失字段。',
+                scene: 'delivery_assets',
+                action_label: '去交付页',
+            });
+        }
+    });
+
+    (priorityReport?.priority_queue || []).forEach((item) => {
+        const project = projectById.get(item.project_id) || item;
+        addTask(project, `priority-${item.priority_rank || 'queue'}`, {
+            priority: Number(item.priority_rank) || 2,
+            tone: Number(item.priority_rank) <= 2 ? 'high' : 'medium',
+            title: '处理交付队列',
+            description: localizeReportText(item.schedule_reason || item.recommended_action || '交付队列里还有待处理事项。'),
+            scene: 'delivery_assets',
+            action_label: '去交付页',
+            ...item,
+        });
+    });
+
+    return tasks
+        .sort((left, right) => left.priority - right.priority)
+        .slice(0, 8);
+}
+
+function renderPlanTaskPanel(tasks) {
+    const highCount = tasks.filter((task) => task.priority <= 2).length;
+    return `
+        <article class="hero-card plan-task-panel">
+            <div class="plan-task-header">
+                <div>
+                    <p class="eyebrow">PLAN</p>
+                    <h2>计划任务列表</h2>
+                    <p>把今天真正要推进的项目动作收成一张清单，先看优先级，再决定打开项目、推进状态或切到交付页。</p>
+                </div>
+                <div class="inline-tags">
+                    ${createTag(`${tasks.length} 项任务`)}
+                    ${createTag(`${highCount} 项优先`, highCount ? 'risk-high' : '')}
+                    ${renderStatusTag('local_shadow')}
+                </div>
+            </div>
+            ${tasks.length ? `
+                <div class="plan-task-list">
+                    ${tasks.map((task) => renderPlanTaskRow(task)).join('')}
+                </div>
+            ` : '<div class="empty-state">当前没有需要主动推进的计划任务。</div>'}
+        </article>
+    `;
+}
+
+function renderPlanTaskRow(task) {
+    const toneClass = task.tone === 'high' ? 'plan-task-high' : (task.tone === 'medium' ? 'plan-task-medium' : '');
+    return `
+        <article class="plan-task-row ${toneClass}">
+            <div class="plan-task-main">
+                <div class="plan-task-titleline">
+                    <strong>${escapeHtml(task.title)}</strong>
+                    ${renderStatusTag(task.status)}
+                    ${createTag(`P${task.priority}`, task.priority <= 2 ? 'risk-high' : '')}
+                </div>
+                <p>${escapeHtml(task.description)}</p>
+                <span class="muted">${escapeHtml(task.project_name)}${task.customer_name ? ` · ${escapeHtml(task.customer_name)}` : ''}</span>
+            </div>
+            <div class="plan-task-actions">
+                <button class="ghost-btn" type="button" data-open-project="${escapeHtml(task.project_id)}">打开</button>
+                ${task.next_status ? `
+                    <button class="primary-btn" type="button" data-advance-project="${escapeHtml(task.project_id)}" data-next-status="${escapeHtml(task.next_status)}">${escapeHtml(task.action_label)}</button>
+                ` : `
+                    <button class="ghost-btn" type="button" data-plan-scene="${escapeHtml(task.scene)}" data-plan-project="${escapeHtml(task.project_id)}">${escapeHtml(task.action_label)}</button>
+                `}
+            </div>
+        </article>
+    `;
+}
+
 function renderPriorityQueue(priorityReport) {
     const queue = priorityReport?.priority_queue || [];
     if (!queue.length) {
@@ -2914,6 +3113,7 @@ function renderDashboard(result) {
         }
         : summary;
     const prioritySummary = visibleReporting.prioritize_pending?.summary || {};
+    const planTasks = buildPlanTasks(projects, visibleReporting.prioritize_pending);
 
     document.getElementById('scene-root').innerHTML = `
         <section class="scene-panel">
@@ -2946,6 +3146,7 @@ function renderDashboard(result) {
             ` : ''}
 
             ${renderHomeMetricGrid(visibleMetrics, visibleReporting)}
+            ${renderPlanTaskPanel(planTasks)}
 
             <section class="report-grid">
                 <article class="hero-card">
@@ -2995,6 +3196,7 @@ function renderDashboard(result) {
 
     bindProjectActions();
     bindHomeActions();
+    bindPlanTaskActions();
 }
 
 function renderProjects(result) {

@@ -199,6 +199,19 @@ CI / 自动检查追加收口：
 - 本地等价验证已通过：关键 JS 文件语法检查通过，Photo Studio closeout smoke 为 `25/25 passed`。
 - 打包验证仍按上面的本地阻塞记录单独处理。
 
+生产预检追加记录：
+
+- 对 `A:\VCP\VCPToolBox-prod-stable` 做了只读预检。
+- 稳定生产线当前分支为 `prod/stable`，HEAD 与 `origin/prod/stable` 对齐在 `0e4449c`。
+- 生产线工作区当前存在未归类本地修改：
+  - `Plugin/AIGentStyle/AIGentStyle.js`
+  - `Plugin/AIGentStyle/README.md`
+  - `Plugin/AIGentStyle/plugin-manifest.json`
+  - `Plugin/UserAuth/code.bin`
+  - `docs/AI_IMAGE_AGENT_PROGRESS.md`
+- 未读取、未打印、未修改敏感二进制内容。
+- 在这些本地修改完成归类前，不建议做任何生产合并、发布或推广。
+
 ## 未验证 / 未执行
 
 本轮已尝试但未通过：
@@ -214,14 +227,13 @@ CI / 自动检查追加收口：
 本轮没有继续执行：
 
 - `npm run dist`
-- 生产稳定线预检
 - 生产合并 / 部署 / 发布
 
 原因：
 
 - 当前目标是 Draft 整合快照收口，不是生产发布。
 - `pack` 当前被本机权限与依赖环境阻塞，`dist` 不应在 `pack` 未通过前继续执行。
-- 生产线 `A:\VCP\VCPToolBox-prod-stable` 需要单独预检和明确授权。
+- 生产线 `A:\VCP\VCPToolBox-prod-stable` 存在多项未归类本地修改，需要先确认归属和风险，再谈合并或发布。
 
 ## 回滚与恢复口径
 
@@ -272,7 +284,7 @@ PR12 是独立候选分支：
 - [x] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
 - [-] 打包验证：`npm run pack` 已尝试，但被本机 `winCodeSign` 符号链接权限与依赖卫生阻塞；`npm run dist` 暂不继续执行。
 - [x] CI / 自动检查：新增轻量 GitHub Actions workflow，覆盖关键 JS 语法检查和 Photo Studio closeout smoke。
-- [ ] 生产预检：如需推广到 `A:\VCP\VCPToolBox-prod-stable`，单独做生产线预检、合并策略和回滚方案。
+- [-] 生产预检：已做只读预检；`prod/stable` 上存在多项未归类本地修改，需先归类这些修改，再决定是否进入生产合并方案。
 
 说明：
 

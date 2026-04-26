@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - 'Desktopmodules/photoStudio/**'
+      - 'main.js'
+      - 'preload.js'
       - 'modules/ipc/desktopHandlers.js'
       - 'modules/renderer/**'
       - 'modules/services/photoStudio/**'
@@ -14,6 +16,8 @@ on:
   pull_request:
     paths:
       - 'Desktopmodules/photoStudio/**'
+      - 'main.js'
+      - 'preload.js'
       - 'modules/ipc/desktopHandlers.js'
       - 'modules/renderer/**'
       - 'modules/services/photoStudio/**'
@@ -54,6 +58,9 @@ jobs:
           foreach ($file in $files) {
             if (Test-Path -LiteralPath $file) {
               node --check $file
+              if ($LASTEXITCODE -ne 0) {
+                throw "Syntax check failed: $file"
+              }
             } else {
               Write-Host "skip missing file: $file"
             }

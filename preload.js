@@ -1,2 +1,3 @@
-console.warn('[Preload] Deprecated root preload shim loaded. Delegating to utility preload.');
+// preload.js
+// Legacy compatibility shim. The active preload implementation now lives in preloads/utility.js.
 require('./preloads/utility');

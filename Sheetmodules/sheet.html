@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VCP SheetAI</title>
+    <link rel="stylesheet" href="sheet.css">
+</head>
+<body>
+    <div class="sheet-shell">
+        <header class="sheet-header">
+            <div>
+                <div class="eyebrow">VCP OfficeAI</div>
+                <h1>SheetAI</h1>
+                <p class="subtitle">面向 AI 的轻量表格工作台</p>
+            </div>
+            <div class="status-card">
+                <span class="status-label">状态</span>
+                <strong id="sheetStatus">MVP 骨架</strong>
+            </div>
+        </header>
+
+        <main class="sheet-layout">
+            <aside class="sidebar-card">
+                <div class="card-title-row">
+                    <h2>工作簿</h2>
+                    <button id="createWorkbookBtn" type="button">新建</button>
+                </div>
+                <ul id="workbookList" class="workbook-list">
+                    <li class="placeholder-item">Workbook CRUD 待接入</li>
+                </ul>
+            </aside>
+
+            <section class="workspace-card">
+                <div class="card-title-row">
+                    <h2>表格区</h2>
+                    <span class="muted">下一步接入 Grid 与公式栏</span>
+                </div>
+                <div class="grid-placeholder">
+                    <div class="formula-bar">fx =SUM(A1:A10)</div>
+                    <div class="fake-grid" id="fakeGrid"></div>
+                </div>
+            </section>
+
+            <aside class="ai-card">
+                <div class="card-title-row">
+                    <h2>AI 动作</h2>
+                </div>
+                <div class="action-list">
+                    <button type="button">自然语言生成公式</button>
+                    <button type="button">清洗当前列</button>
+                    <button type="button">总结选中区域</button>
+                    <button type="button">生成周报结论</button>
+                </div>
+                <p class="muted">
+                    当前仅提供窗口与布局骨架，后续直接在这里接入 VCPToolBox 的 `/admin_api/sheetai/*`。
+                </p>
+            </aside>
+        </main>
+    </div>
+
+    <script src="sheet.js"></script>
+</body>
+</html>

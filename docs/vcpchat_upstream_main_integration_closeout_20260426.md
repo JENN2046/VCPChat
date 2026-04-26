@@ -4,7 +4,7 @@
 
 整合线：`integration/upstream-main-vcp-20260425`
 
-当前头部提交：`8a778ad fix(photo-studio): constrain date input years`
+当前头部提交：`e5102f2 feat(photo-studio): add plan task panel`
 
 底座：`upstream/main`，提交 `c329146`
 
@@ -18,7 +18,7 @@
 - 已吸收 `origin/custom` 的稳定生产定制能力。
 - 已吸收 VCPChat desktop/native host 基础能力。
 - 已吸收 Photo Studio 工作台必要文件与宿主挂载点。
-- 已补齐 Photo Studio 收尾修复，包括窗口尺寸、入口、IPC、preload API、中文文案、沟通草稿、日期输入年份限制。
+- 已补齐 Photo Studio 收尾修复，包括窗口尺寸、入口、IPC、preload API、中文文案、沟通草稿、日期输入年份限制、首页 Plan 任务列表。
 - 已确认 Photo Studio 手工验收没有发现异常。
 
 这条线仍然是候选整合线，不是生产线。当前不自动替换 `custom`、`main` 或 `A:\VCP\VCPToolBox-prod-stable`。
@@ -54,6 +54,7 @@
   - `d56a260 feat(photo-studio): integrate workbench on upstream baseline`
   - `f37a694 fix(photo-studio): restore desktop integration closeout`
   - `8a778ad fix(photo-studio): constrain date input years`
+  - `e5102f2 feat(photo-studio): add plan task panel`
 
 当前 Photo Studio 主线能力包括：
 
@@ -69,6 +70,7 @@
 - 交付任务、交付包创建、交付包状态推进、外部同步影子记录、审计读取
 - 全局搜索
 - 日期输入年份限制为 4 位
+- 首页 Plan 任务列表：根据缺字段、状态推进、拍摄日期、交付日期、选片/交付准备和交付队列自动生成待办，并支持打开项目、推进状态和跳转交付页。
 
 ## 分支审计表
 
@@ -103,12 +105,14 @@
 
 - 结果：`25/25 passed`
 - 覆盖：dashboard、项目创建、非法状态推进、项目推进、抽屉读取、客户创建、线索创建、报价创建、沟通草稿、跟进提醒、本地预约、交付包、外部同步影子记录、交付审计、五页面刷新。
+- 最近一次运行是在 Plan 任务列表面板提交前的同一轮验证中完成，Plan 面板改动也通过了 `node --check` 和 `git diff --check`。
 
 手工验收：
 
 - Photo Studio 已从整合线桌面端拉起。
 - 用户反馈：Photo Studio 没发现异常。
 - 日期输入年份限制已由用户确认 OK。
+- Plan 任务列表面板已从整合线桌面端重新拉起，仍待用户做视觉与按钮手工确认。
 
 ## 未验证
 

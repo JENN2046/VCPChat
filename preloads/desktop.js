@@ -157,6 +157,7 @@ function createCatalog(ops) {
         openMusicWindow: command(() => ops.send('open-music-window')),
         openDiceWindow: query(() => ops.invoke('open-dice-window')),
         openCanvasWindow: query(() => ops.invoke('open-canvas-window')),
+        openSheetWindow: query(() => ops.invoke('open-sheet-window')),
         openDesktopWindow: query(() => ops.invoke('open-desktop-window')),
 
         // Chat/app shell APIs
@@ -259,6 +260,7 @@ function createCatalog(ops) {
         onFlowlockCommand: subscription(ops.subscribe('flowlock-command', (_event, data) => data)),
         onFlowlockRequest: subscription(ops.subscribe('flowlock:request', (_event, data) => data)),
         sendFlowlockRpcResponse: command((data) => ops.send('flowlock:response', data)),
+        codexRouterHostControl: query((commandPayload) => ops.invoke('codex-router-host:control', commandPayload)),
 
         // Utility APIs
         readNotesTree: query(() => ops.invoke('read-notes-tree')),
@@ -437,6 +439,7 @@ const ALLOWED_KEYS = [
     "desktopPush",
     "onDesktopPush",
     "onDesktopStatus",
+    "openSheetWindow",
     "openDesktopWindow",
     "onDesktopRemoteSetWallpaper",
     "onDesktopRemoteRequest",
@@ -469,6 +472,7 @@ const ALLOWED_KEYS = [
     "desktopMetricsGetCapabilities",
     "desktopMetricsGetDetailedProcesses",
     "desktopOpenSystemTool",
+    "codexRouterHostControl",
     "musicPlay",
     "musicPause",
     "getMusicState",

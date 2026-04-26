@@ -168,7 +168,7 @@ function initialize(mainWindow, openChildWindows) {
 
         forumWindow.setMenu(null);
 
-        const url = `file://${path.join(__dirname, '../../Forummodules/forum.html')}`;
+        const url = `file://${path.join(__dirname, '../../Desktopmodules/legacy/Forummodules/forum.html')}`;
         forumWindow.loadURL(url);
 
         forumWindow.once('ready-to-show', () => {
@@ -225,7 +225,7 @@ function initialize(mainWindow, openChildWindows) {
 
         memoWindow.setMenu(null);
 
-        const url = `file://${path.join(__dirname, '../../Memomodules/memo.html')}`;
+        const url = `file://${path.join(__dirname, '../../Desktopmodules/legacy/Memomodules/memo.html')}`;
         memoWindow.loadURL(url);
 
         memoWindow.once('ready-to-show', () => {

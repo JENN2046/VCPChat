@@ -1,12 +1,14 @@
 const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
+const { createPluginRoots } = require('../../../modules/utils/vcpPathRoots');
 
 // Load environment variables
 require('dotenv').config();
 
 // Configuration
-const AGENT_DIR = process.env.AGENT_DIR || path.join(__dirname, '..', '..', '..', 'AppData', 'Agents');
+const runtimeRoots = createPluginRoots(__dirname);
+const AGENT_DIR = process.env.AGENT_DIR || path.join(runtimeRoots.runtimeDataRoot, 'Agents');
 const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 
 // Get reference to main process IPC (if available)
@@ -918,8 +920,7 @@ async function listPresets(agentId) {
     if (!path.isAbsolute(presetPath)) {
       const cleanPath = presetPath.replace(/^\.[\/\\]/, '');
       if (cleanPath.startsWith('AppData')) {
-        const appDataRoot = path.join(__dirname, '..', '..', '..', 'AppData');
-        absolutePath = path.join(appDataRoot, cleanPath.substring('AppData'.length).replace(/^[\/\\]/, ''));
+        absolutePath = path.join(runtimeRoots.runtimeDataRoot, cleanPath.substring('AppData'.length).replace(/^[\/\\]/, ''));
       } else {
         const projectRoot = path.join(__dirname, '..', '..', '..');
         absolutePath = path.join(projectRoot, cleanPath);

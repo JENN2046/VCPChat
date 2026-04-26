@@ -13,7 +13,7 @@
  */
 :root {
     /* --- Wallpaper Interface --- */
-    --chat-wallpaper-dark: url('../assets/wallpaper/wolfgirl.png');
+    --chat-wallpaper-dark: url('../assets/wallpaper/themes_star_abyss_dark.jpg');
 
     /* --- Base Colors --- */
     --primary-bg: #1a1a1d;      /* 主背景 - 战损深灰 */
@@ -83,7 +83,7 @@ body.light-theme {
     /* Wallpaper and background properties */
     background-image: var(--chat-wallpaper-light);
     /* --- Wallpaper Interface --- */
-    --chat-wallpaper-light: url('../assets/wallpaper/stargirl.png');
+    --chat-wallpaper-light: url('../assets/wallpaper/themes_snow_realm_light.jpg');
 
     /* --- Base Colors --- */
     --primary-bg: #0f172a;      /* 主背景 - 深空蓝 */

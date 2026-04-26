@@ -5,6 +5,7 @@ const { Document } = require('flexsearch');
 const jieba = require('node-jieba');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const { createPluginRoots, resolveConfiguredPath } = require('../../../modules/utils/vcpPathRoots');
 
 // --- 主逻辑 ---
 async function main() {
@@ -132,8 +133,8 @@ function parseToolArgs(input) {
 }
 
 async function loadConfig() {
-    const VchatDataURL = path.join(__dirname, '..', '..', '..', 'AppData');
-    const configPath = path.join(__dirname, 'config.env');
+    const roots = createPluginRoots(__dirname);
+    const configPath = path.join(roots.pluginRoot, 'config.env');
     try {
         const configContent = await fs.readFile(configPath, 'utf-8');
         const config = dotenv.parse(configContent);
@@ -144,6 +145,10 @@ async function loadConfig() {
 
         // 加载 Rerank 配置
         const RerankSearch = config.RerankSearch ? config.RerankSearch.toLowerCase() === 'true' : false;
+        const VchatDataURL = resolveConfiguredPath(config.VchatDataURL, roots, {
+            baseRoot: roots.pluginRoot,
+            fallback: roots.runtimeDataRoot,
+        });
 
         return {
             VchatDataURL: VchatDataURL,

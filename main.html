@@ -13,8 +13,8 @@
                    connect-src * ws: wss:;">
     <title>VCPChat</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="Flowlockmodules/flowlock.css">
-    <link rel="stylesheet" href="Promptmodules/prompt-modules.css">
+    <link rel="stylesheet" href="Desktopmodules/legacy/Flowlockmodules/flowlock.css">
+    <link rel="stylesheet" href="Desktopmodules/legacy/Promptmodules/prompt-modules.css">
     <link rel="stylesheet" href="vendor/katex.min.css" crossorigin="anonymous">
     <script defer src="vendor/katex.min.js" crossorigin="anonymous"></script>
     <script defer src="vendor/auto-render.min.js" crossorigin="anonymous"></script>
@@ -133,7 +133,7 @@
                 </div>
             </div>
             <div class="sidebar-tab-content" id="tabContentTopics" role="tabpanel" aria-hidden="true">
-                <!-- 话题内容区 -->
+                <!-- 话题内容�?-->
                 <div class="topics-header-container">
                     <div class="sidebar-subtab-item sidebar-search-subtab">
                         <div class="topic-search-container">
@@ -151,12 +151,12 @@
                 </div>
                 <div class="sidebar-list-scroll">
                     <ul class="topic-list" id="topicList">
-                    <!-- 话题列表将在这里动态加载 -->
+                    <!-- 话题列表将在这里动态加�?-->
                     </ul>
                 </div>
             </div>
             <div class="sidebar-tab-content" id="tabContentSettings" role="tabpanel" aria-hidden="true">
-                <!-- 设置内容区 -->
+                <!-- 设置内容�?-->
                 <div class="settings-header-bar">
                     <h2>设置</h2>
                     <button id="globalSettingsBtn" class="sidebar-button global-settings-btn">全局设置</button>
@@ -166,7 +166,7 @@
                     <h3 id="agentSettingsContainerTitle">助手设置: <span id="selectedAgentNameForSettings"></span></h3>
                     <form id="agentSettingsForm">
                         <input type="hidden" id="editingAgentId" name="agentId">
-                        <!-- Agent名称和头像容器 -->
+                        <!-- Agent名称和头像容�?-->
                         <div class="agent-settings-collapsible-container agent-settings-section collapsed" data-section-key="identity">
                             <div class="agent-settings-section-header" id="identityToggleHeader">
                                 <span class="agent-settings-section-title">基础信息</span>
@@ -202,19 +202,19 @@
                                         </div>
                                     </div>
 
-                                    <!-- 自定义样式设置 - 可折叠 -->
+                                    <!-- 自定义样式设�?- 可折�?-->
                                     <div class="agent-style-collapsible-container collapsed">
                                         <div class="style-collapse-header" id="styleCollapseHeader">
-                                            <span class="style-collapse-icon">▶</span>
-                                            <span class="style-collapse-title">自定义样式设置</span>
+                                            <span class="style-collapse-icon">�?/span>
+                                            <span class="style-collapse-title">自定义样式设�?/span>
                                         </div>
                                         <div class="agent-style-controls">
-                                    <!-- 禁用自定义颜色开关 -->
+                                    <!-- 禁用自定义颜色开�?-->
                                     <div class="style-control-item full-width">
                                         <div class="form-group-inline"
                                             style="justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                             <label for="disableCustomColors"
-                                                style="margin-bottom: 0;">助手页面中使用主题默认颜色</label>
+                                                style="margin-bottom: 0;">助手页面中使用主题默认颜�?/label>
                                             <label class="switch" style="margin-bottom: 0;">
                                                 <input type="checkbox" id="disableCustomColors"
                                                     name="disableCustomColors">
@@ -223,12 +223,12 @@
                                         </div>
                                     </div>
 
-                                    <!-- 会话中使用主题颜色开关 -->
+                                    <!-- 会话中使用主题颜色开�?-->
                                     <div class="style-control-item full-width">
                                         <div class="form-group-inline"
                                             style="justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                             <label for="useThemeColorsInChat"
-                                                style="margin-bottom: 0;">会话界面中使用主题默认颜色</label>
+                                                style="margin-bottom: 0;">会话界面中使用主题默认颜�?/label>
                                             <label class="switch" style="margin-bottom: 0;">
                                                 <input type="checkbox" id="useThemeColorsInChat"
                                                     name="useThemeColorsInChat">
@@ -266,7 +266,7 @@
                                                 <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
                                                 <path d="M3 21v-5h5"></path>
                                             </svg>
-                                            重置为头像默认颜色
+                                            重置为头像默认颜�?
                                         </button>
                                     </div>
 
@@ -276,7 +276,7 @@
                                             placeholder="例如: border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);"
                                             rows="3"></textarea>
                                         <small
-                                            style="color: var(--text-secondary); font-size: 0.85em;">提示：此CSS将应用于【助手】页面的Agent列表项容器</small>
+                                            style="color: var(--text-secondary); font-size: 0.85em;">????CSS???????????Agent?????</small>
                                     </div>
 
                                     <div class="style-control-item full-width">
@@ -295,7 +295,7 @@
                                             rows="4"></textarea>
                                         <small
                                             style="color: var(--text-secondary); font-size: 0.85em;">提示：此CSS将应用于【聊天会话】中Agent的头像和名称。可使用
-                                            .message-avatar 控制头像，.sender-name 控制名称</small>
+                                            .message-avatar 控制头像�?sender-name 控制名称</small>
                                     </div>
                                         </div>
                                     </div>
@@ -304,7 +304,7 @@
                         </div>
                         <div class="agent-settings-collapsible-container agent-settings-section collapsed" data-section-key="prompt">
                             <div class="agent-settings-section-header" id="promptToggleHeader">
-                                <span class="agent-settings-section-title">系统提示词</span>
+                                <span class="agent-settings-section-title">系统提示�?/span>
                                 <div class="agent-settings-section-summary" id="promptSummary"></div>
                                 <button type="button" class="agent-settings-toggle-btn" id="promptToggleBtn" aria-label="展开或收起系统提示词">
                                     <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -315,7 +315,7 @@
                             </div>
                             <div class="agent-settings-section-content" id="promptContent">
                                 <div class="agent-settings-card-shell agent-settings-prompt-shell">
-                                    <div class="prompt-section-note">三个模块独立编辑后，注意保存以生效</div>
+                                    <div class="prompt-section-note">三个模块独立编辑后，注意保存以生�?/div>
                                     <div id="systemPromptContainer" class="system-prompt-container">
                                         <!-- Promptmodules will be initialized here -->
                                     </div>
@@ -326,7 +326,7 @@
                             <div class="agent-settings-section-header" id="modelToggleHeader">
                                 <span class="agent-settings-section-title">模型设置</span>
                                 <div class="agent-settings-section-summary" id="modelSummary"></div>
-                                <button type="button" class="agent-settings-toggle-btn" id="modelToggleBtn" aria-label="展开或收起模型设置">
+                                <button type="button" class="agent-settings-toggle-btn" id="modelToggleBtn" aria-label="展开或收起模型设�?>
                                     <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2">
                                         <polyline points="6 9 12 15 18 9"></polyline>
@@ -350,7 +350,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- 参数设置可折叠容器 -->
+                        <!-- 参数设置可折叠容�?-->
                         <div class="agent-settings-collapsible-container agent-params-collapsible-container agent-settings-section collapsed" data-section-key="params">
                             <div class="agent-settings-section-header params-header" id="paramsToggleHeader">
                                 <span class="agent-settings-section-title params-title">模型参数配置</span>
@@ -391,7 +391,7 @@
                                     <label>输出模式:</label>
                                     <label for="agentStreamOutputTrue" style="margin-left: 10px;">
                                         <input type="radio" id="agentStreamOutputTrue" name="streamOutput" value="true"
-                                            checked> 流
+                                            checked> �?
                                     </label>
                                     <label for="agentStreamOutputFalse" style="margin-left: 15px;">
                                         <input type="radio" id="agentStreamOutputFalse" name="streamOutput"
@@ -401,7 +401,7 @@
                             </div>
                         </div>
 
-                        <!-- 语音设置可折叠容器 -->
+                        <!-- 语音设置可折叠容�?-->
                         <div class="agent-settings-collapsible-container agent-params-collapsible-container agent-settings-section collapsed" data-section-key="tts">
                             <div class="agent-settings-section-header params-header" id="ttsToggleHeader">
                                 <span class="agent-settings-section-title params-title">语音设置 (Sovits TTS)</span>
@@ -419,7 +419,7 @@
                                     <label for="agentTtsVoicePrimary">主语言模型:</label>
                                     <div class="model-input-container">
                                         <select id="agentTtsVoicePrimary" name="ttsVoicePrimary">
-                                            <option value="">不使用语音</option>
+                                            <option value="">不使用语�?/option>
                                         </select>
                                         <button type="button" id="refreshTtsModelsBtn" class="small-button"
                                             title="刷新模型列表">
@@ -438,7 +438,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="agentTtsRegexPrimary">主语言正则 (留空则匹配全部):</label>
+                                    <label for="agentTtsRegexPrimary">主语言正则 (留空则匹配全�?:</label>
                                     <input type="text" id="agentTtsRegexPrimary" name="ttsRegexPrimary"
                                         placeholder="例如 [^\[\]]+">
                                 </div>
@@ -447,7 +447,7 @@
                                     <label for="agentTtsVoiceSecondary">副语言模型:</label>
                                     <div class="model-input-container">
                                         <select id="agentTtsVoiceSecondary" name="ttsVoiceSecondary">
-                                            <option value="">不使用</option>
+                                            <option value="">不使�?/option>
                                         </select>
                                     </div>
                                 </div>
@@ -458,7 +458,7 @@
                                 </div>
 
                                 <div>
-                                    <label for="agentTtsSpeed">语速:</label>
+                                    <label for="agentTtsSpeed">语�?</label>
                                     <div class="slider-container">
                                         <input type="range" id="agentTtsSpeed" name="ttsSpeed" min="0.5" max="2.0"
                                             step="0.1" value="1.0">
@@ -474,7 +474,7 @@
                                 <button type="button" id="deleteAgentBtn" class="danger-button">删除此Agent</button>
                             </div>
                         </div>
-                    </form>
+                </div>
                 </div>
                 <p id="selectAgentPromptForSettings" style="display: block;">请先在“助手”标签页选择一个Agent以查看或修改其设置。</p>
             </div>
@@ -627,7 +627,7 @@
                             <path d="M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"></path>
                         </svg>
                     </button>
-                    <button id="doNotDisturbBtn" class="header-button" title="过滤模式（左键总开关/右键设置过滤规则）">
+                    <button id="doNotDisturbBtn" class="header-button" title="过滤模式（左键总开关，右键设置过滤规则）">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" class="lucide lucide-funnel-plus-icon lucide-funnel-plus"
@@ -1384,7 +1384,7 @@
                                     <div class="settings-form-group">
                                         <label for="speechRecognizerPagePath">STT 浏览器识别页路径:</label>
                                         <input type="text" id="speechRecognizerPagePath" name="speechRecognizerPagePath"
-                                            placeholder="默认: Voicechatmodules/recognizer.html">
+                                            placeholder="默认: Desktopmodules/legacy/Voicechatmodules/recognizer.html">
                                         <small style="color: var(--text-secondary); margin-top: 5px; display: block;">
                                             可配置用于浏览器语音识别的本地 HTML 页面相对路径，默认使用内置识别页。
                                         </small>
@@ -1398,13 +1398,13 @@
                                     </div>
 
                                     <div class="settings-form-group">
-                                        <label for="voiceNetworkProviderUrl">网络供应商 URL:</label>
-                                        <input type="url" id="voiceNetworkProviderUrl" name="voiceNetworkProviderUrl"
+                                        <label for="voiceLocalProviderUrl">网络供应商 URL:</label>
+                                        <input type="url" id="voiceLocalProviderUrl" name="voiceLocalProviderUrl"
                                             placeholder="例如: https://api.example.com/voice">
                                     </div>
                                     <div class="settings-form-group">
-                                        <label for="voiceNetworkProviderKey">网络供应商 Key:</label>
-                                        <input type="password" id="voiceNetworkProviderKey" name="voiceNetworkProviderKey">
+                                        <label for="voiceLocalProviderKey">网络供应商 Key:</label>
+                                        <input type="password" id="voiceLocalProviderKey" name="voiceLocalProviderKey">
                                     </div>
                                 </div>
 
@@ -1415,13 +1415,13 @@
                                     </div>
 
                                     <div class="settings-form-group">
-                                        <label for="voiceLocalSovitsUrl">本地 SoVITS URL:</label>
-                                        <input type="url" id="voiceLocalSovitsUrl" name="voiceLocalSovitsUrl"
+                                        <label for="voiceNetworkSovitsUrl">本地 SoVITS URL:</label>
+                                        <input type="url" id="voiceNetworkSovitsUrl" name="voiceNetworkSovitsUrl"
                                             placeholder="例如: http://127.0.0.1:9880">
                                     </div>
                                     <div class="settings-form-group">
-                                        <label for="voiceLocalSovitsKey">本地 SoVITS Key:</label>
-                                        <input type="password" id="voiceLocalSovitsKey" name="voiceLocalSovitsKey"
+                                        <label for="voiceNetworkSovitsKey">本地 SoVITS Key:</label>
+                                        <input type="password" id="voiceNetworkSovitsKey" name="voiceNetworkSovitsKey"
                                             placeholder="如无可留空">
                                     </div>
                                 </div>
@@ -1672,11 +1672,11 @@
         <div class="modal" id="createGroupModal">
             <div class="modal-content">
                 <span class="close-button" onclick="uiHelperFunctions.closeModal('createGroupModal')">×</span>
-                <h2>创建新群组</h2>
+                <h2>创建新群�?/h2>
                 <form id="createGroupForm">
                     <div>
                         <label for="newGroupNameInput">群组名称:</label>
-                        <input type="text" id="newGroupNameInput" name="groupName" placeholder="请输入群组名称" required>
+                        <input type="text" id="newGroupNameInput" name="groupName" placeholder="请输入群组名�? required>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="button-secondary"
@@ -1728,7 +1728,7 @@
                         </select>
                     </div>
                     <textarea id="global-search-input"
-                        placeholder="搜索聊天记录 (Ctrl+F)...&#10;支持多行搜索，Ctrl+Enter 或 Shift+Enter 执行搜索" rows="3"></textarea>
+                        placeholder="搜索聊天记录 (Ctrl+F)...&#10;支持多行搜索，Ctrl+Enter �?Shift+Enter 执行搜索" rows="3"></textarea>
                     <div id="global-search-results"></div>
                     <div id="global-search-pagination"></div>
                 </div>
@@ -1743,14 +1743,14 @@
                 <h2>转发消息</h2>
                 <div id="forward-modal-body">
                     <div class="form-group">
-                        <label for="forwardTargetSearch">转发给:</label>
-                        <input type="text" id="forwardTargetSearch" placeholder="搜索 Agent 或群组...">
+                        <label for="forwardTargetSearch">转发�?</label>
+                        <input type="text" id="forwardTargetSearch" placeholder="搜索 Agent 或群�?..">
                     </div>
                     <ul id="forwardTargetList" class="agent-list">
                         <!-- Target agents will be populated here -->
                     </ul>
                     <div class="form-group">
-                        <label for="forwardAdditionalComment">附加评论 (可选):</label>
+                        <label for="forwardAdditionalComment">附加评论 (可�?:</label>
                         <textarea id="forwardAdditionalComment" rows="3" placeholder="例如：你怎么看？"></textarea>
                     </div>
                     <div class="form-actions">
@@ -1767,7 +1767,7 @@
         <div class="modal" id="regexRuleModal">
             <div class="modal-content">
                 <span class="close-button" id="closeRegexRuleModal">×</span>
-                <h2>编辑正则表达式规则</h2>
+                <h2>编辑正则表达式规�?/h2>
                 <form id="regexRuleForm">
                     <input type="hidden" id="editingRegexRuleId">
 
@@ -1777,13 +1777,13 @@
                     </div>
 
                     <div>
-                        <label for="regexRuleFind">查找内容 (正则表达式):</label>
+                        <label for="regexRuleFind">查找内容 (正则表达�?:</label>
                         <textarea id="regexRuleFind" name="findPattern" rows="3"
-                            placeholder="例如：/\[VCP.*?\]/g"></textarea>
+                            placeholder="例如�?\[VCP.*?\]/g"></textarea>
                     </div>
 
                     <div>
-                        <label for="regexRuleReplace">替换为 (留空则为删除):</label>
+                        <label for="regexRuleReplace">替换�?(留空则为删除):</label>
                         <textarea id="regexRuleReplace" name="replaceWith" rows="2" placeholder="例如：[内容已隐藏]"></textarea>
                     </div>
 
@@ -1799,14 +1799,14 @@
                         <label>影响范围:</label>
                         <div class="checkbox-group">
                             <label title="仅影响聊天界面的显示，不改变实际数据">
-                                <input type="checkbox" id="applyToFrontend"> 应用于前端显示
+                                <input type="checkbox" id="applyToFrontend"> 应用于前端显�?
                             </label>
                             <label title="仅影响发送给AI的上下文，不改变聊天界面">
-                                <input type="checkbox" id="applyToContext"> 应用于AI上下文
+                                <input type="checkbox" id="applyToContext"> 应用于AI上下�?
                             </label>
                         </div>
                         <small style="color: var(--text-secondary); margin-top: 5px; display: block;">
-                            提示：可以同时勾选两项，或只勾选其中一项实现特定效果
+                            提示：可以同时勾选两项，或只勾选其中一项实现特定效�?
                         </small>
                     </div>
 
@@ -1814,11 +1814,11 @@
                         <label>深度控制 (-1代表无限):</label>
                         <div class="depth-control-group">
                             <div>
-                                <label for="regexRuleMinDepth">最小深度:</label>
+                                <label for="regexRuleMinDepth">最小深�?</label>
                                 <input type="number" id="regexRuleMinDepth" name="minDepth" value="0" min="-1">
                             </div>
                             <div>
-                                <label for="regexRuleMaxDepth">最大深度:</label>
+                                <label for="regexRuleMaxDepth">最大深�?</label>
                                 <input type="number" id="regexRuleMaxDepth" name="maxDepth" value="-1" min="-1">
                             </div>
                         </div>
@@ -1842,7 +1842,7 @@
                 <div class="filter-rules-header"
                     style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px;">
                     <div style="display: flex; align-items: center; gap: 8px; flex: 0 1 auto;">
-                        <span style="font-weight: 500; color: var(--secondary-text); white-space: nowrap;">当前状态:</span>
+                        <span style="font-weight: 500; color: var(--secondary-text); white-space: nowrap;">当前状�?</span>
                         <span id="filterStatus"
                             style="color: var(--text-secondary); font-size: 0.95em; white-space: nowrap;"></span>
                     </div>
@@ -1851,15 +1851,15 @@
                 </div>
 
                 <div id="filterRulesList" class="filter-rules-list">
-                    <!-- 过滤规则将在这里动态显示 -->
+                    <!-- 过滤规则将在这里动态显�?-->
                 </div>
 
                 <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
                     <div style="font-size: 0.9em; color: var(--text-secondary);">
-                        <p><strong>使用说明：</strong></p>
-                        <p>• <strong>过滤总开关关闭：</strong>显示所有通知</p>
-                        <p>• <strong>过滤总开关开启：</strong>只显示白名单规则匹配的消息，其他消息都被过滤掉</p>
-                        <p>• <strong>停留时间：</strong>可设置每条规则对应的通知显示时长，支持永久显示</p>
+                        <p><strong>使用说明�?/strong></p>
+                        <p>�?<strong>过滤总开关关闭：</strong>显示所有通知</p>
+                        <p>�?<strong>过滤总开关开启：</strong>只显示白名单规则匹配的消息，其他消息都被过滤�?/p>
+                        <p>�?<strong>停留时间�?/strong>可设置每条规则对应的通知显示时长，支持永久显�?/p>
                     </div>
                 </div>
             </div>
@@ -1876,7 +1876,7 @@
 
                     <div>
                         <label for="filterRuleName">规则名称:</label>
-                        <input type="text" id="filterRuleName" name="name" placeholder="例如：系统消息过滤" required>
+                        <input type="text" id="filterRuleName" name="name" placeholder="例如：系统消息过�? required>
                     </div>
 
                     <div class="form-fieldset">
@@ -1891,44 +1891,44 @@
 
                     <div>
                         <label for="filterRulePattern">匹配模式:</label>
-                        <input type="text" id="filterRulePattern" name="pattern" placeholder="消息标题中包含的关键字或正则表达式"
+                        <input type="text" id="filterRulePattern" name="pattern" placeholder="消息标题中包含的关键字或正则表达�?
                             required>
                         <small style="color: var(--text-secondary); margin-top: 5px; display: block;">
-                            支持简单的关键字匹配或正则表达式（无需/包围）
+                            支持简单的关键字匹配或正则表达式（无需/包围�?
                         </small>
                     </div>
 
                     <div class="form-fieldset">
                         <label>匹配位置:</label>
                         <div class="checkbox-group">
-                            <label><input type="checkbox" name="matchPosition" value="start"> 标题开头</label>
+                            <label><input type="checkbox" name="matchPosition" value="start"> 标题开�?/label>
                             <label><input type="checkbox" name="matchPosition" value="end"> 标题结尾</label>
                             <label><input type="checkbox" name="matchPosition" value="contain"> 标题包含</label>
                         </div>
                     </div>
 
                     <div>
-                        <label for="filterRuleDuration">消息停留时间（秒）:</label>
+                        <label for="filterRuleDuration">消息停留时间（秒�?</label>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <input type="number" id="filterRuleDuration" name="duration" min="0" max="300" value="7"
                                 style="width: 80px;"
                                 oninput="this.value = Math.max(0, Math.min(300, parseInt(this.value) || 0))">
-                            <span>秒</span>
+                            <span>�?/span>
                             <label for="filterRuleDurationInfinite"
                                 style="display: flex; align-items: center; gap: 5px;">
                                 <input type="checkbox" id="filterRuleDurationInfinite" name="durationInfinite">
-                                永久显示（不自动消失）
+                                永久显示（不自动消失�?
                             </label>
                         </div>
                         <small style="color: var(--text-secondary); margin-top: 5px; display: block;">
-                            设为0表示立即消失，1-300秒表示停留指定时间后消失，勾选永久显示则不自动消失
+                            设为0表示立即消失�?-300秒表示停留指定时间后消失，勾选永久显示则不自动消�?
                         </small>
                     </div>
 
                     <div class="form-fieldset">
                         <label for="filterRuleEnabled" style="display: flex; align-items: center; gap: 5px;">
                             <input type="checkbox" id="filterRuleEnabled" name="enabled" checked>
-                            启用此规则
+                            启用此规�?
                         </label>
                     </div>
 
@@ -1943,7 +1943,7 @@
 
     <div id="floating-toast-notifications-container"></div>
 
-    <!-- Pretext 文本布局引擎（纯算术高度预算，避免 reflow） -->
+    <!-- Pretext 文本布局引擎（纯算术高度预算，避�?reflow�?-->
     <script src="modules/renderer/pretext.bundle.js"></script>
     <script src="modules/renderer/pretext-bridge.js"></script>
 
@@ -1956,17 +1956,18 @@
     <script src="modules/chatManager.js"></script>
     <script src="modules/uiManager.js"></script>
     <script src="modules/settingsManager.js"></script>
-    <script src="modules/emoticonManager.js"></script> <!-- 新增：用户表情包管理器 -->
+    <script src="modules/emoticonManager.js"></script> <!-- 新增：用户表情包管理�?-->
     <script src="modules/filterManager.js"></script> <!-- 新增：过滤规则管理器 -->
     <script src="modules/ui-helpers.js"></script>
+    <script src="modules/trayManager.js"></script>
     <!-- Promptmodules -->
-    <script src="Promptmodules/original-prompt-module.js"></script>
-    <script src="Promptmodules/modular-prompt-module.js"></script>
-    <script src="Promptmodules/preset-prompt-module.js"></script>
-    <script src="Promptmodules/prompt-manager.js"></script>
+    <script src="Desktopmodules/legacy/Promptmodules/original-prompt-module.js"></script>
+    <script src="Desktopmodules/legacy/Promptmodules/modular-prompt-module.js"></script>
+    <script src="Desktopmodules/legacy/Promptmodules/preset-prompt-module.js"></script>
+    <script src="Desktopmodules/legacy/Promptmodules/prompt-manager.js"></script>
     <script src="vendor/Sortable.min.js"></script>
-    <script src="Groupmodules/groupSettingsMarkup.js"></script>
-    <script src="Groupmodules/grouprenderer.js"></script>
+    <script src="Desktopmodules/legacy/Groupmodules/groupSettingsMarkup.js"></script>
+    <script src="Desktopmodules/legacy/Groupmodules/grouprenderer.js"></script>
     <script type="module" src="modules/renderer/colorUtils.js"></script>
     <script type="module" src="modules/renderer/imageHandler.js"></script>
     <script type="module" src="modules/renderer/domBuilder.js"></script>
@@ -1974,8 +1975,8 @@
     <script type="module" src="modules/renderer/contentProcessor.js"></script>
     <script type="module" src="modules/renderer/messageContextMenu.js"></script>
     <script type="module" src="modules/event-listeners.js"></script>
-    <script src="Flowlockmodules/flowlock.js"></script>
-    <script src="Flowlockmodules/flowlock-integration.js"></script>
+    <script src="Desktopmodules/legacy/Flowlockmodules/flowlock.js"></script>
+    <script src="Desktopmodules/legacy/Flowlockmodules/flowlock-integration.js"></script>
     <script type="module" src="renderer.js" defer></script>
 
     <!-- User Emoticon Panel -->

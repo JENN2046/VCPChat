@@ -249,7 +249,7 @@ function createOrFocusNotesWindow() {
         show: false
     });
 
-    const notesUrl = `file://${path.join(__dirname, '..', '..', 'Notemodules', 'notes.html')}`; // Corrected path
+    const notesUrl = `file://${path.join(__dirname, '..', '..', 'Desktopmodules', 'legacy', 'Notemodules', 'notes.html')}`; // Corrected path
     notesWindow.loadURL(notesUrl);
     windowService.attachWindow(WINDOW_APP_IDS.NOTES, notesWindow);
     

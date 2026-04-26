@@ -191,7 +191,7 @@ function ensureRagOverlayWindow() {
 
     ragOverlayWindow = new BrowserWindow(windowConfig);
 
-    const overlayUrl = `file://${path.join(app.getAppPath(), 'RAGmodules', 'RAG_Overlay.html')}`;
+    const overlayUrl = `file://${path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'RAGmodules', 'RAG_Overlay.html')}`;
     ragOverlayReady = false;
     ragOverlayWindow.loadURL(overlayUrl);
     ragOverlayWindow.setAlwaysOnTop(true, 'screen-saver');
@@ -273,7 +273,7 @@ async function openRagObserverWindow() {
     const vcpLogKey = settings.vcpLogKey || '';
     const currentThemeMode = settings.currentThemeMode || 'dark';
 
-    const observerUrl = `file://${path.join(app.getAppPath(), 'RAGmodules', 'RAG_Observer.html')}?vcpLogUrl=${encodeURIComponent(vcpLogUrl)}&vcpLogKey=${encodeURIComponent(vcpLogKey)}&currentThemeMode=${encodeURIComponent(currentThemeMode)}`;
+    const observerUrl = `file://${path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'RAGmodules', 'RAG_Observer.html')}?vcpLogUrl=${encodeURIComponent(vcpLogUrl)}&vcpLogKey=${encodeURIComponent(vcpLogKey)}&currentThemeMode=${encodeURIComponent(currentThemeMode)}`;
 
     ragObserverWindow.loadURL(observerUrl);
     ragObserverWindow.setMenu(null);

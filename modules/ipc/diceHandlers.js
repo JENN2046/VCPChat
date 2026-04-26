@@ -1,4 +1,4 @@
-// modules/ipc/diceHandlers.js
+﻿// modules/ipc/diceHandlers.js
 
 const { ipcMain, BrowserWindow, dialog } = require('electron');
 const path = require('path');
@@ -23,7 +23,7 @@ function startDiceServer(projectRoot) {
         const port = 6677;
 
         // Serve static files from the project root
-        app.use('/', express.static(path.join(projectRoot, 'Dicemodules')));
+        app.use('/', express.static(path.join(projectRoot, 'Desktopmodules', 'legacy', 'Dicemodules')));
         app.use('/node_modules', express.static(path.join(projectRoot, 'node_modules')));
         app.use('/styles', express.static(path.join(projectRoot, 'styles')));
         app.use('/assets', express.static(path.join(projectRoot, 'assets')));
@@ -43,7 +43,7 @@ async function createOrFocusDiceWindow(projectRoot) {
         await startDiceServer(projectRoot); // Ensure the server is running
     } catch (error) {
         console.error("Cannot create dice window because server failed to start.", error);
-        dialog.showErrorBox("骰子服务启动失败", "无法启动后台Web服务器，请检查端口6677是否被占用。");
+        dialog.showErrorBox("骰子服务启动失败", "无法启动后台 Web 服务器，请检查端口 6677 是否被占用。");
         return; // Stop if server fails
     }
 

@@ -15,6 +15,9 @@ use tantivy::{doc, Index, tokenizer::BoxTokenStream};
 use tokio::fs;
 use futures::future::join_all;
 
+mod path_roots;
+use path_roots::{create_plugin_roots, resolve_configured_path};
+
 // --- Jieba Tokenizer for Tantivy ---
 
 #[derive(Clone)]
@@ -757,24 +760,19 @@ fn load_config() -> Result<Config> {
         .into_iter()
         .find(|p| p.exists())
         .ok_or_else(|| anyhow!("config.env not found in search paths"))?;
+    let plugin_root = config_path
+        .parent()
+        .ok_or_else(|| anyhow!("Failed to determine plugin root from config path"))?;
+    let roots = create_plugin_roots(plugin_root);
     
     dotenv::from_path(&config_path).with_context(|| format!("Failed to load .env file from {:?}", config_path))?;
 
-    let vchat_data_url = match std::env::var("VchatDataURL") {
-        Ok(url) if !url.trim().is_empty() => PathBuf::from(url),
-        _ => {
-            // config_path is VCPDistributedServer/Plugin/DeepMemo/config.env
-            // Project root (h:/MCP/VCPChat) is 4 levels up from config_path.
-            let project_root = config_path
-                .parent()
-                .and_then(|p| p.parent())
-                .and_then(|p| p.parent())
-                .and_then(|p| p.parent())
-                .ok_or_else(|| anyhow!("Failed to determine project root from config path."))?;
-
-            project_root.join("AppData")
-        }
-    };
+    let vchat_data_url = resolve_configured_path(
+        std::env::var("VchatDataURL").ok().as_deref(),
+        &roots,
+        &roots.plugin_root,
+        roots.runtime_data_root.join(""),
+    );
 
     Ok(Config {
         vchat_data_url,

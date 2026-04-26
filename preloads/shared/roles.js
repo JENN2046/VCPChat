@@ -38,6 +38,7 @@ const SHARED_KEYS = [
     'openMemoWindow',
     'openMusicWindow',
     'openCanvasWindow',
+    'openSheetWindow',
     'openDesktopWindow',
 ];
 

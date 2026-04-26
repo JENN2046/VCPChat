@@ -23,21 +23,49 @@ const fsSync = require('fs');
 const dotenv = require('dotenv');
 const os = require('os');
 const mime = require('mime-types');
+const { createServerRoots } = require('../modules/utils/vcpPathRoots');
  // const { ipcMain } = require('electron'); // This was incorrect. ipcMain should be injected.
  const pluginManager = require('./Plugin.js');
-const GENERATED_LISTS_CONFIG_PATH = path.join(__dirname, '..', 'AppData', 'generated_lists', 'config.env');
+const serverRoots = createServerRoots(__dirname);
+const GENERATED_LISTS_CONFIG_PATH = path.join(serverRoots.runtimeDataRoot, 'generated_lists', 'config.env');
+const TOOLBOX_CONFIG_PATH = path.resolve(__dirname, '..', '..', 'VCPToolBox', 'config.env');
 
 // DEBUG_MODE is now passed in config
 // const DEBUG_MODE = (process.env.DebugMode || "False").toLowerCase() === "true";
+
+function normalizeEnvKeyAliases(config = {}) {
+    const normalized = { ...config };
+    const fileKey = normalized.file_key || normalized.File_Key || normalized.FILE_KEY;
+
+    if (fileKey) {
+        normalized.file_key = fileKey;
+        normalized.File_Key = fileKey;
+        normalized.FILE_KEY = fileKey;
+    }
+
+    return normalized;
+}
 
 function loadGeneratedListsConfig() {
     try {
         if (!fsSync.existsSync(GENERATED_LISTS_CONFIG_PATH)) {
             return {};
         }
-        return dotenv.parse(fsSync.readFileSync(GENERATED_LISTS_CONFIG_PATH));
+        return normalizeEnvKeyAliases(dotenv.parse(fsSync.readFileSync(GENERATED_LISTS_CONFIG_PATH, 'utf8')));
     } catch (error) {
         console.error('[DistributedServer] Failed to read generated_lists/config.env:', error.message);
+        return {};
+    }
+}
+
+function loadToolBoxConfig() {
+    try {
+        if (!fsSync.existsSync(TOOLBOX_CONFIG_PATH)) {
+            return {};
+        }
+        return normalizeEnvKeyAliases(dotenv.parse(fsSync.readFileSync(TOOLBOX_CONFIG_PATH, 'utf8')));
+    } catch (error) {
+        console.error('[DistributedServer] Failed to read VCPToolBox/config.env:', error.message);
         return {};
     }
 }
@@ -147,12 +175,24 @@ class DistributedServer {
 
     registerDiagnosticRoutes() {
         const generatedConfig = loadGeneratedListsConfig();
-        const fileKey = generatedConfig.file_key;
+        const toolboxConfig = loadToolBoxConfig();
+        const fileKey =
+            generatedConfig.file_key
+            || generatedConfig.File_Key
+            || generatedConfig.FILE_KEY
+            || toolboxConfig.file_key
+            || toolboxConfig.File_Key
+            || toolboxConfig.FILE_KEY
+            || process.env.file_key
+            || process.env.File_Key
+            || process.env.FILE_KEY;
 
         if (!fileKey) {
-            console.error(`[${this.serverName}] DesktopRemote test route disabled: missing file_key in AppData/generated_lists/config.env.`);
+            console.error(`[${this.serverName}] DesktopRemote test route disabled: missing file_key/File_Key in AppData/generated_lists/config.env and VCPToolBox/config.env.`);
             return;
         }
+
+        console.log(`[${this.serverName}] DesktopRemote test route enabled using file_key from generated_lists/config.env, VCPToolBox/config.env, or process.env.`);
 
         this.app.post(/\/pw=([^\/]+)\/desktop-remote-test/, async (req, res) => {
             const requestKey = req.params[0];
@@ -415,7 +455,7 @@ class DistributedServer {
     // 新增：检查是否应该记录静态插件日志
     async shouldLogStaticPlugins() {
         try {
-            const settingsPath = path.join(__dirname, '..', 'AppData', 'settings.json');
+            const settingsPath = path.join(serverRoots.runtimeDataRoot, 'settings.json');
             if (!fsSync.existsSync(settingsPath)) {
                 return true; // 默认启用日志
             }

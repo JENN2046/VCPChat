@@ -8,17 +8,20 @@ const mammoth = require('mammoth');
 const ExcelJS = require('exceljs');
 const axios = require('axios');
 const { validateCode } = require('./CodeValidator');
+const { createPluginRoots, resolveConfiguredPath } = require('../../../modules/utils/vcpPathRoots');
 
 // Load environment variables without writing tips to stdout,
 // because plugin stdout must remain clean JSON for the VCP protocol.
 require('dotenv').config({ quiet: true });
 
 // Configuration
-const CANVAS_DIRECTORY = path.join(__dirname, '..', '..', '..', 'AppData', 'Canvas');
+const roots = createPluginRoots(__dirname);
+const CANVAS_DIRECTORY = path.join(roots.runtimeDataRoot, 'Canvas');
 const ALLOWED_DIRECTORIES = (process.env.ALLOWED_DIRECTORIES || '')
   .split(',')
   .map(dir => dir.trim())
-  .filter(dir => dir);
+  .filter(dir => dir)
+  .map(dir => resolveConfiguredPath(dir, roots, { baseRoot: roots.workspaceRoot }));
 
 // Ensure the dedicated canvas directory is always allowed
 if (!ALLOWED_DIRECTORIES.includes(CANVAS_DIRECTORY)) {
@@ -27,7 +30,10 @@ if (!ALLOWED_DIRECTORIES.includes(CANVAS_DIRECTORY)) {
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE) || 20971520; // 20MB default
 const MAX_DIRECTORY_ITEMS = parseInt(process.env.MAX_DIRECTORY_ITEMS) || 1000;
 const MAX_SEARCH_RESULTS = parseInt(process.env.MAX_SEARCH_RESULTS) || 100;
-const DEFAULT_DOWNLOAD_DIR = (process.env.DEFAULT_DOWNLOAD_DIR || '').trim();
+const DEFAULT_DOWNLOAD_DIR = resolveConfiguredPath(process.env.DEFAULT_DOWNLOAD_DIR || '', roots, {
+  baseRoot: roots.workspaceRoot,
+  fallback: '',
+});
 const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 const ENABLE_RECURSIVE_OPERATIONS = process.env.ENABLE_RECURSIVE_OPERATIONS !== 'false';
 const ENABLE_HIDDEN_FILES = process.env.ENABLE_HIDDEN_FILES === 'true';
@@ -228,7 +234,7 @@ async function runValidationAndAttachResults(result, filePath, fileContent) {
 // File operation functions
 async function webReadFile(fileUrl) {
   try {
-    const fileDir = path.join(__dirname, '..', '..', '..', 'AppData', 'file');
+    const fileDir = path.join(roots.runtimeDataRoot, 'file');
     await fs.mkdir(fileDir, { recursive: true }); // Ensure directory exists
 
     // Extract filename from URL, handling potential query strings
@@ -936,7 +942,7 @@ async function downloadFile(url, downloadDir, customFileName) {
     } else if (DEFAULT_DOWNLOAD_DIR) {
       baseDir = DEFAULT_DOWNLOAD_DIR;
     } else {
-      baseDir = path.join(__dirname, '..', '..', '..', 'AppData', 'file');
+      baseDir = path.join(roots.runtimeDataRoot, 'file');
     }
 
     const destinationPath = path.join(baseDir, fileName);

@@ -25,7 +25,7 @@ const os = require('os');
 const { spawn } = require('child_process'); // For executing local python
 const { Worker } = require('worker_threads');
 const fileManager = require('./modules/fileManager'); // Import the new file manager
-const groupChat = require('./Groupmodules/groupchat'); // Import the group chat module
+const groupChat = require('./Desktopmodules/legacy/Groupmodules/groupchat'); // Import the group chat module
 const windowHandlers = require('./modules/ipc/windowHandlers'); // Import window IPC handlers
 const settingsHandlers = require('./modules/ipc/settingsHandlers'); // Import settings IPC handlers
 const fileDialogHandlers = require('./modules/ipc/fileDialogHandlers'); // Import file dialog handlers
@@ -676,6 +676,8 @@ if (!gotTheLock) {
             }
         }
 
+        promptHandlers.initialize({ AGENT_DIR, APP_DATA_ROOT_IN_PROJECT });
+
         // Create the main window first to give immediate feedback to the user.
         createWindow();
         createTray();
@@ -933,7 +935,7 @@ if (!gotTheLock) {
             const vcpServerUrl = settings.vcpServerUrl || '';
             const vcpApiKey = settings.vcpApiKey || '';
 
-            const translatorUrl = `file://${path.join(__dirname, 'Translatormodules', 'translator.html')}?vcpServerUrl=${encodeURIComponent(vcpServerUrl)}&vcpApiKey=${encodeURIComponent(vcpApiKey)}`;
+                const translatorUrl = `file://${path.join(__dirname, 'Desktopmodules', 'legacy', 'Translatormodules', 'translator.html')}?vcpServerUrl=${encodeURIComponent(vcpServerUrl)}&vcpApiKey=${encodeURIComponent(vcpApiKey)}`;
             console.log(`[Main Process] Attempting to load URL in translator window: ${translatorUrl.substring(0, 200)}...`);
 
             translatorWindow.webContents.on('did-start-loading', () => {
@@ -1065,7 +1067,9 @@ if (!gotTheLock) {
         canvasHandlers.initialize({ mainWindow, openChildWindows, CANVAS_CACHE_DIR });
         desktopHandlers.initialize({ mainWindow, openChildWindows, settingsManager: appSettingsManager });
         desktopRemoteHandlers.initialize({ mainWindow });
-        promptHandlers.initialize({ AGENT_DIR, APP_DATA_ROOT_IN_PROJECT });
+        ipcMain.handle('codex-router-host:control', async (event, commandPayload) => {
+            return desktopRemoteHandlers.handleCodexRouterHostControl(commandPayload || {});
+        });
 
         ipcMain.on('minimize-to-tray', () => {
             if (mainWindow) {
@@ -1090,7 +1094,8 @@ if (!gotTheLock) {
                         handleDiceControl: diceHandlers.handleDiceControl, // Inject the dice control handler
                         handleCanvasControl: desktopRemoteHandlers.handleCanvasControl, // Inject the canvas control handler
                         handleFlowlockControl: desktopRemoteHandlers.handleFlowlockControl, // Inject the flowlock control handler
-                        handleDesktopRemoteControl: desktopRemoteHandlers.handleDesktopRemoteControl // Inject the desktop remote control handler
+                        handleDesktopRemoteControl: desktopRemoteHandlers.handleDesktopRemoteControl, // Inject the desktop remote control handler
+                        handleCodexRouterHostControl: desktopRemoteHandlers.handleCodexRouterHostControl
                     };
                     distributedServer = new DistributedServer(config);
                     await distributedServer.initialize();
@@ -1287,19 +1292,19 @@ if (!gotTheLock) {
     function connectVcpLog(wsUrl, wsKey) {
         const WebSocket = require('ws'); // Lazy load
         if (!wsUrl || !wsKey) {
-            if (mainWindow) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'error', message: 'URL或KEY未配置。' });
+            if (mainWindow) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'error', message: 'URL\u6216KEY\u672a\u914d\u7f6e\u3002' });
             return;
         }
 
         const fullWsUrl = `${wsUrl}/VCPlog/VCP_Key=${wsKey}`;
 
         if (vcpLogWebSocket && (vcpLogWebSocket.readyState === WebSocket.OPEN || vcpLogWebSocket.readyState === WebSocket.CONNECTING)) {
-            console.log('VCPLog WebSocket 已连接或正在连接。');
+            console.log('VCPLog WebSocket is already connected or connecting.');
             return;
         }
 
-        console.log(`尝试连接 VCPLog WebSocket: ${fullWsUrl}`);
-        if (mainWindow) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'connecting', message: '连接中...' });
+        console.log(`Connecting VCPLog WebSocket: ${fullWsUrl}`);
+        if (mainWindow) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'connecting', message: '\u8fde\u63a5\u4e2d...' });
 
         vcpLogWebSocket = new WebSocket(fullWsUrl);
 
@@ -1307,9 +1312,9 @@ if (!gotTheLock) {
             console.log('[MAIN_VCP_LOG] WebSocket onopen event triggered.');
             if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents && !mainWindow.webContents.isDestroyed()) {
                 console.log('[MAIN_VCP_LOG] Attempting to send vcp-log-status "open" to renderer.');
-                mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'open', message: '已连接' });
+                mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'open', message: '\u5df2\u8fde\u63a5' });
                 console.log('[MAIN_VCP_LOG] vcp-log-status "open" sent.');
-                mainWindow.webContents.send('vcp-log-message', { type: 'connection_ack', message: 'VCPLog 连接成功！' });
+                mainWindow.webContents.send('vcp-log-message', { type: 'connection_ack', message: 'VCPLog \u8fde\u63a5\u6210\u529f\uff01' });
             } else {
                 console.error('[MAIN_VCP_LOG] mainWindow or webContents not available in onopen. Cannot send status.');
             }
@@ -1320,21 +1325,21 @@ if (!gotTheLock) {
         };
 
         vcpLogWebSocket.onmessage = (event) => {
-            console.log('VCPLog 收到消息:', event.data);
+            console.log('VCPLog message received:', event.data);
             try {
                 const data = JSON.parse(event.data.toString());
                 if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('vcp-log-message', data);
             } catch (e) {
-                console.error('VCPLog 解析消息失败:', e);
-                if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('vcp-log-message', { type: 'error', data: `收到无法解析的消息: ${event.data.toString().substring(0, 100)}...` });
+                console.error('Failed to parse VCPLog message:', e);
+                if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('vcp-log-message', { type: 'error', data: `\u6536\u5230\u65e0\u6cd5\u89e3\u6790\u7684\u6d88\u606f: ${event.data.toString().substring(0, 100)}...` });
             }
         };
 
         vcpLogWebSocket.onclose = (event) => {
-            console.log('VCPLog WebSocket 连接已关闭:', event.code, event.reason);
-            if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'closed', message: `连接已断开 (${event.code})` });
+            console.log('VCPLog WebSocket closed:', event.code, event.reason);
+            if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'closed', message: `\u8fde\u63a5\u5df2\u65ad\u5f00 (${event.code})` });
             if (!vcpLogReconnectInterval && wsUrl && wsKey) {
-                console.log('将在5秒后尝试重连 VCPLog...');
+                console.log('Retrying VCPLog connection in 5 seconds...');
                 vcpLogReconnectInterval = setTimeout(() => {
                     vcpLogReconnectInterval = null;
                     connectVcpLog(wsUrl, wsKey);
@@ -1345,7 +1350,7 @@ if (!gotTheLock) {
         vcpLogWebSocket.onerror = (error) => {
             console.error('[MAIN_VCP_LOG] WebSocket onerror event:', error.message);
             if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents && !mainWindow.webContents.isDestroyed()) {
-                mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'error', message: '连接错误' });
+                mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'error', message: '\u8fde\u63a5\u9519\u8bef' });
             } else {
                 console.error('[MAIN_VCP_LOG] mainWindow or webContents not available in onerror.');
             }
@@ -1371,16 +1376,16 @@ if (!gotTheLock) {
             clearTimeout(vcpLogReconnectInterval);
             vcpLogReconnectInterval = null;
         }
-        if (mainWindow) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'closed', message: '已手动断开' });
-        console.log('VCPLog 已手动断开');
+        if (mainWindow) mainWindow.webContents.send('vcp-log-status', { source: 'VCPLog', status: 'closed', message: '\u5df2\u624b\u52a8\u65ad\u5f00' });
+        console.log('VCPLog manually disconnected.');
     });
 
     ipcMain.on('send-vcplog-message', (event, data) => {
         if (vcpLogWebSocket && vcpLogWebSocket.readyState === 1) { // 1 is WebSocket.OPEN
-            console.log('VCPLog 发送消息:', data);
+            console.log('Sending VCPLog message:', data);
             vcpLogWebSocket.send(JSON.stringify(data));
         } else {
-            console.warn('VCPLog WebSocket 未连接或未就绪，无法发送消息:', data);
+            console.warn('VCPLog WebSocket is not connected or ready; cannot send message:', data);
         }
     });
 
@@ -1410,7 +1415,7 @@ ipcMain.on('open-voice-chat-window', (event, { agentId }) => {
         voiceChatWindow.webContents.send('voice-chat-data', { agentId, theme });
     });
     
-    voiceChatWindow.loadFile(path.join(__dirname, 'Voicechatmodules/voicechat.html'));
+    voiceChatWindow.loadFile(path.join(__dirname, 'Desktopmodules/legacy/Voicechatmodules/voicechat.html'));
 
     voiceChatWindow.once('ready-to-show', () => {
         voiceChatWindow.show();
@@ -1436,7 +1441,7 @@ ipcMain.on('start-speech-recognition', async (event) => {
         const settings = await appSettingsManager.readSettings();
         speechConfig = {
             browserPath: settings?.speechRecognizerBrowserPath || '',
-            recognizerPagePath: settings?.speechRecognizerPagePath || 'Voicechatmodules/recognizer.html'
+    recognizerPagePath: settings?.speechRecognizerPagePath || 'Desktopmodules/legacy/Voicechatmodules/recognizer.html'
         };
     } catch (error) {
         console.warn('[Main] Failed to read speech recognition settings, using defaults:', error.message);

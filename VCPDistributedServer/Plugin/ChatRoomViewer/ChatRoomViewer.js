@@ -2,6 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const os = require('os');
 const WebSocket = require('ws');
+const { createPluginRoots } = require('../../../modules/utils/vcpPathRoots');
 const chokidar = require('chokidar'); // 添加chokidar用于实时文件监控
 
 // 全局变量用于存储最新数据
@@ -27,6 +28,7 @@ let currentAgentConfigs = new Set();
 // 从环境变量读取配置
 const debugMode = (process.env.DebugMode || "false").toLowerCase() === "true";
 const enabled = (process.env.Enabled || "true").toLowerCase() === "true";
+const defaultRoots = createPluginRoots(__dirname);
 const customVCPChatRoot = process.env.VCPChatRoot; // 自定义VCPChat根目录
 const timeZone = process.env.TimeZone || "Asia/Shanghai"; // 默认东八区
 
@@ -92,7 +94,7 @@ function initializeFileWatchers() {
     setImmediate(async () => {
         try {
             const mainDir = getVCPChatMainDirectory();
-            const settingsPath = path.join(mainDir, 'AppData', 'settings.json');
+            const settingsPath = path.join(getRuntimeDataRoot(), 'settings.json');
             
             // 监控settings.json文件变化（进一步降低稳定性阈值）
             const settingsWatcher = chokidar.watch(settingsPath, {
@@ -165,7 +167,7 @@ function initializeFileWatchers() {
 async function initializeAgentConfigWatchers() {
     try {
         const mainDir = getVCPChatMainDirectory();
-        const agentsDir = path.join(mainDir, 'AppData', 'Agents');
+        const agentsDir = path.join(getRuntimeDataRoot(), 'Agents');
         
         // 监控整个Agents目录的变化（进一步优化监控参数）
         const agentDirWatcher = chokidar.watch(agentsDir, {
@@ -287,7 +289,7 @@ async function initializeSessionFileWatcher() {
         
         // 同时监控UserData目录以检测新的会话文件（进一步优化监控参数）
         const mainDir = getVCPChatMainDirectory();
-        const userDataDir = path.join(mainDir, 'AppData', 'UserData');
+        const userDataDir = path.join(getRuntimeDataRoot(), 'UserData');
         
         if (!fileWatchers.has('userDataDir')) {
             const userDataDirWatcher = chokidar.watch(userDataDir, {
@@ -391,7 +393,7 @@ async function initializeGroupSessionWatcher() {
             
             // 监控AgentGroups目录以检测新的群聊会话文件
             const mainDir = getVCPChatMainDirectory();
-            const agentGroupsDir = path.join(mainDir, 'AppData', 'AgentGroups');
+            const agentGroupsDir = path.join(getRuntimeDataRoot(), 'AgentGroups');
             
             if (!fileWatchers.has('agentGroupsDir')) {
                 const agentGroupsDirWatcher = chokidar.watch(agentGroupsDir, {
@@ -477,21 +479,28 @@ function getVCPChatMainDirectory() {
     }
     
     // 从当前插件路径推断主目录
-    const currentDir = __dirname;
     // 插件路径格式：/path/to/VCPChat/VCPDistributedServer/Plugin/ChatRoomViewer
     // 需要回到 /path/to/VCPChat
-    const vcpChatMainDir = path.resolve(currentDir, '../../..');
+    const vcpChatMainDir = defaultRoots.workspaceRoot;
     
     FORCE_LOG('[ChatRoomViewer] Auto-detected VCPChat root:', vcpChatMainDir);
     return vcpChatMainDir;
 }
 
 // 读取VCPChat设置文件
+function getRuntimeDataRoot() {
+    if (customVCPChatRoot) {
+        return path.join(customVCPChatRoot, 'AppData');
+    }
+
+    return defaultRoots.runtimeDataRoot;
+}
+
 async function readVCPChatSettings() {
     try {
         const mainDir = getVCPChatMainDirectory();
         // VCPChat的settings.json位于AppData目录下，不是用户主目录
-        const settingsPath = path.join(mainDir, 'AppData', 'settings.json');
+        const settingsPath = path.join(getRuntimeDataRoot(), 'settings.json');
         
         FORCE_LOG('[ChatRoomViewer] Attempting to read settings from:', settingsPath);
         
@@ -612,7 +621,7 @@ function parseThemeFromCSS(cssContent, settings = null) {
 async function getCurrentNodeInfo() {
     try {
         const mainDir = getVCPChatMainDirectory();
-        const agentsDir = path.join(mainDir, 'AppData', 'Agents');
+        const agentsDir = path.join(getRuntimeDataRoot(), 'Agents');
         
         // 获取所有Agent目录
         const agentDirs = await fs.readdir(agentsDir, { withFileTypes: true });
@@ -787,7 +796,7 @@ async function generateThemeInfo() {
 async function getCurrentSessionWatcher() {
     try {
         const mainDir = getVCPChatMainDirectory();
-        const userDataDir = path.join(mainDir, 'AppData', 'UserData');
+        const userDataDir = path.join(getRuntimeDataRoot(), 'UserData');
         
         // 查找最新修改的history.json文件
         let latestFile = null;
@@ -1045,7 +1054,7 @@ function formatDuration(milliseconds) {
 async function generateGroupSessionWatcher() {
     try {
         const mainDir = getVCPChatMainDirectory();
-        const groupDataDir = path.join(mainDir, 'AppData', 'UserData');
+        const groupDataDir = path.join(getRuntimeDataRoot(), 'UserData');
         
         // 查找群聊会话文件（以_Agent_开头但实际是群聊的特殊处理）
         let latestGroupFile = null;
@@ -1124,7 +1133,7 @@ async function generateGroupSessionWatcher() {
 async function getAllAgentsInfo() {
     try {
         const mainDir = getVCPChatMainDirectory();
-        const agentsDir = path.join(mainDir, 'AppData', 'Agents');
+        const agentsDir = path.join(getRuntimeDataRoot(), 'Agents');
         
         // 获取所有Agent目录
         const agentDirs = await fs.readdir(agentsDir, { withFileTypes: true });

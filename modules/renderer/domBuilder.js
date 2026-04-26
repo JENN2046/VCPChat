@@ -22,7 +22,7 @@
 
 function fixVoiceChatAssetPath(url) {
     if (!url) return url;
-    const isVoiceChatPage = window.location.pathname.replace(/\\/g, '/').includes('/Voicechatmodules/');
+const isVoiceChatPage = window.location.pathname.replace(/\\/g, '/').includes('/Desktopmodules/legacy/Voicechatmodules/');
     if (!isVoiceChatPage) return url;
     if (url.startsWith('assets/')) return `../${url}`;
     return url;

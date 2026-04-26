@@ -101,6 +101,16 @@
             <circle cx="34" cy="28" r="4" fill="#FFE66D" opacity="0.8"/>
             <path d="M8 40l6-14 4 8 6-20 6 16 4-6 6 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.5"/>
         </svg>`,
+        aiImageGen: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="40" height="40" rx="8" fill="currentColor" opacity="0.08"/>
+            <rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <path d="M16 14h16M16 20h12M16 26h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+            <circle cx="34" cy="32" r="8" fill="currentColor" opacity="0.15"/>
+            <circle cx="34" cy="32" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M31 32l2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="14" cy="34" r="4" fill="#7c3aed" opacity="0.4"/>
+            <circle cx="20" cy="36" r="3" fill="#c084fc" opacity="0.5"/>
+        </svg>`,
         translator: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="24" cy="24" r="18" fill="currentColor" opacity="0.08"/>
             <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2.5" fill="none"/>
@@ -294,6 +304,16 @@
             emoji: '🎨',
             description: '打开 Canvas 协同编辑画布',
             appAction: 'open-canvas-window',
+        },
+        {
+            id: 'vchat-app-ai-image-gen',
+            name: 'AI 生图',
+            icon: null,
+            animatedIcon: null,
+            svgIcon: SVG_ICONS.aiImageGen,
+            emoji: '🎨',
+            description: '打开 AI 生图工作流，支持电商/人像/营销/二次元等场景',
+            appAction: 'open-ai-image-gen-window',
         },
         {
             id: 'vchat-app-translator',

@@ -1,17 +1,28 @@
 # Audio Engine Dual-Build Script (AVX2 & AVX-512)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RootDir = (Resolve-Path (Join-Path $ScriptDir "..")).Path
+$WorkspaceDir = (Resolve-Path (Join-Path $RootDir "..\\..")).Path
+$VcpkgRoot = Join-Path $WorkspaceDir "runtimes\\vcpkg"
+
 # vcpkg path detection - Prefer static-md for stability
-$VcpkgBase = "H:\VCP\vcpkg\installed\x64-windows-static-md"
+$VcpkgBase = Join-Path $VcpkgRoot "installed\\x64-windows-static-md"
 if (!(Test-Path $VcpkgBase)) {
     Write-Host ">>> Info: static-md not found. Falling back to x64-windows-static." -ForegroundColor Yellow
-    $VcpkgBase = "H:\VCP\vcpkg\installed\x64-windows-static"
+    $VcpkgBase = Join-Path $VcpkgRoot "installed\\x64-windows-static"
+}
+
+if (!(Test-Path $VcpkgBase)) {
+    Write-Host ">>> ERROR: Could not find a usable vcpkg install under $VcpkgRoot" -ForegroundColor Red
+    exit 1
 }
 
 # Inject environment variables for pkg-config discovery
 $env:PATH = "$VcpkgBase\tools\pkgconf;$env:PATH"
-$env:PKG_CONFIG_PATH = "$VcpkgBase\lib\pkgconfig;$(Join-Path (Get-Location) 'pkgconfig')"
+$env:PKG_CONFIG = "$VcpkgBase\tools\pkgconf\pkgconf.exe"
+$env:PKG_CONFIG_PATH = "$VcpkgBase\lib\pkgconfig;$(Join-Path $RootDir 'pkgconfig')"
 
 # Force vcpkg root and triplet for cargo vcpkg-crate
-$env:VCPKG_ROOT = "H:\VCP\vcpkg"
+$env:VCPKG_ROOT = $VcpkgRoot
 if ($VcpkgBase -match "static-md") {
     $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-static-md"
 } else {
@@ -19,7 +30,7 @@ if ($VcpkgBase -match "static-md") {
 }
 
 # Directory Setup
-$RootDir = Get-Location
+Set-Location $RootDir
 $OutputDir = Join-Path (Split-Path $RootDir -Parent) "audio_engine"
 if (!(Test-Path $OutputDir)) { 
     Write-Host "Creating output directory: $OutputDir"

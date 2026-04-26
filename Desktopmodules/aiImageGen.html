@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 生图工作流</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header h1 { font-size: 1.2rem; font-weight: 600; }
+        .container { padding: 20px; height: calc(100vh - 60px); overflow-y: auto; }
+        .category-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .category-tab {
+            padding: 8px 16px;
+            background: rgba(124,58,237,0.2);
+            border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #a78bfa;
+        }
+        .category-tab:hover { background: rgba(124,58,237,0.3); }
+        .category-tab.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .workflow-card {
+            padding: 16px;
+            background: rgba(124,58,237,0.1);
+            border: 1px solid rgba(124,58,237,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .workflow-card:hover { background: rgba(124,58,237,0.2); border-color: #7c3aed; }
+        .workflow-card.selected { border-color: #c084fc; box-shadow: 0 0 15px rgba(124,58,237,0.3); }
+        .wf-id { font-size: 11px; color: #7c3aed; font-weight: 600; }
+        .wf-name { font-size: 14px; font-weight: 500; margin: 4px 0; }
+        .wf-desc { font-size: 12px; color: rgba(255,255,255,0.6); }
+        .prompt-section { margin-top: 16px; }
+        .prompt-label { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+        .prompt-textarea {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+        .prompt-textarea:focus { outline: none; border-color: #7c3aed; }
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .param-item {
+            background: rgba(124,58,237,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .param-label { font-size: 10px; color: rgba(255,255,255,0.5); }
+        .param-value { font-size: 13px; font-weight: 600; color: #c084fc; }
+        .actions { display: flex; gap: 10px; margin-top: 16px; }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #7c3aed; color: #fff; }
+        .btn-primary:hover { background: #6d28d9; }
+        .btn-secondary { background: rgba(124,58,237,0.2); color: #a78bfa; }
+        .btn-secondary:hover { background: rgba(124,58,237,0.3); }
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+        }
+        .status.success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; display: block; }
+        .status.error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; display: block; }
+        .status.info { background: rgba(59,130,237,0.2); border: 1px solid #3b82f6; color: #3b82f6; display: block; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span style="font-size: 24px;">🎨</span>
+        <h1>AI 生图工作流</h1>
+    </div>
+    <div class="container">
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">全部</div>
+            <div class="category-tab" data-category="ecommerce">服装电商</div>
+            <div class="category-tab" data-category="portrait">人像写真</div>
+            <div class="category-tab" data-category="marketing">营销海报</div>
+            <div class="category-tab" data-category="anime">二次元</div>
+        </div>
+        <div class="workflow-grid" id="workflowGrid"></div>
+        <div class="prompt-section" id="promptSection" style="display:none;">
+            <div class="params-grid" id="paramsGrid"></div>
+            <div class="prompt-label">正面提示词</div>
+            <textarea class="prompt-textarea" id="promptInput" placeholder="描述你想生成的图像内容..."></textarea>
+            <div class="prompt-label">负面提示词</div>
+            <textarea class="prompt-textarea" id="negativeInput" placeholder="描述你不想出现的内容..."></textarea>
+            <div class="actions">
+                <button class="btn btn-primary" id="generateBtn">🚀 生成图像</button>
+                <button class="btn btn-secondary" id="copyBtn">📋 复制提示词</button>
+            </div>
+            <div class="status" id="statusBar"></div>
+        </div>
+    </div>
+
+    <script>
+        const workflows = [
+            { id: 'WF-001', name: '电商模特图 - 基础', category: 'ecommerce', desc: '标准电商服装展示，纯色背景' },
+            { id: 'WF-002', name: '电商模特图 - 场景化', category: 'ecommerce', desc: '场景化穿搭展示，街头/咖啡厅' },
+            { id: 'WF-003', name: '同款多色批量生成', category: 'ecommerce', desc: '同一款式多颜色变体批量生成' },
+            { id: 'WF-004', name: '平铺图转模特图', category: 'ecommerce', desc: '平铺图转换为真人模特展示' },
+            { id: 'WF-005', name: '清新人像', category: 'portrait', desc: '清新风格的人像写真' },
+            { id: 'WF-006', name: '职业形象照', category: 'portrait', desc: '职业头像/工牌照' },
+            { id: 'WF-007', name: '艺术写真', category: 'portrait', desc: '艺术创作/创意人像' },
+            { id: 'WF-008', name: '电商促销海报', category: 'marketing', desc: '电商活动促销海报' },
+            { id: 'WF-009', name: '产品展示白底图', category: 'marketing', desc: '产品目录/电商详情页' },
+            { id: 'WF-010', name: '二次元角色设计', category: 'anime', desc: '原创角色/同人创作' },
+            { id: 'WF-011', name: '游戏原画风格', category: 'anime', desc: '游戏概念图/宣传图' },
+            { id: 'WF-012', name: 'Q 版角色生成', category: 'anime', desc: '表情包/Q 版头像' },
+        ];
+
+        const promptTemplates = {
+            'WF-001': { prompt: 'professional model wearing {服装}, studio lighting, clean white background, full body shot, fashion photography, commercial grade, detailed fabric texture, masterpiece, best quality, 8k, ultra-detailed', negative: '(worst quality, low quality, normal quality:1.7), watermark, text, signature, logo, deformed, bad anatomy', params: { width: 1024, height: 1536, steps: 30, cfg: 7.5, sampler: 'dpmpp_2m' } },
+            'WF-002': { prompt: 'fashion model wearing {服装}, {场景}, {光影}, candid pose, lifestyle photography, masterpiece, best quality, 8k', negative: '(worst quality, low quality, normal quality:1.7), watermark, text, signature, deformed', params: { width: 1024, height: 1536, steps: 30, cfg: 7.5, sampler: 'dpmpp_2m' } },
+            'WF-005': { prompt: 'beautiful asian woman, natural makeup, soft smile, daylight, park background, shallow depth of field, portrait photography, skin retouching, masterpiece, best quality, 8k', negative: '(worst quality, low quality:1.4), ugly, deformed, noisy, blurry, bad anatomy, extra limbs', params: { width: 1024, height: 1024, steps: 30, cfg: 7, sampler: 'dpmpp_2m' } },
+            'WF-006': { prompt: 'professional headshot, business attire, studio lighting, neutral expression, clean background, corporate portrait, confident expression, sharp focus, masterpiece, best quality, 8k', negative: '(worst quality, low quality:1.4), ugly, deformed, noisy, bad anatomy', params: { width: 1024, height: 1024, steps: 35, cfg: 8, sampler: 'dpmpp_2m' } },
+            'WF-008': { prompt: 'promotional banner, sale event, discount badge, clean layout, commercial design, high contrast, eye catching, professional graphic design, red and white colors, 8k', negative: '(worst quality, low quality:1.4), blurry, distorted, text error, spelling mistake', params: { width: 1024, height: 1024, steps: 30, cfg: 7, sampler: 'dpmpp_2m' } },
+            'WF-010': { prompt: 'anime style, original character, detailed eyes, long hair, beautiful dress, cel shading, vibrant colors, character design, illustration, masterpiece, best quality, 8k', negative: '(worst quality, low quality:1.4), deformed, mutated, extra limbs', params: { width: 1024, height: 1024, steps: 30, cfg: 7, sampler: 'dpmpp_2m' } },
+            'WF-012': { prompt: 'chibi style, cute character, simplified proportions, big eyes, kawaii, sticker art, clean lines, flat colors, masterpiece, best quality', negative: '(worst quality, low quality:1.4)', params: { width: 1024, height: 1024, steps: 25, cfg: 6, sampler: 'dpmpp_2m' } },
+        };
+
+        let selectedWorkflow = null;
+        let currentCategory = 'all';
+
+        function renderWorkflows() {
+            const grid = document.getElementById('workflowGrid');
+            grid.innerHTML = '';
+            workflows.forEach(wf => {
+                if (currentCategory !== 'all' && wf.category !== currentCategory) return;
+                const card = document.createElement('div');
+                card.className = 'workflow-card';
+                card.innerHTML = `<div class="wf-id">${wf.id}</div><div class="wf-name">${wf.name}</div><div class="wf-desc">${wf.desc}</div>`;
+                card.onclick = () => selectWorkflow(wf.id, card);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectWorkflow(id, card) {
+            selectedWorkflow = id;
+            document.querySelectorAll('.workflow-card').forEach(c => c.classList.remove('selected'));
+            if (card) card.classList.add('selected');
+            const template = promptTemplates[id] || {};
+            document.getElementById('promptSection').style.display = 'block';
+            document.getElementById('promptInput').value = template.prompt || '';
+            document.getElementById('negativeInput').value = template.negative || '';
+            renderParams(template.params || {});
+        }
+
+        function renderParams(params) {
+            const grid = document.getElementById('paramsGrid');
+            grid.innerHTML = `
+                <div class="param-item"><div class="param-label">Width</div><div class="param-value">${params.width || 1024}</div></div>
+                <div class="param-item"><div class="param-label">Height</div><div class="param-value">${params.height || 1024}</div></div>
+                <div class="param-item"><div class="param-label">Steps</div><div class="param-value">${params.steps || 30}</div></div>
+                <div class="param-item"><div class="param-label">CFG</div><div class="param-value">${params.cfg || 7}</div></div>
+                <div class="param-item"><div class="param-label">Sampler</div><div class="param-value">${params.sampler || 'dpmpp_2m'}</div></div>
+            `;
+        }
+
+        function showStatus(msg, type) {
+            const bar = document.getElementById('statusBar');
+            bar.textContent = msg;
+            bar.className = 'status ' + type;
+            setTimeout(() => { bar.style.display = 'none'; }, 5000);
+        }
+
+        // 分类切换
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.onclick = () => {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.dataset.category;
+                renderWorkflows();
+            };
+        });
+
+        // 生成按钮
+        document.getElementById('generateBtn').onclick = async () => {
+            if (!selectedWorkflow) { showStatus('请先选择一个工作流', 'error'); return; }
+            const prompt = document.getElementById('promptInput').value;
+            showStatus('正在生成...', 'info');
+            // 这里可以对接真实的 ComfyUI API
+            setTimeout(() => { showStatus('✅ 生成请求已发送', 'success'); }, 1000);
+        };
+
+        // 复制按钮
+        document.getElementById('copyBtn').onclick = () => {
+            const prompt = document.getElementById('promptInput').value;
+            navigator.clipboard.writeText(prompt).then(() => showStatus('✅ 已复制', 'success'));
+        };
+
+        renderWorkflows();
+    </script>
+</body>
+</html>

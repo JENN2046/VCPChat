@@ -3,7 +3,7 @@
 //! SQLite storage for track loudness metadata following EBU R128 standard.
 //! Enables pre-computed gain values for fast playback without real-time analysis.
 
-use rusqlite::{Connection, params, OptionalExtension};
+use rusqlite::{Connection, OptionalExtension, params};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
@@ -175,7 +175,7 @@ impl LoudnessDatabase {
     /// Initialize database schema
     fn init_schema(&self) -> Result<(), String> {
         let conn = self.conn.lock().map_err(|e| e.to_string())?;
-        
+
         conn.execute_batch(r#"
             CREATE TABLE IF NOT EXISTS track_loudness (
                 track_id        TEXT PRIMARY KEY,
@@ -193,13 +193,41 @@ impl LoudnessDatabase {
             
             CREATE INDEX IF NOT EXISTS idx_file_path ON track_loudness(file_path);
             CREATE INDEX IF NOT EXISTS idx_scan_version ON track_loudness(scan_version);
-            
-            -- Add columns to existing databases (migration)
-            -- These will silently fail if columns already exist, which is fine
-            ALTER TABLE track_loudness ADD COLUMN file_mtime INTEGER;
-            ALTER TABLE track_loudness ADD COLUMN file_size INTEGER;
         "#).map_err(|e| format!("Failed to initialize schema: {}", e))?;
-        
+
+        self.ensure_optional_column(&conn, "file_mtime", "INTEGER")?;
+        self.ensure_optional_column(&conn, "file_size", "INTEGER")?;
+
+        Ok(())
+    }
+
+    fn ensure_optional_column(
+        &self,
+        conn: &Connection,
+        column_name: &str,
+        column_type: &str,
+    ) -> Result<(), String> {
+        let mut stmt = conn
+            .prepare("PRAGMA table_info(track_loudness)")
+            .map_err(|e| format!("Failed to inspect track_loudness schema: {}", e))?;
+
+        let existing_columns: Vec<String> = stmt
+            .query_map([], |row| row.get::<_, String>(1))
+            .map_err(|e| format!("Failed to enumerate track_loudness columns: {}", e))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| format!("Failed to collect track_loudness columns: {}", e))?;
+
+        if existing_columns.iter().any(|name| name == column_name) {
+            return Ok(());
+        }
+
+        let sql = format!(
+            "ALTER TABLE track_loudness ADD COLUMN {} {}",
+            column_name, column_type
+        );
+        conn.execute(&sql, [])
+            .map_err(|e| format!("Failed to add {} column: {}", column_name, e))?;
+
         Ok(())
     }
     
@@ -531,5 +559,18 @@ mod tests {
         
         // Different target
         assert_eq!(track.gain_for_target(-23.0), -3.0);
+    }
+
+    #[test]
+    fn test_schema_init_is_idempotent_for_reopen() {
+        let db_path = std::env::temp_dir().join(format!(
+            "vcp_audio_loudness_{}.db",
+            chrono_timestamp()
+        ));
+
+        LoudnessDatabase::open(&db_path).unwrap();
+        LoudnessDatabase::open(&db_path).unwrap();
+
+        std::fs::remove_file(db_path).unwrap();
     }
 }

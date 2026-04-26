@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
-const path = require('path');
 const cheerio = require('cheerio');
+const { createPluginRoots } = require('../../../modules/utils/vcpPathRoots');
 
 // --- 主逻辑 ---
 async function main() {
@@ -8,8 +8,8 @@ async function main() {
         const input = await readStdin();
         const args = parseToolArgs(input);
 
-        // 1. 获取 AppData 路径
-        const VchatDataURL = path.join(__dirname, '..', '..', '..', 'AppData');
+        // 1. 获取 runtime data root
+        const VchatDataURL = createPluginRoots(__dirname).runtimeDataRoot;
 
         // 2. 获取 maid 参数
         const maidName = args.maid;

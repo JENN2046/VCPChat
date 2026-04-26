@@ -11,6 +11,13 @@ let emoticonLibraryPath;
 let degradedReason = null;
 let hasWarnedForCurrentReason = false;
 
+function readEnvValue(envText, key) {
+    if (!envText) return '';
+    const match = String(envText).match(new RegExp(`^${key}\\s*=\\s*(.+)$`, 'm'));
+    if (!match) return '';
+    return match[1].trim().replace(/^["']|["']$/g, '');
+}
+
 function setDegradedState(reason) {
     emoticonLibrary = [];
     if (degradedReason === reason && hasWarnedForCurrentReason) {
@@ -43,10 +50,39 @@ async function generateEmoticonLibrary() {
             return [];
         }
 
-        const fileKey = typeof settings.fileKey === 'string' ? settings.fileKey.trim() : '';
+        let fileKey = typeof settings.fileKey === 'string' ? settings.fileKey.trim() : '';
+        if (!fileKey) {
+            const vcpToolBoxConfigPath = path.resolve(path.dirname(settingsFilePath), '..', '..', 'VCPToolBox', 'config.env');
+            if (await fs.pathExists(vcpToolBoxConfigPath)) {
+                const vcpToolBoxConfig = await fs.readFile(vcpToolBoxConfigPath, 'utf8');
+                fileKey = readEnvValue(vcpToolBoxConfig, 'File_Key') || readEnvValue(vcpToolBoxConfig, 'FILE_KEY');
+            }
+        }
+        if (!fileKey) {
+            const generatedListsConfigPath = path.join(path.dirname(settingsFilePath), 'generated_lists', 'config.env');
+            if (await fs.pathExists(generatedListsConfigPath)) {
+                const generatedListsConfig = await fs.readFile(generatedListsConfigPath, 'utf8');
+                fileKey = readEnvValue(generatedListsConfig, 'DIST_IMAGE_KEY');
+            }
+        }
         if (!fileKey) {
             setDegradedState('missing fileKey in settings.json');
             return [];
+        }
+
+        const cachedLibraryPath = path.join(path.dirname(settingsFilePath), 'generated_lists', 'emoticon_library.json');
+        if (await fs.pathExists(cachedLibraryPath)) {
+            try {
+                const cachedLibrary = await fs.readJson(cachedLibraryPath);
+                if (Array.isArray(cachedLibrary) && cachedLibrary.length > 0) {
+                    emoticonLibrary = cachedLibrary;
+                    clearDegradedState();
+                    console.log(`[EmoticonFixer] Loaded emoticon library cache with ${cachedLibrary.length} items.`);
+                    return cachedLibrary;
+                }
+            } catch (cacheError) {
+                console.warn(`[EmoticonFixer] Failed to read cache ${cachedLibraryPath}: ${cacheError.message}`);
+            }
         }
 
         const urlObject = new URL(vcpServerUrl);
@@ -74,6 +110,20 @@ async function generateEmoticonLibrary() {
             const authHint = response.status === 401 || response.status === 403
                 ? ' (admin auth required, please login in Forum page)'
                 : '';
+            if (await fs.pathExists(cachedLibraryPath)) {
+                try {
+                    const cachedLibrary = await fs.readJson(cachedLibraryPath);
+                    if (Array.isArray(cachedLibrary) && cachedLibrary.length > 0) {
+                        emoticonLibrary = cachedLibrary;
+                        clearDegradedState();
+                        console.warn(`[EmoticonFixer] Emoji list API returned HTTP ${response.status}${authHint}; using local cache instead.`);
+                        return cachedLibrary;
+                    }
+                } catch (fallbackError) {
+                    console.warn(`[EmoticonFixer] Failed to use cache after HTTP ${response.status}: ${fallbackError.message}`);
+                }
+            }
+
             setDegradedState(`failed to fetch emoji list: HTTP ${response.status}${authHint}`);
             return [];
         }

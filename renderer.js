@@ -13,7 +13,6 @@ let globalSettings = {
     enableRegenerateConfirmation: true, // 重新回复确认机制开关
     flowlockContinueDelay: 5, // 心流锁续写延迟（秒）
     enableThoughtChainInjection: false, // 元思考注入上下文开关
-    fileKey: '',
     enableWideChatLayout: false,
     chatBubbleMaxWidthDefault: 82,
     chatBubbleMaxWidthNotifications: 90,
@@ -33,13 +32,13 @@ let globalSettings = {
     showUserMetaInChatBubbleUi: true,
     voiceMode: 'local',
     speechRecognizerBrowserPath: '',
-    speechRecognizerPagePath: 'Voicechatmodules/recognizer.html',
-    voiceLocalSettings: {
-        sovitsUrl: '',
+    speechRecognizerPagePath: 'Desktopmodules/legacy/Voicechatmodules/recognizer.html',
+    voiceNetworkSettings: {
+        sovitsUrl: 'https://api.siliconflow.cn',
         sovitsKey: ''
     },
-    voiceNetworkSettings: {
-        providerUrl: 'https://api.siliconflow.cn',
+    voiceLocalSettings: {
+        providerUrl: '',
         providerKey: ''
     }
 };
@@ -249,6 +248,32 @@ async function handleSendButtonAction() {
     if (window.chatManager && typeof window.chatManager.handleSendMessage === 'function') {
         await window.chatManager.handleSendMessage();
     }
+}
+
+function createCodexRouterHostClient(runtime = window) {
+    const controlApi =
+        runtime?.chatAPI?.codexRouterHostControl
+        || runtime?.desktopAPI?.codexRouterHostControl
+        || runtime?.electronAPI?.codexRouterHostControl;
+
+    if (typeof controlApi !== 'function') {
+        return null;
+    }
+
+    return {
+        inspect() {
+            return controlApi({ action: 'inspect' });
+        },
+        status() {
+            return controlApi({ action: 'status' });
+        },
+        run(task) {
+            return controlApi({ action: 'run', task });
+        },
+        resume(task, options = {}) {
+            return controlApi({ action: 'resume', task, options });
+        },
+    };
 }
 
 window.updateSendButtonState = updateSendButtonState;
@@ -1993,7 +2018,6 @@ async function syncGlobalSettingsToUI() {
     const completedUrl = window.settingsManager.completeVcpUrl(globalSettings.vcpServerUrl || '');
     safeSet('vcpServerUrl', completedUrl);
     safeSet('vcpApiKey', globalSettings.vcpApiKey || '');
-    safeSet('fileKey', globalSettings.fileKey || '');
     safeSet('vcpLogUrl', globalSettings.vcpLogUrl || '');
     safeSet('vcpLogKey', globalSettings.vcpLogKey || '');
     safeSet('topicSummaryModel', globalSettings.topicSummaryModel || '');
@@ -2002,11 +2026,11 @@ async function syncGlobalSettingsToUI() {
     safeCheck('voiceModeLocal', (globalSettings.voiceMode || 'local') !== 'network');
     safeCheck('voiceModeNetwork', (globalSettings.voiceMode || 'local') === 'network');
     safeSet('speechRecognizerBrowserPath', globalSettings.speechRecognizerBrowserPath || '');
-    safeSet('speechRecognizerPagePath', globalSettings.speechRecognizerPagePath || 'Voicechatmodules/recognizer.html');
-    safeSet('voiceLocalSovitsUrl', globalSettings.voiceLocalSettings?.sovitsUrl || '');
-    safeSet('voiceLocalSovitsKey', globalSettings.voiceLocalSettings?.sovitsKey || '');
-    safeSet('voiceNetworkProviderUrl', globalSettings.voiceNetworkSettings?.providerUrl || '');
-    safeSet('voiceNetworkProviderKey', globalSettings.voiceNetworkSettings?.providerKey || '');
+    safeSet('speechRecognizerPagePath', globalSettings.speechRecognizerPagePath || 'Desktopmodules/legacy/Voicechatmodules/recognizer.html');
+    safeSet('voiceNetworkSovitsUrl', globalSettings.voiceNetworkSettings?.sovitsUrl || '');
+    safeSet('voiceNetworkSovitsKey', globalSettings.voiceNetworkSettings?.sovitsKey || '');
+    safeSet('voiceLocalProviderUrl', globalSettings.voiceLocalSettings?.providerUrl || '');
+    safeSet('voiceLocalProviderKey', globalSettings.voiceLocalSettings?.providerKey || '');
     
     // Network Notes Paths
     const networkNotesPathsContainer = document.getElementById('networkNotesPathsContainer');
@@ -2433,6 +2457,7 @@ async function handleConfirmForward() {
 // These are no longer needed as uiHelperFunctions handles them directly
 window.ensureAudioContext = () => { /* Placeholder, will be defined in setupTtsListeners */ };
 window.showForwardModal = showForwardModal;
+window.codexRouterHostClient = createCodexRouterHostClient(window);
 
 // Make globalSettings accessible for notification renderer
 window.applyChatBubbleLayoutSettings = applyChatBubbleLayoutSettings;

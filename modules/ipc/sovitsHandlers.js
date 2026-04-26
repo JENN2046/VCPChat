@@ -52,7 +52,7 @@ function initialize(mainWindow, settingsManager) {
     });
 
 
-    console.log('SovitsTTS IPC handlers initialisés.');
+    console.log('SovitsTTS IPC handlers initialized.');
 }
 
 module.exports = {

@@ -162,6 +162,10 @@ function transformHeadingCodexTodoLists(text, escapeHtml) {
         while (cursor < lines.length) {
             const candidate = lines[cursor];
             if (candidate.trim() === '') {
+                if (seenTask) {
+                    break;
+                }
+
                 lookahead.push(candidate);
                 cursor += 1;
                 continue;
@@ -182,6 +186,9 @@ function transformHeadingCodexTodoLists(text, escapeHtml) {
 
         const { items } = parseCodexTodoBlock(lookahead.join('\n'), title);
         output.push(renderCodexTodoPanel(title, items, escapeHtml));
+        if (cursor < lines.length && lines[cursor].trim() !== '') {
+            output.push('');
+        }
         i = cursor - 1;
     }
 

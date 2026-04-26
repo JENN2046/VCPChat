@@ -238,3 +238,18 @@ PR12 是独立候选分支：
    - 明确合并策略、验证范围和回滚路径。
 
 当前推荐：先保留 PR12 Draft，不切 Ready，不合并。
+
+## Plan
+
+- [ ] 拆分正式审查 PR：从 PR12 拆出宿主基础能力、Photo Studio、legacy 迁移、文档、插件 / 工具链几个小 PR。
+- [ ] 配置卫生治理：逐插件补齐 `.example` 模板，移出基线中仍被 Git 跟踪的真实 `.env` / `config.env`。
+- [ ] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
+- [ ] 打包验证：按需执行 `npm run pack` 和 `npm run dist`，确认构建产物和打包白名单。
+- [ ] CI / 自动检查：为 PR 或后续拆分 PR 补 GitHub checks 或等价自动验证。
+- [ ] 生产预检：如需推广到 `A:\VCP\VCPToolBox-prod-stable`，单独做生产线预检、合并策略和回滚方案。
+
+说明：
+
+- 上面 6 项不是 PR12 Draft 快照收口的阻塞项。
+- 这些任务属于正式审查、配置治理、构建验证或生产推广阶段。
+- 当前 PR12 仍建议保持 Draft，不切 Ready，不直接合并。

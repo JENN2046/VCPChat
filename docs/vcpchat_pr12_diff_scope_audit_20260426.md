@@ -194,10 +194,19 @@ git diff --shortstat origin/custom...HEAD
 - `config.env` 是真实配置文件命名，应作为高优先级风险处理。
 - 本审计没有读取或打印该文件内容，避免暴露秘密。
 
+处理记录：
+
+- 已确认 `.gitignore` 中存在 `VCPDistributedServer/Plugin/DistImageServer/config.env` 和 `VCPDistributedServer/Plugin/*/config.env` 规则。
+- 已执行 `git rm --cached -- VCPDistributedServer/Plugin/DistImageServer/config.env`。
+- 本地文件保留，Git 索引中移除。
+- `git status --short --ignored VCPDistributedServer/Plugin/DistImageServer/config.env` 显示该文件为 ignored。
+- 已新增安全模板 `VCPDistributedServer/Plugin/DistImageServer/config.env.example`。
+- 模板字段来自 `plugin-manifest.json` 和 `image-server.js`，未读取或复制真实 `config.env` 内容。
+
 建议：
 
-- 进入 Ready 前必须做敏感配置审计。
-- 若 `VCPDistributedServer/Plugin/DistImageServer/config.env` 含真实环境值，应从 PR 中移除或改为安全模板。
+- 进入 Ready 前仍建议做敏感配置审计，确认没有其他真实配置文件进入 PR。
+- 后续只维护安全的 `.example` 模板，不恢复跟踪真实 `config.env`。
 - 不应在 PR 评论、文档或日志中打印该文件内容。
 
 ### 7. 其他非 Photo Studio 范围

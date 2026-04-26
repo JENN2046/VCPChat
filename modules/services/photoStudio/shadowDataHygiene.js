@@ -97,7 +97,8 @@ function isCloseoutCalendarEvent(record) {
 function isCloseoutDeliveryPackage(record) {
     return hasCloseoutMarker(record)
         || hasCloseoutStamp(record.package_type)
-        || hasCloseoutStamp(record.delivery_package_key);
+        || hasCloseoutStamp(record.delivery_package_key)
+        || hasCloseoutStamp(record.package_key);
 }
 
 function isCloseoutExternalExport(record) {

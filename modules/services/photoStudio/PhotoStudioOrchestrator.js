@@ -6,8 +6,7 @@ const { analyzeProjectRisk } = require('./riskAnalyzer');
 const { createUiHints, hintsForProject } = require('./uiHints');
 const { analyzeShadowData } = require('./shadowDataHygiene');
 
-const DEFAULT_TOOLBOX_ROOT = 'A:\\VCP\\VCPToolBox-photo-studio-next';
-const DEFAULT_VCPCHAT_ROOT = 'A:\\VCP\\VCPChat';
+const DEFAULT_VCPCHAT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const REGISTRY_RELATIVE_PATH = path.join('plugins', 'registry.json');
 const STORE_RELATIVE_PATH = path.join('plugins', 'custom', 'shared', 'photo_studio_data', 'PhotoStudioDataStore.js');
 const TOOLBOX_DATA_RELATIVE_PATH = path.join('plugins', 'custom', 'shared', 'photo_studio_data');
@@ -27,8 +26,8 @@ function createRequestId() {
 
 class PhotoStudioOrchestrator {
     constructor(options = {}) {
-        this.toolboxRoot = options.toolboxRoot || DEFAULT_TOOLBOX_ROOT;
-        this.vcpChatRoot = options.vcpChatRoot || DEFAULT_VCPCHAT_ROOT;
+        this.toolboxRoot = options.toolboxRoot || process.env.PHOTO_STUDIO_TOOLBOX_ROOT || '';
+        this.vcpChatRoot = options.vcpChatRoot || process.env.VCPCHAT_ROOT || DEFAULT_VCPCHAT_ROOT;
         this.dataRoot = path.join(this.vcpChatRoot, 'AppData', 'PhotoStudioShadowData');
         this.registry = this.#readRegistry();
         this.#ensureShadowDataRoot();
@@ -1023,6 +1022,231 @@ class PhotoStudioOrchestrator {
         return pluginModule.processToolCall(payload, {});
     }
 
+    #createLocalPlugin(pluginName) {
+        return {
+            processToolCall: async (payload = {}) => this.#runLocalPlugin(pluginName, payload),
+        };
+    }
+
+    #localPluginSuccess(data = {}) {
+        return { success: true, data };
+    }
+
+    #localPluginFailure(code, message, details = {}) {
+        return { success: false, error: { code, message, details } };
+    }
+
+    #runLocalPlugin(pluginName, payload = {}) {
+        if (pluginName === 'create_customer_record') {
+            return this.#localPluginSuccess(this.store.createCustomer(payload));
+        }
+
+        if (pluginName === 'create_project_record') {
+            return this.#localPluginSuccess(this.store.createProject(payload));
+        }
+
+        if (pluginName === 'create_project_tasks') {
+            const projectId = String(payload.project_id || '').trim();
+            if (!projectId || !this.store.getProject(projectId)) {
+                return this.#localPluginFailure('NOT_FOUND', '未找到对应项目', { project_id: projectId });
+            }
+            const tasks = this.store.createProjectTasks(projectId, payload.override_existing === true);
+            return this.#localPluginSuccess({ project_id: projectId, tasks });
+        }
+
+        if (pluginName === 'update_project_status') {
+            const projectId = String(payload.project_id || '').trim();
+            const project = this.store.getProject(projectId);
+            if (!project) {
+                return this.#localPluginFailure('NOT_FOUND', '未找到对应项目', { project_id: projectId });
+            }
+            const nextStatus = String(payload.new_status || '').trim();
+            if (nextStatus === project.status) {
+                return this.#localPluginSuccess(project);
+            }
+            const allowed = getAllowedTransitions(project.status);
+            if (!allowed.includes(nextStatus)) {
+                return this.#localPluginFailure(
+                    'INVALID_TRANSITION',
+                    `不允许从 ${project.status} 转换到 ${nextStatus}，合法目标: ${allowed.join(', ') || '无'}`,
+                    { project_id: projectId, current_status: project.status, requested_status: nextStatus, allowed }
+                );
+            }
+            const updatedProject = this.store.updateProject(projectId, { status: nextStatus });
+            this.store.appendStatusLog({
+                project_id: projectId,
+                old_status: project.status,
+                new_status: nextStatus,
+                reason: payload.reason || '',
+                operator: 'photo_studio_local',
+            });
+            return this.#localPluginSuccess(updatedProject);
+        }
+
+        if (pluginName === 'generate_client_reply_draft') {
+            return this.#localPluginSuccess({
+                project_id: payload.project_id || '',
+                context_type: payload.context_type || 'general',
+                tone: payload.tone || 'warm',
+                key_points: payload.key_points || '',
+                draft_text: '',
+            });
+        }
+
+        if (pluginName === 'create_followup_reminder') {
+            const reminders = this.#readShadowObjectFile('reminders.json');
+            const reminderId = this.store.generateId('rem');
+            const now = new Date().toISOString();
+            const record = {
+                reminder_id: reminderId,
+                project_id: payload.project_id || '',
+                customer_id: payload.customer_id || '',
+                reminder_type: payload.reminder_type || 'followup',
+                due_date: payload.due_date || '',
+                note: payload.note || payload.notes || '',
+                status: 'pending',
+                sync_state: 'local_shadow',
+                created_at: now,
+                updated_at: now,
+            };
+            reminders[reminderId] = record;
+            this.#writeShadowObjectFile('reminders.json', reminders);
+            return this.#localPluginSuccess(record);
+        }
+
+        if (pluginName === 'check_missing_project_fields') {
+            const projectId = String(payload.project_id || '').trim();
+            const projects = projectId ? [this.store.getProject(projectId)].filter(Boolean) : this.store.listProjects();
+            const flagged = projects.map((project) => ({
+                project_id: project.project_id,
+                project_name: project.project_name,
+                required_gaps: ['project_name', 'customer_id'].filter((field) => !project[field]),
+                recommended_gaps: ['delivery_deadline', 'shoot_date'].filter((field) => !project[field]),
+            })).filter((item) => item.required_gaps.length || item.recommended_gaps.length);
+            return this.#localPluginSuccess({
+                mode: projectId ? 'single_project' : 'all_projects',
+                project_id: projectId,
+                projects_checked: projects.length,
+                projects_with_issues: flagged.length,
+                required_gaps: flagged.reduce((sum, item) => sum + item.required_gaps.length, 0),
+                recommended_gaps: flagged.reduce((sum, item) => sum + item.recommended_gaps.length, 0),
+                invalid_customer_references: 0,
+                flagged_projects: flagged,
+            });
+        }
+
+        if (pluginName === 'archive_project_assets') {
+            const projectId = String(payload.project_id || '').trim();
+            const project = this.store.getProject(projectId);
+            if (!project) {
+                return this.#localPluginFailure('NOT_FOUND', '未找到对应项目', { project_id: projectId });
+            }
+            if (!['completed', 'archived'].includes(project.status)) {
+                return this.#localPluginFailure('INVALID_STATUS', '项目完成或已归档后才能归档素材', {
+                    project_id: projectId,
+                    status: project.status,
+                });
+            }
+            const archives = this.#readShadowObjectFile('archive_assets.json');
+            const archiveId = this.store.generateId('archive');
+            const record = {
+                archive_id: archiveId,
+                project_id: projectId,
+                archive_mode: payload.archive_mode || 'shadow',
+                archive_label: payload.archive_label || project.project_name || projectId,
+                sync_state: 'local_shadow',
+                created_at: new Date().toISOString(),
+            };
+            archives[archiveId] = record;
+            this.#writeShadowObjectFile('archive_assets.json', archives);
+            return this.#localPluginSuccess(record);
+        }
+
+        if (pluginName === 'create_selection_notice') {
+            return this.#localPluginSuccess({
+                project_id: payload.project_id || '',
+                notice_text: '选片通知草稿已生成，本地影子记录未发送给客户。',
+                sync_state: 'local_shadow',
+            });
+        }
+
+        if (pluginName === 'create_delivery_tasks') {
+            const projectId = String(payload.project_id || '').trim();
+            if (!projectId || !this.store.getProject(projectId)) {
+                return this.#localPluginFailure('NOT_FOUND', '未找到对应项目', { project_id: projectId });
+            }
+            const tasks = this.store.createProjectTasks(projectId, payload.override_existing === true);
+            return this.#localPluginSuccess({
+                project_id: projectId,
+                delivery_mode: payload.delivery_mode || 'digital delivery',
+                tasks,
+            });
+        }
+
+        if (pluginName === 'sync_to_external_sheet_or_notion') {
+            const exports = this.#readShadowObjectFile('external_exports.json');
+            const exportId = this.store.generateId('export');
+            const record = {
+                export_id: exportId,
+                export_key: `sync:${payload.project_id || 'all'}:${exportId}`,
+                project_id: payload.project_id || '',
+                target_type: payload.target_type || 'sheet',
+                target_provider: payload.target_provider || 'local_shadow',
+                target_name: payload.target_name || '',
+                note: payload.note || '',
+                status: 'queued',
+                sync_state: 'local_shadow',
+                created_at: new Date().toISOString(),
+            };
+            exports[exportId] = record;
+            this.#writeShadowObjectFile('external_exports.json', exports);
+            return this.#localPluginSuccess(record);
+        }
+
+        if (pluginName === 'prioritize_pending_delivery_actions') {
+            const projects = this.store.listProjects();
+            return this.#localPluginSuccess({
+                priority_items: projects.slice(0, 5).map((project) => ({
+                    project_id: project.project_id,
+                    project_name: project.project_name,
+                    priority: project.delivery_deadline ? 'high' : 'normal',
+                    reason: project.delivery_deadline ? 'delivery_deadline' : 'local_shadow',
+                })),
+            });
+        }
+
+        if (pluginName === 'generate_delivery_queue_schedule') {
+            return this.#localPluginSuccess({
+                schedule_items: this.store.listProjects().slice(0, 5).map((project) => ({
+                    project_id: project.project_id,
+                    project_name: project.project_name,
+                    delivery_deadline: project.delivery_deadline || '',
+                })),
+            });
+        }
+
+        if (pluginName === 'generate_weekly_project_digest') {
+            return this.#localPluginSuccess({
+                digest_text: `本地影子项目 ${this.store.listProjects().length} 个。`,
+            });
+        }
+
+        if (pluginName === 'inspect_delivery_audit_trail') {
+            const exports = Object.values(this.#readShadowObjectFile('external_exports.json'));
+            const packages = Object.values(this.#readShadowObjectFile(DELIVERY_PACKAGES_FILENAME));
+            return this.#localPluginSuccess({
+                audit_summary: {
+                    total_events: exports.length + packages.length,
+                    external_exports: exports.length,
+                    delivery_packages: packages.length,
+                },
+                events: [...exports, ...packages].slice(-20),
+            });
+        }
+
+        return this.#localPluginFailure('UNSUPPORTED_LOCAL_PLUGIN', `本地影子模式暂不支持插件 ${pluginName}`);
+    }
+
     async #pluginData(pluginName, payload) {
         const result = await this.#invokePlugin(pluginName, payload);
         return result && result.success
@@ -1044,10 +1268,17 @@ class PhotoStudioOrchestrator {
 
         const pluginEntry = this.registry.plugins.find((entry) => entry.name === pluginName);
         if (!pluginEntry) {
-            throw new Error(`影像工作台插件“${pluginName}”尚未注册。`);
+            const localPlugin = this.#createLocalPlugin(pluginName);
+            this.pluginCache.set(pluginName, localPlugin);
+            return localPlugin;
         }
 
         const pluginPath = path.join(this.toolboxRoot, 'plugins', pluginEntry.path, 'src', 'index.js');
+        if (!fs.existsSync(pluginPath)) {
+            const localPlugin = this.#createLocalPlugin(pluginName);
+            this.pluginCache.set(pluginName, localPlugin);
+            return localPlugin;
+        }
         const pluginModule = require(pluginPath);
         if (typeof pluginModule.initialize === 'function') {
             await pluginModule.initialize({
@@ -1060,8 +1291,10 @@ class PhotoStudioOrchestrator {
     }
 
     #loadStore() {
-        const storePath = path.join(this.toolboxRoot, STORE_RELATIVE_PATH);
-        const store = require(storePath);
+        const storePath = this.toolboxRoot ? path.join(this.toolboxRoot, STORE_RELATIVE_PATH) : '';
+        const store = storePath && fs.existsSync(storePath)
+            ? require(storePath)
+            : require('./localDataStore');
         if (typeof store.configureDataRoot === 'function') {
             store.configureDataRoot(this.dataRoot);
         }
@@ -1069,14 +1302,19 @@ class PhotoStudioOrchestrator {
     }
 
     #readRegistry() {
-        const registryPath = path.join(this.toolboxRoot, REGISTRY_RELATIVE_PATH);
+        const registryPath = this.toolboxRoot ? path.join(this.toolboxRoot, REGISTRY_RELATIVE_PATH) : '';
+        if (!registryPath || !fs.existsSync(registryPath)) {
+            return { plugins: [] };
+        }
         return JSON.parse(fs.readFileSync(registryPath, 'utf8'));
     }
 
     #ensureShadowDataRoot() {
         fs.mkdirSync(this.dataRoot, { recursive: true });
-        const sourceDir = path.join(this.toolboxRoot, TOOLBOX_DATA_RELATIVE_PATH);
-        const jsonFiles = fs.readdirSync(sourceDir).filter((fileName) => fileName.endsWith('.json'));
+        const sourceDir = this.toolboxRoot ? path.join(this.toolboxRoot, TOOLBOX_DATA_RELATIVE_PATH) : '';
+        const jsonFiles = sourceDir && fs.existsSync(sourceDir)
+            ? fs.readdirSync(sourceDir).filter((fileName) => fileName.endsWith('.json'))
+            : [];
 
         for (const fileName of jsonFiles) {
             const sourcePath = path.join(sourceDir, fileName);
@@ -1086,10 +1324,21 @@ class PhotoStudioOrchestrator {
             }
         }
 
-        SHADOW_OBJECT_FILES.forEach((fileName) => {
+        [
+            'customers.json',
+            'projects.json',
+            'tasks.json',
+            'status_log.json',
+            'reminders.json',
+            'calendar_events.json',
+            'archive_assets.json',
+            'external_exports.json',
+            ...SHADOW_OBJECT_FILES,
+        ].forEach((fileName) => {
             const filePath = path.join(this.dataRoot, fileName);
             if (!fs.existsSync(filePath)) {
-                fs.writeFileSync(filePath, JSON.stringify({}, null, 2), 'utf8');
+                const emptyValue = fileName === 'status_log.json' ? [] : {};
+                fs.writeFileSync(filePath, JSON.stringify(emptyValue, null, 2), 'utf8');
             }
         });
     }

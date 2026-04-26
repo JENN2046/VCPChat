@@ -10,6 +10,7 @@ let canvasHandlersRef = null;
 let mainWindowRef = null;
 let codexRouterHostStarterPromise = null;
 let codexRouterHostBundlePromise = null;
+let codexRouterHostIpcRegistered = false;
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const pendingDesktopRemoteRequests = new Map();
@@ -143,6 +144,10 @@ function initialize(params) {
     desktopHandlersRef = require('./desktopHandlers');
     canvasHandlersRef = require('./canvasHandlers');
     initBridgeListeners();
+    if (!codexRouterHostIpcRegistered) {
+        ipcMain.handle('codex-router-host:control', (_event, commandPayload) => handleCodexRouterHostControl(commandPayload || {}));
+        codexRouterHostIpcRegistered = true;
+    }
     console.log('[DesktopRemoteHandlers] Initialized.');
 }
 

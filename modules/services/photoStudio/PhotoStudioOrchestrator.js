@@ -964,7 +964,8 @@ class PhotoStudioOrchestrator {
             this.#normalizeProjectAuditDataForUi(
                 pluginName,
                 this.#localizeDeliveryReportData(pluginName, result.data)
-            )
+            ),
+            pluginPayload
         );
         const projectId = localizedData?.project_id || pluginPayload.project_id || null;
         let toast = '操作已完成';
@@ -1030,7 +1031,8 @@ class PhotoStudioOrchestrator {
                 this.#normalizeProjectAuditDataForUi(
                     pluginName,
                     this.#localizeDeliveryReportData(pluginName, result.data)
-                )
+                ),
+                payload
             )
             : {};
     }
@@ -1299,13 +1301,13 @@ class PhotoStudioOrchestrator {
         };
     }
 
-    #normalizeDraftDataForUi(pluginName, data) {
+    #normalizeDraftDataForUi(pluginName, data, pluginPayload = {}) {
         if (!data || typeof data !== 'object' || pluginName !== 'generate_client_reply_draft') {
             return data;
         }
 
         const draftText = data.draft_text || data.reply_draft || data.draft_content || data.draft_body || data.message || '';
-        return {
+        const localizedData = {
             ...data,
             customer_name: this.#localizeSystemGeneratedText(data.customer_name || ''),
             project_name: this.#localizeSystemGeneratedText(data.project_name || ''),
@@ -1315,6 +1317,82 @@ class PhotoStudioOrchestrator {
             subject: this.#localizeSystemGeneratedText(data.subject || data.draft_title || ''),
             draft_text: this.#localizeSystemGeneratedText(draftText),
         };
+        const naturalDraft = this.#buildNaturalClientReplyDraft(localizedData, pluginPayload);
+        const naturalSubject = this.#buildNaturalClientReplySubject(localizedData, pluginPayload);
+        return {
+            ...localizedData,
+            draft_title: naturalSubject,
+            draft_body: naturalDraft,
+            draft_content: naturalDraft,
+            reply_draft: naturalDraft,
+            subject: naturalSubject,
+            draft_text: naturalDraft,
+            tone_style: '亲切自然随和认真',
+        };
+    }
+
+    #buildNaturalClientReplySubject(data, pluginPayload = {}) {
+        const contextType = pluginPayload.context_type || data.context_type || 'general';
+        const projectName = this.#draftProjectName(data, pluginPayload);
+        const subjectMap = {
+            quotation: '报价沟通',
+            schedule: '拍摄安排确认',
+            delivery: '成片交付沟通',
+            general: '拍摄细节沟通',
+        };
+        return `${projectName}${subjectMap[contextType] || subjectMap.general}`;
+    }
+
+    #buildNaturalClientReplyDraft(data, pluginPayload = {}) {
+        const contextType = pluginPayload.context_type || data.context_type || 'general';
+        const customerName = this.#draftCustomerName(data, pluginPayload);
+        const projectLabel = this.#draftProjectLabel(data, pluginPayload);
+        const keyPoints = String(pluginPayload.key_points || '').trim();
+        const detailLine = keyPoints
+            ? `我这边先记到的重点是：${keyPoints}。如果有哪里需要调整，你也可以直接跟我说。`
+            : '如果你这边有已经确定的想法，也可以直接发我，我这边一起帮你整理。';
+
+        const contextLines = {
+            quotation: `这边想跟你对一下${projectLabel}的报价和拍摄安排，主要是把拍摄内容、时间节奏和后面的准备事项先确认清楚。`,
+            schedule: `这边想跟你确认一下${projectLabel}的时间安排和当天流程，主要是提前把容易临时卡住的细节都顺一遍。`,
+            delivery: `${projectLabel}这边我想跟你同步一下成片和交付安排，主要是确认交付内容、时间节点，还有你比较在意的地方。`,
+            general: `${projectLabel}这边我想提前跟你对几个小细节，主要是当天的时间安排、流程，还有你们比较想重点记录的画面。`,
+        };
+
+        return [
+            `${customerName}，你好呀～`,
+            '',
+            contextLines[contextType] || contextLines.general,
+            '',
+            `${detailLine}我这边会先把准备工作整理起来，尽量把前面这些事都提前确认好，这样到拍摄当天你们也能少操心一点。`,
+            '',
+            '很期待这次给你们好好记录～',
+        ].join('\n');
+    }
+
+    #draftProjectLabel(data, pluginPayload = {}) {
+        const projectName = this.#draftProjectName(data, pluginPayload);
+        if (/婚礼|wedding/i.test(projectName)) return '婚礼拍摄';
+        if (/写真|portrait|人像/i.test(projectName)) return '人像拍摄';
+        if (/商业|commercial|产品/i.test(projectName)) return '商业拍摄';
+        return projectName;
+    }
+
+    #draftProjectName(data, pluginPayload = {}) {
+        const projectId = data.project_id || pluginPayload.project_id || '';
+        const project = projectId ? this.store.getProject(projectId) : null;
+        return this.#localizeSystemGeneratedText(data.project_name || project?.project_name || '拍摄');
+    }
+
+    #draftCustomerName(data, pluginPayload = {}) {
+        const projectId = data.project_id || pluginPayload.project_id || '';
+        const project = projectId ? this.store.getProject(projectId) : null;
+        const customer = project?.customer_id ? this.store.getCustomer(project.customer_id) : null;
+        const customerName = this.#localizeSystemGeneratedText(data.customer_name || customer?.customer_name || '').trim();
+        if (!customerName || /^\[.*\]$/.test(customerName)) {
+            return '你好';
+        }
+        return customerName;
     }
 
     #normalizePluginErrorForUi(pluginName, error) {

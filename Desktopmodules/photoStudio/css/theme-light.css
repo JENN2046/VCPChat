@@ -1,0 +1,9 @@
+body[data-theme="light"] {
+    --ps-bg-base: #f5f2ec;
+    --ps-bg-panel: rgba(255, 255, 255, 0.86);
+    --ps-bg-panel-strong: rgba(255, 255, 255, 0.94);
+    --ps-text-primary: #171a20;
+    --ps-text-secondary: rgba(23, 26, 32, 0.72);
+    --ps-text-tertiary: rgba(23, 26, 32, 0.52);
+    --ps-border-soft: rgba(23, 26, 32, 0.10);
+}

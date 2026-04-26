@@ -11,6 +11,7 @@ const desktopMetrics = require('./desktopMetrics');
 const windowService = require('../services/windowService');
 const WINDOW_APP_IDS = require('../services/windowAppIds');
 const { PRELOAD_ROLES, resolveAppPreload } = require('../services/preloadPaths');
+const PhotoStudioOrchestrator = require('../services/photoStudio/PhotoStudioOrchestrator');
 
 // --- 妯″潡鐘舵€?---
 let desktopWindow = null;
@@ -31,6 +32,7 @@ let vchatMusicWindow = null;
 let vchatThemesWindow = null;
 let vchatAIImageGenWindow = null;
 let vchatPhotoStudioWindow = null;
+let photoStudioOrchestrator = null;
 
 // --- 鏀惰棌绯荤粺璺緞 - 浣跨敤椤圭洰鏍圭洰褰曠殑 AppData ---
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -39,6 +41,27 @@ const DESKTOP_DATA_DIR = path.join(PROJECT_ROOT, 'AppData', 'DesktopData');
 const DOCK_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'dock.json');
 const LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
 const CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
+
+function getPhotoStudioOrchestrator() {
+    if (!photoStudioOrchestrator) {
+        photoStudioOrchestrator = new PhotoStudioOrchestrator({
+            vcpChatRoot: app.getAppPath(),
+        });
+    }
+    return photoStudioOrchestrator;
+}
+
+function photoStudioHandlerFailure(code, error, extra = {}) {
+    const message = error?.message || String(error || 'Photo Studio handler failed');
+    return {
+        success: false,
+        error: {
+            code,
+            message,
+            ...extra,
+        },
+    };
+}
 
 /**
  * 鑷姩鐢熸垚 CATALOG.md 鈥斺€?鏀惰棌鎸備欢鐩綍绱㈠紩
@@ -266,6 +289,32 @@ function findWindowByUrl(urlKeyword) {
     }) || null;
 }
 
+function getPreferredDisplay() {
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    if (focusedWindow && !focusedWindow.isDestroyed()) {
+        return screen.getDisplayMatching(focusedWindow.getBounds());
+    }
+    return screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+}
+
+function getNearFullscreenBounds(options = {}) {
+    const display = getPreferredDisplay();
+    const workArea = display?.workArea || screen.getPrimaryDisplay().workArea;
+    const minWidth = options.minWidth || 600;
+    const minHeight = options.minHeight || 400;
+    const horizontalInset = Math.max(20, Math.round(workArea.width * 0.02));
+    const verticalInset = Math.max(24, Math.round(workArea.height * 0.035));
+    const width = Math.max(minWidth, workArea.width - (horizontalInset * 2));
+    const height = Math.max(minHeight, workArea.height - (verticalInset * 2));
+
+    return {
+        x: workArea.x + Math.max(0, Math.round((workArea.width - width) / 2)),
+        y: workArea.y + Math.max(0, Math.round((workArea.height - height) / 2)),
+        width,
+        height,
+    };
+}
+
 /**
  * 鍒涘缓鎴栬仛鐒︿竴涓€氱敤瀛愮獥鍙ｏ紙鐢ㄤ簬 VChat 鍐呴儴搴旂敤锛?
  * @param {BrowserWindow|null} existingWindow - 鐜版湁绐楀彛寮曠敤
@@ -279,11 +328,18 @@ function createOrFocusChildWindow(existingWindow, options) {
         return existingWindow;
     }
 
+    const preferredBounds = options.launchLayout === 'near-fullscreen'
+        ? getNearFullscreenBounds(options)
+        : null;
+
     const win = new BrowserWindow({
-        width: options.width || 1000,
-        height: options.height || 700,
+        width: preferredBounds?.width || options.width || 1000,
+        height: preferredBounds?.height || options.height || 700,
+        x: preferredBounds?.x,
+        y: preferredBounds?.y,
         minWidth: options.minWidth || 600,
         minHeight: options.minHeight || 400,
+        center: preferredBounds ? false : options.center !== false,
         title: options.title || 'VChat',
         frame: false,
         ...(process.platform === 'darwin' ? {} : { titleBarStyle: 'hidden' }),
@@ -735,6 +791,71 @@ function initialize(params) {
     // --- IPC: 鎵撳紑妗岄潰绐楀彛 ---
     ipcMain.handle('open-desktop-window', async () => {
         await openDesktopWindow();
+    });
+
+    // --- IPC: Photo Studio 数据桥 ---
+    ipcMain.handle('photo-studio-open', async () => {
+        try {
+            await windowService.open(WINDOW_APP_IDS.PHOTO_STUDIO);
+            return {
+                success: true,
+                data: {
+                    app_id: WINDOW_APP_IDS.PHOTO_STUDIO,
+                },
+            };
+        } catch (error) {
+            console.error('[DesktopHandlers] photo-studio-open failed:', error);
+            return photoStudioHandlerFailure('PHOTO_STUDIO_OPEN_FAILED', error);
+        }
+    });
+
+    ipcMain.handle('photo-studio-get-dashboard', async () => {
+        try {
+            return await getPhotoStudioOrchestrator().getDashboard();
+        } catch (error) {
+            console.error('[DesktopHandlers] photo-studio-get-dashboard failed:', error);
+            return photoStudioHandlerFailure('PHOTO_STUDIO_GET_DASHBOARD_FAILED', error);
+        }
+    });
+
+    ipcMain.handle('photo-studio-list-projects', async (event, filters = {}) => {
+        try {
+            return await getPhotoStudioOrchestrator().listProjects(filters);
+        } catch (error) {
+            console.error('[DesktopHandlers] photo-studio-list-projects failed:', error);
+            return photoStudioHandlerFailure('PHOTO_STUDIO_LIST_PROJECTS_FAILED', error);
+        }
+    });
+
+    ipcMain.handle('photo-studio-get-project', async (event, projectId) => {
+        try {
+            return await getPhotoStudioOrchestrator().getProject(projectId);
+        } catch (error) {
+            console.error('[DesktopHandlers] photo-studio-get-project failed:', error);
+            return photoStudioHandlerFailure('PHOTO_STUDIO_GET_PROJECT_FAILED', error, {
+                project_id: projectId,
+            });
+        }
+    });
+
+    ipcMain.handle('photo-studio-run-action', async (event, request = {}) => {
+        try {
+            const { scene, action, payload = {} } = request || {};
+            return await getPhotoStudioOrchestrator().runAction(scene, action, payload);
+        } catch (error) {
+            console.error('[DesktopHandlers] photo-studio-run-action failed:', error);
+            return photoStudioHandlerFailure('PHOTO_STUDIO_RUN_ACTION_FAILED', error);
+        }
+    });
+
+    ipcMain.handle('photo-studio-refresh-scene', async (event, request = {}) => {
+        try {
+            const { scene, payload = {} } = request || {};
+            return await getPhotoStudioOrchestrator().refreshScene(scene, payload);
+        } catch (error) {
+            console.error('[DesktopHandlers] photo-studio-refresh-scene failed:', error);
+            return photoStudioHandlerFailure('PHOTO_STUDIO_REFRESH_SCENE_FAILED', error);
+        }
     });
 
     // --- IPC: 绐楀彛濮嬬粓缃簳鎺у埗 ---

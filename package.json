@@ -7,9 +7,11 @@
     "start": "electron .",
     "start:desktop": "electron . --desktop-only",
     "start:rag-observer": "electron . --rag-observer-only",
-    "start:utf8": "start-vcpchat-utf8.cmd",
-    "start:desktop:utf8": "start-vcpchat-utf8.cmd --desktop-only",
-    "start:rag-observer:utf8": "start-vcpchat-utf8.cmd --rag-observer-only",
+    "start:utf8": "cmd /d /s /c \"chcp 65001 >nul && .\\node_modules\\electron\\dist\\electron.exe .\"",
+    "start:desktop:utf8": "cmd /d /s /c \"chcp 65001 >nul && .\\node_modules\\electron\\dist\\electron.exe . --desktop-only\"",
+    "start:rag-observer:utf8": "cmd /d /s /c \"chcp 65001 >nul && .\\node_modules\\electron\\dist\\electron.exe . --rag-observer-only\"",
+    "test:photo-studio": "node scripts/photo-studio-closeout-smoke.js",
+    "photo-studio:prune-shadow-data": "node scripts/photo-studio-prune-shadow-data.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
@@ -93,6 +95,8 @@
       "text-viewer.html",
       "style.css",
       "assets/",
+      "Desktopmodules/**/*",
+      "Sheetmodules/**/*",
       "modules/**/*",
       "vendor/**/*",
       "node_modules/**/*"

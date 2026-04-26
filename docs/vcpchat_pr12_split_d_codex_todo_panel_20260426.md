@@ -18,12 +18,12 @@ PR12 中同一组渲染文件还包含“工具结果渲染架构修复”，但
 
 - `modules/renderer/contentPipeline.js`
 - `styles/messageRenderer.css`
-- `scripts/codex-todo-panel-smoke.js`
 
 ## 本批次刻意不包含
 
 - `modules/messageRenderer.js`
 - VCP Tool Result 独立渲染架构修复。
+- 新增专用 smoke 脚本或长期测试工具。
 - Photo Studio 功能代码。
 - DesktopRemote / Codex Router Host。
 - legacy 目录迁移。
@@ -59,15 +59,13 @@ title: 下一步
 
 ```text
 node --check modules/renderer/contentPipeline.js
-node --check scripts/codex-todo-panel-smoke.js
-node scripts/codex-todo-panel-smoke.js
 git diff --check
 ```
 
 结果：
 
 ```text
-codex todo panel smoke: ok
+语法检查和 diff 检查通过。
 ```
 
 ## 风险
@@ -75,6 +73,7 @@ codex todo panel smoke: ok
 - 该能力位于消息内容预处理流水线，会影响匹配到 `## Plan`、`## TODO`、`## 计划`、`## 待办` 后紧跟任务列表的消息。
 - 本批次不改变普通 Markdown 列表；只有标题命中且后续确实存在列表项时才转换。
 - 本批次不改工具结果渲染，避免扩大审查范围。
+- 本批次不新增长期 smoke 脚本，避免为拆分工作重复造测试工具；桌面视觉验收留到 PR 检查阶段执行。
 
 ## 下一步
 

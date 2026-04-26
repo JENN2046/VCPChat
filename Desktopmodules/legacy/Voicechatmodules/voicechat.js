@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             voiceMode: settings.voiceMode || 'local',
             speechRecognizerBrowserPath: settings.speechRecognizerBrowserPath || '',
-            speechRecognizerPagePath: settings.speechRecognizerPagePath || 'Voicechatmodules/recognizer.html',
+    speechRecognizerPagePath: settings.speechRecognizerPagePath || 'Desktopmodules/legacy/Voicechatmodules/recognizer.html',
             voiceNetworkSettings: settings.voiceNetworkSettings || { sovitsUrl: '', sovitsKey: '' },
             voiceLocalSettings: settings.voiceLocalSettings || { providerUrl: '', providerKey: '' }
         };

@@ -98,7 +98,7 @@ class SettingsManager extends EventEmitter {
             assistantAgent: '',
             voiceMode: 'local',
             speechRecognizerBrowserPath: '',
-            speechRecognizerPagePath: 'Voicechatmodules/recognizer.html',
+            speechRecognizerPagePath: 'Desktopmodules/legacy/Voicechatmodules/recognizer.html',
             voiceLocalSettings: {
                 sovitsUrl: '',
                 sovitsKey: ''

@@ -212,6 +212,12 @@ CI / 自动检查追加收口：
 - 未读取、未打印、未修改敏感二进制内容。
 - 在这些本地修改完成归类前，不建议做任何生产合并、发布或推广。
 
+正式审查拆分规划：
+
+- 已新增 `docs/vcpchat_pr12_split_review_plan_20260426.md`。
+- 该文档将 PR12 拆成 8 个建议批次：文档/CI、宿主基础能力、Photo Studio、Codex TODO 面板、配置卫生、legacy 迁移、实验插件、音频/Rust/二进制资源。
+- 当前只完成拆分规划，不自动创建拆分 PR，不切 Ready，不合并生产线。
+
 ## 未验证 / 未执行
 
 本轮已尝试但未通过：
@@ -279,7 +285,7 @@ PR12 是独立候选分支：
 
 ## Plan
 
-- [ ] 拆分正式审查 PR：从 PR12 拆出宿主基础能力、Photo Studio、legacy 迁移、文档、插件 / 工具链几个小 PR。
+- [-] 拆分正式审查 PR：已完成拆分规划文档；尚未实际创建拆分 PR，需确认 base 和每个批次的验证范围。
 - [ ] 配置卫生治理：逐插件补齐 `.example` 模板，移出基线中仍被 Git 跟踪的真实 `.env` / `config.env`。
 - [x] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
 - [-] 打包验证：`npm run pack` 已尝试，但被本机 `winCodeSign` 符号链接权限与依赖卫生阻塞；`npm run dist` 暂不继续执行。

@@ -44,6 +44,7 @@ VCPDistributedServer/Plugin/FileOperator/.env
 .claude/
 .omc/
 Desktopmodules/.omc/
+dist/
 AppData/
 config.json
 loudness_cache.db

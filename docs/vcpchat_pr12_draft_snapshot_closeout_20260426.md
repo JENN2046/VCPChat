@@ -193,9 +193,18 @@ DesktopRemote live smoke 追加验证通过：
 
 ## 未验证 / 未执行
 
-本轮没有执行：
+本轮已尝试但未通过：
 
 - `npm run pack`
+
+阻塞原因：
+
+- `electron-builder` 在处理 `winCodeSign` 时需要创建符号链接，本机当前权限不足，报错为无法创建 symbolic link。
+- 本地依赖树仍存在 `extraneous` / `missing` 提示，且当前 worktree 的 `node_modules` 有复用旧工作区依赖的迹象，需要单独做依赖卫生治理。
+- `npm run pack` 已生成本地 `dist/` 产物目录；该目录已加入 `.gitignore`，不纳入 PR12 快照。
+
+本轮没有继续执行：
+
 - `npm run dist`
 - 生产稳定线预检
 - 生产合并 / 部署 / 发布
@@ -203,7 +212,7 @@ DesktopRemote live smoke 追加验证通过：
 原因：
 
 - 当前目标是 Draft 整合快照收口，不是生产发布。
-- `pack/dist` 可能生成产物并引入额外变量，暂不纳入本次快照收口。
+- `pack` 当前被本机权限与依赖环境阻塞，`dist` 不应在 `pack` 未通过前继续执行。
 - 生产线 `A:\VCP\VCPToolBox-prod-stable` 需要单独预检和明确授权。
 
 ## 回滚与恢复口径
@@ -253,7 +262,7 @@ PR12 是独立候选分支：
 - [ ] 拆分正式审查 PR：从 PR12 拆出宿主基础能力、Photo Studio、legacy 迁移、文档、插件 / 工具链几个小 PR。
 - [ ] 配置卫生治理：逐插件补齐 `.example` 模板，移出基线中仍被 Git 跟踪的真实 `.env` / `config.env`。
 - [x] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
-- [ ] 打包验证：按需执行 `npm run pack` 和 `npm run dist`，确认构建产物和打包白名单。
+- [-] 打包验证：`npm run pack` 已尝试，但被本机 `winCodeSign` 符号链接权限与依赖卫生阻塞；`npm run dist` 暂不继续执行。
 - [ ] CI / 自动检查：为 PR 或后续拆分 PR 补 GitHub checks 或等价自动验证。
 - [ ] 生产预检：如需推广到 `A:\VCP\VCPToolBox-prod-stable`，单独做生产线预检、合并策略和回滚方案。
 

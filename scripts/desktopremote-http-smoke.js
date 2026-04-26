@@ -9,7 +9,11 @@ const dotenv = require('dotenv');
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const DIST_CONFIG_PATH = path.join(PROJECT_ROOT, 'VCPDistributedServer', 'config.env');
 const GENERATED_LISTS_CONFIG_PATH = path.join(PROJECT_ROOT, 'AppData', 'generated_lists', 'config.env');
+const TOOLBOX_CONFIG_PATH = path.resolve(PROJECT_ROOT, '..', 'VCPToolBox', 'config.env');
 const DEFAULT_HOST = '127.0.0.1';
+const HOST_ENV_VAR = 'DESKTOP_REMOTE_HOST';
+const PORT_ENV_VAR = 'DESKTOP_REMOTE_PORT';
+const FILE_KEY_ENV_VAR = 'DESKTOP_REMOTE_FILE_KEY';
 const TEST_WIDGET_ID = 'desktopremote-http-smoke';
 const TEST_WIDGET_MARKER = 'Codex DesktopRemote HTTP Smoke';
 
@@ -42,22 +46,31 @@ function parseArgs(argv) {
 function resolveConfig(cliOptions) {
     const distConfig = readEnvFile(DIST_CONFIG_PATH);
     const generatedConfig = readEnvFile(GENERATED_LISTS_CONFIG_PATH);
+    const toolboxConfig = readEnvFile(TOOLBOX_CONFIG_PATH);
 
-    const port = Number(cliOptions.port || distConfig.DIST_SERVER_PORT);
+    const port = Number(cliOptions.port || process.env[PORT_ENV_VAR] || distConfig.DIST_SERVER_PORT);
     if (!port || Number.isNaN(port)) {
-        throw new Error('DIST_SERVER_PORT is missing or invalid.');
+        throw new Error(`DesktopRemote port is missing or invalid. Provide --port, ${PORT_ENV_VAR}, or DIST_SERVER_PORT.`);
     }
 
-    const key = cliOptions.key || generatedConfig.file_key;
+    const key = cliOptions.key
+        || process.env[FILE_KEY_ENV_VAR]
+        || pickFileKey(process.env)
+        || pickFileKey(generatedConfig)
+        || pickFileKey(toolboxConfig);
     if (!key) {
-        throw new Error('file_key is missing from AppData/generated_lists/config.env.');
+        throw new Error(`DesktopRemote file key is missing. Provide --key, ${FILE_KEY_ENV_VAR}, file_key/File_Key/FILE_KEY, AppData/generated_lists/config.env, or VCPToolBox/config.env.`);
     }
 
     return {
-        host: cliOptions.host || DEFAULT_HOST,
+        host: cliOptions.host || process.env[HOST_ENV_VAR] || DEFAULT_HOST,
         port,
         key,
     };
+}
+
+function pickFileKey(config = {}) {
+    return config.file_key || config.File_Key || config.FILE_KEY || null;
 }
 
 function postJson({ host, port, key }, payload) {
@@ -119,45 +132,80 @@ function extractTextContent(response) {
 async function main() {
     const cliOptions = parseArgs(process.argv.slice(2));
     const config = resolveConfig(cliOptions);
+    let cleanupRequired = false;
+    let primaryError = null;
 
     console.log(`[smoke] DesktopRemote HTTP target: http://${config.host}:${config.port}/pw=<key>/desktop-remote-test`);
 
-    const createPayload = {
-        command: 'CreateWidget',
-        widgetId: TEST_WIDGET_ID,
-        htmlContent: `<div style="padding:12px;font-size:18px;">${TEST_WIDGET_MARKER}</div>`,
-        x: 180,
-        y: 180,
-        width: 320,
-        height: 140,
-    };
-    const createResponse = await postJson(config, createPayload);
-    if (!createResponse?.success || createResponse?.result?.status !== 'success') {
-        throw new Error('CreateWidget did not succeed.');
-    }
-    const createdWidgetId = createResponse?.result?.result?.content
-        ? TEST_WIDGET_ID
-        : (createResponse?.commandPayload?.widgetId || TEST_WIDGET_ID);
-    console.log(`[smoke] CreateWidget PASS: ${createdWidgetId}`);
+    try {
+        const createPayload = {
+            command: 'CreateWidget',
+            widgetId: TEST_WIDGET_ID,
+            htmlContent: `<div style="padding:12px;font-size:18px;">${TEST_WIDGET_MARKER}</div>`,
+            x: 180,
+            y: 180,
+            width: 320,
+            height: 140,
+        };
+        const createResponse = await postJson(config, createPayload);
+        if (!createResponse?.success || createResponse?.result?.status !== 'success') {
+            throw new Error('CreateWidget did not succeed.');
+        }
+        const createdWidgetId = createResponse?.result?.result?.content
+            ? TEST_WIDGET_ID
+            : (createResponse?.commandPayload?.widgetId || TEST_WIDGET_ID);
+        cleanupRequired = true;
+        console.log(`[smoke] CreateWidget PASS: ${createdWidgetId}`);
 
-    const queryResponse = await postJson(config, { command: 'QueryDesktop' });
-    const desktopReport = extractTextContent(queryResponse);
-    if (!queryResponse?.success || !desktopReport.includes(TEST_WIDGET_ID)) {
-        throw new Error('QueryDesktop did not report the smoke widget.');
-    }
-    console.log('[smoke] QueryDesktop PASS');
+        const queryResponse = await postJson(config, { command: 'QueryDesktop' });
+        const desktopReport = extractTextContent(queryResponse);
+        if (!queryResponse?.success || !desktopReport.includes(TEST_WIDGET_ID)) {
+            throw new Error('QueryDesktop did not report the smoke widget.');
+        }
+        console.log('[smoke] QueryDesktop PASS');
 
-    const sourceResponse = await postJson(config, {
-        command: 'ViewWidgetSource',
-        widgetId: TEST_WIDGET_ID,
-    });
-    const widgetSource = extractTextContent(sourceResponse);
-    if (!sourceResponse?.success || !widgetSource.includes(TEST_WIDGET_MARKER)) {
-        throw new Error('ViewWidgetSource did not include the smoke marker.');
-    }
-    console.log('[smoke] ViewWidgetSource PASS');
+        const sourceResponse = await postJson(config, {
+            command: 'ViewWidgetSource',
+            widgetId: TEST_WIDGET_ID,
+        });
+        const widgetSource = extractTextContent(sourceResponse);
+        if (!sourceResponse?.success || !widgetSource.includes(TEST_WIDGET_MARKER)) {
+            throw new Error('ViewWidgetSource did not include the smoke marker.');
+        }
+        console.log('[smoke] ViewWidgetSource PASS');
 
-    console.log('[smoke] DesktopRemote HTTP smoke test passed.');
+        console.log('[smoke] DesktopRemote HTTP smoke test passed.');
+    } catch (error) {
+        primaryError = error;
+        throw error;
+    } finally {
+        if (cleanupRequired) {
+            try {
+                await cleanupSmokeWidget(config);
+            } catch (error) {
+                if (!primaryError) {
+                    throw error;
+                }
+                console.warn(`[smoke] DeleteWidget cleanup failed after smoke failure: ${error.message}`);
+            }
+        }
+    }
+}
+
+async function cleanupSmokeWidget(config) {
+    try {
+        const deleteResponse = await postJson(config, {
+            command: 'DeleteWidget',
+            widgetId: TEST_WIDGET_ID,
+        });
+        if (deleteResponse?.success && deleteResponse?.result?.status === 'success') {
+            console.log('[smoke] DeleteWidget cleanup PASS');
+        } else {
+            throw new Error('DeleteWidget cleanup did not report success.');
+        }
+    } catch (error) {
+        throw new Error(`DeleteWidget cleanup failed: ${error.message}`);
+    }
 }
 
 main().catch((error) => {

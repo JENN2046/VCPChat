@@ -22,6 +22,11 @@ const HIGH_RISK_ACTION_CONFIRMATIONS = Object.freeze({
     sync_external: '外部同步属于高风险动作，请确认目标和范围后再执行。',
 });
 
+const DATE_INPUT_MIN = '1900-01-01';
+const DATE_INPUT_MAX = '9999-12-31';
+const DATE_INPUT_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const DATE_INPUT_EXAMPLE = '2026-04-26';
+
 const PROJECT_LANES = Object.freeze([
     {
         key: 'lead_quote',
@@ -89,6 +94,108 @@ function showToast(message) {
     setTimeout(() => {
         toast.remove();
     }, 2400);
+}
+
+function isDateInput(target) {
+    return target?.matches?.('input[type="date"]');
+}
+
+function getDateInputLabel(input) {
+    const labelText = input.closest('label')?.querySelector('span')?.textContent?.trim();
+    return labelText || input.getAttribute('aria-label') || input.name || '日期';
+}
+
+function getDateInputErrorMessage(input) {
+    return `${getDateInputLabel(input)}请使用 4 位年份，例如 ${DATE_INPUT_EXAMPLE}`;
+}
+
+function setupDateInput(input) {
+    if (!isDateInput(input)) {
+        return;
+    }
+
+    input.setAttribute('min', DATE_INPUT_MIN);
+    input.setAttribute('max', DATE_INPUT_MAX);
+    input.setAttribute('maxlength', '10');
+    input.setAttribute('placeholder', 'YYYY-MM-DD');
+}
+
+function setupDateInputs(root = document) {
+    if (isDateInput(root)) {
+        setupDateInput(root);
+    }
+    root.querySelectorAll?.('input[type="date"]').forEach(setupDateInput);
+}
+
+function validateDateInput(input) {
+    if (!isDateInput(input)) {
+        return true;
+    }
+
+    setupDateInput(input);
+    input.setCustomValidity('');
+
+    const value = String(input.value || '').trim();
+    if (input.validity?.badInput) {
+        input.setCustomValidity(getDateInputErrorMessage(input));
+        return false;
+    }
+
+    if (value && (!DATE_INPUT_PATTERN.test(value) || value < DATE_INPUT_MIN || value > DATE_INPUT_MAX)) {
+        input.setCustomValidity(getDateInputErrorMessage(input));
+        return false;
+    }
+
+    return true;
+}
+
+function validateFormDateInputs(form) {
+    setupDateInputs(form);
+    const invalidInput = [...form.querySelectorAll('input[type="date"]')]
+        .find((input) => !validateDateInput(input));
+
+    if (!invalidInput) {
+        return true;
+    }
+
+    showToast(getDateInputErrorMessage(invalidInput));
+    invalidInput.reportValidity();
+    invalidInput.focus();
+    return false;
+}
+
+function installDateInputGuards() {
+    setupDateInputs(document);
+
+    document.addEventListener('input', (event) => {
+        if (isDateInput(event.target)) {
+            validateDateInput(event.target);
+        }
+    }, true);
+
+    document.addEventListener('change', (event) => {
+        if (isDateInput(event.target)) {
+            validateDateInput(event.target);
+        }
+    }, true);
+
+    document.addEventListener('submit', (event) => {
+        if (event.target instanceof HTMLFormElement && !validateFormDateInputs(event.target)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }
+    }, true);
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    setupDateInputs(node);
+                }
+            });
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 }
 
 function getErrorMessage(error) {
@@ -3392,6 +3499,8 @@ async function runActionAndSync(scene, action, payload) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    installDateInputGuards();
+
     document.querySelectorAll('.nav-item').forEach((button) => {
         button.addEventListener('click', () => {
             void switchScene(button.dataset.scene);

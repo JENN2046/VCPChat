@@ -119,6 +119,171 @@
     animation: vcp-loading-dots 1.4s infinite;
 }
 
+/* Codex TODO / Plan panel */
+.vcp-codex-todo-panel {
+    position: relative;
+    margin: 14px 0;
+    padding: 16px;
+    border: 1px solid color-mix(in srgb, var(--border-color, #7d8590) 55%, transparent);
+    border-radius: 16px;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--panel-bg, #171b22) 92%, #2f80ed 8%), transparent 70%),
+        color-mix(in srgb, var(--panel-bg, #171b22) 96%, #ffffff 4%);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+}
+
+.vcp-codex-todo-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4da3ff, #f2d675, #6ad6a8);
+    opacity: 0.9;
+}
+
+.vcp-codex-todo-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.vcp-codex-todo-kicker {
+    display: block;
+    margin-bottom: 5px;
+    color: color-mix(in srgb, var(--text-color, #f2f5f8) 58%, transparent);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.vcp-codex-todo-header h3 {
+    margin: 0;
+    color: var(--text-color, #f2f5f8);
+    font-size: 1.02rem;
+    line-height: 1.25;
+}
+
+.vcp-codex-todo-counts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 150px;
+}
+
+.vcp-codex-todo-counts span {
+    border: 1px solid color-mix(in srgb, var(--border-color, #7d8590) 50%, transparent);
+    border-radius: 999px;
+    padding: 4px 8px;
+    color: color-mix(in srgb, var(--text-color, #f2f5f8) 74%, transparent);
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 0.74rem;
+    white-space: nowrap;
+}
+
+.vcp-codex-todo-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.vcp-codex-todo-item {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 38px;
+    border: 1px solid color-mix(in srgb, var(--border-color, #7d8590) 36%, transparent);
+    border-radius: 12px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.vcp-codex-todo-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid color-mix(in srgb, var(--border-color, #7d8590) 72%, transparent);
+    border-radius: 50%;
+    color: var(--text-color, #f2f5f8);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.vcp-codex-todo-text {
+    min-width: 0;
+    color: var(--text-color, #f2f5f8);
+    line-height: 1.45;
+}
+
+.vcp-codex-todo-state {
+    border-radius: 999px;
+    padding: 3px 8px;
+    color: color-mix(in srgb, var(--text-color, #f2f5f8) 68%, transparent);
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.vcp-codex-todo-item.is-done {
+    opacity: 0.74;
+}
+
+.vcp-codex-todo-item.is-done .vcp-codex-todo-check {
+    border-color: color-mix(in srgb, #6ad6a8 80%, transparent);
+    background: color-mix(in srgb, #6ad6a8 20%, transparent);
+    color: #6ad6a8;
+}
+
+.vcp-codex-todo-item.is-active .vcp-codex-todo-check {
+    border-color: color-mix(in srgb, #f2d675 80%, transparent);
+    background: color-mix(in srgb, #f2d675 18%, transparent);
+    color: #f2d675;
+}
+
+.vcp-codex-todo-item.is-pending .vcp-codex-todo-check {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.light-theme .vcp-codex-todo-panel {
+    background:
+        linear-gradient(135deg, rgba(74, 124, 174, 0.1), transparent 72%),
+        rgba(255, 255, 255, 0.86);
+    box-shadow: 0 14px 32px rgba(50, 55, 64, 0.14);
+}
+
+body.light-theme .vcp-codex-todo-item {
+    background: rgba(255, 255, 255, 0.64);
+}
+
+@media (max-width: 720px) {
+    .vcp-codex-todo-header {
+        display: block;
+    }
+
+    .vcp-codex-todo-counts {
+        justify-content: flex-start;
+        margin-top: 10px;
+    }
+
+    .vcp-codex-todo-item {
+        grid-template-columns: 24px minmax(0, 1fr);
+    }
+
+    .vcp-codex-todo-state {
+        grid-column: 2;
+        justify-self: start;
+    }
+}
+
 /* 主气泡样式 - VCP ToolUse */
 .vcp-tool-use-bubble {
     background: linear-gradient(145deg, #3a7bd5 0%, #00d2ff 100%) !important;

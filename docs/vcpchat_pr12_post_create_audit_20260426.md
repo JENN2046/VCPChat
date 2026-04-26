@@ -33,6 +33,60 @@ PR12 当前适合作为“候选整合线 Draft PR”，不适合直接作为生
 - mergeable：`MERGEABLE`
 - status checks：空
 
+## 追加验证记录
+
+2026-04-26 追加执行了一轮目标验证。
+
+语法检查通过：
+
+- `node --check main.js`
+- `node --check preload.js`
+- `node --check preloads\desktop.js`
+- `node --check modules\ipc\desktopHandlers.js`
+- `node --check modules\ipc\desktopRemoteHandlers.js`
+- `node --check Desktopmodules\photoStudio\photoStudio.js`
+- `node --check Desktopmodules\photoStudio\services\photoStudioState.js`
+- `node --check Desktopmodules\photoStudio\services\photoStudioEvents.js`
+- `node --check modules\services\photoStudio\PhotoStudioOrchestrator.js`
+- `node --check modules\services\photoStudio\actionCatalog.js`
+- `node --check modules\services\photoStudio\uiHints.js`
+
+空白检查通过：
+
+- `git diff --check`
+
+Photo Studio 收口冒烟通过：
+
+```powershell
+npm run test:photo-studio
+```
+
+结果：
+
+```text
+Photo Studio closeout smoke: 25/25 passed
+```
+
+覆盖动作：
+
+- dashboard 读取
+- 项目创建
+- 非法状态推进明确失败
+- 项目推进到报价状态
+- 项目抽屉读取
+- 客户创建
+- 线索创建
+- 报价创建
+- 沟通草稿生成
+- 跟进提醒创建
+- 本地预约创建、改期、开始、完成
+- 交付任务补齐
+- 交付包创建
+- 交付包推进到已发送、已确认
+- 外部同步影子记录
+- 交付审计读取
+- 首页、项目指挥台、跟进与报价、日程排期、交付与素材五页刷新
+
 ## 已复核的本地差异
 
 本地命令：
@@ -116,4 +170,3 @@ git diff --shortstat origin/custom...HEAD
 3. 用户确认后，再决定：
    - 继续保留一个大 Draft PR；
    - 或从该整合线拆出 Photo Studio / 宿主 / 文档几个小 PR。
-

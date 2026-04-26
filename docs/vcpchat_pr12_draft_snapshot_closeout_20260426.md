@@ -181,13 +181,22 @@ codex todo panel transform: ok
 - 用户已确认 Codex TODO / Plan 面板桌面端视觉验收完成。
 - 当前记录只确认视觉验收结果，不代表生产发布或生产合并。
 
+DesktopRemote live smoke 追加验证通过：
+
+```text
+[smoke] CreateWidget PASS: desktopremote-http-smoke
+[smoke] QueryDesktop PASS
+[smoke] ViewWidgetSource PASS
+[smoke] DesktopRemote HTTP smoke test passed.
+[smoke] DeleteWidget cleanup PASS
+```
+
 ## 未验证 / 未执行
 
 本轮没有执行：
 
 - `npm run pack`
 - `npm run dist`
-- DesktopRemote live HTTP smoke
 - 生产稳定线预检
 - 生产合并 / 部署 / 发布
 
@@ -243,7 +252,7 @@ PR12 是独立候选分支：
 
 - [ ] 拆分正式审查 PR：从 PR12 拆出宿主基础能力、Photo Studio、legacy 迁移、文档、插件 / 工具链几个小 PR。
 - [ ] 配置卫生治理：逐插件补齐 `.example` 模板，移出基线中仍被 Git 跟踪的真实 `.env` / `config.env`。
-- [ ] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
+- [x] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
 - [ ] 打包验证：按需执行 `npm run pack` 和 `npm run dist`，确认构建产物和打包白名单。
 - [ ] CI / 自动检查：为 PR 或后续拆分 PR 补 GitHub checks 或等价自动验证。
 - [ ] 生产预检：如需推广到 `A:\VCP\VCPToolBox-prod-stable`，单独做生产线预检、合并策略和回滚方案。

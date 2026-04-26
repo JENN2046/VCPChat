@@ -4,7 +4,7 @@
 
 整合线：`integration/upstream-main-vcp-20260425`
 
-当前头部提交：`e5102f2 feat(photo-studio): add plan task panel`
+记录基准提交：`508b280 docs: update integration closeout for plan panel`
 
 底座：`upstream/main`，提交 `c329146`
 
@@ -122,18 +122,16 @@
 - 没有触碰 `A:\VCP\VCPToolBox-prod-stable`。
 - 没有执行真实生产发布。
 - 没有执行 live DesktopRemote HTTP smoke，因为需要当前 DesktopRemote 服务和桌面环境配合。
-- 没有处理 `.vcp_ready` 删除状态。
+- `.vcp_ready` 已按 readiness artifact 决策恢复。
 
 ## 剩余风险
 
-- 当前 worktree 仍显示 `.vcp_ready` 被删除。该项按约定暂不处理，避免混入用户/环境侧变更。
 - Photo Studio 已通过本地 smoke 和手工验收，但仍不是生产发布验证。
 - `codex-photo-studio-pr1-pr2-shell` 是历史开发线，不应再作为直接 merge 来源；后续如要追溯，只能按文件/功能点 cherry-pick。
 - 实验线 `feature/vcpchat-ai-image-split` 和 `rebuild/vcpchat-ai-image-split-clean` 没有进入第一阶段主线，需要另开二阶段审计。
 
 ## 建议下一步
 
-1. 明确 `.vcp_ready` 是恢复、忽略，还是继续保持不处理。
-2. 如果要做宿主更完整验收，单独运行 DesktopRemote live smoke。
-3. 如果整合线准备进入远端协作，再执行 push / PR 前检查。
-4. 生产推广必须另开步骤，从 `A:\VCP\VCPToolBox-prod-stable` 做生产级预检，不能从当前整合线直接替换。
+1. 如果要做宿主更完整验收，单独运行 DesktopRemote live smoke。
+2. 如果整合线准备进入远端协作，再执行 push / PR 前检查。
+3. 生产推广必须另开步骤，从 `A:\VCP\VCPToolBox-prod-stable` 做生产级预检，不能从当前整合线直接替换。

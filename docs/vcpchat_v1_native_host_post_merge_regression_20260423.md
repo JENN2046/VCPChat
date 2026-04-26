@@ -4,6 +4,61 @@
 
 Merge time + 24 hours
 
+## Current Status
+
+- PR #11 merged to `main` at `2026-04-24T11:45:20Z`.
+- `origin/main` contains merge commit `20a0ba5`.
+- Immediate post-merge verification passed for:
+  - `.vcp_ready` presence in `HEAD` and `origin/main`
+  - DesktopRemote plugin / handler / bridge syntax checks
+  - DesktopRemote manifest JSON parsing
+  - DesktopRemote HTTP smoke with `CreateWidget`, `QueryDesktop`,
+    `ViewWidgetSource`, and `DeleteWidget cleanup PASS`
+  - cleanup failure simulation causing the smoke script to fail
+  - cleanup success simulation allowing the smoke script to pass
+  - renderer `window.codexRouterHostClient.inspect()`
+  - renderer `window.codexRouterHostClient.run(taskEnvelope)`
+  - renderer `window.codexRouterHostClient.resume(taskEnvelope, { required: false })`
+- Renderer control-path validation used `VCP_CODEX_ROUTER_ROOT=A:\codex-router`
+  because the router checkout is installed at `A:\codex-router`, not
+  `A:\VCP\codex-router`.
+- `inspect` returned `status = success`, `ready = true`, and no pending runtime
+  or memory methods.
+- `run` and `resume` returned `status = success` with both `decisionResult` and
+  `executionResult` present.
+- The protected release-style smoke task was intentionally blocked before live
+  side effects:
+  - `decisionStatus = blocked_preflight`
+  - `executionStatus = not_ready`
+  - decision blocking reason: `memory_recent_rejections:39`
+  - execution blocking reason: `telemetry_sink_required`
+- Donor memory diagnostics show the `memory_recent_rejections:39` count is from
+  the default VCPToolBox memory overview window; latest rejected write was
+  `2026-04-22T10:46:03.665Z`, so this is historical memory-health debt rather
+  than a new PR #11 regression.
+- Test Electron processes were stopped after validation.
+- `.vcp_ready` was restored after Electron removed it locally during startup.
+- Current post-merge record branch: `postmerge/vcpchat-native-host-regression`.
+- A user-accepted 20-minute warm-up was completed with an isolated Electron
+  profile and DevTools port `9338`.
+  - Start probe at `2026-04-24T12:37:05.605Z`: renderer ready, host client
+    present, `inspect.status = success`, `ready = true`, no pending methods.
+  - Liveness probes at +5m, +10m, +15m, and +20m: DevTools port remained alive
+    and Electron process set remained present.
+  - End probe at `2026-04-24T13:03:20.729Z`: renderer ready, host client
+    present, `inspect.status = success`, `ready = true`, no pending methods.
+  - Test Electron processes were stopped after the warm-up.
+  - `.vcp_ready` was restored after Electron removed it locally during startup.
+
+## Pending Windows
+
+- The exact 30-minute warm-up window was not held open; the operator accepted
+  the 20-minute warm-up as sufficient for this post-merge pass.
+- The 4-hour stability check is still pending.
+- The 24-hour operational check is still pending.
+- Do not mark `POST_MERGE_STABLE` until the timed windows complete without P1/P0
+  regressions.
+
 ## Owner
 
 VCPChat host integration owner

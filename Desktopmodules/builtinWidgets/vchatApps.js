@@ -101,6 +101,16 @@
             <circle cx="34" cy="28" r="4" fill="#FFE66D" opacity="0.8"/>
             <path d="M8 40l6-14 4 8 6-20 6 16 4-6 6 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.5"/>
         </svg>`,
+        photoStudio: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="8" width="36" height="28" rx="6" fill="currentColor" opacity="0.08"/>
+            <rect x="6" y="8" width="36" height="28" rx="6" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <path d="M16 20h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <circle cx="24" cy="22" r="7" fill="currentColor" opacity="0.14"/>
+            <circle cx="24" cy="22" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+            <circle cx="24" cy="22" r="2.5" fill="currentColor"/>
+            <path d="M14 12l3-4h14l3 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 40h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>`,
         translator: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="24" cy="24" r="18" fill="currentColor" opacity="0.08"/>
             <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2.5" fill="none"/>
@@ -294,6 +304,16 @@
             emoji: '🎨',
             description: '打开 Canvas 协同编辑画布',
             appAction: 'open-canvas-window',
+        },
+        {
+            id: 'vchat-app-photo-studio',
+            name: 'Photo Studio',
+            icon: null,
+            animatedIcon: null,
+            svgIcon: SVG_ICONS.photoStudio,
+            emoji: '📸',
+            description: '打开影像工作台，处理项目、排期、交付与客户推进',
+            appAction: 'open-photo-studio-window',
         },
         {
             id: 'vchat-app-translator',

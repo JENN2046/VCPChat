@@ -7,6 +7,8 @@
     "start": "electron .",
     "start:desktop": "electron . --desktop-only",
     "start:rag-observer": "electron . --rag-observer-only",
+    "test:photo-studio": "node scripts/photo-studio-closeout-smoke.js",
+    "photo-studio:prune-shadow-data": "node scripts/photo-studio-prune-shadow-data.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
@@ -90,6 +92,7 @@
       "text-viewer.html",
       "style.css",
       "assets/",
+      "Desktopmodules/**/*",
       "modules/**/*",
       "vendor/**/*",
       "node_modules/**/*"

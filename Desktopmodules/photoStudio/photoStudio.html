@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>影像工作台</title>
+    <link rel="stylesheet" href="./photoStudio.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">VCP 工作台</p>
+                <h1>影像工作台</h1>
+            </div>
+            <div class="global-search" role="search">
+                <input id="global-search-input" type="search" placeholder="搜索项目、客户、编号" autocomplete="off">
+                <button class="ghost-btn" id="btn-clear-search" type="button">清空</button>
+            </div>
+            <div class="topbar-actions">
+                <div class="status-chip" id="status-chip">工作台已就绪</div>
+                <button class="ghost-btn" id="btn-refresh" type="button">刷新</button>
+                <button class="primary-btn" id="btn-new-project" type="button">新建项目</button>
+            </div>
+        </header>
+
+        <div class="workspace">
+            <aside class="left-nav">
+                <button class="nav-item active" data-scene="home" type="button">首页</button>
+                <button class="nav-item" data-scene="project_command" type="button">项目指挥台</button>
+                <button class="nav-item" data-scene="schedule_board" type="button">日程排期</button>
+                <button class="nav-item" data-scene="client_leads" type="button">跟进与报价</button>
+                <button class="nav-item" data-scene="delivery_assets" type="button">交付与素材</button>
+            </aside>
+
+            <main class="scene-root" id="scene-root" aria-live="polite"></main>
+
+            <aside class="right-drawer" id="drawer-root">
+                <div class="drawer-card">
+                    <p class="drawer-label">项目上下文</p>
+                    <h2>等待选择项目</h2>
+                    <p class="muted">点击项目卡片后，这里会显示项目详情、任务、状态日志和可执行动作。</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="toast-root" id="toast-root"></div>
+
+    <script src="./services/photoStudioApi.js"></script>
+    <script src="./services/photoStudioState.js"></script>
+    <script src="./services/photoStudioEvents.js"></script>
+    <script src="./photoStudio.js"></script>
+</body>
+</html>

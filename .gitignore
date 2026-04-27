@@ -7,8 +7,11 @@ AppData/
 
 node_modules/
 
-.env
-!audio_engine/.env
+# Local runtime configuration files must stay out of Git.
+**/.env
+**/config.env
+!**/.env.example
+!**/config.env.example
 
 /public/assets
 
@@ -34,8 +37,6 @@ styles/themes.css
 # LibreHardwareMonitor 官方二进制由开发者本地自行准备，不进入仓库
 vendor/LibreHardwareMonitor/*
 !vendor/LibreHardwareMonitor/README.md
-VCPDistributedServer/Plugin/DistImageServer/config.env
-VCPDistributedServer/Plugin/FileOperator/.env
 
 # 忽略 WebIndexTTS2 生成输出目录
 /WebIndexTTS2/tmp-output/

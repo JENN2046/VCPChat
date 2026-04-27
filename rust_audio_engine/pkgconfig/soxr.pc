@@ -1,4 +1,5 @@
-prefix=${pcfiledir}/../../../runtimes/vcpkg/installed/x64-windows-static-md
+# Template consumed by rust_audio_engine/scripts/build_all.ps1.
+prefix=__VCPKG_BASE__
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include

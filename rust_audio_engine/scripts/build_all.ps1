@@ -1,14 +1,14 @@
 # Audio Engine Dual-Build Script (AVX2 & AVX-512)
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RootDir = (Resolve-Path (Join-Path $ScriptDir "..")).Path
-$WorkspaceDir = (Resolve-Path (Join-Path $RootDir "..\\..")).Path
-$VcpkgRoot = Join-Path $WorkspaceDir "runtimes\\vcpkg"
+$WorkspaceDir = (Resolve-Path (Join-Path $RootDir "..\..")).Path
+$VcpkgRoot = Join-Path $WorkspaceDir "runtimes\vcpkg"
 
 # vcpkg path detection - Prefer static-md for stability
-$VcpkgBase = Join-Path $VcpkgRoot "installed\\x64-windows-static-md"
+$VcpkgBase = Join-Path $VcpkgRoot "installed\x64-windows-static-md"
 if (!(Test-Path $VcpkgBase)) {
     Write-Host ">>> Info: static-md not found. Falling back to x64-windows-static." -ForegroundColor Yellow
-    $VcpkgBase = Join-Path $VcpkgRoot "installed\\x64-windows-static"
+    $VcpkgBase = Join-Path $VcpkgRoot "installed\x64-windows-static"
 }
 
 if (!(Test-Path $VcpkgBase)) {
@@ -17,9 +17,18 @@ if (!(Test-Path $VcpkgBase)) {
 }
 
 # Inject environment variables for pkg-config discovery
+$PkgConfigTemplate = Join-Path $RootDir "pkgconfig\soxr.pc"
+$GeneratedPkgConfigDir = Join-Path $RootDir "target\pkgconfig"
+$GeneratedPkgConfigFile = Join-Path $GeneratedPkgConfigDir "soxr.pc"
+New-Item -ItemType Directory -Path $GeneratedPkgConfigDir -Force | Out-Null
+
+$VcpkgBaseForPc = $VcpkgBase -replace '[\\/]+', '/'
+(Get-Content $PkgConfigTemplate -Raw).Replace('__VCPKG_BASE__', $VcpkgBaseForPc) |
+    Set-Content -Path $GeneratedPkgConfigFile -Encoding utf8
+
 $env:PATH = "$VcpkgBase\tools\pkgconf;$env:PATH"
 $env:PKG_CONFIG = "$VcpkgBase\tools\pkgconf\pkgconf.exe"
-$env:PKG_CONFIG_PATH = "$VcpkgBase\lib\pkgconfig;$(Join-Path $RootDir 'pkgconfig')"
+$env:PKG_CONFIG_PATH = "$GeneratedPkgConfigDir;$VcpkgBase\lib\pkgconfig"
 
 # Force vcpkg root and triplet for cargo vcpkg-crate
 $env:VCPKG_ROOT = $VcpkgRoot

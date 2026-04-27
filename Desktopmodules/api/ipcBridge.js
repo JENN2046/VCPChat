@@ -246,7 +246,7 @@
                         ok: true,
                         data: {
                             widgetId,
-                            deleted: true,
+                            removed: true,
                         },
                     });
                     return;

@@ -10,6 +10,13 @@ node_modules/
 .env
 !audio_engine/.env
 
+# Local runtime configuration files must stay out of Git.
+**/.env
+**/config.env
+**/config.local.env
+!**/.env.example
+!**/config.env.example
+
 /public/assets
 
 **/.DS_Store
@@ -51,3 +58,4 @@ NativeSplash.exe
 **/reports/
 VCPDistributedServer/Plugin/*/.env
 VCPDistributedServer/Plugin/*/config.env
+VCPDistributedServer/Plugin/*/config.local.env

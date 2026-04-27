@@ -39,3 +39,18 @@ VCPDistributedServer/Plugin/FileOperator/.env
 
 # 忽略 WebIndexTTS2 生成输出目录
 /WebIndexTTS2/tmp-output/
+
+# VCPChat local runtime and generated artifacts
+.claude/
+.omc/
+Desktopmodules/.omc/
+dist/
+AppData/
+config.json
+loudness_cache.db
+NativeSplash.exe
+**/*.bak
+**/*.log
+**/reports/
+VCPDistributedServer/Plugin/*/.env
+VCPDistributedServer/Plugin/*/config.env

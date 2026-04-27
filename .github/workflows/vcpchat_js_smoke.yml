@@ -5,22 +5,36 @@ on:
   push:
     paths:
       - 'Desktopmodules/photoStudio/**'
+      - 'Desktopmodules/legacy/Groupmodules/groupchat.js'
+      - 'Desktopmodules/legacy/Voicechatmodules/**'
       - 'main.js'
       - 'preload.js'
+      - 'preloads/chat.js'
       - 'modules/ipc/desktopHandlers.js'
+      - 'modules/ipc/desktopRemoteHandlers.js'
       - 'modules/renderer/**'
       - 'modules/services/photoStudio/**'
+      - 'VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js'
+      - 'VCPDistributedServer/Plugin/ScreenPilot/config.env.example'
+      - 'VCPDistributedServer/Plugin/WaitingForUrReply/config.env.example'
       - 'scripts/photo-studio-closeout-smoke.js'
       - 'package.json'
       - '.github/workflows/vcpchat_js_smoke.yml'
   pull_request:
     paths:
       - 'Desktopmodules/photoStudio/**'
+      - 'Desktopmodules/legacy/Groupmodules/groupchat.js'
+      - 'Desktopmodules/legacy/Voicechatmodules/**'
       - 'main.js'
       - 'preload.js'
+      - 'preloads/chat.js'
       - 'modules/ipc/desktopHandlers.js'
+      - 'modules/ipc/desktopRemoteHandlers.js'
       - 'modules/renderer/**'
       - 'modules/services/photoStudio/**'
+      - 'VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js'
+      - 'VCPDistributedServer/Plugin/ScreenPilot/config.env.example'
+      - 'VCPDistributedServer/Plugin/WaitingForUrReply/config.env.example'
       - 'scripts/photo-studio-closeout-smoke.js'
       - 'package.json'
       - '.github/workflows/vcpchat_js_smoke.yml'
@@ -45,8 +59,13 @@ jobs:
           $files = @(
             'main.js',
             'preload.js',
+            'preloads/chat.js',
             'modules/ipc/desktopHandlers.js',
+            'modules/ipc/desktopRemoteHandlers.js',
             'modules/renderer/contentPipeline.js',
+            'VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js',
+            'Desktopmodules/legacy/Groupmodules/groupchat.js',
+            'Desktopmodules/legacy/Voicechatmodules/voicechat.js',
             'Desktopmodules/photoStudio/photoStudio.js',
             'Desktopmodules/photoStudio/services/photoStudioEvents.js',
             'Desktopmodules/photoStudio/services/photoStudioState.js',
@@ -64,6 +83,19 @@ jobs:
             } else {
               Write-Host "skip missing file: $file"
             }
+          }
+
+      - name: Check plugin template defaults
+        shell: pwsh
+        run: |
+          $screenPilot = Get-Content 'VCPDistributedServer/Plugin/ScreenPilot/config.env.example' | ForEach-Object { $_.Trim() }
+          if ($screenPilot -notcontains 'VISION_API_FORMAT=chat') {
+            throw 'ScreenPilot template must use VISION_API_FORMAT=chat'
+          }
+
+          $waitingForReply = Get-Content 'VCPDistributedServer/Plugin/WaitingForUrReply/config.env.example' | ForEach-Object { $_.Trim() }
+          if ($waitingForReply -notcontains 'DEFAULT_TIMEOUT=1200') {
+            throw 'WaitingForUrReply template must keep DEFAULT_TIMEOUT=1200'
           }
 
       - name: Optional Photo Studio closeout smoke

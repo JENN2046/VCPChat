@@ -23,7 +23,7 @@ function startDiceServer(projectRoot) {
         const port = 6677;
 
         // Serve static files from the project root
-        app.use('/', express.static(path.join(projectRoot, 'Dicemodules')));
+        app.use('/', express.static(path.join(projectRoot, 'Desktopmodules', 'legacy', 'Dicemodules')));
         app.use('/node_modules', express.static(path.join(projectRoot, 'node_modules')));
         app.use('/styles', express.static(path.join(projectRoot, 'styles')));
         app.use('/assets', express.static(path.join(projectRoot, 'assets')));

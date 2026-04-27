@@ -33,7 +33,7 @@ let globalSettings = {
     showUserMetaInChatBubbleUi: true,
     voiceMode: 'local',
     speechRecognizerBrowserPath: '',
-    speechRecognizerPagePath: 'Voicechatmodules/recognizer.html',
+    speechRecognizerPagePath: 'Desktopmodules/legacy/Voicechatmodules/recognizer.html',
     voiceLocalSettings: {
         sovitsUrl: '',
         sovitsKey: ''
@@ -2002,7 +2002,7 @@ async function syncGlobalSettingsToUI() {
     safeCheck('voiceModeLocal', (globalSettings.voiceMode || 'local') !== 'network');
     safeCheck('voiceModeNetwork', (globalSettings.voiceMode || 'local') === 'network');
     safeSet('speechRecognizerBrowserPath', globalSettings.speechRecognizerBrowserPath || '');
-    safeSet('speechRecognizerPagePath', globalSettings.speechRecognizerPagePath || 'Voicechatmodules/recognizer.html');
+safeSet('speechRecognizerPagePath', globalSettings.speechRecognizerPagePath || 'Desktopmodules/legacy/Voicechatmodules/recognizer.html');
     safeSet('voiceLocalSovitsUrl', globalSettings.voiceLocalSettings?.sovitsUrl || '');
     safeSet('voiceLocalSovitsKey', globalSettings.voiceLocalSettings?.sovitsKey || '');
     safeSet('voiceNetworkProviderUrl', globalSettings.voiceNetworkSettings?.providerUrl || '');

@@ -475,7 +475,7 @@ function registerManagedWindows() {
             vchatMemoWindow = createOrFocusChildWindow(vchatMemoWindow, {
                 width: 1200, height: 800, minWidth: 800, minHeight: 600,
                 title: 'VCP Memo Center',
-                htmlPath: path.join(app.getAppPath(), 'Memomodules', 'memo.html'),
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Memomodules', 'memo.html'),
             });
             return vchatMemoWindow;
         },
@@ -495,7 +495,7 @@ function registerManagedWindows() {
             vchatForumWindow = createOrFocusChildWindow(vchatForumWindow, {
                 width: 1200, height: 800, minWidth: 800, minHeight: 600,
                 title: 'VCP Forum',
-                htmlPath: path.join(app.getAppPath(), 'Forummodules', 'forum.html'),
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Forummodules', 'forum.html'),
             });
             return vchatForumWindow;
         },
@@ -560,7 +560,7 @@ function registerManagedWindows() {
             vchatTranslatorWindow = createOrFocusChildWindow(vchatTranslatorWindow, {
                 width: 1000, height: 700, minWidth: 800, minHeight: 600,
                 title: 'Translator',
-                htmlPath: path.join(app.getAppPath(), 'Translatormodules', 'translator.html'),
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Translatormodules', 'translator.html'),
                 queryParams: `vcpServerUrl=${encodeURIComponent(vcpServerUrl)}&vcpApiKey=${encodeURIComponent(vcpApiKey)}`,
             });
             return vchatTranslatorWindow;
@@ -587,7 +587,7 @@ function registerManagedWindows() {
             vchatThemesWindow = createOrFocusChildWindow(vchatThemesWindow, {
                 width: 850, height: 700,
                 title: 'Theme Picker',
-                htmlPath: path.join(app.getAppPath(), 'Themesmodules', 'themes.html'),
+                htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Themesmodules', 'themes.html'),
             });
             return vchatThemesWindow;
         },
@@ -1971,7 +1971,7 @@ function initialize(params) {
                         vchatMemoWindow = createOrFocusChildWindow(vchatMemoWindow, {
                             width: 1200, height: 800, minWidth: 800, minHeight: 600,
                             title: 'VCP Memo 中心',
-                            htmlPath: path.join(app.getAppPath(), 'Memomodules', 'memo.html'),
+                            htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Memomodules', 'memo.html'),
                         });
                     }
                     return { success: true };
@@ -1987,7 +1987,7 @@ function initialize(params) {
                         vchatForumWindow = createOrFocusChildWindow(vchatForumWindow, {
                             width: 1200, height: 800, minWidth: 800, minHeight: 600,
                             title: 'VCP 论坛',
-                            htmlPath: path.join(app.getAppPath(), 'Forummodules', 'forum.html'),
+                            htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Forummodules', 'forum.html'),
                         });
                     }
                     return { success: true };
@@ -2033,7 +2033,7 @@ function initialize(params) {
                     vchatTranslatorWindow = createOrFocusChildWindow(vchatTranslatorWindow, {
                         width: 1000, height: 700, minWidth: 800, minHeight: 600,
                         title: '翻译',
-                        htmlPath: path.join(app.getAppPath(), 'Translatormodules', 'translator.html'),
+                        htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Translatormodules', 'translator.html'),
                         queryParams: `vcpServerUrl=${encodeURIComponent(vcpServerUrl)}&vcpApiKey=${encodeURIComponent(vcpApiKey)}`,
                     });
                     return { success: true };
@@ -2054,7 +2054,7 @@ function initialize(params) {
                     vchatThemesWindow = createOrFocusChildWindow(vchatThemesWindow, {
                         width: 850, height: 700,
                         title: '主题选择',
-                        htmlPath: path.join(app.getAppPath(), 'Themesmodules', 'themes.html'),
+                        htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Themesmodules', 'themes.html'),
                     });
                     return { success: true };
                 }

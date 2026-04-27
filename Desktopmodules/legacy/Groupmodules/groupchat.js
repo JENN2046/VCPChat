@@ -3,9 +3,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { ipcMain } = require('electron');
-const contextSanitizer = require('../modules/contextSanitizer');
-const fileManager = require('../modules/fileManager');
-const canvasHandlers = require('../modules/ipc/canvasHandlers');
+const contextSanitizer = require('../../../modules/contextSanitizer');
+const fileManager = require('../../../modules/fileManager');
+const canvasHandlers = require('../../../modules/ipc/canvasHandlers');
 
 // 群聊模式策略模块
 const sequentialMode = require('./modes/sequentialMode');

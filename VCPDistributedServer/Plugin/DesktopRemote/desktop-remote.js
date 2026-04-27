@@ -79,8 +79,14 @@ process.stdin.on('end', () => {
             const htmlContent = args.htmlContent || args.htmlcontent || args.HtmlContent
                 || args.html || args.Html || args.content || args.Content;
 
-            if (!htmlContent) {
-                throw new Error("The 'htmlContent' parameter is required for CreateWidget command. Provide the HTML code for the widget.");
+            const builtinWidgetKey = args.builtinWidgetKey || args.builtinwidgetkey || args.BuiltinWidgetKey
+                || args.builtin_widget_key || args.builtinId || args.builtinid || args.BuiltinId
+                || args.builtin_id || null;
+            const metricComponent = args.metricComponent || args.metriccomponent || args.MetricComponent
+                || args.metric_component || args.component || args.Component || null;
+
+            if (!htmlContent && !builtinWidgetKey && !metricComponent) {
+                throw new Error("CreateWidget requires one of 'htmlContent', 'builtinWidgetKey', or 'metricComponent'. Provide HTML for a custom widget, or use a builtin widget id from QueryDock.");
             }
 
             // Optional position and size parameters
@@ -100,8 +106,8 @@ process.stdin.on('end', () => {
 
             const commandPayload = {
                 command: 'CreateWidget',
-                htmlContent: htmlContent,
             };
+            if (htmlContent) commandPayload.htmlContent = htmlContent;
 
             // Only include optional fields if they have valid values
             if (x !== null) commandPayload.x = x;
@@ -111,9 +117,14 @@ process.stdin.on('end', () => {
             if (widgetId) commandPayload.widgetId = widgetId;
             if (autoSave) commandPayload.autoSave = true;
             if (saveName) commandPayload.saveName = saveName;
+            if (builtinWidgetKey) commandPayload.builtinWidgetKey = builtinWidgetKey;
+            if (metricComponent) commandPayload.metricComponent = metricComponent;
 
             // Include scriptCode if provided (plain JS string, saved as app.js)
             if (scriptCode && typeof scriptCode === 'string' && scriptCode.trim().length > 0) {
+                if (!htmlContent) {
+                    throw new Error("The 'htmlContent' parameter is required when scriptFiles/scriptCode is provided.");
+                }
                 commandPayload.scriptCode = scriptCode;
                 // When scriptCode is provided, force autoSave (file needs persistent storage)
                 commandPayload.autoSave = true;

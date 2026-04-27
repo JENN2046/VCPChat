@@ -132,8 +132,14 @@ function createLineEndingHelper(content) {
 function isPathAllowed(targetPath, operationType = 'generic') {
   const resolvedPath = path.resolve(targetPath);
 
-  const isWithinDirectory = directory =>
-    resolvedPath.toLowerCase().startsWith(path.resolve(directory).toLowerCase());
+  const isWithinDirectory = directory => {
+    const resolvedDir = path.resolve(directory).toLowerCase();
+    const lowerPath = resolvedPath.toLowerCase();
+    if (!lowerPath.startsWith(resolvedDir)) return false;
+    if (lowerPath.length === resolvedDir.length) return true;
+    const nextChar = lowerPath[resolvedDir.length];
+    return nextChar === '\\' || nextChar === '/';
+  };
 
   if (SAFE_INTERNAL_DIRECTORIES.some(isWithinDirectory)) {
     debugLog(`Path is within internal safe directories. Access granted.`, { targetPath, operationType });

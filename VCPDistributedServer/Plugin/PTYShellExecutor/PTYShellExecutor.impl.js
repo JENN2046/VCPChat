@@ -1198,7 +1198,7 @@ function getShellArgs(shellName, pipeMode = false) {
 
 // --- 安全检查 ---
 function securityCheck(command) {
-    const normalizedCommand = command.trim().toLowerCase();
+    const normalizedCommand = command.trim().replace(/\s+/g, ' ').toLowerCase();
     
     for (const forbidden of defaultConfig.forbiddenCommands) {
         if (normalizedCommand.includes(forbidden)) {

@@ -926,11 +926,17 @@ let executionQueueLength = 0;
 const MAX_EXECUTION_QUEUE_LENGTH = 50;
 
 // --- 配置加载 ---
+const DEFAULT_FORBIDDEN_COMMANDS = ['rm -rf', 'dd if=', 'mkfs', 'fdisk', 'shutdown', 'reboot', 'poweroff', 'halt'];
+const DEFAULT_AUTH_REQUIRED_COMMANDS = ['rm ', 'mv ', 'chmod ', 'chown ', 'systemctl ', 'service ', 'docker ', 'kubectl ', 'git push', 'git reset', 'kill ', 'killall ', 'pkill '];
+const DEFAULT_SHELL_PRIORITY = process.platform === 'win32'
+    ? ['pwsh', 'powershell', 'cmd']
+    : ['fish', 'zsh', 'bash', 'sh'];
+
 const defaultConfig = {
     returnMode: 'delta',
-    shellPriority: ['fish', 'zsh', 'bash'],
-    forbiddenCommands: [],
-    authRequiredCommands: [],
+    shellPriority: DEFAULT_SHELL_PRIORITY,
+    forbiddenCommands: DEFAULT_FORBIDDEN_COMMANDS,
+    authRequiredCommands: DEFAULT_AUTH_REQUIRED_COMMANDS,
     commandTimeout: 60000,
     ptyMode: 'auto' // auto | pty | pipe
 };
@@ -975,12 +981,28 @@ function getEffectivePtyMode() {
 }
 
 // --- Shell 检测 ---
-function detectShell(preferredShell) {
-    const shellPaths = {
+function getShellCandidates() {
+    if (process.platform === 'win32') {
+        return {
+            pwsh: [
+                path.join(process.env.ProgramFiles || 'C:\\Program Files', 'PowerShell', '7', 'pwsh.exe'),
+                'pwsh.exe'
+            ],
+            powershell: ['powershell.exe'],
+            cmd: ['cmd.exe']
+        };
+    }
+
+    return {
         fish: ['/usr/bin/fish', '/bin/fish', '/usr/local/bin/fish'],
         zsh: ['/usr/bin/zsh', '/bin/zsh', '/usr/local/bin/zsh'],
-        bash: ['/usr/bin/bash', '/bin/bash', '/usr/local/bin/bash']
+        bash: ['/usr/bin/bash', '/bin/bash', '/usr/local/bin/bash'],
+        sh: ['/usr/bin/sh', '/bin/sh']
     };
+}
+
+function detectShell(preferredShell) {
+    const shellPaths = getShellCandidates();
 
     // 如果指定了 shell，优先使用
     if (preferredShell && shellPaths[preferredShell]) {
@@ -999,7 +1021,30 @@ function detectShell(preferredShell) {
     }
 
     // 回退到环境变量或默认 bash
+    if (process.platform === 'win32') {
+        return 'powershell.exe';
+    }
     return process.env.SHELL || '/bin/bash';
+}
+
+function getShellArgs(shellName, pipeMode = false) {
+    if (process.platform === 'win32') {
+        if (shellName === 'pwsh' || shellName === 'powershell') {
+            return ['-NoLogo'];
+        }
+        if (shellName === 'cmd') {
+            return ['/Q'];
+        }
+        return [];
+    }
+
+    if (shellName === 'bash' || shellName === 'zsh') {
+        return ['--login'];
+    }
+    if (pipeMode && shellName === 'fish') {
+        return ['-l'];
+    }
+    return [];
 }
 
 // --- 安全检查 ---
@@ -1035,7 +1080,7 @@ function createNewPtySession(preferredShell) {
     const shellName = path.basename(shell);
     
     // 使用登录 shell 模式以加载配置文件
-    const args = shellName === 'bash' ? ['--login'] : (shellName === 'zsh' ? ['--login'] : []);
+    const args = getShellArgs(shellName, false);
 
     console.log(`[PTYShellExecutor] Starting shell: ${shell} with args: ${args.join(' ')}`);
 
@@ -1086,10 +1131,7 @@ function createNewPipeSession(preferredShell) {
     const shell = detectShell(preferredShell);
     const shellName = path.basename(shell);
 
-    let args = [];
-    if (shellName === 'bash') args = ['--login'];
-    else if (shellName === 'zsh') args = ['--login'];
-    else if (shellName === 'fish') args = ['-l'];
+    const args = getShellArgs(shellName, true);
 
     console.log(`[PTYShellExecutor] Starting pipe shell: ${shell} with args: ${args.join(' ')}`);
 

@@ -210,8 +210,29 @@ let isExecutingCommand = false; // 新增：执行命令状态标志
 // --- 配置加载 ---
 const defaultConfig = {
     returnMode: 'delta', // 默认为增量模式
-    forbiddenCommands: [],
-    authRequiredCommands: []
+    forbiddenCommands: [
+        'clear-disk',
+        'format-volume',
+        'stop-computer',
+        'restart-computer',
+        'remove-item -recurse',
+        'remove-item -force',
+        'diskpart',
+        'bcdedit'
+    ],
+    authRequiredCommands: [
+        'remove-item',
+        'stop-process',
+        'restart-service',
+        'set-service',
+        'start-process',
+        'invoke-expression',
+        'taskkill',
+        'reg add',
+        'reg delete',
+        'git push',
+        'git reset'
+    ]
 };
 
 try {

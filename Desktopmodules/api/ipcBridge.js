@@ -273,6 +273,31 @@
                     return;
                 }
 
+                case 'DeleteWidget': {
+                    const widgetId = payload.widgetId;
+                    const widgetData = state.widgets.get(widgetId);
+                    if (!widgetId) {
+                        throw new Error('DeleteWidget requires widgetId.');
+                    }
+                    if (!widgetData) {
+                        sendDesktopRemoteRpcResponse(requestId, {
+                            ok: false,
+                            error: `Widget "${widgetId}" does not exist on the current desktop.`,
+                        });
+                        return;
+                    }
+
+                    widget.remove(widgetId);
+                    sendDesktopRemoteRpcResponse(requestId, {
+                        ok: true,
+                        data: {
+                            widgetId,
+                            removed: true,
+                        },
+                    });
+                    return;
+                }
+
                 case 'SetStyleAutomation': {
                     if (!window.VCPDesktop?.styleAutomation) {
                         throw new Error('styleAutomation module is unavailable.');

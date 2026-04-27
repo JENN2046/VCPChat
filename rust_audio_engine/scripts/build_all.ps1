@@ -1,25 +1,58 @@
 # Audio Engine Dual-Build Script (AVX2 & AVX-512)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RootDir = (Resolve-Path (Join-Path $ScriptDir "..")).Path
+$WorkspaceDir = (Resolve-Path (Join-Path $RootDir "..\..")).Path
+$VcpkgRoot = Join-Path $WorkspaceDir "runtimes\vcpkg"
+
 # vcpkg path detection - Prefer static-md for stability
-$VcpkgBase = "H:\VCP\vcpkg\installed\x64-windows-static-md"
+$VcpkgBase = Join-Path $VcpkgRoot "installed\x64-windows-static-md"
 if (!(Test-Path $VcpkgBase)) {
     Write-Host ">>> Info: static-md not found. Falling back to x64-windows-static." -ForegroundColor Yellow
-    $VcpkgBase = "H:\VCP\vcpkg\installed\x64-windows-static"
+    $VcpkgBase = Join-Path $VcpkgRoot "installed\x64-windows-static"
+}
+
+if (!(Test-Path $VcpkgBase)) {
+    Write-Host ">>> ERROR: Could not find a usable vcpkg install under $VcpkgRoot" -ForegroundColor Red
+    exit 1
 }
 
 # Inject environment variables for pkg-config discovery
+$PkgConfigTemplate = Join-Path $RootDir "pkgconfig\soxr.pc"
+$GeneratedPkgConfigDir = Join-Path $RootDir "target\pkgconfig"
+$GeneratedPkgConfigFile = Join-Path $GeneratedPkgConfigDir "soxr.pc"
+New-Item -ItemType Directory -Path $GeneratedPkgConfigDir -Force | Out-Null
+
+$VcpkgBaseForPc = $VcpkgBase -replace '[\\/]+', '/'
+(Get-Content $PkgConfigTemplate -Raw).Replace('__VCPKG_BASE__', $VcpkgBaseForPc) |
+    Set-Content -Path $GeneratedPkgConfigFile -Encoding utf8
+
 $env:PATH = "$VcpkgBase\tools\pkgconf;$env:PATH"
-$env:PKG_CONFIG_PATH = "$VcpkgBase\lib\pkgconfig;$(Join-Path (Get-Location) 'pkgconfig')"
+$env:PKG_CONFIG = "$VcpkgBase\tools\pkgconf\pkgconf.exe"
+$env:PKG_CONFIG_PATH = "$GeneratedPkgConfigDir;$VcpkgBase\lib\pkgconfig"
 
 # Force vcpkg root and triplet for cargo vcpkg-crate
-$env:VCPKG_ROOT = "H:\VCP\vcpkg"
+$env:VCPKG_ROOT = $VcpkgRoot
 if ($VcpkgBase -match "static-md") {
     $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-static-md"
 } else {
     $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-static"
 }
 
+$CargoExe = (Get-Command cargo -ErrorAction SilentlyContinue).Source
+if (-not $CargoExe) {
+    $CargoCandidate = Join-Path $HOME ".cargo\\bin\\cargo.exe"
+    if (Test-Path $CargoCandidate) {
+        $CargoExe = $CargoCandidate
+    }
+}
+
+if (-not $CargoExe) {
+    Write-Host ">>> ERROR: Could not find cargo. Install Rust or add cargo to PATH." -ForegroundColor Red
+    exit 1
+}
+
 # Directory Setup
-$RootDir = Get-Location
+Set-Location $RootDir
 $OutputDir = Join-Path (Split-Path $RootDir -Parent) "audio_engine"
 if (!(Test-Path $OutputDir)) { 
     Write-Host "Creating output directory: $OutputDir"
@@ -30,7 +63,7 @@ if (!(Test-Path $OutputDir)) {
 Write-Host ">>> Building AVX2 Version (x86-64-v3)..." -ForegroundColor Cyan
 # IMPORTANT: Use target-specific RUSTFLAGS to avoid crashing build-scripts on host
 $env:CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS = "-C target-cpu=x86-64-v3"
-cargo build --release --bin audio_server --target x86_64-pc-windows-msvc
+& $CargoExe build --release --bin audio_server --target x86_64-pc-windows-msvc
 if ($LASTEXITCODE -eq 0) {
     if (Test-Path "target/x86_64-pc-windows-msvc/release/audio_server.exe") {
         Move-Item -Path "target/x86_64-pc-windows-msvc/release/audio_server.exe" -Destination (Join-Path $OutputDir "audio_server.exe") -Force
@@ -48,7 +81,7 @@ if ($LASTEXITCODE -eq 0) {
 Write-Host "`n>>> Building AVX-512 Version (x86-64-v4)..." -ForegroundColor Cyan
 # IMPORTANT: This ensures build-scripts run on host (no AVX-512), while target EXE uses AVX-512
 $env:CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS = "-C target-cpu=x86-64-v4"
-cargo build --release --bin audio_server --target x86_64-pc-windows-msvc
+& $CargoExe build --release --bin audio_server --target x86_64-pc-windows-msvc
 if ($LASTEXITCODE -eq 0) {
     if (Test-Path "target/x86_64-pc-windows-msvc/release/audio_server.exe") {
         Move-Item -Path "target/x86_64-pc-windows-msvc/release/audio_server.exe" -Destination (Join-Path $OutputDir "audio_server_avx512.exe") -Force

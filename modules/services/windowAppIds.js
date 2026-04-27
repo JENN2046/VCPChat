@@ -11,4 +11,5 @@ module.exports = Object.freeze({
     MUSIC: 'music',
     THEMES: 'themes',
     TASK: 'task',
+    PHOTO_STUDIO: 'photo-studio',
 });

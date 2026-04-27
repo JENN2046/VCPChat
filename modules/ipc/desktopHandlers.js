@@ -2055,13 +2055,8 @@ function initialize(params) {
                 }
 
                 case 'open-music-window': {
-                    // 音乐窗口需要通过已注册的 ipcMain.on('open-music-window') 打开
-                    // 通过桌面窗口自身的渲染进程触发（桌面窗口加载了相同的 preload.js）
-                    if (desktopWindow && !desktopWindow.isDestroyed()) {
-                        desktopWindow.webContents.executeJavaScript(`window.electron?.send('open-music-window')`).catch(() => {});
-                    } else if (mainWindow && !mainWindow.isDestroyed()) {
-                        mainWindow.webContents.executeJavaScript(`window.electron?.send('open-music-window')`).catch(() => {});
-                    }
+                    const musicHandlers = require('./musicHandlers');
+                    await musicHandlers.createOrFocusMusicWindow();
                     return { success: true };
                 }
 

@@ -19,6 +19,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     let USER_NAME = 'Human';
     let settings = {};
     let MAX_FILENAME_LENGTH = 400;
+    let windowControlsInitialized = false;
+
+    function initializeWindowControls() {
+        if (windowControlsInitialized) return;
+        windowControlsInitialized = true;
+
+        document.getElementById('minimize-btn')?.addEventListener('click', () => {
+            window.electronAPI.send('window-control', 'minimize');
+        });
+        document.getElementById('maximize-btn')?.addEventListener('click', () => {
+            window.electronAPI.send('window-control', 'maximize');
+        });
+        document.getElementById('close-btn')?.addEventListener('click', () => {
+            window.electronAPI.send('window-control', 'close');
+        });
+    }
 
     // --- 设置加载与保存 ---
     async function loadSettings() {
@@ -45,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 初始化应用程序 ---
     async function initializeApp() {
+        initializeWindowControls();
         await loadSettings();
 
         if (settings.vcpServerUrl) {
@@ -1119,17 +1136,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function initializeUI() {
-        // Window controls
-        document.getElementById('minimize-btn').addEventListener('click', () => {
-            window.electronAPI.send('window-control', 'minimize');
-        });
-        document.getElementById('maximize-btn').addEventListener('click', () => {
-            window.electronAPI.send('window-control', 'maximize');
-        });
-        document.getElementById('close-btn').addEventListener('click', () => {
-            window.electronAPI.send('window-control', 'close');
-        });
-
         // Theme toggle
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
         

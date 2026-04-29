@@ -102,8 +102,8 @@ jobs:
         shell: pwsh
         run: |
           $toolboxRoot = 'A:\VCP\VCPToolBox-photo-studio-next'
-          $registryPath = Join-Path $toolboxRoot 'plugins\registry.json'
-          $storePath = Join-Path $toolboxRoot 'plugins\custom\shared\photo_studio_data\PhotoStudioDataStore.js'
+          $registryPath = [System.IO.Path]::Combine($toolboxRoot, 'plugins', 'registry.json')
+          $storePath = [System.IO.Path]::Combine($toolboxRoot, 'plugins', 'custom', 'shared', 'photo_studio_data', 'PhotoStudioDataStore.js')
 
           if ((Test-Path -LiteralPath $registryPath) -and (Test-Path -LiteralPath $storePath)) {
             npm run test:photo-studio --if-present

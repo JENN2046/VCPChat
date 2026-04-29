@@ -7,9 +7,6 @@ AppData/
 
 node_modules/
 
-.env
-!audio_engine/.env
-
 # Local runtime configuration files must stay out of Git.
 **/.env
 **/config.env

@@ -42,6 +42,8 @@ const DOCK_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'dock.json');
 const LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
 const CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
 
+let layoutOpQueue = Promise.resolve();
+
 function getPhotoStudioOrchestrator() {
     if (!photoStudioOrchestrator) {
         photoStudioOrchestrator = new PhotoStudioOrchestrator({
@@ -1671,14 +1673,47 @@ function initialize(params) {
      * 淇濆瓨妗岄潰甯冨眬
      */
     ipcMain.handle('desktop-save-layout', async (event, layoutData) => {
-        try {
-            await fs.writeJson(LAYOUT_CONFIG_PATH, layoutData, { spaces: 2 });
-            console.log(`[DesktopHandlers] Layout saved`);
-            return { success: true };
-        } catch (err) {
-            console.error('[DesktopHandlers] Save layout error:', err);
-            return { success: false, error: err.message };
-        }
+        layoutOpQueue = layoutOpQueue.then(async () => {
+            try {
+                await fs.writeJson(LAYOUT_CONFIG_PATH, layoutData, { spaces: 2 });
+                console.log(`[DesktopHandlers] Layout saved (full)`);
+                return { success: true };
+            } catch (err) {
+                console.error('[DesktopHandlers] Save layout error:', err);
+                return { success: false, error: err.message };
+            }
+        }).catch(err => ({ success: false, error: err.message }));
+        return layoutOpQueue;
+    });
+
+    /**
+     * 增量更新桌面布局，由主进程串行合并写入，避免并发保存互相覆盖。
+     */
+    ipcMain.handle('desktop-patch-layout', async (event, patch = {}) => {
+        layoutOpQueue = layoutOpQueue.then(async () => {
+            try {
+                let current = {};
+                if (await fs.pathExists(LAYOUT_CONFIG_PATH)) {
+                    current = await fs.readJson(LAYOUT_CONFIG_PATH);
+                }
+
+                const updated = {
+                    ...current,
+                    ...patch,
+                    globalSettings: patch.globalSettings
+                        ? { ...(current.globalSettings || {}), ...patch.globalSettings }
+                        : current.globalSettings,
+                };
+
+                await fs.writeJson(LAYOUT_CONFIG_PATH, updated, { spaces: 2 });
+                console.log(`[DesktopHandlers] Layout patched: keys=[${Object.keys(patch).join(', ')}]`);
+                return { success: true, data: updated };
+            } catch (err) {
+                console.error('[DesktopHandlers] Patch layout error:', err);
+                return { success: false, error: err.message };
+            }
+        }).catch(err => ({ success: false, error: err.message }));
+        return layoutOpQueue;
     });
 
     /**

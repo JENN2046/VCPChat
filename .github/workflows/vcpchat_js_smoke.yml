@@ -100,4 +100,14 @@ jobs:
 
       - name: Optional Photo Studio closeout smoke
         shell: pwsh
-        run: npm run test:photo-studio --if-present
+        run: |
+          $toolboxRoot = 'A:\VCP\VCPToolBox-photo-studio-next'
+          $registryPath = Join-Path $toolboxRoot 'plugins\registry.json'
+          $storePath = Join-Path $toolboxRoot 'plugins\custom\shared\photo_studio_data\PhotoStudioDataStore.js'
+
+          if ((Test-Path -LiteralPath $registryPath) -and (Test-Path -LiteralPath $storePath)) {
+            npm run test:photo-studio --if-present
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else {
+            Write-Host 'skip optional Photo Studio closeout smoke: external Photo Studio toolbox root is not available on this runner'
+          }

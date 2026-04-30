@@ -372,7 +372,9 @@ async def delete_model_func(model: checkModelInstalled):
 # 关闭服务
 @APP.post("/shutdown")
 async def shutdown(model: shutdown):
-    shutdown_password = "wYdjEHnnjrNAahFsQ0yVmv1TEeUU9Z8A"  # 设置关闭密码
+    shutdown_password = os.environ.get("SOVITS_SHUTDOWN_PASSWORD", "").strip()
+    if not shutdown_password:
+        return {"msg": "关闭密码未配置"}
     if model.password == shutdown_password:
         os.kill(os.getpid(), signal.SIGINT)
         print("服务已关闭")

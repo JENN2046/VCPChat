@@ -236,6 +236,10 @@ const defaultConfig = {
     ]
 };
 
+function parseCommandList(rawValue) {
+    return String(rawValue || '').split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+}
+
 try {
     const configPath = path.join(__dirname, 'config.env');
     if (fs.existsSync(configPath)) {
@@ -247,13 +251,13 @@ try {
         }
 
         const forbiddenMatch = configContent.match(/^FORBIDDEN_COMMANDS\s*=\s*(.*)/m);
-        if (forbiddenMatch && forbiddenMatch[1]) {
-            defaultConfig.forbiddenCommands = forbiddenMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        if (forbiddenMatch) {
+            defaultConfig.forbiddenCommands = parseCommandList(forbiddenMatch[1]);
         }
 
         const authRequiredMatch = configContent.match(/^AUTH_REQUIRED_COMMANDS\s*=\s*(.*)/m);
-        if (authRequiredMatch && authRequiredMatch[1]) {
-            defaultConfig.authRequiredCommands = authRequiredMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        if (authRequiredMatch) {
+            defaultConfig.authRequiredCommands = parseCommandList(authRequiredMatch[1]);
         }
     }
 } catch (error) {

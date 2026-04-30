@@ -946,6 +946,10 @@ const defaultConfig = {
     ptyMode: 'auto' // auto | pty | pipe
 };
 
+function parseCommandList(rawValue) {
+    return String(rawValue || '').split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+}
+
 try {
     const configPath = path.join(__dirname, 'config.env');
     if (fs.existsSync(configPath)) {
@@ -962,13 +966,13 @@ try {
         }
 
         const forbiddenMatch = configContent.match(/^FORBIDDEN_COMMANDS\s*=\s*(.*)/m);
-        if (forbiddenMatch && forbiddenMatch[1]) {
-            defaultConfig.forbiddenCommands = forbiddenMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        if (forbiddenMatch) {
+            defaultConfig.forbiddenCommands = parseCommandList(forbiddenMatch[1]);
         }
 
         const authMatch = configContent.match(/^AUTH_REQUIRED_COMMANDS\s*=\s*(.*)/m);
-        if (authMatch && authMatch[1]) {
-            defaultConfig.authRequiredCommands = authMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        if (authMatch) {
+            defaultConfig.authRequiredCommands = parseCommandList(authMatch[1]);
         }
 
         const timeoutMatch = configContent.match(/^COMMAND_TIMEOUT\s*=\s*(\d+)/m);
@@ -1177,20 +1181,22 @@ function detectShell(preferredShell) {
 }
 
 function getShellArgs(shellName, pipeMode = false) {
+    const normalizedShellName = String(shellName || '').toLowerCase().replace(/\.exe$/i, '');
+
     if (process.platform === 'win32') {
-        if (shellName === 'pwsh' || shellName === 'powershell') {
+        if (normalizedShellName === 'pwsh' || normalizedShellName === 'powershell') {
             return ['-NoLogo'];
         }
-        if (shellName === 'cmd') {
+        if (normalizedShellName === 'cmd') {
             return ['/Q'];
         }
         return [];
     }
 
-    if (shellName === 'bash' || shellName === 'zsh') {
+    if (normalizedShellName === 'bash' || normalizedShellName === 'zsh') {
         return ['--login'];
     }
-    if (pipeMode && shellName === 'fish') {
+    if (pipeMode && normalizedShellName === 'fish') {
         return ['-l'];
     }
     return [];

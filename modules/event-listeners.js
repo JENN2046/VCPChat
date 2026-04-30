@@ -14,7 +14,7 @@ export function setupEventListeners(deps) {
         globalSettingsForm, userAvatarInput, createNewAgentBtn, createNewGroupBtn,
         currentItemActionBtn, clearNotificationsBtn, openForumBtn, toggleNotificationsBtn,
         notificationsSidebar, agentSearchInput, minimizeToTrayBtn, addNetworkPathBtn,
-        openTranslatorBtn, openNotesBtn, openMusicBtn, openCanvasBtn, toggleAssistantBtn,
+        openTranslatorBtn, openNotesBtn, openSheetBtn, openMusicBtn, openCanvasBtn, toggleAssistantBtn,
         leftSidebar, toggleSidebarBtn,
         enableContextSanitizerCheckbox, contextSanitizerDepthContainer, seamFixer,
 
@@ -1186,6 +1186,17 @@ export function setupEventListeners(deps) {
             } else {
                 console.warn('[Renderer] electronAPI.openNotesWindow is not available.');
                 uiHelperFunctions.showToastNotification('无法打开笔记：功能不可用。', 'error');
+            }
+        });
+    }
+
+    if (openSheetBtn) {
+        openSheetBtn.addEventListener('click', async () => {
+            if (window.electronAPI && window.electronAPI.openSheetWindow) {
+                await window.electronAPI.openSheetWindow();
+            } else {
+                console.warn('[Renderer] electronAPI.openSheetWindow is not available.');
+                uiHelperFunctions.showToastNotification('无法打开 SheetAI：功能不可用。', 'error');
             }
         });
     }

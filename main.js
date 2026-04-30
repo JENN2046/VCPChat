@@ -1,6 +1,11 @@
 // main.js - Electron 主窗口
 
 // --- 模块加载性能诊断 ---
+const initWindowsConsoleUtf8 = require('./modules/utils/initWindowsConsoleUtf8');
+initWindowsConsoleUtf8();
+const patchConsoleForUnicodeSafeLogging = require('./modules/utils/patchConsoleForUnicodeSafeLogging');
+patchConsoleForUnicodeSafeLogging();
+
 const originalRequire = require;
 require = function (id) {
     const start = Date.now();
@@ -31,6 +36,7 @@ const groupChatHandlers = require('./modules/ipc/groupChatHandlers'); // Import 
 const sovitsHandlers = require('./modules/ipc/sovitsHandlers'); // Import SovitsTTS IPC handlers
 const promptHandlers = require('./modules/ipc/promptHandlers'); // Import prompt handlers
 const notesHandlers = require('./modules/ipc/notesHandlers'); // Import notes handlers
+const sheetHandlers = require('./modules/ipc/sheetHandlers'); // Import SheetAI handlers
 const assistantHandlers = require('./modules/ipc/assistantHandlers'); // Import assistant handlers
 const musicHandlers = require('./modules/ipc/musicHandlers'); // Import music handlers
 const diceHandlers = require('./modules/ipc/diceHandlers'); // Import dice handlers
@@ -881,6 +887,9 @@ if (!gotTheLock) {
             openChildWindows,
             APP_DATA_ROOT_IN_PROJECT,
             SETTINGS_FILE
+        });
+        sheetHandlers.initialize({
+            openChildWindows
         });
 
         // Translator IPC Handlers

@@ -17,22 +17,20 @@ require('dotenv').config({ quiet: true });
 // Configuration
 const roots = createPluginRoots(__dirname);
 const CANVAS_DIRECTORY = path.join(roots.runtimeDataRoot, 'Canvas');
-const ALLOWED_DIRECTORIES = (process.env.ALLOWED_DIRECTORIES || '')
+const INTERNAL_FILE_DIRECTORY = path.join(roots.runtimeDataRoot, 'file');
+const USER_ALLOWED_DIRECTORIES = (process.env.ALLOWED_DIRECTORIES || '')
   .split(',')
   .map(dir => dir.trim())
   .filter(dir => dir)
   .map(dir => resolveConfiguredPath(dir, roots, { baseRoot: roots.workspaceRoot }));
-
-// Ensure the dedicated canvas directory is always allowed
-if (!ALLOWED_DIRECTORIES.includes(CANVAS_DIRECTORY)) {
-  ALLOWED_DIRECTORIES.push(CANVAS_DIRECTORY);
-}
+const SAFE_INTERNAL_DIRECTORIES = [CANVAS_DIRECTORY, INTERNAL_FILE_DIRECTORY];
+const ALLOWED_DIRECTORIES = [...new Set([...USER_ALLOWED_DIRECTORIES, ...SAFE_INTERNAL_DIRECTORIES])];
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE) || 20971520; // 20MB default
 const MAX_DIRECTORY_ITEMS = parseInt(process.env.MAX_DIRECTORY_ITEMS) || 1000;
 const MAX_SEARCH_RESULTS = parseInt(process.env.MAX_SEARCH_RESULTS) || 100;
 const DEFAULT_DOWNLOAD_DIR = resolveConfiguredPath(process.env.DEFAULT_DOWNLOAD_DIR || '', roots, {
   baseRoot: roots.workspaceRoot,
-  fallback: '',
+  fallback: INTERNAL_FILE_DIRECTORY,
 });
 const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 const ENABLE_RECURSIVE_OPERATIONS = process.env.ENABLE_RECURSIVE_OPERATIONS !== 'false';
@@ -134,32 +132,37 @@ function createLineEndingHelper(content) {
 function isPathAllowed(targetPath, operationType = 'generic') {
   const resolvedPath = path.resolve(targetPath);
 
-  // 1. 如果在允许的目录内，则授予所有权限。
-  if (ALLOWED_DIRECTORIES.length > 0) {
-    const isInAllowedDir = ALLOWED_DIRECTORIES.some(allowedDir => {
-      const resolvedAllowedDir = path.resolve(allowedDir);
-      // Normalize to lower case for case-insensitive comparison, crucial for Windows
-      return resolvedPath.toLowerCase().startsWith(resolvedAllowedDir.toLowerCase());
-    });
-    if (isInAllowedDir) {
-      debugLog(`Path is within allowed directories. Access granted.`, { targetPath, operationType });
-      return true;
-    }
-  } else {
-    // 如果没有配置允许的目录，则允许所有操作（保持原有灵活性）。
-    debugLog('No ALLOWED_DIRECTORIES configured, allowing access to all paths.');
+  const isWithinDirectory = directory => {
+    const resolvedDir = path.resolve(directory).toLowerCase();
+    const lowerPath = resolvedPath.toLowerCase();
+    if (!lowerPath.startsWith(resolvedDir)) return false;
+    if (lowerPath.length === resolvedDir.length) return true;
+    const nextChar = lowerPath[resolvedDir.length];
+    return nextChar === '\\' || nextChar === '/';
+  };
+
+  if (SAFE_INTERNAL_DIRECTORIES.some(isWithinDirectory)) {
+    debugLog(`Path is within internal safe directories. Access granted.`, { targetPath, operationType });
     return true;
   }
 
-  // 2. 如果路径在允许的目录之外，则只对只读操作开绿灯。
+  if (USER_ALLOWED_DIRECTORIES.some(isWithinDirectory)) {
+    debugLog(`Path is within configured allowed directories. Access granted.`, { targetPath, operationType });
+    return true;
+  }
+
+  // 仅对绝对路径上的只读操作开绿灯，避免模板默认值放开全盘访问。
   const readOnlyBypassOperations = ['ReadFile', 'FileInfo'];
   if (readOnlyBypassOperations.includes(operationType) && path.isAbsolute(targetPath)) {
     debugLog(`Path is outside allowed directories, but operation is a read-only bypass. Access granted.`, { targetPath, operationType });
     return true;
   }
 
-  // 3. 对于所有其他情况（例如，在沙箱外的写/删除操作），一律拒绝。
-  debugLog(`Access denied. Path is outside allowed directories and operation is not a read-only bypass.`, { targetPath, operationType });
+  debugLog(`Access denied. Path is outside allowed directories and operation is not a read-only bypass.`, {
+    targetPath,
+    operationType,
+    configuredAllowedDirectories: USER_ALLOWED_DIRECTORIES,
+  });
   return false;
 }
 
@@ -583,7 +586,7 @@ async function listDirectory(dirPath, showHidden = ENABLE_HIDDEN_FILES) {
         truncated: items.length > MAX_DIRECTORY_ITEMS,
         message: message,
         content: [
-          { type: 'text', text: `### ${message}\n\n${mdTable}` }
+          { type: 'text', text: `### ${message}\n\n---\n${mdTable}---` }
         ]
       },
     };
@@ -910,7 +913,7 @@ async function searchFiles(searchPath, pattern, options = {}) {
         options: options,
         message: message,
         content: [
-          { type: 'text', text: `### ${message}\n\n${mdTable}` }
+          { type: 'text', text: `### ${message}\n\n---\n${mdTable}---` }
         ]
       },
     };
@@ -1039,11 +1042,11 @@ async function listAllowedDirectories() {
       if (items.length === 0) {
         mdStr += `*(空目录)*\n\n`;
       } else {
-        mdStr += `| 名称 | 类型 |\n|---|---|\n`;
+        mdStr += `---\n| 名称 | 类型 |\n|---|---|\n`;
         for (const item of items) {
           mdStr += `| ${item.name} | ${item.type === 'directory' ? '📁 目录' : '📄 文件'} |\n`;
         }
-        mdStr += `\n`;
+        mdStr += `---\n\n`;
       }
     }
 

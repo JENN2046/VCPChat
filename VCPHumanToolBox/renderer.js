@@ -19,6 +19,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     let USER_NAME = 'Human';
     let settings = {};
     let MAX_FILENAME_LENGTH = 400;
+    let windowControlsInitialized = false;
+
+    function initializeWindowControls() {
+        if (windowControlsInitialized) return;
+        windowControlsInitialized = true;
+
+        document.getElementById('minimize-btn')?.addEventListener('click', () => {
+            window.electronAPI.send('window-control', 'minimize');
+        });
+        document.getElementById('maximize-btn')?.addEventListener('click', () => {
+            window.electronAPI.send('window-control', 'maximize');
+        });
+        document.getElementById('close-btn')?.addEventListener('click', () => {
+            window.electronAPI.send('window-control', 'close');
+        });
+    }
 
     // --- 设置加载与保存 ---
     async function loadSettings() {
@@ -45,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 初始化应用程序 ---
     async function initializeApp() {
+        initializeWindowControls();
         await loadSettings();
 
         if (settings.vcpServerUrl) {
@@ -59,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         VCP_API_KEY = settings.vcpApiKey || '';
         USER_NAME = settings.userName || 'Human';
         MAX_FILENAME_LENGTH = settings.maxFilenameLength || 400;
-        
+
         // 动态加载模块并传递配置
         // 注意：由于移除了 require，模块需要重构为浏览器兼容的格式
         canvasHandler.setMaxFilenameLength(MAX_FILENAME_LENGTH);
@@ -71,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         initializeUI();
     }
-    
+
 
 
     // --- 函数定义 ---
@@ -96,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tool = tools[toolName];
         toolTitle.textContent = tool.displayName;
         toolDescription.textContent = tool.description;
-        
+
         buildToolForm(toolName);
 
         toolGrid.style.display = 'none';
@@ -117,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const commandSelect = document.createElement('select');
             commandSelect.id = 'command-select';
             commandSelect.name = 'command';
-            
+
             for (const commandName in tool.commands) {
                 const option = document.createElement('option');
                 option.value = commandName;
@@ -126,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             commandSelectGroup.appendChild(commandSelect);
             toolForm.appendChild(commandSelectGroup);
-            
+
             toolForm.appendChild(paramsContainer);
 
             commandSelect.addEventListener('change', (e) => {
@@ -142,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 添加按钮容器
         const buttonContainer = document.createElement('div');
         buttonContainer.style.cssText = 'display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;';
-        
+
         const submitButton = document.createElement('button');
         submitButton.type = 'submit';
         submitButton.textContent = '执行';
@@ -157,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             transition: background-color 0.2s;
         `;
         buttonContainer.appendChild(submitButton);
-        
+
         // 添加全部清空按钮
         const clearAllButton = document.createElement('button');
         clearAllButton.type = 'button';
@@ -172,11 +189,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             font-size: 14px;
             transition: all 0.2s;
         `;
-        
+
         clearAllButton.addEventListener('click', () => {
             clearAllFormData(toolName);
         });
-        
+
         buttonContainer.appendChild(clearAllButton);
 
         // 为 ComfyUI 工具添加设置按钮
@@ -189,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             settingsButton.addEventListener('click', () => openComfyUISettings());
             buttonContainer.appendChild(settingsButton);
         }
-        
+
         // 为 NanoBananaGen 工具添加文件名设置按钮
         if (toolName === 'NanoBananaGen') {
             const filenameSettingsButton = document.createElement('button');
@@ -205,11 +222,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 font-size: 14px;
                 transition: all 0.2s;
             `;
-            
+
             filenameSettingsButton.addEventListener('click', () => {
                 showFilenameSettings();
             });
-            
+
             buttonContainer.appendChild(filenameSettingsButton);
         }
 
@@ -232,11 +249,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         params.forEach(param => {
             const paramGroup = document.createElement('div');
             paramGroup.className = 'form-group';
-            
+
             let labelText = param.description || param.name;
             const label = document.createElement('label');
             label.textContent = `${labelText}${param.required ? ' *' : ''}`;
-            
+
             let input;
             if (param.type === 'textarea') {
                 input = document.createElement('textarea');
@@ -258,7 +275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     radioInput.name = param.name;
                     radioInput.value = opt;
                     if (opt === param.default) radioInput.checked = true;
-                    
+
                     radioLabel.appendChild(radioInput);
                     radioLabel.append(` ${opt}`);
                     input.appendChild(radioLabel);
@@ -275,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (param.type === 'checkbox') {
                 input = document.createElement('div');
                 input.className = 'checkbox-group';
-                
+
                 const checkboxLabel = document.createElement('label');
                 checkboxLabel.className = 'checkbox-label';
                 checkboxLabel.style.cssText = `
@@ -285,24 +302,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     cursor: pointer;
                     margin-top: 5px;
                 `;
-                
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.name = param.name;
                 checkbox.checked = param.default || false;
-                
+
                 const checkboxText = document.createElement('span');
                 checkboxText.textContent = param.description || param.name;
-                
+
                 checkboxLabel.appendChild(checkbox);
                 checkboxLabel.appendChild(checkboxText);
                 input.appendChild(checkboxLabel);
-                
+
                 // 添加翻译相关的UI元素
                 if (param.name === 'enable_translation') {
                     const translationContainer = createTranslationContainer(param.name);
                     input.appendChild(translationContainer);
-                    
+
                     // 监听 checkbox 状态变化
                     checkbox.addEventListener('change', (e) => {
                         const container = input.querySelector('.translation-container');
@@ -314,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 input = document.createElement('input');
                 input.type = param.type || 'text';
-                
+
                 // 为数字类型添加属性支持
                 if (input.type === 'number') {
                     if (param.min !== undefined) input.min = param.min;
@@ -323,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     input.step = param.step || 'any';
                 }
             }
-            
+
             if (input.tagName !== 'DIV' || param.type === 'dragdrop_image') {
                 input.name = param.name;
                 if (param.type !== 'dragdrop_image') {
@@ -377,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             border-radius: 6px;
             background: rgba(59, 130, 246, 0.05);
         `;
-        
+
         // 翻译设置区域
         const settingsArea = document.createElement('div');
         settingsArea.style.cssText = `
@@ -387,7 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             align-items: center;
             flex-wrap: wrap;
         `;
-        
+
         const qualityLabel = document.createElement('label');
         qualityLabel.textContent = '质量：';
         qualityLabel.style.cssText = `
@@ -395,7 +412,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             color: var(--secondary-text);
             font-size: 14px;
         `;
-        
+
         const qualitySelect = document.createElement('select');
         qualitySelect.className = 'translation-quality-select';
         qualitySelect.innerHTML = `
@@ -410,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             background: var(--input-bg);
             color: var(--primary-text);
         `;
-        
+
         const languageLabel = document.createElement('label');
         languageLabel.textContent = '目标语言：';
         languageLabel.style.cssText = `
@@ -418,7 +435,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             color: var(--secondary-text);
             font-size: 14px;
         `;
-        
+
         const languageSelect = document.createElement('select');
         languageSelect.className = 'translation-language-select';
         languageSelect.innerHTML = `
@@ -437,12 +454,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             background: var(--input-bg);
             color: var(--primary-text);
         `;
-        
+
         settingsArea.appendChild(qualityLabel);
         settingsArea.appendChild(qualitySelect);
         settingsArea.appendChild(languageLabel);
         settingsArea.appendChild(languageSelect);
-        
+
         const translatedPromptLabel = document.createElement('label');
         translatedPromptLabel.textContent = '翻译后的提示词：';
         translatedPromptLabel.style.cssText = `
@@ -451,7 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             font-weight: bold;
             color: var(--secondary-text);
         `;
-        
+
         const translatedPromptArea = document.createElement('textarea');
         translatedPromptArea.className = 'translated-prompt';
         translatedPromptArea.placeholder = '翻译结果将显示在这里…';
@@ -468,14 +485,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             resize: vertical;
             box-sizing: border-box;
         `;
-        
+
         const buttonGroup = document.createElement('div');
         buttonGroup.style.cssText = `
             display: flex;
             gap: 10px;
             margin-top: 10px;
         `;
-        
+
         const translateButton = document.createElement('button');
         translateButton.type = 'button';
         translateButton.innerHTML = '🌍 翻译';
@@ -488,7 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cursor: pointer;
             font-size: 14px;
         `;
-        
+
         const useOriginalButton = document.createElement('button');
         useOriginalButton.type = 'button';
         useOriginalButton.innerHTML = '⬅️ 使用原文';
@@ -501,7 +518,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cursor: pointer;
             font-size: 14px;
         `;
-        
+
         // 翻译功能
         translateButton.addEventListener('click', async () => {
             const promptTextarea = toolForm.querySelector('textarea[name="prompt"]');
@@ -513,7 +530,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert('请先输入提示词');
             }
         });
-        
+
         // 使用原文
         useOriginalButton.addEventListener('click', () => {
             const promptTextarea = toolForm.querySelector('textarea[name="prompt"]');
@@ -521,15 +538,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 translatedPromptArea.value = promptTextarea.value;
             }
         });
-        
+
         buttonGroup.appendChild(translateButton);
         buttonGroup.appendChild(useOriginalButton);
-        
+
         container.appendChild(settingsArea);
         container.appendChild(translatedPromptLabel);
         container.appendChild(translatedPromptArea);
         container.appendChild(buttonGroup);
-        
+
         return container;
     }
 
@@ -538,29 +555,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         const originalText = button.innerHTML;
         button.innerHTML = '🔄 翻译中...';
         button.disabled = true;
-        
+
         try {
             // 获取目标语言名称
             const languageMap = {
                 'en': '英语',
-                'zh': '中文', 
+                'zh': '中文',
                 'ja': '日语',
                 'ko': '韩语',
                 'fr': '法语',
                 'de': '德语',
                 'es': '西班牙语'
             };
-            
+
             const targetLanguageText = languageMap[targetLang] || '英语';
-            
+
             // 构建系统提示词（与 VCPChat 翻译模块保持一致）
             const systemPrompt = `你是一个专业的翻译助手。请将用户提供的文本翻译成${targetLanguageText}。 仅返回翻译结果，不要包含任何解释或额外信息。`;
-            
+
             const messages = [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: text }
             ];
-            
+
             // 使用 VCP 的 chat 接口进行翻译
             const chatUrl = VCP_SERVER_URL.replace('/v1/human/tool', '/v1/chat/completions');
             const response = await fetch(chatUrl, {
@@ -577,15 +594,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     stream: false
                 })
             });
-            
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`服务器错误: ${response.status} ${response.statusText} - ${errorText}`);
             }
-            
+
             const result = await response.json();
             const translation = result.choices?.[0]?.message?.content;
-            
+
             if (translation) {
                 outputTextarea.value = translation.trim();
             } else {
@@ -603,9 +620,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 全部清空功能
     function clearAllFormData(toolName) {
         const confirmed = confirm('确定要清空所有内容吗？包括提示词、翻译内容、图片和额外图片。');
-        
+
         if (!confirmed) return;
-        
+
         // 1. 清空所有输入框
         const inputs = toolForm.querySelectorAll('input, textarea, select');
         inputs.forEach(input => {
@@ -617,7 +634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 input.value = '';
             }
         });
-        
+
         // 2. 清空翻译容器
         const translationContainers = toolForm.querySelectorAll('.translation-container');
         translationContainers.forEach(container => {
@@ -628,18 +645,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 隐藏翻译容器
             container.style.display = 'none';
         });
-        
+
         // 3. 清空图片预览区域
         const previewAreas = toolForm.querySelectorAll('.image-preview-area');
         previewAreas.forEach(preview => {
             preview.style.display = 'none';
             preview.innerHTML = '';
         });
-        
+
         // 4. 显示所有拖拽区域，隐藏清空按钮
         const dropZones = toolForm.querySelectorAll('.drop-zone');
         const clearButtons = toolForm.querySelectorAll('.clear-image-btn');
-        
+
         dropZones.forEach(dropZone => {
             dropZone.style.display = 'block';
             dropZone.innerHTML = `
@@ -648,11 +665,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             dropZone.style.color = 'var(--secondary-text)';
         });
-        
+
         clearButtons.forEach(btn => {
             btn.style.display = 'none';
         });
-        
+
         // 5. 清空动态图片区域（仅限 NanoBananaGen compose 模式）
         if (toolName === 'NanoBananaGen') {
             const dynamicContainer = toolForm.querySelector('.dynamic-images-container');
@@ -667,12 +684,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         }
-        
+
         // 6. 清空结果容器
         if (resultContainer) {
             resultContainer.innerHTML = '';
         }
-        
+
         // 7. 显示成功提示
         const successMessage = document.createElement('div');
         successMessage.className = 'success-notification';
@@ -691,7 +708,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         successMessage.textContent = '✓ 已清空所有内容';
         document.body.appendChild(successMessage);
-        
+
         // 3秒后移除提示
         setTimeout(() => {
             if (successMessage.parentNode) {
@@ -720,7 +737,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             justify-content: center;
             align-items: center;
         `;
-        
+
         const dialog = document.createElement('div');
         dialog.style.cssText = `
             background: var(--card-bg);
@@ -731,17 +748,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
         `;
-        
+
         dialog.innerHTML = `
             <h3 style="margin: 0 0 20px 0; color: var(--primary-text); text-align: center;">文件名显示设置</h3>
             <div style="margin-bottom: 20px;">
                 <label style="display: block; margin-bottom: 8px; color: var(--secondary-text); font-weight: bold;">
                     文件名最大长度（超过则省略）：
                 </label>
-                <input type="number" id="filename-length-input" 
-                    value="${MAX_FILENAME_LENGTH}" 
-                    min="50" 
-                    max="1000" 
+                <input type="number" id="filename-length-input"
+                    value="${MAX_FILENAME_LENGTH}"
+                    min="50"
+                    max="1000"
                     style="
                         width: 100%;
                         padding: 10px;
@@ -776,24 +793,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ">保存</button>
             </div>
         `;
-        
+
         const input = dialog.querySelector('#filename-length-input');
         const cancelBtn = dialog.querySelector('#cancel-btn');
         const saveBtn = dialog.querySelector('#save-btn');
-        
+
         cancelBtn.addEventListener('click', () => {
             document.body.removeChild(overlay);
         });
-        
+
         saveBtn.addEventListener('click', async () => {
             const newLength = parseInt(input.value, 10);
             if (newLength >= 50 && newLength <= 1000) {
                 MAX_FILENAME_LENGTH = newLength;
                 settings.maxFilenameLength = newLength;
-                
+
                 try {
                     await saveSettings();
-                    
+
                     // 显示成功提示
                     const successMsg = document.createElement('div');
                     successMsg.className = 'success-notification';
@@ -811,13 +828,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `;
                     successMsg.textContent = '✓ 设置已保存';
                     document.body.appendChild(successMsg);
-                    
+
                     setTimeout(() => {
                         if (successMsg.parentNode) {
                             successMsg.parentNode.removeChild(successMsg);
                         }
                     }, 2000);
-                    
+
                     document.body.removeChild(overlay);
                 } catch (saveError) {
                     console.error('[VCPHumanToolBox] Failed to save settings:', saveError);
@@ -827,10 +844,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert('请输入 50-1000 之间的数值');
             }
         });
-        
+
         overlay.appendChild(dialog);
         document.body.appendChild(overlay);
-        
+
         // 点击背景关闭
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
@@ -880,7 +897,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderResult(data, toolName) {
         resultContainer.innerHTML = '';
-    
+
         // 1. Handle errors first
         if (data.status === 'error' || data.error) {
             const errorMessage = data.error || data.message || '未知错误';
@@ -890,7 +907,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             resultContainer.appendChild(pre);
             return; // Exit on error, no images to process
         }
-    
+
         // 2. Extract the core content, handling nested JSON from certain tools
         let content = data.result || data.message || data;
         if (content && typeof content.content === 'string') {
@@ -903,7 +920,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 content = content.content;
             }
         }
-    
+
         // 3. Render content based on its type
         if (content == null) {
             const p = document.createElement('p');
@@ -998,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Check for common image/text properties within the object
             const imageUrl = content.image_url || content.url || content.image;
             const textResult = content.result || content.message || content.original_plugin_output || content.content;
-    
+
             if (typeof imageUrl === 'string') {
                 const imgElement = document.createElement('img');
                 imgElement.src = imageUrl;
@@ -1021,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             pre.textContent = `插件返回了未知类型的数据: ${String(content)}`;
             resultContainer.appendChild(pre);
         }
-    
+
         // 4. Finally, ensure all rendered images (newly created or from HTML) have the context menu
         // attachEventListenersToImages(resultContainer);
     }
@@ -1119,20 +1136,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function initializeUI() {
-        // Window controls
-        document.getElementById('minimize-btn').addEventListener('click', () => {
-            window.electronAPI.send('window-control', 'minimize');
-        });
-        document.getElementById('maximize-btn').addEventListener('click', () => {
-            window.electronAPI.send('window-control', 'maximize');
-        });
-        document.getElementById('close-btn').addEventListener('click', () => {
-            window.electronAPI.send('window-control', 'close');
-        });
-
         // Theme toggle
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        
+
         function applyTheme(theme) {
             if (theme === 'light') {
                 document.body.classList.add('light-theme');
@@ -1151,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const newTheme = isLight ? 'light' : 'dark';
             applyTheme(newTheme);
             settings.vcpht_theme = newTheme;
-            
+
             try {
                 await saveSettings();
             } catch (saveError) {
@@ -1170,7 +1176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (workflowBtn) {
             workflowBtn.addEventListener('click', openWorkflowEditor);
         }
-        
+
         renderToolGrid();
         loadAndProcessWallpaper();
         setupImageViewer();
@@ -1215,10 +1221,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!comfyUILoaded) {
             try {
                 await loadComfyUIModules();
-                
+
                 if (window.ComfyUILoader) {
                     await window.ComfyUILoader.load();
-                    
+
                     const drawerContent = document.getElementById('comfyui-drawer-content');
                     if (window.comfyUI && drawerContent) {
                         window.comfyUI.createUI(drawerContent, {
@@ -1226,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             onClose: closeComfyUISettings
                         });
                     }
-                    
+
                     comfyUILoaded = true;
                 } else {
                     throw new Error('ComfyUILoader 未能正确加载');
@@ -1265,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadComfyUIModules() {
         const loaderScript = document.createElement('script');
         loaderScript.src = 'ComfyUImodules/ComfyUILoader.js';
-        
+
         return new Promise((resolve, reject) => {
             loaderScript.onload = resolve;
             loaderScript.onerror = () => reject(new Error('无法加载 ComfyUILoader.js'));
@@ -1297,7 +1303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadWorkflowEditorModules() {
         const loaderScript = document.createElement('script');
         loaderScript.src = 'WorkflowEditormodules/WorkflowEditorLoader_Simplified.js';
-        
+
         await new Promise((resolve, reject) => {
             loaderScript.onload = resolve;
             loaderScript.onerror = () => reject(new Error('无法加载 WorkflowEditorLoader_Simplified.js'));
@@ -1306,7 +1312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (window.WorkflowEditorLoader) {
             await window.WorkflowEditorLoader.load();
-            
+
             if (window.workflowEditor) {
                 await window.workflowEditor.init();
                 console.log('工作流编排器初始化成功');

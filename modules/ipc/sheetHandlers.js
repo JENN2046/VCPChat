@@ -6,7 +6,7 @@ let sheetWindow = null;
 let openChildWindows = [];
 
 function buildSheetWindowUrl(options = {}) {
-    const targetUrl = pathToFileURL(path.join(__dirname, '..', '..', 'Desktopmodules', 'legacy', 'Sheetmodules', 'sheet-studio.html'));
+    const targetUrl = pathToFileURL(path.join(__dirname, '..', '..', 'Sheetmodules', 'sheet-studio.html'));
     if (options.workbookId) {
         targetUrl.searchParams.set('workbookId', options.workbookId);
     }

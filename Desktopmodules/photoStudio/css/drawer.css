@@ -1,0 +1,42 @@
+.drawer-card {
+    display: grid;
+    gap: var(--ps-space-3);
+}
+
+.drawer-label {
+    margin: 0;
+    color: var(--ps-text-tertiary);
+    font-size: var(--ps-font-size-xs);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.drawer-kv {
+    display: grid;
+    gap: var(--ps-space-2);
+}
+
+.drawer-kv div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--ps-space-3);
+    padding: var(--ps-space-2) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+    color: var(--ps-text-tertiary);
+    font-size: var(--ps-font-size-sm);
+}
+
+.drawer-kv strong {
+    color: var(--ps-text-primary);
+}
+
+.drawer-list {
+    margin: 0;
+    padding-left: var(--ps-space-5);
+    color: var(--ps-text-secondary);
+    line-height: var(--ps-line-height-relaxed);
+}
+
+.drawer-actions {
+    margin: var(--ps-space-1) 0;
+}

@@ -211,9 +211,34 @@ let isExecutingCommand = false; // 新增：执行命令状态标志
 // --- 配置加载 ---
 const defaultConfig = {
     returnMode: 'delta', // 默认为增量模式
-    forbiddenCommands: [],
-    authRequiredCommands: []
+    forbiddenCommands: [
+        'clear-disk',
+        'format-volume',
+        'stop-computer',
+        'restart-computer',
+        'remove-item -recurse',
+        'remove-item -force',
+        'diskpart',
+        'bcdedit'
+    ],
+    authRequiredCommands: [
+        'remove-item',
+        'stop-process',
+        'restart-service',
+        'set-service',
+        'start-process',
+        'invoke-expression',
+        'taskkill',
+        'reg add',
+        'reg delete',
+        'git push',
+        'git reset'
+    ]
 };
+
+function parseCommandList(rawValue) {
+    return String(rawValue || '').split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+}
 
 try {
     const configPath = path.join(__dirname, 'config.env');
@@ -226,13 +251,13 @@ try {
         }
 
         const forbiddenMatch = configContent.match(/^FORBIDDEN_COMMANDS\s*=\s*(.*)/m);
-        if (forbiddenMatch && forbiddenMatch[1]) {
-            defaultConfig.forbiddenCommands = forbiddenMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        if (forbiddenMatch) {
+            defaultConfig.forbiddenCommands = parseCommandList(forbiddenMatch[1]);
         }
 
         const authRequiredMatch = configContent.match(/^AUTH_REQUIRED_COMMANDS\s*=\s*(.*)/m);
-        if (authRequiredMatch && authRequiredMatch[1]) {
-            defaultConfig.authRequiredCommands = authRequiredMatch[1].split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+        if (authRequiredMatch) {
+            defaultConfig.authRequiredCommands = parseCommandList(authRequiredMatch[1]);
         }
     }
 } catch (error) {

@@ -12,6 +12,7 @@ on:
       - 'preloads/chat.js'
       - 'modules/ipc/desktopHandlers.js'
       - 'modules/ipc/desktopRemoteHandlers.js'
+      - 'modules/ipc/sheetHandlers.js'
       - 'modules/renderer/**'
       - 'modules/services/photoStudio/**'
       - 'VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js'
@@ -30,6 +31,7 @@ on:
       - 'preloads/chat.js'
       - 'modules/ipc/desktopHandlers.js'
       - 'modules/ipc/desktopRemoteHandlers.js'
+      - 'modules/ipc/sheetHandlers.js'
       - 'modules/renderer/**'
       - 'modules/services/photoStudio/**'
       - 'VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js'
@@ -62,6 +64,7 @@ jobs:
             'preloads/chat.js',
             'modules/ipc/desktopHandlers.js',
             'modules/ipc/desktopRemoteHandlers.js',
+            'modules/ipc/sheetHandlers.js',
             'modules/renderer/contentPipeline.js',
             'VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js',
             'Desktopmodules/legacy/Groupmodules/groupchat.js',

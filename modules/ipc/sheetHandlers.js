@@ -36,7 +36,7 @@ function createOrFocusSheetWindow(options = {}) {
         frame: false,
         ...(process.platform === 'darwin' ? {} : { titleBarStyle: 'hidden' }),
         webPreferences: {
-            preload: path.join(__dirname, '..', '..', 'preload.js'),
+            preload: path.join(__dirname, '..', '..', 'preloads', 'desktop.js'),
             contextIsolation: true,
             nodeIntegration: false,
             devTools: true

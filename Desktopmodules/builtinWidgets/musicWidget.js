@@ -149,7 +149,9 @@
      */
     async function spawnMusicWidget() {
         var widgetId = 'builtin-music';
-        if (state.widgets.has(widgetId)) return;
+        if (state.widgets.has(widgetId)) {
+            return { widgetId: widgetId, reused: true };
+        }
 
         var widgetData = widget.create(widgetId, {
             x: 40,
@@ -170,6 +172,7 @@
         }, 100);
 
         console.log('[VCPdesktop] Music mini-bar widget spawned.');
+        return { widgetId: widgetId, reused: false };
     }
 
     // ============================================================

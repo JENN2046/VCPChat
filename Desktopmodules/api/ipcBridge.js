@@ -17,6 +17,35 @@
         });
     }
 
+    const BUILTIN_WIDGET_IDS = {
+        builtinWeather: 'builtin-weather',
+        builtinNews: 'builtin-news',
+        builtinTranslate: 'builtin-translate',
+        builtinSheet: 'builtin-sheet',
+        builtinMusic: 'builtin-music',
+        builtinAppTray: 'builtin-appTray',
+        builtinPerformanceMonitor: 'builtin-performance-monitor',
+    };
+
+    function resolveBuiltinWidgetId(builtinKey, requestedWidgetId, spawnResult, beforeWidgetIds) {
+        if (spawnResult?.widgetId) {
+            return spawnResult.widgetId;
+        }
+        if (requestedWidgetId && state.widgets.has(requestedWidgetId)) {
+            return requestedWidgetId;
+        }
+        const knownWidgetId = BUILTIN_WIDGET_IDS[builtinKey];
+        if (knownWidgetId && state.widgets.has(knownWidgetId)) {
+            return knownWidgetId;
+        }
+        for (const widgetId of state.widgets.keys()) {
+            if (!beforeWidgetIds.has(widgetId)) {
+                return widgetId;
+            }
+        }
+        return requestedWidgetId || knownWidgetId || builtinKey;
+    }
+
     async function handleDesktopRemoteRpcRequest(request) {
         const requestId = request?.requestId;
         const command = request?.command;
@@ -158,14 +187,31 @@
                     } = payload;
 
                     const builtinKey = builtinWidgetKey || metricComponent;
-                    if (builtinKey && window.VCPDesktop.metricWidgets?.spawn) {
-                        const spawnResult = window.VCPDesktop.metricWidgets.spawn(builtinKey, {
-                            ...options,
-                            widgetId,
-                        });
-                        const createdWidgetId = spawnResult?.widgetId || widgetId;
+                    if (builtinKey) {
+                        const beforeWidgetIds = new Set(state.widgets.keys());
+                        let spawnResult = null;
+
+                        if (window.VCPDesktop[builtinKey]?.spawn) {
+                            spawnResult = await window.VCPDesktop[builtinKey].spawn({
+                                ...options,
+                                widgetId,
+                            });
+                        } else if (window.VCPDesktop.metricWidgets?.spawn) {
+                            spawnResult = await window.VCPDesktop.metricWidgets.spawn(builtinKey, {
+                                ...options,
+                                widgetId,
+                            });
+                        } else {
+                            throw new Error(`Builtin widget "${builtinKey}" is not available.`);
+                        }
+
+                        const createdWidgetId = resolveBuiltinWidgetId(builtinKey, widgetId, spawnResult, beforeWidgetIds);
                         const builtinWidgetData = state.widgets.get(createdWidgetId);
-                        const savedResult = autoSave && saveName && builtinWidgetData
+                        if (!builtinWidgetData) {
+                            throw new Error(`Builtin widget "${builtinKey}" did not create a desktop widget.`);
+                        }
+
+                        const savedResult = autoSave && saveName
                             ? await _autoSaveWidget(createdWidgetId, saveName, builtinWidgetData).catch(() => null)
                             : null;
 
@@ -246,7 +292,7 @@
                         ok: true,
                         data: {
                             widgetId,
-                            deleted: true,
+                            removed: true,
                         },
                     });
                     return;

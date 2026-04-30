@@ -1,0 +1,295 @@
+# VCPChat PR12 Draft 整合快照收口说明
+
+日期：2026-04-26
+
+工作区：`A:\VCP\VCPChat_integration_upstream_vcp_20260425`
+
+分支：`integration/upstream-main-vcp-20260425`
+
+PR：`https://github.com/JENN2046/VCPChat/pull/12`
+
+base：`custom`
+
+head：`integration/upstream-main-vcp-20260425`
+
+## 收口结论
+
+PR12 已收成一个“干净、可解释、可回滚的 Draft 整合快照”。
+
+它当前不作为生产发布 PR，也不建议直接合入生产稳定线。
+
+推荐定位：
+
+- 用作 upstream/main 重建整合线的远端锚点。
+- 用作 Photo Studio、宿主基础能力、legacy 迁移、文档与插件层差异的审计快照。
+- 后续可选择继续保留大 Draft PR，或从该快照拆出更小 PR。
+
+## 当前状态
+
+- PR 状态：Draft / Open
+- base：`custom`
+- head：`integration/upstream-main-vcp-20260425`
+- mergeable：最近一次复核为 `MERGEABLE`
+- status checks：空
+- 工作区：干净
+- 未触碰 VCPChat 生产线；当前拆分/稳定整合目标仍是 `custom`
+- 口径修正：`A:\VCP\VCPToolBox-prod-stable` 是 VCPToolBox 后端项目稳定生产线，不是 VCPChat 生产线
+
+## 当前差异体量
+
+对比基线：`origin/custom...HEAD`
+
+```text
+271 files changed, 34878 insertions(+), 11145 deletions(-)
+```
+
+说明：
+
+- 体量较大，GitHub diff API 曾因超过 20000 行返回 HTTP 406。
+- 当前 PR 更适合作为整合快照，不适合当作普通单功能 PR 轻审。
+- 后续若进入 Ready Review，应先确认接受大 PR 审计成本，或拆成小 PR。
+
+## 已完成的关键收口
+
+### 0. Codex TODO / Plan 面板
+
+PR12 收口后追加了一个轻量通用渲染能力：
+
+- 支持将 `## Plan`、`## TODO`、`## 计划`、`## 待办` 后紧跟的 Markdown 任务列表渲染为 Codex TODO 面板。
+- 支持显式块：
+
+```text
+<<<[CODEX_TODO]>>>
+title: 下一步
+- [x] 已完成项
+- [-] 进行中项
+- [ ] 待处理项
+<<<[END_CODEX_TODO]>>>
+```
+
+- 渲染层只做展示转换，不写外部系统，不改变任务数据源。
+- 已通过转换测试、语法检查和 Photo Studio smoke。
+
+### 1. Photo Studio 主链路
+
+已完成并验证：
+
+- 首页 dashboard 读取
+- 项目创建
+- 非法状态推进明确失败
+- 项目状态推进
+- 项目抽屉读取
+- 客户创建
+- 线索创建
+- 报价创建
+- 沟通草稿生成
+- 跟进提醒
+- 本地预约创建、改期、开始、完成
+- 交付任务补齐
+- 交付包创建
+- 交付包推进到已发送、已确认
+- 外部同步影子记录
+- 交付审计读取
+- 五页面刷新：首页、项目指挥台、跟进与报价、日程排期、交付与素材
+
+### 2. PR 可解释性
+
+已补充审计文档：
+
+- `docs/vcpchat_upstream_main_integration_closeout_20260426.md`
+- `docs/vcpchat_upstream_integration_pr_readiness_20260426.md`
+- `docs/vcpchat_pr12_post_create_audit_20260426.md`
+- `docs/vcpchat_pr12_diff_scope_audit_20260426.md`
+- `docs/vcpchat_pr12_env_tracking_audit_20260426.md`
+- `docs/vcpchat_pr12_draft_snapshot_closeout_20260426.md`
+
+### 3. 敏感配置风险处理
+
+已处理：
+
+- `VCPDistributedServer/Plugin/DistImageServer/config.env` 已从 Git 跟踪中移除。
+- 本地真实 `config.env` 文件保留，并被 `.gitignore` 忽略。
+- 新增安全模板：`VCPDistributedServer/Plugin/DistImageServer/config.env.example`。
+- 没有读取、打印或复制真实 `config.env` 内容。
+
+仍需注意：
+
+- 仓库基线中还有其他已跟踪 `.env` / `config.env`，它们不是 PR12 新增风险。
+- 不建议在 PR12 中一把梭处理全部基线配置文件。
+- 若要继续配置卫生，应另开独立任务逐插件处理。
+
+### 4. `.vcp_ready` 定位
+
+`.vcp_ready` 内容：
+
+```text
+V1 native host line: ready-for-review-closeout
+```
+
+当前定位：
+
+- 这是 V1 native host 线的 readiness artifact。
+- 不是运行时代码。
+- 不包含配置、密钥或本地环境值。
+- 若保留 PR12 为大整合快照，可保留。
+- 若后续拆 PR，更适合归入 native host / 宿主收口 PR。
+
+## 本轮最终验证
+
+执行时间：2026-04-26
+
+语法检查通过：
+
+- `node --check main.js`
+- `node --check preload.js`
+- `node --check preloads/desktop.js`
+- `node --check modules/ipc/desktopHandlers.js`
+- `node --check modules/ipc/desktopRemoteHandlers.js`
+- `node --check Desktopmodules/photoStudio/photoStudio.js`
+- `node --check Desktopmodules/photoStudio/services/photoStudioState.js`
+- `node --check Desktopmodules/photoStudio/services/photoStudioEvents.js`
+- `node --check modules/services/photoStudio/PhotoStudioOrchestrator.js`
+- `node --check modules/services/photoStudio/actionCatalog.js`
+- `node --check modules/services/photoStudio/uiHints.js`
+- `node --check modules/renderer/contentPipeline.js`
+- `node --check modules/messageRenderer.js`
+- `node --check modules/renderer/streamManager.js`
+
+空白检查通过：
+
+- `git diff --check`
+
+Photo Studio 收口 smoke 通过：
+
+```powershell
+npm run test:photo-studio
+```
+
+结果：
+
+```text
+Photo Studio closeout smoke: 25/25 passed
+```
+
+Codex TODO 面板转换验证通过：
+
+```text
+codex todo panel transform: ok
+```
+
+桌面端视觉验收：
+
+- 用户已确认 Codex TODO / Plan 面板桌面端视觉验收完成。
+- 当前记录只确认视觉验收结果，不代表生产发布或生产合并。
+
+DesktopRemote live smoke 追加验证通过：
+
+```text
+[smoke] CreateWidget PASS: desktopremote-http-smoke
+[smoke] QueryDesktop PASS
+[smoke] ViewWidgetSource PASS
+[smoke] DesktopRemote HTTP smoke test passed.
+[smoke] DeleteWidget cleanup PASS
+```
+
+CI / 自动检查追加收口：
+
+- 已新增 `.github/workflows/vcpchat_js_smoke.yml`。
+- 该 workflow 只覆盖轻量自动检查：关键 JS 文件 `node --check` 和 `npm run test:photo-studio`。
+- 该 workflow 不执行 `npm install`、不执行 Electron 打包、不触碰生产线。
+- 本地等价验证已通过：关键 JS 文件语法检查通过，Photo Studio closeout smoke 为 `25/25 passed`。
+- 打包验证仍按上面的本地阻塞记录单独处理。
+
+生产线口径修正：
+
+- 此前对 `A:\VCP\VCPToolBox-prod-stable` 的检查仅是只读误触达核对。
+- 该路径和 `prod/stable` 属于 VCPToolBox 后端项目稳定生产线，不属于 VCPChat 当前生产线目标。
+- 未读取、未打印、未修改 `Plugin/UserAuth/code.bin` 等 VCPToolBox 后端生产线内容。
+- 当前 VCPChat 拆分 PR 的目标仍是 `custom`。
+- VCPChat 生产推广和稳定线预检尚未执行，后续需要单独定义 VCPChat 的生产线命名、合并策略和回滚路径。
+
+正式审查拆分规划：
+
+- 已新增 `docs/vcpchat_pr12_split_review_plan_20260426.md`。
+- 该文档将 PR12 拆成 8 个建议批次：文档/CI、宿主基础能力、Photo Studio、Codex TODO 面板、配置卫生、legacy 迁移、实验插件、音频/Rust/二进制资源。
+- 当前只完成拆分规划，不自动创建拆分 PR，不切 Ready，不合并生产线。
+
+## 未验证 / 未执行
+
+本轮已尝试但未通过：
+
+- `npm run pack`
+
+阻塞原因：
+
+- `electron-builder` 在处理 `winCodeSign` 时需要创建符号链接，本机当前权限不足，报错为无法创建 symbolic link。
+- 本地依赖树仍存在 `extraneous` / `missing` 提示，且当前 worktree 的 `node_modules` 有复用旧工作区依赖的迹象，需要单独做依赖卫生治理。
+- `npm run pack` 已生成本地 `dist/` 产物目录；该目录已加入 `.gitignore`，不纳入 PR12 快照。
+
+本轮没有继续执行：
+
+- `npm run dist`
+- VCPChat 生产合并 / 部署 / 发布
+
+原因：
+
+- 当前目标是 Draft 整合快照收口，不是生产发布。
+- `pack` 当前被本机权限与依赖环境阻塞，`dist` 不应在 `pack` 未通过前继续执行。
+- 此前把 VCPToolBox 后端生产线当作 VCPChat 生产预检对象是口径错误；VCPChat 生产推广尚未执行。
+
+## 回滚与恢复口径
+
+PR12 是独立候选分支：
+
+- 当前分支：`integration/upstream-main-vcp-20260425`
+- 远端分支：`origin/integration/upstream-main-vcp-20260425`
+- PR 类型：Draft
+
+安全回滚方式：
+
+- 不合并 PR12，即不会影响 `custom` 或后续单独定义的 VCPChat 生产稳定线。
+- 如需撤销远端协作，只需关闭 Draft PR。
+- 如需回到本地旧状态，可继续保留当前 worktree 或切换回原工作区。
+
+禁止直接做的事：
+
+- 不要直接把 PR12 合入 VCPChat 生产稳定线。
+- 不要把 PR12 视为生产发布凭证。
+- 不要把 VCPChat 推广动作指向 `A:\VCP\VCPToolBox-prod-stable`；该路径属于 VCPToolBox 后端项目。
+
+## 推荐下一步
+
+建议先停止往 PR12 增加大功能。
+
+后续有三条安全路线：
+
+1. 保持 PR12 为 Draft 整合快照
+   - 用作远端锚点和审计基线。
+
+2. 从 PR12 拆小 PR
+   - 宿主基础能力 PR
+   - Photo Studio 工作台 PR
+   - legacy 迁移 PR
+   - 文档 PR
+   - 插件 / 工具链 PR
+
+3. 单独开 VCPChat 生产预检任务
+   - 以 VCPChat 的目标线 `custom` 或后续明确命名的 VCPChat 生产分支为对照。
+   - 明确合并策略、验证范围和回滚路径。
+
+当前推荐：先保留 PR12 Draft，不切 Ready，不合并。
+
+## Plan
+
+- [-] 拆分正式审查 PR：已完成拆分规划文档；尚未实际创建拆分 PR，需确认 base 和每个批次的验证范围。
+- [ ] 配置卫生治理：逐插件补齐 `.example` 模板，移出基线中仍被 Git 跟踪的真实 `.env` / `config.env`。
+- [x] DesktopRemote live smoke：在独立验证步骤中跑真实 DesktopRemote HTTP smoke。
+- [-] 打包验证：`npm run pack` 已尝试，但被本机 `winCodeSign` 符号链接权限与依赖卫生阻塞；`npm run dist` 暂不继续执行。
+- [x] CI / 自动检查：新增轻量 GitHub Actions workflow，覆盖关键 JS 语法检查和 Photo Studio closeout smoke。
+- [ ] VCPChat 生产预检：尚未执行；需要先明确 VCPChat 生产线命名、目标分支、合并策略和回滚路径。
+
+说明：
+
+- 上面 6 项不是 PR12 Draft 快照收口的阻塞项。
+- 这些任务属于正式审查、配置治理、构建验证或生产推广阶段。
+- 当前 PR12 仍建议保持 Draft，不切 Ready，不直接合并。

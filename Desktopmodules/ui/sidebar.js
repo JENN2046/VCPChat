@@ -17,6 +17,7 @@
         { id: 'builtinWeather', name: '天气预报', icon: '🌤️', description: '实时天气数据与预报', spawnKey: 'builtinWeather' },
         { id: 'builtinNews', name: '今日热点', icon: '📰', description: '多源新闻热点聚合', spawnKey: 'builtinNews' },
         { id: 'builtinTranslate', name: 'AI 翻译', icon: '🌐', description: 'AI 驱动的多语言翻译工具', spawnKey: 'builtinTranslate' },
+        { id: 'builtinSheet', name: 'SheetAI 工作台', icon: '📊', description: '最近工作簿、快速新建与表格入口', spawnKey: 'builtinSheet' },
         { id: 'builtinMusic', name: '音乐播放条', icon: '🎵', description: '迷你音乐控制器', spawnKey: 'builtinMusic' },
         { id: 'builtinAppTray', name: '应用托盘', icon: '📦', description: '网格浏览全部应用，拖拽到桌面', spawnKey: 'builtinAppTray' },
         { id: 'builtinPerformanceMonitor', name: '性能监视器', icon: '⚡', description: '实时监控挂件与系统负载', spawnKey: 'builtinPerformanceMonitor' },
@@ -505,22 +506,15 @@
     }
 
     /**
-     * 保存预设列表，同时保留 layout.json 中的 globalSettings 等其他字段
+     * 保存预设列表（使用增量更新 API，由主进程负责合并，避免竞态覆盖）
      */
     async function savePresetsAndKeepSettings(presets) {
-        if (!desktopApi?.desktopSaveLayout) return;
+        if (!desktopApi?.desktopPatchLayout) {
+            console.warn('[Sidebar] desktopPatchLayout API not available');
+            return;
+        }
         try {
-            // 读取现有数据以保留 globalSettings 等字段
-            let existingData = {};
-            if (desktopApi?.desktopLoadLayout) {
-                const result = await desktopApi.desktopLoadLayout();
-                if (result?.success && result.data) {
-                    existingData = result.data;
-                }
-            }
-            // 更新预设列表，保留其他字段
-            existingData.presets = presets;
-            await desktopApi.desktopSaveLayout(existingData);
+            await desktopApi.desktopPatchLayout({ presets });
         } catch (err) {
             console.error('[Sidebar] Save presets error:', err);
         }

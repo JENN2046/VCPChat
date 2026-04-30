@@ -12,4 +12,5 @@ module.exports = Object.freeze({
     THEMES: 'themes',
     TASK: 'task',
     AI_IMAGE_GEN: 'ai-image-gen',
+    PHOTO_STUDIO: 'photo-studio',
 });

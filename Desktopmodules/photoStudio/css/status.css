@@ -1,0 +1,94 @@
+.empty-state {
+    padding: var(--ps-space-5);
+    color: var(--ps-text-tertiary);
+    border: 1px dashed var(--ps-border-medium);
+    border-radius: var(--ps-radius-lg);
+    background: rgba(255, 255, 255, 0.032);
+}
+
+.error-panel {
+    padding: var(--ps-space-6);
+    color: var(--ps-text-secondary);
+    border: 1px solid var(--ps-border-danger);
+    border-radius: var(--ps-radius-lg);
+    background: rgba(255, 138, 138, 0.08);
+}
+
+.error-panel h2 {
+    margin: 0 0 var(--ps-space-2);
+    color: var(--ps-text-primary);
+    font-size: var(--ps-font-size-xl);
+}
+
+.error-panel p {
+    margin: 0;
+    color: var(--ps-text-secondary);
+    line-height: var(--ps-line-height-relaxed);
+}
+
+.result-card {
+    margin-top: var(--ps-space-2);
+}
+
+.result-success {
+    border-color: rgba(124, 224, 180, 0.24);
+    background:
+        linear-gradient(180deg, rgba(124, 224, 180, 0.06), transparent),
+        var(--ps-bg-panel-strong);
+}
+
+.result-error {
+    border-color: var(--ps-border-danger);
+    background:
+        linear-gradient(180deg, rgba(255, 138, 138, 0.08), transparent),
+        var(--ps-bg-panel-strong);
+}
+
+.result-description {
+    margin: 0 0 var(--ps-space-3);
+    color: var(--ps-text-secondary);
+    line-height: var(--ps-line-height-relaxed);
+}
+
+.result-rows {
+    display: grid;
+    gap: var(--ps-space-2);
+    margin-bottom: var(--ps-space-3);
+}
+
+.result-rows div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--ps-space-3);
+    padding: var(--ps-space-2) var(--ps-space-3);
+    border-radius: var(--ps-radius-md);
+    font-size: var(--ps-font-size-sm);
+}
+
+.result-rows strong {
+    color: var(--ps-text-primary);
+}
+
+.result-rows span {
+    color: var(--ps-text-tertiary);
+    text-align: right;
+}
+
+.result-card details {
+    color: var(--ps-text-tertiary);
+    font-size: var(--ps-font-size-sm);
+}
+
+.result-card summary {
+    cursor: pointer;
+    margin-bottom: var(--ps-space-2);
+}
+
+.result-card pre {
+    margin: 0;
+    color: var(--ps-text-secondary);
+    font-size: var(--ps-font-size-xs);
+    line-height: var(--ps-line-height-relaxed);
+    white-space: pre-wrap;
+    word-break: break-word;
+}

@@ -6,7 +6,7 @@ let sheetWindow = null;
 let openChildWindows = [];
 
 function buildSheetWindowUrl(options = {}) {
-    const targetUrl = pathToFileURL(path.join(__dirname, '..', '..', 'Desktopmodules', 'legacy', 'Sheetmodules', 'sheet-studio.html'));
+    const targetUrl = pathToFileURL(path.join(__dirname, '..', '..', 'Sheetmodules', 'sheet-studio.html'));
     if (options.workbookId) {
         targetUrl.searchParams.set('workbookId', options.workbookId);
     }
@@ -36,7 +36,7 @@ function createOrFocusSheetWindow(options = {}) {
         frame: false,
         ...(process.platform === 'darwin' ? {} : { titleBarStyle: 'hidden' }),
         webPreferences: {
-            preload: path.join(__dirname, '..', '..', 'preloads', 'desktop.js'),
+            preload: path.join(__dirname, '..', '..', 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false,
             devTools: true

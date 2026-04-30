@@ -1,4 +1,19 @@
 // VCPDistributedServer.js
+// 设置控制台编码为 UTF-8，解决 Windows 下中文乱码问题
+if (process.platform === 'win32') {
+    try {
+        // 设置控制台代码页为 UTF-8 (65001)
+        require('child_process').execSync('chcp 65001', { stdio: 'ignore' });
+    } catch (e) {
+        // 忽略错误，某些环境可能不支持
+    }
+}
+
+const initWindowsConsoleUtf8 = require('../modules/utils/initWindowsConsoleUtf8');
+initWindowsConsoleUtf8();
+const patchConsoleForUnicodeSafeLogging = require('../modules/utils/patchConsoleForUnicodeSafeLogging');
+patchConsoleForUnicodeSafeLogging();
+
 const WebSocket = require('ws');
 const express = require('express');
 const http = require('http');

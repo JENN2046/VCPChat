@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VCP SheetAI</title>
+    <link rel="stylesheet" href="sheet-editor.css">
+</head>
+<body>
+    <div class="sheet-shell">
+        <header class="sheet-header">
+            <div>
+                <div class="eyebrow">VCP OfficeAI</div>
+                <h1>SheetAI</h1>
+                <p class="subtitle">面向个人工作系统的 AI 表格工作台</p>
+            </div>
+            <div class="status-card">
+                <span class="status-label">状态</span>
+                <strong id="sheetStatus">正在初始化</strong>
+            </div>
+        </header>
+
+        <main class="sheet-layout">
+            <aside class="sidebar-card">
+                <div class="card-title-row">
+                    <h2>工作簿</h2>
+                    <div class="toolbar-actions">
+                        <button id="refreshWorkbooksBtn" type="button" class="secondary-btn">刷新</button>
+                        <button id="createWorkbookBtn" type="button">新建</button>
+                    </div>
+                </div>
+                <p class="panel-hint">先做个人工作簿和轻量表格编辑，后续再接 AI 公式、导入导出和版本快照。</p>
+                <ul id="workbookList" class="workbook-list">
+                    <li class="placeholder-item workbook-empty">正在加载工作簿...</li>
+                </ul>
+            </aside>
+
+            <section class="workspace-card">
+                <div class="card-title-row">
+                    <div class="workspace-head">
+                        <h2 id="activeWorkbookTitle">未打开工作簿</h2>
+                        <div id="activeWorkbookMeta" class="muted">选择一个工作簿后，会在这里显示当前工作簿和工作表信息。</div>
+                    </div>
+                    <span id="sheetSaveState" class="muted">未保存改动</span>
+                </div>
+
+                <div class="sheet-tabs-row">
+                    <div id="sheetTabs" class="sheet-tabs"></div>
+                    <div id="sheetGridSummary" class="muted">尚未加载工作表</div>
+                </div>
+
+                <div class="formula-toolbar">
+                    <div id="selectedCellBadge" class="selected-cell-badge">未选中</div>
+                    <input id="formulaInput" class="formula-input" type="text" placeholder="选择单元格后，可在这里直接编辑内容" />
+                    <button id="applyFormulaBtn" type="button">应用</button>
+                </div>
+
+                <div class="grid-wrapper">
+                    <div id="sheetGrid" class="sheet-grid">
+                        <div class="grid-empty">正在准备表格...</div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="ai-card">
+                <div class="card-title-row">
+                    <h2>AI 动作</h2>
+                </div>
+                <div class="action-list">
+                    <button type="button">自然语言生成公式</button>
+                    <button type="button">清洗当前列</button>
+                    <button type="button">总结选中区域</button>
+                    <button type="button">生成周报结论</button>
+                </div>
+                <div class="info-list">
+                    <div class="info-card">
+                        <strong>当前已打通</strong>
+                        <span>工作簿列表、工作表读取、公式栏编辑、单元格保存。</span>
+                    </div>
+                    <div class="info-card">
+                        <strong>下一步</strong>
+                        <span>补充 AI 公式、CSV/XLSX 导入导出、筛选排序和多工作表操作。</span>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="sheet-editor.js"></script>
+</body>
+</html>

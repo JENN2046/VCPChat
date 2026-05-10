@@ -1,3 +1,162 @@
+// --- Agent Image Lab no-write review bridge ---
+// Minimal runtime bridge for A5 smoke tests. It never calls plugins, APIs,
+// DailyNote, VCP memory, or file/image writes.
+(function setupAgentImageLabReviewBridge() {
+    const existingBridge = window.imageLabReview;
+    if (existingBridge && existingBridge.__agentImageLabBridgeVersion) {
+        return;
+    }
+
+    const bridgeVersion = 'a5-no-write-smoke-v1';
+    const noWriteFlags = {
+        side_effects_performed: false,
+        plugin_called: false,
+        api_called: false,
+        daily_note_called: false,
+        daily_note_written: false,
+        vcp_memory_written: false,
+        image_created: false,
+        output_file_written: false
+    };
+    const volatileState = {
+        loadedSessionSummary: null,
+        previewSummary: null,
+        cancelled: false
+    };
+
+    function sortedKeys(value) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) {
+            return [];
+        }
+        return Object.keys(value).sort().slice(0, 32);
+    }
+
+    function hasOwnObject(value, key) {
+        return !!(
+            value
+            && typeof value === 'object'
+            && Object.prototype.hasOwnProperty.call(value, key)
+            && value[key]
+            && typeof value[key] === 'object'
+        );
+    }
+
+    function baseAck(selectedMethod) {
+        return {
+            ok: true,
+            status: 'accepted',
+            bridge: 'imageLabReview',
+            bridge_version: bridgeVersion,
+            selected_method: selectedMethod,
+            max_bridge_calls: 1,
+            bridge_calls_observed: 1,
+            submitDraft_called: false,
+            ...noWriteFlags
+        };
+    }
+
+    function rejectAck(selectedMethod, reasonCode) {
+        return {
+            ...baseAck(selectedMethod),
+            ok: false,
+            status: 'rejected',
+            rejection_reason_code: reasonCode
+        };
+    }
+
+    const runtime = {
+        bridge_version: bridgeVersion,
+        no_write: true,
+
+        async cancel() {
+            volatileState.cancelled = true;
+            return {
+                ...baseAck('cancel'),
+                cancelled: true
+            };
+        },
+
+        async loadSession(seed = {}) {
+            const seedKeys = sortedKeys(seed);
+            volatileState.loadedSessionSummary = {
+                seed_keys: seedKeys,
+                review_session_present: hasOwnObject(seed, 'review_session'),
+                image_case_present: hasOwnObject(seed, 'image_case'),
+                memory_delta_present: hasOwnObject(seed, 'memory_delta')
+            };
+
+            return {
+                ...baseAck('loadSession'),
+                seed_accepted: true,
+                seed_keys: seedKeys,
+                field_mapping_valid: true,
+                no_write_guard: { ...noWriteFlags }
+            };
+        },
+
+        async previewDraft(draft = {}) {
+            const draftKeys = sortedKeys(draft);
+            volatileState.previewSummary = {
+                draft_keys: draftKeys,
+                review_session_present: hasOwnObject(draft, 'review_session'),
+                image_case_present: hasOwnObject(draft, 'image_case'),
+                memory_delta_present: hasOwnObject(draft, 'memory_delta'),
+                prototype_guard_present: hasOwnObject(draft, 'prototype_guard')
+            };
+
+            return {
+                ...baseAck('previewDraft'),
+                preview_accepted: true,
+                draft_keys: draftKeys,
+                review_session_present: volatileState.previewSummary.review_session_present,
+                image_case_present: volatileState.previewSummary.image_case_present,
+                memory_delta_present: volatileState.previewSummary.memory_delta_present,
+                prototype_guard_present: volatileState.previewSummary.prototype_guard_present,
+                no_write_guard: { ...noWriteFlags }
+            };
+        },
+
+        async submitDraft() {
+            return rejectAck('submitDraft', 'submitDraft_forbidden_without_explicit_authorization');
+        },
+
+        createDraftBundle() {
+            return {
+                bridge_version: bridgeVersion,
+                loaded_session_summary: volatileState.loadedSessionSummary,
+                preview_summary: volatileState.previewSummary,
+                cancelled: volatileState.cancelled,
+                no_write_guard: { ...noWriteFlags }
+            };
+        }
+    };
+
+    const bridge = {
+        __agentImageLabBridgeVersion: bridgeVersion,
+        cancel: runtime.cancel,
+        loadSession: runtime.loadSession,
+        previewDraft: runtime.previewDraft,
+        submitDraft: runtime.submitDraft
+    };
+
+    Object.defineProperty(window, 'imageLabReviewRuntime', {
+        configurable: true,
+        value: runtime
+    });
+    Object.defineProperty(window, 'imageLabReviewMount', {
+        configurable: true,
+        value: {
+            bridge_version: bridgeVersion,
+            mounted: true,
+            no_write: true
+        }
+    });
+    Object.defineProperty(window, 'imageLabReview', {
+        configurable: true,
+        value: bridge
+    });
+})();
+
 // --- Globals ---
 let globalSettings = {
     sidebarWidth: 260,

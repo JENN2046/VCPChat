@@ -22,6 +22,31 @@ const repairManifestMojibake = require('../modules/utils/repairManifestMojibake'
 const PLUGIN_DIR = path.join(__dirname, 'Plugin');
 const manifestFileName = 'plugin-manifest.json';
 
+function terminatePluginProcess(pluginProcess) {
+    if (!pluginProcess || !pluginProcess.pid) return;
+
+    if (process.platform === 'win32') {
+        const killer = spawn('taskkill', ['/pid', String(pluginProcess.pid), '/T', '/F'], {
+            windowsHide: true,
+            stdio: 'ignore',
+        });
+        killer.on('error', () => {
+            try {
+                pluginProcess.kill('SIGKILL');
+            } catch (error) {
+                // Process may already have exited.
+            }
+        });
+        return;
+    }
+
+    try {
+        pluginProcess.kill('SIGKILL');
+    } catch (error) {
+        // Process may already have exited.
+    }
+}
+
 function formatAsciiSafeLogText(value) {
     const text = value == null ? '' : String(value);
     if (!/[^\x20-\x7E]/.test(text)) {
@@ -241,13 +266,32 @@ class PluginManager {
             let outputBuffer = '';
             let errorOutput = '';
             let initialResponseSent = false;
+            let processExited = false;
+            let promiseSettled = false;
             const timeoutDuration = plugin.entryPoint?.timeout || plugin.communication?.timeout || (isAsyncPlugin ? 1800000 : 60000);
+            const resolveOnce = (value) => {
+                if (promiseSettled) return;
+                promiseSettled = true;
+                resolve(value);
+            };
+            const rejectOnce = (error) => {
+                if (promiseSettled) return;
+                promiseSettled = true;
+                reject(error);
+            };
 
             const timeoutId = setTimeout(() => {
-                if (!initialResponseSent) {
-                    pluginProcess.kill('SIGKILL');
-                    reject(new Error(`Plugin "${pluginName}" execution timed out.`));
+                if (processExited) return;
+
+                const message = `Plugin "${pluginName}" execution timed out after ${timeoutDuration}ms.`;
+                terminatePluginProcess(pluginProcess);
+
+                if (isAsyncPlugin && initialResponseSent) {
+                    console.error(`[DistPluginManager] Async ${message} Child process was killed after the initial response.`);
+                    return;
                 }
+
+                rejectOnce(new Error(message));
             }, timeoutDuration);
 
             pluginProcess.stdout.setEncoding('utf8');
@@ -264,7 +308,7 @@ class PluginManager {
                             const parsedOutput = JSON.parse(potentialJsonMatch[1]);
                             if (parsedOutput && (parsedOutput.status === "success" || parsedOutput.status === "error")) {
                                 initialResponseSent = true;
-                                resolve(outputBuffer.trim());
+                                resolveOnce(outputBuffer.trim());
                             }
                         }
                     } catch (e) {
@@ -279,26 +323,33 @@ class PluginManager {
             });
 
             pluginProcess.on('error', (err) => {
+                processExited = true;
                 clearTimeout(timeoutId);
-                reject(new Error(`Failed to start plugin "${pluginName}": ${err.message}`));
+                rejectOnce(new Error(`Failed to start plugin "${pluginName}": ${err.message}`));
             });
 
             pluginProcess.on('exit', (code, signal) => {
+                processExited = true;
                 clearTimeout(timeoutId);
                 if (isAsyncPlugin && initialResponseSent) {
                     if (this.debugMode) console.log(`[DistPluginManager] Async plugin ${pluginName} exited after initial response.`);
                     return;
                 }
 
+                if (signal === 'SIGKILL') {
+                    rejectOnce(new Error(`Plugin "${pluginName}" was killed.`));
+                    return;
+                }
+
                 if (code !== 0 && signal !== 'SIGKILL') {
                     const errMsg = `Plugin ${pluginName} exited with code ${code}. Stderr: ${errorOutput.trim()}`;
                     console.error(`[DistPluginManager] ${errMsg}`);
-                    if (!initialResponseSent) reject(new Error(errMsg));
+                    rejectOnce(new Error(errMsg));
                 } else {
                     if (errorOutput.trim() && this.debugMode) {
                         console.warn(`[DistPluginManager] Plugin ${pluginName} produced stderr: ${errorOutput.trim()}`);
                     }
-                    if (!initialResponseSent) resolve(outputBuffer.trim());
+                    resolveOnce(outputBuffer.trim());
                 }
             });
 
@@ -360,7 +411,7 @@ class PluginManager {
             const timeoutId = setTimeout(() => {
                 if (!processExited) {
                     console.error(`[DistPluginManager] Static plugin "${plugin.name}" execution timed out after ${timeoutDuration}ms.`);
-                    pluginProcess.kill('SIGKILL');
+                    terminatePluginProcess(pluginProcess);
                     reject(new Error(`Static plugin "${plugin.name}" execution timed out.`));
                 }
             }, timeoutDuration);

@@ -175,6 +175,14 @@ class DistributedServer {
 
             // 注册异步插件回调接口
             this.app.post('/plugin/callback', (req, res) => {
+                const remoteAddress = getRequestRemoteAddress(req);
+                if (!isLoopbackAddress(remoteAddress)) {
+                    return res.status(403).json({
+                        status: 'error',
+                        error: `Loopback only. Remote address: ${remoteAddress || 'unknown'}`,
+                    });
+                }
+
                 const callbackData = req.body;
                 if (this.debugMode) console.log(`[${this.serverName}] Received plugin callback:`, callbackData);
 

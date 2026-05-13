@@ -177,7 +177,7 @@ class DistributedServer {
             this.app.post('/plugin/callback', (req, res) => {
                 const callbackData = req.body;
                 if (this.debugMode) console.log(`[${this.serverName}] Received plugin callback:`, callbackData);
-                
+
                 // 通过 WebSocket 隧道转发回调数据到主服务器
                 const payload = {
                     type: 'plugin_callback_forward',

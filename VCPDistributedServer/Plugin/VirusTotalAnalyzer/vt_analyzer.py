@@ -70,7 +70,7 @@ def resolve_file_path(image_url, param_name=None):
         file_path = url2pathname(parsed_url.path)
         if os.name == 'nt' and parsed_url.path.startswith('/'):
             file_path = url2pathname(parsed_url.path[1:])
-        
+
         if not os.path.exists(file_path):
             log_event("error", f"Local file not found: {file_path}")
             raise LocalFileNotFoundError("本地文件未找到，需要远程获取。", image_url, param_name)
@@ -97,7 +97,7 @@ def get_vt_report(api_key, file_hash):
 def upload_file_to_vt(api_key, file_path):
     file_size = os.path.getsize(file_path)
     headers = {"x-apikey": api_key}
-    
+
     if file_size <= 32 * 1024 * 1024: # 32MB
         url = f"{VT_API_BASE}/files"
         with open(file_path, "rb") as f:
@@ -112,7 +112,7 @@ def upload_file_to_vt(api_key, file_path):
         with open(file_path, "rb") as f:
             files = {"file": (os.path.basename(file_path), f)}
             response = requests.post(upload_url, headers=headers, files=files, timeout=300)
-            
+
     response.raise_for_status()
     return response.json()["data"]["id"] # 返回 analysis_id
 
@@ -129,16 +129,16 @@ def process_single_file(api_key, file_path, force_upload, request_id, callback_b
         log_event("info", f"[{request_id}] Starting analysis for {file_path}")
         file_hash = get_file_hash(file_path)
         report = None
-        
+
         if not force_upload:
             log_event("info", f"[{request_id}] Checking existing report for hash: {file_hash}")
             report = get_vt_report(api_key, file_hash)
-            
+
         if not report:
             log_event("info", f"[{request_id}] No existing report or force upload. Uploading file...")
             analysis_id = upload_file_to_vt(api_key, file_path)
             log_event("info", f"[{request_id}] File uploaded. Analysis ID: {analysis_id}. Polling for results...")
-            
+
             # 轮询结果
             max_retries = 20
             retry_interval = 15
@@ -160,7 +160,7 @@ def process_single_file(api_key, file_path, force_upload, request_id, callback_b
         malicious = stats.get("malicious", 0)
         suspicious = stats.get("suspicious", 0)
         total = sum(stats.values())
-        
+
         result_summary = f"分析完成。恶意: {malicious}, 可疑: {suspicious}, 总计引擎: {total}。\n"
         result_summary = format_report_summary(report, file_hash)
 
@@ -192,7 +192,7 @@ def format_report_summary(report, file_hash):
     malicious = stats.get("malicious", 0)
     suspicious = stats.get("suspicious", 0)
     total = sum(stats.values())
-    
+
     result_summary = f"分析完成。恶意: {malicious}, 可疑: {suspicious}, 总计引擎: {total}。\n"
     if malicious > 0:
         result_summary += "⚠️ 警告：发现恶意软件！\n"
@@ -200,7 +200,7 @@ def format_report_summary(report, file_hash):
         result_summary += "💡 提示：发现可疑行为。\n"
     else:
         result_summary += "✅ 安全：未发现威胁。\n"
-        
+
     result_summary += f"完整报告: https://www.virustotal.com/gui/file/{file_hash}"
     return result_summary
 
@@ -208,10 +208,10 @@ def format_report_summary(report, file_hash):
 def main():
     dotenv_path = os.path.join(os.path.dirname(__file__), 'config.env')
     load_dotenv(dotenv_path=dotenv_path)
-    
+
     api_key = os.getenv("VT_API_KEY")
     callback_base_url = os.getenv("CALLBACK_BASE_URL")
-    
+
     if not api_key:
         print_json_output("error", error="VT_API_KEY not found.")
         sys.exit(1)
@@ -229,18 +229,18 @@ def main():
         cmd_key = f"command{i}" if i > 1 else "command"
         if i == 1 and "command" not in input_data and "command1" in input_data:
              cmd_key = "command1"
-             
+
         if cmd_key not in input_data:
             if i == 1: # 兼容没有数字后缀的情况
                 pass
             else:
                 break
-        
+
         suffix = str(i) if (i > 1 or cmd_key == "command1") else ""
         cmd = input_data.get(cmd_key)
         file_path_raw = input_data.get(f"filePath{suffix}") or input_data.get("filePath")
         force_upload = input_data.get(f"forceUpload{suffix}", False)
-        
+
         if cmd == "AnalyzeFile" and file_path_raw:
             commands_to_process.append({
                 "type": "analyze",
@@ -254,7 +254,7 @@ def main():
                 "filePath": file_path_raw,
                 "paramName": f"filePath{suffix}" if suffix else "filePath"
             })
-        
+
         i += 1
         if i > 20: break # 防止死循环
 
@@ -266,7 +266,7 @@ def main():
     for item in commands_to_process:
         try:
             file_path = resolve_file_path(item["filePath"], item["paramName"])
-            
+
             if item["type"] == "analyze":
                 request_id = f"VT_{int(time.time())}_{hashlib.md5(file_path.encode()).hexdigest()[:6]}"
                 # 启动后台线程
@@ -282,7 +282,7 @@ def main():
                     results_for_ai.append(f"文件 '{os.path.basename(file_path)}' 的查询结果：\n{format_report_summary(report, file_hash)}")
                 else:
                     results_for_ai.append(f"文件 '{os.path.basename(file_path)}' 在 VirusTotal 上没有记录。请使用 AnalyzeFile 指令上传分析。")
-                    
+
         except LocalFileNotFoundError as e:
             print_json_output("error", code="FILE_NOT_FOUND_LOCALLY", error=str(e), file_url=e.file_url, failed_parameter=e.failed_parameter)
             sys.exit(0)

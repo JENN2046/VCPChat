@@ -65,6 +65,12 @@ def get_file_hash(file_path):
     return sha256_hash.hexdigest()
 
 def resolve_file_path(image_url, param_name=None):
+    if len(image_url) >= 3 and image_url[1] == ':' and image_url[2] in ('/', '\\'):
+        if not os.path.exists(image_url):
+            log_event("error", f"Local file not found: {image_url}")
+            raise LocalFileNotFoundError("本地文件未找到，需要远程获取。", image_url, param_name)
+        return image_url
+
     parsed_url = urlparse(image_url)
     if parsed_url.scheme == 'file':
         file_path = url2pathname(parsed_url.path)

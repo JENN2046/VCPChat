@@ -1084,10 +1084,24 @@ function isRenderSessionActive(sessionId) {
     return sessionId === activeRenderSessionId;
 }
 
+function cleanupToolResultFullContentInContent(root) {
+    if (!root || typeof root.querySelectorAll !== 'function' || toolResultFullContentMap.size === 0) {
+        return;
+    }
+
+    root.querySelectorAll('.vcp-tool-result-truncated-notice[data-content-id]').forEach((notice) => {
+        const contentId = Number.parseInt(notice.dataset.contentId, 10);
+        if (Number.isInteger(contentId)) {
+            toolResultFullContentMap.delete(contentId);
+        }
+    });
+}
+
 function removeMessageById(messageId, saveHistory = false) {
     const item = mainRendererReferences.chatMessagesDiv.querySelector(`.message-item[data-message-id="${messageId}"]`);
     if (item) {
         // --- NEW: Cleanup dynamic content before removing from DOM ---
+        cleanupToolResultFullContentInContent(item);
         const contentDiv = item.querySelector('.md-content');
         if (contentDiv) {
             contentProcessor.cleanupPreviewsInContent(contentDiv);
@@ -1128,6 +1142,9 @@ function clearChat() {
     invalidateRenderSession();
 
     if (mainRendererReferences.chatMessagesDiv) {
+        cleanupToolResultFullContentInContent(mainRendererReferences.chatMessagesDiv);
+        toolResultFullContentMap.clear();
+
         // --- NEW: Cleanup all messages before clearing the container ---
         const allMessages = mainRendererReferences.chatMessagesDiv.querySelectorAll('.message-item');
         allMessages.forEach(item => {
@@ -2184,6 +2201,7 @@ async function renderFullMessage(messageId, fullContent, agentName, agentId) {
     // 🟢 工具结果恢复
     rawHtml = restoreRenderedToolResults(rawHtml, toolResultMapFinal);
 
+    cleanupToolResultFullContentInContent(contentDiv);
     setContentAndProcessImages(contentDiv, rawHtml, messageId);
 
     // Apply post-processing in two steps
@@ -2264,6 +2282,7 @@ function updateMessageContent(messageId, newContent) {
     // --- Post-Render Processing (aligned with renderMessage logic) ---
 
     // 1. Set content and process images
+    cleanupToolResultFullContentInContent(contentDiv);
     setContentAndProcessImages(contentDiv, rawHtml, messageId);
 
     // 2. Re-render attachments if they exist
@@ -2620,6 +2639,7 @@ window.messageRenderer = {
         if (!existingMessageDom) return;
         const newMessageDom = await renderMessage(updatedMessage, true, false);
         if (newMessageDom) {
+            cleanupToolResultFullContentInContent(existingMessageDom);
             existingMessageDom.replaceWith(newMessageDom);
             // 重新观察
             visibilityOptimizer.observeMessage(newMessageDom);

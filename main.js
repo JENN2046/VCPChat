@@ -32,6 +32,7 @@ const fileDialogHandlers = require('./modules/ipc/fileDialogHandlers'); // Impor
 const { getAgentConfigById, ...agentHandlers } = require('./modules/ipc/agentHandlers'); // Import agent handlers
 const regexHandlers = require('./modules/ipc/regexHandlers'); // Import regex handlers
 const chatHandlers = require('./modules/ipc/chatHandlers'); // Import chat handlers
+const imageLabReviewHandlers = require('./modules/ipc/imageLabReviewHandlers'); // Import Agent Image Lab review handlers
 const groupChatHandlers = require('./modules/ipc/groupChatHandlers'); // Import group chat handlers
 const sovitsHandlers = require('./modules/ipc/sovitsHandlers'); // Import SovitsTTS IPC handlers
 const promptHandlers = require('./modules/ipc/promptHandlers'); // Import prompt handlers
@@ -1036,6 +1037,7 @@ if (!gotTheLock) {
             fileWatcher, // 注入文件监控器
             agentConfigManager
         });
+        imageLabReviewHandlers.initialize(mainWindow);
 
         // New dedicated watcher IPC handlers
         ipcMain.handle('watcher:start', (event, filePath, agentId, topicId) => {

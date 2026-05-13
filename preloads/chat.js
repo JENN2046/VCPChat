@@ -98,6 +98,15 @@ function exposeRoleApis(roleApiName, roleApi, compatApi, ops) {
     contextBridge.exposeInMainWorld('electronAPI', compatApi);
 }
 
+function exposeImageLabReviewApi(ops) {
+    contextBridge.exposeInMainWorld('imageLabReview', {
+        loadSession: (payload = {}) => ops.invoke('imageLabReview.loadSession', payload),
+        previewDraft: (payload = {}) => ops.invoke('imageLabReview.previewDraft', payload),
+        submitDraft: (payload = {}) => ops.invoke('imageLabReview.submitDraft', payload),
+        cancel: (payload = {}) => ops.invoke('imageLabReview.cancel', payload)
+    });
+}
+
 function createCatalog(ops) {
     return {
         // Shared shell/config/theme helpers
@@ -592,5 +601,6 @@ const roleApi = materializeApi(definitions, ALLOWED_KEYS);
 const compatApi = createCompatApi(definitions, ALLOWED_KEYS);
 
 exposeRoleApis('chatAPI', roleApi, compatApi, ops);
+exposeImageLabReviewApi(ops);
 
 console.log('[Preload][chat] loaded');

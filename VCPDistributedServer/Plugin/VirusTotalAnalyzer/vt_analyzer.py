@@ -123,6 +123,15 @@ def get_analysis_result(api_key, analysis_id):
     response.raise_for_status()
     return response.json()
 
+def post_callback(callback_url, callback_payload, request_id):
+    response = requests.post(callback_url, json=callback_payload, timeout=30)
+    response.raise_for_status()
+    log_event(
+        "success",
+        f"[{request_id}] Callback successful.",
+        {"status_code": getattr(response, "status_code", None)}
+    )
+
 # --- 异步处理逻辑 ---
 def process_single_file(api_key, file_path, force_upload, request_id, callback_base_url):
     try:
@@ -173,8 +182,7 @@ def process_single_file(api_key, file_path, force_upload, request_id, callback_b
                 "result": result_summary,
                 "data": report
             }
-            requests.post(callback_url, json=callback_payload, timeout=30)
-            log_event("success", f"[{request_id}] Callback successful.")
+            post_callback(callback_url, callback_payload, request_id)
 
     except Exception as e:
         log_event("error", f"[{request_id}] Error in background processing: {str(e)}", {"traceback": traceback.format_exc()})
@@ -185,7 +193,10 @@ def process_single_file(api_key, file_path, force_upload, request_id, callback_b
                 "status": "Failed",
                 "error": str(e)
             }
-            requests.post(callback_url, json=callback_payload, timeout=30)
+            try:
+                post_callback(callback_url, callback_payload, request_id)
+            except Exception as callback_error:
+                log_event("error", f"[{request_id}] Failed to deliver failure callback: {str(callback_error)}")
 
 def format_report_summary(report, file_hash):
     stats = report["data"]["attributes"]["last_analysis_stats"]

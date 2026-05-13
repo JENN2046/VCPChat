@@ -65,6 +65,12 @@ def get_file_hash(file_path):
     return sha256_hash.hexdigest()
 
 def resolve_file_path(image_url, param_name=None):
+    if len(image_url) >= 3 and image_url[1] == ':' and image_url[2] in ('/', '\\'):
+        if not os.path.exists(image_url):
+            log_event("error", f"Local file not found: {image_url}")
+            raise LocalFileNotFoundError("本地文件未找到，需要远程获取。", image_url, param_name)
+        return image_url
+
     parsed_url = urlparse(image_url)
     if parsed_url.scheme == 'file':
         file_path = url2pathname(parsed_url.path)
@@ -235,11 +241,15 @@ def main():
 
     # 处理批量请求
     commands_to_process = []
+    batch_mode = input_data.get("command") == "BatchAnalyze"
     i = 1
     while True:
-        cmd_key = f"command{i}" if i > 1 else "command"
-        if i == 1 and "command" not in input_data and "command1" in input_data:
-             cmd_key = "command1"
+        if batch_mode:
+            cmd_key = f"command{i}"
+        else:
+            cmd_key = f"command{i}" if i > 1 else "command"
+            if i == 1 and "command" not in input_data and "command1" in input_data:
+                 cmd_key = "command1"
 
         if cmd_key not in input_data:
             if i == 1: # 兼容没有数字后缀的情况
@@ -270,7 +280,7 @@ def main():
         if i > 20: break # 防止死循环
 
     if not commands_to_process:
-        print_json_output("error", error="No valid AnalyzeFile commands found.")
+        print_json_output("error", error="No valid VirusTotal commands found.")
         sys.exit(1)
 
     results_for_ai = []

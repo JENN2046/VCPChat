@@ -166,7 +166,7 @@ def process_single_file(api_key, file_path, force_upload, request_id, callback_b
 
         # 回调
         if callback_base_url:
-            callback_url = f"{callback_base_url}/{PLUGIN_NAME}/{request_id}"
+            callback_url = callback_base_url
             callback_payload = {
                 "requestId": request_id,
                 "status": "Succeed",
@@ -179,7 +179,7 @@ def process_single_file(api_key, file_path, force_upload, request_id, callback_b
     except Exception as e:
         log_event("error", f"[{request_id}] Error in background processing: {str(e)}", {"traceback": traceback.format_exc()})
         if callback_base_url:
-            callback_url = f"{callback_base_url}/{PLUGIN_NAME}/{request_id}"
+            callback_url = callback_base_url
             callback_payload = {
                 "requestId": request_id,
                 "status": "Failed",

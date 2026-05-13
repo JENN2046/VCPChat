@@ -5,6 +5,12 @@ const ENHANCED_RENDER_DEBOUNCE_DELAY = 400; // ms, for general blocks during str
 const DIARY_RENDER_DEBOUNCE_DELAY = 1000; // ms, potentially longer for diary if complex
 const enhancedRenderDebounceTimers = new WeakMap(); // For debouncing prettify calls
 
+// 🟢 大内容截断阈值与缓存
+const TOOL_RESULT_TRUNCATE_THRESHOLD = 50000; // 50KB 以上触发截断
+const TOOL_RESULT_TRUNCATE_LINES = 80; // 截断后只显示前80行
+const toolResultFullContentMap = new Map(); // placeholderId -> { raw: string, fieldKey: string }
+let toolResultContentIdCounter = 0;
+
 import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.js';
 import { initializeImageHandler, setContentAndProcessImages } from './renderer/imageHandler.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
@@ -895,17 +901,41 @@ function renderToolResultBlock(fullMatch) {
             // 🟢 架构级修复：工具结果内容使用独立的 Markdown 渲染
             // 由于工具结果块已经从外部文本中完全隔离，这里可以安全地使用 Markdown 解析器
             // 支持表格、代码围栏、列表等完整 Markdown 语法，不再需要 escapeHtml + <pre> 的妥协方案
+
+            // 🟢 性能优化：大内容二级截断
+            const isLargeContent = value.length > TOOL_RESULT_TRUNCATE_THRESHOLD;
+            let valueToRender = value;
+            let truncationNotice = '';
+
+            if (isLargeContent) {
+                // 截断到前 N 行
+                const allLines = value.split('\n');
+                const truncatedLines = allLines.slice(0, TOOL_RESULT_TRUNCATE_LINES);
+                valueToRender = truncatedLines.join('\n');
+
+                // 存储完整内容供懒加载
+                const contentId = toolResultContentIdCounter++;
+                toolResultFullContentMap.set(contentId, { raw: value, fieldKey: key });
+
+                const remainingLines = allLines.length - TOOL_RESULT_TRUNCATE_LINES;
+                const sizeKB = Math.round(value.length / 1024);
+                truncationNotice = `<div class="vcp-tool-result-truncated-notice" data-content-id="${contentId}">` +
+                    `<span>📄 内容已截断（共 ${allLines.length} 行 / ${sizeKB}KB），当前显示前 ${TOOL_RESULT_TRUNCATE_LINES} 行</span>` +
+                    `<span style="font-weight:600;">点击展开全部</span>` +
+                    `</div>`;
+            }
+
             let renderedMarkdown;
             if (mainRendererReferences.markedInstance) {
                 try {
-                    renderedMarkdown = mainRendererReferences.markedInstance.parse(value);
+                    renderedMarkdown = mainRendererReferences.markedInstance.parse(valueToRender);
                 } catch (e) {
-                    renderedMarkdown = `<pre class="vcp-tool-result-raw-content">${escapeHtml(value)}</pre>`;
+                    renderedMarkdown = `<pre class="vcp-tool-result-raw-content">${escapeHtml(valueToRender)}</pre>`;
                 }
             } else {
-                renderedMarkdown = `<pre class="vcp-tool-result-raw-content">${escapeHtml(value)}</pre>`;
+                renderedMarkdown = `<pre class="vcp-tool-result-raw-content">${escapeHtml(valueToRender)}</pre>`;
             }
-            processedValue = `<div class="vcp-tool-result-markdown-content">${renderedMarkdown}</div>`;
+            processedValue = `<div class="vcp-tool-result-markdown-content">${renderedMarkdown}</div>${truncationNotice}`;
         } else {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             processedValue = escapeHtml(value);
@@ -1054,10 +1084,24 @@ function isRenderSessionActive(sessionId) {
     return sessionId === activeRenderSessionId;
 }
 
+function cleanupToolResultFullContentInContent(root) {
+    if (!root || typeof root.querySelectorAll !== 'function' || toolResultFullContentMap.size === 0) {
+        return;
+    }
+
+    root.querySelectorAll('.vcp-tool-result-truncated-notice[data-content-id]').forEach((notice) => {
+        const contentId = Number.parseInt(notice.dataset.contentId, 10);
+        if (Number.isInteger(contentId)) {
+            toolResultFullContentMap.delete(contentId);
+        }
+    });
+}
+
 function removeMessageById(messageId, saveHistory = false) {
     const item = mainRendererReferences.chatMessagesDiv.querySelector(`.message-item[data-message-id="${messageId}"]`);
     if (item) {
         // --- NEW: Cleanup dynamic content before removing from DOM ---
+        cleanupToolResultFullContentInContent(item);
         const contentDiv = item.querySelector('.md-content');
         if (contentDiv) {
             contentProcessor.cleanupPreviewsInContent(contentDiv);
@@ -1098,6 +1142,9 @@ function clearChat() {
     invalidateRenderSession();
 
     if (mainRendererReferences.chatMessagesDiv) {
+        cleanupToolResultFullContentInContent(mainRendererReferences.chatMessagesDiv);
+        toolResultFullContentMap.clear();
+
         // --- NEW: Cleanup all messages before clearing the container ---
         const allMessages = mainRendererReferences.chatMessagesDiv.querySelectorAll('.message-item');
         allMessages.forEach(item => {
@@ -1195,7 +1242,37 @@ function initializeMessageRenderer(refs) {
             return;
         }
 
-        // 2. Avatar 点击停止 TTS（也使用委托）
+        // 🟢 3. Handle "展开全部" button for truncated tool results
+        const truncatedNotice = e.target.closest('.vcp-tool-result-truncated-notice');
+        if (truncatedNotice) {
+            const contentId = parseInt(truncatedNotice.dataset.contentId, 10);
+            const fullData = toolResultFullContentMap.get(contentId);
+            if (fullData) {
+                // 找到对应的 markdown-content 容器（紧邻的前一个兄弟元素）
+                const markdownContainer = truncatedNotice.previousElementSibling;
+                if (markdownContainer && markdownContainer.classList.contains('vcp-tool-result-markdown-content')) {
+                    // 渲染完整内容
+                    let fullHtml;
+                    if (mainRendererReferences.markedInstance) {
+                        try {
+                            fullHtml = mainRendererReferences.markedInstance.parse(fullData.raw);
+                        } catch (err) {
+                            fullHtml = `<pre class="vcp-tool-result-raw-content">${escapeHtml(fullData.raw)}</pre>`;
+                        }
+                    } else {
+                        fullHtml = `<pre class="vcp-tool-result-raw-content">${escapeHtml(fullData.raw)}</pre>`;
+                    }
+                    markdownContainer.innerHTML = fullHtml;
+                    // 移除按钮
+                    truncatedNotice.remove();
+                    // 释放缓存
+                    toolResultFullContentMap.delete(contentId);
+                }
+            }
+            return;
+        }
+
+        // 4. Avatar 点击停止 TTS（也使用委托）
         const avatar = e.target.closest('.message-avatar');
         if (avatar) {
             const messageItem = avatar.closest('.message-item');
@@ -2124,6 +2201,7 @@ async function renderFullMessage(messageId, fullContent, agentName, agentId) {
     // 🟢 工具结果恢复
     rawHtml = restoreRenderedToolResults(rawHtml, toolResultMapFinal);
 
+    cleanupToolResultFullContentInContent(contentDiv);
     setContentAndProcessImages(contentDiv, rawHtml, messageId);
 
     // Apply post-processing in two steps
@@ -2204,6 +2282,7 @@ function updateMessageContent(messageId, newContent) {
     // --- Post-Render Processing (aligned with renderMessage logic) ---
 
     // 1. Set content and process images
+    cleanupToolResultFullContentInContent(contentDiv);
     setContentAndProcessImages(contentDiv, rawHtml, messageId);
 
     // 2. Re-render attachments if they exist
@@ -2560,6 +2639,7 @@ window.messageRenderer = {
         if (!existingMessageDom) return;
         const newMessageDom = await renderMessage(updatedMessage, true, false);
         if (newMessageDom) {
+            cleanupToolResultFullContentInContent(existingMessageDom);
             existingMessageDom.replaceWith(newMessageDom);
             // 重新观察
             visibilityOptimizer.observeMessage(newMessageDom);

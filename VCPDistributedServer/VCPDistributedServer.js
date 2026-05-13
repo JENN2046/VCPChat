@@ -169,6 +169,42 @@ class DistributedServer {
         const address = await this.bindHttpServer(this.port);
             this.port = this.server.address().port; // 获取实际监听的端口
             console.log(`[${this.serverName}] HTTP server listening on 0.0.0.0:${this.port}`);
+
+            // 注入端口到插件管理器，用于构造回调 URL
+            pluginManager.setServerPort(this.port);
+
+            // 注册异步插件回调接口
+            this.app.post('/plugin/callback', (req, res) => {
+                const remoteAddress = getRequestRemoteAddress(req);
+                if (!isLoopbackAddress(remoteAddress)) {
+                    return res.status(403).json({
+                        status: 'error',
+                        error: `Loopback only. Remote address: ${remoteAddress || 'unknown'}`,
+                    });
+                }
+
+                const callbackData = req.body;
+                if (this.debugMode) console.log(`[${this.serverName}] Received plugin callback:`, callbackData);
+
+                // 通过 WebSocket 隧道转发回调数据到主服务器
+                const payload = {
+                    type: 'plugin_callback_forward',
+                    data: {
+                        serverName: this.serverName,
+                        callbackData: callbackData
+                    }
+                };
+                const forwarded = this.sendMessage(payload);
+                if (!forwarded) {
+                    return res.status(503).json({
+                        status: 'error',
+                        error: 'Callback forwarding unavailable: WebSocket tunnel is not open.',
+                    });
+                }
+
+                res.status(200).json({ status: 'success', message: 'Callback forwarded to main server.' });
+            });
+
             // 在 HTTP 服务器启动后，再连接到主服务器
             this.connect();
     }
@@ -706,10 +742,17 @@ class DistributedServer {
 
     sendMessage(payload) {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify(payload));
-        } else {
-            console.error(`[${this.serverName}] Cannot send message, WebSocket is not open.`);
+            try {
+                this.ws.send(JSON.stringify(payload));
+                return true;
+            } catch (error) {
+                console.error(`[${this.serverName}] Failed to send message over WebSocket:`, error.message);
+                return false;
+            }
         }
+
+        console.error(`[${this.serverName}] Cannot send message, WebSocket is not open.`);
+        return false;
     }
 
     async stop() {

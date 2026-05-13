@@ -42,6 +42,7 @@ const DOCK_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'dock.json');
 const LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
 const CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
 
+// --- 布局文件写锁/队列 ---
 let layoutOpQueue = Promise.resolve();
 
 function getPhotoStudioOrchestrator() {
@@ -1670,7 +1671,7 @@ function initialize(params) {
     // ============================================================
 
     /**
-     * 淇濆瓨妗岄潰甯冨眬
+     * 保存桌面布局（全量覆盖，带队列保护）
      */
     ipcMain.handle('desktop-save-layout', async (event, layoutData) => {
         layoutOpQueue = layoutOpQueue.then(async () => {

@@ -194,7 +194,14 @@ class DistributedServer {
                         callbackData: callbackData
                     }
                 };
-                this.sendMessage(payload);
+                const forwarded = this.sendMessage(payload);
+                if (!forwarded) {
+                    return res.status(503).json({
+                        status: 'error',
+                        error: 'Callback forwarding unavailable: WebSocket tunnel is not open.',
+                    });
+                }
+
                 res.status(200).json({ status: 'success', message: 'Callback forwarded to main server.' });
             });
 
@@ -735,10 +742,17 @@ class DistributedServer {
 
     sendMessage(payload) {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify(payload));
-        } else {
-            console.error(`[${this.serverName}] Cannot send message, WebSocket is not open.`);
+            try {
+                this.ws.send(JSON.stringify(payload));
+                return true;
+            } catch (error) {
+                console.error(`[${this.serverName}] Failed to send message over WebSocket:`, error.message);
+                return false;
+            }
         }
+
+        console.error(`[${this.serverName}] Cannot send message, WebSocket is not open.`);
+        return false;
     }
 
     async stop() {

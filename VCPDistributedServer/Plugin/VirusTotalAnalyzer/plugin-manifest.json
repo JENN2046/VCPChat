@@ -12,7 +12,7 @@
   },
   "communication": {
     "protocol": "stdio",
-    "timeout": 300000
+    "timeout": 900000
   },
   "configSchema": {
     "VT_API_KEY": {

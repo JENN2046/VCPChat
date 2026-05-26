@@ -7,6 +7,7 @@ const path = require('path');
 
 let AGENT_DIR = null;
 let APP_DATA_ROOT = null;
+let ipcHandlersRegistered = false;
 
 /**
  * 初始化提示词处理器
@@ -18,6 +19,11 @@ function initialize(options) {
     // 确保预设目录存在
     const defaultPresetDir = path.join(APP_DATA_ROOT, 'systemPromptPresets');
     fs.ensureDirSync(defaultPresetDir);
+
+    if (ipcHandlersRegistered) {
+        return;
+    }
+
     // --- [修正后] 新增全局仓库IPC处理器 ---
 
     // 定义全局仓库文件的路径
@@ -55,6 +61,7 @@ function initialize(options) {
     // --- [修正结束] ---
 
     setupHandlers();
+    ipcHandlersRegistered = true;
 }
 
 /**

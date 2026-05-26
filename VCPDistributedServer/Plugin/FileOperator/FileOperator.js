@@ -35,6 +35,27 @@ const DEFAULT_DOWNLOAD_DIR = resolveConfiguredPath(process.env.DEFAULT_DOWNLOAD_
 const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 const ENABLE_RECURSIVE_OPERATIONS = process.env.ENABLE_RECURSIVE_OPERATIONS !== 'false';
 const ENABLE_HIDDEN_FILES = process.env.ENABLE_HIDDEN_FILES === 'true';
+const EXTRACTED_CONTENT_EXTENSIONS = new Set([
+  '.pdf',
+  '.docx',
+  '.xlsx',
+  '.xls',
+  '.csv',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.mp3',
+  '.wav',
+  '.ogg',
+  '.flac',
+  '.aac',
+  '.m4a',
+  '.mp4',
+  '.webm',
+  '.mov',
+]);
 
 // Utility functions
 function debugLog(message, data = null) {
@@ -127,6 +148,22 @@ function createLineEndingHelper(content) {
     hasCRLF,
     lineEnding: JSON.stringify(lineEnding)
   };
+}
+
+function assertApplyDiffTextTarget(filePath, fileBuffer) {
+  const extension = path.extname(filePath).toLowerCase();
+  if (EXTRACTED_CONTENT_EXTENSIONS.has(extension)) {
+    throw new Error('ApplyDiff cannot be used on extracted content (PDF, DOCX, Excel, CSV, Images, Audio, Video, etc.). It only works on plain text files.');
+  }
+
+  if (fileBuffer.includes(0)) {
+    throw new Error('ApplyDiff cannot be used on binary files. It only works on plain text files.');
+  }
+
+  const sample = fileBuffer.subarray(0, Math.min(fileBuffer.length, 8192)).toString('utf8');
+  if (sample.includes('\uFFFD')) {
+    throw new Error('ApplyDiff cannot be used on files that do not decode cleanly as UTF-8 text.');
+  }
 }
 
 function isPathAllowed(targetPath, operationType = 'generic') {
@@ -222,13 +259,65 @@ function applyDiffLogic(originalContent, diffContent) {
   return replaceResult.result;
 }
 
+// Normalize user-provided paths before file operations.
+// This mirrors the server-side operator behavior and makes ApplyDiff more robust
+// for relative paths, accidental whitespace, and virtual-root style paths.
+function resolveAndNormalizePath(inputPath) {
+  if (!inputPath || typeof inputPath !== 'string') {
+    return inputPath;
+  }
+
+  const originalPath = inputPath.trim();
+
+  // Absolute paths should be preserved, only resolved/canonicalized.
+  if (path.isAbsolute(originalPath)) {
+    return path.resolve(originalPath);
+  }
+
+  // Sanitize each component of the path to remove accidental leading/trailing spaces.
+  const parts = originalPath.split(/[/\\]+/);
+  const trimmedParts = parts.map(part => part.trim());
+  const sanitizedPath = path.join(...trimmedParts);
+
+  const resolvedInput = path.resolve(originalPath);
+  const fileOperatorRoot = path.resolve(__dirname);
+
+  // Idempotency guard: if the path is already resolved under FileOperator, keep it.
+  if (resolvedInput.toLowerCase().startsWith(fileOperatorRoot.toLowerCase())) {
+    return resolvedInput;
+  }
+
+  // Virtual root: map "/xxx" to FileOperator/xxx on platforms where it is not absolute.
+  if (originalPath.startsWith('/')) {
+    const relativePath = originalPath.slice(1);
+    return path.resolve(__dirname, relativePath);
+  }
+
+  const normalized = path.normalize(sanitizedPath);
+  const startsWithDot = normalized.startsWith(`.${path.sep}`);
+  const startsWithDotDot = normalized.startsWith(`..${path.sep}`);
+
+  if (!startsWithDot && !startsWithDotDot) {
+    // Treat plain relative paths like "foo/bar" as project-root relative.
+    return path.resolve(roots.workspaceRoot, normalized);
+  }
+
+  // Treat explicit relative paths like "./foo" or "../foo" as FileOperator-relative.
+  return path.resolve(__dirname, normalized);
+}
+
 // Helper function to run validation and attach results
 async function runValidationAndAttachResults(result, filePath, fileContent) {
   if (result.success && fileContent) {
-    const validationResults = await validateCode(filePath, fileContent);
-    if (validationResults && validationResults.length > 0) {
-      result.data.validation = validationResults;
-      result.data.message += ' (with validation)';
+    try {
+      const validationResults = await validateCode(filePath, fileContent);
+      if (validationResults && validationResults.length > 0) {
+        result.data.validation = validationResults;
+        result.data.message += ' (with validation)';
+      }
+    } catch (error) {
+      debugLog('Code validation failed', { filePath, error: error.message });
+      // Validation diagnostics should not make the file operation itself fail.
     }
   }
   return result;
@@ -1170,60 +1259,72 @@ async function updateHistory(filePath, searchString, replaceString, encoding = '
 
 async function applyDiff(parameters) {
   try {
-    const { filePath, diffContent, searchString, replaceString, encoding } = parameters;
+    const { filePath, diffContent, searchString, replaceString, encoding = 'utf8' } = parameters;
 
-    const readResult = await readFile(filePath, encoding);
-    if (!readResult.success) {
-      throw new Error(`Failed to read file for applying diff: ${readResult.error}`);
-    }
-    // We can only apply diff to string content.
-    if (readResult.data.isExtracted) {
-      throw new Error('ApplyDiff cannot be used on extracted content (PDF, DOCX, Excel, Images, etc.). It only works on plain text files.');
-    }
+    // Read raw file content directly instead of going through readFile(),
+    // because readFile() returns display-oriented multimodal content with headers.
+    // Matching against those wrappers can make otherwise-valid diffs fail.
+    const resolvedPath = resolveAndNormalizePath(filePath);
 
-    let originalContent;
-    if (typeof readResult.data.content === 'string') {
-      originalContent = readResult.data.content;
-    } else if (Array.isArray(readResult.data.content)) {
-      // In multimodal format, the actual file content is the last text part
-      const textParts = readResult.data.content.filter(part => part.type === 'text');
-      if (textParts.length >= 2) {
-        // Skip the header message (e.g., "已读取文件...") and take the actual content
-        originalContent = textParts[textParts.length - 1].text;
-      } else if (textParts.length === 1) {
-        originalContent = textParts[0].text;
-      }
+    if (!isPathAllowed(resolvedPath, 'ApplyDiff')) {
+      throw new Error(`Access denied: Path '${resolvedPath}' is not in allowed directories`);
     }
 
-    if (typeof originalContent !== 'string') {
-      throw new Error('ApplyDiff can only be used on plain text files.');
+    const stats = await fs.stat(resolvedPath);
+    if (stats.isDirectory()) {
+      throw new Error('Cannot apply diff to a directory.');
     }
+    if (stats.size > MAX_FILE_SIZE) {
+      throw new Error(`File too large: ${formatFileSize(stats.size)} exceeds limit of ${formatFileSize(MAX_FILE_SIZE)}`);
+    }
+
+    const originalBuffer = await fs.readFile(resolvedPath);
+    assertApplyDiffTextTarget(resolvedPath, originalBuffer);
+    const originalContent = originalBuffer.toString(encoding);
+    const helper = createLineEndingHelper(originalContent);
+
+    debugLog('ApplyDiff line ending', {
+      hasCRLF: helper.hasCRLF,
+      lineEnding: helper.lineEnding
+    });
+
     let newContent;
 
     if (diffContent) {
-      // Use the existing diff logic if diffContent is provided
-      newContent = applyDiffLogic(originalContent, diffContent);
+      const normOriginal = helper.normalize(originalContent);
+      const normDiff = helper.normalize(diffContent);
+      const normResult = applyDiffLogic(normOriginal, normDiff);
+
+      newContent = helper.denormalize(normResult);
     } else if (searchString !== undefined && replaceString !== undefined) {
-      // Handle the legacy format with searchString and replaceString
-      const helper = createLineEndingHelper(originalContent);
       const replaceResult = helper.safeReplace(originalContent, searchString, replaceString);
       if (!replaceResult.success) {
-        // Make error more specific for debugging
-        throw new Error(`Diff application failed: ${replaceResult.error}. Content not found: "${searchString}"`);
+        throw new Error(
+          `Diff application failed: searchString not found after CRLF normalization. ` +
+          `Search: "${String(searchString).substring(0, 80)}..."`
+        );
       }
+
       newContent = replaceResult.result;
+      debugLog('ApplyDiff CRLF-safe replacement applied', {
+        originalLength: originalContent.length,
+        newLength: newContent.length
+      });
     } else {
       throw new Error('ApplyDiff requires either "diffContent" or both "searchString" and "replaceString" parameters.');
     }
 
-    const editResult = await editFile(filePath, newContent, encoding);
+    const editResult = await editFile(resolvedPath, newContent, encoding);
     if (editResult.success) {
-      editResult.data.message = '文件编辑已经提交等待用户确认';
-      // Since editFile now returns the validation, we just pass it along.
-      // The validation was already run inside editFile.
+      editResult.data.message = '文件编辑成功';
+      if (DEBUG_MODE) {
+        editResult.data.crlfInfo = helper.getDebugInfo();
+      }
     }
-    return await runValidationAndAttachResults(editResult, filePath, newContent);
+
+    return await runValidationAndAttachResults(editResult, resolvedPath, newContent);
   } catch (error) {
+    debugLog('Error in applyDiff', { error: error.message });
     return { success: false, error: `Failed to apply diff: ${error.message}` };
   }
 }

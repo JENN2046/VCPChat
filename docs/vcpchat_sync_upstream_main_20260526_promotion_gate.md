@@ -202,3 +202,65 @@ Current candidate decision:
 ```text
 promote-ready
 ```
+
+## Post-Main Merge Closeout
+
+Date: 2026-05-26
+
+Status: `merged-to-main`
+
+Remote PR:
+
+- PR: `#40 Promote upstream main sync candidate`
+- Head branch: `promotion/upstream-main-20260526`
+- Base branch: `main`
+- PR head: `0231245 fix: preserve translator and group history state`
+- Merge commit on `origin/main`: `b3412ddc036056e32029f2876894e12107148ea4`
+
+Merge evidence:
+
+- PR #40 was merged into `origin/main`.
+- Local `main` was fast-forwarded to `origin/main`.
+- Local `main` now points at `b3412dd`.
+- `promotion/upstream-main-20260526` remains available as a rollback/review reference.
+- `prod-stable` was not touched.
+- `.vcp_ready` remains local runtime output and is not part of the sync or merge commits.
+
+Post-merge validation on `main`:
+
+- `node --check scripts\topic-sponsor-smoke.js`: passed
+- `node scripts\topic-sponsor-smoke.js`: passed
+  - verified `CreateTopic`
+  - verified generated `history.json`
+  - verified generated `config.json`
+  - verified `ReadTopicContent`
+  - verified `CheckTopicOwnership`
+- `npm run test:photo-studio`: passed, 25/25
+- `ELECTRON_UI_SMOKE_TIMEOUT_MS=70000 node scripts\electron-ui-smoke.js`: passed
+  - main renderer probes passed
+  - desktop window probes passed
+  - notes window probes passed
+  - notemini window probes passed
+
+GitHub validation:
+
+- JS smoke checks passed.
+- Rust Assistant Engine checks passed on macOS, Ubuntu, and Windows.
+- Release builds passed on macOS, Ubuntu, and Windows.
+- Codex Review re-review reported no major issues after the final review fixes.
+- All review conversations were resolved.
+- PR merge state was `CLEAN` before merge.
+
+Current governance decision:
+
+```text
+main-integrated
+```
+
+This closeout does not authorize `prod-stable` promotion.
+
+Next safe phase:
+
+1. Observe `main` as the new integration baseline.
+2. Prepare a separate `main -> prod-stable` promotion preflight when explicitly requested.
+3. Keep `promotion/upstream-main-20260526` and PR #40 as the review and rollback evidence for this sync.

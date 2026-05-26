@@ -81,21 +81,30 @@ CI path-filter gap:
 - Current GitHub Actions path filters did not trigger new checks for those files.
 - Local targeted validation and Electron UI smoke were used for those review fixes.
 
-## Stable-Only Delta After Merge
+## Stable-Only Delta Backflow
 
-After PR #41, `origin/prod-stable` includes all of `origin/main` and also has stable-line review fixes that are not yet on `origin/main`:
+After PR #41, `origin/prod-stable` included all of `origin/main` plus two stable-line review fixes:
 
 - `2b2c5e0 fix: harden log center reload and auth`
 - `a60a195 fix: keep log highlight and note windows stable`
 
-Files differing from `origin/main`:
+These fixes were backflowed to `main` through PR #42:
+
+- PR: `#42 Backflow prod-stable review fixes to main`
+- Main merge commit: `642256b9919f0574ff81eba96895717886ad5d03`
+- Backflow commits on the PR branch:
+  - `f582135 fix: harden log center reload and auth`
+  - `7806bdd fix: keep log highlight and note windows stable`
+
+Files covered by the backflow:
 
 - `Logmodules/log.js`
 - `modules/ipc/notesHandlers.js`
 
-Governance implication:
+Post-backflow state:
 
-- The next upstream/main sync or main maintenance step should backflow these stable-line fixes into `main`, or record them as stable-only hotfixes until the next integration cycle.
+- `origin/main` and `origin/prod-stable` no longer differ in these files.
+- `origin/prod-stable` still has stable promotion merge history that is not on `origin/main`, which is expected.
 
 ## Rollback Anchor
 

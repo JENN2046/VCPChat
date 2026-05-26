@@ -17,6 +17,7 @@ Current status:
 - Local promotion branch `promotion/main-to-prod-stable-20260526` exists at `a972109`.
 - `main -> prod-stable` preflight decision is `promotion-branch-validated-with-accepted-whitespace-risk`.
 - PR #41 was merged into `origin/prod-stable` as `e593ea7`.
+- PR #42 was merged into `origin/main` as `642256b`, backflowing the stable-only review fixes.
 - Final decision: `upstream-sync-absorbed-to-stable`.
 
 Changed in this checkpoint:
@@ -38,7 +39,7 @@ Validation run after merge:
 
 Next safe action:
 
-- Decide whether to backflow PR #41 stable-only fixes into `main`.
+- Optional hygiene: add CI path filters for `Logmodules/log.js` and `modules/ipc/notesHandlers.js`, then decide branch cleanup.
 
 Hard boundary:
 

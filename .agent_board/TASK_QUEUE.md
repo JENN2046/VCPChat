@@ -28,6 +28,7 @@ Done:
 - Resolved PR #41 review conversations.
 - Merged PR #41 into `prod-stable`.
 - Recorded stable closeout.
+- Backflowed PR #41 stable-only fixes into `main` via PR #42.
 
 In progress:
 
@@ -36,7 +37,6 @@ In progress:
 Remaining:
 
 - Decide whether to observe `main` before stable promotion.
-- Decide whether to backflow stable-only review fixes into `main`.
 - Decide whether to add `Logmodules/log.js` and `modules/ipc/notesHandlers.js` to CI path filters in a future hygiene task.
 - Decide whether to keep, rename, or clean up `promotion/upstream-main-20260526` after the stable decision.
 

@@ -37,5 +37,6 @@ Next:
 - `origin/main` was merged into it as local commit `a972109`.
 - Current preflight decision: `promotion-branch-validated-with-accepted-whitespace-risk`.
 - PR #41 was merged into `origin/prod-stable` as `e593ea7`.
+- PR #42 backflowed the PR #41 stable-only fixes into `origin/main` as `642256b`.
 - Final closeout decision: `upstream-sync-absorbed-to-stable`.
-- Next safe action is to decide whether to backflow PR #41 stable-only fixes into `main`.
+- Next safe action is optional hygiene: CI path-filter coverage and branch cleanup.

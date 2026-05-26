@@ -33,5 +33,7 @@ Residual risk:
 Next:
 
 - `main -> prod-stable` preflight has started.
-- Current preflight decision: `preflight-pass-with-conditions`.
-- Next safe action is to decide whether to create a local promotion branch from `origin/prod-stable` and merge `origin/main` into it for branch-specific validation.
+- Local branch `promotion/main-to-prod-stable-20260526` was created from `origin/prod-stable`.
+- `origin/main` was merged into it as local commit `a972109`.
+- Current preflight decision: `promotion-branch-validated-with-accepted-whitespace-risk`.
+- Next safe action is to decide whether to push the promotion branch and open a PR to `prod-stable`.

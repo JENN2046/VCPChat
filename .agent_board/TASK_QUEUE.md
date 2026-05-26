@@ -18,6 +18,10 @@ Done:
 - Entered `main -> prod-stable` promotion preflight.
 - Confirmed `origin/main` can merge into `origin/prod-stable` without textual conflicts using `git merge-tree`.
 - Produced `docs/vcpchat_main_to_prod_stable_preflight_20260526.md`.
+- Created local `promotion/main-to-prod-stable-20260526` from `origin/prod-stable`.
+- Merged `origin/main` into the local promotion branch as `a972109`.
+- Ran branch-specific promotion validation.
+- Recorded promotion branch validation results on local `main`.
 
 In progress:
 
@@ -26,8 +30,9 @@ In progress:
 Remaining:
 
 - Decide whether to observe `main` before stable promotion.
-- Decide whether to create `promotion/main-to-prod-stable-20260526`.
-- Validate the actual promotion branch if created.
+- Decide whether to accept inherited whitespace debt for stable promotion.
+- Decide whether to push `promotion/main-to-prod-stable-20260526`.
+- Open PR to `prod-stable` if remote promotion is approved.
 - Define stable-line rollback command plan before moving `prod-stable`.
 - Decide whether to keep, rename, or clean up `promotion/upstream-main-20260526` after the stable decision.
 

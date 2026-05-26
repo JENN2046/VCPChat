@@ -210,3 +210,61 @@ Meaning:
 This is not `promote-ready` yet because the actual promotion branch has not been created and validated.
 
 This is not `freeze-main` because no functional blocker was found in preflight.
+
+## Promotion Branch Validation
+
+Date: 2026-05-26
+
+Local promotion branch:
+
+- Branch: `promotion/main-to-prod-stable-20260526`
+- Base: `origin/prod-stable@3b51c7b`
+- Merged source: `origin/main@b3412dd`
+- Local merge commit: `a972109 Merge origin/main into prod-stable promotion candidate`
+
+Merge result:
+
+- `origin/main` merged into the local promotion branch without conflicts.
+- `.vcp_ready` remained a local runtime artifact and was not part of the merge commit.
+- No remote branch was pushed.
+- `origin/prod-stable` was not moved.
+- The promotion branch intentionally does not include local-only governance checkpoint commits `5959ef5` or `781a528`.
+
+Validation on the actual promotion branch:
+
+- changed JS syntax check across `origin/prod-stable..HEAD`: passed for 46 changed `.js` files
+- `node --check scripts\topic-sponsor-smoke.js`: passed
+- `node scripts\topic-sponsor-smoke.js`: passed
+- `npm run test:photo-studio`: passed, 25/25
+- `ELECTRON_UI_SMOKE_TIMEOUT_MS=70000 node scripts\electron-ui-smoke.js`: passed
+
+Known non-pass on the actual promotion branch:
+
+- `git diff --check origin/prod-stable..HEAD`: failed with the same upstream trailing-whitespace debt
+- counted issue lines: 3,813
+- largest affected files remain:
+  - `Desktopmodules/legacy/Notemodules/notes.js`: 816
+  - `modules/ipc/notesHandlers.js`: 425
+  - `modules/topicListManager.js`: 319
+  - `modules/text-viewer.js`: 307
+  - `Desktopmodules/legacy/Translatormodules/translator.js`: 253
+  - `Desktopmodules/legacy/Notemodules/notes.css`: 252
+  - `Desktopmodules/legacy/Translatormodules/translator.css`: 240
+  - `modules/messageRenderer.js`: 185
+  - `modules/ipc/assistantHandlers.js`: 163
+  - `modules/chatManager.js`: 112
+  - `styles/messageRenderer.css`: 100
+  - `modules/renderer/contentProcessor.js`: 92
+
+Updated decision:
+
+```text
+promotion-branch-validated-with-accepted-whitespace-risk
+```
+
+Meaning:
+
+- The actual local promotion branch is built and validation has passed.
+- The branch is suitable for review as a `prod-stable` promotion candidate if the team accepts the inherited whitespace debt.
+- Next remote step would be pushing `promotion/main-to-prod-stable-20260526` and opening a PR to `prod-stable`.
+- That remote step requires explicit user approval.

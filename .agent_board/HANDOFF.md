@@ -14,7 +14,8 @@ Current status:
 - `promotion/upstream-main-20260526` remains as a review/rollback reference.
 - `prod-stable` is unchanged.
 - `.vcp_ready` is local runtime output and should stay uncommitted.
-- `main -> prod-stable` preflight decision is `preflight-pass-with-conditions`.
+- Local promotion branch `promotion/main-to-prod-stable-20260526` exists at `a972109`.
+- `main -> prod-stable` preflight decision is `promotion-branch-validated-with-accepted-whitespace-risk`.
 
 Changed in this checkpoint:
 
@@ -35,7 +36,7 @@ Validation run after merge:
 
 Next safe action:
 
-- Decide whether to create local branch `promotion/main-to-prod-stable-20260526` from `origin/prod-stable` and merge `origin/main` into it for branch-specific validation.
+- Decide whether to push `promotion/main-to-prod-stable-20260526` and open a PR to `prod-stable`.
 
 Hard boundary:
 

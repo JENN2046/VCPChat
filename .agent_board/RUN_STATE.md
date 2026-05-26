@@ -32,5 +32,6 @@ Current preflight:
 
 - Source: `origin/main@b3412dd`
 - Target: `origin/prod-stable@3b51c7b`
-- Decision: `preflight-pass-with-conditions`
-- Required next step before stable movement: create and validate `promotion/main-to-prod-stable-20260526` only after explicit user approval.
+- Local promotion branch: `promotion/main-to-prod-stable-20260526@a972109`
+- Decision: `promotion-branch-validated-with-accepted-whitespace-risk`
+- Required next step before stable movement: push the promotion branch and open a PR to `prod-stable` only after explicit user approval.

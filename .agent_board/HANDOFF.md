@@ -16,6 +16,8 @@ Current status:
 - `.vcp_ready` is local runtime output and should stay uncommitted.
 - Local promotion branch `promotion/main-to-prod-stable-20260526` exists at `a972109`.
 - `main -> prod-stable` preflight decision is `promotion-branch-validated-with-accepted-whitespace-risk`.
+- PR #41 was merged into `origin/prod-stable` as `e593ea7`.
+- Final decision: `upstream-sync-absorbed-to-stable`.
 
 Changed in this checkpoint:
 
@@ -36,8 +38,8 @@ Validation run after merge:
 
 Next safe action:
 
-- Decide whether to push `promotion/main-to-prod-stable-20260526` and open a PR to `prod-stable`.
+- Decide whether to backflow PR #41 stable-only fixes into `main`.
 
 Hard boundary:
 
-- Do not move `prod-stable`, delete branches, or push new checkpoint commits without explicit user instruction.
+- Do not delete branches or push new checkpoint commits without explicit user instruction.

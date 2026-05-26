@@ -35,3 +35,10 @@ Current preflight:
 - Local promotion branch: `promotion/main-to-prod-stable-20260526@a972109`
 - Decision: `promotion-branch-validated-with-accepted-whitespace-risk`
 - Required next step before stable movement: push the promotion branch and open a PR to `prod-stable` only after explicit user approval.
+
+Stable closeout:
+
+- PR #41 merged into `origin/prod-stable`.
+- New `origin/prod-stable`: `e593ea759ba4d535620cd764f939f3503c90492e`.
+- Final promotion branch head: `a60a195`.
+- Decision: `upstream-sync-absorbed-to-stable`.

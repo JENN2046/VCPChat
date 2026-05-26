@@ -89,3 +89,31 @@ Not validated:
 - No remote promotion branch was pushed.
 - No PR to `prod-stable` was opened.
 - No stable branch movement was performed.
+
+## PR #41 Review Fixes and Stable Merge
+
+Date: 2026-05-26
+
+Commits:
+
+- `2b2c5e0 fix: harden log center reload and auth`
+- `a60a195 fix: keep log highlight and note windows stable`
+- `e593ea7 Merge pull request #41 from JENN2046/promotion/main-to-prod-stable-20260526`
+
+Validation:
+
+- `node --check Logmodules\log.js`: passed.
+- `node --check modules\ipc\notesHandlers.js`: passed.
+- `git diff --check -- Logmodules\log.js modules\ipc\notesHandlers.js`: passed.
+- UTF-8 Basic auth smoke with `用户:密码`: passed.
+- log keyword highlight smoke with filter `span`: passed.
+- `ELECTRON_UI_SMOKE_TIMEOUT_MS=70000 node scripts\electron-ui-smoke.js`: passed.
+
+Remote:
+
+- PR #41 was merged into `origin/prod-stable`.
+- New `origin/prod-stable`: `e593ea759ba4d535620cd764f939f3503c90492e`.
+
+Known gap:
+
+- GitHub Actions did not run for the final review-fix commits because current workflow path filters do not include `Logmodules/log.js` or `modules/ipc/notesHandlers.js`.

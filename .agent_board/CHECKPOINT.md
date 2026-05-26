@@ -36,4 +36,6 @@ Next:
 - Local branch `promotion/main-to-prod-stable-20260526` was created from `origin/prod-stable`.
 - `origin/main` was merged into it as local commit `a972109`.
 - Current preflight decision: `promotion-branch-validated-with-accepted-whitespace-risk`.
-- Next safe action is to decide whether to push the promotion branch and open a PR to `prod-stable`.
+- PR #41 was merged into `origin/prod-stable` as `e593ea7`.
+- Final closeout decision: `upstream-sync-absorbed-to-stable`.
+- Next safe action is to decide whether to backflow PR #41 stable-only fixes into `main`.

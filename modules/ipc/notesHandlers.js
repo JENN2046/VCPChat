@@ -22,6 +22,13 @@ let localNotesWatcher = null;
 let localNotesWatchRefreshTimer = null;
 const LOCAL_NOTES_WATCH_DEBOUNCE_MS = 250;
 
+function removeOpenChildWindow(windowRef) {
+    const index = openChildWindows.indexOf(windowRef);
+    if (index !== -1) {
+        openChildWindows.splice(index, 1);
+    }
+}
+
 // Helper to check if a file path is on the network notes drive
 async function isNetworkNote(filePath) {
     try {
@@ -474,7 +481,7 @@ function createOrFocusNoteMiniWindow() {
     });
 
     noteMiniWindow.on('closed', () => {
-        openChildWindows = openChildWindows.filter(win => win !== noteMiniWindow);
+        removeOpenChildWindow(noteMiniWindow);
         noteMiniWindow = null;
     });
 
@@ -535,7 +542,7 @@ function createOrFocusNotesWindow() {
     notesWindow.on('closed', () => {
         console.log('[Main Process] Notes window has been closed.');
         stopLocalNotesWatcher();
-        openChildWindows = openChildWindows.filter(win => win !== notesWindow); // Remove from broadcast list
+        removeOpenChildWindow(notesWindow); // Remove from broadcast list
         notesWindow = null; // Clear the reference
     });
     

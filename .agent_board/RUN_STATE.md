@@ -22,8 +22,15 @@ State:
 
 Mode:
 
-- Main closeout checkpoint after upstream sync promotion.
+- Main to prod-stable promotion preflight.
 
 Next boundary:
 
 - Any `main -> prod-stable` movement requires a separate promotion preflight and explicit user approval.
+
+Current preflight:
+
+- Source: `origin/main@b3412dd`
+- Target: `origin/prod-stable@3b51c7b`
+- Decision: `preflight-pass-with-conditions`
+- Required next step before stable movement: create and validate `promotion/main-to-prod-stable-20260526` only after explicit user approval.

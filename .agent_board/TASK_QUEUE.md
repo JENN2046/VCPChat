@@ -15,6 +15,9 @@ Done:
 - Fast-forwarded local `main` to `origin/main`.
 - Ran post-merge main validation.
 - Created main closeout checkpoint.
+- Entered `main -> prod-stable` promotion preflight.
+- Confirmed `origin/main` can merge into `origin/prod-stable` without textual conflicts using `git merge-tree`.
+- Produced `docs/vcpchat_main_to_prod_stable_preflight_20260526.md`.
 
 In progress:
 
@@ -23,10 +26,11 @@ In progress:
 Remaining:
 
 - Decide whether to observe `main` before stable promotion.
-- Prepare `main -> prod-stable` promotion preflight.
+- Decide whether to create `promotion/main-to-prod-stable-20260526`.
+- Validate the actual promotion branch if created.
 - Define stable-line rollback command plan before moving `prod-stable`.
 - Decide whether to keep, rename, or clean up `promotion/upstream-main-20260526` after the stable decision.
 
 Blocked:
 
-- `prod-stable` movement is blocked until explicit user approval after a separate preflight.
+- `prod-stable` movement is blocked until explicit user approval after a validated promotion branch and PR.

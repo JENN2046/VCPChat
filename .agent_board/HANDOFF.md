@@ -14,10 +14,12 @@ Current status:
 - `promotion/upstream-main-20260526` remains as a review/rollback reference.
 - `prod-stable` is unchanged.
 - `.vcp_ready` is local runtime output and should stay uncommitted.
+- `main -> prod-stable` preflight decision is `preflight-pass-with-conditions`.
 
 Changed in this checkpoint:
 
 - `docs/vcpchat_sync_upstream_main_20260526_promotion_gate.md`
+- `docs/vcpchat_main_to_prod_stable_preflight_20260526.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/TASK_QUEUE.md`
@@ -33,7 +35,7 @@ Validation run after merge:
 
 Next safe action:
 
-- Prepare a separate `main -> prod-stable` promotion preflight, or observe `main` first.
+- Decide whether to create local branch `promotion/main-to-prod-stable-20260526` from `origin/prod-stable` and merge `origin/main` into it for branch-specific validation.
 
 Hard boundary:
 

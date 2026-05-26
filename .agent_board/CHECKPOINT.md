@@ -32,4 +32,6 @@ Residual risk:
 
 Next:
 
-- Choose whether to observe `main`, prepare `main -> prod-stable` preflight, or freeze/clean promotion branch references.
+- `main -> prod-stable` preflight has started.
+- Current preflight decision: `preflight-pass-with-conditions`.
+- Next safe action is to decide whether to create a local promotion branch from `origin/prod-stable` and merge `origin/main` into it for branch-specific validation.

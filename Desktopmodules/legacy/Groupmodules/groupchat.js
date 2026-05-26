@@ -411,6 +411,9 @@ async function handleGroupChatMessage(groupId, topicId, userMessage, sendStreamC
     
     const globalVcpSettings = await getVcpGlobalSettings();
     const userNameForMessage = userMessage.name || globalVcpSettings.userName || '用户';
+    const userContentTextBeforeTavern = (userMessage.content && typeof userMessage.content.text === 'string')
+        ? userMessage.content.text
+        : '';
 
     // VCPChatTarven (高级回复) - 收集生效的群聊规则
     const tavernRules = (typeof tavernHandlers.getActiveRules === 'function')
@@ -427,7 +430,7 @@ async function handleGroupChatMessage(groupId, topicId, userMessage, sendStreamC
     // userMessage.content.text is combinedTextContent (user input + non-image file texts)
     // userMessage.originalUserText is the raw user input
     const userOriginalTextForHistory = userMessage.originalUserText ||
-                                     ((userMessage.content && typeof userMessage.content.text === 'string') ? userMessage.content.text : ''); // Fallback if originalUserText is somehow missing
+                                     userContentTextBeforeTavern; // Fallback if originalUserText is somehow missing
 
     // userMessage.attachments from grouprenderer.js now contains full _fileManagerData
     const userMessageEntry = {

@@ -77,11 +77,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    const fillSettingsForm = () => {
-        fastModelInput.value = translatorSettings.models.fast;
-        balancedModelInput.value = translatorSettings.models.balanced;
-        qualityModelInput.value = translatorSettings.models.quality;
-        streamModeToggle.checked = translatorSettings.stream;
+    const fillSettingsForm = (settings = translatorSettings) => {
+        const normalizedSettings = normalizeTranslatorSettings(settings);
+        fastModelInput.value = normalizedSettings.models.fast;
+        balancedModelInput.value = normalizedSettings.models.balanced;
+        qualityModelInput.value = normalizedSettings.models.quality;
+        streamModeToggle.checked = normalizedSettings.stream;
         settingsSaveStatus.textContent = '';
     };
 
@@ -369,8 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     settingsModalBackdrop.addEventListener('click', closeSettingsModal);
     saveSettingsBtn.addEventListener('click', saveTranslatorSettingsFromForm);
     resetSettingsBtn.addEventListener('click', () => {
-        translatorSettings = cloneDefaultSettings();
-        fillSettingsForm();
+        fillSettingsForm(cloneDefaultSettings());
         setSettingsStatus('已恢复默认，点击保存后生效。', 'pending');
     });
 

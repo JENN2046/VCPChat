@@ -50,6 +50,7 @@ const ragHandlers = require('./modules/ipc/ragHandlers'); // Import RAG handlers
 const canvasHandlers = require('./modules/ipc/canvasHandlers'); // Import canvas handlers
 const desktopHandlers = require('./modules/ipc/desktopHandlers'); // Import VCPdesktop handlers
 const desktopRemoteHandlers = require('./modules/ipc/desktopRemoteHandlers'); // Import desktop remote control handlers
+const tavernHandlers = require('./modules/ipc/tavernHandlers'); // Import VCPChatTarven (advanced reply) handlers
 const { PRELOAD_ROLES, resolveProjectPreload } = require('./modules/services/preloadPaths');
 // chokidar is now lazy-loaded
 
@@ -1072,6 +1073,8 @@ if (!gotTheLock) {
         ipcMain.handle('codex-router-host:control', async (event, commandPayload) => {
             return desktopRemoteHandlers.handleCodexRouterHostControl(commandPayload || {});
         });
+        promptHandlers.initialize({ AGENT_DIR, APP_DATA_ROOT_IN_PROJECT });
+        tavernHandlers.initialize({ APP_DATA_ROOT_IN_PROJECT });
 
         ipcMain.on('minimize-to-tray', () => {
             if (mainWindow) {
@@ -1131,6 +1134,13 @@ if (!gotTheLock) {
                 focusedWindow.webContents.toggleDevTools();
             }
         });
+
+        const noteMiniShortcutRegistered = globalShortcut.register('Super+Alt+Z', () => {
+            notesHandlers.createOrFocusNoteMiniWindow();
+        });
+        if (!noteMiniShortcutRegistered) {
+            console.warn('[Main] Failed to register global shortcut: Super+Alt+Z');
+        }
 
         // 移除全局 Command+Q 快捷键，改用标准的应用程序菜单
 

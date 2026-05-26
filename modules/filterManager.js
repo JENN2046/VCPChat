@@ -5,8 +5,19 @@ window.filterManager = (() => {
     let _globalSettingsRef;
 
     // --- Helper Functions to access refs ---
-    const getGlobalSettings = () => _globalSettingsRef.get();
-    const setGlobalSettings = (newSettings) => _globalSettingsRef.set(newSettings);
+    const getGlobalSettings = () => {
+        if (_globalSettingsRef && typeof _globalSettingsRef.get === 'function') {
+            return _globalSettingsRef.get();
+        }
+        return window.globalSettings || {};
+    };
+    const setGlobalSettings = (newSettings) => {
+        if (_globalSettingsRef && typeof _globalSettingsRef.set === 'function') {
+            _globalSettingsRef.set(newSettings);
+        } else {
+            window.globalSettings = newSettings;
+        }
+    };
 
     /**
      * 过滤规则数据结构
@@ -303,7 +314,8 @@ window.filterManager = (() => {
             return null;
         }
 
-        for (const rule of settings.filterRules) {
+        const filterRules = Array.isArray(settings.filterRules) ? settings.filterRules : [];
+        for (const rule of filterRules) {
             if (!rule.enabled) continue;
 
             let matches = false;

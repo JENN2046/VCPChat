@@ -18,11 +18,16 @@ function createOps() {
     const subscribeIpc = (channel, callback, mapper = (_event, ...args) => args) => {
         const listener = (event, ...args) => {
             const mapped = mapper(event, ...args);
-            if (mapped && mapped.__multiArgs === true && Array.isArray(mapped.values)) {
-                callback(...mapped.values);
-                return;
+            try {
+                if (mapped && mapped.__multiArgs === true && Array.isArray(mapped.values)) {
+                    callback(...mapped.values);
+                    return;
+                }
+                callback(mapped);
+            } catch (error) {
+                console.error(`[Preload][chat] subscription callback failed for ${channel}:`, error);
+                throw error;
             }
-            callback(mapped);
         };
 
         ipcRenderer.on(channel, listener);
@@ -429,6 +434,11 @@ function createCatalog(ops) {
         desktopMetricsGetCapabilities: query(() => ops.invoke('desktop-metrics-get-capabilities')),
         desktopMetricsGetDetailedProcesses: query(() => ops.invoke('desktop-metrics-get-detailed-processes')),
         desktopOpenSystemTool: query((cmd) => ops.invoke('desktop-open-system-tool', cmd)),
+
+        // VCPChatTarven (高级回复)
+        tavernGetRules: query(() => ops.invoke('tavern:get-rules')),
+        tavernSaveRules: query((store) => ops.invoke('tavern:save-rules', store)),
+        tavernSetRuleEnabled: query((ruleId, enabled) => ops.invoke('tavern:set-rule-enabled', ruleId, enabled)),
     };
 }
 
@@ -592,7 +602,10 @@ const ALLOWED_KEYS = [
     "desktopLaunchVchatApp",
     "desktopOpenSystemTool",
     "minimizeToTray",
-    "closeApp"
+    "closeApp",
+    "tavernGetRules",
+    "tavernSaveRules",
+    "tavernSetRuleEnabled"
 ];
 
 const ops = createOps();

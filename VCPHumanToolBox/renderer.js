@@ -1,4 +1,6 @@
 // VCPHumanToolBox/renderer.js
+// Enhanced by CodeCC &赵枫 - 2026-04-21
+// 8features: search+filter, hide maid, param folding, timer, retry, copy, form cache, history
 import { tools } from './renderer_modules/config.js';
 import * as canvasHandler from './renderer_modules/ui/canvas-handler.js';
 import * as dynamicImageHandler from './renderer_modules/ui/dynamic-image-handler.js';
@@ -20,6 +22,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     let settings = {};
     let MAX_FILENAME_LENGTH = 400;
     let windowControlsInitialized = false;
+
+    // --- 工具分类映射 ---
+    const TOOL_CATEGORIES = {
+        '多媒体生成': ['ZImageGen','ZImageTurboGen','FluxGen','DoubaoGen','QwenImageGen',
+            'GeminiImageGen','NovelAIGen','ComfyCloudGen','SunoGen',
+            'WanVideoGen','GrokVideoGen','WebUIGen','ComfyUIGen','NanoBananaGen2'],
+        '联网搜索': ['VSearch','TavilySearch','GoogleSearch','SerpSearch',
+            'UrlFetch','BilibiliFetch','FlashDeepSearch','AnimeFinder'],
+        '代码与仓库': ['GitSearch','DeepWikiVCP'],
+        '学术研究': ['PubMedSearch','PaperReader'],
+        '记忆与思考': ['DeepMemo','LightMemo','ThoughtClusterManager',
+            'TopicMemo','TopicSponsor'],
+        '通讯与社区': ['AgentAssistant','AgentDream','AgentMessage','VCPForum'],
+        '占卜与趣味': ['TarotDivination'],
+        '工具与计算': ['SciCalculator','MusicController','VCPAlarm','TableLampRemote'],
+        '文件管理': ['LocalSearchController','ServerSearchController',
+            'PowerShellExecutor','ServerPowerShellExecutor',
+            'CodeSearcher','ServerCodeSearcher'],
+        '日程管理': ['ScheduleManager']
+    };
 
     function initializeWindowControls() {
         if (windowControlsInitialized) return;

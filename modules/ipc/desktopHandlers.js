@@ -23,10 +23,12 @@ let alwaysOnBottomInterval = null;
 
 // --- 鐙珛 Electron App 瀛愯繘绋嬪紩鐢紙闃叉閲嶅鍚姩锛?---
 const standaloneAppProcesses = new Map(); // appDir -> child_process
+let standaloneProcessCleanupRegistered = false;
 
 // --- VChat 鍐呴儴瀛愮獥鍙ｅ崟渚嬪紩鐢?---
 let vchatForumWindow = null;
 let vchatMemoWindow = null;
+let vchatLogWindow = null;
 let vchatTranslatorWindow = null;
 let vchatMusicWindow = null;
 let vchatThemesWindow = null;
@@ -64,6 +66,32 @@ function photoStudioHandlerFailure(code, error, extra = {}) {
             ...extra,
         },
     };
+}
+
+function removeFromOpenChildWindows(win) {
+    if (!win || !openChildWindows) return;
+    const idx = openChildWindows.indexOf(win);
+    if (idx > -1) openChildWindows.splice(idx, 1);
+}
+
+function cleanupStandaloneAppProcesses() {
+    for (const [appDir, child] of standaloneAppProcesses.entries()) {
+        standaloneAppProcesses.delete(appDir);
+        if (!child || child.killed) continue;
+
+        try {
+            process.kill(child.pid, 0);
+        } catch (e) {
+            continue;
+        }
+
+        try {
+            child.kill();
+            console.log(`[DesktopHandlers] Requested standalone app shutdown: ${appDir} (PID: ${child.pid})`);
+        } catch (error) {
+            console.warn(`[DesktopHandlers] Failed to stop standalone app ${appDir}:`, error.message);
+        }
+    }
 }
 
 /**
@@ -384,13 +412,11 @@ function createOrFocusChildWindow(existingWindow, options) {
     });
 
     win.on('closed', () => {
-        if (openChildWindows) {
-            const idx = openChildWindows.indexOf(win);
-            if (idx > -1) openChildWindows.splice(idx, 1);
-        }
-        // 娓呯悊鍗曚緥寮曠敤
+        removeFromOpenChildWindows(win);
+        // 清理单例引用
         if (win === vchatForumWindow) vchatForumWindow = null;
         if (win === vchatMemoWindow) vchatMemoWindow = null;
+        if (win === vchatLogWindow) vchatLogWindow = null;
         if (win === vchatTranslatorWindow) vchatTranslatorWindow = null;
         if (win === vchatThemesWindow) vchatThemesWindow = null;
         if (win === vchatPhotoStudioWindow) vchatPhotoStudioWindow = null;
@@ -465,6 +491,18 @@ function registerManagedWindows() {
         readyTimeoutMs: 10000,
     });
 
+    windowService.register(WINDOW_APP_IDS.NOTE_MINI, {
+        owner: 'notesHandlers',
+        getWindow: () => {
+            const notesHandlers = require('./notesHandlers');
+            return notesHandlers.getNoteMiniWindow();
+        },
+        open: async () => {
+            const notesHandlers = require('./notesHandlers');
+            return notesHandlers.createOrFocusNoteMiniWindow();
+        },
+    });
+
     windowService.register(WINDOW_APP_IDS.MEMO, {
         owner: 'desktopHandlers',
         getWindow: () => vchatMemoWindow || findWindowByUrl('memo.html'),
@@ -502,6 +540,26 @@ function registerManagedWindows() {
                 htmlPath: path.join(app.getAppPath(), 'Desktopmodules', 'legacy', 'Forummodules', 'forum.html'),
             });
             return vchatForumWindow;
+        },
+    });
+
+    windowService.register(WINDOW_APP_IDS.LOG, {
+        owner: 'desktopHandlers',
+        getWindow: () => vchatLogWindow || findWindowByUrl('log.html'),
+        open: async () => {
+            const existingLog = findWindowByUrl('log.html');
+            if (existingLog) {
+                if (!existingLog.isVisible()) existingLog.show();
+                existingLog.focus();
+                vchatLogWindow = existingLog;
+                return existingLog;
+            }
+            vchatLogWindow = createOrFocusChildWindow(vchatLogWindow, {
+                width: 450, height: 820, minWidth: 450, minHeight: 560,
+                title: 'VCP日志中心',
+                htmlPath: path.join(app.getAppPath(), 'Logmodules', 'log.html'),
+            });
+            return vchatLogWindow;
         },
     });
 
@@ -617,10 +675,14 @@ function resolveAppActionToAppId(appAction) {
             return WINDOW_APP_IDS.MAIN;
         case 'open-notes-window':
             return WINDOW_APP_IDS.NOTES;
+        case 'open-note-mini-window':
+            return WINDOW_APP_IDS.NOTE_MINI;
         case 'open-memo-window':
             return WINDOW_APP_IDS.MEMO;
         case 'open-forum-window':
             return WINDOW_APP_IDS.FORUM;
+        case 'open-log-window':
+            return WINDOW_APP_IDS.LOG;
         case 'open-rag-observer-window':
             return WINDOW_APP_IDS.RAG_OBSERVER;
         case 'open-dice-window':
@@ -739,8 +801,8 @@ async function launchStandaloneElectronApp(appDir, displayName) {
         const { spawn } = require('child_process');
         const child = spawn(electronExe, [mainJsPath], {
             cwd: appPath,
-            detached: true,       // 鐙珛杩涚▼锛屼笉闅忕埗杩涚▼閫€鍑?
-            stdio: 'ignore',      // 涓嶇户鎵挎爣鍑咺O
+            detached: false,      // 随父进程退出，避免主程序退出后遗留孤儿 Electron 进程
+            stdio: 'ignore',      // 不继承标准 IO
             env: {
                 ...process.env,
                 // 纭繚瀛愯繘绋嬬煡閬撻」鐩牴鐩綍
@@ -748,10 +810,7 @@ async function launchStandaloneElectronApp(appDir, displayName) {
             },
         });
 
-        // 瑙ｉ櫎鐖惰繘绋嬪瀛愯繘绋嬬殑寮曠敤锛屽厑璁稿瓙杩涚▼鐙珛杩愯
-        child.unref();
-
-        // 璁板綍杩涚▼寮曠敤锛堢敤浜庨槻姝㈤噸澶嶅惎鍔級
+        // 记录进程引用（用于防止重复启动/退出清理）
         standaloneAppProcesses.set(appDir, child);
 
         child.on('exit', (code) => {
@@ -781,6 +840,10 @@ function initialize(params) {
     appSettingsManager = params.settingsManager;
     registerManagedWindows();
 
+    if (!standaloneProcessCleanupRegistered) {
+        app.once('will-quit', cleanupStandaloneAppProcesses);
+        standaloneProcessCleanupRegistered = true;
+    }
 
     // 纭繚鐩綍瀛樺湪
     fs.ensureDirSync(DESKTOP_WIDGETS_DIR);
@@ -2213,10 +2276,13 @@ async function openDesktopWindow() {
 
         // 绐楀彛鑷姩缃簳
         if (desktopGlobalSettings.alwaysOnBottom) {
-            // 寤惰繜涓€灏忔鏃堕棿鍐嶅惎鐢紝纭繚绐楀彛宸插畬鍏ㄦ樉绀?
-            setTimeout(() => {
-                setAlwaysOnBottom(true);
+            // 延迟一小段时间再启用，确保窗口已完全显示
+            const enableAlwaysOnBottomTimer = setTimeout(() => {
+                if (desktopWindow && !desktopWindow.isDestroyed()) {
+                    setAlwaysOnBottom(true);
+                }
             }, 500);
+            desktopWindow.once('closed', () => clearTimeout(enableAlwaysOnBottomTimer));
         }
 
         // 閫氱煡妗岄潰绐楀彛鑷韩杩炴帴鐘舵€?
@@ -2261,10 +2327,7 @@ async function openDesktopWindow() {
         }
         stopBottomHelper();
 
-        if (openChildWindows) {
-            const index = openChildWindows.indexOf(desktopWindow);
-            if (index > -1) openChildWindows.splice(index, 1);
-        }
+        removeFromOpenChildWindows(desktopWindow);
         desktopWindow = null;
         console.log('[Desktop] Desktop window closed.');
         // 閫氱煡涓荤獥鍙ｆ闈㈢敾甯冨凡鍏抽棴
@@ -2286,7 +2349,10 @@ let bottomHwnd = 0;             // 缂撳瓨鐨勭獥鍙ｅ彞鏌?
  */
 function startBottomHelper(hwnd) {
     if (process.platform !== 'win32') return;
-    if (bottomHelperProcess) return; // 宸插惎鍔?
+    if (bottomHelperProcess) {
+        bottomHwnd = hwnd;
+        return; // 已启动，仅更新目标窗口句柄
+    }
 
     bottomHwnd = hwnd;
 
@@ -2339,11 +2405,13 @@ Write-Host "VCPREADY"
         bottomHelperProcess.on('exit', (code) => {
             console.log(`[Desktop] Bottom helper process exited with code ${code}`);
             bottomHelperProcess = null;
+            bottomHwnd = 0;
         });
 
         bottomHelperProcess.on('error', (err) => {
             console.error('[Desktop] Bottom helper process error:', err.message);
             bottomHelperProcess = null;
+            bottomHwnd = 0;
         });
 
     } catch (e) {
@@ -2357,9 +2425,21 @@ Write-Host "VCPREADY"
  */
 function stopBottomHelper() {
     if (bottomHelperProcess) {
+        const processRef = bottomHelperProcess;
         try {
-            bottomHelperProcess.stdin.write('exit\n');
-            bottomHelperProcess.stdin.end();
+            if (processRef.stdin && !processRef.stdin.destroyed) {
+                processRef.stdin.write('exit\n');
+                processRef.stdin.end();
+            }
+        } catch (e) { /* ignore */ }
+        try {
+            if (!processRef.killed) {
+                setTimeout(() => {
+                    try {
+                        if (!processRef.killed) processRef.kill();
+                    } catch (e) { /* ignore */ }
+                }, 500).unref?.();
+            }
         } catch (e) { /* ignore */ }
         bottomHelperProcess = null;
     }
@@ -2397,7 +2477,8 @@ function setAlwaysOnBottom(enabled) {
 
     // 绉婚櫎涔嬪墠鐨?focus 浜嬩欢鐩戝惉鍣?
     desktopWindow.removeAllListeners('focus');
-    // 閲嶆柊娉ㄥ唽蹇呰鐨?focus 鐩戝惉锛堝鏋滄湁鍏朵粬妯″潡闇€瑕佺殑璇濆彲浠ュ湪杩欓噷鎭㈠锛?
+    // 重新注册必要的 focus 监听（如果有其他模块需要的话可以在这里恢复）：
+    stopBottomHelper();
 
     if (enabled) {
         console.log('[Desktop] Enabling always-on-bottom mode');
@@ -2431,10 +2512,11 @@ function setAlwaysOnBottom(enabled) {
         // 褰撶獥鍙ｈ幏寰楃劍鐐规椂锛岀珛鍗冲皢鍏舵帹鍒板簳閮?
         desktopWindow.on('focus', () => {
             if (!alwaysOnBottomEnabled) return;
-            // 鐭殏寤惰繜鍚庝笅娌?
-            setTimeout(() => {
+            // 短暂延迟后下沉
+            const focusPushTimer = setTimeout(() => {
                 pushToBottom();
             }, 50);
+            desktopWindow.once('closed', () => clearTimeout(focusPushTimer));
         });
 
         // 瀹氭椂寮哄埗缃簳锛堟瘡 1.5 绉掓墽琛屼竴娆★紝纭繚鎸佺画鍦ㄥ簳灞傦級
@@ -2447,8 +2529,9 @@ function setAlwaysOnBottom(enabled) {
             pushToBottom();
         }, 1500);
 
-        // 鍒濆涓嬫矇锛堝欢杩?200ms 纭繚 PowerShell 杩涚▼宸插垵濮嬪寲锛?
-        setTimeout(() => pushToBottom(), 200);
+        // 初始下沉（延迟 200ms 确保 PowerShell 进程已初始化）：
+        const initialPushTimer = setTimeout(() => pushToBottom(), 200);
+        desktopWindow.once('closed', () => clearTimeout(initialPushTimer));
 
     } else {
         console.log('[Desktop] Disabling always-on-bottom mode');
@@ -2486,4 +2569,5 @@ module.exports = {
     pushToDesktop,
     getDesktopWindow,
     generateCatalog,
+    cleanupStandaloneAppProcesses,
 };

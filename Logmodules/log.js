@@ -190,7 +190,7 @@ async function initAuthAndServer() {
             return;
         }
 
-        apiAuthHeader = `Basic ${btoa(`${forumConfig.username}:${forumConfig.password}`)}`;
+        apiAuthHeader = createBasicAuthHeader(forumConfig.username, forumConfig.password);
         setStatus('已连接配置，准备读取日志');
     } catch (error) {
         console.error('[LogCenter] Init failed:', error);
@@ -237,6 +237,7 @@ async function fetchLog({ incremental, silent }) {
 
         if (data.needFullReload) {
             currentOffset = 0;
+            isLoading = false;
             await fetchLog({ incremental: false, silent: true });
             return;
         }
@@ -495,6 +496,15 @@ function formatBytes(bytes) {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function createBasicAuthHeader(username, password) {
+    const bytes = new TextEncoder().encode(`${username}:${password}`);
+    let binary = '';
+    bytes.forEach((byte) => {
+        binary += String.fromCharCode(byte);
+    });
+    return `Basic ${btoa(binary)}`;
 }
 
 function escapeHtml(value) {

@@ -35,6 +35,27 @@ const DEFAULT_DOWNLOAD_DIR = resolveConfiguredPath(process.env.DEFAULT_DOWNLOAD_
 const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 const ENABLE_RECURSIVE_OPERATIONS = process.env.ENABLE_RECURSIVE_OPERATIONS !== 'false';
 const ENABLE_HIDDEN_FILES = process.env.ENABLE_HIDDEN_FILES === 'true';
+const EXTRACTED_CONTENT_EXTENSIONS = new Set([
+  '.pdf',
+  '.docx',
+  '.xlsx',
+  '.xls',
+  '.csv',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.mp3',
+  '.wav',
+  '.ogg',
+  '.flac',
+  '.aac',
+  '.m4a',
+  '.mp4',
+  '.webm',
+  '.mov',
+]);
 
 // Utility functions
 function debugLog(message, data = null) {
@@ -127,6 +148,22 @@ function createLineEndingHelper(content) {
     hasCRLF,
     lineEnding: JSON.stringify(lineEnding)
   };
+}
+
+function assertApplyDiffTextTarget(filePath, fileBuffer) {
+  const extension = path.extname(filePath).toLowerCase();
+  if (EXTRACTED_CONTENT_EXTENSIONS.has(extension)) {
+    throw new Error('ApplyDiff cannot be used on extracted content (PDF, DOCX, Excel, CSV, Images, Audio, Video, etc.). It only works on plain text files.');
+  }
+
+  if (fileBuffer.includes(0)) {
+    throw new Error('ApplyDiff cannot be used on binary files. It only works on plain text files.');
+  }
+
+  const sample = fileBuffer.subarray(0, Math.min(fileBuffer.length, 8192)).toString('utf8');
+  if (sample.includes('\uFFFD')) {
+    throw new Error('ApplyDiff cannot be used on files that do not decode cleanly as UTF-8 text.');
+  }
 }
 
 function isPathAllowed(targetPath, operationType = 'generic') {
@@ -1241,7 +1278,9 @@ async function applyDiff(parameters) {
       throw new Error(`File too large: ${formatFileSize(stats.size)} exceeds limit of ${formatFileSize(MAX_FILE_SIZE)}`);
     }
 
-    const originalContent = await fs.readFile(resolvedPath, encoding);
+    const originalBuffer = await fs.readFile(resolvedPath);
+    assertApplyDiffTextTarget(resolvedPath, originalBuffer);
+    const originalContent = originalBuffer.toString(encoding);
     const helper = createLineEndingHelper(originalContent);
 
     debugLog('ApplyDiff line ending', {

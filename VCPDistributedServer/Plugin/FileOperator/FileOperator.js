@@ -299,7 +299,7 @@ function resolveAndNormalizePath(inputPath) {
 
   if (!startsWithDot && !startsWithDotDot) {
     // Treat plain relative paths like "foo/bar" as project-root relative.
-    return path.resolve(__dirname, '..', '..', normalized);
+    return path.resolve(roots.workspaceRoot, normalized);
   }
 
   // Treat explicit relative paths like "./foo" or "../foo" as FileOperator-relative.

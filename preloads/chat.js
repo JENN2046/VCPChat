@@ -18,11 +18,16 @@ function createOps() {
     const subscribeIpc = (channel, callback, mapper = (_event, ...args) => args) => {
         const listener = (event, ...args) => {
             const mapped = mapper(event, ...args);
-            if (mapped && mapped.__multiArgs === true && Array.isArray(mapped.values)) {
-                callback(...mapped.values);
-                return;
+            try {
+                if (mapped && mapped.__multiArgs === true && Array.isArray(mapped.values)) {
+                    callback(...mapped.values);
+                    return;
+                }
+                callback(mapped);
+            } catch (error) {
+                console.error(`[Preload][chat] subscription callback failed for ${channel}:`, error);
+                throw error;
             }
-            callback(mapped);
         };
 
         ipcRenderer.on(channel, listener);

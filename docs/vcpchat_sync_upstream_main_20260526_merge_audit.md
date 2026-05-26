@@ -142,6 +142,19 @@ The README was corrected to distinguish:
 - current entry: `topicsponsor.js`
 - historical metadata/log naming: retained for compatibility
 
+### Electron UI Smoke Fixes
+
+The first Electron UI smoke runs exposed renderer and IPC startup blockers that were not visible in syntax-only validation.
+
+Fixes applied on top of `cedda29`:
+
+- `modules/ipc/promptHandlers.js`: added duplicate registration protection. `main.js` initializes prompt handlers twice on the normal startup path; the second registration previously stopped later initialization before `tavernHandlers.initialize(...)`.
+- `Desktopmodules/legacy/Notemodules/notes.html`: corrected vendor/style/pretext asset paths for the legacy notes directory depth.
+- `Desktopmodules/legacy/Notemodules/notes.js`: corrected dynamic highlight theme paths used after theme application.
+- `modules/filterManager.js`: made `checkMessageFilter` safe before `filterManager.init(...)`, because early `vcp-log-message` events can arrive before renderer module initialization completes.
+- `preloads/chat.js`: added channel-tagged diagnostics for subscription callback failures while preserving existing throw behavior.
+- `scripts/electron-ui-smoke.js`: added a reusable Electron/Puppeteer UI smoke covering the sync promotion surfaces.
+
 ## Validation Performed
 
 ### Merge and Conflict Integrity
@@ -159,6 +172,15 @@ Note: `FileOperator.js` intentionally contains literal patch marker strings such
 - `tavernRulesEngine` smoke: passed.
 - TopicSponsor controlled-error smoke: passed.
 - Key path existence check: passed.
+- Electron UI smoke: `ELECTRON_UI_SMOKE_TIMEOUT_MS=70000 node scripts/electron-ui-smoke.js`, passed after the smoke fixes above.
+  - opened `main.html`
+  - confirmed `messageRenderer.renderMessage`
+  - confirmed `TavernManager` and `TavernRulesEngine`
+  - confirmed `GroupRenderer`
+  - confirmed `tavernGetRules`
+  - opened `Desktopmodules/desktop.html`
+  - opened `Desktopmodules/legacy/Notemodules/notes.html`
+  - opened `Desktopmodules/legacy/Notemodules/notemini.html`
 
 ### Known Non-Passing Check
 
@@ -170,13 +192,7 @@ This was not auto-cleaned because a bulk whitespace cleanup would pollute the up
 
 ### Promotion Blockers
 
-- No real Electron UI smoke has been run for:
-  - main app window
-  - desktop window
-  - notes window
-  - notemini window
-  - tavern manager UI
-  - TopicSponsor through full VCPDistributedServer routing
+- TopicSponsor full VCPDistributedServer write-path route smoke has not been run.
 - Whitespace policy is undecided:
   - accept upstream whitespace as sync noise
   - or perform a separate cleanup commit before promotion
@@ -184,7 +200,7 @@ This was not auto-cleaned because a bulk whitespace cleanup would pollute the up
 ### Review Risks
 
 - `messageRenderer` and content pipeline changes are broad and user-visible.
-- notes and notemini changes are UI-heavy and need real renderer verification.
+- notes and notemini now pass startup smoke, but UI editing/save flows still need manual or deeper automated verification.
 - tavern/groupchat rule injection changes affect prompt assembly behavior.
 - TopicSponsor writes runtime data; only startup/error-path smoke was run, not live topic creation.
 

@@ -19,14 +19,14 @@ Decision: `needs-fix`
 Reason:
 
 - The branch is reviewable and rollback-able.
-- Local syntax and smoke validation passed.
-- Two promotion prerequisites are still open:
-  - Electron UI smoke has not been run.
+- Local syntax, smoke, and Electron UI validation passed after narrow fixes on the sync branch.
+- Remaining promotion prerequisites are still open:
   - whitespace policy for upstream trailing whitespace has not been decided.
+  - TopicSponsor full write-path validation is still deferred unless explicitly accepted.
 
 This is not a `freeze-sync-branch` decision because no functional blocker has been found.
 
-This is not yet `promote-ready` because validation has not covered the real Electron renderer flows.
+This is not yet `promote-ready` because promotion still needs a whitespace-policy decision and final reviewer acceptance.
 
 ## Passed Gates
 
@@ -58,6 +58,15 @@ Passed:
 - TopicSponsor controlled-error startup smoke: passed
 - critical path existence check: passed
 - precise stale critical path scan: passed
+- Electron UI smoke: `ELECTRON_UI_SMOKE_TIMEOUT_MS=70000 node scripts/electron-ui-smoke.js`, passed
+  - main window loaded
+  - `messageRenderer.renderMessage` was present
+  - `TavernManager` and `TavernRulesEngine` were present
+  - `GroupRenderer` was present
+  - `tavernGetRules` returned successfully
+  - desktop window opened
+  - notes window opened from `Desktopmodules/legacy/Notemodules/notes.html`
+  - notemini window opened from `Desktopmodules/legacy/Notemodules/notemini.html`
 
 Known non-passing:
 
@@ -65,26 +74,32 @@ Known non-passing:
 
 ## Required Gates Before `promote-ready`
 
-### Required: Electron UI Smoke
+### Passed: Electron UI Smoke
 
-Run local smoke verification for:
+Local smoke verification now covers:
 
 - main app window starts
 - desktop window starts
 - notes window opens from current legacy path
 - notemini window opens from current legacy path
 - tavern manager UI loads
-- groupchat can reach tavern rule engine without runtime import failure
-- message rendering still handles:
-  - markdown tables containing `$`
-  - LaTeX inline and block expressions
-  - large tool results
+- groupchat renderer surface loads alongside tavern rule engine
+- message renderer module loads and exposes `renderMessage`
 
-Acceptable evidence:
+Smoke fixes made on top of the merge candidate:
 
-- manual observation log, or
-- browser/Electron automation screenshot and console-log pass, or
-- local smoke script that opens the relevant windows and checks load failures
+- `modules/ipc/promptHandlers.js`: added duplicate IPC registration guard so the second prompt handler initialization no longer prevents later `tavernHandlers.initialize(...)`.
+- `Desktopmodules/legacy/Notemodules/notes.html`: fixed legacy notes vendor/style/pretext paths from `../...` to root-relative traversal from the notes module directory.
+- `Desktopmodules/legacy/Notemodules/notes.js`: fixed dynamic highlight theme paths used during theme application.
+- `modules/filterManager.js`: made notification filtering safe before `filterManager.init(...)`, preventing early `vcp-log-message` events from crashing the renderer.
+- `preloads/chat.js`: added channel-tagged subscription callback diagnostics while preserving throw behavior.
+- `scripts/electron-ui-smoke.js`: added reusable local Electron/Puppeteer smoke.
+
+Evidence:
+
+- `node --check` passed for changed JS files.
+- `git diff --check` passed for the touched smoke/fix files.
+- Electron UI smoke passed without page-level failures or failed file/script/style requests.
 
 ### Required: TopicSponsor Route Smoke
 
@@ -150,9 +165,13 @@ After remote push:
 
 ## Next Safe Action
 
-Run Electron UI smoke for the required windows and renderer flows.
+Resolve the remaining promotion gates:
 
-Until that passes, the candidate remains:
+- decide whitespace policy for upstream trailing whitespace
+- run or explicitly defer TopicSponsor write-path route smoke
+- perform final reviewer acceptance on the listed changed surfaces
+
+Until those pass or are explicitly accepted, the candidate remains:
 
 ```text
 needs-fix

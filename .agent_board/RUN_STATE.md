@@ -42,4 +42,5 @@ Stable closeout:
 - New `origin/prod-stable`: `e593ea759ba4d535620cd764f939f3503c90492e`.
 - Final promotion branch head: `a60a195`.
 - PR #42 backflowed stable-only fixes into `origin/main` as `642256b9919f0574ff81eba96895717886ad5d03`.
-- Decision: `upstream-sync-absorbed-to-stable`.
+- Branch asset table prepared in `docs/vcpchat_branch_asset_table_20260526.md`.
+- Decision: `upstream-sync-absorbed-to-stable-and-backflowed`.

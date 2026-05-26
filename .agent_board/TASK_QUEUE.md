@@ -29,13 +29,16 @@ Done:
 - Merged PR #41 into `prod-stable`.
 - Recorded stable closeout.
 - Backflowed PR #41 stable-only fixes into `main` via PR #42.
+- Created branch asset table.
 
 In progress:
 
-- None.
+- Governance docs PR to `main`.
 
 Remaining:
 
+- Push `docs/branch-governance-closeout-20260526`.
+- Open docs-only PR to `main`.
 - Decide whether to observe `main` before stable promotion.
 - Decide whether to add `Logmodules/log.js` and `modules/ipc/notesHandlers.js` to CI path filters in a future hygiene task.
 - Decide whether to keep, rename, or clean up `promotion/upstream-main-20260526` after the stable decision.

@@ -38,5 +38,6 @@ Next:
 - Current preflight decision: `promotion-branch-validated-with-accepted-whitespace-risk`.
 - PR #41 was merged into `origin/prod-stable` as `e593ea7`.
 - PR #42 backflowed the PR #41 stable-only fixes into `origin/main` as `642256b`.
-- Final closeout decision: `upstream-sync-absorbed-to-stable`.
-- Next safe action is optional hygiene: CI path-filter coverage and branch cleanup.
+- Branch asset table created.
+- Final closeout decision: `upstream-sync-absorbed-to-stable-and-backflowed`.
+- Next safe action is opening a docs-only PR to `main`.

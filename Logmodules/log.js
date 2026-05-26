@@ -365,24 +365,45 @@ function getVisibleLines() {
 function decorateLogLine(line) {
     const escaped = escapeHtml(line);
     const levelMatch = escaped.match(/\[(LOG|INFO|WARN|WARNING|ERROR|FATAL|DEBUG)\]/i);
-    let result = escaped;
+    const highlighted = currentFilter ? highlightTerm(line, currentFilter) : escaped;
 
-    if (levelMatch) {
-        const level = levelMatch[1].toLowerCase();
-        result = result.replace(levelMatch[0], `<span class="log-level level-${level}">${levelMatch[0]}</span>`);
-    }
+    if (!levelMatch) return highlighted;
 
-    if (currentFilter) {
-        result = highlightTerm(result, currentFilter);
-    }
+    const levelText = levelMatch[0];
+    const level = levelMatch[1].toLowerCase();
+    const levelStart = line.toLowerCase().indexOf(levelText.toLowerCase());
+    if (levelStart === -1) return highlighted;
 
-    return result;
+    const beforeLevel = line.slice(0, levelStart);
+    const afterLevel = line.slice(levelStart + levelText.length);
+    const beforeHtml = currentFilter ? highlightTerm(beforeLevel, currentFilter) : escapeHtml(beforeLevel);
+    const levelHtml = currentFilter ? highlightTerm(levelText, currentFilter) : escapeHtml(levelText);
+    const afterHtml = currentFilter ? highlightTerm(afterLevel, currentFilter) : escapeHtml(afterLevel);
+
+    return `${beforeHtml}<span class="log-level level-${level}">${levelHtml}</span>${afterHtml}`;
 }
 
-function highlightTerm(html, term) {
-    const safeTerm = escapeRegExp(escapeHtml(term));
-    if (!safeTerm) return html;
-    return html.replace(new RegExp(safeTerm, 'ig'), (match) => `<span class="keyword-hit">${match}</span>`);
+function highlightTerm(text, term) {
+    const safeTerm = escapeRegExp(term);
+    if (!safeTerm) return escapeHtml(text);
+    const pattern = new RegExp(safeTerm, 'ig');
+    const source = String(text || '');
+    let result = '';
+    let lastIndex = 0;
+    let match;
+
+    while ((match = pattern.exec(source)) !== null) {
+        result += escapeHtml(source.slice(lastIndex, match.index));
+        result += `<span class="keyword-hit">${escapeHtml(match[0])}</span>`;
+        lastIndex = pattern.lastIndex;
+
+        if (match[0].length === 0) {
+            pattern.lastIndex += 1;
+        }
+    }
+
+    result += escapeHtml(source.slice(lastIndex));
+    return result;
 }
 
 function splitLogLines(content) {

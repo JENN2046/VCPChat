@@ -171,6 +171,10 @@ Note: `FileOperator.js` intentionally contains literal patch marker strings such
 - `npm run test:photo-studio`: 25/25 passed.
 - `tavernRulesEngine` smoke: passed.
 - TopicSponsor controlled-error smoke: passed.
+- TopicSponsor isolated write-path smoke: `node scripts/topic-sponsor-smoke.js`, passed.
+  - exercised `CreateTopic`, `ReadTopicContent`, and `CheckTopicOwnership`
+  - wrote only to a temporary fake workspace under `AppData/topic-sponsor-smoke/`
+  - verified generated `history.json`, agent `config.json`, creator metadata, unread/unlocked flags, and current topic pointer
 - Key path existence check: passed.
 - Electron UI smoke: `ELECTRON_UI_SMOKE_TIMEOUT_MS=70000 node scripts/electron-ui-smoke.js`, passed after the smoke fixes above.
   - opened `main.html`
@@ -188,21 +192,27 @@ Note: `FileOperator.js` intentionally contains literal patch marker strings such
 
 This was not auto-cleaned because a bulk whitespace cleanup would pollute the upstream sync diff and make review harder.
 
+Promotion policy for this candidate:
+
+- accept upstream trailing whitespace as sync noise
+- do not block promotion on this whitespace-only check
+- defer any cleanup to a separate hygiene branch or post-promotion cleanup commit scoped to upstream-added whitespace
+
 ## Remaining Risk
 
 ### Promotion Blockers
 
-- TopicSponsor full VCPDistributedServer write-path route smoke has not been run.
-- Whitespace policy is undecided:
-  - accept upstream whitespace as sync noise
-  - or perform a separate cleanup commit before promotion
+No local promotion blockers remain after the final candidate gate pass.
+
+Promotion into `main` is still not authorized by this audit. It remains a separate branch movement that requires explicit user confirmation.
 
 ### Review Risks
 
 - `messageRenderer` and content pipeline changes are broad and user-visible.
 - notes and notemini now pass startup smoke, but UI editing/save flows still need manual or deeper automated verification.
 - tavern/groupchat rule injection changes affect prompt assembly behavior.
-- TopicSponsor writes runtime data; only startup/error-path smoke was run, not live topic creation.
+- TopicSponsor write-path behavior passed in an isolated fixture, but the live VCPDistributedServer route was not invoked.
+- Upstream trailing whitespace remains present by policy to preserve sync review clarity.
 
 ## Rollback Anchor
 

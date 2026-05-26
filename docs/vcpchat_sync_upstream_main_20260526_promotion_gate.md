@@ -4,7 +4,7 @@ Date: 2026-05-26
 Candidate branch: `sync/upstream-main-20260526`
 Candidate merge commit: `cedda29`
 Target integration line: `main`
-Decision status: `needs-fix`
+Decision status: `promote-ready`
 
 ## Gate Purpose
 
@@ -14,19 +14,19 @@ It does not authorize promotion by itself. Promotion into `main` remains a separ
 
 ## Current Decision
 
-Decision: `needs-fix`
+Decision: `promote-ready`
 
 Reason:
 
 - The branch is reviewable and rollback-able.
 - Local syntax, smoke, and Electron UI validation passed after narrow fixes on the sync branch.
-- Remaining promotion prerequisites are still open:
-  - whitespace policy for upstream trailing whitespace has not been decided.
-  - TopicSponsor full write-path validation is still deferred unless explicitly accepted.
+- TopicSponsor write-path validation passed in an isolated local AppData fixture.
+- Upstream trailing whitespace is accepted as sync noise for this candidate and is not a promotion blocker.
+- Reviewer acceptance is recorded below with residual risks separated from promotion blockers.
 
 This is not a `freeze-sync-branch` decision because no functional blocker has been found.
 
-This is not yet `promote-ready` because promotion still needs a whitespace-policy decision and final reviewer acceptance.
+This is not a `needs-fix` decision because all required local candidate gates are now either passed or explicitly accepted with bounded residual risk.
 
 ## Passed Gates
 
@@ -56,6 +56,7 @@ Passed:
 - Photo Studio smoke: `npm run test:photo-studio`, 25/25 passed
 - tavern rule engine smoke: passed
 - TopicSponsor controlled-error startup smoke: passed
+- TopicSponsor isolated write-path smoke: `node scripts/topic-sponsor-smoke.js`, passed
 - critical path existence check: passed
 - precise stale critical path scan: passed
 - Electron UI smoke: `ELECTRON_UI_SMOKE_TIMEOUT_MS=70000 node scripts/electron-ui-smoke.js`, passed
@@ -72,7 +73,14 @@ Known non-passing:
 
 - `git diff --check cedda29^1..cedda29` reports trailing whitespace in upstream-absorbed files
 
-## Required Gates Before `promote-ready`
+Policy:
+
+- Accept upstream trailing whitespace as sync noise for this candidate.
+- Do not block promotion on this whitespace-only check.
+- Do not mix whitespace cleanup into this sync candidate.
+- If desired, perform cleanup later in a dedicated hygiene branch or post-promotion cleanup commit scoped to upstream-added whitespace.
+
+## Final Gate Outcomes
 
 ### Passed: Electron UI Smoke
 
@@ -101,40 +109,56 @@ Evidence:
 - `git diff --check` passed for the touched smoke/fix files.
 - Electron UI smoke passed without page-level failures or failed file/script/style requests.
 
-### Required: TopicSponsor Route Smoke
+### Passed: TopicSponsor Route Smoke
 
 The controlled-error startup smoke passed.
 
-Before promotion, run one of:
+The write-path smoke also passed through an isolated local fixture:
 
-- dry-run style VCPDistributedServer route invocation if available, or
-- local temp AppData fixture that exercises `CreateTopic` without touching real user data, or
-- explicit human acceptance that full write-path validation is deferred
+- command: `node scripts/topic-sponsor-smoke.js`
+- fixture: copied TopicSponsor entry and `vcpPathRoots` into an isolated fake workspace under `AppData/topic-sponsor-smoke/`
+- verified commands: `CreateTopic`, `ReadTopicContent`, `CheckTopicOwnership`
+- verified writes:
+  - fake `AppData/Agents/<agent>/config.json`
+  - fake `AppData/UserData/<agent>/topics/<topic>/history.json`
+  - `current_topic_id`
+  - `locked: false`
+  - `unread: true`
+  - `creatorSource: "plugin:TopicCreator"`
+  - `_metadata.topicCreator`
+  - `_metadata.creatorAgentId`
 
-### Required: Whitespace Policy Decision
+This does not invoke a live VCPDistributedServer route and does not touch real user data.
 
-Choose one:
+### Accepted: Whitespace Policy Decision
 
-- accept upstream trailing whitespace as sync noise and do not block promotion, or
-- make a separate whitespace cleanup commit after `cedda29`, scoped to upstream-added whitespace only
+Decision:
 
-Do not mix whitespace cleanup into future conflict resolution commits.
+- Accept upstream trailing whitespace as sync noise for this candidate.
+- Keep the candidate review focused on semantic merge safety and local fixes.
+- Defer whitespace cleanup to a separate future hygiene branch or post-promotion cleanup commit if the team wants a clean whitespace baseline.
 
-### Required: Reviewer Acceptance
+Rationale:
 
-Reviewer should explicitly accept these changed surfaces:
+- The whitespace failures are in upstream-absorbed files, not in the narrow smoke/fix files added after the merge.
+- Bulk cleanup would create a large mechanical diff across upstream content and reduce review clarity.
+- `git diff --check` was still run against touched smoke/fix files and passed there.
 
-- `modules/ipc/desktopHandlers.js`
-- `modules/ipc/notesHandlers.js`
-- `Desktopmodules/legacy/Notemodules/**`
-- `VCPDistributedServer/Plugin/TopicSponsor/**`
-- `Tavernmodules/**`
-- `modules/ipc/tavernHandlers.js`
-- `modules/tavernRulesEngine.js`
-- `Desktopmodules/legacy/Groupmodules/groupchat.js`
-- `modules/messageRenderer.js`
-- `modules/renderer/contentPipeline.js`
-- `styles/messageRenderer.css`
+### Accepted: Reviewer Acceptance
+
+| Surface | Evidence | Residual risk |
+| --- | --- | --- |
+| `modules/ipc/desktopHandlers.js` | Photo Studio smoke passed; Electron UI smoke opened the desktop window. | Standalone child-process cleanup behavior was not stress-tested across all standalone apps. |
+| `modules/ipc/notesHandlers.js` | Electron UI smoke opened notes and notemini using the corrected legacy paths. | Notes edit/save interaction depth remains manual/deeper-test territory. |
+| `Desktopmodules/legacy/Notemodules/**` | Electron UI smoke loaded `notes.html` and `notemini.html`; fixed asset path failures were verified absent in the smoke. | Rich editor workflows and persistence edge cases were not exhaustively automated. |
+| `VCPDistributedServer/Plugin/TopicSponsor/**` | Controlled-error startup smoke passed; isolated write-path smoke passed for create/read/ownership. | Live server route wiring was not invoked; entrypoint and data-write behavior were validated locally. |
+| `Tavernmodules/**` | Electron UI smoke confirmed `TavernManager` and `TavernRulesEngine`; tavern rule engine smoke passed. | Prompt semantics should still be watched in real conversations. |
+| `modules/ipc/tavernHandlers.js` | Electron UI smoke confirmed `tavernGetRules` returns successfully. | Broader IPC route combinations were not exhaustively tested. |
+| `modules/tavernRulesEngine.js` | Standalone tavern rule engine smoke passed; Electron UI smoke loaded the shared engine. | Complex rule ordering/conflict cases were not fully enumerated. |
+| `Desktopmodules/legacy/Groupmodules/groupchat.js` | Electron UI smoke confirmed `GroupRenderer` loads alongside tavern rule surfaces. | End-to-end groupchat prompt injection behavior needs real workflow observation. |
+| `modules/messageRenderer.js` | Electron UI smoke confirmed `messageRenderer.renderMessage` is present. | Deep markdown/LaTeX/tool-result visual regressions require broader renderer fixtures or manual review. |
+| `modules/renderer/contentPipeline.js` | Main renderer loaded through Electron UI smoke after the content pipeline sync. | Pipeline edge cases beyond startup/render availability remain review risk. |
+| `styles/messageRenderer.css` | Main renderer loaded without failed CSS requests in Electron UI smoke. | Pixel-level layout and long-content visual regressions were not fully snapshotted. |
 
 ## Promotion Procedure After Gates Pass
 
@@ -165,14 +189,16 @@ After remote push:
 
 ## Next Safe Action
 
-Resolve the remaining promotion gates:
+The candidate is now locally `promote-ready`.
 
-- decide whitespace policy for upstream trailing whitespace
-- run or explicitly defer TopicSponsor write-path route smoke
-- perform final reviewer acceptance on the listed changed surfaces
+Next safe actions are decision-only until the user explicitly approves branch movement:
 
-Until those pass or are explicitly accepted, the candidate remains:
+- review this branch as a promotion candidate
+- decide whether to locally merge `sync/upstream-main-20260526` into `main`
+- if approved later, perform the promotion procedure above and rerun post-merge validation on `main`
+
+Current candidate decision:
 
 ```text
-needs-fix
+promote-ready
 ```

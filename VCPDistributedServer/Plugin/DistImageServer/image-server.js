@@ -4,12 +4,12 @@ const fs = require('fs');
 
 function registerRoutes(app, pluginConfig, projectBasePath) {
     const debugMode = pluginConfig.DebugMode || false;
-    const imageKey = pluginConfig.DIST_IMAGE_KEY;
+    const imageKey = typeof pluginConfig.DIST_IMAGE_KEY === 'string' ? pluginConfig.DIST_IMAGE_KEY.trim() : '';
     const imagePath = pluginConfig.DIST_IMAGE_PATH;
     const fallbackImagePath = path.resolve(projectBasePath, '..', 'AppData', 'UserData', 'attachments');
 
-    if (!imageKey || !imagePath) {
-        console.error('[DistImageServer] Error: config.env is missing DIST_IMAGE_KEY or DIST_IMAGE_PATH.');
+    if (imageKey.length < 16 || !imagePath) {
+        console.error('[DistImageServer] Error: config.env must set DIST_IMAGE_KEY to a unique value of at least 16 characters and set DIST_IMAGE_PATH before enabling this service.');
         return;
     }
 

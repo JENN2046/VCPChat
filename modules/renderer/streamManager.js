@@ -27,6 +27,97 @@ const DESKTOP_PUSH_START = '<<<[DESKTOP_PUSH]>>>';
 const DESKTOP_PUSH_END = '<<<[DESKTOP_PUSH_END]>>>';
 const CODE_FENCE = '```';
 
+const STREAM_BLOCK_TAG_REGEX = /^(P|DIV|UL|OL|LI|PRE|BLOCKQUOTE|H[1-6]|TABLE|TR|FIGURE)$/;
+const STREAM_PRESERVED_BLOCK_CLASSES = [
+    'vcp-tool-use-bubble',
+    'vcp-tool-result-bubble',
+    'maid-diary-bubble',
+    'vcp-thought-chain-bubble',
+    'vcp-role-divider',
+    'mermaid',
+    'katex',
+    'vcp-html-preview-container'
+];
+const STREAM_PRESERVED_CHILD_ATTRS = [
+    'data-vcp-preserve-children',
+    'data-vcp-rendered',
+    'data-vcp-html-preview'
+];
+
+function hasAnyClass(el, classNames) {
+    return !!el?.classList && classNames.some(className => el.classList.contains(className));
+}
+
+function hasAnyAttribute(el, attrNames) {
+    return !!el?.hasAttribute && attrNames.some(attrName => el.hasAttribute(attrName));
+}
+
+function shouldPreserveStreamElement(fromEl, toEl) {
+    if (!fromEl || fromEl.nodeType !== 1) return false;
+
+    if (hasAnyClass(fromEl, STREAM_PRESERVED_BLOCK_CLASSES)) {
+        return true;
+    }
+
+    if (hasAnyAttribute(fromEl, STREAM_PRESERVED_CHILD_ATTRS)) {
+        return true;
+    }
+
+    // 后处理后的代码高亮节点会带 hljs 类，流式下一帧不应反复重写其内部结构。
+    if (fromEl.tagName === 'CODE' && fromEl.classList.contains('hljs')) {
+        return true;
+    }
+
+    // KaTeX 通常会生成复杂嵌套 DOM，保留已处理结果，等待最终完整渲染统一刷新。
+    if (fromEl.closest?.('.katex')) {
+        return true;
+    }
+
+    return false;
+}
+
+function shouldSkipStreamChildren(fromEl, toEl) {
+    if (!fromEl || fromEl.nodeType !== 1) return false;
+
+    if (hasAnyClass(fromEl, STREAM_PRESERVED_BLOCK_CLASSES)) {
+        return true;
+    }
+
+    if (hasAnyAttribute(fromEl, STREAM_PRESERVED_CHILD_ATTRS)) {
+        return true;
+    }
+
+    if (fromEl.tagName === 'PRE' && fromEl.dataset.rawContent) {
+        return true;
+    }
+
+    return false;
+}
+
+function preserveDynamicStreamState(fromEl, toEl) {
+    if (!fromEl || !toEl || fromEl.nodeType !== 1 || toEl.nodeType !== 1) return;
+
+    if (fromEl.classList.contains('expanded')) {
+        toEl.classList.add('expanded');
+    }
+
+    if (fromEl.classList.contains('preview-mode')) {
+        toEl.classList.add('preview-mode');
+    }
+
+    if (fromEl.dataset.vcpInteractive === 'true') {
+        toEl.dataset.vcpInteractive = 'true';
+    }
+
+    if (fromEl.dataset.vcpBlockType) {
+        toEl.dataset.vcpBlockType = fromEl.dataset.vcpBlockType;
+    }
+
+    if (fromEl.dataset.vcpKey) {
+        toEl.dataset.vcpKey = fromEl.dataset.vcpKey;
+    }
+}
+
 // --- DOM Cache ---
 const messageDomCache = new Map(); // messageId -> { messageItem, contentDiv }
 
@@ -42,6 +133,7 @@ const delayedCleanupTimers = new Map(); // messageId -> timerId
 // --- 新增：预缓冲系统 ---
 const preBufferedChunks = new Map(); // messageId -> array of chunks waiting for initialization
 const messageInitializationStatus = new Map(); // messageId -> 'pending' | 'ready' | 'finalized'
+const pendingFinalizationEvents = new Map(); // messageId -> { finishReason, context, finalPayload }
 
 // --- 新增：消息上下文映射 ---
 const messageContextMap = new Map(); // messageId -> {agentId, groupId, topicId, isGroupMessage}
@@ -143,20 +235,20 @@ function getCurrentViewSignature() {
  */
 function isMessageForCurrentView(context) {
     if (!context) return false;
-    
+
     const newSignature = getCurrentViewSignature();
-    
+
     // 如果视图切换了，清空缓存
     if (currentViewSignature !== newSignature) {
         currentViewSignature = newSignature;
         viewContextCache.clear();
     }
-    
+
     const currentSelectedItem = refs.currentSelectedItemRef.get();
     const currentTopicId = refs.currentTopicIdRef.get();
-    
+
     if (!currentSelectedItem || !currentTopicId) return false;
-    
+
     const itemId = context.groupId || context.agentId;
     return itemId === currentSelectedItem.id && context.topicId === currentTopicId;
 }
@@ -164,24 +256,24 @@ function isMessageForCurrentView(context) {
 async function getHistoryForContext(context) {
     const { electronAPI } = refs;
     if (!context) return null;
-    
+
     const { agentId, groupId, topicId, isGroupMessage } = context;
     const itemId = groupId || agentId;
-    
+
     if (!itemId || !topicId) return null;
-    
+
     try {
         const historyResult = isGroupMessage
             ? await electronAPI.getGroupChatHistory(itemId, topicId)
             : await electronAPI.getChatHistory(itemId, topicId);
-        
+
         if (historyResult && !historyResult.error) {
             return historyResult;
         }
     } catch (e) {
         console.error(`[StreamManager] Failed to get history for context`, context, e);
     }
-    
+
     return null;
 }
 
@@ -193,15 +285,15 @@ async function debouncedSaveHistory(context, history) {
     if (!context || context.topicId === 'assistant_chat' || context.topicId?.startsWith('voicechat_')) {
         return; // 跳过临时聊天
     }
-    
+
     const signature = `${context.groupId || context.agentId}-${context.topicId}`;
-    
+
     // 清除之前的定时器
     const existing = historySaveQueue.get(signature);
     if (existing?.timerId) {
         clearTimeout(existing.timerId);
     }
-    
+
     // 设置新的防抖定时器
     const timerId = setTimeout(async () => {
         const queuedData = historySaveQueue.get(signature);
@@ -210,7 +302,7 @@ async function debouncedSaveHistory(context, history) {
             historySaveQueue.delete(signature);
         }
     }, HISTORY_SAVE_DEBOUNCE);
-    
+
     // 使用最新的 history 克隆以避免引用问题
     historySaveQueue.set(signature, { context, history: [...history], timerId });
 }
@@ -222,13 +314,13 @@ async function saveHistoryForContext(context, history) {
         // The renderer avoids saving to prevent race conditions and overwriting the correct history.
         return;
     }
-    
+
     const { agentId, topicId } = context;
-    
+
     if (!agentId || !topicId) return;
-    
+
     const historyToSave = history.filter(msg => !msg.isThinking);
-    
+
     try {
         await electronAPI.saveChatHistory(agentId, topicId, historyToSave);
     } catch (e) {
@@ -353,7 +445,7 @@ function findExplicitStablePrefix(text, startOffset = 0) {
  */
 function getCachedMessageDom(messageId) {
     let cached = messageDomCache.get(messageId);
-    
+
     if (cached) {
         // 验证缓存是否仍然有效（元素还在 DOM 中）
         if (cached.messageItem.isConnected) {
@@ -362,19 +454,19 @@ function getCachedMessageDom(messageId) {
         // 缓存失效，删除
         messageDomCache.delete(messageId);
     }
-    
+
     // 重新查询并缓存
     const { chatMessagesDiv } = refs;
     const messageItem = chatMessagesDiv.querySelector(`.message-item[data-message-id="${messageId}"]`);
-    
+
     if (!messageItem) return null;
-    
+
     const contentDiv = messageItem.querySelector('.md-content');
     if (!contentDiv) return null;
-    
+
     cached = { messageItem, contentDiv };
     messageDomCache.set(messageId, cached);
-    
+
     return cached;
 }
 
@@ -389,7 +481,7 @@ function setupEmoticonHandlers(img) {
         this.onload = null;
         this.onerror = null;
     };
-    
+
     img.onerror = function() {
         // If a fix was already attempted, make it visible (as a broken image) and stop.
         if (this.dataset.emoticonFixAttempted === 'true') {
@@ -399,7 +491,7 @@ function setupEmoticonHandlers(img) {
             return;
         }
         this.dataset.emoticonFixAttempted = 'true';
-        
+
         const fixedSrc = refs.emoticonUrlFixer.fixEmoticonUrl(this.src);
         if (fixedSrc !== this.src) {
             this.src = fixedSrc; // This will re-trigger either onload or onerror
@@ -437,20 +529,20 @@ function processStreamTailImages(container) {
 function renderStreamFrame(messageId) {
     // 🟢 优先使用缓存
     let isForCurrentView = viewContextCache.get(messageId);
-    
+
     // 如果没有缓存（可能是旧消息），回退到实时检查
     if (isForCurrentView === undefined) {
         const context = messageContextMap.get(messageId);
         isForCurrentView = isMessageForCurrentView(context);
         viewContextCache.set(messageId, isForCurrentView);
     }
-    
+
     if (!isForCurrentView) return;
 
     // 🟢 使用缓存的 DOM 引用
     const cachedDom = getCachedMessageDom(messageId);
     if (!cachedDom) return;
-    
+
     const { contentDiv } = cachedDom;
     const { stableRoot, tailRoot } = ensureStreamingRoots(contentDiv);
     const segmentState = getOrCreateStreamSegmentState(messageId);
@@ -479,13 +571,29 @@ function renderStreamFrame(messageId) {
         try {
             refs.morphdom(tailRoot, `<div>${rawHtml}</div>`, {
                 childrenOnly: true,
-                
+
+                getNodeKey: function(node) {
+                    if (!node || node.nodeType !== 1) return undefined;
+                    return node.id || node.dataset?.vcpKey || node.dataset?.vcpBlockKey || undefined;
+                },
+
+                skipFromChildren: function(fromEl, toEl) {
+                    return shouldSkipStreamChildren(fromEl, toEl);
+                },
+
                 onBeforeElUpdated: function(fromEl, toEl) {
                 // 跳过相同节点
                 if (fromEl.isEqualNode(toEl)) {
                     return false;
                 }
-                
+
+                preserveDynamicStreamState(fromEl, toEl);
+
+                // 跳过已完成后处理或需要保留内部状态的复杂块，避免流式尾部 diff 反复重写子树。
+                if (shouldPreserveStreamElement(fromEl, toEl)) {
+                    return false;
+                }
+
                 // 🟢 关键修复：保留正在进行的动画类，防止 morphdom 在下一帧将其移除
                 // 因为 toEl 是从 marked 重新生成的，不包含这些动态添加的动画类
                 if (fromEl.classList.contains('vcp-stream-element-fade-in')) {
@@ -496,11 +604,11 @@ function renderStreamFrame(messageId) {
                 }
 
                 // 🟢 检测块级元素的显著内容增长
-                if (/^(P|DIV|UL|OL|LI|PRE|BLOCKQUOTE|H[1-6]|TABLE|TR|FIGURE)$/.test(fromEl.tagName)) {
+                if (STREAM_BLOCK_TAG_REGEX.test(fromEl.tagName)) {
                     const oldLength = elementContentLengthCache.get(fromEl) || fromEl.textContent.length;
                     const newLength = toEl.textContent.length;
                     const lengthDiff = newLength - oldLength;
-                    
+
                     // 如果内容增长超过阈值（比如20个字符），触发微动画
                     if (lengthDiff > 20) {
                         // 使用脉冲动画而不是滑入动画
@@ -509,11 +617,11 @@ function renderStreamFrame(messageId) {
                             fromEl.classList.remove('vcp-stream-content-pulse');
                         }, 300);
                     }
-                    
+
                     // 更新缓存
                     elementContentLengthCache.set(fromEl, newLength);
                 }
-                
+
                 // 🟢 保留按钮状态
                 if (fromEl.tagName === 'BUTTON' && fromEl.dataset.vcpInteractive === 'true') {
                     if (fromEl.disabled) {
@@ -522,17 +630,17 @@ function renderStreamFrame(messageId) {
                         toEl.textContent = fromEl.textContent; // 保留"✓"标记
                     }
                 }
-                
+
                 // 🟢 保留媒体播放状态
                 if ((fromEl.tagName === 'VIDEO' || fromEl.tagName === 'AUDIO') && !fromEl.paused) {
                     return false; // 不更新正在播放的媒体
                 }
-                
+
                 // 🟢 保留输入焦点
                 if (fromEl === document.activeElement) {
                     requestAnimationFrame(() => toEl.focus());
                 }
-                
+
                 // 🟢 简化图片逻辑：只保留状态，不再做 URL 对比
                 if (fromEl.tagName === 'IMG') {
                     // 保留加载状态标记
@@ -542,7 +650,7 @@ function renderStreamFrame(messageId) {
                     if (fromEl.dataset.emoticonFixAttempted) {
                         toEl.dataset.emoticonFixAttempted = 'true';
                     }
-                    
+
                     // 保留事件处理器
                     if (fromEl.onerror && !toEl.onerror) {
                         toEl.onerror = fromEl.onerror;
@@ -550,21 +658,21 @@ function renderStreamFrame(messageId) {
                     if (fromEl.onload && !toEl.onload) {
                         toEl.onload = fromEl.onload;
                     }
-                    
+
                     // 保留可见性状态
                     if (fromEl.style.visibility) {
                         toEl.style.visibility = fromEl.style.visibility;
                     }
-                    
+
                     // 🟢 如果图片已成功加载，不要更新它
                     if (fromEl.complete && fromEl.naturalWidth > 0) {
                         return false;
                     }
                 }
-                
+
                 return true;
             },
-            
+
             onBeforeNodeDiscarded: function(node) {
                 // 防止删除标记为永久保留的元素
                 if (node.classList?.contains('keep-alive')) {
@@ -572,16 +680,16 @@ function renderStreamFrame(messageId) {
                 }
                 return true;
             },
-            
+
             onNodeAdded: function(node) {
                 // 增强：包含更多常见的块级元素，确保列表、表格等都能触发横向渐入
-                if (node.nodeType === 1 && /^(P|DIV|UL|OL|LI|PRE|BLOCKQUOTE|H[1-6]|TABLE|TR|FIGURE)$/.test(node.tagName)) {
+                if (node.nodeType === 1 && STREAM_BLOCK_TAG_REGEX.test(node.tagName)) {
                     // 确保新节点应用横向渐入类
                     node.classList.add('vcp-stream-element-fade-in');
-                    
+
                     // 初始化长度缓存用于后续的脉冲检测
                     elementContentLengthCache.set(node, node.textContent.length);
-                    
+
                     // 动画结束后清理类名，但保留一小段时间确保渲染稳定
                     setTimeout(() => {
                         if (node && node.classList) {
@@ -614,13 +722,13 @@ function throttledScrollToBottom(messageId) {
     if (scrollThrottleTimers.has(messageId)) {
         return; // 节流期间，跳过
     }
-    
+
     refs.uiHelper.scrollToBottom();
-    
+
     const timerId = setTimeout(() => {
         scrollThrottleTimers.delete(messageId);
     }, SCROLL_THROTTLE_MS);
-    
+
     scrollThrottleTimers.set(messageId, timerId);
 }
 
@@ -640,7 +748,7 @@ function processAndRenderSmoothChunk(messageId) {
 
     // Render the current state of the accumulated text using our lightweight method.
     renderStreamFrame(messageId);
-    
+
     // Scroll if the message is in the current view.
     const context = messageContextMap.get(messageId);
     if (isMessageForCurrentView(context)) {
@@ -656,7 +764,7 @@ function renderChunkDirectlyToDOM(messageId, textToAppend) {
 
 export async function startStreamingMessage(message, passedMessageItem = null) {
     const messageId = message.id;
-    
+
     // 🟢 修复：如果消息已在处理中，且 isThinking 状态没变，直接返回现有状态
     const currentStatus = messageInitializationStatus.get(messageId);
     const cached = getCachedMessageDom(messageId);
@@ -677,27 +785,27 @@ export async function startStreamingMessage(message, passedMessageItem = null) {
         avatarUrl: message.avatarUrl || message.context?.avatarUrl,
         avatarColor: message.avatarColor || message.context?.avatarColor,
     };
-    
+
     // Validate context
     if (!context.topicId || (!context.agentId && !context.groupId)) {
         console.error(`[StreamManager] Invalid context for message ${messageId}`, context);
         return null;
     }
-    
+
     messageContextMap.set(messageId, context);
-    
+
     // 🟢 关键修复：如果消息已经初始化过，不要重新设为 pending，避免阻塞后续 chunk
     if (!currentStatus || currentStatus === 'finalized') {
         messageInitializationStatus.set(messageId, 'pending');
     }
-    
+
     activeStreamingMessageId = messageId;
-    
+
     const { chatMessagesDiv, electronAPI, currentChatHistoryRef, uiHelper } = refs;
     const isForCurrentView = isMessageForCurrentView(context);
     // 🟢 缓存视图检查结果
     viewContextCache.set(messageId, isForCurrentView);
-    
+
     // Get the correct history for this message's context
     let historyForThisMessage;
     // For assistant chat, always use a temporary in-memory history
@@ -715,18 +823,18 @@ export async function startStreamingMessage(message, passedMessageItem = null) {
             return null;
         }
     }
-    
+
     // Only manipulate DOM for current view
     let messageItem = null;
     if (isForCurrentView) {
         messageItem = passedMessageItem || chatMessagesDiv.querySelector(`.message-item[data-message-id="${message.id}"]`);
         if (!messageItem) {
-            const placeholderMessage = { 
-                ...message, 
+            const placeholderMessage = {
+                ...message,
                 content: message.content || '思考中...', // Show thinking text initially
                 isThinking: true, // Mark as thinking
-                timestamp: message.timestamp || Date.now(), 
-                isGroupMessage: message.isGroupMessage || false 
+                timestamp: message.timestamp || Date.now(),
+                isGroupMessage: message.isGroupMessage || false
             };
             messageItem = refs.renderMessage(placeholderMessage, false);
             if (!messageItem) {
@@ -741,14 +849,14 @@ export async function startStreamingMessage(message, passedMessageItem = null) {
             messageItem.classList.remove('thinking');
         }
     }
-    
+
     // Initialize streaming state
     if (shouldEnableSmoothStreaming()) {
         if (!streamingChunkQueues.has(messageId)) {
             streamingChunkQueues.set(messageId, []);
         }
     }
-    
+
     // 🟢 使用更明确的覆盖逻辑
     const existingText = accumulatedStreamText.get(messageId);
     const shouldSkipGroupThinkingSeed = context.isGroupMessage === true && message.isThinking === true;
@@ -756,11 +864,11 @@ export async function startStreamingMessage(message, passedMessageItem = null) {
     const shouldOverwrite = !existingText
         || existingText === '思考中...'
         || newText.length > existingText.length;
-    
+
     if (shouldOverwrite) {
         accumulatedStreamText.set(messageId, newText);
     }
-    
+
     // Prepare placeholder for history
     const placeholderForHistory = {
         ...message,
@@ -771,7 +879,7 @@ export async function startStreamingMessage(message, passedMessageItem = null) {
         name: context.agentName,
         agentId: context.agentId
     };
-    
+
     // Update the appropriate history
     const historyIndex = historyForThisMessage.findIndex(m => m.id === message.id);
     if (historyIndex === -1) {
@@ -779,32 +887,49 @@ export async function startStreamingMessage(message, passedMessageItem = null) {
     } else {
         historyForThisMessage[historyIndex] = { ...historyForThisMessage[historyIndex], ...placeholderForHistory };
     }
-    
+
     // Save the history
     if (isForCurrentView) {
         // Update in-memory reference for current view
         currentChatHistoryRef.set([...historyForThisMessage]);
         window.updateSendButtonState?.();
     }
-    
+
     // 🟢 使用防抖保存
     if (context.topicId !== 'assistant_chat' && !context.topicId.startsWith('voicechat_')) {
         debouncedSaveHistory(context, historyForThisMessage);
     }
-    
+
     // Initialization is complete, message is ready to process chunks.
-    messageInitializationStatus.set(messageId, 'ready');
-    
+    // 如果 end/error 事件在异步初始化期间已经到达，不能把状态从 finalized 回退到 ready。
+    if (messageInitializationStatus.get(messageId) !== 'finalized') {
+        messageInitializationStatus.set(messageId, 'ready');
+    }
+
     // Process any chunks that were pre-buffered during initialization.
     const bufferedChunks = preBufferedChunks.get(messageId);
-    if (bufferedChunks && bufferedChunks.length > 0) {
+    if (bufferedChunks && bufferedChunks.length > 0 && messageInitializationStatus.get(messageId) === 'ready') {
         console.debug(`[StreamManager] Processing ${bufferedChunks.length} pre-buffered chunks for message ${messageId}`);
         for (const chunkData of bufferedChunks) {
             appendStreamChunk(messageId, chunkData.chunk, chunkData.context);
         }
         preBufferedChunks.delete(messageId);
     }
-    
+
+    const deferredFinalization = pendingFinalizationEvents.get(messageId);
+    if (deferredFinalization) {
+        pendingFinalizationEvents.delete(messageId);
+        console.warn(`[StreamManager] Replaying deferred finalization for message ${messageId}.`);
+        setTimeout(() => {
+            finalizeStreamedMessage(
+                messageId,
+                deferredFinalization.finishReason,
+                deferredFinalization.context,
+                deferredFinalization.finalPayload
+            );
+        }, 0);
+    }
+
     if (isForCurrentView) {
         // 如果从思考转为非思考，立即触发一次渲染以清理占位符
         if (!message.isThinking && isCurrentlyThinking) {
@@ -812,7 +937,7 @@ export async function startStreamingMessage(message, passedMessageItem = null) {
         }
         uiHelper.scrollToBottom();
     }
-    
+
     return messageItem;
 }
 
@@ -950,7 +1075,7 @@ function processDesktopPushToken(messageId, textToAppend) {
                         state.tagBuffer = '';
                         continue;
                     }
-                    
+
                     // 匹配到开始标签，进入active状态但延迟创建挂件
                     state.active = true;
                     state.backtickContext = false;
@@ -979,7 +1104,7 @@ function processDesktopPushToken(messageId, textToAppend) {
                             // 替换模式：解析 target/replace 的「始ESCAPE」「末ESCAPE」或旧版「始」「末」
                             const targetMatch = state.buffer.match(/target:(?:「始ESCAPE」([\s\S]*?)「末ESCAPE」|「始」([\s\S]*?)「末」)/);
                             const replaceMatch = state.buffer.match(/replace:(?:「始ESCAPE」([\s\S]*?)「末ESCAPE」|「始」([\s\S]*?)「末」)/);
-                            
+
                             if (targetMatch && replaceMatch) {
                                 const targetSelector = (targetMatch[1] || targetMatch[2] || '').trim();
                                 const replaceContent = (replaceMatch[1] || replaceMatch[2] || '').trim();
@@ -1018,21 +1143,21 @@ function processDesktopPushToken(messageId, textToAppend) {
                 if (!state.validated && state.buffer.trim().length >= 5) {
                     const trimmedBuffer = state.buffer.trim().toLowerCase();
                     const isValid = DESKTOP_PUSH_VALID_PREFIXES.some(prefix => trimmedBuffer.startsWith(prefix));
-                    
+
                     if (isValid) {
                         state.validated = true;
-                        
+
                         // 判断是否为替换模式（target:「始」...「末」开头）
                         const isReplaceMode = trimmedBuffer.startsWith('target:');
                         state.isReplaceMode = isReplaceMode;
-                        
+
                         if (isReplaceMode) {
                             console.log(`[DesktopPush] Replace mode detected, waiting for target and replace fields...`);
                             state.created = true; // 标记为已处理，但不创建新挂件
                             // 替换模式不需要定时推送，等到结束标签时一次性解析并替换
                         } else {
                             console.log(`[DesktopPush] Content validated with prefix: ${trimmedBuffer.substring(0, 15)}...`);
-                            
+
                             // 创建模式：验证通过后才创建挂件
                             if (canPush) {
                                 electronAPI.desktopPush({
@@ -1040,7 +1165,7 @@ function processDesktopPushToken(messageId, textToAppend) {
                                     options: { x: 200, y: 150, width: 400, height: 300 }
                                 });
                                 state.created = true;
-                                
+
                                 // 启动定时推送 + 内置空闲超时检测
                                 state.lastTokenTime = Date.now();
                                 state.pushTimer = setInterval(() => {
@@ -1051,7 +1176,7 @@ function processDesktopPushToken(messageId, textToAppend) {
                                         });
                                         state.lastPushedLength = state.buffer.length;
                                     }
-                                    
+
                                     // 🟢 空闲超时检测：如果距离上次token超过150秒，自动finalize
                                     // 不需要单独的setTimeout，复用已有的interval，零额外开销
                                     if (state.lastTokenTime && (Date.now() - state.lastTokenTime > DESKTOP_PUSH_TIMEOUT_MS)) {
@@ -1107,7 +1232,7 @@ function cleanupDesktopPushState(messageId) {
 
 export function appendStreamChunk(messageId, chunkData, context) {
     const initStatus = messageInitializationStatus.get(messageId);
-    
+
     if (!initStatus || initStatus === 'pending') {
         if (!preBufferedChunks.has(messageId)) {
             preBufferedChunks.set(messageId, []);
@@ -1116,7 +1241,7 @@ export function appendStreamChunk(messageId, chunkData, context) {
         }
         const buffer = preBufferedChunks.get(messageId);
         buffer.push({ chunk: chunkData, context });
-        
+
         // 防止缓冲区无限增长 - 如果超过1000个chunks，可能有问题
         if (buffer.length > 1000) {
             console.warn(`[StreamManager] Pre-buffer overflow for ${messageId}, discarding old chunks.`);
@@ -1125,19 +1250,19 @@ export function appendStreamChunk(messageId, chunkData, context) {
         }
         return;
     }
-    
+
     if (initStatus === 'finalized') {
         console.warn(`[StreamManager] Received chunk for already finalized message ${messageId}. Ignoring.`);
         return;
     }
-    
+
     // Extract text from chunk
     // 如果检测到 JSON 解析错误，直接过滤掉，不显示给用户
     if (chunkData?.error === 'json_parse_error') {
         console.warn(`[StreamManager] 过滤掉 JSON 解析错误的 chunk for messageId: ${messageId}`, chunkData.raw);
         return;
     }
-    
+
     let textToAppend = "";
     if (chunkData?.choices?.[0]?.delta?.content) {
         textToAppend = chunkData.choices[0].delta.content;
@@ -1151,20 +1276,20 @@ export function appendStreamChunk(messageId, chunkData, context) {
         // 只有在没有错误标记时才显示 raw 数据
         textToAppend = chunkData.raw;
     }
-    
+
     if (!textToAppend) return;
 
     // --- VCPdesktop 流式推送拦截 ---
     // 在累积到 accumulatedStreamText 之前，先过滤桌面推送语法
     // 返回不属于推送块的正常文本（推送块内容被拦截转发到桌面画布）
     const normalText = processDesktopPushToken(messageId, textToAppend);
-    
+
     // Always maintain accumulated text（只累积正常文本，推送块内容不进入聊天气泡）
     // 但开始/结束标签本身会被累积（用于transformSpecialBlocks的转义封印显示占位符）
     let currentAccumulated = accumulatedStreamText.get(messageId) || "";
     currentAccumulated += textToAppend; // 保留完整文本用于最终渲染
     accumulatedStreamText.set(messageId, currentAccumulated);
-    
+
     // Update context if provided
     if (context) {
         const storedContext = messageContextMap.get(messageId);
@@ -1174,7 +1299,7 @@ export function appendStreamChunk(messageId, chunkData, context) {
             messageContextMap.set(messageId, storedContext);
         }
     }
-    
+
     if (shouldEnableSmoothStreaming()) {
         const queue = streamingChunkQueues.get(messageId);
         if (queue) {
@@ -1187,7 +1312,7 @@ export function appendStreamChunk(messageId, chunkData, context) {
             renderChunkDirectlyToDOM(messageId, textToAppend);
             return;
         }
-        
+
         // 🟢 使用全局循环替代单独的定时器
         if (!streamingTimers.has(messageId)) {
             streamingTimers.set(messageId, true); // 只是标记，不存储实际的 timerId
@@ -1199,31 +1324,38 @@ export function appendStreamChunk(messageId, chunkData, context) {
 }
 
 export async function finalizeStreamedMessage(messageId, finishReason, context, finalPayload = null) {
+    const initStatusAtFinalize = messageInitializationStatus.get(messageId);
+    if (!initStatusAtFinalize || initStatusAtFinalize === 'pending') {
+        console.warn(`[StreamManager] Finalization arrived before message initialization completed for ${messageId}. Deferring. status=${initStatusAtFinalize || 'missing'}`);
+        pendingFinalizationEvents.set(messageId, { finishReason, context, finalPayload });
+        return;
+    }
+
     // With the global render loop, we no longer need to manually drain the queue here or clear timers.
     // The loop will continue to process chunks until the queue is empty and the message is finalized, then clean itself up.
     if (activeStreamingMessageId === messageId) {
         activeStreamingMessageId = null;
     }
-    
+
     // 🟢 清理节流定时器
     const scrollTimer = scrollThrottleTimers.get(messageId);
     if (scrollTimer) {
         clearTimeout(scrollTimer);
         scrollThrottleTimers.delete(messageId);
     }
-    
+
     messageInitializationStatus.set(messageId, 'finalized');
-    
+
     // Get the stored context for this message
     const storedContext = messageContextMap.get(messageId) || context;
     if (!storedContext) {
         console.error(`[StreamManager] No context available for message ${messageId}`);
         return;
     }
-    
+
     const { chatMessagesDiv, markedInstance, uiHelper } = refs;
     const isForCurrentView = isMessageForCurrentView(storedContext);
-    
+
     // Get the correct history
     let historyForThisMessage;
     // For assistant chat, always use the in-memory history from the ref
@@ -1238,7 +1370,7 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
             return;
         }
     }
-    
+
     // Find and update the message
     const accumulatedText = accumulatedStreamText.get(messageId) || "";
     const payloadFullResponse = typeof finalPayload?.fullResponse === 'string' ? finalPayload.fullResponse : "";
@@ -1247,7 +1379,7 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
     const payloadResponseIsUsable = payloadFullResponse.trim() !== "" && !isThinkingPlaceholderText(payloadFullResponse);
 
     let finalFullText = accumulatedText;
-    
+
     // --- Consistency Logic: Choose the most complete text available ---
     // If the main process payload has more content (as in error recovery) or is explicitly marked as recovery, prefer it.
     if (payloadResponseIsUsable && (payloadFullResponse.length > accumulatedText.length || payloadFullResponse.includes('[!WARNING]'))) {
@@ -1262,7 +1394,7 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
         }
     }
     const messageIndex = historyForThisMessage.findIndex(msg => msg.id === messageId);
-    
+
     if (messageIndex === -1) {
         // If it's an assistant chat and the message is not found,
         // it's likely the window was reset. Ignore gracefully.
@@ -1276,7 +1408,7 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
         console.error(`[StreamManager] Message ${messageId} not found in history`, storedContext);
         return;
     }
-    
+
     const message = historyForThisMessage[messageIndex];
     message.content = finalFullText;
     message.finishReason = finishReason;
@@ -1285,7 +1417,7 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
         message.name = storedContext.agentName || message.name;
         message.agentId = storedContext.agentId || message.agentId;
     }
-    
+
     // Update UI if it's the current view
     if (isForCurrentView) {
         refs.currentChatHistoryRef.set([...historyForThisMessage]);
@@ -1305,11 +1437,11 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
                 // 它内部已经处理了 preprocessFullContent + LaTeX 保护 + 工具结果恢复
                 // 所以这里直接传原始文本给 wrapper，避免双重预处理
                 const rawHtml = markedInstance.parse(finalFullText);
-                
+
                 // Perform the final, high-quality render using the original global refresh method.
                 // This ensures images, KaTeX, code highlighting, etc., are all processed correctly.
                 refs.setContentAndProcessImages(contentDiv, rawHtml, messageId);
-                
+
                 // Step 1: Run synchronous processors (KaTeX, hljs, etc.)
                 refs.processRenderedContent(contentDiv);
 
@@ -1325,7 +1457,7 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
                     refs.processAnimationsInContent(contentDiv);
                 }
             }
-            
+
             const nameTimeBlock = messageItem.querySelector('.name-time-block');
             if (nameTimeBlock && !nameTimeBlock.querySelector('.message-timestamp')) {
                 const timestampDiv = document.createElement('div');
@@ -1344,18 +1476,18 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
 
         window.updateSendButtonState?.();
     }
-    
+
     // 🟢 使用防抖保存
     if (storedContext.topicId !== 'assistant_chat') {
         debouncedSaveHistory(storedContext, historyForThisMessage);
     }
-    
+
     // Cleanup
         streamingChunkQueues.delete(messageId);
         accumulatedStreamText.delete(messageId);
         streamSegmentStates.delete(messageId);
         cleanupDesktopPushState(messageId);
-        
+
         // Delayed cleanup
         const existingCleanupTimer = delayedCleanupTimers.get(messageId);
         if (existingCleanupTimer) {
@@ -1371,33 +1503,33 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
         }, 5000);
         delayedCleanupTimers.set(messageId, cleanupTimerId);
     }
-    
+
     export function cleanupTransientState() {
         // 清理所有流式消息相关状态
         for (const timerId of scrollThrottleTimers.values()) {
             clearTimeout(timerId);
         }
         scrollThrottleTimers.clear();
-    
+
         for (const state of desktopPushStates.values()) {
             if (state?.pushTimer) {
                 clearInterval(state.pushTimer);
             }
         }
         desktopPushStates.clear();
-    
+
         for (const timerId of delayedCleanupTimers.values()) {
             clearTimeout(timerId);
         }
         delayedCleanupTimers.clear();
-    
+
         for (const timerId of historySaveQueue.values()) {
             if (timerId?.timerId) {
                 clearTimeout(timerId.timerId);
             }
         }
         historySaveQueue.clear();
-    
+
         streamingChunkQueues.clear();
         streamingTimers.clear();
         accumulatedStreamText.clear();
@@ -1406,13 +1538,14 @@ export async function finalizeStreamedMessage(messageId, finishReason, context, 
         messageDomCache.clear();
         preBufferedChunks.clear();
         messageInitializationStatus.clear();
+        pendingFinalizationEvents.clear();
         messageContextMap.clear();
         viewContextCache.clear();
-    
+
         activeStreamingMessageId = null;
         currentViewSignature = null;
         globalRenderLoopRunning = false;
-    
+
         console.debug('[StreamManager] Transient state cleared');
     }
 

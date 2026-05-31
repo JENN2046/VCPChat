@@ -72,6 +72,34 @@ function formatAsciiSafeLogText(value) {
 }
 
 class PluginManager {
+    /**
+     * 跨平台进程树终止方法。
+     * Windows 上 shell:true 会创建 cmd.exe 包装进程，直接 kill 只杀 cmd 不杀子进程，
+     * 导致孤儿进程。此方法使用 taskkill /T /F 递归杀死整个进程树。
+     * Linux/macOS 上使用负 PID 发送信号给进程组，或回退到普通 SIGKILL。
+     */
+    _killProcessTree(pid, pluginName) {
+        if (!pid) return;
+        try {
+            if (process.platform === 'win32') {
+                spawn('taskkill', ['/T', '/F', '/PID', pid.toString()], {
+                    windowsHide: true,
+                    stdio: 'ignore'
+                });
+                if (this.debugMode) console.log(`[DistPluginManager] Sent taskkill /T /F /PID ${pid} for plugin "${pluginName}"`);
+            } else {
+                try {
+                    process.kill(-pid, 'SIGKILL');
+                } catch (e) {
+                    try { process.kill(pid, 'SIGKILL'); } catch (e2) { /* 进程可能已退出 */ }
+                }
+                if (this.debugMode) console.log(`[DistPluginManager] Sent SIGKILL to process group -${pid} for plugin "${pluginName}"`);
+            }
+        } catch (err) {
+            console.warn(`[DistPluginManager] Failed to kill process tree for plugin "${pluginName}" (PID: ${pid}): ${err.message}`);
+        }
+    }
+
     constructor() {
         this.plugins = new Map();
         this.serviceModules = new Map(); // 新增：用于存储服务类插件
@@ -119,7 +147,7 @@ class PluginManager {
                 config[key] = value;
             }
         }
-        
+
         // 添加调试模式配置
         if (pluginSpecificEnv.hasOwnProperty('DebugMode')) {
             config.DebugMode = String(pluginSpecificEnv.DebugMode).toLowerCase() === 'true';
@@ -153,7 +181,7 @@ class PluginManager {
                             continue;
                         }
                         manifest.basePath = pluginPath;
-                        
+
                         // Load plugin-specific config.env
                         manifest.pluginSpecificEnvConfig = {};
                          try {
@@ -186,14 +214,14 @@ class PluginManager {
                 }
             }
             console.log(`[DistPluginManager] Plugin discovery finished. Loaded ${this.plugins.size} plugins.`);
-            
+
             // 初始化静态插件
             await this.initializeStaticPlugins();
         } catch (error) {
             console.error(`[DistPluginManager] Plugin directory ${PLUGIN_DIR} not found or could not be read.`);
         }
     }
-    
+
     getAllPluginManifests() {
         return Array.from(this.plugins.values());
     }
@@ -229,7 +257,7 @@ class PluginManager {
         executionParam = toolArgs ? JSON.stringify(toolArgs) : null;
 
         if (this.debugMode) console.log(`[DistPluginManager] Calling executePlugin for: ${toolName} with prepared param:`, executionParam);
-        
+
         return this.executePlugin(toolName, executionParam);
     }
 
@@ -284,7 +312,7 @@ class PluginManager {
                 if (processExited) return;
 
                 const message = `Plugin "${pluginName}" execution timed out after ${timeoutDuration}ms.`;
-                terminatePluginProcess(pluginProcess);
+                this._killProcessTree(pluginProcess.pid, pluginName);
 
                 if (isAsyncPlugin && initialResponseSent) {
                     console.error(`[DistPluginManager] Async ${message} Child process was killed after the initial response.`);
@@ -336,12 +364,7 @@ class PluginManager {
                     return;
                 }
 
-                if (signal === 'SIGKILL') {
-                    rejectOnce(new Error(`Plugin "${pluginName}" was killed.`));
-                    return;
-                }
-
-                if (code !== 0 && signal !== 'SIGKILL') {
+                if (code !== 0 && signal !== 'SIGKILL' && signal !== 'SIGTERM') {
                     const errMsg = `Plugin ${pluginName} exited with code ${code}. Stderr: ${errorOutput.trim()}`;
                     console.error(`[DistPluginManager] ${errMsg}`);
                     rejectOnce(new Error(errMsg));
@@ -370,7 +393,7 @@ class PluginManager {
             try {
                 const pluginConfig = this._getPluginConfig(serviceData.manifest);
                 if (this.debugMode) console.log(`[DistPluginManager] Registering routes for service plugin: ${name}.`);
-                
+
                 if (serviceData.module && typeof serviceData.module.registerRoutes === 'function') {
                     // 分布式服务器只传递核心参数
                     serviceData.module.registerRoutes(app, pluginConfig, projectBasePath);
@@ -410,9 +433,10 @@ class PluginManager {
 
             const timeoutId = setTimeout(() => {
                 if (!processExited) {
-                    console.error(`[DistPluginManager] Static plugin "${plugin.name}" execution timed out after ${timeoutDuration}ms.`);
-                    terminatePluginProcess(pluginProcess);
-                    reject(new Error(`Static plugin "${plugin.name}" execution timed out.`));
+                    console.log(`[DistPluginManager] Static plugin "${plugin.name}" has completed its work cycle (${timeoutDuration}ms), terminating background process.`);
+                    this._killProcessTree(pluginProcess.pid, plugin.name);
+                    // 超时不作为错误 - static 插件完成工作周期后返回已收集的输出
+                    resolve(output.trim());
                 }
             }, timeoutDuration);
 
@@ -425,11 +449,15 @@ class PluginManager {
                 console.error(`[DistPluginManager] Failed to start static plugin ${plugin.name}: ${err.message}`);
                 reject(err);
             });
-            
+
             pluginProcess.on('exit', (code, signal) => {
                 processExited = true;
                 clearTimeout(timeoutId);
-                if (signal === 'SIGKILL') {
+                if (signal === 'SIGKILL' || signal === 'SIGTERM') {
+                    return;
+                }
+                if (code === 1 && !output.trim() && !errorOutput.trim()) {
+                    // Windows taskkill 导致的退出码 1，且无有效输出，视为超时终止
                     return;
                 }
                 if (code !== 0) {
@@ -471,7 +499,7 @@ class PluginManager {
                     } catch (parseError) {
                         if (this.debugMode) console.warn(`[DistPluginManager] Static plugin ${plugin.name} output is not valid JSON, using as string.`);
                     }
-                    
+
                     let valueForPlaceholder;
                     if (parsedOutput && typeof parsedOutput === 'object' && parsedOutput[placeholderKey]) {
                         // 如果插件输出包含占位符键，使用对应的值
@@ -485,7 +513,7 @@ class PluginManager {
                         // 否则使用整个输出
                         this.staticPlaceholderValues.set(placeholderKey, newValue.trim());
                     }
-                    
+
                     if (this.debugMode) {
                         const displayValue = this.staticPlaceholderValues.get(placeholderKey);
                         console.log(`[DistPluginManager] Placeholder ${placeholderKey} for ${plugin.name} updated with value: "${(displayValue || "").substring(0,70)}..."`);

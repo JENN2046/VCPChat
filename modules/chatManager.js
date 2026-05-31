@@ -18,7 +18,7 @@ window.chatManager = (() => {
 
     // DOM Elements from renderer.js
     let elements = {};
-    
+
     // Functions from main renderer
     let mainRendererFunctions = {};
     let isCanvasWindowOpen = false; // State to track if the canvas window is open
@@ -62,12 +62,12 @@ window.chatManager = (() => {
                     regex = new RegExp(rule.findPattern, 'g');
                 }
             }
-            
+
             if (!regex) {
                 console.error('无法解析正则表达式', rule.findPattern);
                 return text;
             }
-            
+
             // 应用替换（如果没有替换内容，则默认替换为空字符串）
             return text.replace(regex, rule.replaceWith || '');
         } catch (error) {
@@ -91,31 +91,31 @@ window.chatManager = (() => {
         }
 
         let processedText = text;
-        
+
         rules.forEach(rule => {
             // 检查是否应该应用此规则
-            
+
             // 1. 检查作用域
             const shouldApplyToScope =
                 (scope === 'context' && rule.applyToContext) ||
                 (scope === 'frontend' && rule.applyToFrontend);
-            
+
             if (!shouldApplyToScope) return;
-            
+
             // 2. 检查角色
             const shouldApplyToRole = rule.applyToRoles && rule.applyToRoles.includes(role);
             if (!shouldApplyToRole) return;
-            
+
             // 3. 检查深度（-1 表示无限制）
             const minDepthOk = rule.minDepth === undefined || rule.minDepth === -1 || depth >= rule.minDepth;
             const maxDepthOk = rule.maxDepth === undefined || rule.maxDepth === -1 || depth <= rule.maxDepth;
-            
+
             if (!minDepthOk || !maxDepthOk) return;
-            
+
             // 应用规则
             processedText = applyRegexRule(processedText, rule);
         });
-        
+
         return processedText;
     }
 
@@ -178,7 +178,7 @@ window.chatManager = (() => {
     function init(config) {
         electronAPI = config.electronAPI;
         uiHelper = config.uiHelper;
-        
+
         // Modules
         messageRenderer = config.modules.messageRenderer;
         itemListManager = config.modules.itemListManager;
@@ -194,7 +194,7 @@ window.chatManager = (() => {
 
         // DOM Elements
         elements = config.elements;
-        
+
         // Main Renderer Functions
         mainRendererFunctions = config.mainRendererFunctions;
 
@@ -269,9 +269,9 @@ window.chatManager = (() => {
 
         return trimmedTitle;
     }
- 
+
     // --- Functions moved from renderer.js ---
- 
+
     function displayNoItemSelected() {
         const { currentChatNameH3, chatMessagesDiv, currentItemActionBtn, messageInput, sendMessageBtn, attachFileBtn } = elements;
         const voiceChatBtn = document.getElementById('voiceChatBtn');
@@ -283,7 +283,7 @@ window.chatManager = (() => {
         sendMessageBtn.disabled = true;
         attachFileBtn.disabled = true;
         if (mainRendererFunctions.displaySettingsForItem) {
-            mainRendererFunctions.displaySettingsForItem(); 
+            mainRendererFunctions.displaySettingsForItem();
         }
         if (topicListManager) topicListManager.loadTopicList();
     }
@@ -297,7 +297,7 @@ window.chatManager = (() => {
             console.log('[ChatManager] Blocked agent switch due to active Flowlock');
             return;
         }
-        
+
         // Stop any previous watcher when switching items
         if (electronAPI.watcherStop) {
             await electronAPI.watcherStop();
@@ -336,7 +336,7 @@ window.chatManager = (() => {
                 groupRenderer.clearInviteAgentButtons();
             }
         }
-     
+
         const voiceChatBtn = document.getElementById('voiceChatBtn');
 
         const itemTypeLabel = itemType === 'group' ? ' (群组)' : '';
@@ -344,7 +344,7 @@ window.chatManager = (() => {
         setCurrentItemActionButtonText(currentItemActionBtn, itemType === 'group' ? '新建群聊话题' : '新建聊天话题');
         currentItemActionBtn.title = `为 ${itemName} 新建${itemType === 'group' ? '群聊话题' : '聊天话题'}`;
         currentItemActionBtn.style.display = 'inline-flex';
-        
+
         if (voiceChatBtn) {
             voiceChatBtn.style.display = itemType === 'agent' ? 'inline-block' : 'none';
         }
@@ -418,7 +418,7 @@ window.chatManager = (() => {
         if (topicListManager) topicListManager.loadTopicList();
         _saveLastOpenState(); // Save state after selecting an item and its default topic
     }
- 
+
     async function selectTopic(topicId) {
         // 心流锁激活时，不允许切换话题
         if (window.flowlockManager && window.flowlockManager.getState && window.flowlockManager.getState().isActive) {
@@ -428,7 +428,7 @@ window.chatManager = (() => {
             console.log('[ChatManager] Blocked topic switch due to active Flowlock');
             return;
         }
-        
+
         let currentTopicId = currentTopicIdRef.get();
         if (currentTopicId === topicId) {
             return;
@@ -511,17 +511,17 @@ window.chatManager = (() => {
         if (messageRenderer) messageRenderer.clearChat();
         currentChatHistoryRef.set([]);
         window.updateSendButtonState?.();
-    
-    
+
+
         document.querySelectorAll('.topic-list .topic-item').forEach(item => {
             const isCurrent = item.dataset.topicId === topicId && item.dataset.itemId === itemId && item.dataset.itemType === itemType;
             item.classList.toggle('active', isCurrent);
             item.classList.toggle('active-topic-glowing', isCurrent);
         });
-    
+
         if (messageRenderer) messageRenderer.setCurrentTopicId(topicId);
         if (abortIfStale()) return;
-    
+
         if (!itemId) {
             const errorMsg = `错误：无法加载聊天记录，${itemType === 'group' ? '群组' : '助手'}ID (${itemId}) 缺失。`;
             console.error(errorMsg);
@@ -529,13 +529,13 @@ window.chatManager = (() => {
             await displayTopicTimestampBubble(null, null, null);
             return;
         }
-    
+
         if (!topicId) {
             if (messageRenderer) messageRenderer.renderMessage({ role: 'system', content: '请选择或创建一个话题以开始聊天。', timestamp: Date.now() });
             await displayTopicTimestampBubble(itemId, itemType, null);
             return;
         }
-    
+
         // 核心修改：使用 await 确保加载消息被渲染
         if (messageRenderer) {
             await messageRenderer.renderMessage({ role: 'system', name: '系统', content: '加载聊天记录中...', timestamp: Date.now(), isThinking: true, id: 'loading_history' });
@@ -544,7 +544,7 @@ window.chatManager = (() => {
             if (messageRenderer) messageRenderer.removeMessageById('loading_history');
             return;
         }
-    
+
         let historyResult;
         if (itemType === 'agent') {
             historyResult = await electronAPI.getChatHistory(itemId, topicId);
@@ -556,7 +556,7 @@ window.chatManager = (() => {
             if (messageRenderer) messageRenderer.removeMessageById('loading_history');
             return;
         }
-    
+
         const currentSelectedItem = currentSelectedItemRef.get();
         const agentConfigForHistory = currentSelectedItem.config || currentSelectedItem;
         if (electronAPI.watcherStart && agentConfigForHistory?.agentDataPath) {
@@ -568,12 +568,12 @@ window.chatManager = (() => {
             if (messageRenderer) messageRenderer.removeMessageById('loading_history');
             return;
         }
-    
+
         if (messageRenderer) messageRenderer.removeMessageById('loading_history');
-    
+
         await displayTopicTimestampBubble(itemId, itemType, topicId);
         if (abortIfStale()) return;
-    
+
         if (historyResult && historyResult.error) {
             if (messageRenderer) messageRenderer.renderMessage({ role: 'system', content: `加载话题 "${topicId}" 的聊天记录失败: ${historyResult.error}`, timestamp: Date.now() });
         } else if (historyResult && historyResult.length > 0) {
@@ -586,13 +586,13 @@ window.chatManager = (() => {
                     batchSize: 10,      // 后续每批10条消息
                     batchDelay: 80      // 批次间延迟 80ms，平衡性能和用户体验
                 };
-                
+
                 console.log(`[ChatManager] 开始加载话题历史，共 ${historyResult.length} 条消息`);
                 await messageRenderer.renderHistory(historyResult, renderOptions);
                 if (abortIfStale()) return;
                 console.log(`[ChatManager] 话题历史加载完成`);
             }
-    
+
         } else if (historyResult) { // History is empty
             currentChatHistoryRef.set([]);
             window.updateSendButtonState?.();
@@ -601,7 +601,7 @@ window.chatManager = (() => {
         }
 
         if (abortIfStale()) return;
-    
+
         if (itemId && topicId && !(historyResult && historyResult.error)) {
             localStorage.setItem(`lastActiveTopic_${itemId}_${itemType}`, topicId);
         }
@@ -923,7 +923,7 @@ window.chatManager = (() => {
         // The 'content' variable still holds the user's raw input, including the placeholder.
         // We will resolve the placeholder later, only for the final message sent to VCP.
         let combinedTextContent = content; // 用于发送给VCP的组合文本内容
- 
+
         const uiAttachments = [];
         if (attachedFiles.length > 0) {
             for (const af of attachedFiles) {
@@ -960,7 +960,7 @@ window.chatManager = (() => {
             id: `msg_${Date.now()}_user_${Math.random().toString(36).substring(2, 9)}`,
             attachments: uiAttachments
         };
-        
+
         if (messageRenderer) {
             await messageRenderer.renderMessage(userMessage);
         }
@@ -982,7 +982,7 @@ window.chatManager = (() => {
         messageInput.value = '';
         attachedFilesRef.set([]);
         if(mainRendererFunctions.updateAttachmentPreview) mainRendererFunctions.updateAttachmentPreview();
-        
+
         // After sending, if the canvas window is still open, restore the placeholder
         if (isCanvasWindowOpen) {
             messageInput.value = CANVAS_PLACEHOLDER;
@@ -1043,7 +1043,7 @@ window.chatManager = (() => {
                             turns.unshift({ assistant: null, user: historySnapshotForVCP[i] });
                         }
                     }
-                    
+
                     // 找到当前消息所在的轮次
                     const turnIndex = turns.findIndex(t => (t.assistant && t.assistant.id === msg.id) || (t.user && t.user.id === msg.id));
                     const depth = turnIndex !== -1 ? (turns.length - 1 - turnIndex) : -1;
@@ -1092,13 +1092,20 @@ window.chatManager = (() => {
                     for (const att of msg.attachments) {
                         const fileManagerData = att._fileManagerData || {};
                         // 优先使用 att.src，因为它代表前端的本地可访问路径
-                        // 后备为 internalPath（来自 fileManager），最后才是文件名
-                        const filePathForContext = att.src || (fileManagerData.internalPath ? fileManagerData.internalPath.replace('file://', '') : (att.name || '未知文件'));
+                        // 后备为 internalPath（来自 fileManager 或 att 顶层），最后才是文件名
+                        // 兼容两种附件结构：通过正常发送的附件（数据在 _fileManagerData 中）
+                        // 和通过 addAttachmentsToMessage 添加的附件（数据直接在 att 顶层）
+                        const effectiveInternalPath = fileManagerData.internalPath || att.internalPath;
+                        const filePathForContext = att.src || (effectiveInternalPath ? effectiveInternalPath.replace('file://', '') : (att.name || '未知文件'));
 
-                        if (fileManagerData.imageFrames && fileManagerData.imageFrames.length > 0) {
+                        // 兼容读取：优先从 _fileManagerData 读取，回退到 att 顶层字段
+                        const effectiveImageFrames = fileManagerData.imageFrames || att.imageFrames;
+                        const effectiveExtractedText = fileManagerData.extractedText || att.extractedText;
+
+                        if (effectiveImageFrames && effectiveImageFrames.length > 0) {
                              historicalAppendedText += `\n\n[附加文件: ${filePathForContext} (扫描版PDF，已转换为图片)]`;
-                        } else if (fileManagerData.extractedText) {
-                            historicalAppendedText += `\n\n[附加文件: ${filePathForContext}]\n${fileManagerData.extractedText}\n[/附加文件结束: ${att.name || '未知文件'}]`;
+                        } else if (effectiveExtractedText) {
+                            historicalAppendedText += `\n\n[附加文件: ${filePathForContext}]\n${effectiveExtractedText}\n[/附加文件结束: ${att.name || '未知文件'}]`;
                         } else {
                             // 对于没有提取文本的文件（如音视频），只附加路径
                             historicalAppendedText += `\n\n[附加文件: ${filePathForContext}]`;
@@ -1111,17 +1118,19 @@ window.chatManager = (() => {
                     // --- IMAGE PROCESSING ---
                     const imageAttachmentsPromises = msg.attachments.map(async att => {
                         const fileManagerData = att._fileManagerData || {};
+                        // 兼容读取：优先从 _fileManagerData 读取，回退到 att 顶层字段
+                        const effectiveImageFrames = fileManagerData.imageFrames || att.imageFrames;
                         // Case 1: Scanned PDF converted to image frames
-                        if (fileManagerData.imageFrames && fileManagerData.imageFrames.length > 0) {
-                            return fileManagerData.imageFrames.map(frameData => ({
+                        if (effectiveImageFrames && effectiveImageFrames.length > 0) {
+                            return effectiveImageFrames.map(frameData => ({
                                 type: 'image_url',
                                 image_url: { url: `data:image/jpeg;base64,${frameData}` }
                             }));
                         }
                         // Case 2: Regular image file (including GIFs that get framed)
-                        if (att.type.startsWith('image/')) {
+                        if (att.type && att.type.startsWith('image/')) {
                             try {
-                                const result = await electronAPI.getFileAsBase64(att.src);
+                                const result = await electronAPI.getFileAsBase64(att.src || att.internalPath);
                                 if (result && result.success) {
                                     return result.base64Frames.map(frameData => ({
                                         type: 'image_url',
@@ -1149,10 +1158,10 @@ window.chatManager = (() => {
                     // --- AUDIO PROCESSING ---
                     const supportedAudioTypes = ['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/aiff', 'audio/aac', 'audio/ogg', 'audio/flac'];
                     const audioAttachmentsPromises = msg.attachments
-                        .filter(att => supportedAudioTypes.includes(att.type))
+                        .filter(att => att.type && supportedAudioTypes.includes(att.type))
                         .map(async att => {
                             try {
-                                const result = await electronAPI.getFileAsBase64(att.src);
+                                const result = await electronAPI.getFileAsBase64(att.src || att.internalPath);
                                 if (result && result.success) {
                                     return result.base64Frames.map(frameData => ({
                                         type: 'image_url',
@@ -1175,10 +1184,10 @@ window.chatManager = (() => {
 
                     // --- VIDEO PROCESSING ---
                     const videoAttachmentsPromises = msg.attachments
-                        .filter(att => att.type.startsWith('video/'))
+                        .filter(att => att.type && att.type.startsWith('video/'))
                         .map(async att => {
                             try {
-                                const result = await electronAPI.getFileAsBase64(att.src);
+                                const result = await electronAPI.getFileAsBase64(att.src || att.internalPath);
                                 if (result && result.success) {
                                     return result.base64Frames.map(frameData => ({
                                         type: 'image_url',
@@ -1211,7 +1220,7 @@ window.chatManager = (() => {
                 if (finalContentPartsForVCP.length === 0 && msg.role === 'user') {
                      finalContentPartsForVCP.push({ type: 'text', text: '(用户发送了附件，但无文本或图片内容)' });
                 }
-                
+
                 return { role: msg.role, content: finalContentPartsForVCP.length > 0 ? finalContentPartsForVCP : msg.content };
             }));
 
@@ -1340,7 +1349,7 @@ window.chatManager = (() => {
                         // Remove any lingering 'thinking' message and add the new one
                         const finalHistory = historyForSave.filter(msg => msg.id !== thinkingMessage.id && !msg.isThinking);
                         finalHistory.push(assistantMessage);
-                        
+
                         // Save the final, complete history to the correct file
                         await electronAPI.saveChatHistory(responseContext.agentId, responseContext.topicId, finalHistory);
 
@@ -1386,11 +1395,11 @@ window.chatManager = (() => {
             uiHelper.showToastNotification("请先选择一个项目。", 'error');
             return;
         }
-        
+
         const currentSelectedItem = currentSelectedItemRef.get();
         const itemName = currentSelectedItem.name || (itemType === 'group' ? "当前群组" : "当前助手");
         const newTopicName = `新话题 ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-        
+
         try {
             let result;
             if (itemType === 'agent') {
@@ -1410,7 +1419,7 @@ window.chatManager = (() => {
                     // messageRenderer.renderMessage({ role: 'system', content: `新话题 "${result.topicName}" 已开始。`, timestamp: Date.now() });
                 }
                 localStorage.setItem(`lastActiveTopic_${itemId}_${itemType}`, result.topicId);
-                
+
                 // 🔧 关键修复：为新建的话题启动文件监听器
                 const agentConfigForWatcher = currentSelectedItem.config || currentSelectedItem;
                 if (electronAPI.watcherStart && agentConfigForWatcher?.agentDataPath) {
@@ -1418,11 +1427,11 @@ window.chatManager = (() => {
                     await electronAPI.watcherStart(historyFilePath, itemId, result.topicId);
                     console.log(`[ChatManager] Started file watcher for new topic: ${result.topicId}`);
                 }
-                
+
                 if (document.getElementById('tabContentTopics').classList.contains('active')) {
                     if (topicListManager) await topicListManager.loadTopicList();
                 }
-                
+
                 await displayTopicTimestampBubble(itemId, itemType, result.topicId);
                 // elements.messageInput.focus();
             } else {
@@ -1511,7 +1520,7 @@ window.chatManager = (() => {
 
             currentTopicIdRef.set(newTopicId);
             if (messageRenderer) messageRenderer.setCurrentTopicId(newTopicId);
-            
+
             if (document.getElementById('tabContentTopics').classList.contains('active')) {
                 if (topicListManager) await topicListManager.loadTopicList();
             }
@@ -1528,7 +1537,7 @@ window.chatManager = (() => {
 
     async function handleForwardMessage(target, content, attachments) {
         const { messageInput } = elements;
-        
+
         // 1. Find the target item's full config to select it
         let targetItemFullConfig;
         if (target.type === 'agent') {
@@ -1549,7 +1558,7 @@ window.chatManager = (() => {
         setTimeout(async () => {
             // 4. Populate the message input and attachments ref
             messageInput.value = content;
-            
+
             const uiAttachments = attachments.map(att => ({
                 file: { name: att.name, type: att.type, size: att.size },
                 localPath: att.src,
@@ -1557,12 +1566,12 @@ window.chatManager = (() => {
                 _fileManagerData: att._fileManagerData || {}
             }));
             attachedFilesRef.set(uiAttachments);
-            
+
             // Manually trigger attachment preview update
             if (mainRendererFunctions.updateAttachmentPreview) {
                 mainRendererFunctions.updateAttachmentPreview();
             }
-            
+
             // Manually trigger textarea resize
             uiHelper.autoResizeTextarea(messageInput);
 
@@ -1636,7 +1645,7 @@ window.chatManager = (() => {
             if (oldMsg.id === activeStreamingId) {
                 continue; // Protect the currently streaming message
             }
-            
+
             const newMsgData = newHistoryMap.get(oldMsg.id);
 
             if (!newMsgData) {

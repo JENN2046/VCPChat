@@ -322,9 +322,9 @@ const uiHelperFunctions = window.uiHelperFunctions;
 import searchManager from './modules/searchManager.js';
 import { initialize as initializeEmoticonFixer } from './modules/renderer/emoticonUrlFixer.js';
 import * as interruptHandler from './modules/interruptHandler.js';
- 
+
 import { setupEventListeners } from './modules/event-listeners.js';
- 
+
  // --- Initialization ---
  document.addEventListener('DOMContentLoaded', async () => {
     // Initialize Emoticon Manager
@@ -584,15 +584,15 @@ import { setupEventListeners } from './modules/event-listeners.js';
                     // This can run in the background
                     await window.chatManager.attemptTopicSummarizationIfNeeded();
                 }
-                
+
                 // --- Flowlock: 检查是否需要自动触发续写 ---
                 if (window.flowlockManager) {
                     const flowlockState = window.flowlockManager.getState();
                     console.log('[Flowlock] End event received. State:', flowlockState, 'isRelevantToCurrentView:', isRelevantToCurrentView);
-                    
+
                     if (flowlockState.isActive && !flowlockState.isProcessing && isRelevantToCurrentView) {
                         console.log('[Flowlock] ✓ All conditions met, triggering continue writing...');
-                        
+
                         // 使用全局设置中的延迟
                         const delaySeconds = globalSettings.flowlockContinueDelay !== undefined ? globalSettings.flowlockContinueDelay : 5;
                         const delayMilliseconds = delaySeconds * 1000;
@@ -602,7 +602,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                         setTimeout(() => {
                             if (window.flowlockManager && window.flowlockManager.getState().isActive) {
                                 console.log('[Flowlock] Calling handleContinueWriting now...');
-                                
+
                                 // 触发心跳动画
                                 const chatNameElement = document.getElementById('currentChatAgentName');
                                 if (chatNameElement) {
@@ -612,12 +612,12 @@ import { setupEventListeners } from './modules/event-listeners.js';
                                         chatNameElement.classList.remove('flowlock-heartbeat');
                                     }, 800);
                                 }
-                                
+
                                 // 获取输入框内容作为提示词
                                 const messageInput = document.getElementById('messageInput');
                                 const customPrompt = messageInput ? messageInput.value.trim() : '';
                                 console.log('[Flowlock] Using custom prompt from input:', customPrompt || '(empty, will use default)');
-                                
+
                                 // 直接调用续写函数，使用输入框内容或空字符串（将使用默认提示词）
                                 if (window.handleContinueWriting) {
                                     window.flowlockManager.isProcessing = true;
@@ -629,7 +629,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                                         console.error('[Flowlock] Continue writing failed:', error);
                                         window.flowlockManager.isProcessing = false;
                                         window.flowlockManager.retryCount++;
-                                        
+
                                         if (window.flowlockManager.retryCount >= window.flowlockManager.maxRetries) {
                                             console.error('[Flowlock] Max retries reached, stopping flowlock');
                                             if (window.uiHelperFunctions && window.uiHelperFunctions.showToastNotification) {
@@ -662,7 +662,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
 
             case 'error':
                 console.error('VCP Stream Error on ID', messageId, ':', error, 'Context:', context);
-                
+
                 // --- Recovery Logic: Use accumulated text from main if fullResponse is missing ---
                 let finalContent = fullResponse || eventData.accumulatedResponse || "";
                 if (finalContent && finalContent.trim() !== "") {
@@ -676,22 +676,22 @@ import { setupEventListeners } from './modules/event-listeners.js';
                     context,
                     { fullResponse: finalContent, error }
                 );
-                
+
                 // --- Flowlock: 处理错误情况，重置状态并可能触发下一次续写 ---
                 if (window.flowlockManager) {
                     const flowlockState = window.flowlockManager.getState();
                     console.log('[Flowlock] Error event received. State:', flowlockState, 'isRelevantToCurrentView:', isRelevantToCurrentView);
-                    
+
                     // 重置processing状态
                     if (window.flowlockManager.isProcessing) {
                         console.log('[Flowlock] Resetting isProcessing state due to error');
                         window.flowlockManager.isProcessing = false;
                     }
-                    
+
                     // 如果心流锁仍然激活且相关，触发下一次续写（即使出错也继续）
                     if (flowlockState.isActive && isRelevantToCurrentView) {
                         console.log('[Flowlock] Flowlock still active after error, will trigger next continue writing');
-                        
+
                         const errorDelaySeconds = globalSettings.flowlockContinueDelay !== undefined ? globalSettings.flowlockContinueDelay : 5;
                         const errorDelayMilliseconds = errorDelaySeconds * 1000;
                         console.log(`[Flowlock] Using error recovery delay of ${errorDelaySeconds}s (${errorDelayMilliseconds}ms)`);
@@ -699,7 +699,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                         setTimeout(() => {
                             if (window.flowlockManager && window.flowlockManager.getState().isActive) {
                                 console.log('[Flowlock] Triggering continue writing after error...');
-                                
+
                                 // 触发心跳动画
                                 const chatNameElement = document.getElementById('currentChatAgentName');
                                 if (chatNameElement) {
@@ -708,12 +708,12 @@ import { setupEventListeners } from './modules/event-listeners.js';
                                         chatNameElement.classList.remove('flowlock-heartbeat');
                                     }, 800);
                                 }
-                                
+
                                 // 获取输入框内容作为提示词
                                 const messageInput = document.getElementById('messageInput');
                                 const customPrompt = messageInput ? messageInput.value.trim() : '';
                                 console.log('[Flowlock] Using custom prompt from input:', customPrompt || '(empty, will use default)');
-                                
+
                                 // 触发续写
                                 if (window.handleContinueWriting) {
                                     window.flowlockManager.isProcessing = true;
@@ -725,7 +725,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                                         console.error('[Flowlock] Continue writing failed after error recovery:', error);
                                         window.flowlockManager.isProcessing = false;
                                         window.flowlockManager.retryCount++;
-                                        
+
                                         if (window.flowlockManager.retryCount >= window.flowlockManager.maxRetries) {
                                             console.error('[Flowlock] Max retries reached, stopping flowlock');
                                             if (window.uiHelperFunctions && window.uiHelperFunctions.showToastNotification) {
@@ -739,7 +739,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                         }, errorDelayMilliseconds);
                     }
                 }
-                
+
                 if (isRelevantToCurrentView) {
                     const errorMsgItem = document.querySelector(`.message-item[data-message-id="${messageId}"] .md-content`);
                     if (errorMsgItem) {
@@ -754,7 +754,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                     }
                 }
                 break;
-            
+
             // These events create new message bubbles, so they should only execute if the view is relevant.
             case 'agent_thinking':
                 // Use startStreamingMessage for both visible and non-visible chats to ensure proper initialization
@@ -800,7 +800,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                 // START事件时，思考消息应该已经存在了
                 // 我们只需要确保消息已经初始化，如果没有则初始化
                 console.log(`[Renderer onVCPStreamEvent START] Processing start event for ${context.agentName} (msgId: ${messageId})`);
-                
+
                 // 确保消息被初始化（如果agent_thinking被跳过）
                 if (window.streamManager && typeof window.streamManager.startStreamingMessage === 'function') {
                     // streamManager 会检查消息是否已存在，避免重复初始化
@@ -836,7 +836,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                         context: context
                     });
                 }
-                
+
                 if (isRelevantToCurrentView) {
                      console.log(`[Renderer onVCPStreamEvent START] UI updated for visible chat ${context.agentName} (msgId: ${messageId})`);
                 } else {
@@ -1229,7 +1229,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
         if (!currentSelectedItem.id) {
             window.chatManager.displayNoItemSelected();
         }
- 
+
         // Initialize Search Manager
         if (searchManager) {
             searchManager.init({
@@ -1237,6 +1237,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                 uiHelper: uiHelperFunctions,
                 refs: {
                     currentSelectedItemRef: { get: () => currentSelectedItem },
+                    currentTopicIdRef: { get: () => currentTopicId },
                 },
                 modules: {
                     chatManager: window.chatManager,
@@ -1272,7 +1273,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
     }
 
     console.log('[Renderer DOMContentLoaded END] createNewGroupBtn textContent:', document.getElementById('createNewGroupBtn')?.textContent);
-    
+
     // --- Agent Settings Reload Listener ---
     if (chatAPI?.onReloadAgentSettings) {
         chatAPI.onReloadAgentSettings(async ({ agentId }) => {
@@ -1289,7 +1290,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
         });
         console.log('[Renderer] Agent settings reload listener initialized');
     }
-    
+
     // --- TTS Audio Playback and Visuals ---
     setupTtsListeners();
     // --- File Watcher Listener ---
@@ -1328,7 +1329,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
 
         const flowlockCommandHandler = async (commandData) => {
             console.log('[Renderer] Received flowlock command from plugin:', commandData);
-            
+
             if (!window.flowlockManager) {
                 console.error('[Renderer] flowlockManager not available');
                 respondToFlowlockRequest(commandData, {
@@ -1338,9 +1339,9 @@ import { setupEventListeners } from './modules/event-listeners.js';
                 });
                 return;
             }
-            
+
             const { command, agentId, topicId, prompt, promptSource } = commandData;
-            
+
             try {
                 switch (command) {
                     case 'start':
@@ -1352,13 +1353,13 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             console.error('[Renderer] Missing agentId or topicId for start command');
                         }
                         break;
-                        
+
                     case 'stop':
                         // Stop flowlock
                         await window.flowlockManager.stop();
                         console.log('[Renderer] Flowlock stopped');
                         break;
-                        
+
                     case 'promptee':
                         // Set custom prompt and append to input
                         if (prompt) {
@@ -1376,7 +1377,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             console.error('[Renderer] Missing prompt for promptee command');
                         }
                         break;
-                        
+
                     case 'prompter':
                         // Get content from external source and append to input
                         if (promptSource) {
@@ -1398,7 +1399,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             console.error('[Renderer] Missing promptSource for prompter command');
                         }
                         break;
-                        
+
                     case 'clear':
                         // Clear all content in input box
                         {
@@ -1413,7 +1414,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             }
                         }
                         break;
-                        
+
                     case 'remove':
                         // Remove specific text from input
                         {
@@ -1435,7 +1436,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             }
                         }
                         break;
-                        
+
                     case 'edit':
                         // Edit (diff) specific text in input - find oldText and replace with newText
                         {
@@ -1462,7 +1463,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             }
                         }
                         break;
-                        
+
                     case 'get':
                         // Get current input box content and return it
                         {
@@ -1485,7 +1486,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             }
                         }
                         break;
-                        
+
                     case 'status':
                         // Get current flowlock status and return it
                         {
@@ -1512,7 +1513,7 @@ import { setupEventListeners } from './modules/event-listeners.js';
                             }
                         }
                         break;
-                        
+
                     default:
                         console.error(`[Renderer] Unknown flowlock command: ${command}`);
                 }
@@ -1565,7 +1566,7 @@ function setupTtsListeners() {
             // 清空队列，扔掉所有可能属于更旧会话的音频块
             ttsAudioQueue = [];
         }
-        
+
         // 只有当sessionId匹配时，才将音频加入队列
         console.log(`[TTS Renderer] Received audio data for msgId ${msgId} (session ${sessionId}). Pushing to queue.`);
         if (!audioContext) {
@@ -1615,11 +1616,11 @@ function setupTtsListeners() {
                 // onStopTtsAudio已经处理了状态重置，这里只需中止即可
                 return;
             }
-            
+
             currentAudioSource = audioContext.createBufferSource();
             currentAudioSource.buffer = audioBuffer;
             currentAudioSource.connect(audioContext.destination);
-            
+
             currentAudioSource.onended = () => {
                 console.log(`[TTS Renderer] Playback finished for a chunk of msgId ${msgId}.`);
                 isTtsPlaying = false;
@@ -1640,15 +1641,15 @@ function setupTtsListeners() {
 
     chatAPI.onStopTtsAudio(() => {
         console.error("!!!!!!!!!! [TTS RENDERER] STOP EVENT RECEIVED !!!!!!!!!!");
-        
+
         // 关键：增加会话ID，使所有后续到达的、属于旧会话的play-tts-audio事件全部失效
         currentTtsSessionId++;
         console.log(`[TTS Renderer] Stop event incremented session ID to ${currentTtsSessionId}.`);
 
         console.log("Clearing TTS queue, stopping current audio source, and resetting state.");
-        
+
         ttsAudioQueue = []; // 1. 清空前端队列
-        
+
         if (currentAudioSource) {
             console.log("Found active audio source. Stopping it now.");
             currentAudioSource.onended = null; // 2. 阻止onended回调
@@ -1657,7 +1658,7 @@ function setupTtsListeners() {
         } else {
             console.warn("Stop event received, but no active audio source was found.");
         }
-        
+
         isTtsPlaying = false; // 4. 重置播放状态标志
 
         // 5. 确保关闭当前的播放动画
@@ -1683,7 +1684,7 @@ async function loadAndApplyGlobalSettings() {
         globalSettings = { ...globalSettings, ...settings }; // Merge with defaults
         window.globalSettings = globalSettings;
         applyChatBubbleLayoutSettings(globalSettings);
-        
+
         // 🟢 优化：仅更新始终存在的 UI 元素
         if (globalSettings.sidebarWidth && leftSidebar) {
             leftSidebar.style.width = `${globalSettings.sidebarWidth}px`;
@@ -2004,17 +2005,17 @@ async function syncGlobalSettingsToUI() {
     };
 
     safeSet('userName', globalSettings.userName || '用户');
-    
+
     const borderColor = globalSettings.userAvatarBorderColor || '#3d5a80';
     safeSet('userAvatarBorderColor', borderColor);
     safeSet('userAvatarBorderColorText', borderColor);
-    
+
     const nameColor = globalSettings.userNameTextColor || '#ffffff';
     safeSet('userNameTextColor', nameColor);
     safeSet('userNameTextColorText', nameColor);
-    
+
     safeCheck('userUseThemeColorsInChat', globalSettings.userUseThemeColorsInChat);
-    
+
     const completedUrl = window.settingsManager.completeVcpUrl(globalSettings.vcpServerUrl || '');
     safeSet('vcpServerUrl', completedUrl);
     safeSet('vcpApiKey', globalSettings.vcpApiKey || '');
@@ -2031,7 +2032,7 @@ async function syncGlobalSettingsToUI() {
     safeSet('voiceNetworkSovitsKey', globalSettings.voiceNetworkSettings?.sovitsKey || '');
     safeSet('voiceLocalProviderUrl', globalSettings.voiceLocalSettings?.providerUrl || '');
     safeSet('voiceLocalProviderKey', globalSettings.voiceLocalSettings?.providerKey || '');
-    
+
     // Network Notes Paths
     const networkNotesPathsContainer = document.getElementById('networkNotesPathsContainer');
     if (networkNotesPathsContainer) {
@@ -2168,7 +2169,7 @@ async function syncGlobalSettingsToUI() {
     safeCheck('enableThoughtChainInjection', globalSettings.enableThoughtChainInjection === true);
     safeCheck('enableContextSanitizer', globalSettings.enableContextSanitizer === true);
     safeSet('contextSanitizerDepth', globalSettings.contextSanitizerDepth ?? 2);
-    
+
     const contextSanitizerDepthContainer = document.getElementById('contextSanitizerDepthContainer');
     if (contextSanitizerDepthContainer) {
         contextSanitizerDepthContainer.style.display = globalSettings.enableContextSanitizer === true ? 'block' : 'none';
@@ -2267,7 +2268,7 @@ async function syncGlobalSettingsToUI() {
 // These functions have been moved to modules/ui-helpers.js
 
 // This function has been moved to modules/ui-helpers.js
- 
+
 let markedInstance;
 if (window.marked && typeof window.marked.Marked === 'function') { // Ensure Marked is a constructor
     try {
@@ -2296,7 +2297,7 @@ if (window.marked && typeof window.marked.Marked === 'function') { // Ensure Mar
     console.warn("Marked library not found or not in expected format, Markdown rendering will be basic.");
     markedInstance = { parse: (text) => `<p>${String(text || '').replace(/\n/g, '<br>')}</p>` };
 }
- 
+
 window.addEventListener('contextmenu', (e) => {
     // Allow context menu for text input fields
     if (e.target.closest('textarea, input[type="text"], .message-item .md-content')) { // Also allow on rendered message content
@@ -2305,7 +2306,7 @@ window.addEventListener('contextmenu', (e) => {
         // e.preventDefault(); // Optionally prevent context menu elsewhere
     }
 }, false);
- 
+
 // Helper to get a centrally stored cropped file (agent, group, or user)
 // These functions are now part of modules/ui-helpers.js and are accessed via uiHelperFunctions
 
@@ -2316,7 +2317,7 @@ let selectedForwardTarget = null;
 async function showForwardModal(message) {
     messageToForward = message;
     selectedForwardTarget = null; // Reset selection
-    
+
     // 🟢 修复：先调用 openModal 确保从模板实例化 DOM 元素
     uiHelperFunctions.openModal('forwardMessageModal');
 
@@ -2374,7 +2375,7 @@ function renderForwardTargetList(items) {
         const avatar = document.createElement('img');
         avatar.className = 'avatar';
         avatar.src = item.avatarUrl || (item.type === 'group' ? 'assets/default_group_avatar.png' : 'assets/default_user_avatar.png');
-        
+
         const nameSpan = document.createElement('span');
         nameSpan.className = 'agent-name';
         nameSpan.textContent = `${item.name} (${item.type === 'group' ? '群组' : 'Agent'})`;
@@ -2402,7 +2403,7 @@ async function handleConfirmForward() {
     }
 
     const additionalComment = document.getElementById('forwardAdditionalComment').value.trim();
-    
+
     // We need to get the original message from history to ensure we have all data
     const originalMessageResult = await chatAPI.getOriginalMessageContent(
         currentSelectedItem.id,
@@ -2415,20 +2416,20 @@ async function handleConfirmForward() {
         uiHelperFunctions.showToastNotification(`无法获取原始消息内容: ${originalMessageResult.error}`, 'error');
         return;
     }
-    
+
     const originalMessage = { ...messageToForward, content: originalMessageResult.content };
 
     let forwardedContent = '';
     const senderName = originalMessage.name || (originalMessage.role === 'user' ? '用户' : '助手');
     forwardedContent += `> 转发自 **${senderName}** 的消息:\n\n`;
-    
+
     let originalText = '';
     if (typeof originalMessage.content === 'string') {
         originalText = originalMessage.content;
     } else if (originalMessage.content && typeof originalMessage.content.text === 'string') {
         originalText = originalMessage.content.text;
     }
-    
+
     forwardedContent += originalText;
 
     if (additionalComment) {

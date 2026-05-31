@@ -88,7 +88,7 @@ function extractEmoticonInfo(url) {
             }
         }
     }
-    
+
     return { filename, packageName };
 }
 
@@ -154,25 +154,13 @@ function fixEmoticonUrl(originalSrc) {
         return originalSrc;
     }
 
-    // 快速通道：baseName 精确匹配（忽略扩展名和文件夹路径）
-    // 解决"文件夹写错+格式写错"的双重错误场景
-    const searchBaseName = searchInfo.filename.replace(/\.[^.]+$/, '').toLowerCase();
-    if (searchBaseName) {
-        for (const item of emoticonLibrary) {
-            const itemBaseName = (item.filename || '').replace(/\.[^.]+$/, '').toLowerCase();
-            if (searchBaseName === itemBaseName) {
-                console.log(`[EmoticonFixer] 精确文件名匹配: "${originalSrc}" → "${item.url}"`);
-                return item.url;
-            }
-        }
-    }
 
     let bestMatch = null;
     let highestScore = -1;
 
     for (const item of emoticonLibrary) {
         const itemPackageInfo = extractEmoticonInfo(item.url);
-        
+
         let packageScore = 0.5;
         if (searchInfo.packageName && itemPackageInfo.packageName) {
             packageScore = getSimilarity(searchInfo.packageName, itemPackageInfo.packageName);

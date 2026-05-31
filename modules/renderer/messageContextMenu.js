@@ -96,31 +96,31 @@ function showContextMenu(event, messageItem, message) {
                     } else {
                         console.warn(`[ContextMenu] Interrupt failed: ${result.error}`);
                         uiHelper.showToastNotification(`中止失败: ${result.error}`, "error");
-                        
+
                         // 中止失败时手动finalize消息
                         if (contextMenuDependencies.finalizeStreamedMessage) {
                             contextMenuDependencies.finalizeStreamedMessage(activeMessageId, 'cancelled_by_user');
                         }
-                        
+
                         // --- Flowlock: 中止失败后恢复心流锁自动续写 ---
                         if (window.flowlockManager) {
                             const flowlockState = window.flowlockManager.getState();
                             console.log('[Flowlock] Interrupt failed, checking if flowlock should recover. State:', flowlockState);
-                            
+
                             // 重置processing状态
                             if (window.flowlockManager.isProcessing) {
                                 console.log('[Flowlock] Resetting isProcessing state after interrupt failure');
                                 window.flowlockManager.isProcessing = false;
                             }
-                            
+
                             // 如果心流锁激活，触发下一次续写
                             if (flowlockState.isActive) {
                                 console.log('[Flowlock] Flowlock active after interrupt failure, will trigger next continue writing');
-                                
+
                                 setTimeout(() => {
                                     if (window.flowlockManager && window.flowlockManager.getState().isActive) {
                                         console.log('[Flowlock] Triggering continue writing after interrupt failure recovery...');
-                                        
+
                                         // 触发心跳动画
                                         const chatNameElement = document.getElementById('currentChatAgentName');
                                         if (chatNameElement) {
@@ -129,12 +129,12 @@ function showContextMenu(event, messageItem, message) {
                                                 chatNameElement.classList.remove('flowlock-heartbeat');
                                             }, 800);
                                         }
-                                        
+
                                         // 获取输入框内容作为提示词
                                         const messageInput = document.getElementById('messageInput');
                                         const customPrompt = messageInput ? messageInput.value.trim() : '';
                                         console.log('[Flowlock] Using custom prompt from input:', customPrompt || '(empty, will use default)');
-                                        
+
                                         // 触发续写
                                         if (window.handleContinueWriting) {
                                             window.flowlockManager.isProcessing = true;
@@ -146,7 +146,7 @@ function showContextMenu(event, messageItem, message) {
                                                 console.error('[Flowlock] Continue writing failed after interrupt failure recovery:', error);
                                                 window.flowlockManager.isProcessing = false;
                                                 window.flowlockManager.retryCount++;
-                                                
+
                                                 if (window.flowlockManager.retryCount >= window.flowlockManager.maxRetries) {
                                                     console.error('[Flowlock] Max retries reached, stopping flowlock');
                                                     if (window.uiHelperFunctions && window.uiHelperFunctions.showToastNotification) {
@@ -172,7 +172,7 @@ function showContextMenu(event, messageItem, message) {
         };
         menu.appendChild(interruptOption);
     }
-    
+
     // For non-thinking/non-streaming messages (including errors and completed messages)
     if (!isThinkingOrStreaming) {
         const isEditing = messageItem.classList.contains('message-item-editing');
@@ -216,7 +216,7 @@ function showContextMenu(event, messageItem, message) {
                 }
                 textToCopy = contentToProcess.replace(/<img[^>]*>/g, '').trim();
             }
-            
+
             navigator.clipboard.writeText(textToCopy);
             uiHelper.showToastNotification("已复制渲染后的文本。", "success");
             closeContextMenu();
@@ -295,7 +295,7 @@ function showContextMenu(event, messageItem, message) {
 
                 try {
                     const agentConfig = await electronAPI.getAgentConfig(agentId);
-                    
+
                     // 检查是否获取配置失败
                     if (agentConfig && agentConfig.error) {
                         console.error('[MessageContextMenu] Failed to get agent config for TTS:', agentConfig.error);
@@ -303,7 +303,7 @@ function showContextMenu(event, messageItem, message) {
                         closeContextMenu();
                         return;
                     }
-                    
+
                     if (agentConfig && agentConfig.ttsVoicePrimary) {
                         const contentDiv = messageItem.querySelector('.md-content');
                         const textToRead = contextMenuDependencies.extractSpeakableTextFromContentElement
@@ -365,10 +365,10 @@ function showContextMenu(event, messageItem, message) {
                     // The content from history can be a string or an object like { text: "..." }
                     const rawContent = result.content;
                     const contentString = (typeof rawContent === 'string') ? rawContent : (rawContent?.text || '');
-                    
+
                     const windowTitle = `阅读: ${message.id.substring(0, 10)}...`;
                     const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
-                    
+
                     if (electronAPI && typeof electronAPI.openTextInNewWindow === 'function') {
                         electronAPI.openTextInNewWindow(contentString, windowTitle, currentTheme);
                     }
@@ -397,13 +397,13 @@ function showContextMenu(event, messageItem, message) {
             } else {
                 textForConfirm = '[消息内容无法预览]';
             }
-            
+
             if (await uiHelper.showConfirmDialog(`确定要删除此消息吗？\n"${textForConfirm.substring(0, 50)}${textForConfirm.length > 50 ? '...' : ''}"`, '删除确认', '删除', '取消', true)) {
                 contextMenuDependencies.removeMessageById(message.id, true); // Pass true to save history
             }
             closeContextMenu();
         };
-        
+
         // Regenerate option should be here to maintain order
         if (message.role === 'assistant' && !message.isGroupMessage && currentSelectedItemVal.type === 'agent') {
             const regenerateOption = document.createElement('div');
@@ -415,7 +415,7 @@ function showContextMenu(event, messageItem, message) {
             };
             menu.appendChild(regenerateOption);
         }
-        
+
         // 新增：群聊中的“重新回复”功能
         if (message.role === 'assistant' && message.isGroupMessage) {
             const redoGroupOption = document.createElement('div');
@@ -488,7 +488,7 @@ function toggleEditMode(messageItem, message) {
         } else {
             textToDisplay = '[内容错误]';
         }
-        
+
         // 🟢 修复：使用 updateMessageContent 确保正则规则被应用
         if (contextMenuDependencies.updateMessageContent) {
             contextMenuDependencies.updateMessageContent(message.id, textToDisplay);
@@ -525,7 +525,7 @@ function toggleEditMode(messageItem, message) {
 
         const textarea = document.createElement('textarea');
         textarea.classList.add('message-edit-textarea');
-        
+
         let textForEditing = "";
         if (typeof message.content === 'string') {
             textForEditing = message.content;
@@ -546,7 +546,7 @@ function toggleEditMode(messageItem, message) {
         saveButton.onclick = async () => {
             // 🔧 关键修复：添加防御性编程和错误处理
             const newContent = textarea.value;
-            
+
             // Get original content for comparison
             let originalTextContent = "";
             if (typeof message.content === 'string') {
@@ -562,7 +562,7 @@ function toggleEditMode(messageItem, message) {
             }
 
             const messageIndex = currentChatHistoryArray.findIndex(msg => msg.id === message.id);
-            
+
             if (messageIndex === -1) {
                 uiHelper.showToastNotification("无法找到要编辑的消息，编辑失败。", "error");
                 return;
@@ -571,7 +571,7 @@ function toggleEditMode(messageItem, message) {
             // 🔧 保存原始状态以便回滚
             const originalContent = currentChatHistoryArray[messageIndex].content;
             const originalMessageContent = message.content;
-            
+
             try {
                 // 🔧 先临时禁用文件监控，避免竞态条件
                 if (electronAPI.watcherStop) {
@@ -582,7 +582,7 @@ function toggleEditMode(messageItem, message) {
                 // 🔧 更新内存状态
                 currentChatHistoryArray[messageIndex].content = newContent;
                 message.content = newContent;
-                
+
                 // 🔧 尝试保存到文件
                 if (currentSelectedItemVal.id && currentTopicIdVal) {
                     let saveResult;
@@ -591,16 +591,16 @@ function toggleEditMode(messageItem, message) {
                     } else if (currentSelectedItemVal.type === 'group' && electronAPI.saveGroupChatHistory) {
                         saveResult = await electronAPI.saveGroupChatHistory(currentSelectedItemVal.id, currentTopicIdVal, currentChatHistoryArray);
                     }
-                    
+
                     // 🔧 检查保存结果
                     if (saveResult && !saveResult.success) {
                         throw new Error(saveResult.error || '保存失败');
                     }
                 }
-                
+
                 // 🔧 保存成功后更新UI
                 mainRefs.currentChatHistoryRef.set([...currentChatHistoryArray]);
-                
+
                 // 🟢 修复：使用 updateMessageContent 确保正则规则被应用
                 if (contextMenuDependencies.updateMessageContent) {
                     contextMenuDependencies.updateMessageContent(message.id, newContent);
@@ -612,24 +612,24 @@ function toggleEditMode(messageItem, message) {
                     contextMenuDependencies.processRenderedContent(contentDiv);
                     contextMenuDependencies.renderAttachments(message, contentDiv);
                 }
-                
+
                 // 🔧 重新启动文件监控
                 if (electronAPI.watcherStart && currentSelectedItemVal.config?.agentDataPath) {
                     const historyFilePath = `${currentSelectedItemVal.config.agentDataPath}\\topics\\${currentTopicIdVal}\\history.json`;
                     await electronAPI.watcherStart(historyFilePath, currentSelectedItemVal.id, currentTopicIdVal);
                 }
-                
+
                 if (uiHelper && typeof uiHelper.showToastNotification === 'function') {
                     uiHelper.showToastNotification("消息编辑已保存。", "success");
                 }
-                
+
             } catch (error) {
                 // 🔧 保存失败时回滚状态
                 console.error('[EditMode] Save failed, rolling back:', error);
                 currentChatHistoryArray[messageIndex].content = originalContent;
                 message.content = originalMessageContent;
                 mainRefs.currentChatHistoryRef.set([...currentChatHistoryArray]);
-                
+
                 // 🔧 重新启动文件监控（即使保存失败）
                 if (electronAPI.watcherStart && currentSelectedItemVal.config?.agentDataPath) {
                     try {
@@ -639,13 +639,13 @@ function toggleEditMode(messageItem, message) {
                         console.error('[EditMode] Failed to restart watcher after save failure:', watcherError);
                     }
                 }
-                
+
                 if (uiHelper && typeof uiHelper.showToastNotification === 'function') {
                     uiHelper.showToastNotification(`编辑保存失败: ${error.message}`, "error");
                 }
                 return; // 不退出编辑模式，让用户重试
             }
-            
+
             // 🔧 只有在保存成功后才退出编辑模式
             toggleEditMode(messageItem, message);
         };
@@ -661,7 +661,7 @@ function toggleEditMode(messageItem, message) {
 
         messageItem.appendChild(textarea);
         messageItem.appendChild(controlsDiv);
-         
+
         if (uiHelper.autoResizeTextarea) uiHelper.autoResizeTextarea(textarea);
         textarea.focus();
         textarea.addEventListener('input', () => uiHelper.autoResizeTextarea(textarea));
@@ -695,7 +695,7 @@ async function handleRegenerateResponse(originalAssistantMessage) {
     if (originalMessageIndex === -1) return;
 
     const historyForRegeneration = currentChatHistoryArray.slice(0, originalMessageIndex);
-    
+
     // Remove original and subsequent messages from DOM and history
     const messagesToRemove = currentChatHistoryArray.splice(originalMessageIndex);
     mainRefs.currentChatHistoryRef.set([...currentChatHistoryArray]);
@@ -727,7 +727,7 @@ async function handleRegenerateResponse(originalAssistantMessage) {
 
     try {
         const agentConfig = await electronAPI.getAgentConfig(currentSelectedItemVal.id);
-        
+
         // 检查是否获取配置失败
         if (agentConfig && agentConfig.error) {
             console.error('[MessageContextMenu] Failed to get agent config for regeneration:', agentConfig.error);
@@ -755,7 +755,7 @@ async function handleRegenerateResponse(originalAssistantMessage) {
             let vcpAudioAttachmentsPayload = [];
             let vcpVideoAttachmentsPayload = [];
             let currentMessageTextContent;
- 
+
             let originalText = (typeof msg.content === 'string') ? msg.content : (msg.content?.text || '');
 
             // Check if this is the last user message in the history for regeneration
@@ -774,21 +774,28 @@ async function handleRegenerateResponse(originalAssistantMessage) {
                     originalText = originalText.replace(/\{\{VCPChatCanvas\}\}/g, '\n[Error loading canvas content]\n');
                 }
             }
- 
+
             if (msg.attachments && msg.attachments.length > 0) {
                 let historicalAppendedText = "";
                 for (const att of msg.attachments) {
                     const fileManagerData = att._fileManagerData || {};
                     // 🟢 同步：重新生成时的多级路径探测。优先使用 internalPath (物理路径)
-                    const filePathForContext = (fileManagerData && fileManagerData.internalPath) || 
-                                               att.localPath || 
-                                               att.src || 
+                    // 兼容两种附件结构：通过正常发送的附件（数据在 _fileManagerData 中）
+                    // 和通过 addAttachmentsToMessage 添加的附件（数据直接在 att 顶层）
+                    const filePathForContext = (fileManagerData && fileManagerData.internalPath) ||
+                                               att.internalPath ||
+                                               att.localPath ||
+                                               att.src ||
                                                (att.name || '未知文件');
 
-                    if (fileManagerData.imageFrames && fileManagerData.imageFrames.length > 0) {
+                    // 兼容读取：优先从 _fileManagerData 读取，回退到 att 顶层字段
+                    const effectiveImageFrames = fileManagerData.imageFrames || att.imageFrames;
+                    const effectiveExtractedText = fileManagerData.extractedText || att.extractedText;
+
+                    if (effectiveImageFrames && effectiveImageFrames.length > 0) {
                          historicalAppendedText += `\n\n[附加文件: ${filePathForContext} (扫描版PDF，已转换为图片)]`;
-                    } else if (fileManagerData.extractedText) {
-                        historicalAppendedText += `\n\n[附加文件: ${filePathForContext}]\n${fileManagerData.extractedText}\n[/附加文件结束: ${att.name || '未知文件'}]`;
+                    } else if (effectiveExtractedText) {
+                        historicalAppendedText += `\n\n[附加文件: ${filePathForContext}]\n${effectiveExtractedText}\n[/附加文件结束: ${att.name || '未知文件'}]`;
                     } else {
                         historicalAppendedText += `\n\n[附加文件: ${filePathForContext}]`;
                     }
@@ -811,17 +818,19 @@ async function handleRegenerateResponse(originalAssistantMessage) {
                 // --- IMAGE PROCESSING ---
                 const imageAttachmentsPromises = msg.attachments.map(async att => {
                     const fileManagerData = att._fileManagerData || {};
+                    // 兼容读取：优先从 _fileManagerData 读取，回退到 att 顶层字段
+                    const effectiveImageFrames = fileManagerData.imageFrames || att.imageFrames;
                     // Case 1: Scanned PDF converted to image frames
-                    if (fileManagerData.imageFrames && fileManagerData.imageFrames.length > 0) {
-                        return fileManagerData.imageFrames.map(frameData => ({
+                    if (effectiveImageFrames && effectiveImageFrames.length > 0) {
+                        return effectiveImageFrames.map(frameData => ({
                             type: 'image_url',
                             image_url: { url: `data:image/jpeg;base64,${frameData}` }
                         }));
                     }
                     // Case 2: Regular image file (including GIFs that get framed)
-                    if (att.type.startsWith('image/')) {
+                    if (att.type && att.type.startsWith('image/')) {
                         try {
-                            const result = await electronAPI.getFileAsBase64(att.src);
+                            const result = await electronAPI.getFileAsBase64(att.src || att.internalPath);
                             if (result && result.success) {
                                 return result.base64Frames.map(frameData => ({
                                     type: 'image_url',
@@ -849,10 +858,10 @@ async function handleRegenerateResponse(originalAssistantMessage) {
                 // --- AUDIO PROCESSING ---
                 const supportedAudioTypes = ['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/aiff', 'audio/aac', 'audio/ogg', 'audio/flac'];
                 const audioAttachmentsPromises = msg.attachments
-                    .filter(att => supportedAudioTypes.includes(att.type))
+                    .filter(att => att.type && supportedAudioTypes.includes(att.type))
                     .map(async att => {
                         try {
-                            const result = await electronAPI.getFileAsBase64(att.src);
+                            const result = await electronAPI.getFileAsBase64(att.src || att.internalPath);
                             if (result && result.success && result.base64Frames.length > 0) {
                                 return result.base64Frames.map(frameData => ({
                                     type: 'image_url',
@@ -875,10 +884,10 @@ async function handleRegenerateResponse(originalAssistantMessage) {
 
                 // --- VIDEO PROCESSING ---
                 const videoAttachmentsPromises = msg.attachments
-                    .filter(att => att.type.startsWith('video/'))
+                    .filter(att => att.type && att.type.startsWith('video/'))
                     .map(async att => {
                         try {
-                            const result = await electronAPI.getFileAsBase64(att.src);
+                            const result = await electronAPI.getFileAsBase64(att.src || att.internalPath);
                             if (result && result.success && result.base64Frames.length > 0) {
                                 return result.base64Frames.map(frameData => ({
                                     type: 'image_url',
@@ -911,7 +920,7 @@ async function handleRegenerateResponse(originalAssistantMessage) {
             if (finalContentPartsForVCP.length === 0 && msg.role === 'user') {
                  finalContentPartsForVCP.push({ type: 'text', text: '(用户发送了附件，但无文本或图片内容)' });
             }
-            
+
             return { role: msg.role, content: finalContentPartsForVCP.length > 0 ? finalContentPartsForVCP : msg.content };
         }));
 
@@ -977,7 +986,7 @@ async function handleRegenerateResponse(originalAssistantMessage) {
             top_k: agentConfig.top_k ? parseInt(agentConfig.top_k) : undefined,
             stream: agentConfig.streamOutput === true || String(agentConfig.streamOutput) === 'true'
         };
-        
+
         // 【关键修复】如果使用流式输出，先调用 startStreamingMessage
         if (modelConfigForVCP.stream) {
             contextMenuDependencies.startStreamingMessage({ ...regenerationThinkingMessage, content: "" });
@@ -988,7 +997,7 @@ async function handleRegenerateResponse(originalAssistantMessage) {
             topicId: currentTopicIdVal,
             isGroupMessage: false
         };
-        
+
         const vcpResult = await electronAPI.sendToVCP(
             globalSettingsVal.vcpServerUrl,
             globalSettingsVal.vcpApiKey,
@@ -1036,7 +1045,7 @@ async function handleRegenerateResponse(originalAssistantMessage) {
                     // 确保历史记录中没有残余的 "thinking" 消息
                     const finalHistory = historyForSave.filter(msg => msg.id !== regenerationThinkingMessage.id && !msg.isThinking);
                     finalHistory.push(assistantMessage);
-                    
+
                     await electronAPI.saveChatHistory(context.agentId, context.topicId, finalHistory);
 
                     if (isForActiveChat) {

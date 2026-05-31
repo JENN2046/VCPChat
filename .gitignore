@@ -49,6 +49,8 @@ VCPDistributedServer/Plugin/FileOperator/.env
 /WebIndexTTS2/tmp-output/
 
 # VCPChat local runtime and generated artifacts
+.vcp_ready
+pr_body_*.md
 .claude/
 .omc/
 Desktopmodules/.omc/

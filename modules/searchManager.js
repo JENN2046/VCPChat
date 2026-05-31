@@ -12,6 +12,7 @@ const searchManager = {
     uiHelper: null,
     chatManager: null,
     currentSelectedItemRef: null,
+    currentTopicIdRef: null,
 
     elements: {},
     state: {
@@ -31,9 +32,10 @@ const searchManager = {
         this.uiHelper = dependencies.uiHelper;
         this.chatManager = dependencies.modules.chatManager;
         this.currentSelectedItemRef = dependencies.refs.currentSelectedItemRef;
+        this.currentTopicIdRef = dependencies.refs.currentTopicIdRef;
 
         this.setupGlobalShortcuts();
-        
+
         // 🟢 监听模态框就绪事件
         document.addEventListener('modal-ready', (e) => {
             if (e.detail.modalId === 'globalSearchModal') {
@@ -102,7 +104,7 @@ const searchManager = {
             this.uiHelper.openModal('globalSearchModal');
             // openModal 会触发 modal-ready，进而调用 cacheDOMElements
         }
-        
+
         if (this.elements.modal) {
             this.elements.modal.style.display = 'flex';
             this.elements.input.focus();
@@ -118,9 +120,25 @@ const searchManager = {
                 this.electronAPI.getAgentGroups()
             ]);
 
-            // 保留“所有”选项
+            // 保留当前选中值
             const currentValue = this.elements.agentSelect.value;
-            this.elements.agentSelect.innerHTML = '<option value="all">所有助手和群组</option>';
+            this.elements.agentSelect.innerHTML = '';
+
+            // 置顶"当前会话"选项
+            const currentItem = this.currentSelectedItemRef?.get();
+            const currentTopicId = this.currentTopicIdRef?.get();
+            if (currentItem && currentItem.id && currentTopicId) {
+                const currentSessionOption = document.createElement('option');
+                currentSessionOption.value = 'current-session';
+                currentSessionOption.textContent = `当前会话 (${currentItem.name || currentItem.id})`;
+                this.elements.agentSelect.appendChild(currentSessionOption);
+            }
+
+            // "所有助手和群组"选项
+            const allOption = document.createElement('option');
+            allOption.value = 'all';
+            allOption.textContent = '所有助手和群组';
+            this.elements.agentSelect.appendChild(allOption);
 
             if (agents && !agents.error) {
                 const agentGroup = document.createElement('optgroup');
@@ -163,7 +181,7 @@ const searchManager = {
         if (this.elements.input) this.elements.input.value = '';
         if (this.elements.resultsContainer) this.elements.resultsContainer.innerHTML = '';
         if (this.elements.paginationContainer) this.elements.paginationContainer.innerHTML = '';
-        
+
         this.state.currentQuery = '';
         this.state.searchResults = [];
         this.state.currentPage = 1;
@@ -227,7 +245,7 @@ const searchManager = {
             if ((!agents || agents.error) || (!groups || groups.error)) {
                 throw new Error(`Failed to fetch data. AgentError: ${agents?.error}, GroupError: ${groups?.error}`);
             }
-            
+
             this.state.allAgents = agents.reduce((acc, agent) => { acc[agent.id] = agent; return acc; }, {});
             this.state.allGroups = groups.reduce((acc, group) => { acc[group.id] = group; return acc; }, {});
 
@@ -235,35 +253,60 @@ const searchManager = {
             let allFoundMessages = [];
             const topicsToFetch = [];
 
-            const selectedFilter = this.elements.agentSelect.value; // "all", "agent:id", or "group:id"
-            const [filterType, filterId] = selectedFilter.split(':');
+            const selectedFilter = this.elements.agentSelect.value; // "all", "current-session", "agent:id", or "group:id"
 
-            const processItem = (item, type) => {
-                // 如果指定了过滤，且当前项目不匹配，则跳过
-                if (selectedFilter !== 'all') {
-                    if (type !== filterType || item.id !== filterId) {
-                        return;
-                    }
-                }
+            // 处理"当前会话"筛选
+            if (selectedFilter === 'current-session') {
+                const currentItem = this.currentSelectedItemRef?.get();
+                const currentTopicId = this.currentTopicIdRef?.get();
+                if (currentItem && currentItem.id && currentTopicId) {
+                    // 从当前 item 的 config 中找到当前 topic 的名称
+                    const itemConfig = currentItem.config || currentItem;
+                    const topics = itemConfig.topics || [];
+                    const currentTopic = topics.find(t => t.id === currentTopicId);
+                    const topicName = currentTopic ? currentTopic.name : '当前话题';
 
-                if (item.topics && item.topics.length > 0) {
-                    item.topics.forEach(topic => {
-                        topicsToFetch.push({
-                            context: {
-                                itemId: item.id,
-                                itemName: item.name,
-                                itemType: type,
-                                itemAvatar: item.avatarUrl,
-                                topicId: topic.id,
-                                topicName: topic.name
-                            }
-                        });
+                    topicsToFetch.push({
+                        context: {
+                            itemId: currentItem.id,
+                            itemName: currentItem.name,
+                            itemType: currentItem.type,
+                            itemAvatar: currentItem.avatarUrl,
+                            topicId: currentTopicId,
+                            topicName: topicName
+                        }
                     });
                 }
-            };
+            } else {
+                const [filterType, filterId] = selectedFilter.split(':');
 
-            agents.forEach(agent => processItem(agent, 'agent'));
-            groups.forEach(group => processItem(group, 'group'));
+                const processItem = (item, type) => {
+                    // 如果指定了过滤，且当前项目不匹配，则跳过
+                    if (selectedFilter !== 'all') {
+                        if (type !== filterType || item.id !== filterId) {
+                            return;
+                        }
+                    }
+
+                    if (item.topics && item.topics.length > 0) {
+                        item.topics.forEach(topic => {
+                            topicsToFetch.push({
+                                context: {
+                                    itemId: item.id,
+                                    itemName: item.name,
+                                    itemType: type,
+                                    itemAvatar: item.avatarUrl,
+                                    topicId: topic.id,
+                                    topicName: topic.name
+                                }
+                            });
+                        });
+                    }
+                };
+
+                agents.forEach(agent => processItem(agent, 'agent'));
+                groups.forEach(group => processItem(group, 'group'));
+            }
 
             const historyReadPromises = topicsToFetch.map(info => {
                 const { itemType, itemId, topicId } = info.context;
@@ -296,7 +339,7 @@ const searchManager = {
                     // 支持多行搜索：将搜索查询和内容都标准化处理
                     const normalizedContent = content.toLowerCase().replace(/\s+/g, ' ').trim();
                     const normalizedQuery = lowerCaseQuery.replace(/\s+/g, ' ').trim();
-                    
+
                     // 如果查询包含换行符，进行精确的多行匹配
                     let isMatch = false;
                     if (lowerCaseQuery.includes('\n')) {
@@ -349,10 +392,10 @@ const searchManager = {
         paginatedResults.forEach(message => {
             const itemEl = document.createElement('div');
             itemEl.classList.add('search-result-item');
-            
+
             const scopeId = this.generateUniqueId();
             itemEl.id = scopeId;
-            
+
             itemEl.addEventListener('click', () => this.navigateToMessage(message));
 
             const contentText = (typeof message.content === 'object' && message.content !== null && message.content.text)
@@ -362,17 +405,17 @@ const searchManager = {
             // ========== 🔧 修复的核心逻辑 ==========
             let processedContent = contentText;
             const codeBlocks = [];
-            
+
             // 1️⃣ 提取代码块并用占位符替换
             processedContent = processedContent.replace(CODE_FENCE_REGEX, (match, codeContent) => {
                 const placeholder = `__VCP_CODE_BLOCK_${codeBlocks.length}__`;
                 codeBlocks.push(codeContent); // 只保存代码内容，不保存 ``` 标记
                 return placeholder;
             });
-            
+
             // 2️⃣ 提取并注入 Scoped CSS（针对非代码块区域）
             processedContent = this.processAndInjectScopedCss(processedContent, scopeId);
-            
+
             // 3️⃣ 恢复代码块：转义后包装成 <pre><code>
             codeBlocks.forEach((code, i) => {
                 const placeholder = `__VCP_CODE_BLOCK_${i}__`;
@@ -393,7 +436,7 @@ const searchManager = {
 
             // 4️⃣ 直接渲染 HTML（div 气泡会正常显示，代码块已经被安全处理）
             contentWrapperEl.innerHTML = `<span class="name">${this.escapeHtml(message.name || message.role)}: </span><span class="message-body">${processedContent}</span>`;
-            
+
             // 5️⃣ 在 DOM 层面高亮搜索词（避免破坏 HTML 结构）
             const query = this.state.currentQuery;
             if (query) {
@@ -415,9 +458,9 @@ const searchManager = {
      */
     highlightTextInElement(element, query) {
         if (!element || !query) return;
-        
+
         const lowerQuery = query.toLowerCase().replace(/\s+/g, ' ').trim();
-        
+
         // 使用 TreeWalker 遍历所有文本节点
         const walker = document.createTreeWalker(
             element,
@@ -425,23 +468,23 @@ const searchManager = {
             null,
             false
         );
-        
+
         const textNodes = [];
         let node;
         while ((node = walker.nextNode())) {
             textNodes.push(node);
         }
-        
+
         textNodes.forEach(textNode => {
             const text = textNode.textContent;
             const lowerText = text.toLowerCase();
-            
+
             if (!lowerText.includes(lowerQuery)) return;
-            
+
             const fragment = document.createDocumentFragment();
             let lastIndex = 0;
             let searchIndex = 0;
-            
+
             while ((searchIndex = lowerText.indexOf(lowerQuery, lastIndex)) !== -1) {
                 // 添加匹配前的文本
                 if (searchIndex > lastIndex) {
@@ -454,15 +497,15 @@ const searchManager = {
                 strong.className = 'search-highlight';
                 strong.textContent = text.slice(searchIndex, searchIndex + lowerQuery.length);
                 fragment.appendChild(strong);
-                
+
                 lastIndex = searchIndex + lowerQuery.length;
             }
-            
+
             // 添加剩余文本
             if (lastIndex < text.length) {
                 fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
             }
-            
+
             textNode.parentNode.replaceChild(fragment, textNode);
         });
     },
@@ -506,11 +549,11 @@ const searchManager = {
         this.closeModal();
 
         const { itemId, itemType, topicId, itemName, itemAvatar } = message.context;
-        
-        const itemConfig = (itemType === 'agent') 
-            ? this.state.allAgents[itemId] 
+
+        const itemConfig = (itemType === 'agent')
+            ? this.state.allAgents[itemId]
             : this.state.allGroups[itemId];
-            
+
         if (!itemConfig) {
             console.error(`[SearchManager] Could not find config for ${itemType} with ID ${itemId}`);
             this.uiHelper.showToastNotification('无法导航：找不到对应的项目配置。', 'error');

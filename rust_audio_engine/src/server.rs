@@ -91,7 +91,7 @@ where
 
 /// FIX for Defect 44: Validate file paths to prevent path traversal attacks.
 /// FIX for SEC-01: Reject paths that fail canonicalization (file doesn't exist).
-/// 
+///
 /// - HTTP(S) URLs are allowed (they have their own security model)
 /// - Local paths are validated to prevent directory traversal
 /// - Local paths MUST exist and be accessible (canonicalize must succeed)
@@ -111,16 +111,20 @@ fn validate_path(path: &str) -> Result<String, String> {
         }
         return Ok(path.to_string());
     }
-    
+
     // Local file path validation
     let path = std::path::Path::new(path);
-    
-    // Check for path traversal attempts
-    let path_str = path.to_string_lossy();
-    if path_str.contains("..") {
-        return Err("Path traversal not allowed: '..' found in path".into());
+
+    // Check for path traversal attempts.
+    // IMPORTANT: do not reject filenames that merely contain two dots, e.g.
+    // "02. One More Wish - Japanese Ver..mp3". Only an actual parent-dir
+    // component (`..`) is path traversal.
+    if path.components().any(|component| matches!(component, std::path::Component::ParentDir)) {
+        return Err("Path traversal not allowed: '..' path component found".into());
     }
-    
+
+    let path_str = path.to_string_lossy();
+
     // On Windows, also check for drive letter injection
     #[cfg(windows)]
     {
@@ -133,14 +137,14 @@ fn validate_path(path: &str) -> Result<String, String> {
             .and_then(|n| n.to_str())
             .unwrap_or("")
             .to_uppercase();
-        let reserved = ["CON", "PRN", "AUX", "NUL", 
+        let reserved = ["CON", "PRN", "AUX", "NUL",
                        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
                        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"];
         if reserved.contains(&file_name.as_str()) {
             return Err(format!("Reserved device name not allowed: {}", file_name));
         }
     }
-    
+
     // FIX for SEC-01: Require canonicalization to succeed for local paths
     // This prevents:
     // 1. Path probing attacks (determining if arbitrary paths exist)
@@ -404,7 +408,7 @@ impl ApiResponse {
             devices: None,
         }
     }
-    
+
     fn success_with_state(msg: &str, state: StateResponse) -> Self {
         Self {
             status: "success".into(),
@@ -413,7 +417,7 @@ impl ApiResponse {
             devices: None,
         }
     }
-    
+
     fn error(msg: &str) -> Self {
         Self {
             status: "error".into(),
@@ -430,9 +434,9 @@ impl ApiResponse {
 fn apply_settings_to_player(player: &mut AudioPlayer, settings: &PersistentSettings) {
     // Volume
     player.set_volume(settings.volume as f64);
-    
+
     // Device settings are applied separately via configure_output API
-    
+
     // EQ
     if settings.eq_type == "FIR" {
         let taps = settings.fir_taps.unwrap_or(1023);
@@ -440,7 +444,7 @@ fn apply_settings_to_player(player: &mut AudioPlayer, settings: &PersistentSetti
     } else {
         *player.shared_state().eq_type.write() = "IIR".to_string();
     }
-    
+
     if let Some(ref bands) = settings.eq_bands {
         // Build gains array from bands map
         let band_map: std::collections::HashMap<&str, usize> = [
@@ -466,16 +470,16 @@ fn apply_settings_to_player(player: &mut AudioPlayer, settings: &PersistentSetti
             }
         }
     }
-    
+
     // Dither (state only; lock-free audio path currently does not host NoiseShaper stage)
     player.dither_enabled = settings.dither_enabled;
     player.set_output_bits(settings.output_bits);
-    
+
     // Loudness
     player.set_loudness_enabled(settings.loudness_enabled);
     player.set_target_lufs(settings.target_lufs);
     player.set_preamp_gain(settings.preamp_db);
-    
+
     // Set loudness mode
     let mode = match settings.loudness_mode.as_str() {
         "album" => crate::config::NormalizationMode::Album,
@@ -485,23 +489,23 @@ fn apply_settings_to_player(player: &mut AudioPlayer, settings: &PersistentSetti
         _ => crate::config::NormalizationMode::Track,
     };
     player.set_normalization_mode(mode);
-    
+
     // Saturation
     player.set_saturation_enabled(settings.saturation_enabled);
     player.set_saturation_drive(settings.saturation_drive);
     player.set_saturation_mix(settings.saturation_mix);
-    
+
     // Crossfeed
     player.set_crossfeed_enabled(settings.crossfeed_enabled);
     player.set_crossfeed_mix(settings.crossfeed_mix);
-    
+
     // Dynamic Loudness
     player.set_dynamic_loudness_enabled(settings.dynamic_loudness_enabled);
     player.set_dynamic_loudness_strength(settings.dynamic_loudness_strength);
-    
+
     // Resampling
     player.target_sample_rate = settings.target_samplerate;
-    
+
     // Set resample quality
     {
         use crate::config::ResampleQuality;
@@ -520,16 +524,16 @@ fn apply_settings_to_player(player: &mut AudioPlayer, settings: &PersistentSetti
 fn get_player_state(player: &AudioPlayer) -> StateResponse {
     let shared = player.shared_state();
     let state = player.get_state();
-    
+
     // Get real values from SharedState
     let volume = shared.volume.load(std::sync::atomic::Ordering::Relaxed) as f32 / 1_000_000.0;
     let device_id = shared.device_id.load(std::sync::atomic::Ordering::Relaxed);
     let file_path = shared.file_path.read().clone();
     let eq_type = shared.eq_type.read().clone();
-    
+
     // Get track metadata
     let metadata = shared.track_metadata.read();
-    
+
     // Get loudness normalization info
     let loudness_info = player.get_loudness_info();
     let loudness_mode = match player.get_normalization_mode() {
@@ -539,16 +543,16 @@ fn get_player_state(player: &AudioPlayer) -> StateResponse {
         crate::config::NormalizationMode::ReplayGainTrack => "replaygain_track".to_string(),
         crate::config::NormalizationMode::ReplayGainAlbum => "replaygain_album".to_string(),
     };
-    
+
     // Get saturation info
     let saturation_info = player.get_saturation_info();
-    
+
     // Get crossfeed info
     let crossfeed_info = player.get_crossfeed_info();
-    
+
     // Get noise shaper info
     let noise_shaper_curve = player.get_noise_shaper_curve();
-    
+
     StateResponse {
         is_playing: state == PlayerState::Playing,
         is_paused: state == PlayerState::Paused,
@@ -691,7 +695,7 @@ pub async fn run_server(port: u16, config: AppConfig, settings_manager: SharedSe
         .and_then(|v| v.parse::<u64>().ok())
         .filter(|&v| v > 0)
         .unwrap_or(180);
-    
+
     // Apply persisted settings to player
     {
         let settings = settings_manager.lock().get_settings();
@@ -713,12 +717,12 @@ pub async fn run_server(port: u16, config: AppConfig, settings_manager: SharedSe
         analysis_task_timeout_secs,
         shutdown_handle: Mutex::new(None),
     });
-    
+
     log::info!("Starting VCP Audio Engine on http://127.0.0.1:{}", port);
-    
+
     // Print ready signal for parent process
     println!("RUST_AUDIO_ENGINE_READY");
-    
+
     let server_state = Arc::clone(&state);
     let server = HttpServer::new(move || {
         App::new()

@@ -3,6 +3,13 @@
 
 function setupUtils(app) {
     const api = app.api || window.utilityAPI || window.electronAPI;
+
+    // 去除标题尾部的音频文件扩展名（如 .mp3, .flac, .wav 等）
+    app.stripAudioExtension = (title) => {
+        if (!title) return title;
+        return title.replace(/\.(mp3|flac|wav|m4a|ogg|aac|wma|ape|dsf|dff|alac|aiff|opus|wv)$/i, '');
+    };
+
     app.formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
@@ -56,10 +63,10 @@ tag_boost:「始」0.95「末」
             });
 
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            
+
             const data = await res.json();
             console.log('[Music] Semantic search result:', data);
-            
+
             // 灵活处理返回格式
             let output = '';
             if (data.original_plugin_output) {
@@ -95,13 +102,13 @@ tag_boost:「始」0.95「末」
         // [路径: file:///MusicDiary/Ebb and Flow (5 years after remix)-Tamame-Ebb and Flow (5 years after remix).txt]
         // [TagMemo 增强: 赛博朋克, VCP, 日记, 图像生成,提示词工程]
         // Ebb and Flow (5 years after remix)
-        
+
         const results = [];
         const sections = output.split('--- (来源:');
-        
+
         sections.forEach(section => {
             if (!section.trim()) return;
-            
+
             // 提取路径
             const pathMatch = section.match(/\[路径: (.*?)\]/);
             if (pathMatch) {
@@ -110,7 +117,7 @@ tag_boost:「始」0.95「末」
                 if (path.startsWith('file:///')) {
                     path = path.substring(8);
                 }
-                
+
                 // 提取文件名（不含扩展名）作为搜索关键词
                 const fileName = path.split('/').pop().replace(/\.txt$/, '');
                 results.push({
@@ -131,7 +138,7 @@ tag_boost:「始」0.95「末」
             // 1. 尝试通过文件名匹配 (处理歌单中的逐行扫描逻辑)
             const query = res.fileName.toLowerCase();
             const queryParts = query.split('-').map(p => p.trim()).filter(p => p.length > 1);
-            
+
             app.playlist.forEach(track => {
                 if (seenPaths.has(track.path)) return;
 
@@ -140,7 +147,7 @@ tag_boost:「始」0.95「末」
                 const trackPath = track.path.toLowerCase();
 
                 let isMatch = false;
-                
+
                 // A. 精确匹配标题或标题包含在查询中（要求标题长度大于2以避免误伤）
                 if (title && (title === query || (query.includes(title) && title.length > 2))) {
                     isMatch = true;
@@ -161,7 +168,7 @@ tag_boost:「始」0.95「末」
                     seenPaths.add(track.path);
                 }
             });
-            
+
             // 2. 处理歌单文件内容 (逐行扫描)
             const lines = res.originalSection.split(/[\r\n]+/);
             lines.forEach(line => {
@@ -174,7 +181,7 @@ tag_boost:「始」0.95「末」
                     const songQuery = trimmedLine.replace(/\.[^.]+$/, '').toLowerCase();
                     app.playlist.forEach(track => {
                         if (seenPaths.has(track.path)) return;
-                        
+
                         const title = (track.title || '').toLowerCase();
                         const trackPath = track.path.toLowerCase();
 
@@ -195,7 +202,7 @@ tag_boost:「始」0.95「末」
         app.sidebarTabs.forEach(t => t.classList.remove('active'));
         const allTab = document.querySelector('.sidebar-tab[data-view="all"]');
         if (allTab) allTab.classList.add('active');
-        
+
         const categoryView = document.getElementById('sidebar-category-view');
         if (categoryView) categoryView.style.display = 'none';
         if (app.playlistEl) app.playlistEl.style.display = 'block';

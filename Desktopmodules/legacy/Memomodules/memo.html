@@ -32,9 +32,9 @@
             <button id="create-memo-btn" class="jelly-btn" style="width: auto; padding: 8px 20px; font-size: 0.9rem;">
                 + 新建日记
             </button>
-            
+
             <div style="width: 1px; height: 20px; background: var(--glass-border); margin: 0 10px;"></div>
-            
+
             <button id="minimize-memo-btn" class="nav-icon-btn" title="最小化">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
@@ -246,7 +246,7 @@
                     <button id="close-workbench-btn" class="nav-icon-btn" style="font-size: 1.5rem;">&times;</button>
                 </div>
             </div>
-            
+
             <div class="workbench-body">
                 <!-- 上半部分：参考区 -->
                 <div class="workbench-reference-section">
@@ -298,8 +298,7 @@
     </div>
 
     <!-- Pretext 文本布局引擎 -->
-    <script src="../../../modules/renderer/pretext.bundle.js"></script>
-    <script src="../../../modules/renderer/pretext-bridge.js"></script>
+    <script type="module" src="../../../modules/renderer/pretext-bridge.js"></script>
     <script src="memo.js"></script>
     <script src="memo-graph.js"></script>
     <script src="memo-workbench.js"></script>
@@ -314,7 +313,7 @@
                 </h2>
                 <button id="close-assoc-config-btn" class="nav-icon-btn" style="font-size: 1.5rem;">&times;</button>
             </div>
-            
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
                 <div class="assoc-input-group">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
@@ -384,7 +383,7 @@
                 </div>
             </div>
         </div>
-        
+
         <canvas id="neural-canvas"></canvas>
 
         <div id="node-detail-panel" class="node-detail-panel glass hidden">

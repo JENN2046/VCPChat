@@ -513,21 +513,30 @@ function transformSpecialBlocks(text, codeBlockMap) {
             // --- It's a DailyNote Tool, render it as a diary bubble ---
             const maid = extractMarkedField(content, /(?:maid|maidName):\s*/i) || '';
             const date = extractMarkedField(content, /Date:\s*/i) || '';
+            const fileName = extractMarkedField(content, /fileName:\s*/i) || '';
+            const folder = extractMarkedField(content, /folder:\s*/i) || '';
             const diaryContent = extractMarkedField(content, /Content:\s*/i) || '[日记内容解析失败]';
             const diaryTag = extractMarkedField(content, /Tag:\s*/i) || '';
 
-            let html = `<div class="maid-diary-bubble">`;
+            let html = `<div class="maid-diary-bubble" data-vcp-block-type="maid-diary" data-vcp-preserve-children="true">`;
             html += `<div class="diary-header">`;
-            html += `<span class="diary-title">Maid's Diary</span>`;
+            html += `<span class="diary-title">${fileName ? escapeHtml(fileName) : "Maid's Diary"}</span>`;
             if (date) {
                 html += `<span class="diary-date">${escapeHtml(date)}</span>`;
             }
             html += `</div>`;
 
-            if (maid) {
+            if (maid || folder) {
                 html += `<div class="diary-maid-info">`;
-                html += `<span class="diary-maid-label">Maid:</span> `;
-                html += `<span class="diary-maid-name">${escapeHtml(maid)}</span>`;
+                if (maid) {
+                    html += `<span class="diary-maid-label">Maid:</span> `;
+                    html += `<span class="diary-maid-name">${escapeHtml(maid)}</span>`;
+                }
+                if (folder) {
+                    if (maid) html += ` <span class="diary-meta-separator">·</span> `;
+                    html += `<span class="diary-folder-label">Folder:</span> `;
+                    html += `<span class="diary-folder-name">${escapeHtml(folder)}</span>`;
+                }
                 html += `</div>`;
             }
 
@@ -564,7 +573,7 @@ function transformSpecialBlocks(text, codeBlockMap) {
             }
 
             const escapedFullContent = escapeHtml(restoreBlocks(content));
-            return `\n\n<div class="vcp-tool-use-bubble">` +
+            return `\n\n<div class="vcp-tool-use-bubble" data-vcp-block-type="tool-use" data-vcp-preserve-children="true">` +
                 `<div class="vcp-tool-summary">` +
                 `<span class="vcp-tool-label">VCP-ToolUse:</span> ` +
                 `<span class="vcp-tool-name-highlight">${escapeHtml(toolName)}</span>` +
@@ -590,7 +599,7 @@ function transformSpecialBlocks(text, codeBlockMap) {
         // The rest of the text after "Content:", or the full text if "Content:" is not found
         const diaryContent = contentMatch ? contentMatch[1].trim() : content;
 
-        let html = `<div class="maid-diary-bubble">`;
+        let html = `<div class="maid-diary-bubble" data-vcp-block-type="maid-diary" data-vcp-preserve-children="true">`;
         html += `<div class="diary-header">`;
         html += `<span class="diary-title">Maid's Diary</span>`;
         if (date) {
@@ -627,7 +636,7 @@ function transformSpecialBlocks(text, codeBlockMap) {
         const content = rawContent.trim();
         const escapedContent = escapeHtml(restoreBlocks(content));
 
-        let html = `<div class="vcp-thought-chain-bubble collapsible">`;
+        let html = `<div class="vcp-thought-chain-bubble collapsible" data-vcp-block-type="thought-chain" data-vcp-preserve-children="true">`;
         html += `<div class="vcp-thought-chain-header">`;
         html += `<span class="vcp-thought-chain-icon">🧠</span>`;
         html += `<span class="vcp-thought-chain-label">${escapeHtml(displayTheme)}</span>`;
@@ -678,7 +687,7 @@ function transformSpecialBlocks(text, codeBlockMap) {
 
         const actionText = isEndMarker ? '结束' : '起始';
 
-        return `\n\n<div class="vcp-role-divider role-${roleLower} type-${isEndMarker ? 'end' : 'start'}"><span class="divider-text">角色分界: ${label} [${actionText}]</span></div>\n\n`;
+        return `\n\n<div class="vcp-role-divider role-${roleLower} type-${isEndMarker ? 'end' : 'start'}" data-vcp-block-type="role-divider" data-vcp-preserve-children="true"><span class="divider-text">角色分界: ${label} [${actionText}]</span></div>\n\n`;
     });
 
     return processed;
@@ -999,7 +1008,7 @@ function renderToolResultBlock(fullMatch) {
         else details.push({ key: currentKey, value: val });
     }
 
-    let html = `<div class="vcp-tool-result-bubble collapsible">`;
+    let html = `<div class="vcp-tool-result-bubble collapsible" data-vcp-block-type="tool-result" data-vcp-preserve-children="true">`;
     html += `<div class="vcp-tool-result-header">`;
     html += `<span class="vcp-tool-result-label">VCP-ToolResult</span>`;
     html += `<span class="vcp-tool-result-name">${escapeHtml(toolName)}</span>`;
@@ -1147,10 +1156,10 @@ function fixEmoticonUrlsInMarkdown(text) {
  * @property {'user'|'assistant'|'system'} role
  * @property {string} content
  * @property {number} timestamp
- * @property {string} [id] 
+ * @property {string} [id]
  * @property {boolean} [isThinking]
  * @property {Array<{type: string, src: string, name: string}>} [attachments]
- * @property {string} [finishReason] 
+ * @property {string} [finishReason]
  * @property {boolean} [isGroupMessage] // New: Indicates if it's a group message
  * @property {string} [agentId] // New: ID of the speaking agent in a group
  * @property {string} [name] // New: Name of the speaking agent in a group (can override default role name)
@@ -1162,7 +1171,7 @@ function fixEmoticonUrlsInMarkdown(text) {
 /**
  * @typedef {Object} CurrentSelectedItem
  * @property {string|null} id - Can be agentId or groupId
- * @property {'agent'|'group'|null} type 
+ * @property {'agent'|'group'|null} type
  * @property {string|null} name
  * @property {string|null} avatarUrl
  * @property {object|null} config - Full config of the selected item
@@ -1317,12 +1326,12 @@ function initializeMessageRenderer(refs) {
                 const tempEl = document.createElement('textarea');
                 tempEl.innerHTML = code;
                 const encodedCode = encodeURIComponent(tempEl.value.trim());
-                return `<div class="mermaid-placeholder" data-mermaid-code="${encodedCode}"></div>`;
+                return `<div class="mermaid-placeholder" data-vcp-block-type="mermaid" data-vcp-preserve-children="true" data-mermaid-code="${encodedCode}"></div>`;
             });
 
             transformed = transformed.replace(MERMAID_FENCE_REGEX, (match, lang, code) => {
                 const encodedCode = encodeURIComponent(code.trim());
-                return `<div class="mermaid-placeholder" data-mermaid-code="${encodedCode}"></div>`;
+                return `<div class="mermaid-placeholder" data-vcp-block-type="mermaid" data-vcp-preserve-children="true" data-mermaid-code="${encodedCode}"></div>`;
             });
 
             return transformed;
@@ -1537,16 +1546,16 @@ function initializeMessageRenderer(refs) {
     mainRendererReferences.chatMessagesDiv.addEventListener('dragover', (e) => {
         const messageItem = e.target.closest('.message-item.user');
         if (!messageItem) return;
-        
+
         const mdContent = messageItem.querySelector('.md-content');
         if (!mdContent) return;
-        
+
         e.preventDefault();
         e.stopPropagation();
-        
+
         // 关键修复：显式设置 dropEffect 允许外部文件放置
         e.dataTransfer.dropEffect = 'copy';
-        
+
         if (!mdContent.classList.contains('drag-over')) {
             console.debug(`[MessageRenderer] Dragover detected on message ${messageItem.dataset.messageId}`);
             mdContent.classList.add('drag-over');
@@ -1556,10 +1565,10 @@ function initializeMessageRenderer(refs) {
     mainRendererReferences.chatMessagesDiv.addEventListener('dragleave', (e) => {
         const messageItem = e.target.closest('.message-item.user');
         if (!messageItem) return;
-        
+
         const mdContent = messageItem.querySelector('.md-content');
         if (!mdContent) return;
-        
+
         // 仅当鼠标真正离开该容器（而不是进入了它的子元素）时才移除类
         const rect = mdContent.getBoundingClientRect();
         if (e.clientX <= rect.left || e.clientX >= rect.right || e.clientY <= rect.top || e.clientY >= rect.bottom) {
@@ -1570,25 +1579,25 @@ function initializeMessageRenderer(refs) {
     mainRendererReferences.chatMessagesDiv.addEventListener('drop', async (e) => {
         const messageItem = e.target.closest('.message-item.user');
         if (!messageItem) return;
-        
+
         const mdContent = messageItem.querySelector('.md-content');
         if (!mdContent) return;
-        
+
         e.preventDefault();
         e.stopPropagation();
         mdContent.classList.remove('drag-over');
-        
+
         const messageId = messageItem.dataset.messageId;
         const files = e.dataTransfer.files;
-        
+
         console.log(`[MessageRenderer] Drop detected on message ${messageId}. Files count: ${files?.length || 0}`);
-        
+
         if (files && files.length > 0) {
             if (window.chatManager && window.chatManager.processFilesData) {
                 // 使用通用的文件读取管线
                 const processedFiles = await window.chatManager.processFilesData(files);
                 const successfulFiles = processedFiles.filter(f => !f.error);
-                
+
                 if (successfulFiles.length > 0) {
                     window.chatManager.addAttachmentsToMessage(messageId, successfulFiles);
                 } else if (processedFiles.length > 0) {
@@ -1665,7 +1674,7 @@ async function renderAttachments(message, contentDiv) {
         message.attachments.forEach((att, index) => {
             const wrapper = document.createElement('div');
             wrapper.classList.add('message-attachment-wrapper');
-            
+
             let attachmentElement;
             if (att.type.startsWith('image/')) {
                 attachmentElement = document.createElement('img');
@@ -1867,7 +1876,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 return placeholder;
             });
             TOOL_RESULT_REGEX.lastIndex = 0;
-            
+
             // 🔴 保护工具请求块（<<<[TOOL_REQUEST]>>>...<<<[END_TOOL_REQUEST]>>>）
             // 工具请求参数中可能包含完整的HTML文档（如壁纸HTML），其中的 <style> 不应被注入
             // 使用 ESCAPE 感知的扫描器，避免参数内容里的 END 标记导致工具块提前闭合
@@ -1876,7 +1885,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 protectedBlocks.push(match);
                 return placeholder;
             });
-            
+
             // 🔴 保护「始」「末」与「始ESCAPE」「末ESCAPE」标记区域及其变体
             // 这些标记内的内容是工具参数，可能包含任意HTML（含<style>），不应被提取
             // 注意：ESCAPE 必须优先按「末ESCAPE」闭合，不能被内部普通「末」打断
@@ -1890,7 +1899,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 protectedBlocks.push(match);
                 return placeholder;
             });
-            
+
             // 保护桌面推送块（必须在代码块之前，因为推送块可能包含代码围栏）
             textWithProtectedBlocks = textWithProtectedBlocks.replace(DESKTOP_PUSH_REGEX, (match) => {
                 const placeholder = `__VCP_STYLE_PROTECT_${protectedBlocks.length}__`;
@@ -1903,7 +1912,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 protectedBlocks.push(match);
                 return placeholder;
             });
-            
+
             // 保护代码块
             textWithProtectedBlocks = textWithProtectedBlocks.replace(CODE_FENCE_REGEX, (match) => {
                 const placeholder = `__VCP_STYLE_PROTECT_${protectedBlocks.length}__`;
@@ -2168,7 +2177,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
          const currentChatHistoryArray = mainRendererReferences.currentChatHistoryRef.get();
          currentChatHistoryArray.push(message);
          mainRendererReferences.currentChatHistoryRef.set(currentChatHistoryArray); // Update the ref
- 
+
          if (currentSelectedItem.id && mainRendererReferences.currentTopicIdRef.get()) {
               if (currentSelectedItem.type === 'agent') {
                  electronAPI.saveChatHistory(currentSelectedItem.id, mainRendererReferences.currentTopicIdRef.get(), currentChatHistoryArray);

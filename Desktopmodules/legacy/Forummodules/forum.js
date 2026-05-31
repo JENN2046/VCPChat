@@ -344,7 +344,7 @@ function fixEmoticonUrl(originalSrc) {
 
     for (const item of emoticonLibrary) {
         const itemPackageInfo = extractEmoticonInfo(item.url);
-        
+
         let packageScore = 0.5;
         if (searchInfo.packageName && itemPackageInfo.packageName) {
             packageScore = getSimilarity(searchInfo.packageName, itemPackageInfo.packageName);
@@ -362,14 +362,14 @@ function fixEmoticonUrl(originalSrc) {
             bestMatch = item;
         }
     }
-    
+
     console.log(`[Forum Debug] Best match: ${bestMatch ? bestMatch.filename : 'None'}. Score: ${highestScore.toFixed(2)}`);
 
     if (bestMatch && highestScore > 0.6) {
         console.log('[Forum] Fixed emoticon URL:', originalSrc, '->', bestMatch.url);
         return bestMatch.url;
     }
-    
+
     console.log('[Forum Debug] No suitable match found.');
     return originalSrc;
 }
@@ -382,14 +382,14 @@ function setupEmoticonFixer(container) {
         if (img.src) {
             // Remove escaped quotes and backslashes that might appear in URLs
             let cleanedSrc = img.src.replace(/\\"/g, '"').replace(/\\\\/g, '/').replace(/\\/g, '/');
-            
+
             // If the URL was cleaned, update it immediately
             if (cleanedSrc !== img.src) {
                 console.log('[Forum] Cleaned malformed URL:', img.src, '->', cleanedSrc);
                 img.src = cleanedSrc;
             }
         }
-        
+
         // Then set up error handling for emoticon fixing
         img.addEventListener('error', function() {
             const originalSrc = this.src;
@@ -424,7 +424,7 @@ function setupImageViewer(container) {
                 img.src = cleanedSrc;
             }
         }
-        
+
         // Exclude avatars from the image viewer functionality
         if (img.closest('.author-avatar, .reply-avatar')) {
             return;
@@ -445,7 +445,7 @@ function setupImageViewer(container) {
 
 async function getAvatarForUser(username) {
     if (!username) return null;
-    
+
     // Check cache first
     if (avatarCache.hasOwnProperty(username)) {
         return avatarCache[username];
@@ -460,7 +460,7 @@ async function getAvatarForUser(username) {
         // Check if it's the current user (check both replyUsername and username)
         const isCurrentUser = (forumConfig.replyUsername && username === forumConfig.replyUsername) ||
                              (forumConfig.username && username === forumConfig.username);
-        
+
         if (isCurrentUser) {
             const userAvatar = await api?.loadUserAvatar();
             if (userAvatar) {
@@ -473,7 +473,7 @@ async function getAvatarForUser(username) {
         for (const agent of agentsList) {
             const agentNameLower = agent.name.toLowerCase();
             const usernameLower = username.toLowerCase();
-            
+
             if (agentNameLower.includes(usernameLower) || usernameLower.includes(agentNameLower)) {
                 const agentAvatar = await api?.loadAgentAvatar(agent.folder);
                 if (agentAvatar) {
@@ -525,7 +525,7 @@ async function saveSettings() {
     if (!newConfig.rememberCredentials) {
         newConfig.password = '';
     }
-    
+
     saveSettingsBtn.textContent = '保存中...';
     saveSettingsBtn.disabled = true;
     try {
@@ -673,11 +673,11 @@ function createPostCard(post, index) {
     // Limit staggered animation to first 20 items to avoid massive delays on large lists
     const delay = index < 20 ? index * 0.05 : 0;
     el.style.animationDelay = `${delay}s`;
-    
+
     // Backend returns lastReplyBy and lastReplyAt
     const displayDate = post.mtime || post.lastReplyAt || post.timestamp;
     const hasReply = post.lastReplyAt && post.timestamp && post.lastReplyAt !== post.timestamp;
-    
+
     // Use lastReplyBy from backend API
     const lastReplier = post.lastReplyBy;
     const hasNewReplier = hasReply && lastReplier && lastReplier !== post.author;
@@ -707,10 +707,32 @@ function createPostCard(post, index) {
                 </div>
             </div>
         `;
-    } else {
+    } else if (hasReply) {
+        // Same person posted and last replied
         const authorHue = post.author.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 360;
         const authorAvatarColor = `hsl(${authorHue}, 70%, 60%)`;
-        const timestampLabel = hasReply ? '最后回复' : '发帖于';
+
+        metaHTML = `
+            <div class="author-info-with-time">
+                <div class="author-avatar loading-avatar" style="background: ${authorAvatarColor}" data-author="${escapeHtml(post.author)}">${post.author.slice(0,1).toUpperCase()}</div>
+                <div class="time-info">
+                    <div style="font-size: 0.8em; opacity: 0.7;">发帖于</div>
+                    <div>${formatDate(post.timestamp)}</div>
+                </div>
+            </div>
+            <div class="meta-separator"></div>
+            <div class="author-info-with-time">
+                <div class="author-avatar loading-avatar" style="background: ${authorAvatarColor}" data-author="${escapeHtml(post.author)}">${post.author.slice(0,1).toUpperCase()}</div>
+                <div class="time-info">
+                    <div style="font-size: 0.8em; opacity: 0.7;">最后回复</div>
+                    <div>${formatDate(displayDate)}</div>
+                </div>
+            </div>
+        `;
+    } else {
+        // No replies yet, just show author
+        const authorHue = post.author.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 360;
+        const authorAvatarColor = `hsl(${authorHue}, 70%, 60%)`;
 
         metaHTML = `
             <div class="meta-left">
@@ -718,7 +740,7 @@ function createPostCard(post, index) {
                 <span>${escapeHtml(post.author)}</span>
             </div>
             <div style="text-align: right;">
-                <div style="font-size: 0.8em; opacity: 0.7;">${timestampLabel}</div>
+                <div style="font-size: 0.8em; opacity: 0.7;">发帖于</div>
                 <div>${formatDate(displayDate)}</div>
             </div>
         `;
@@ -738,7 +760,7 @@ function createPostCard(post, index) {
     `;
 
     el.addEventListener('click', (e) => expandPost(post, el));
-    
+
     // Async load avatar(s)
     const avatars = el.querySelectorAll('.author-avatar');
     if (avatars.length > 0) {
@@ -748,13 +770,13 @@ function createPostCard(post, index) {
             });
         });
     }
-    
+
     return el;
 }
 
 async function loadAvatarForElement(avatarEl, username) {
     if (!avatarEl) return;
-    
+
     const avatarPath = await getAvatarForUser(username);
     if (avatarPath) {
         avatarEl.style.backgroundImage = `url("${avatarPath}")`;
@@ -788,7 +810,7 @@ async function expandPost(post, originalCard) {
     activePostOverlay.appendChild(expanded);
 
     expanded.offsetHeight; // Force reflow
-    
+
     // Animate to center with auto height
     expanded.style.position = 'relative';
     expanded.style.top = 'auto';
@@ -927,19 +949,19 @@ function processAndInjectScopedCss(content, scopeId) {
 function deIndentHtml(text) {
     const lines = text.split('\n');
     let inFence = false;
-    
+
     return lines.map(line => {
         // Check for code fences
         if (line.trim().startsWith('```')) {
             inFence = !inFence;
             return line;
         }
-        
+
         // Don't process lines inside code fences (keep original indentation for code)
         if (inFence) {
             return line;
         }
-        
+
         // 🔥 关键修复：去除所有行的前导空格，防止被Markdown识别为缩进代码块
         // 只有在代码围栏内才保留缩进
         return line.trimStart();
@@ -955,7 +977,7 @@ function enhanceMarkdown(markdown) {
     // Step 2: Protect code blocks before de-indenting (like text-viewer.js)
     const codeBlockMap = new Map();
     let placeholderId = 0;
-    
+
     let processed = markdown.replace(/```\w*([\s\S]*?)```/g, (match) => {
         const placeholder = `__FORUM_CODE_BLOCK_PLACEHOLDER_${placeholderId}__`;
         codeBlockMap.set(placeholder, match);
@@ -969,7 +991,7 @@ function enhanceMarkdown(markdown) {
 
     // Step 4: Detect if content contains block-level HTML
     const hasBlockHtml = /<div[\s>]|<style[\s>]/i.test(processed);
-    
+
     if (hasBlockHtml) {
         // Restore code blocks before returning
         if (codeBlockMap.size > 0) {
@@ -1065,15 +1087,15 @@ function applyBoldFormatting(container) {
 
 function renderFullContent(container, markdown, uid) {
     const previewEl = container.querySelector('.post-preview');
-    
+
     // Generate unique scope ID for CSS isolation (like text-viewer.js)
     const scopeId = generateUniqueId();
     previewEl.id = scopeId;
-    
+
     // === 关键修复：使用完整预处理流程（像 text-viewer.js） ===
     const codeBlockMap = new Map();
     let placeholderId = 0;
-    
+
     // Step 1: 保护所有代码块（包括CSS代码块）
     let processed = markdown.replace(/```\w*([\s\S]*?)```/g, (match) => {
         const placeholder = `__FORUM_RENDER_CODE_BLOCK_${placeholderId}__`;
@@ -1081,11 +1103,11 @@ function renderFullContent(container, markdown, uid) {
         placeholderId++;
         return placeholder;
     });
-    
+
     // Step 2: 提取和处理CSS（代码块已被保护）
     const { processedContent: contentWithoutStyles } = processAndInjectScopedCss(processed, scopeId);
     processed = contentWithoutStyles;
-    
+
     // Step 3: 恢复代码块
     if (codeBlockMap.size > 0) {
         for (const [placeholder, block] of codeBlockMap.entries()) {
@@ -1093,7 +1115,7 @@ function renderFullContent(container, markdown, uid) {
         }
     }
     // === 预处理完成 ===
-    
+
     const replyDelimiter = '\n\n---\n\n## 评论区\n---';
     const parts = processed.split(replyDelimiter);
     let mainMd = parts[0];
@@ -1170,22 +1192,22 @@ function renderFullContent(container, markdown, uid) {
         const replyList = document.createElement('div');
         replyList.className = 'reply-list';
         replyList.innerHTML = '<h3>💬 评论</h3>';
-        
+
         // 修复：正确解析楼层，使用 '---\n### 楼层' 作为分隔标记
         // 先移除开头的 '---' 分隔符（如果存在）
         let cleanedReplies = repliesMd.trim();
         if (cleanedReplies.startsWith('---')) {
             cleanedReplies = cleanedReplies.substring(3).trim();
         }
-        
+
         // 使用正则表达式分割楼层：匹配 '---' 后面跟着换行和 '### 楼层'
         const floorSplitRegex = /\n---\n(?=### 楼层)/;
         const floors = cleanedReplies.split(floorSplitRegex).filter(r => r.trim());
-        
+
         floors.forEach((replyMd, i) => {
             if (!replyMd.trim()) return;
             const floor = i + 1;
-            
+
             // Extract username from reply markdown
             let replyUsername = '';
             const replyerMatch = replyMd.match(/\*\*回复者[：:]\*\*\s*([^\s\n*]+)/);
@@ -1197,10 +1219,10 @@ function renderFullContent(container, markdown, uid) {
                     replyUsername = boldMatch[1];
                 }
             }
-            
+
             const hue = replyUsername.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 360;
             const avatarColor = `hsl(${hue}, 70%, 60%)`;
-            
+
             const replyItem = document.createElement('div');
             replyItem.className = 'reply-item glass';
             replyItem.style.animationDelay = `${i * 0.1}s`;
@@ -1223,13 +1245,13 @@ function renderFullContent(container, markdown, uid) {
             `;
             replyItem.querySelector('.reply-content').dataset.rawContent = replyRawContent; // Store raw content
             replyList.appendChild(replyItem);
-            
+
             // Load avatar for reply
             if (replyUsername) {
                 const avatarEl = replyItem.querySelector('.reply-avatar');
                 loadAvatarForElement(avatarEl, replyUsername);
             }
-            
+
             // Setup emoticon fixer and bold formatting for reply content
             const replyContentEl = replyItem.querySelector('.reply-content');
             if (replyContentEl) {
@@ -1250,7 +1272,7 @@ function renderFullContent(container, markdown, uid) {
                     }
                 });
             }
-            
+
             // Add event listeners for action buttons
             replyItem.querySelector('.delete-floor-btn').addEventListener('click', (e) => handleDeleteFloor(uid, floor, container));
             replyItem.querySelector('.edit-btn').addEventListener('click', (e) => toggleEditMode(e.currentTarget.closest('.expanded-card'), replyContentEl, uid, floor));
@@ -1273,7 +1295,7 @@ function renderFullContent(container, markdown, uid) {
     const textInput = container.querySelector('#quick-reply-text');
     nameInput.value = forumConfig.replyUsername || forumConfig.username || '';
     if (!nameInput.value) nameInput.placeholder = "请先在设置中指定署名";
-    
+
     // Add emoticon button listener for reply box
     const replyEmoticonBtn = container.querySelector('#reply-emoticon-btn');
     if (replyEmoticonBtn) {
@@ -1325,7 +1347,7 @@ function toggleEditMode(card, contentEl, uid, floor = null) {
             // Find the main post's edit button
             editBtn = contentParent.querySelector('.post-actions .edit-btn');
         }
-        
+
         if (editBtn) {
             editBtn.addEventListener('click', (e) => toggleEditMode(card, contentEl, uid, floor));
         }
@@ -1350,7 +1372,7 @@ async function handleSaveEdit(uid, content, floor, card) {
             method: 'PATCH',
             body: JSON.stringify(payload)
         });
-        
+
         // Reload the entire post content to reflect changes
         const data = await apiFetch(`/post/${uid}`);
         card.querySelectorAll('.reply-list, .reply-area-fixed').forEach(e => e.remove());
@@ -1372,7 +1394,7 @@ async function handleSaveEdit(uid, content, floor, card) {
 async function handleDeletePost(uid) {
     const confirmed = await customConfirm('您确定要删除整个帖子吗？此操作无法撤销！', '⚠️ 删除帖子');
     if (!confirmed) return;
-    
+
     try {
         await apiFetch(`/post/${uid}`, {
             method: 'DELETE',
@@ -1389,7 +1411,7 @@ async function handleDeletePost(uid) {
 async function handleDeleteFloor(uid, floor, container) {
     const confirmed = await customConfirm(`您确定要删除第 ${floor} 楼吗？此操作无法撤销！`, '⚠️ 删除楼层');
     if (!confirmed) return;
-    
+
     try {
         await apiFetch(`/post/${uid}`, {
             method: 'DELETE',
@@ -1612,7 +1634,7 @@ function parseForumDate(ts) {
         // Assumes it's already a Date object or a valid timestamp number
         d = new Date(ts);
     }
-    
+
     // If still invalid, return null
     if (isNaN(d.getTime())) {
         return null;
@@ -1630,15 +1652,15 @@ function formatDate(ts) {
             console.warn('Invalid date:', ts);
             return String(ts);
         }
-        
+
         const now = new Date();
         const diff = (now - d) / 1000;
-        
+
         if (diff < 60) return '刚刚';
         if (diff < 3600) return `${Math.floor(diff / 60)}分钟前`;
         if (diff < 86400) return `${Math.floor(diff / 3600)}小时前`;
         if (diff < 86400 * 7) return `${Math.floor(diff / 86400)}天前`;
-        
+
         // Format as date with time, including year if it's not the current year.
         const year = d.getFullYear();
         const currentYear = now.getFullYear();
@@ -1646,7 +1668,7 @@ function formatDate(ts) {
         const day = d.getDate();
         const hours = d.getHours().toString().padStart(2, '0');
         const minutes = d.getMinutes().toString().padStart(2, '0');
-        
+
         if (year !== currentYear) {
             return `${year}年${month}月${day}日 ${hours}:${minutes}`;
         } else {

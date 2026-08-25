@@ -3046,6 +3046,18 @@ function appendStreamChunk(messageId, chunkData, context) {
     streamManager.appendStreamChunk(messageId, chunkData, context);
 }
 
+function renderResidentEphemeralPresentation(
+    messageId,
+    presentation,
+    context
+) {
+    return streamManager.renderResidentEphemeralPresentation(
+        messageId,
+        presentation,
+        context
+    );
+}
+
 /**
  * 从完整的消息内容中提取桌面推送块，一次性推送到桌面画布
  * 仅作为兜底机制：当流式推送不可用时（如桌面窗口在流式过程中不存在），
@@ -3568,6 +3580,7 @@ window.messageRenderer = {
     renderMessageBatch, // Expose batch rendering utility
     startStreamingMessage,
     appendStreamChunk,
+    renderResidentEphemeralPresentation,
     finalizeStreamedMessage,
     renderFullMessage,
     clearChat,

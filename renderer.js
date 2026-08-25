@@ -522,10 +522,19 @@ import { setupEventListeners } from './modules/event-listeners.js';
             return;
         }
 
-        const { type, messageId, context, chunk, error, finish_reason, fullResponse } = eventData;
+        const {
+            type,
+            messageId,
+            context,
+            chunk,
+            error,
+            finish_reason,
+            fullResponse,
+            presentation
+        } = eventData;
 
         if (!messageId) {
-            console.error("onVCPStreamEvent: Received event without a messageId. Cannot process.", eventData);
+            console.error("onVCPStreamEvent: Received event without a messageId. Cannot process.");
             return;
         }
 
@@ -546,6 +555,14 @@ import { setupEventListeners } from './modules/event-listeners.js';
         // Data model updates should ALWAYS happen, regardless of the current view.
         // UI updates (creating new DOM elements) should only happen if the view is relevant.
         switch (type) {
+            case 'ephemeral_presentation':
+                window.messageRenderer.renderResidentEphemeralPresentation(
+                    messageId,
+                    presentation,
+                    context
+                );
+                break;
+
             case 'data':
                 window.messageRenderer.appendStreamChunk(messageId, chunk, context);
                 break;

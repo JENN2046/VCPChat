@@ -1,12 +1,16 @@
 // modules/renderer/streamManager.js
 import { formatMessageTimestamp } from './domBuilder.js';
 import { createContentPipeline, PIPELINE_MODES } from './contentPipeline.js';
+import {
+    renderResidentEphemeralPresentation as renderResidentPresentationCard
+} from './residentEphemeralPresentation.mjs';
 
 // --- Stream State ---
 const streamingChunkQueues = new Map(); // messageId -> array of original chunk strings
 const streamingTimers = new Map();      // messageId -> intervalId
 const accumulatedStreamText = new Map(); // messageId -> string
 const streamSegmentStates = new Map(); // messageId -> { stableCutoff, stableHtml, stableRenderedCutoff, stableBlocks, stableBlockSeq, lastTailText, lastParagraphBoundary }
+const residentPresentationTimers = new Map(); // messageId -> timeoutId
 let activeStreamingMessageId = null; // Track the currently active streaming message
 const elementContentLengthCache = new WeakMap(); // 跟踪每个元素的内容长度；WeakMap 避免 morphdom 替换节点后的强引用泄漏
 
@@ -2134,6 +2138,32 @@ export function appendStreamChunk(messageId, chunkData, context) {
     }
 }
 
+export function renderResidentEphemeralPresentation(
+    messageId,
+    presentation,
+    context
+) {
+    if (!isMessageForCurrentView(context)) return false;
+    const result = renderResidentPresentationCard({
+        container: refs.chatMessagesDiv,
+        document: window.document,
+        messageId,
+        presentation
+    });
+    if (result === null) return false;
+    if (!result.rendered) return true;
+
+    const existingTimer = residentPresentationTimers.get(messageId);
+    if (existingTimer) clearTimeout(existingTimer);
+    const timerId = setTimeout(() => {
+        result.element.remove();
+        residentPresentationTimers.delete(messageId);
+    }, result.expiresInMilliseconds);
+    residentPresentationTimers.set(messageId, timerId);
+    refs.uiHelper?.scrollToBottom?.();
+    return true;
+}
+
 export async function finalizeStreamedMessage(messageId, finishReason, context, finalPayload = null) {
     const initStatusAtFinalize = messageInitializationStatus.get(messageId);
     if (!initStatusAtFinalize || initStatusAtFinalize === 'pending') {
@@ -2352,6 +2382,11 @@ export function cleanupTransientState() {
             clearTimeout(timerId);
         }
         delayedCleanupTimers.clear();
+
+        for (const timerId of residentPresentationTimers.values()) {
+            clearTimeout(timerId);
+        }
+        residentPresentationTimers.clear();
     
         for (const timerId of historySaveQueue.values()) {
             if (timerId?.timerId) {
@@ -2384,6 +2419,7 @@ window.streamManager = {
     initStreamManager,
     startStreamingMessage,
     appendStreamChunk,
+    renderResidentEphemeralPresentation,
     finalizeStreamedMessage,
     cleanupTransientState,
     isMessageActive,

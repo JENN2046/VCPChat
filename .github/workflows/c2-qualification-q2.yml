@@ -41,6 +41,9 @@ jobs:
         run: npm run native
       - name: Execute hardware target only
         run: node qualification/c2-q2/target-probe.cjs
+      - name: Qualify available CryptoKit path without promoting authority
+        if: runner.os == 'macOS'
+        run: node qualification/c2-q2/enclave-five-purpose.cjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

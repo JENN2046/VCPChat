@@ -15,6 +15,15 @@ The second iteration also directly tests CryptoKit ephemeral Secure Enclave key 
 to distinguish a legacy persistent-keychain enrollment failure from framework availability.
 It never persists a key handle, changes entitlements, or creates a signer service.
 
+After that diagnostic succeeded, the third iteration adds a separate disposable CryptoKit
+five-purpose fixture. Only this additional fixture persists an opaque enclave representation
+inside a fresh runner temporary directory, then reopens it across processes and removes it.
+The handle is never uploaded or logged. It is a diagnostic, not a production provider API.
+Only fixed fixture indices can be signed. Real frozen C2 wrapping and Host crypto check all
+five purposes, low-S normalization, replay and modified-transcript rejection. A successful
+foreign same-user signature is recorded as invocation-isolation FAIL. No physical-hardware,
+production key-ownership, durable descriptor, or Human-provenance assurance is inferred.
+
 A successful CI job means that probes executed and evidence was collected. It is not
 a hardware/provenance/isolation or pre-production qualification PASS. Unavailable
 hardware and absent legitimate test signing remain explicit limitations. Production

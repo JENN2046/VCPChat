@@ -16,7 +16,7 @@
 static napi_value fail(napi_env e,const char* code){napi_throw_error(e,code,code);return nullptr;}
 static napi_value str(napi_env e,const std::string& s){napi_value v;napi_create_string_utf8(e,s.c_str(),s.size(),&v);return v;}
 static void set(napi_env e,napi_value o,const char* k,napi_value v){napi_set_named_property(e,o,k,v);}
-static napi_value jsBoolean(napi_env e,bool b){napi_value v;napi_get_jsBoolean(e,b,&v);return v;}
+static napi_value jsBoolean(napi_env e,bool b){napi_value v;napi_get_boolean(e,b,&v);return v;}
 static napi_value jsNull(napi_env e){napi_value v;napi_get_null(e,&v);return v;}
 static std::string b64(const std::vector<unsigned char>& v){static const char* a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";std::string s;unsigned acc=0;int bits=0;for(auto x:v){acc=(acc<<8)|x;bits+=8;while(bits>=6){bits-=6;s+=a[(acc>>bits)&63];}}if(bits)s+=a[(acc<<(6-bits))&63];return s;}
 // Q1 successor is a separate test target. No production loader imports it.

@@ -3,8 +3,10 @@
 This is a separate native target and separate packaged test application. All40 frozen
 C2 source entries are copied byte-identically under frozen-c2. The production native
 loader, Main bootstrap and Host profile catalog are unchanged. This application does
-not instantiate any Host admission/receipt authority or contact a Host. Two frozen
-Host modules are used only for transcript creation and cryptographic verification.
+not start Host admission or contact a Host. Two frozen Host modules supply transcript
+canonicalization and cryptographic verification. Importing the frozen receipt module
+creates its default empty in-memory singleton; it remains unconfigured and is used
+only for explicit fail-closed negative controls, never for Human admission or minting.
 
 qualificationInit requires a fresh32-hex test namespace and one of TARGET or
 SOFTWARE_DIAGNOSTIC. OS key names/tags are forced under VCPChat.Qualification.Q1 or
@@ -43,3 +45,5 @@ Official API references:
 - https://www.electronjs.org/docs/latest/tutorial/fuses
 
 Q1 build corrections are isolated: helper names avoid Windows/macOS SDK collisions; Windows custom descriptor uses PERSIST + PERSIST_ONLY flags. Software macOS diagnostic omits the Secure-Enclave-only privateKeyUsage flag (Apple documents failure outside Secure Enclave); TARGET retains it. Native ad-hoc signing precedes the ASAR hash commitment, and the builder preserves that exact signed native byte sequence. None is a production source change.
+
+The hosted macOS target returns OSStatus -34018 (missing entitlement) under test signing: it remains UNPROVEN. Software diagnostic uses the ordinary file-based Keychain path (no Secure Enclave token or data-protection AccessControl constraint); this intentionally weaker diagnostic cannot qualify hardware protection, code identity, or Human provenance.

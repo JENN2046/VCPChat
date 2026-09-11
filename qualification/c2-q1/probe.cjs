@@ -4,11 +4,13 @@ const C=require('./frozen-host/humanClientAdmissionCrypto');
 const {wrapNative}=require('./frozen-c2/modules/trusted-client/trustedClientKeyProvider');
 const {reconcile}=require('./frozen-c2/modules/trusted-client/trustedClientIdentityDescriptor');
 const native=require('./native/build/Release/qualification_provider.node');
+const {authority}=require('./frozen-host/approvalReceiptAuthority');
+function noHumanAuthority(){const unbound=Object.freeze({});assert.equal(authority.isChannelIssuer(),false);assert.equal(authority.isHuman(unbound),false);assert.equal(authority.humanContext(unbound),null);assert.throws(()=>authority.issueClientChannel({productionAdmission:'ADMITTED',implementationProfileId:'vcp_chat.c2'}));assert.throws(()=>authority.approve({},'QUALIFICATION_ONLY',unbound));}
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 function proof(purpose,fingerprint){const boundFields={protocolVersion:1,purpose,hostBootId:crypto.randomBytes(32).toString('base64url'),trustedHostOrigin:'https://127.0.0.1',surface:'vcp_chat',publicKeyFingerprint:fingerprint,nonceId:crypto.randomBytes(32).toString('base64url'),issuedAt:Date.now(),expiresAt:Date.now()+30000,method:'POST',path:'/qualification-only/v1/'+purpose,bodyDigest:hash('Q1 disposable fixture')};const t=C.transcript(boundFields);return {nonceId:boundFields.nonceId,boundFields,...t};}
 async function runNative(mode,id,{foreign=true}={}){
  assert(['TARGET','SOFTWARE_DIAGNOSTIC'].includes(mode));assert(/^[a-f0-9]{32}$/.test(id));
- const r={mode,platform:process.platform,arch:process.arch,productionEligible:false,HumanInputProvenance:'UNPROVEN',nativeExecuted:true,qualifiedHumanAuthority:false};
+ noHumanAuthority();const r={mode,platform:process.platform,arch:process.arch,productionEligible:false,HumanInputProvenance:'UNPROVEN',nativeExecuted:true,qualifiedHumanAuthority:false,canonicalAuthority:{isChannelIssuer:false,isHuman:false,humanContext:null,syntheticProfileRejected:true,receiptMinted:0}};
  for(const bad of ['x','f'.repeat(33),'../production'])assert.throws(()=>native.qualificationInit(bad,mode));
  assert.throws(()=>native.createIdentity());native.qualificationInit(id,mode);assert.throws(()=>native.qualificationInit(id,mode));
  assert.equal(native.getIdentity(),null,'Fresh test namespace must be empty');assert.equal(native.getSecurityProperties().productionEligible,false);
@@ -24,7 +26,7 @@ async function runNative(mode,id,{foreign=true}={}){
   r.privateExportAPISucceeded=native.probePrivateExport();r.KeyExtractionProtection=r.privateExportAPISucceeded?'EXPORTABLE':'UNPROVEN_API_EXPORT_REJECTED';
   r.keyLifecycle='PASS';r.descriptorPersistence='SAME_PROCESS_PASS';r.KeyInvocationIsolation='UNPROVEN';
   if(foreign){const cp=require('node:child_process');const p=proof('capability-mint',k.fingerprint);const child=cp.spawnSync(process.execPath,[__filename,'foreign',id,mode,JSON.stringify(p),k.fingerprint],{encoding:'utf8',timeout:30000});assert.equal(child.status,0,child.stderr);const result=JSON.parse(child.stdout);assert(result.fingerprintSame&&result.descriptorSame&&result.signatureVerified);r.foreignProcess=result;r.KeyInvocationIsolation='SHARED_PRINCIPAL';r.descriptorPersistence='CROSS_PROCESS_PASS';}
-  r.productionEligible=false;return r;
+  noHumanAuthority();r.canonicalAuthority={isChannelIssuer:false,isHuman:false,humanContext:null,syntheticProfileRejected:true,receiptMinted:0};r.productionEligible=false;return r;
  }finally{native.destroyIdentity();assert.equal(native.getIdentity(),null,'Qualification key cleanup failed');r.cleanup='PASS';}
 }
 module.exports={runNative};

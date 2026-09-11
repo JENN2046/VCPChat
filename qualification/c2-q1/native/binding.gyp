@@ -1,0 +1,1 @@
+{"targets":[{"target_name":"qualification_provider","sources":["provider.cc"],"conditions":[["OS==\"win\"",{"libraries":["ncrypt.lib","bcrypt.lib"]}],["OS==\"mac\"",{"libraries":["-framework Security","-framework CoreFoundation"],"xcode_settings":{"CLANG_CXX_LANGUAGE_STANDARD":"c++17"}}]]}]}

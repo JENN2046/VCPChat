@@ -1,0 +1,45 @@
+name: C2 Qualification Only Q1
+on:
+  push:
+    branches: ['qualification/c2-q1-*']
+    paths: ['qualification/c2-q1/**', '.github/workflows/c2-qualification-q1.yml']
+permissions:
+  contents: read
+jobs:
+  qualification:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-14]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: qualification/c2-q1
+        shell: bash
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.15.0'
+      - run: node verify.cjs
+      - run: npm ci --ignore-scripts --registry=https://registry.npmjs.org
+      - run: node node_modules/electron/install.js
+      - run: npm run native
+      - run: npm run probe
+      - run: npm run package
+      - run: node packaged-tests.cjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: qualification-${{ matrix.os }}
+          retention-days: 7
+          path: |
+            qualification/c2-q1/evidence
+            qualification/c2-q1/native/build/config.gypi
+            qualification/c2-q1/native/build/Release/qualification_provider.node
+            qualification/c2-q1/artifact-native.json

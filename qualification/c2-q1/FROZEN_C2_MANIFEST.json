@@ -1,0 +1,190 @@
+{
+  "gate": "V2-R5-H2-S2-C2 SOURCE FREEZE / CLOSEOUT",
+  "status": "FROZEN / ACCEPTED / CLOSED",
+  "freeze_kind": "Logical SHA-256 source freeze only; no commit/tag/release/deployment",
+  "source_root": "/mnt/datadisk0/dev-cache/ubuntu/runs/vcpchat-c2-r4-ab0wxynu/source",
+  "candidate_HEAD": "7ef7fdd21bce84f1605013e15d2367c07c336716",
+  "original_candidate_manifest": "/mnt/datadisk0/dev-cache/ubuntu/runs/vcpchat-c2-r4-ab0wxynu/evidence/C2_CANDIDATE_SOURCE_MANIFEST.json",
+  "original_candidate_manifest_sha256": "4f5e43fd8fa5b75393217552f2f4267870deb173e9e4132633c07d037adff46f",
+  "files": {
+    "docs/trusted-client/C2_SECURITY_DECLARATION.md": {
+      "sha256": "7e6ac72b32eabe35be18a6f1d2d2fd58653f8ffb3a26dd0fef05cc768263adac",
+      "size": 4088
+    },
+    "docs/trusted-client/C2_TDB_CONTRACT.md": {
+      "sha256": "998e806043c8ec5bb3577c3a8cb403ace0cc5384065414c6a169c0eaa3867a00",
+      "size": 5956
+    },
+    "main.html": {
+      "sha256": "5dcbd19d94406d356d6d707eeb463d6884bb2559069cae10e01f7622a976d9b2",
+      "size": 123319
+    },
+    "main.js": {
+      "sha256": "d776e9d44b5c443c02aa0ea33cbad0c9a1bade5fb1798cd699e9a00f86c33a3e",
+      "size": 89678
+    },
+    "modules/filterManager.js": {
+      "sha256": "e8b4c5f1d9ff137b9fc050feba2e1668786134f994b81f6ecfce243dbfaffe57",
+      "size": 32846
+    },
+    "modules/notificationRenderer.js": {
+      "sha256": "60ab02f57a1ada5750b7f9ef9dc3fef668ae707f80bb442790264c84e55ead44",
+      "size": 40331
+    },
+    "modules/services/preloadPaths.js": {
+      "sha256": "b278fe60f32f893e4eff18f5212cb4974273b410dcadbf5e5d815805565a13f2",
+      "size": 620
+    },
+    "modules/trusted-client/approvalDelivery.js": {
+      "sha256": "fe2f7198735fb9a6f6620f7cd002921f7643bd222f22d038903481f2673eb10d",
+      "size": 20785
+    },
+    "modules/trusted-client/artifactIntegrity.js": {
+      "sha256": "e51197d6e2c8e734703c65c1c23e0a0901d7aa7508a021e6eb15a3dbff14db9d",
+      "size": 1086
+    },
+    "modules/trusted-client/bootstrap.js": {
+      "sha256": "026bbbd71574aae2e66bf94a6813e4da5ff3ac873b9b4f3ca0d2dbabd986ed04",
+      "size": 2952
+    },
+    "modules/trusted-client/genericApprovalGuard.js": {
+      "sha256": "cfa86daf25dd62d93ad17e4bbd3fafb90ca2bba7136ead190cac93d2ba4d1f5b",
+      "size": 766
+    },
+    "modules/trusted-client/humanInputProvenance.js": {
+      "sha256": "e550d4a784194e100e2edd6523366d12cc3edddeb3cdab9f4144a7bb01759b50",
+      "size": 1682
+    },
+    "modules/trusted-client/humanInteractionEligibility.js": {
+      "sha256": "40f25e53e4e6b7d355633dc4a9bc6333caf52752ffd0dcc57e4ad9b344126e3b",
+      "size": 568
+    },
+    "modules/trusted-client/humanSafeCanonicalDisplay.js": {
+      "sha256": "27ddc2211b0104976627bfd550fd868ff34184340e059400fdc5c994925f8ad3",
+      "size": 1908
+    },
+    "modules/trusted-client/native/binding.gyp": {
+      "sha256": "9add8400ab366a8ece44468606f08f7a5d557ba4f88985c9e5505db56a76d084",
+      "size": 284
+    },
+    "modules/trusted-client/native/build/Release/trusted_client.node": {
+      "sha256": "19fcbfc78aa612f1f90e67372e0d1b72151539185f41b25d1712a8cc33d531b0",
+      "size": 21824
+    },
+    "modules/trusted-client/native/provider.cc": {
+      "sha256": "b6915913abd03ee22b2250771e50a22cc57fea42e3b75c5e07af1358b997e3e1",
+      "size": 12839
+    },
+    "modules/trusted-client/protocolProof.js": {
+      "sha256": "a1ea8b70b3e75a35f1ee7f7173003af340f33be51e9b7fd69ae92c0707ff7be5",
+      "size": 3599
+    },
+    "modules/trusted-client/securityEpoch.js": {
+      "sha256": "d9e6171601b202b98287e20fa5f159c2c1658ce454b024c704215d58d3515289",
+      "size": 1257
+    },
+    "modules/trusted-client/sensitiveAuthorityClassifier.js": {
+      "sha256": "31da9cfe3a6084f3b8c20b3fb92235e570ac43286309ca8d57dc9534e8918add",
+      "size": 574
+    },
+    "modules/trusted-client/trustedClientIdentityDescriptor.js": {
+      "sha256": "29ad40b1cab576cddb82fa218a557f2a8ceb8c1577bcccf3ac9941a42d61b57b",
+      "size": 1900
+    },
+    "modules/trusted-client/trustedClientKeyProvider.js": {
+      "sha256": "e218fa7fa6e66d2479f08a9f7dc5e718b67f9955f0ea41b8e6473422d1124c34",
+      "size": 2248
+    },
+    "modules/trusted-client/trustedClientNativeService.js": {
+      "sha256": "8f2a0e96a06e22e3e82df613069c7e9a4b16f77fef94c47d3b845fecff4336ee",
+      "size": 6842
+    },
+    "modules/trusted-client/trustedClientSession.js": {
+      "sha256": "2078da11f16a8af4f2a3e83236cc8f837121e1e8f2ed2eb0572e4c04f1748168",
+      "size": 9216
+    },
+    "modules/trusted-client/trustedDecisionBoundary.js": {
+      "sha256": "f21d3cac85ac1d4b8765b1c5bea117481c25fb3d9e053b511b3952ea468afd0e",
+      "size": 2882
+    },
+    "modules/trusted-client/ui/approval.css": {
+      "sha256": "5cbfeb22dc104cc0c88e6f7a5db2fa687575dbb00a1fc2bb5b58778239f8f23b",
+      "size": 421
+    },
+    "modules/trusted-client/ui/approval.html": {
+      "sha256": "56934d105e9eaaf19b3333991757ab1171516a73a875a55ad64ea224464461ac",
+      "size": 825
+    },
+    "modules/trusted-client/ui/approval.js": {
+      "sha256": "8de409bcf22d859b7bf42f637bc3f0bbadf25da42c92976d4e9de50933a975ef",
+      "size": 2078
+    },
+    "package.json": {
+      "sha256": "643191c368c7978b92155e81c07c198ad5713178c0ea5b77a8ccff265963a092",
+      "size": 13903
+    },
+    "preloads/trusted-approval.js": {
+      "sha256": "8edeccf5ace4f1be0e6fc6202a4e13c1b4b7c56118d7506f404cbd5aecfc7552",
+      "size": 735
+    },
+    "scripts/build-trusted-client.cjs": {
+      "sha256": "e93784dc3b41dffcbd809c9b93f565fbc3c71d744373f5081a42192c378cd21f",
+      "size": 426
+    },
+    "scripts/pack-trusted-client.cjs": {
+      "sha256": "9c9a9c197e7d38b4bb496ead2972750313a6cb2abed9b4f4d062ce9ebc54a5cb",
+      "size": 782
+    },
+    "scripts/trusted-client-after-pack.cjs": {
+      "sha256": "d8915b10667027d6bcab71785e7f7349633b9c2e38b008018fac33680c3654c7",
+      "size": 1676
+    },
+    "tests/notification-change-audit.test.js": {
+      "sha256": "be74369e14b19d13979e745374dd81f26dfba44609043a2d740fe6bf080576b1",
+      "size": 4784
+    },
+    "tests/trusted-client/core.test.js": {
+      "sha256": "cd93529757239a1fc0eaa93ba4a9dbbaedcb9baf1a20959510e1eea937f21575",
+      "size": 10456
+    },
+    "tests/trusted-client/host-contract.test.js": {
+      "sha256": "bd2b3184ca0e1e6e024e94d204740f1a5238711de6b48bdbcff0daa66123a0dd",
+      "size": 2354
+    },
+    "tests/trusted-client/lifecycle.test.js": {
+      "sha256": "4cc19241545f6468d323d7146511ff772594f52681d683345419b2a340d23fb9",
+      "size": 4495
+    },
+    "tests/trusted-client/session.test.js": {
+      "sha256": "c172da8198747844a97427696ee55008867444a9fa1123c500a0ea5faf12062f",
+      "size": 7525
+    },
+    "tests/trusted-client/tdb-delivery.test.js": {
+      "sha256": "76a844d985e58e98e7366f914bcc2e6436ec42ebb6a11e5d760e4ac4e0620d7f",
+      "size": 10758
+    },
+    "tests/trusted-client/window-ui.test.js": {
+      "sha256": "9479674381511693e082e65bce3d8a28f207e3dbc05705ae988c9be68c9cb4e9",
+      "size": 7542
+    }
+  },
+  "transport_evidence_dependency": {
+    "manifest": "/mnt/datadisk0/dev-cache/ubuntu/runs/c1a2-t1-a1-sync-u7felr0c/review/C1_A2_T1_A1_FINAL_FROZEN_SOURCE_MANIFEST.json",
+    "sha256": "fb6a53ea1968b0f4a3e02057bf0149ea306d58663d682a4c9c274d10e32878e9",
+    "qualification": "Frozen TEST_ONLY sync readiness and request delivery; production canonical sync still unauthorized for TEST_ONLY"
+  },
+  "re_review": {
+    "report": "/mnt/datadisk0/dev-cache/ubuntu/runs/c2-a1-sync-frozen-rerun-rnp81zpd/review/C2_A1_RE_REVIEW_CLOSEOUT.md",
+    "sha256": "5cb5b74baebac8387b8d5db63925519f1a7b1d1af435e4913bd7f6ac34457538",
+    "P0": 0,
+    "P1": 0,
+    "material_P2": 0
+  },
+  "production_profile": "PRODUCTION_DISABLED",
+  "production_admission": false,
+  "deployment": false,
+  "live_h2_retry_allowed": false,
+  "production_write_authorization_admitted": false,
+  "r5c_unblocked": false,
+  "platform_qualification": "Source acceptance only. Prior provider/OS input integrity/freshness assurance limitations unchanged; simulated window/presence/software signing is not new production evidence."
+}

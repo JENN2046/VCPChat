@@ -1,0 +1,43 @@
+{
+  "name": "vcpchat-qualification-only-q1",
+  "version": "0.0.0",
+  "private": true,
+  "main": "runtime.cjs",
+  "description": "Isolated TEST_ONLY native and packaged-component qualification; no Host admission",
+  "scripts": {
+    "native": "node-gyp rebuild --directory native",
+    "probe": "node driver.cjs",
+    "package": "node package.cjs"
+  },
+  "devDependencies": {
+    "electron": "44.0.0",
+    "electron-builder": "26.15.3",
+    "node-gyp": "11.4.2",
+    "@electron/fuses": "1.8.0",
+    "@electron/asar": "3.4.1"
+  },
+  "build": {
+    "appId": "test.vcpchat.qualification.q1",
+    "productName": "VCPQualificationQ1",
+    "asar": true,
+    "asarUnpack": [
+      "native/build/Release/qualification_provider.node"
+    ],
+    "npmRebuild": false,
+    "files": [
+      "runtime.cjs",
+      "probe.cjs",
+      "frozen-c2/modules/trusted-client/**",
+      "frozen-c2/modules/services/preloadPaths.js",
+      "frozen-c2/preloads/trusted-approval.js",
+      "native/build/Release/qualification_provider.node",
+      "package.json",
+      "frozen-host/*.js",
+      "artifact-native.json"
+    ],
+    "mac": {
+      "identity": null
+    },
+    "win": {}
+  }
+}

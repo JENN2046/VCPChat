@@ -16,8 +16,8 @@
 static napi_value fail(napi_env e,const char* code){napi_throw_error(e,code,code);return nullptr;}
 static napi_value str(napi_env e,const std::string& s){napi_value v;napi_create_string_utf8(e,s.c_str(),s.size(),&v);return v;}
 static void set(napi_env e,napi_value o,const char* k,napi_value v){napi_set_named_property(e,o,k,v);}
-static napi_value boolean(napi_env e,bool b){napi_value v;napi_get_boolean(e,b,&v);return v;}
-static napi_value nil(napi_env e){napi_value v;napi_get_null(e,&v);return v;}
+static napi_value jsBoolean(napi_env e,bool b){napi_value v;napi_get_jsBoolean(e,b,&v);return v;}
+static napi_value jsNull(napi_env e){napi_value v;napi_get_null(e,&v);return v;}
 static std::string b64(const std::vector<unsigned char>& v){static const char* a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";std::string s;unsigned acc=0;int bits=0;for(auto x:v){acc=(acc<<8)|x;bits+=8;while(bits>=6){bits-=6;s+=a[(acc>>bits)&63];}}if(bits)s+=a[(acc<<(6-bits))&63];return s;}
 // Q1 successor is a separate test target. No production loader imports it.
 static std::string qid; static bool diagnostic=false;
@@ -29,7 +29,7 @@ static napi_value qualificationInit(napi_env e,napi_callback_info info){
  if(napi_get_value_string_utf8(e,args[0],idbuf,sizeof(idbuf),&n)!=napi_ok||n!=32||napi_get_value_string_utf8(e,args[1],mode,sizeof(mode),&m)!=napi_ok)return fail(e,"QUALIFICATION_INIT_INVALID");
  for(size_t i=0;i<n;i++)if(!((idbuf[i]>='0'&&idbuf[i]<='9')||(idbuf[i]>='a'&&idbuf[i]<='f')))return fail(e,"QUALIFICATION_INIT_INVALID");
  std::string policy(mode,m);if(policy!="TARGET"&&policy!="SOFTWARE_DIAGNOSTIC")return fail(e,"QUALIFICATION_INIT_INVALID");
- qid=std::string(idbuf,n);diagnostic=policy=="SOFTWARE_DIAGNOSTIC";return boolean(e,true);
+ qid=std::string(idbuf,n);diagnostic=policy=="SOFTWARE_DIAGNOSTIC";return jsBoolean(e,true);
 }
 #ifdef __APPLE__
 static CFStringRef serviceName(){static CFStringRef value=CFStringCreateWithCString(nullptr,("com.vcp.qualification.q1."+qid).c_str(),kCFStringEncodingUTF8);return value;}
@@ -46,13 +46,13 @@ static CFDataRef tag(){const std::string s="com.vcp.qualification.q1."+qid;retur
 static SecKeyRef openKey(){CFDataRef t=tag();const void* ks[]={kSecClass,kSecAttrApplicationTag,kSecAttrKeyType,kSecReturnRef};const void* vs[]={kSecClassKey,t,kSecAttrKeyTypeECSECPrimeRandom,kCFBooleanTrue};CFDictionaryRef q=CFDictionaryCreate(nullptr,ks,vs,4,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);CFTypeRef r=nullptr;OSStatus s=SecItemCopyMatching(q,&r);CFRelease(q);CFRelease(t);return s==errSecSuccess?(SecKeyRef)r:nullptr;}
 static bool publicBytes(SecKeyRef key,std::vector<unsigned char>& out){SecKeyRef pub=SecKeyCopyPublicKey(key);if(!pub)return false;CFErrorRef err=nullptr;CFDataRef d=SecKeyCopyExternalRepresentation(pub,&err);CFRelease(pub);if(err)CFRelease(err);if(!d)return false;bool ok=CFDataGetLength(d)==65&&CFDataGetBytePtr(d)[0]==4;if(ok){out.assign(prefix,prefix+sizeof(prefix));out.insert(out.end(),CFDataGetBytePtr(d),CFDataGetBytePtr(d)+65);}CFRelease(d);return ok;}
 #endif
-static napi_value identity(napi_env e,napi_callback_info){if(qid.empty())return nil(e);std::vector<unsigned char> pub;
+static napi_value identity(napi_env e,napi_callback_info){if(qid.empty())return jsNull(e);std::vector<unsigned char> pub;
 #ifdef _WIN32
-Key k;if(!k.open())return nil(e);if(!publicBytes(k,pub))return fail(e,"KEY_INVALID");const char* type=(diagnostic?"QUALIFICATION_WINDOWS_SOFTWARE":"QUALIFICATION_WINDOWS_TPM");
+Key k;if(!k.open())return jsNull(e);if(!publicBytes(k,pub))return fail(e,"KEY_INVALID");const char* type=(diagnostic?"QUALIFICATION_WINDOWS_SOFTWARE":"QUALIFICATION_WINDOWS_TPM");
 #elif defined(__APPLE__)
-SecKeyRef k=openKey();if(!k)return nil(e);bool ok=publicBytes(k,pub);CFRelease(k);if(!ok)return fail(e,"KEY_INVALID");const char* type=(diagnostic?"QUALIFICATION_MACOS_SOFTWARE":"QUALIFICATION_MACOS_SECURE_ENCLAVE");
+SecKeyRef k=openKey();if(!k)return jsNull(e);bool ok=publicBytes(k,pub);CFRelease(k);if(!ok)return fail(e,"KEY_INVALID");const char* type=(diagnostic?"QUALIFICATION_MACOS_SOFTWARE":"QUALIFICATION_MACOS_SECURE_ENCLAVE");
 #else
-return nil(e);const char* type="UNAVAILABLE";
+return jsNull(e);const char* type="UNAVAILABLE";
 #endif
 napi_value o;napi_create_object(e,&o);set(e,o,"publicKeySpki",str(e,b64(pub)));set(e,o,"publicKeyAlgorithm",str(e,"ECDSA_P256_SHA256"));set(e,o,"providerType",str(e,type));set(e,o,"providerKeyId",str(e,"VCPChat.Qualification.Q1."+qid));return o;}
 static napi_value create(napi_env e,napi_callback_info i){
@@ -77,22 +77,22 @@ SecKeyRef key=openKey();if(!key)return fail(e,"KEY_LOST");CFDataRef message=CFDa
 return fail(e,"PROVIDER_UNAVAILABLE");
 #endif
 napi_value out,bytes;napi_create_object(e,&out);napi_create_buffer_copy(e,signature.size(),signature.data(),nullptr,&bytes);set(e,out,"bytes",bytes);set(e,out,"format",str(e,format));return out;}
-static napi_value properties(napi_env e,napi_callback_info){napi_value o;napi_create_object(e,&o);set(e,o,"KeyExtractionProtection",str(e,"UNKNOWN"));set(e,o,"KeyInvocationIsolation",str(e,"UNKNOWN"));set(e,o,"productionEligible",boolean(e,false));set(e,o,"reason",str(e,"QUALIFICATION_ONLY: same-principal invocation may be possible; no Human or production admission"));return o;}
+static napi_value properties(napi_env e,napi_callback_info){napi_value o;napi_create_object(e,&o);set(e,o,"KeyExtractionProtection",str(e,"UNKNOWN"));set(e,o,"KeyInvocationIsolation",str(e,"UNKNOWN"));set(e,o,"productionEligible",jsBoolean(e,false));set(e,o,"reason",str(e,"QUALIFICATION_ONLY: same-principal invocation may be possible; no Human or production admission"));return o;}
 // Provider-adjacent non-secret locator. This is not admission authority or key material.
-static napi_value readDescriptor(napi_env e,napi_callback_info){if(qid.empty())return nil(e);
+static napi_value readDescriptor(napi_env e,napi_callback_info){if(qid.empty())return jsNull(e);
 #ifdef _WIN32
-Key k;if(!k.open())return nil(e);DWORD n=0;auto status=NCryptGetProperty(k.k,L"VCPChat.Qualification.Descriptor",nullptr,0,&n,NCRYPT_PERSIST_ONLY_FLAG);if(status==NTE_NOT_FOUND)return nil(e);if(status||n>8192)return fail(e,"DESCRIPTOR_UNAVAILABLE");std::vector<unsigned char>b(n);if(NCryptGetProperty(k.k,L"VCPChat.Qualification.Descriptor",b.data(),n,&n,NCRYPT_PERSIST_ONLY_FLAG))return fail(e,"DESCRIPTOR_UNAVAILABLE");return str(e,std::string((char*)b.data(),n));
+Key k;if(!k.open())return jsNull(e);DWORD n=0;auto status=NCryptGetProperty(k.k,L"VCPChat.Qualification.Descriptor",nullptr,0,&n,NCRYPT_PERSIST_ONLY_FLAG);if(status==NTE_NOT_FOUND)return jsNull(e);if(status||n>8192)return fail(e,"DESCRIPTOR_UNAVAILABLE");std::vector<unsigned char>b(n);if(NCryptGetProperty(k.k,L"VCPChat.Qualification.Descriptor",b.data(),n,&n,NCRYPT_PERSIST_ONLY_FLAG))return fail(e,"DESCRIPTOR_UNAVAILABLE");return str(e,std::string((char*)b.data(),n));
 #elif defined(__APPLE__)
-const void* ks[]={kSecClass,kSecAttrService,kSecAttrAccount,kSecReturnData};const void* vs[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor"),kCFBooleanTrue};CFDictionaryRef q=CFDictionaryCreate(nullptr,ks,vs,4,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);CFTypeRef data=nullptr;OSStatus status=SecItemCopyMatching(q,&data);CFRelease(q);if(status==errSecItemNotFound)return nil(e);if(status!=errSecSuccess)return fail(e,"DESCRIPTOR_UNAVAILABLE");CFDataRef d=(CFDataRef)data;std::string json((char*)CFDataGetBytePtr(d),CFDataGetLength(d));CFRelease(d);if(json.size()>8192)return fail(e,"DESCRIPTOR_UNAVAILABLE");return str(e,json);
+const void* ks[]={kSecClass,kSecAttrService,kSecAttrAccount,kSecReturnData};const void* vs[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor"),kCFBooleanTrue};CFDictionaryRef q=CFDictionaryCreate(nullptr,ks,vs,4,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);CFTypeRef data=nullptr;OSStatus status=SecItemCopyMatching(q,&data);CFRelease(q);if(status==errSecItemNotFound)return jsNull(e);if(status!=errSecSuccess)return fail(e,"DESCRIPTOR_UNAVAILABLE");CFDataRef d=(CFDataRef)data;std::string json((char*)CFDataGetBytePtr(d),CFDataGetLength(d));CFRelease(d);if(json.size()>8192)return fail(e,"DESCRIPTOR_UNAVAILABLE");return str(e,json);
 #else
-return nil(e);
+return jsNull(e);
 #endif
 }
 static napi_value writeDescriptor(napi_env e,napi_callback_info info){if(qid.empty())return fail(e,"QUALIFICATION_NOT_INITIALIZED");size_t count=1;napi_value arg;size_t n=0;napi_get_cb_info(e,info,&count,&arg,nullptr,nullptr);if(count!=1||napi_get_value_string_utf8(e,arg,nullptr,0,&n)!=napi_ok||n>8192)return fail(e,"DESCRIPTOR_INVALID");std::vector<char>b(n+1);napi_get_value_string_utf8(e,arg,b.data(),b.size(),&n);
 #ifdef _WIN32
-Key k;if(!k.open())return fail(e,"KEY_LOST");if(NCryptSetProperty(k.k,L"VCPChat.Qualification.Descriptor",(PBYTE)b.data(),(DWORD)n,NCRYPT_PERSIST_FLAG))return fail(e,"DESCRIPTOR_WRITE_FAILED");return boolean(e,true);
+Key k;if(!k.open())return fail(e,"KEY_LOST");if(NCryptSetProperty(k.k,L"VCPChat.Qualification.Descriptor",(PBYTE)b.data(),(DWORD)n,NCRYPT_PERSIST_FLAG))return fail(e,"DESCRIPTOR_WRITE_FAILED");return jsBoolean(e,true);
 #elif defined(__APPLE__)
-SecKeyRef k=openKey();if(!k)return fail(e,"KEY_LOST");CFRelease(k);CFDataRef d=CFDataCreate(nullptr,(UInt8*)b.data(),n);const void* ks[]={kSecClass,kSecAttrService,kSecAttrAccount,kSecAttrAccessible,kSecValueData};const void* vs[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor"),kSecAttrAccessibleWhenUnlockedThisDeviceOnly,d};CFDictionaryRef q=CFDictionaryCreate(nullptr,ks,vs,5,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);OSStatus status=SecItemAdd(q,nullptr);CFRelease(q);if(status==errSecDuplicateItem){const void* qk[]={kSecClass,kSecAttrService,kSecAttrAccount};const void* qv[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor")};q=CFDictionaryCreate(nullptr,qk,qv,3,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);const void* uk[]={kSecValueData};const void* uv[]={d};CFDictionaryRef u=CFDictionaryCreate(nullptr,uk,uv,1,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);status=SecItemUpdate(q,u);CFRelease(u);CFRelease(q);}CFRelease(d);if(status!=errSecSuccess)return fail(e,"DESCRIPTOR_WRITE_FAILED");return boolean(e,true);
+SecKeyRef k=openKey();if(!k)return fail(e,"KEY_LOST");CFRelease(k);CFDataRef d=CFDataCreate(nullptr,(UInt8*)b.data(),n);const void* ks[]={kSecClass,kSecAttrService,kSecAttrAccount,kSecAttrAccessible,kSecValueData};const void* vs[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor"),kSecAttrAccessibleWhenUnlockedThisDeviceOnly,d};CFDictionaryRef q=CFDictionaryCreate(nullptr,ks,vs,5,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);OSStatus status=SecItemAdd(q,nullptr);CFRelease(q);if(status==errSecDuplicateItem){const void* qk[]={kSecClass,kSecAttrService,kSecAttrAccount};const void* qv[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor")};q=CFDictionaryCreate(nullptr,qk,qv,3,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);const void* uk[]={kSecValueData};const void* uv[]={d};CFDictionaryRef u=CFDictionaryCreate(nullptr,uk,uv,1,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);status=SecItemUpdate(q,u);CFRelease(u);CFRelease(q);}CFRelease(d);if(status!=errSecSuccess)return fail(e,"DESCRIPTOR_WRITE_FAILED");return jsBoolean(e,true);
 #else
 return fail(e,"PROVIDER_UNAVAILABLE");
 #endif
@@ -100,21 +100,21 @@ return fail(e,"PROVIDER_UNAVAILABLE");
 // Boolean-only negative extraction probe; raw private material never leaves native code.
 static napi_value probeExport(napi_env e,napi_callback_info){if(qid.empty())return fail(e,"QUALIFICATION_NOT_INITIALIZED");
 #ifdef _WIN32
- Key k;if(!k.open())return fail(e,"KEY_LOST");DWORD n=0;SECURITY_STATUS st=NCryptExportKey(k.k,0,BCRYPT_ECCPRIVATE_BLOB,nullptr,nullptr,0,&n,0);if(st||!n)return boolean(e,false);std::vector<unsigned char> secret(n);st=NCryptExportKey(k.k,0,BCRYPT_ECCPRIVATE_BLOB,nullptr,secret.data(),n,&n,0);SecureZeroMemory(secret.data(),secret.size());return boolean(e,st==0);
+ Key k;if(!k.open())return fail(e,"KEY_LOST");DWORD n=0;SECURITY_STATUS st=NCryptExportKey(k.k,0,BCRYPT_ECCPRIVATE_BLOB,nullptr,nullptr,0,&n,0);if(st||!n)return jsBoolean(e,false);std::vector<unsigned char> secret(n);st=NCryptExportKey(k.k,0,BCRYPT_ECCPRIVATE_BLOB,nullptr,secret.data(),n,&n,0);SecureZeroMemory(secret.data(),secret.size());return jsBoolean(e,st==0);
 #elif defined(__APPLE__)
- SecKeyRef k=openKey();if(!k)return fail(e,"KEY_LOST");CFErrorRef err=nullptr;CFDataRef d=SecKeyCopyExternalRepresentation(k,&err);CFRelease(k);if(err)CFRelease(err);bool available=d!=nullptr;if(d)CFRelease(d);return boolean(e,available);
+ SecKeyRef k=openKey();if(!k)return fail(e,"KEY_LOST");CFErrorRef err=nullptr;CFDataRef d=SecKeyCopyExternalRepresentation(k,&err);CFRelease(k);if(err)CFRelease(err);bool available=d!=nullptr;if(d)CFRelease(d);return jsBoolean(e,available);
 #else
  return fail(e,"PROVIDER_UNAVAILABLE");
 #endif
 }
 static napi_value destroy(napi_env e,napi_callback_info){if(qid.empty())return fail(e,"QUALIFICATION_NOT_INITIALIZED");
 #ifdef _WIN32
- Key k;if(!k.open())return boolean(e,true);auto status=NCryptDeleteKey(k.k,0);if(status)return fail(e,"QUALIFICATION_CLEANUP_FAILED");k.k=0;return boolean(e,true);
+ Key k;if(!k.open())return jsBoolean(e,true);auto status=NCryptDeleteKey(k.k,0);if(status)return fail(e,"QUALIFICATION_CLEANUP_FAILED");k.k=0;return jsBoolean(e,true);
 #elif defined(__APPLE__)
  CFDataRef t=tag();const void* ks[]={kSecClass,kSecAttrApplicationTag,kSecAttrKeyType};const void* vs[]={kSecClassKey,t,kSecAttrKeyTypeECSECPrimeRandom};CFDictionaryRef q=CFDictionaryCreate(nullptr,ks,vs,3,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);auto status=SecItemDelete(q);CFRelease(q);CFRelease(t);if(status!=errSecSuccess&&status!=errSecItemNotFound)return fail(e,"QUALIFICATION_CLEANUP_FAILED");
- const void* dk[]={kSecClass,kSecAttrService,kSecAttrAccount};const void* dv[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor")};q=CFDictionaryCreate(nullptr,dk,dv,3,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);status=SecItemDelete(q);CFRelease(q);if(status!=errSecSuccess&&status!=errSecItemNotFound)return fail(e,"QUALIFICATION_CLEANUP_FAILED");return boolean(e,true);
+ const void* dk[]={kSecClass,kSecAttrService,kSecAttrAccount};const void* dv[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor")};q=CFDictionaryCreate(nullptr,dk,dv,3,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);status=SecItemDelete(q);CFRelease(q);if(status!=errSecSuccess&&status!=errSecItemNotFound)return fail(e,"QUALIFICATION_CLEANUP_FAILED");return jsBoolean(e,true);
 #else
- return boolean(e,true);
+ return jsBoolean(e,true);
 #endif
 }
 static napi_value init(napi_env e,napi_value exports){napi_property_descriptor p[]={{"qualificationInit",0,qualificationInit,0,0,0,napi_default,0},{"probePrivateExport",0,probeExport,0,0,0,napi_default,0},{"destroyIdentity",0,destroy,0,0,0,napi_default,0},{"getIdentity",0,identity,0,0,0,napi_default,0},{"createIdentity",0,create,0,0,0,napi_default,0},{"signHumanClientProtocolProof",0,signProof,0,0,0,napi_default,0},{"getSecurityProperties",0,properties,0,0,0,napi_default,0},{"readDescriptor",0,readDescriptor,0,0,0,napi_default,0},{"writeDescriptor",0,writeDescriptor,0,0,0,napi_default,0}};napi_define_properties(e,exports,sizeof(p)/sizeof(p[0]),p);return exports;}

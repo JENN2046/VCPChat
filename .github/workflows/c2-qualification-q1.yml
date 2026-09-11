@@ -43,3 +43,4 @@ jobs:
             qualification/c2-q1/native/build/config.gypi
             qualification/c2-q1/native/build/Release/qualification_provider.node
             qualification/c2-q1/artifact-native.json
+            qualification/c2-q1/artifact/**

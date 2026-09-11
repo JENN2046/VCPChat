@@ -36,7 +36,7 @@
       "artifact-native.json"
     ],
     "mac": {
-      "identity": null
+      "identity": "-"
     },
     "win": {}
   }

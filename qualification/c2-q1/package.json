@@ -37,7 +37,11 @@
       "!frozen-c2/modules/trusted-client/native/build/**"
     ],
     "mac": {
-      "identity": "-"
+      "identity": "-",
+      "signIgnore": [
+        "qualification_provider\\.node$"
+      ],
+      "notarize": false
     },
     "win": {}
   }

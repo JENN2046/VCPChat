@@ -14,6 +14,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 static napi_value fail(napi_env e,const char* code){napi_throw_error(e,code,code);return nullptr;}
+static napi_value failStatus(napi_env e,const char* code,long status){std::string m=std::string(code)+" platformStatus="+std::to_string(status);napi_throw_error(e,code,m.c_str());return nullptr;}
 static napi_value str(napi_env e,const std::string& s){napi_value v;napi_create_string_utf8(e,s.c_str(),s.size(),&v);return v;}
 static void set(napi_env e,napi_value o,const char* k,napi_value v){napi_set_named_property(e,o,k,v);}
 static napi_value jsBoolean(napi_env e,bool b){napi_value v;napi_get_boolean(e,b,&v);return v;}
@@ -90,7 +91,7 @@ return jsNull(e);
 }
 static napi_value writeDescriptor(napi_env e,napi_callback_info info){if(qid.empty())return fail(e,"QUALIFICATION_NOT_INITIALIZED");size_t count=1;napi_value arg;size_t n=0;napi_get_cb_info(e,info,&count,&arg,nullptr,nullptr);if(count!=1||napi_get_value_string_utf8(e,arg,nullptr,0,&n)!=napi_ok||n>8192)return fail(e,"DESCRIPTOR_INVALID");std::vector<char>b(n+1);napi_get_value_string_utf8(e,arg,b.data(),b.size(),&n);
 #ifdef _WIN32
-Key k;if(!k.open())return fail(e,"KEY_LOST");if(NCryptSetProperty(k.k,L"VCPChat.Qualification.Descriptor",(PBYTE)b.data(),(DWORD)n,NCRYPT_PERSIST_FLAG))return fail(e,"DESCRIPTOR_WRITE_FAILED");return jsBoolean(e,true);
+Key k;if(!k.open())return fail(e,"KEY_LOST");auto status=NCryptSetProperty(k.k,L"VCPChat.Qualification.Descriptor",(PBYTE)b.data(),(DWORD)n,NCRYPT_PERSIST_FLAG|NCRYPT_PERSIST_ONLY_FLAG);if(status)return failStatus(e,"DESCRIPTOR_WRITE_FAILED",status);return jsBoolean(e,true);
 #elif defined(__APPLE__)
 SecKeyRef k=openKey();if(!k)return fail(e,"KEY_LOST");CFRelease(k);CFDataRef d=CFDataCreate(nullptr,(UInt8*)b.data(),n);const void* ks[]={kSecClass,kSecAttrService,kSecAttrAccount,kSecAttrAccessible,kSecValueData};const void* vs[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor"),kSecAttrAccessibleWhenUnlockedThisDeviceOnly,d};CFDictionaryRef q=CFDictionaryCreate(nullptr,ks,vs,5,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);OSStatus status=SecItemAdd(q,nullptr);CFRelease(q);if(status==errSecDuplicateItem){const void* qk[]={kSecClass,kSecAttrService,kSecAttrAccount};const void* qv[]={kSecClassGenericPassword,serviceName(),CFSTR("descriptor")};q=CFDictionaryCreate(nullptr,qk,qv,3,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);const void* uk[]={kSecValueData};const void* uv[]={d};CFDictionaryRef u=CFDictionaryCreate(nullptr,uk,uv,1,&kCFTypeDictionaryKeyCallBacks,&kCFTypeDictionaryValueCallBacks);status=SecItemUpdate(q,u);CFRelease(u);CFRelease(q);}CFRelease(d);if(status!=errSecSuccess)return fail(e,"DESCRIPTOR_WRITE_FAILED");return jsBoolean(e,true);
 #else

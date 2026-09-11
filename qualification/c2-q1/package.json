@@ -33,7 +33,8 @@
       "native/build/Release/qualification_provider.node",
       "package.json",
       "frozen-host/*.js",
-      "artifact-native.json"
+      "artifact-native.json",
+      "!frozen-c2/modules/trusted-client/native/build/**"
     ],
     "mac": {
       "identity": "-"

@@ -32,7 +32,10 @@ jobs:
       - run: npm run native
       - run: npm run probe
       - run: npm run package
+      - run: node platform-info.cjs
       - run: node packaged-tests.cjs
+      - run: tar -czf qualification-package.tar.gz -C artifact .
+        if: always()
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -43,4 +46,11 @@ jobs:
             qualification/c2-q1/native/build/config.gypi
             qualification/c2-q1/native/build/Release/qualification_provider.node
             qualification/c2-q1/artifact-native.json
-            qualification/c2-q1/artifact/**
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: qualification-package-${{ matrix.os }}
+          retention-days: 7
+          compression-level: 0
+          path: qualification/c2-q1/qualification-package.tar.gz

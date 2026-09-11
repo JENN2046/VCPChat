@@ -11,6 +11,10 @@ initialize TPM, enroll, change keychain policy, capture biometric input or modif
 The exact frozen Q1 TARGET probe then uses a random disposable qualification key
 namespace, with cleanup, and never falls back to the software diagnostic provider.
 
+The second iteration also directly tests CryptoKit ephemeral Secure Enclave key creation
+to distinguish a legacy persistent-keychain enrollment failure from framework availability.
+It never persists a key handle, changes entitlements, or creates a signer service.
+
 A successful CI job means that probes executed and evidence was collected. It is not
 a hardware/provenance/isolation or pre-production qualification PASS. Unavailable
 hardware and absent legitimate test signing remain explicit limitations. Production

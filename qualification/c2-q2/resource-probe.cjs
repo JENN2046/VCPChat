@@ -23,6 +23,9 @@ if (process.platform === 'win32') {
   if (result.enclave.status !== 0) result.enclaveAvailability = 'UNPROVEN';
   else if (!['AVAILABLE', 'UNAVAILABLE'].includes(result.enclave.stdout)) throw new Error('UNEXPECTED_ENCLAVE_RESULT');
   else result.enclaveAvailability = result.enclave.stdout;
+  result.enclaveCreation = run('/usr/bin/swift', [path.join(__dirname, 'enclave-probe.swift')]);
+  if (result.enclaveCreation.status !== 0) throw new Error('SWIFT_ENCLAVE_DIAGNOSTIC_FAILED: ' + result.enclaveCreation.stderr);
+  result.enclaveCreationObserved = JSON.parse(result.enclaveCreation.stdout);
 } else throw new Error('TARGET_PLATFORM_REQUIRED');
 fs.writeFileSync(path.join(output, 'RESOURCE_PROBE.json'), JSON.stringify(result, null, 2));
 console.log(JSON.stringify(result));

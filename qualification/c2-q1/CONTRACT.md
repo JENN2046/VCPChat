@@ -41,3 +41,5 @@ Official API references:
 - https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptcreatepersistedkey
 - https://developer.apple.com/documentation/security/seckeycopyexternalrepresentation(_:_:)
 - https://www.electronjs.org/docs/latest/tutorial/fuses
+
+Q1 build corrections are isolated: helper names avoid Windows/macOS SDK collisions; Windows custom descriptor uses PERSIST + PERSIST_ONLY flags. Software macOS diagnostic omits the Secure-Enclave-only privateKeyUsage flag (Apple documents failure outside Secure Enclave); TARGET retains it. Native ad-hoc signing precedes the ASAR hash commitment, and the builder preserves that exact signed native byte sequence. None is a production source change.

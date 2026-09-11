@@ -2,6 +2,7 @@
 const crypto=require('node:crypto'),assert=require('node:assert/strict'),path=require('node:path');
 const C=require('./frozen-host/humanClientAdmissionCrypto');
 const {wrapNative}=require('./frozen-c2/modules/trusted-client/trustedClientKeyProvider');
+const {reconcile}=require('./frozen-c2/modules/trusted-client/trustedClientIdentityDescriptor');
 const native=require('./native/build/Release/qualification_provider.node');
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 function proof(purpose,fingerprint){const boundFields={protocolVersion:1,purpose,hostBootId:crypto.randomBytes(32).toString('base64url'),trustedHostOrigin:'https://127.0.0.1',surface:'vcp_chat',publicKeyFingerprint:fingerprint,nonceId:crypto.randomBytes(32).toString('base64url'),issuedAt:Date.now(),expiresAt:Date.now()+30000,method:'POST',path:'/qualification-only/v1/'+purpose,bodyDigest:hash('Q1 disposable fixture')};const t=C.transcript(boundFields);return {nonceId:boundFields.nonceId,boundFields,...t};}
@@ -13,10 +14,10 @@ async function runNative(mode,id,{foreign=true}={}){
  assert.equal(native.getIdentity(),null,'Fresh test namespace must be empty');assert.equal(native.getSecurityProperties().productionEligible,false);
  try{
   let identity;
-  try{identity=native.createIdentity();}catch(e){r.keyLifecycle='UNPROVEN';r.reason=e.code||e.message;return r;}
+  try{identity=native.createIdentity();}catch(e){r.keyLifecycle='UNPROVEN';r.reason=e.code||e.message;r.platformDiagnostic=e.message;return r;}
   const k=C.importPublicKey(identity.publicKeySpki);assert.equal(k.publicKeyAlgorithm,'ECDSA_P256_SHA256');r.identity={algorithm:k.publicKeyAlgorithm,fingerprint:k.fingerprint,providerType:identity.providerType};
-  const provider=wrapNative(native);const safeDescriptor={schemaVersion:1,clientEnrollmentId:'QUALIFICATION_ONLY_'+id,publicKeyFingerprint:k.fingerprint,implementationProfileId:'TEST_ONLY'};
-  provider.writeDescriptor(safeDescriptor);assert.deepEqual(provider.readDescriptor(),safeDescriptor);
+  const provider=wrapNative(native);const safeDescriptor={schemaVersion:1,hostAuthorityId:'QUALIFICATION_ONLY',clientEnrollmentId:'QUALIFICATION_ONLY_'+id,publicKeyAlgorithm:k.publicKeyAlgorithm,publicKeyFingerprint:k.fingerprint,providerType:identity.providerType,providerKeyId:identity.providerKeyId,implementationProfileId:'TEST_ONLY'};const expected={hostAuthorityId:'QUALIFICATION_ONLY',implementationProfileId:'TEST_ONLY'};assert.equal(reconcile(identity,null,expected).state,'RECOVERY_REQUIRED');assert.equal(reconcile(null,null,expected).state,'UNENROLLED');assert.equal(reconcile(null,safeDescriptor,expected).state,'KEY_LOST');assert.equal(reconcile(identity,{...safeDescriptor,publicKeyFingerprint:'0'.repeat(64)},expected).state,'IDENTITY_RECOVERY_LOCKED');
+  provider.writeDescriptor(safeDescriptor);assert.deepEqual(provider.readDescriptor(),safeDescriptor);assert.equal(reconcile(provider.getIdentity(),provider.readDescriptor(),expected).state,'ENROLLED');r.recoveryProjection='five frozen recovery states checked against actual native key/descriptor';
   r.purposes=[];
   for(const purpose of C.PURPOSES){const p=proof(purpose,k.fingerprint);const answer=await provider.signHumanClientProtocolProof(p,{...p.boundFields});assert(C.verifyHumanClientProof({publicKeyAlgorithm:k.publicKeyAlgorithm,canonicalPublicKey:k.key,signingInput:Buffer.from(p.signingInput,'base64url'),signature:answer.signature}));await assert.rejects(()=>provider.signHumanClientProtocolProof(p,{...p.boundFields}),/PROOF_REPLAYED/);r.purposes.push(purpose);}
   assert.throws(()=>native.signHumanClientProtocolProof(Buffer.from('arbitrary')));assert.throws(()=>native.signHumanClientProtocolProof(Buffer.concat([Buffer.from('VCP-HUMAN-CLIENT\0v1\0decision-sign\0'),Buffer.alloc(32)])));

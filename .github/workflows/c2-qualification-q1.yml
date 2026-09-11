@@ -34,7 +34,9 @@ jobs:
       - run: npm run package
       - run: node platform-info.cjs
       - run: node packaged-tests.cjs
-      - run: tar -czf qualification-package.tar.gz -C artifact .
+      - run: |
+          tar -czf qualification-package.tar.gz -C artifact .
+          node -e "const f=require('fs'),c=require('crypto');f.mkdirSync('evidence',{recursive:true});f.writeFileSync('evidence/PACKAGE_ARCHIVE_SHA256.json',JSON.stringify({sha256:c.createHash('sha256').update(f.readFileSync('qualification-package.tar.gz')).digest('hex')}))"
         if: always()
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -46,6 +48,8 @@ jobs:
             qualification/c2-q1/native/build/config.gypi
             qualification/c2-q1/native/build/Release/qualification_provider.node
             qualification/c2-q1/artifact-native.json
+            qualification/c2-q1/artifact/**/app.asar
+            qualification/c2-q1/artifact/**/qualification_provider.node
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

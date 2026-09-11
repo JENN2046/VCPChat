@@ -1,0 +1,45 @@
+name: C2 Q2 Hardware Resource Qualification
+on:
+  push:
+    branches: ['qualification/c2-q2-cz38p9rr']
+    paths: ['qualification/c2-q2/**', '.github/workflows/c2-qualification-q2.yml']
+permissions:
+  contents: read
+jobs:
+  resource-qualification:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-14]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.15.0'
+      - name: Verify frozen Q1 source inputs
+        run: node qualification/c2-q2/verify-q1.cjs
+      - name: Observe hardware availability without device mutations
+        run: node qualification/c2-q2/resource-probe.cjs
+      - name: Install locked build tools without lifecycle scripts
+        working-directory: qualification/c2-q1
+        run: npm ci --ignore-scripts --registry=https://registry.npmjs.org
+      - name: Compile exact frozen qualification provider
+        working-directory: qualification/c2-q1
+        run: npm run native
+      - name: Execute hardware target only
+        run: node qualification/c2-q2/target-probe.cjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: q2-resource-${{ matrix.os }}
+          retention-days: 14
+          path: qualification/c2-q2/evidence

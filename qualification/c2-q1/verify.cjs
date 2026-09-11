@@ -4,5 +4,5 @@ const m=JSON.parse(fs.readFileSync('FROZEN_C2_MANIFEST.json'));for(const [p,v] o
 for(const [p,v] of Object.entries(JSON.parse(fs.readFileSync('FROZEN_HOST_CRYPTO.json'))))assert.equal(hash('frozen-host/'+p),v,p);
 const original=fs.readFileSync('frozen-c2/modules/trusted-client/native/provider.cc','utf8');assert(original.includes('return fail(e,"PROVIDER_NOT_ADMITTED");'));assert(!original.includes('qualificationInit'));
 assert(!fs.readFileSync('frozen-c2/modules/trusted-client/trustedClientKeyProvider.js','utf8').includes('qualification_provider'));
-assert(fs.readFileSync('native/provider.cc','utf8').includes('"productionEligible",boolean(e,false)'));
+assert(fs.readFileSync('native/provider.cc','utf8').includes('"productionEligible",jsBoolean(e,false)'));
 console.log('Frozen C2 40/40; Host crypto2/2; separate qualification target; production loader unchanged');

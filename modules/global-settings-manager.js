@@ -1,104 +1,134 @@
 /**
  * This module handles the logic for saving global settings.
  */
-export async function handleSaveGlobalSettings(e, deps) {
-    const chatAPI = window.chatAPI || window.electronAPI;
+import { collectSettings } from './settings/value-semantics.js';
+import { schemaSurfaceSections } from './settings/schema-surface.js';
+
+export function handleSaveGlobalSettings(e, deps) {
     e.preventDefault();
+    const settingsForm = e.currentTarget || document.getElementById('globalSettingsForm');
+    if (settingsForm && settingsForm.dataset.vcpAutosaveSubmission !== 'true') {
+        settingsForm.dispatchEvent(new CustomEvent('vcp-settings-manual-save-start'));
+    }
+    if (settingsForm?.dataset.globalSettingsSaving === 'true') {
+        // The legacy autosave state machine unlocks only on a
+        // `vcp-settings-save-result` event. Returning silently here wedged that
+        // machine on 保存中… forever and made the close-time flush drop the
+        // edit. Publish an explicit outcome instead of dropping it.
+        //
+        // This is *not* a terminal failure: the in-flight save still owns the
+        // outcome and will publish its own result. `inflight: true` marks the
+        // event as a merge notice so consumers keep waiting rather than
+        // flipping the status bar to 失败 and immediately re-submitting.
+        settingsForm?.dispatchEvent(new CustomEvent('vcp-settings-save-result', {
+            detail: {
+                success: false,
+                status: 'inflight',
+                error: '已有保存任务进行中，请稍后重试',
+                owner: 'global-settings-concurrent-guard',
+                inflight: true,
+            }
+        }));
+        return;
+    }
+    if (settingsForm) settingsForm.dataset.globalSettingsSaving = 'true';
+
+    // A real submit supersedes any pending legacy debounce. Without this
+    // boundary, the explicit save can close the modal and the old timer then
+    // starts a second save against a torn-down surface.
+
+    return saveGlobalSettings(deps, settingsForm).catch(error => {
+        // Exceptions (notably the bounded IPC timeout) are terminal outcomes
+        // for the autosave consumer too. Publish the same failure contract as
+        // an explicit `{ success: false }` result before releasing the lock.
+        settingsForm?.dispatchEvent(new CustomEvent('vcp-settings-save-result', {
+            detail: { success: false, status: error?.code === 'SETTINGS_CONFLICT' ? 'conflict' : 'failed', code: error?.code, operationId: settingsForm?.dataset.vcpSettingsOperationId, error: error?.message || String(error) }
+        }));
+        throw error;
+    }).finally(() => {
+        if (settingsForm) delete settingsForm.dataset.globalSettingsSaving;
+    });
+}
+
+function awaitWithTimeout(value, timeoutMs) {
+    const duration = Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 15000;
+    let timer;
+    return Promise.race([
+        Promise.resolve(value),
+        new Promise((_, reject) => {
+            timer = setTimeout(() => reject(new Error(`保存设置超时（${duration}ms）`)), duration);
+        }),
+    ]).finally(() => clearTimeout(timer));
+}
+
+function buildSettingsPatch(before, after) {
+    if (before && after && typeof before === 'object' && typeof after === 'object'
+        && !Array.isArray(before) && !Array.isArray(after)) {
+        const patch = {};
+        for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) {
+            if (!(key in after)) continue;
+            const child = buildSettingsPatch(before[key], after[key]);
+            if (child !== undefined) patch[key] = child;
+        }
+        return Object.keys(patch).length ? patch : undefined;
+    }
+    return Object.is(before, after) ? undefined : after;
+}
+
+function patchToOps(patch, prefix = []) {
+    return Object.entries(patch || {}).flatMap(([key, value]) => {
+        const path = [...prefix, key];
+        return value && typeof value === 'object' && !Array.isArray(value)
+            ? patchToOps(value, path)
+            : [{ op: 'set', path, value }];
+    });
+}
+
+async function saveGlobalSettings(deps, settingsForm) {
+    const chatAPI = window.chatAPI || window.electronAPI;
+    const autosaveSubmission = settingsForm?.dataset.vcpAutosaveSubmission === 'true';
+    const reportSaveResult = (success, error = '', status = success ? 'success' : 'failed', extra = {}) => {
+        settingsForm?.dispatchEvent(new CustomEvent('vcp-settings-save-result', {
+            detail: { success, status, operationId: settingsForm?.dataset.vcpSettingsOperationId, error: error || undefined, ...extra }
+        }));
+    };
 
     const {
         refs,
+        messageRenderer,
         getCroppedFile,
         setCroppedFile,
         uiHelperFunctions,
-        settingsManager
+        settingsManager,
+        normalizeChatPresentationMode,
+        applyChatPresentationMode,
+        applyChatBubbleLayoutSettings,
+        getAppearance = () => window.VCPAppearance
     } = deps;
+    if (typeof normalizeChatPresentationMode !== 'function' || typeof applyChatPresentationMode !== 'function'
+        || typeof applyChatBubbleLayoutSettings !== 'function') {
+        throw new TypeError('Global settings save requires presentation and layout capabilities.');
+    }
     const currentSettings = refs.globalSettings.get();
 
-    const clampBubbleWidthPercent = (rawValue, fallback) => {
-        const parsed = Number.parseInt(rawValue, 10);
-        if (!Number.isFinite(parsed)) return fallback;
-        return Math.min(98, Math.max(50, parsed));
-    };
+    // M5-a 值链路合一：settings.json 全量载荷由 schema 字段描述符的 save
+    // 声明推导（value-semantics.collectSettings），与旧手写收集器逐键等价
+    // （tests/settings-value-golden.test.mjs 金测为门禁）。锁/超时/结果事件
+    // 契约不变；划词 patch、论坛凭据、头像仍是独立通道。
+    const newSettings = collectSettings(schemaSurfaceSections(), {
+        doc: document,
+        currentSettings,
+        settingsManager,
+        getAppearance,
+        normalizeChatPresentationMode,
+    });
 
-    const networkNotesPathsContainer = document.getElementById('networkNotesPathsContainer');
-    const pathInputs = networkNotesPathsContainer.querySelectorAll('input[name="networkNotesPath"]');
-    const networkNotesPaths = Array.from(pathInputs).map(input => input.value.trim()).filter(path => path);
     const parseMultilineKeywords = (id) => {
         const value = document.getElementById(id)?.value || '';
         return value
             .split(/\r?\n|,|，|;|；/)
             .map(item => item.trim())
             .filter(Boolean);
-    };
-
-    const voiceMode = document.getElementById('voiceModeNetwork')?.checked ? 'network' : 'local';
-    const speechRecognizerBrowserPath = document.getElementById('speechRecognizerBrowserPath')?.value.trim() || '';
-    const speechRecognizerPagePath = document.getElementById('speechRecognizerPagePath')?.value.trim() || '';
-
-    const newSettings = {
-        userName: document.getElementById('userName').value.trim() || '用户',
-        userAvatarBorderColor: document.getElementById('userAvatarBorderColor')?.value || '#3d5a80',
-        userNameTextColor: document.getElementById('userNameTextColor')?.value || '#ffffff',
-        userUseThemeColorsInChat: document.getElementById('userUseThemeColorsInChat')?.checked || false,
-        continueWritingPrompt: document.getElementById('continueWritingPrompt').value.trim() || '请继续',
-        flowlockContinueDelay: parseInt(document.getElementById('flowlockContinueDelay').value, 10) || 5,
-        enableMiddleClickQuickAction: document.getElementById('enableMiddleClickQuickAction').checked,
-        middleClickQuickAction: document.getElementById('middleClickQuickAction').value,
-        enableMiddleClickAdvanced: document.getElementById('enableMiddleClickAdvanced').checked,
-        middleClickAdvancedDelay: Math.max(1000, parseInt(document.getElementById('middleClickAdvancedDelay').value, 10) || 1000),
-        enableRegenerateConfirmation: document.getElementById('enableRegenerateConfirmation').checked,
-        vcpServerUrl: settingsManager.completeVcpUrl(document.getElementById('vcpServerUrl').value.trim()),
-        vcpApiKey: document.getElementById('vcpApiKey').value,
-        fileKey: document.getElementById('fileKey')?.value || '',
-        vcpLogUrl: document.getElementById('vcpLogUrl').value.trim(),
-        vcpLogKey: document.getElementById('vcpLogKey').value.trim(),
-        topicSummaryModel: document.getElementById('topicSummaryModel').value.trim(),
-        networkNotesPaths: networkNotesPaths,
-        sidebarWidth: refs.globalSettings.get().sidebarWidth,
-        notificationsSidebarWidth: refs.globalSettings.get().notificationsSidebarWidth,
-        enableAgentBubbleTheme: document.getElementById('enableAgentBubbleTheme').checked,
-        enableSmoothStreaming: document.getElementById('enableSmoothStreaming').checked,
-        chatFontPreset: document.getElementById('chatFontPreset')?.value || currentSettings.chatFontPreset || 'system',
-        chatFontCustom: document.getElementById('chatFontCustom')?.value.trim() || '',
-        chatCodeFontPreset: document.getElementById('chatCodeFontPreset')?.value || currentSettings.chatCodeFontPreset || 'consolas',
-        chatCodeFontCustom: document.getElementById('chatCodeFontCustom')?.value.trim() || '',
-        chatDiaryFontPreset: document.getElementById('chatDiaryFontPreset')?.value || currentSettings.chatDiaryFontPreset || 'serif',
-        chatDiaryFontCustom: document.getElementById('chatDiaryFontCustom')?.value.trim() || '',
-        chatToolFontPreset: document.getElementById('chatToolFontPreset')?.value || currentSettings.chatToolFontPreset || 'system',
-        chatToolFontCustom: document.getElementById('chatToolFontCustom')?.value.trim() || '',
-        enableWideChatLayout: document.getElementById('chatLayoutModeWide')?.checked || false,
-        enableUserChatBubbleUi: document.getElementById('enableUserChatBubbleUi')?.checked !== false,
-        showUserMetaInChatBubbleUi: document.getElementById('showUserMetaInChatBubbleUi')?.checked !== false,
-        chatBubbleMaxWidthDefault: clampBubbleWidthPercent(currentSettings.chatBubbleMaxWidthDefault, 82),
-        chatBubbleMaxWidthNotifications: clampBubbleWidthPercent(currentSettings.chatBubbleMaxWidthNotifications, 90),
-        chatBubbleMaxWidthNarrow: clampBubbleWidthPercent(currentSettings.chatBubbleMaxWidthNarrow, 85),
-        chatBubbleMaxWidthWideDefault: clampBubbleWidthPercent(document.getElementById('chatBubbleMaxWidthWideDefault')?.value, 92),
-        chatBubbleMaxWidthWideNotifications: clampBubbleWidthPercent(document.getElementById('chatBubbleMaxWidthWideNotifications')?.value, 96),
-        chatBubbleMaxWidthWideNarrow: clampBubbleWidthPercent(
-            document.getElementById('chatBubbleMaxWidthWideNarrow')?.value,
-            clampBubbleWidthPercent(currentSettings.chatBubbleMaxWidthWideNarrow, 92)
-        ),
-        minChunkBufferSize: parseInt(document.getElementById('minChunkBufferSize').value, 10) || 16,
-        smoothStreamIntervalMs: parseInt(document.getElementById('smoothStreamIntervalMs').value, 10) || 100,
-        assistantAgent: document.getElementById('assistantAgent').value,
-        voiceMode,
-        speechRecognizerBrowserPath,
-        speechRecognizerPagePath,
-        voiceLocalSettings: {
-            sovitsUrl: document.getElementById('voiceLocalSovitsUrl')?.value.trim() || '',
-            sovitsKey: document.getElementById('voiceLocalSovitsKey')?.value || ''
-        },
-        voiceNetworkSettings: {
-            providerUrl: document.getElementById('voiceNetworkProviderUrl')?.value.trim() || '',
-            providerKey: document.getElementById('voiceNetworkProviderKey')?.value || ''
-        },
-        enableDistributedServer: document.getElementById('enableDistributedServer').checked,
-        agentMusicControl: document.getElementById('agentMusicControl').checked,
-        enableVcpToolInjection: document.getElementById('enableVcpToolInjection').checked,
-        enableThoughtChainInjection: document.getElementById('enableThoughtChainInjection').checked,
-        enableContextSanitizer: document.getElementById('enableContextSanitizer').checked,
-        contextSanitizerDepth: parseInt(document.getElementById('contextSanitizerDepth').value, 10) || 0,
-        enableAiMessageButtons: document.getElementById('enableAiMessageButtons').checked,
     };
 
     // 处理规则模式选择
@@ -146,7 +176,7 @@ export async function handleSaveGlobalSettings(e, deps) {
                 buffer: arrayBuffer
             });
             if (avatarSaveResult.success) {
-                refs.globalSettings.get().userAvatarUrl = avatarSaveResult.avatarUrl;
+                newSettings.userAvatarUrl = avatarSaveResult.avatarUrl;
                 const userAvatarPreview = document.getElementById('userAvatarPreview');
                 userAvatarPreview.src = avatarSaveResult.avatarUrl;
                 userAvatarPreview.style.display = 'block';
@@ -157,9 +187,7 @@ export async function handleSaveGlobalSettings(e, deps) {
                     userAvatarWrapper.classList.remove('no-avatar');
                 }
                 
-                if (window.messageRenderer) {
-                    window.messageRenderer.setUserAvatar(avatarSaveResult.avatarUrl);
-                }
+                messageRenderer?.setUserAvatar(avatarSaveResult.avatarUrl);
                 if (avatarSaveResult.needsColorExtraction && chatAPI?.saveAvatarColor) {
                     if (window.getDominantAvatarColor) {
                         window.getDominantAvatarColor(avatarSaveResult.avatarUrl).then(avgColor => {
@@ -167,8 +195,9 @@ export async function handleSaveGlobalSettings(e, deps) {
                                 chatAPI.saveAvatarColor({ type: 'user', id: 'user_global', color: avgColor })
                                     .then((saveColorResult) => {
                                         if (saveColorResult && saveColorResult.success) {
-                                            refs.globalSettings.get().userAvatarCalculatedColor = avgColor;
-                                            if (window.messageRenderer) window.messageRenderer.setUserAvatarColor(avgColor);
+                                            const current = refs.globalSettings.get();
+                                            refs.globalSettings.set?.({ ...current, userAvatarCalculatedColor: avgColor });
+                                            messageRenderer?.setUserAvatarColor(avgColor);
                                         } else {
                                             console.warn("Failed to save user avatar color:", saveColorResult?.error);
                                         }
@@ -180,17 +209,24 @@ export async function handleSaveGlobalSettings(e, deps) {
                 setCroppedFile('user', null);
                 document.getElementById('userAvatarInput').value = '';
             } else {
-                uiHelperFunctions.showToastNotification(`保存用户头像失败: ${avatarSaveResult.error}`, 'error');
+                const error = avatarSaveResult.error || '未知错误';
+                reportSaveResult(false, `保存用户头像失败: ${error}`);
+                uiHelperFunctions.showToastNotification(`保存用户头像失败: ${error}`, 'error');
+                return;
             }
         } catch (readError) {
-            uiHelperFunctions.showToastNotification(`读取用户头像文件失败: ${readError.message}`, 'error');
+            const error = readError?.message || String(readError);
+            reportSaveResult(false, `读取用户头像文件失败: ${error}`);
+            uiHelperFunctions.showToastNotification(`读取用户头像文件失败: ${error}`, 'error');
+            return;
         }
     }
 
     // 保存论坛配置 (forum.config.json)
     const adminUsername = document.getElementById('adminUsername')?.value?.trim() || '';
     const adminPassword = document.getElementById('adminPassword')?.value || '';
-    if (adminUsername || adminPassword) {
+    const forumFieldOwnerMounted = settingsForm?.dataset.vcpTypedForumFieldOwnerMounted === 'true';
+    if ((adminUsername || adminPassword) && !forumFieldOwnerMounted) {
         try {
             const forumConfig = {
                 username: adminUsername,
@@ -198,21 +234,62 @@ export async function handleSaveGlobalSettings(e, deps) {
                 replyUsername: newSettings.userName || '用户',
                 rememberCredentials: true
             };
-            const forumResult = await chatAPI.saveForumConfig(forumConfig);
+            const forumService = window.VCPUISettingsBridge?.getForumConfigService?.();
+            const forumResult = forumService?.save?.execute
+                ? await forumService.save.execute(forumConfig)
+                : await chatAPI.saveForumConfig(forumConfig);
             if (!forumResult?.success) {
-                console.warn('[GlobalSettings] Failed to save forum config:', forumResult?.error);
+                const error = forumResult?.error || '未知错误';
+                reportSaveResult(false, `论坛配置保存失败: ${error}`);
+                uiHelperFunctions.showToastNotification(`论坛配置保存失败: ${error}`, 'error');
+                return;
             }
         } catch (forumErr) {
-            console.warn('[GlobalSettings] Error saving forum config:', forumErr);
+            const error = forumErr?.message || String(forumErr);
+            reportSaveResult(false, `论坛配置保存失败: ${error}`);
+            uiHelperFunctions.showToastNotification(`论坛配置保存失败: ${error}`, 'error');
+            return;
         }
     }
 
-    const result = await chatAPI.saveSettings(newSettings);
-    if (result.success) {
+    // A renderer must regain control when the main-process save never
+    // settles. The underlying IPC call may still finish later, but its late
+    // result cannot continue this operation because the bounded await has
+    // already rejected and the form lock is released by the outer finally.
+    const typedSettingsService = window.VCPUISettingsBridge?.getTypedService?.();
+    const operationId = settingsForm?.dataset.vcpSettingsOperationId || `global-${Date.now().toString(36)}`;
+    const settingsPatch = buildSettingsPatch(currentSettings, newSettings) || {};
+    const savePayload = typedSettingsService?.save?.execute
+        ? settingsPatch
+        : { ...settingsPatch, __vcpSettingsOps: patchToOps(settingsPatch), __vcpSettingsOperationId: operationId, expectedRevision: settingsForm?.dataset.vcpSettingsRevision || undefined, operationId };
+    const saveOperation = typedSettingsService?.save?.execute
+        ? typedSettingsService.save.execute(savePayload)
+        : chatAPI.saveSettings(savePayload);
+    let result;
+    try {
+        result = await awaitWithTimeout(saveOperation, deps.saveTimeoutMs);
+    } catch (error) {
+        // A bounded UI timeout is a terminal owner transition. Invalidate the
+        // typed command generation so a late IPC result cannot republish the
+        // timed-out patch into SettingsRoot.
+        typedSettingsService?.cancelPendingSaves?.();
+        throw error;
+    }
+    if (result?.success) {
         if (chatAPI?.saveRustAssistantConfig) {
-            const rustSaveResult = await chatAPI.saveRustAssistantConfig(rustConfigPatch);
+            const rustService = window.VCPUISettingsBridge?.getRustAssistantService?.();
+            const rustSaveResult = rustService?.save?.execute
+                ? await rustService.save.execute(rustConfigPatch)
+                : await chatAPI.saveRustAssistantConfig(rustConfigPatch);
             if (!rustSaveResult?.success) {
-                uiHelperFunctions.showToastNotification(`Rust助手配置保存失败: ${rustSaveResult?.error || '未知错误'}`, 'warning');
+                const error = rustSaveResult?.error || '未知错误';
+                reportSaveResult(false, `Rust助手配置保存失败: ${error}`);
+                uiHelperFunctions.showToastNotification(`Rust助手配置保存失败: ${error}`, 'error');
+                // Global settings are already durable, but the Rust capability
+                // is a separate command boundary. Keep SettingsRoot open so
+                // autosave can expose retry instead of closing on a partial
+                // success.
+                return;
             } else if (rustSaveResult.reconcile?.modeChanged) {
                 const modeLabel = rustSaveResult.reconcile.mode === 'rust' ? 'Rust' : 'Disabled';
                 const restartText = rustSaveResult.reconcile.restarted ? '并已热重启监听器' : '将在下次启用监听器时生效';
@@ -220,12 +297,58 @@ export async function handleSaveGlobalSettings(e, deps) {
             }
         }
 
-        Object.assign(refs.globalSettings.get(), newSettings);
-        if (typeof window.applyChatBubbleLayoutSettings === 'function') {
-            window.applyChatBubbleLayoutSettings(refs.globalSettings.get());
+        try {
+            newSettings.appearanceProfile = getAppearance()?.commit(
+                newSettings.appearanceProfile,
+                { uiMode: 'next', source: 'settings-save' }
+            ) || newSettings.appearanceProfile;
+            const committedSettings = { ...currentSettings, ...newSettings };
+            refs.globalSettings.set?.(committedSettings);
+            window.dispatchEvent(new CustomEvent('global-settings-updated', {
+                detail: { settings: committedSettings, source: 'settings-save' }
+            }));
+            if (typeof applyChatBubbleLayoutSettings === 'function') {
+                applyChatBubbleLayoutSettings(committedSettings);
+            }
+            if (typeof applyChatPresentationMode === 'function') {
+                // Typed settings controls may save a partial patch (for
+                // example, the content-width choice only sends
+                // enableWideChatLayout). Re-applying an undefined
+                // presentation mode here would normalize to bubble and can
+                // race the just-committed layout projection. Always use the
+                // merged authoritative snapshot for this second pass.
+                await applyChatPresentationMode(committedSettings.chatPresentationMode, {
+                    persist: false,
+                    preserveScroll: true,
+                    source: 'global-settings'
+                });
+            }
+        } catch (presentationError) {
+            // Settings have already been written. Keep the dialog state
+            // truthful and surface this as a post-save presentation warning,
+            // rather than incorrectly reporting an unsaved form.
+            console.error('[GlobalSettings] Saved, but applying presentation settings failed:', presentationError);
+            uiHelperFunctions.showToastNotification(`设置已保存，但界面应用失败：${presentationError?.message || presentationError}`, 'warning');
         }
-        uiHelperFunctions.showToastNotification('全局设置已保存！部分设置（如通知URL/Key）可能需要重新连接生效。');
-        uiHelperFunctions.closeModal('globalSettingsModal');
+        reportSaveResult(true, '', 'success', { currentRevision: result?.currentRevision });
+        delete settingsForm.dataset.vcpSettingsConflict;
+        settingsForm?.removeAttribute?.('data-vcp-settings-conflict');
+        if (!autosaveSubmission && settingsForm?.dataset.vcpAutosaveMounted !== 'true') {
+            uiHelperFunctions.showToastNotification('全局设置已保存！部分设置（如通知URL/Key）可能需要重新连接生效。');
+        }
+        // Keep-open contract: avatar saves and autosave-initiated submissions
+        // stay in the dialog — an autosave that slams the modal shut (and
+        // tears the unified surface down mid-edit) is what white-screened the
+        // settings page on every numeric commit.
+        const keepOpenAfterSave = autosaveSubmission
+            || settingsForm?.dataset.vcpKeepOpenAfterAvatarSave === 'true'
+            || settingsForm?.dataset.vcpKeepOpenAfterSave === 'true';
+        if (keepOpenAfterSave) {
+            delete settingsForm.dataset.vcpKeepOpenAfterAvatarSave;
+            delete settingsForm.dataset.vcpKeepOpenAfterSave;
+        } else {
+            uiHelperFunctions.closeModal('globalSettingsModal');
+        }
         if (refs.globalSettings.get().vcpLogUrl && refs.globalSettings.get().vcpLogKey) {
              chatAPI.connectVCPLog(refs.globalSettings.get().vcpLogUrl, refs.globalSettings.get().vcpLogKey);
         } else {
@@ -233,6 +356,11 @@ export async function handleSaveGlobalSettings(e, deps) {
              if (window.notificationRenderer) window.notificationRenderer.updateVCPLogStatus({ status: 'error', message: 'VCPLog未配置' }, document.getElementById('vcpLogConnectionStatus'));
         }
    } else {
-       uiHelperFunctions.showToastNotification(`保存全局设置失败: ${result.error}`, 'error');
+       const error = result?.error || '保存接口未返回成功结果';
+       const isConflict = result?.status === 'conflict' || result?.code === 'SETTINGS_CONFLICT' || String(error).includes('Settings changed since it was read');
+       reportSaveResult(false, error, isConflict ? 'conflict' : 'failed', { code: result?.code, currentRevision: result?.currentRevision });
+       if (!isConflict) {
+           uiHelperFunctions.showToastNotification(`保存全局设置失败: ${error}`, 'error');
+       }
     }
 }

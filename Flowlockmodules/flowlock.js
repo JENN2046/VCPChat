@@ -35,6 +35,39 @@ class FlowlockManager {
     }
 
     /**
+     * 获取用于界面提示的 Agent 名称。
+     * Session 缓存优先，避免后台 Agent 停止时依赖当前可见聊天；
+     * 配置读取失败时保留 ID 作为安全回退。
+     * @param {string} agentId
+     * @param {string|null} preferredName
+     * @returns {Promise<string>}
+     */
+    async resolveAgentDisplayName(agentId, preferredName = null) {
+        const normalize = value => typeof value === 'string' && value.trim() ? value.trim() : null;
+        const preferred = normalize(preferredName);
+        if (preferred) return preferred;
+
+        const sessionName = normalize(this.sessions.get(agentId)?.agentName);
+        if (sessionName) return sessionName;
+
+        const currentItem = window.VCPMainChatState?.snapshot?.()?.selectedItem;
+        if (currentItem?.id === agentId) {
+            const currentName = normalize(currentItem.name);
+            if (currentName) return currentName;
+        }
+
+        try {
+            const config = await this.electronAPI?.getAgentConfig?.(agentId);
+            const configName = normalize(config?.name);
+            if (configName) return configName;
+        } catch (error) {
+            console.warn(`[Flowlock] Failed to resolve display name for agent ${agentId}:`, error);
+        }
+
+        return agentId;
+    }
+
+    /**
      * 启动心流锁
      * @param {string} agentId - Agent ID
      * @param {string} topicId - Topic ID
@@ -60,14 +93,17 @@ class FlowlockManager {
         const {
             startImmediately = false,
             prompt = null,
-            delaySeconds = null
+            delaySeconds = null,
+            agentName: preferredAgentName = null
         } = options;
 
+        const agentName = await this.resolveAgentDisplayName(agentId, preferredAgentName);
         const globalSettings = this.globalSettingsRef?.get?.() || {};
         const defaultDelay = delaySeconds ?? globalSettings.flowlockContinueDelay ?? 5;
 
         const session = {
             agentId,
+            agentName,
             topicId,
             status: 'active',
             generation: 0,
@@ -99,7 +135,7 @@ class FlowlockManager {
 
         // 显示通知
         if (this.uiHelper?.showToastNotification) {
-            this.uiHelper.showToastNotification(`Agent "${agentId}" 心流锁已启动`, 'success');
+            this.uiHelper.showToastNotification(`Agent "${agentName}" 心流锁已启动`, 'success');
         }
 
         // 如果需要立即开始续写
@@ -115,7 +151,7 @@ class FlowlockManager {
      */
     async stop(agentId) {
         // 兼容旧插件 stop()：优先停止当前可见 Agent，不再错误地停止其他并发 Session。
-        const resolvedAgentId = agentId || window.currentSelectedItem?.id;
+        const resolvedAgentId = agentId || window.VCPMainChatState?.snapshot?.()?.selectedItem?.id;
         const session = this.sessions.get(resolvedAgentId);
         agentId = resolvedAgentId;
         if (!session) {
@@ -140,9 +176,11 @@ class FlowlockManager {
         this.updateSidebarIndicator(agentId, false);
         this.updateCurrentHeaderIndicator(agentId, false);
 
-        // 显示通知
+        // 显示通知。优先使用 Session 启动时缓存的名称，确保后台 Agent
+        // 不会因当前界面已切换而退化成 UUID。
+        const agentName = await this.resolveAgentDisplayName(agentId, session.agentName);
         if (this.uiHelper?.showToastNotification) {
-            this.uiHelper.showToastNotification(`Agent "${agentId}" 心流锁已停止`, 'info');
+            this.uiHelper.showToastNotification(`Agent "${agentName}" 心流锁已停止`, 'info');
         }
 
         this.sessions.delete(agentId);
@@ -583,6 +621,7 @@ class FlowlockManager {
         if (!session) return null;
         return {
             agentId: session.agentId,
+            agentName: session.agentName || session.agentId,
             claimRequestId: session.claimRequestId || null,
             topicId: session.topicId,
             status: session.status,
@@ -635,7 +674,7 @@ class FlowlockManager {
      * 切换 Agent 后也可无参数调用，以当前可见 Agent 的真实 Session 为准。
      */
     syncCurrentHeaderIndicator() {
-        const currentItem = window.currentSelectedItem;
+        const currentItem = window.VCPMainChatState?.snapshot?.()?.selectedItem;
         const header = document.getElementById('currentChatAgentName');
         if (!header) return;
 
@@ -651,7 +690,7 @@ class FlowlockManager {
     }
 
     updateCurrentHeaderIndicator(agentId, active) {
-        const currentItem = window.currentSelectedItem;
+        const currentItem = window.VCPMainChatState?.snapshot?.()?.selectedItem;
         if (currentItem?.type !== 'agent' || currentItem.id !== agentId) return;
 
         const header = document.getElementById('currentChatAgentName');
@@ -667,7 +706,7 @@ class FlowlockManager {
     }
 
     triggerCurrentHeaderHeartbeat(agentId) {
-        const currentItem = window.currentSelectedItem;
+        const currentItem = window.VCPMainChatState?.snapshot?.()?.selectedItem;
         if (currentItem?.type !== 'agent' || currentItem.id !== agentId) return;
 
         const header = document.getElementById('currentChatAgentName');

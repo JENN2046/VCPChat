@@ -55,12 +55,28 @@ class DistributedServer {
         this.handleCanvasControl = config.handleCanvasControl; // Inject the canvas control handler
         this.handleFlowlockControl = config.handleFlowlockControl; // Inject the flowlock control handler
         this.handleDesktopRemoteControl = config.handleDesktopRemoteControl; // Inject the desktop remote control handler
+        this.chatDataService = config.chatDataService || null; // Shared VCP-CDS facade owned by Electron.
+        this.loomManager = config.loomManager || null; // Shared VCP Loom manager owned by Electron.
+        this.scriptoriumAgentControl = config.scriptoriumAgentControl || null;
+        this.pluginAgentOperationService = config.pluginAgentOperationService || null;
         this.ws = null;
         this.app = express(); // 创建 Express 应用
         this.server = http.createServer(this.app); // 创建 HTTP 服务器
         this.reconnectInterval = 5000;
-        this.app.use(express.json({ limit: '2mb' }));
-        this.app.use(express.urlencoded({ extended: false, limit: '2mb' }));
+        const defaultJsonParser = express.json({ limit: '2mb' });
+        const defaultUrlencodedParser = express.urlencoded({ extended: false, limit: '2mb' });
+        const isMobileSyncPath = req => req.path === '/api/mobile-sync'
+            || req.path.startsWith('/api/mobile-sync/');
+        // MobileSync owns strict per-route parsers and NDJSON/raw streaming
+        // budgets. Bypassing the generic parser here prevents it from
+        // buffering or rejecting the sync body before the plugin can apply
+        // those limits; every other Chat route keeps the existing 2 MiB cap.
+        this.app.use((req, res, next) => isMobileSyncPath(req)
+            ? next()
+            : defaultJsonParser(req, res, next));
+        this.app.use((req, res, next) => isMobileSyncPath(req)
+            ? next()
+            : defaultUrlencodedParser(req, res, next));
         this.maxReconnectInterval = 60000;
         this.reconnectTimeoutId = null; // To keep track of the reconnect timeout
         this.stopped = false; // Flag to prevent reconnection when stopped manually
@@ -124,8 +140,13 @@ class DistributedServer {
         pluginManager.setProjectBasePath(basePath);
         await pluginManager.loadPlugins();
 
-        // 初始化服务类插件
-        await pluginManager.initializeServices(this.app, null, basePath);
+        // 初始化服务类插件，并将主进程持有的共享服务依赖注入 direct 模块。
+        await pluginManager.initializeServices(this.app, null, basePath, {
+            chatDataService: this.chatDataService,
+            loomManager: this.loomManager,
+            scriptoriumAgentControl: this.scriptoriumAgentControl,
+            pluginAgentOperationService: this.pluginAgentOperationService,
+        });
         this.registerDiagnosticRoutes();
 
         const address = await this.bindHttpServer(this.port);
@@ -586,7 +607,7 @@ class DistributedServer {
     }
 
     async handleToolExecutionRequest(data) {
-        const { requestId, toolName, toolArgs } = data;
+        const { requestId, toolName, toolArgs, _vcpContext } = data;
         if (!requestId || !toolName) {
             console.error(`[${this.serverName}] Invalid tool execution request received.`);
             return;
@@ -639,7 +660,13 @@ class DistributedServer {
             }
             // --- 结束：处理内部文件请求 ---
 
-            const result = await pluginManager.processToolCall(toolName, toolArgs);
+            // _vcpContext 来自受信任的 execute_tool 传输层，与模型生成的 toolArgs 隔离。
+            const result = await pluginManager.processToolCall(toolName, toolArgs, {
+                requestId,
+                vcpContext: _vcpContext && typeof _vcpContext === 'object'
+                    ? { ..._vcpContext, requestId }
+                    : { requestId }
+            });
             let finalResult;
 
             // --- Special Handling for MusicController ---
@@ -728,8 +755,12 @@ class DistributedServer {
 
             } else {
                 // --- Default Handling for all other plugins ---
-                if (typeof result === 'object' && result !== null) {
-                    // Result is already an object from a direct call (e.g., hybrid service)
+                const plugin = pluginManager.getPlugin(toolName);
+                const isDirectPlugin = plugin?.pluginType === 'hybridservice'
+                    && plugin?.communication?.protocol === 'direct';
+                if (isDirectPlugin || (typeof result === 'object' && result !== null)) {
+                    // direct 插件的字符串也必须原样返回；回忆正文可能包含 JSON 花括号，
+                    // 不能误走旧 stdio 插件的 JSON 提取逻辑。
                     finalResult = result;
                 } else {
                     // Result is a string from stdio, needs parsing
@@ -773,14 +804,37 @@ class DistributedServer {
                     }
                 }
 
-                // --- Special Handling for create_canvas action (applied to the finalResult) ---
+                // --- Special Handling for Canvas actions (applied to the finalResult) ---
                 if (finalResult && finalResult._specialAction === 'create_canvas') {
                     if (typeof this.handleCanvasControl === 'function') {
                         console.log(`[${this.serverName}] Detected create_canvas action. Calling main process handler.`);
-                        this.handleCanvasControl(finalResult.payload.filePath);
+                        void this.handleCanvasControl(finalResult.payload.filePath);
                     } else {
                         console.error(`[${this.serverName}] Canvas control handler is not configured for the Distributed Server.`);
                     }
+                } else if (finalResult && finalResult._specialAction === 'edit_canvas') {
+                    if (typeof this.handleCanvasControl !== 'function') {
+                        throw new Error('Canvas control handler is not configured for the Distributed Server.');
+                    }
+                    console.log(`[${this.serverName}] Detected edit_canvas action. Waiting for user review.`);
+                    const canvasResult = await this.handleCanvasControl({
+                        action: 'edit',
+                        ...finalResult.payload,
+                    });
+                    if (canvasResult.status === 'error') {
+                        const error = new Error(canvasResult.message || 'Canvas edit review failed.');
+                        error.code = canvasResult.code;
+                        throw error;
+                    }
+                    finalResult = {
+                        content: [{
+                            type: 'text',
+                            text: canvasResult.result?.approved
+                                ? '用户已允许并应用 Canvas 编辑提案。'
+                                : `Canvas 编辑提案未应用：${canvasResult.result?.message || '用户拒绝了该提案。'}`,
+                        }],
+                        details: canvasResult.result,
+                    };
                 }
                 // --- End of special handling ---
             }

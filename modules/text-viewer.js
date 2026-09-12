@@ -1,5 +1,8 @@
-import * as emoticonFixer from './renderer/emoticonUrlFixer.js';
+import { createEmoticonUrlFixer } from './renderer/emoticonUrlFixer.js';
+import { replaceMarkdownCodeDomains } from './renderer/markdownCodeDomainScanner.js';
 import { domToCanvas, domToBlob } from '../vendor/modern-screenshot.js';
+
+const emoticonFixer = createEmoticonUrlFixer();
 
 document.addEventListener('DOMContentLoaded', async () => {
     const viewerAPI = window.utilityAPI || window.electronAPI;
@@ -299,8 +302,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const noteRegex = /<<<DailyNoteStart>>>(.*?)<<<DailyNoteEnd>>>/gs;
         const toolResultRegex = /\[\[VCP调用结果信息汇总:(.*?)VCP调用结果结束\]\]/gs;
         const toolCallSummaryRegex = /\[本轮工具调用摘要:\]([\s\S]*?)\[本轮工具调用摘要结束\]/g;
-        const thoughtChainRegex = /\[--- VCP元思考链(?::\s*"([^"]*)")?\s*---\]([\s\S]*?)\[--- 元思考链结束 ---\]/gs;
-        const conventionalThoughtRegex = /<think(?:ing)?>([\s\S]*?)<\/think(?:ing)?>/gi;
+        const thoughtChainRegex = /^[ \t]*\[--- VCP元思考链(?::\s*"([^"]*)")?\s*---\][ \t]*\r?\n([\s\S]*?)^[ \t]*\[--- 元思考链结束 ---\][ \t]*(?:\r?\n|$)/gm;
+        const conventionalThoughtRegex = /^[ \t]*<think(?:ing)?>[ \t]*\r?\n([\s\S]*?)^[ \t]*<\/think(?:ing)?>[ \t]*(?:\r?\n|$)/gim;
         const roleDividerRegex = /<<<\[(END_)?ROLE_DIVIDE_(SYSTEM|ASSISTANT|USER)\]>>>/g;
         // 🟢 桌面推送块正则（排除反引号包裹）
         const desktopPushRegex = /(?<!`)<<<\[DESKTOP_PUSH\]>>>([\s\S]*?)<<<\[DESKTOP_PUSH_END\]>>>(?!`)/gs;
@@ -815,16 +818,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const codeBlockMap = new Map();
         let placeholderId = 0;
 
-        // Step 2: Now, find and protect ALL fenced code blocks (including the ones we just added).
-        // This prevents the CSS processor from touching styles inside code blocks.
-        processed = processed.replace(/```\w*([\s\S]*?)```/g, (match) => {
+        // Step 2: 保护全部 Markdown 代码域，而不是仅保护固定三个反引号围栏。
+        // 正文中的 inline `<style>` 若暴露给后续 CSS 正则，会跨越匹配到真实动画岛
+        // 的 </style>；共享扫描器同时覆盖可变长度/波浪号围栏和未闭合流尾。
+        processed = replaceMarkdownCodeDomains(processed, (match) => {
             const placeholder = `__VCP_CODE_BLOCK_PLACEHOLDER_${placeholderId}__`;
             codeBlockMap.set(placeholder, match);
             placeholderId++;
             return placeholder;
         });
 
-        // Step 3: CSS 提取前保护 TOOL_REQUEST 与 VCP 参数区域，避免参数内 <style> 被误注入。
+        // Step 3: CSS 提取前保护 HTML 注释、TOOL_REQUEST 与 VCP 参数区域，
+        // 避免这些字面量域内的 <style> 被误注入或跨越吞到后续真实 </style>。
         const styleProtectMap = new Map();
         let styleProtectId = 0;
         const protectForStyle = (match) => {
@@ -833,6 +838,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             styleProtectId++;
             return placeholder;
         };
+
+        // HTML 注释中的标签只是说明文字；未闭合注释同样保护到文档末尾。
+        processed = processed.replace(/<!--[\s\S]*?(?:-->|$)/g, protectForStyle);
 
         // 🔴 关键修复：使用 ESCAPE 感知的扫描器保护工具请求块，避免参数内的
         // 字面量 `<<<[END_TOOL_REQUEST]>>>` 导致工具块提前闭合，从而把后续
@@ -909,11 +917,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         animeJsPatterns.forEach(pattern => {
             processed = processed.replace(pattern, '../vendor/anime.min.js');
         });
-        
-        // 3. 通用 CDN 域名替换（后备方案）
+
+        // 3. Pixi.js CDN 替换
+        const pixiJsPatterns = [
+            /https?:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/pixi\.js\/[^'"`);\s]*/gi,
+            /https?:\/\/cdn\.jsdelivr\.net\/npm\/pixi\.js[@\/][^'"`);\s]*/gi,
+            /https?:\/\/unpkg\.com\/pixi\.js[@\/][^'"`);\s]*/gi,
+        ];
+
+        pixiJsPatterns.forEach(pattern => {
+            processed = processed.replace(pattern, '../vendor/pixi.min.js');
+        });
+
+        // 4. 通用 CDN 域名替换（后备方案）
         const genericCdnPatterns = [
             { pattern: /https?:\/\/[^'"`);\s]*three[^'"`);\s]*\.js/gi, replacement: '../vendor/three.min.js' },
             { pattern: /https?:\/\/[^'"`);\s]*anime[^'"`);\s]*\.js/gi, replacement: '../vendor/anime.min.js' },
+            { pattern: /https?:\/\/[^'"`);\s]*(?:pixi\.js|pixijs|pixi)[^'"`);\s]*\.js/gi, replacement: '../vendor/pixi.min.js' },
         ];
         
         genericCdnPatterns.forEach(({ pattern, replacement }) => {
@@ -1008,29 +1028,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                     newScript.setAttribute(attr.name, attr.value);
                 });
 
-                // 🔥 关键修复：如果有外部库正在加载，等待它们加载完成后再执行内联脚本
-                if (window.__vcpExternalLibsLoading && window.__vcpExternalLibsLoading.length > 0) {
+                // 所有内联脚本统一在局部包装器中执行：
+                // 1. 等待可能异步加载的外部库；
+                // 2. 注入当前阅读内容根节点 container；
+                // 3. 注入全局 Pixi 的局部别名，兼容 AI 常见脚本写法。
+                const hasPendingExternalLibraries =
+                    window.__vcpExternalLibsLoading && window.__vcpExternalLibsLoading.length > 0;
+                if (hasPendingExternalLibraries) {
                     console.log('[TextViewer] ⏳ Waiting for external libraries to load before executing inline script...');
-                    
-                    // 包装内联脚本，等待所有外部库加载完成
-                    const wrappedContent = `
-                        (async function() {
-                            try {
-                                if (window.__vcpExternalLibsLoading) {
-                                    await Promise.all(window.__vcpExternalLibsLoading);
+                }
+
+                const containerSelector = JSON.stringify(`#${scopeId}`);
+                const wrappedContent = `
+                    (async function() {
+                        try {
+                            if (window.__vcpExternalLibsLoading) {
+                                await Promise.all(window.__vcpExternalLibsLoading);
+                                if (${hasPendingExternalLibraries ? 'true' : 'false'}) {
                                     console.log('[TextViewer] ✅ All external libraries loaded, executing inline script.');
                                 }
-                                ${processedContent}
-                            } catch (error) {
-                                console.error('[TextViewer] ❌ Error in wrapped inline script:', error);
                             }
-                        })();
-                    `;
-                    newScript.textContent = wrappedContent;
-                } else {
-                    // 没有外部库需要等待，直接执行
-                    newScript.textContent = processedContent;
-                }
+                            const container = document.querySelector(${containerSelector});
+                            const PIXI = window.PIXI;
+                            ${processedContent}
+                        } catch (error) {
+                            console.error('[TextViewer] ❌ Error in wrapped inline script:', error);
+                        }
+                    })();
+                `;
+                newScript.textContent = wrappedContent;
                 
                 if (oldScript.parentNode) {
                     oldScript.parentNode.replaceChild(newScript, oldScript);
@@ -1618,10 +1644,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const bodyStyles = document.body.classList.contains('light-theme')
                             ? 'color: #2c3e50; background-color: #ffffff;'
                             : 'color: #abb2bf; background-color: #282c34;';
-                        finalHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HTML Preview</title><script src="../vendor/anime.min.js"><\/script><style>body { font-family: sans-serif; padding: 15px; margin: 0; ${bodyStyles} }</style></head><body>${codeContent}</body></html>`;
+                        finalHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HTML Preview</title><script src="../vendor/anime.min.js"><\/script><script src="../vendor/pixi.min.js"><\/script><script src="../vendor/pixi-unsafe-eval.min.js"><\/script><style>body { font-family: sans-serif; padding: 15px; margin: 0; ${bodyStyles} }</style></head><body>${codeContent}</body></html>`;
                     } else {
-                        // If it's a full document, inject anime.js before the closing </head> tag
-                        finalHtml = finalHtml.replace('</head>', '<script src="../vendor/anime.min.js"><\/script></head>');
+                        // Inject animation runtimes before user HTML executes.
+                        finalHtml = finalHtml.replace('</head>', '<script src="../vendor/anime.min.js"><\/script><script src="../vendor/pixi.min.js"><\/script><script src="../vendor/pixi-unsafe-eval.min.js"><\/script></head>');
                     }
                     // Use srcdoc for better security and reliability
                     iframe.srcdoc = finalHtml;
@@ -1693,6 +1719,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </head>
                         <body>
                             <script src="../vendor/three.min.js"><\/script>
+                            <script src="../vendor/pixi.min.js"><\/script>
+                            <script src="../vendor/pixi-unsafe-eval.min.js"><\/script>
                             <script>
                                 // Defer execution until three.js is loaded
                                 window.addEventListener('load', () => {

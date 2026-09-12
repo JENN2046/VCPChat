@@ -299,27 +299,6 @@ function initialize(context) {
         }
     });
 
-    // 新增：更新Agent配置（部分更新）
-    ipcMain.handle('update-agent-config', async (event, agentId, updates) => {
-        try {
-            if (agentConfigManager) {
-                const result = await agentConfigManager.updateAgentConfig(agentId, existingConfig => ({
-                    ...existingConfig,
-                    ...updates
-                }));
-                invalidateCaches();
-                return { success: true, message: `Agent ${agentId} 配置已更新。` };
-            } else {
-                // AgentConfigManager 不可用，报错而非静默 fallback
-                console.error(`AgentConfigManager not available, cannot safely update config for agent ${agentId}`);
-                return { error: 'AgentConfigManager 未初始化，无法安全更新配置。' };
-            }
-        } catch (error) {
-            console.error(`更新Agent ${agentId} 配置失败:`, error);
-            return { error: error.message };
-        }
-    });
-
     ipcMain.handle('save-avatar', async (event, agentId, avatarData) => {
         const listenerWasActive = context.getSelectionListenerStatus();
         if (listenerWasActive) context.stopSelectionListener();
@@ -416,22 +395,21 @@ function initialize(context) {
             }
             await fs.ensureDir(agentDir);
 
-            let configToSave;
-            if (initialConfig) {
-                configToSave = { ...initialConfig, name: agentName };
-            } else {
-                configToSave = {
-                    name: agentName,
-                    systemPrompt: `你是 ${agentName}。`,
-                    model: 'gemini-2.5-flash-preview-05-20',
-                    temperature: 0.7,
-                    contextTokenLimit: 1000000,
-                    maxOutputTokens: 60000,
-                    topics: [{ id: "default", name: "主要对话", createdAt: Date.now() }],
-                    disableCustomColors: true,  // 默认启用：禁用自定义颜色（使用主题默认颜色）
-                    useThemeColorsInChat: true  // 默认启用：会话中使用主题颜色
-                };
-            }
+            const defaultConfig = {
+                name: agentName,
+                systemPrompt: `你是 ${agentName}。`,
+                model: 'gemini-2.5-flash-preview-05-20',
+                temperature: 0.7,
+                contextTokenLimit: 1000000,
+                maxOutputTokens: 60000,
+                topics: [{ id: "default", name: "主要对话", createdAt: Date.now() }],
+                disableCustomColors: true,
+                useThemeColorsInChat: true
+            };
+            const configOverrides = initialConfig && typeof initialConfig === 'object'
+                ? initialConfig
+                : {};
+            const configToSave = { ...defaultConfig, ...configOverrides, name: agentName };
             if (!configToSave.topics || !Array.isArray(configToSave.topics) || configToSave.topics.length === 0) {
                 configToSave.topics = [{ id: "default", name: "主要对话", createdAt: Date.now() }];
             }

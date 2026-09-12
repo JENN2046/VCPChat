@@ -3,6 +3,7 @@
  */
 
 import { handleSaveGlobalSettings } from './global-settings-manager.js';
+import { syncDependentRows } from './ui-system/settings/dependent-rows.js';
 
 let eventListenersBound = false;
 
@@ -18,22 +19,26 @@ export function setupEventListeners(deps) {
     const {
         // DOM Elements from a future dom-elements.js or passed directly
         chatMessagesDiv, sendMessageBtn, messageInput, attachFileBtn, globalSettingsBtn,
-        globalSettingsForm, userAvatarInput, createNewAgentBtn, createNewGroupBtn,
-        currentItemActionBtn, clearNotificationsBtn, openForumBtn, toggleNotificationsBtn,
-        notificationsSidebar, agentSearchInput, minimizeToTrayBtn, addNetworkPathBtn,
-        openTranslatorBtn, openNotesBtn, openMusicBtn, openCanvasBtn, toggleAssistantBtn,
+        globalSettingsForm, userAvatarInput,
+        currentItemActionBtn, toggleNotificationsBtn,
+        notificationsSidebar, agentSearchInput, addNetworkPathBtn,
+        openTranslatorBtn, openNotesBtn, openMusicBtn, openCanvasBtn, toggleAssistantBtn, toggleSidebarModeBtn,
         leftSidebar, toggleSidebarBtn,
-        enableContextSanitizerCheckbox, contextSanitizerDepthContainer, seamFixer,
 
         // State variables (passed via refs)
         refs,
 
         // Modules and helper functions
-        uiHelperFunctions, chatManager, itemListManager, settingsManager, uiManager, topicListManager,
+        uiHelperFunctions, chatManager, messageRenderer, historyMutationAuthority, itemListManager, settingsManager, uiManager, topicListManager,
         getCroppedFile, setCroppedFile, updateAttachmentPreview, filterAgentList,
-        addNetworkPathInput
+        addNetworkPathInput, sendButtonAction, listenerOwner, syncSettingsToUI
     } = deps;
+    const addListener = (target, type, handler, options) => listenerOwner?.add(target, type, handler, options) || target?.addEventListener?.(type, handler, options);
+    const setOwnedTimeout = (callback, delay) => listenerOwner?.timeout?.(callback, delay) ?? setTimeout(callback, delay);
+    const releaseCapturedListeners = listenerOwner?.capture?.() || (() => {});
 
+    let setupCompleted = false;
+    try {
     const setupAutoHideScrollbar = (container, hideDelayMs = 700) => {
         if (!container) return;
         if (container.dataset.autoHideScrollbarBound === 'true') return;
@@ -42,7 +47,7 @@ export function setupEventListeners(deps) {
         const showScrollingState = () => {
             container.classList.add('is-scrolling');
             if (hideTimer) clearTimeout(hideTimer);
-            hideTimer = setTimeout(() => {
+            hideTimer = setOwnedTimeout(() => {
                 container.classList.remove('is-scrolling');
                 hideTimer = null;
             }, hideDelayMs);
@@ -138,9 +143,9 @@ export function setupEventListeners(deps) {
                     const contentClone = contentElement.cloneNode(true);
                     contentClone.querySelectorAll('.vcp-thought-chain-bubble').forEach(el => el.remove());
                     let content = contentClone.innerText || contentClone.textContent || "";
-                    // 兜底：清理明文形式思维链
-                    content = content.replace(/\[--- VCP元思考链(?::\s*"[^"]*")?\s*---\][\s\S]*?\[--- 元思考链结束 ---\]/gs, '');
-                    content = content.replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi, '');
+                    // 兜底：仅清理起止标签分别独占一行的明文思维链。
+                    content = content.replace(/^[ \t]*\[--- VCP元思考链(?::\s*"[^"]*")?\s*---\][ \t]*\r?\n[\s\S]*?^[ \t]*\[--- 元思考链结束 ---\][ \t]*(?:\r?\n|$)/gm, '');
+                    content = content.replace(/^[ \t]*<think(?:ing)?>[ \t]*\r?\n[\s\S]*?^[ \t]*<\/think(?:ing)?>[ \t]*(?:\r?\n|$)/gim, '');
                     content = content.trim();
 
                     if (sender && content) {
@@ -227,10 +232,6 @@ export function setupEventListeners(deps) {
             avatarColor: (currentSelectedItem.config || currentSelectedItem)?.avatarCalculatedColor
         };
 
-        let thinkingMessageItem = null;
-        if (window.messageRenderer) {
-            thinkingMessageItem = await window.messageRenderer.renderMessage(thinkingMessage);
-        }
         currentChatHistory.push(thinkingMessage);
 
         try {
@@ -295,13 +296,6 @@ export function setupEventListeners(deps) {
                 stream: useStreaming
             };
 
-            if (useStreaming) {
-                if (window.messageRenderer) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    await window.messageRenderer.startStreamingMessage({ ...thinkingMessage, content: "" }, thinkingMessageItem);
-                }
-            }
-
             const context = {
                 agentId: currentSelectedItem.id,
                 agentName: currentSelectedItem.name || currentSelectedItem.id,
@@ -326,12 +320,12 @@ export function setupEventListeners(deps) {
                 const isForActiveChat = context && context.agentId === currentSelectedItem.id && context.topicId === currentTopicId;
 
                 if (isForActiveChat) {
-                    if (window.messageRenderer) window.messageRenderer.removeMessageById(thinkingMessage.id);
+                    messageRenderer?.removeMessageById(thinkingMessage.id);
                 }
 
                 if (response.error) {
-                    if (isForActiveChat && window.messageRenderer) {
-                        window.messageRenderer.renderMessage({ role: 'system', content: `VCP错误: ${response.error}`, timestamp: Date.now() });
+                    if (isForActiveChat && messageRenderer) {
+                        messageRenderer.renderMessage({ role: 'system', content: `VCP错误: ${response.error}`, timestamp: Date.now() });
                     }
                     console.error(`[ContinueWriting] VCP Error:`, response.error);
                 } else if (response.choices && response.choices.length > 0) {
@@ -350,13 +344,16 @@ export function setupEventListeners(deps) {
                     if (historyForSave && !historyForSave.error) {
                         const finalHistory = historyForSave.filter(msg => msg.id !== thinkingMessage.id && !msg.isThinking);
                         finalHistory.push(assistantMessage);
-                        await chatAPI.saveChatHistory(context.agentId, context.topicId, finalHistory);
+                        await historyMutationAuthority.replace({
+                            itemId: context.agentId, itemType: 'agent', topicId: context.topicId,
+                            category: 'flowlock-non-stream-terminal',
+                        }, finalHistory);
 
                         if (isForActiveChat) {
                             currentChatHistory.length = 0;
                             currentChatHistory.push(...finalHistory);
-                            if (window.messageRenderer) window.messageRenderer.renderMessage(assistantMessage);
-                            await window.chatManager.attemptTopicSummarizationIfNeeded();
+                            messageRenderer?.renderMessage(assistantMessage);
+                            await chatManager.attemptTopicSummarizationIfNeeded();
                         }
                     }
                 }
@@ -368,10 +365,13 @@ export function setupEventListeners(deps) {
 
         } catch (error) {
             console.error('[ContinueWriting] 续写时出错:', error);
-            if (window.messageRenderer) window.messageRenderer.removeMessageById(thinkingMessage.id);
-            if (window.messageRenderer) window.messageRenderer.renderMessage({ role: 'system', content: `错误: ${error.message}`, timestamp: Date.now() });
+            messageRenderer?.removeMessageById(thinkingMessage.id);
+            messageRenderer?.renderMessage({ role: 'system', content: `错误: ${error.message}`, timestamp: Date.now() });
             if (currentSelectedItem.id && currentTopicId) {
-                await chatAPI.saveChatHistory(currentSelectedItem.id, currentTopicId, currentChatHistory.filter(msg => !msg.isThinking));
+                await historyMutationAuthority.replace({
+                    itemId: currentSelectedItem.id, itemType: currentSelectedItem.type, topicId: currentTopicId,
+                    category: 'flowlock-failure-cleanup',
+                }, currentChatHistory.filter(msg => !msg.isThinking));
             }
         }
     }
@@ -380,7 +380,7 @@ export function setupEventListeners(deps) {
     window.handleContinueWriting = handleContinueWriting;
 
     if (chatMessagesDiv) {
-        chatMessagesDiv.addEventListener('click', (event) => {
+        addListener(chatMessagesDiv, 'click', (event) => {
             // Stop TTS playback when clicking a speaking avatar
             const avatar = event.target.closest('.chat-avatar');
             if (avatar && avatar.classList.contains('speaking')) {
@@ -423,16 +423,16 @@ export function setupEventListeners(deps) {
         console.error('[Renderer] chatMessagesDiv not found during setupEventListeners.');
     }
 
-    sendMessageBtn.addEventListener('click', async () => {
-        if (typeof window.handleSendButtonAction === 'function' && sendMessageBtn?.dataset.mode === 'interrupt') {
-            await window.handleSendButtonAction();
+    addListener(sendMessageBtn, 'click', async () => {
+        if (typeof sendButtonAction === 'function') {
+            await sendButtonAction();
             return;
         }
         chatManager.handleSendMessage();
     });
 
     // 发送按钮右键 - 打开「高级回复」(VCPChatTarven) 浮窗
-    sendMessageBtn.addEventListener('contextmenu', (e) => {
+    addListener(sendMessageBtn, 'contextmenu', (e) => {
         e.preventDefault();
         if (window.TavernManager && typeof window.TavernManager.togglePopover === 'function') {
             window.TavernManager.togglePopover(sendMessageBtn);
@@ -440,15 +440,15 @@ export function setupEventListeners(deps) {
             console.warn('[EventListeners] TavernManager not available.');
         }
     });
-    messageInput.addEventListener('keydown', (e) => {
+    addListener(messageInput, 'keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             chatManager.handleSendMessage();
         }
     });
-    messageInput.addEventListener('input', () => uiHelperFunctions.autoResizeTextarea(messageInput));
+    addListener(messageInput, 'input', () => uiHelperFunctions.autoResizeTextarea(messageInput));
 
-    messageInput.addEventListener('mousedown', async (e) => {
+    addListener(messageInput, 'mousedown', async (e) => {
         if (e.button === 1) { // 中键
             e.preventDefault();
             e.stopPropagation();
@@ -471,7 +471,7 @@ export function setupEventListeners(deps) {
         }
     });
 
-    attachFileBtn.addEventListener('click', async () => {
+    addListener(attachFileBtn, 'click', async () => {
         const currentSelectedItem = refs.currentSelectedItem.get();
         const currentTopicId = refs.currentTopicId.get();
         if (!currentSelectedItem.id || !currentTopicId) {
@@ -486,7 +486,7 @@ export function setupEventListeners(deps) {
                     console.error(`Error processing selected file ${att.name || 'unknown'}: ${att.error}`);
                     uiHelperFunctions.showToastNotification(`处理文件 ${att.name || '未知文件'} 失败: ${att.error}`, 'error');
                 } else {
-                    refs.attachedFiles.get().push({
+                    refs.attachedFiles.append({
                         file: { name: att.name, type: att.type, size: att.size },
                         localPath: att.internalPath,
                         originalName: att.name,
@@ -502,113 +502,94 @@ export function setupEventListeners(deps) {
         }
     });
 
-
-    globalSettingsBtn.addEventListener('click', () => uiHelperFunctions.openModal('globalSettingsModal'));
-
-    // 🟢 优化：监听模态框就绪事件，动态绑定内部元素的事件
-    document.addEventListener('modal-ready', (e) => {
-        const { modalId } = e.detail;
-        if (modalId === 'globalSettingsModal') {
-            const form = document.getElementById('globalSettingsForm');
-            if (form) form.addEventListener('submit', (ev) => handleSaveGlobalSettings(ev, deps));
-
-            const addPathBtn = document.getElementById('addNetworkPathBtn');
-            if (addPathBtn) addPathBtn.addEventListener('click', () => addNetworkPathInput());
-
-            const avatarInput = document.getElementById('userAvatarInput');
-            if (avatarInput) setupUserAvatarListener(avatarInput);
-
-            const resetBtn = document.getElementById('resetUserAvatarColorsBtn');
-            if (resetBtn) setupResetUserColorsListener(resetBtn);
-
-            const styleHeader = document.getElementById('userStyleCollapseHeader');
-            if (styleHeader) {
-                styleHeader.addEventListener('click', () => {
-                    const container = styleHeader.closest('.agent-style-collapsible-container');
-                    if (container) container.classList.toggle('collapsed');
-                });
-            }
-
-            // 绑定颜色选择器同步
-            setupColorSyncListeners();
-
-            // 绑定 Rust 助手配置相关的事件
-            setupRustAssistantConfigListeners();
-
-            // 绑定全局设置导航切换
-            setupGlobalSettingsNavigation();
-
-            // continueWritingPrompt 使用 CSS field-sizing: content 自动调整高度，无需 JS 处理
+    // The modal is template-backed.  Do not rely solely on its one-time
+    // `modal-ready` event: an early open can otherwise leave the existing
+    // form without a submit listener, making the Save button appear inert.
+    function bindGlobalSettingsModal() {
+        const modal = document.getElementById('globalSettingsModal');
+        if (!modal) return;
+        const closeButton = modal.querySelector('.close-button');
+        if (closeButton && !closeButton.dataset.closeBound) {
+            closeButton.addEventListener('click', () => uiHelperFunctions.closeModal('globalSettingsModal'));
+            closeButton.dataset.closeBound = 'true';
         }
-    });
 
-    // 全局设置双栏导航切换
-    function setupGlobalSettingsNavigation() {
-        const navItems = document.querySelectorAll('.settings-nav-item');
-        const sections = document.querySelectorAll('.settings-section');
-        let isAnimating = false;
-
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                // 防止动画过程中重复点击
-                if (isAnimating) return;
-
-                const targetSection = item.dataset.section;
-                const currentActive = document.querySelector('.settings-section.active');
-
-                // 如果点击的是当前已激活的项，不执行任何操作
-                if (currentActive && currentActive.id === `section-${targetSection}`) {
-                    return;
-                }
-
-                isAnimating = true;
-
-                // 更新导航项激活状态
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-
-                // 获取目标面板
-                const targetPanel = document.getElementById(`section-${targetSection}`);
-                if (!targetPanel) {
-                    isAnimating = false;
-                    return;
-                }
-
-                // 如果有当前激活的面板，先执行退出动画
-                if (currentActive) {
-                    currentActive.classList.add('switching-out');
-                    currentActive.classList.remove('active');
-
-                    // 等待退出动画完成后显示新面板
-                    setTimeout(() => {
-                        currentActive.style.display = 'none';
-                        currentActive.classList.remove('switching-out');
-
-                        // 显示新面板
-                        targetPanel.style.display = 'block';
-                        targetPanel.classList.add('switching-in');
-
-                        // 强制重排以触发动画
-                        void targetPanel.offsetWidth;
-
-                        targetPanel.classList.remove('switching-in');
-                        targetPanel.classList.add('active');
-                        isAnimating = false;
-                    }, 150);
-                } else {
-                    // 没有当前面板，直接显示新面板
-                    targetPanel.style.display = 'block';
-                    targetPanel.classList.add('switching-in');
-
-                    void targetPanel.offsetWidth;
-
-                    targetPanel.classList.remove('switching-in');
-                    targetPanel.classList.add('active');
-                    isAnimating = false;
-                }
+        const form = modal.querySelector('#globalSettingsForm');
+        if (form && !form.dataset.globalSettingsSaveBound) {
+            form.addEventListener('submit', (ev) => {
+                Promise.resolve(handleSaveGlobalSettings(ev, deps)).catch((error) => {
+                    console.error('[GlobalSettings] Unexpected save failure:', error);
+                    // `handleSaveGlobalSettings` owns the terminal failure
+                    // event contract. This catch only reports the error to
+                    // the user; dispatching here would duplicate retry state.
+                    uiHelperFunctions.showToastNotification(`保存全局设置失败: ${error?.message || error}`, 'error');
+                });
             });
+            form.dataset.globalSettingsSaveBound = 'true';
+        }
+
+        const addPathBtn = modal.querySelector('#addNetworkPathBtn');
+        if (addPathBtn && !addPathBtn.dataset.globalSettingsBound) {
+            addListener(addPathBtn, 'click', () => {
+                if (window.VCPUISettingsBridge?.addNetworkPathInput?.()) return;
+                addNetworkPathInput();
+            });
+            addPathBtn.dataset.globalSettingsBound = 'true';
+        }
+
+        const avatarInput = modal.querySelector('#userAvatarInput');
+        if (avatarInput && !avatarInput.dataset.globalSettingsBound) {
+            setupUserAvatarListener(avatarInput);
+            avatarInput.dataset.globalSettingsBound = 'true';
+        }
+
+        const resetBtn = modal.querySelector('#resetUserAvatarColorsBtn');
+        if (resetBtn && !resetBtn.dataset.globalSettingsBound) {
+            setupResetUserColorsListener(resetBtn);
+            resetBtn.dataset.globalSettingsBound = 'true';
+        }
+
+        if (!modal.dataset.globalSettingsControlsBound) {
+            // Generated ColorPair owns the production mirror listeners. Keep
+            // the legacy binder only for bootstrap environments without the
+            // UIUX artifact, avoiding duplicate writes in the real surface.
+            if (!window.VCPUIUX?.mountColorPair) setupColorSyncListeners();
+            setupRustAssistantConfigListeners();
+            modal.dataset.globalSettingsControlsBound = 'true';
+        }
+        // The modal is cloned after startup; explicitly reapply the loaded
+        // settings snapshot so the persisted avatar is restored on every open.
+        Promise.resolve(typeof syncSettingsToUI === 'function' ? syncSettingsToUI() : undefined).catch(error => {
+            console.warn('[GlobalSettings] Failed to sync modal snapshot:', error);
         });
     }
+
+    const openGlobalSettings = () => {
+        uiHelperFunctions.openModal('globalSettingsModal');
+        bindGlobalSettingsModal();
+    };
+    // Classic settings and the Next UI account dock are two visual entry
+    // points for one shared settings surface. Keep their lifecycle identical
+    // instead of letting the redesigned shell expose an inert gear button.
+    [globalSettingsBtn, document.getElementById('nextUiAccountSettingsBtn')]
+        .filter(Boolean)
+        .forEach((trigger) => {
+            if (trigger.dataset.globalSettingsOpenBound) return;
+            trigger.addEventListener('click', openGlobalSettings);
+            trigger.dataset.globalSettingsOpenBound = 'true';
+        });
+
+    document.addEventListener('modal-ready', (e) => {
+        if (e.detail?.modalId === 'globalSettingsModal') bindGlobalSettingsModal();
+    });
+    window.addEventListener('global-settings-updated', (event) => {
+        const preview = document.getElementById('userAvatarPreview');
+        if (!preview) return;
+        const avatarUrl = String(event.detail?.settings?.userAvatarUrl || '');
+        preview.src = avatarUrl || 'assets/default_user_avatar.png';
+        preview.style.display = 'block';
+        preview.closest('.agent-avatar-wrapper')?.classList.toggle('no-avatar', !avatarUrl);
+    });
 
     function setupUserAvatarListener(input) {
         input.addEventListener('change', (event) => {
@@ -616,6 +597,11 @@ export function setupEventListeners(deps) {
             if (file) {
                 uiHelperFunctions.openAvatarCropper(file, (croppedFile) => {
                     setCroppedFile('user', croppedFile);
+                    // The picker change happened before the crop result
+                    // existed, so explicitly schedule the real settings save
+                    // after the cropped File is installed.
+                    if (input.form) input.form.dataset.vcpKeepOpenAfterAvatarSave = 'true';
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
                     const userAvatarPreview = document.getElementById('userAvatarPreview');
                     if (userAvatarPreview) {
                         const previewUrl = URL.createObjectURL(croppedFile);
@@ -715,46 +701,24 @@ export function setupEventListeners(deps) {
         // 首先加载当前的Rust配置并填充表单
         await loadAndPopulateRustConfig();
 
-        // 启用Rust助手时，显示规则容器
-        const rustUseAssistantCheckbox = document.getElementById('rustUseAssistant');
-        const rustGuardRulesContainer = document.getElementById('rustGuardRulesContainer');
+        // When the typed Settings consumer is active it owns the Rust section
+        // projection and its lifecycle-bound visibility listeners. Keep this
+        // legacy binder exclusively for Classic/early-bootstrap fallback.
+        if (window.VCPUISettingsBridge?.getRustAssistantService?.()) return;
 
-        if (rustUseAssistantCheckbox && rustGuardRulesContainer) {
-            const toggleRustGuardRules = () => {
-                rustGuardRulesContainer.style.display = rustUseAssistantCheckbox.checked ? 'block' : 'none';
-            };
-            rustUseAssistantCheckbox.addEventListener('change', toggleRustGuardRules);
+        // The flattened Rust rows own their visibility via data-visible-when
+        // (rustUseAssistant / rustEnableCustomThresholds / rustRuleMode /
+        // rustDebugMode clauses).  This fallback binder re-evaluates them with
+        // the shared evaluator; the typed owner runs the same projection when
+        // it is active (this binder exits above in that case).
+        const rustForm = document.getElementById('globalSettingsForm');
+        if (rustForm) {
+            const syncRustRows = () => syncDependentRows(rustForm);
+            for (const rustSourceId of ['rustUseAssistant', 'rustEnableCustomThresholds', 'rustRuleMode', 'rustDebugMode']) {
+                document.getElementById(rustSourceId)?.addEventListener('change', syncRustRows);
+            }
             // 初始化时设置一次
-            toggleRustGuardRules();
-        }
-
-        // 启用自定义阈值时，显示阈值配置面板
-        const rustEnableCustomThresholdsCheckbox = document.getElementById('rustEnableCustomThresholds');
-        const rustCustomThresholdsPanel = document.getElementById('rustCustomThresholdsPanel');
-
-        if (rustEnableCustomThresholdsCheckbox && rustCustomThresholdsPanel) {
-            const toggleThresholdsPanel = () => {
-                rustCustomThresholdsPanel.style.display = rustEnableCustomThresholdsCheckbox.checked ? 'block' : 'none';
-            };
-            rustEnableCustomThresholdsCheckbox.addEventListener('change', toggleThresholdsPanel);
-            // 初始化时设置一次
-            toggleThresholdsPanel();
-        }
-
-        // 规则模式选择时，切换白名单/黑名单面板的显示
-        const rustRuleModeSelect = document.getElementById('rustRuleMode');
-        const rustWhitelistPanel = document.getElementById('rustWhitelistPanel');
-        const rustBlacklistPanel = document.getElementById('rustBlacklistPanel');
-
-        if (rustRuleModeSelect && rustWhitelistPanel && rustBlacklistPanel) {
-            const updateRulePanels = () => {
-                const mode = rustRuleModeSelect.value;
-                rustWhitelistPanel.style.display = mode === 'whitelist' ? 'block' : 'none';
-                rustBlacklistPanel.style.display = mode === 'blacklist' ? 'block' : 'none';
-            };
-            rustRuleModeSelect.addEventListener('change', updateRulePanels);
-            // 初始化时设置一次
-            updateRulePanels();
+            syncRustRows();
         }
     }
 
@@ -764,6 +728,12 @@ export function setupEventListeners(deps) {
                 console.warn('[EventListeners] electronAPI not available, skipping rust config load');
                 return;
             }
+
+            // Rust Assistant UI projection is owned by the scoped typed
+            // adapter when the SettingsRoot is mounted. Keep this loader as
+            // the compatibility fallback for Classic/early bootstrap paths,
+            // but never let it overwrite the production typed consumer.
+            if (window.VCPUISettingsBridge?.getRustAssistantService?.()) return;
 
             const result = await chatAPI.getRustAssistantConfig?.() || {};
             if (result.error) {
@@ -855,73 +825,6 @@ export function setupEventListeners(deps) {
         }
     }
 
-    // 用户样式设置折叠功能
-    const userStyleCollapseHeader = document.getElementById('userStyleCollapseHeader');
-    if (userStyleCollapseHeader) {
-        userStyleCollapseHeader.addEventListener('click', () => {
-            const container = userStyleCollapseHeader.closest('.agent-style-collapsible-container');
-            if (container) {
-                container.classList.toggle('collapsed');
-            }
-        });
-    }
-
-    // 用户颜色选择器同步
-    const userAvatarBorderColorInput = document.getElementById('userAvatarBorderColor');
-    const userAvatarBorderColorTextInput = document.getElementById('userAvatarBorderColorText');
-    const userNameTextColorInput = document.getElementById('userNameTextColor');
-    const userNameTextColorTextInput = document.getElementById('userNameTextColorText');
-
-    if (userAvatarBorderColorInput && userAvatarBorderColorTextInput) {
-        userAvatarBorderColorInput.addEventListener('input', (e) => {
-            userAvatarBorderColorTextInput.value = e.target.value;
-            const userAvatarPreview = document.getElementById('userAvatarPreview');
-            if (userAvatarPreview) {
-                userAvatarPreview.style.borderColor = e.target.value;
-            }
-        });
-
-        userAvatarBorderColorTextInput.addEventListener('input', (e) => {
-            const color = e.target.value.trim();
-            if (/^#[0-9A-F]{6}$/i.test(color)) {
-                userAvatarBorderColorInput.value = color;
-                const userAvatarPreview = document.getElementById('userAvatarPreview');
-                if (userAvatarPreview) {
-                    userAvatarPreview.style.borderColor = color;
-                }
-            }
-        });
-
-        userAvatarBorderColorTextInput.addEventListener('blur', (e) => {
-            const color = e.target.value.trim();
-            if (!/^#[0-9A-F]{6}$/i.test(color)) {
-                e.target.value = userAvatarBorderColorInput.value;
-                uiHelperFunctions.showToastNotification('颜色格式无效，请使用 #RRGGBB 格式', 'warning');
-            }
-        });
-    }
-
-    if (userNameTextColorInput && userNameTextColorTextInput) {
-        userNameTextColorInput.addEventListener('input', (e) => {
-            userNameTextColorTextInput.value = e.target.value;
-        });
-
-        userNameTextColorTextInput.addEventListener('input', (e) => {
-            const color = e.target.value.trim();
-            if (/^#[0-9A-F]{6}$/i.test(color)) {
-                userNameTextColorInput.value = color;
-            }
-        });
-
-        userNameTextColorTextInput.addEventListener('blur', (e) => {
-            const color = e.target.value.trim();
-            if (!/^#[0-9A-F]{6}$/i.test(color)) {
-                e.target.value = userNameTextColorInput.value;
-                uiHelperFunctions.showToastNotification('颜色格式无效，请使用 #RRGGBB 格式', 'warning');
-            }
-        });
-    }
-
     // 用户重置颜色按钮
     const resetUserAvatarColorsBtn = document.getElementById('resetUserAvatarColorsBtn');
     if (resetUserAvatarColorsBtn) {
@@ -966,37 +869,6 @@ export function setupEventListeners(deps) {
                 uiHelperFunctions.showToastNotification('颜色提取功能不可用', 'error');
             }
         });
-    }
-
-    if (createNewAgentBtn) {
-        createNewAgentBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M2 21a8 8 0 0 1 13.292-6"></path>
-                <circle cx="10" cy="8" r="5"></circle>
-                <path d="M19 16v6"></path>
-                <path d="M22 19h-6"></path>
-            </svg>
-            <span class="sidebar-button-label">
-                <span class="sidebar-button-prefix">&#21019;&#24314;</span>
-                <span class="sidebar-button-keyword">Agent</span>
-            </span>
-        `;
-        createNewAgentBtn.style.width = 'auto';
-        createNewAgentBtn.addEventListener('click', async () => {
-            const defaultAgentName = `新Agent_${Date.now()}`;
-            const result = await chatAPI.createAgent(defaultAgentName);
-            if (result.success) {
-                await itemListManager.loadItems();
-                await chatManager.selectItem(result.agentId, 'agent', result.agentName, null, result.config);
-                uiManager.switchToTab('settings');
-            } else {
-                uiHelperFunctions.showToastNotification(`创建Agent失败: ${result.error}`, 'error');
-            }
-        });
-    }
-
-    if (createNewGroupBtn) {
-        createNewGroupBtn.style.display = 'inline-flex';
     }
 
     currentItemActionBtn.addEventListener('click', async () => {
@@ -1054,8 +926,8 @@ export function setupEventListeners(deps) {
 
         document.body.appendChild(menu);
 
-        setTimeout(() => {
-            document.addEventListener('click', closeMenu, true);
+        setOwnedTimeout(() => {
+            addListener(document, 'click', closeMenu, true);
         }, 0);
     }
 
@@ -1107,92 +979,146 @@ export function setupEventListeners(deps) {
         }
     }
 
-    clearNotificationsBtn.addEventListener('click', () => {
-        const notificationsList = document.getElementById('notificationsList');
-        if (!notificationsList) return;
+    /* Notification quick actions are owned by NextShell's
+     * NotificationMenuController. Keeping a second document-level binding
+     * here causes every command and Escape action to run twice. */
+    const nextUiNotificationMenuBtn = null;
+    /*
+    const nextUiNotificationMenu = document.getElementById('nextUiNotificationMenu');
+    const nextUiNotificationForum = document.getElementById('nextUiNotificationForum');
+    const nextUiNotificationMemo = document.getElementById('nextUiNotificationMemo');
+    const nextUiNotificationFilterToggle = document.getElementById('nextUiNotificationFilterToggle');
+    const nextUiNotificationFilterState = document.getElementById('nextUiNotificationFilterState');
+    const nextUiNotificationClear = document.getElementById('nextUiNotificationClear');
+    if (
+        nextUiNotificationMenuBtn
+        && nextUiNotificationMenu
+        && nextUiNotificationForum
+        && nextUiNotificationMemo
+        && nextUiNotificationFilterToggle
+        && nextUiNotificationFilterState
+        && nextUiNotificationClear
+    ) {
+        const syncNotificationFilterState = (state = null) => {
+            const isActive = typeof state?.enabled === 'boolean' ? state.enabled : window.filterManager?.isFilterEnabled?.() === true;
+            nextUiNotificationFilterToggle.setAttribute('aria-checked', String(isActive));
+            nextUiNotificationFilterState.textContent = isActive ? '开启' : '关闭';
+        };
 
-        notificationsList.querySelectorAll('.notification-item').forEach(item => {
-            if (item.dataset.protectedNotification === 'tool-approval') return;
-            item.remove();
-        });
-    });
+        const closeNotificationMenu = ({ restoreFocus = false } = {}) => {
+            if (nextUiNotificationMenu.hidden) return;
+            nextUiNotificationMenu.hidden = true;
+            nextUiNotificationMenuBtn.setAttribute('aria-expanded', 'false');
+            if (restoreFocus) nextUiNotificationMenuBtn.focus();
+        };
 
-    if (openForumBtn) {
-        openForumBtn.style.display = 'inline-block';
-        const enableMiddleClickCheckbox = document.getElementById('enableMiddleClickQuickAction');
-        const middleClickContainer = document.getElementById('middleClickQuickActionContainer');
-        const middleClickAdvancedContainer = document.getElementById('middleClickAdvancedContainer');
+        const openNotificationMenu = () => {
+            syncNotificationFilterState();
+            nextUiNotificationMenu.hidden = false;
+            nextUiNotificationMenuBtn.setAttribute('aria-expanded', 'true');
+            nextUiNotificationForum.focus();
+        };
 
-        if (enableMiddleClickCheckbox && middleClickContainer && middleClickAdvancedContainer) {
-            enableMiddleClickCheckbox.addEventListener('change', () => {
-                const isEnabled = enableMiddleClickCheckbox.checked;
-                middleClickContainer.style.display = isEnabled ? 'block' : 'none';
-                middleClickAdvancedContainer.style.display = isEnabled ? 'block' : 'none';
-            });
-        }
-
-        const enableMiddleClickAdvancedCheckbox = document.getElementById('enableMiddleClickAdvanced');
-        const middleClickAdvancedSettings = document.getElementById('middleClickAdvancedSettings');
-
-        if (enableMiddleClickAdvancedCheckbox && middleClickAdvancedSettings) {
-            enableMiddleClickAdvancedCheckbox.addEventListener('change', () => {
-                middleClickAdvancedSettings.style.display = enableMiddleClickAdvancedCheckbox.checked ? 'block' : 'none';
-            });
-        }
-
-        const middleClickQuickActionSelect = document.getElementById('middleClickQuickAction');
-        const regenerateConfirmationContainer = document.getElementById('regenerateConfirmationContainer');
-
-        if (enableMiddleClickCheckbox && middleClickQuickActionSelect && regenerateConfirmationContainer) {
-            const updateRegenerateConfirmationVisibility = () => {
-                const isMiddleClickEnabled = enableMiddleClickCheckbox.checked;
-                const selectedAction = middleClickQuickActionSelect.value;
-                const shouldShowConfirmation = isMiddleClickEnabled && selectedAction === 'regenerate';
-                regenerateConfirmationContainer.style.display = shouldShowConfirmation ? 'block' : 'none';
-            };
-            updateRegenerateConfirmationVisibility();
-            enableMiddleClickCheckbox.addEventListener('change', updateRegenerateConfirmationVisibility);
-            middleClickQuickActionSelect.addEventListener('change', updateRegenerateConfirmationVisibility);
-        }
-
-        const middleClickAdvancedDelayInput = document.getElementById('middleClickAdvancedDelay');
-        if (middleClickAdvancedDelayInput) {
-            middleClickAdvancedDelayInput.addEventListener('input', (e) => {
-                const value = parseInt(e.target.value, 10);
-                if (value < 1000) {
-                    e.target.value = 1000;
-                    uiHelperFunctions.showToastNotification('快捷环出现延迟不能小于1000ms，已自动调整', 'info');
-                }
-            });
-            middleClickAdvancedDelayInput.addEventListener('blur', (e) => {
-                const value = parseInt(e.target.value, 10);
-                if (isNaN(value) || value < 1000) {
-                    e.target.value = 1000;
-                    uiHelperFunctions.showToastNotification('快捷环出现延迟不能小于1000ms，已自动调整', 'info');
-                }
-            });
-        }
-
-        openForumBtn.addEventListener('click', async () => {
-            if (chatAPI?.openForumWindow) {
-                await chatAPI.openForumWindow();
+        nextUiNotificationMenuBtn.addEventListener('click', () => {
+            if (nextUiNotificationMenu.hidden) {
+                openNotificationMenu();
             } else {
-                console.warn('[Renderer] electronAPI.openForumWindow is not available.');
-                uiHelperFunctions.showToastNotification('无法打开论坛：功能不可用。', 'error');
+                closeNotificationMenu();
             }
         });
 
-        // 右键点击 - 打开 VCPMemo 中心
-        openForumBtn.addEventListener('contextmenu', async (e) => {
-            e.preventDefault();
-            if (chatAPI?.openMemoWindow) {
-                await chatAPI.openMemoWindow();
-            } else {
-                console.warn('[Renderer] electronAPI.openMemoWindow is not available.');
-                uiHelperFunctions.showToastNotification('无法打开 VCPMemo 中心：功能不可用。', 'error');
+        const runMenuAction = async (action, { restoreFocus = true } = {}) => {
+            try {
+                return await action?.();
+            } catch (error) {
+                console.warn('[Notifications] Menu action failed:', error);
+                uiHelperFunctions.showToastNotification(`通知操作失败：${error.message}`, 'error');
+                return { success: false, error: error.message };
+            } finally {
+                syncNotificationFilterState();
+                closeNotificationMenu({ restoreFocus });
+            }
+        };
+
+        nextUiNotificationForum.addEventListener('click', () => {
+            void runMenuAction(() => window.MainChatCommands?.openForum?.());
+        });
+        nextUiNotificationMemo.addEventListener('click', () => {
+            void runMenuAction(() => window.MainChatCommands?.openMemo?.());
+        });
+
+        nextUiNotificationFilterToggle.addEventListener('click', () => {
+            void runMenuAction(() => window.MainChatCommands?.toggleNotificationFilter?.());
+        });
+        nextUiNotificationFilterToggle.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            void runMenuAction(() => window.MainChatCommands?.openNotificationFilterSettings?.(), {
+                restoreFocus: false
+            });
+        });
+
+        nextUiNotificationClear.addEventListener('click', () => {
+            void runMenuAction(() => window.MainChatCommands?.clearNotifications?.());
+        });
+
+        document.addEventListener('pointerdown', (event) => {
+            if (
+                !nextUiNotificationMenu.hidden
+                && !nextUiNotificationMenu.contains(event.target)
+                && !nextUiNotificationMenuBtn.contains(event.target)
+            ) {
+                closeNotificationMenu();
             }
         });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !nextUiNotificationMenu.hidden) {
+                event.preventDefault();
+                closeNotificationMenu({ restoreFocus: true });
+            }
+        });
+
+        document.addEventListener('next-ui-overlay-changed', (event) => {
+            if (event.detail?.active === true) closeNotificationMenu();
+        });
+
+        nextUiNotificationMenu.addEventListener('keydown', (event) => {
+            if ((event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10'))
+                && document.activeElement === nextUiNotificationFilterToggle) {
+                event.preventDefault();
+                document.activeElement.dispatchEvent(new MouseEvent('contextmenu', {
+                    bubbles: true,
+                    cancelable: true,
+                    button: 2
+                }));
+                return;
+            }
+            if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+
+            const menuItems = [...nextUiNotificationMenu.querySelectorAll('[role^="menuitem"]')];
+            const currentIndex = menuItems.indexOf(document.activeElement);
+            let nextIndex = currentIndex;
+
+            if (event.key === 'Home') nextIndex = 0;
+            if (event.key === 'End') nextIndex = menuItems.length - 1;
+            if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % menuItems.length;
+            if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
+
+            event.preventDefault();
+            menuItems[nextIndex]?.focus();
+        });
+
+        if (window.filterManager?.subscribe) {
+        // State-channel subscriptions are lifecycle resources too. Keep the
+        // disposer with the main renderer owner so a remount/reload cannot
+        // retain a callback closed over stale settings refs.
+        listenerOwner?.own(window.filterManager.subscribe(syncNotificationFilterState));
+        } else {
+            window.addEventListener('notification-filter-changed', event => syncNotificationFilterState(event.detail));
+            syncNotificationFilterState();
+        }
     }
+    */
 
     if (openTranslatorBtn) {
         openTranslatorBtn.addEventListener('click', async () => {
@@ -1237,6 +1163,20 @@ export function setupEventListeners(deps) {
     }
 
     if (toggleNotificationsBtn && notificationsSidebar) {
+        const syncNotificationTogglePlacement = (isActive = notificationsSidebar.classList.contains('active')) => {
+            const chatHost = document.getElementById('nextUiChatNotificationHost');
+            const panelHost = document.getElementById('nextUiPanelNotificationHost');
+            const targetHost = isActive ? panelHost : chatHost;
+            if (targetHost && toggleNotificationsBtn.parentElement !== targetHost) {
+                targetHost.append(toggleNotificationsBtn);
+            }
+
+            toggleNotificationsBtn.classList.toggle('notification-panel-active', isActive);
+            toggleNotificationsBtn.setAttribute('aria-expanded', String(isActive));
+            toggleNotificationsBtn.setAttribute('aria-label', isActive ? '关闭通知面板' : '打开通知面板');
+            toggleNotificationsBtn.title = `${isActive ? '左键关闭通知面板' : '左键打开通知面板'}/右键监控面板`;
+        };
+
         toggleNotificationsBtn.addEventListener('click', () => {
             chatAPI.sendToggleNotificationsSidebar();
         });
@@ -1251,7 +1191,7 @@ export function setupEventListeners(deps) {
             }
         });
 
-        chatAPI.onDoToggleNotificationsSidebar(() => {
+        listenerOwner?.own(chatAPI.onDoToggleNotificationsSidebar(() => {
             const isActive = notificationsSidebar.classList.toggle('active');
             const mainContent = document.querySelector('.main-content');
             if (mainContent) {
@@ -1260,21 +1200,97 @@ export function setupEventListeners(deps) {
             if (isActive && refs.globalSettings.get().notificationsSidebarWidth) {
                 notificationsSidebar.style.width = `${refs.globalSettings.get().notificationsSidebarWidth}px`;
             }
-        });
+            syncNotificationTogglePlacement(isActive);
+        }));
+
+        syncNotificationTogglePlacement();
     }
 
     if (toggleAssistantBtn) {
         let longPressTimer;
         let wasLongPress = false;
+        let sidebarLongPressTimer = null;
+        let wasSidebarLongPress = false;
+
+        const saveSidebarState = settings => {
+            if (!chatAPI?.saveSettings) return;
+            const source = settings || refs.globalSettings.get();
+            const ops = Object.entries(source || {}).map(([key, value]) => ({ op: 'set', path: [key], value }));
+            chatAPI.saveSettings({ __vcpSettingsOps: ops }).then(result => {
+                if (!result.success) {
+                    console.error('保存侧边栏状态失败:', result.error);
+                }
+            }).catch(error => {
+                console.error('保存侧边栏状态时出错:', error);
+            });
+        };
+
+        const syncSidebarVisibility = (isActive) => {
+            const mainContent = document.querySelector('.main-content');
+            mainContent?.classList.toggle('sidebar-active', isActive);
+            toggleSidebarBtn?.classList.toggle('active', isActive);
+        };
+
+        const setAvatarOnlyMode = (enabled) => {
+            const target = leftSidebar;
+            if (!target) return false;
+
+            const agentsTabIsActive = document.getElementById('tabContentAgents')?.classList.contains('active');
+            if (enabled && !agentsTabIsActive) return false;
+
+            target.classList.toggle('avatar-only', enabled);
+            toggleSidebarModeBtn?.classList.toggle('active', enabled);
+            toggleSidebarModeBtn?.setAttribute('aria-pressed', String(enabled));
+            if (enabled) {
+                target.classList.add('active');
+                syncSidebarVisibility(true);
+            }
+
+            const globalSettings = refs.globalSettings.get();
+            const nextSettings = {
+                ...globalSettings,
+                sidebarAvatarOnly: enabled,
+                sidebarActive: enabled ? true : globalSettings.sidebarActive,
+            };
+            refs.globalSettings.set(nextSettings);
+            saveSidebarState(nextSettings);
+            return true;
+        };
+
+        const toggleSidebarVisibility = () => {
+            const target = leftSidebar;
+            if (!target) return;
+            target.classList.remove('avatar-only', 'compact-topics-open');
+            document.getElementById('tabContentTopics')?.classList.remove('compact-drawer-open');
+            toggleSidebarModeBtn?.classList.remove('active');
+            toggleSidebarModeBtn?.setAttribute('aria-pressed', 'false');
+
+            const isActive = target.classList.toggle('active');
+            syncSidebarVisibility(isActive);
+
+            const nextSettings = {
+                ...refs.globalSettings.get(),
+                sidebarActive: isActive,
+                sidebarAvatarOnly: false,
+            };
+            refs.globalSettings.set(nextSettings);
+            saveSidebarState(nextSettings);
+            uiHelperFunctions.showToastNotification(`侧栏已${isActive ? '显示' : '隐藏'}`, 'info');
+        };
+
+        toggleAssistantBtn.title = '点击：开关划词助手｜长按：直接呼出';
+        toggleAssistantBtn.setAttribute('aria-label', '划词助手开关与呼出');
+
         toggleAssistantBtn.addEventListener('mousedown', (e) => {
-            if (e.button !== 0) return; // Only left click
-            wasLongPress = false;
-            longPressTimer = setTimeout(() => {
-                console.log('[Assistant] Long press detected on toggle button');
-                chatAPI.assistantAction('open');
-                wasLongPress = true;
-                longPressTimer = null;
-            }, 600);
+            if (e.button === 0) {
+                wasLongPress = false;
+                longPressTimer = setOwnedTimeout(() => {
+                    console.log('[Assistant] Long press detected on toggle button');
+                    chatAPI.assistantAction('open');
+                    wasLongPress = true;
+                    longPressTimer = null;
+                }, 600);
+            }
         });
 
         const clearLongPress = () => {
@@ -1284,7 +1300,16 @@ export function setupEventListeners(deps) {
             }
         };
 
-        toggleAssistantBtn.addEventListener('mouseup', clearLongPress);
+        const clearSidebarLongPress = () => {
+            if (sidebarLongPressTimer) {
+                clearTimeout(sidebarLongPressTimer);
+                sidebarLongPressTimer = null;
+            }
+        };
+
+        toggleAssistantBtn.addEventListener('mouseup', (e) => {
+            if (e.button === 0) clearLongPress();
+        });
         toggleAssistantBtn.addEventListener('mouseleave', clearLongPress);
 
         toggleAssistantBtn.addEventListener('click', async () => {
@@ -1296,54 +1321,58 @@ export function setupEventListeners(deps) {
 
             const globalSettings = refs.globalSettings.get();
             const isActive = toggleAssistantBtn.classList.toggle('active');
-            globalSettings.assistantEnabled = isActive;
+            const nextSettings = { ...globalSettings, assistantEnabled: isActive };
+            refs.globalSettings.set(nextSettings);
             chatAPI.toggleSelectionListener(isActive);
-            const result = await chatAPI.saveSettings({
-                ...globalSettings,
-                assistantEnabled: isActive
-            });
+            const result = await chatAPI.saveSettings({ __vcpSettingsOps: [{ op: 'set', path: ['assistantEnabled'], value: isActive }] });
             if (result.success) {
                 uiHelperFunctions.showToastNotification(`划词助手已${isActive ? '开启' : '关闭'}`, 'info');
             } else {
                 uiHelperFunctions.showToastNotification(`设置划词助手状态失败: ${result.error}`, 'error');
                 toggleAssistantBtn.classList.toggle('active', !isActive);
-                globalSettings.assistantEnabled = !isActive;
+                refs.globalSettings.set({ ...globalSettings, assistantEnabled: !isActive });
             }
         });
 
-        // 右键点击 - 切换侧边栏显示/隐藏
-        toggleAssistantBtn.addEventListener('contextmenu', (e) => {
-            e.preventDefault(); // 阻止默认的右键菜单
-            if (leftSidebar) {
-                const isActive = leftSidebar.classList.toggle('active');
-                const mainContent = document.querySelector('.main-content');
-                if (mainContent) {
-                    mainContent.classList.toggle('sidebar-active', isActive);
+        if (toggleSidebarModeBtn) {
+            toggleSidebarModeBtn.addEventListener('mousedown', e => {
+                if (e.button !== 0) return;
+                wasSidebarLongPress = false;
+                sidebarLongPressTimer = setOwnedTimeout(() => {
+                    sidebarLongPressTimer = null;
+                    if (!leftSidebar) return;
+
+                    wasSidebarLongPress = true;
+                    toggleSidebarVisibility();
+                }, 600);
+            });
+            toggleSidebarModeBtn.addEventListener('mouseup', e => {
+                if (e.button === 0) clearSidebarLongPress();
+            });
+            toggleSidebarModeBtn.addEventListener('mouseleave', clearSidebarLongPress);
+            toggleSidebarModeBtn.addEventListener('click', () => {
+                if (wasSidebarLongPress) {
+                    wasSidebarLongPress = false;
+                    return;
                 }
-                // 更新按钮状态
-                if (toggleSidebarBtn) {
-                    toggleSidebarBtn.classList.toggle('active', isActive);
+                clearSidebarLongPress();
+
+                const agentsTabIsActive = document.getElementById('tabContentAgents')?.classList.contains('active');
+                if (!leftSidebar || !agentsTabIsActive) {
+                    uiHelperFunctions.showToastNotification('请先切换到助手列表。', 'info');
+                    return;
                 }
 
-                // 保存侧边栏状态到设置
-                const globalSettings = refs.globalSettings.get();
-                globalSettings.sidebarActive = isActive;
-
-                // 异步保存设置
-                if (chatAPI?.saveSettings) {
-                    chatAPI.saveSettings(globalSettings).then(result => {
-                        if (!result.success) {
-                            console.error('保存侧边栏状态失败:', result.error);
-                        }
-                    }).catch(error => {
-                        console.error('保存侧边栏状态时出错:', error);
-                    });
+                const enableAvatarOnly = !leftSidebar.classList.contains('avatar-only');
+                if (setAvatarOnlyMode(enableAvatarOnly)) {
+                    uiHelperFunctions.showToastNotification(
+                        enableAvatarOnly ? '侧栏已切换为仅头像模式' : '侧栏已恢复完整模式',
+                        'info'
+                    );
                 }
-
-                // 显示操作提示
-                // uiHelperFunctions.showToastNotification(`侧边栏已${isActive ? '显示' : '隐藏'}`, 'info');
-            }
-        });
+            });
+            toggleSidebarModeBtn.addEventListener('contextmenu', e => e.preventDefault());
+        }
     }
 
     // 语音聊天按钮事件处理
@@ -1375,18 +1404,6 @@ export function setupEventListeners(deps) {
     if (agentSearchInput) {
         agentSearchInput.addEventListener('input', (e) => {
             filterAgentList(e.target.value);
-        });
-    }
-
-    if (minimizeToTrayBtn) {
-        minimizeToTrayBtn.addEventListener('click', () => {
-            chatAPI.minimizeToTray();
-        });
-    }
-
-    if (enableContextSanitizerCheckbox && contextSanitizerDepthContainer) {
-        enableContextSanitizerCheckbox.addEventListener('change', () => {
-            contextSanitizerDepthContainer.style.display = enableContextSanitizerCheckbox.checked ? 'block' : 'none';
         });
     }
 
@@ -1456,7 +1473,7 @@ export function setupEventListeners(deps) {
 
     // 监听来自主进程的全局快捷键触发的创建未锁定话题事件
     if (chatAPI?.onCreateUnlockedTopic) {
-        chatAPI.onCreateUnlockedTopic(() => {
+        listenerOwner?.own(chatAPI.onCreateUnlockedTopic(() => {
             console.log('[快捷键] 收到来自主进程的创建未锁定话题请求');
             const currentSelectedItem = refs.currentSelectedItem.get();
             if (!currentSelectedItem.id) {
@@ -1468,65 +1485,12 @@ export function setupEventListeners(deps) {
                 return;
             }
             createNewTopicWithLockStatus(currentSelectedItem, false);
-        });
+        }));
     }
 
-    if (seamFixer && notificationsSidebar) {
-        let seamFrame = 0;
-        let pendingSidebarWidth = 0;
-
-        const scheduleSeamFixerWidth = (width) => {
-            pendingSidebarWidth = width;
-            if (seamFrame) return;
-
-            seamFrame = requestAnimationFrame(() => {
-                seamFrame = 0;
-                const offset = pendingSidebarWidth > 0 ? 3 : 0;
-                seamFixer.style.right = `${pendingSidebarWidth + offset}px`;
-            });
-        };
-
-        const resizeObserver = new ResizeObserver((entries) => {
-            const entry = entries[entries.length - 1];
-            scheduleSeamFixerWidth(entry?.contentRect?.width || 0);
-        });
-        resizeObserver.observe(notificationsSidebar);
+        setupCompleted = true;
+    } finally {
+        releaseCapturedListeners();
+        if (!setupCompleted) eventListenersBound = false;
     }
-
-    const setLayoutExperimentMode = (mode = 'baseline') => {
-        const normalizedMode = mode === 'overlay' ? 'overlay' : 'baseline';
-
-        if (normalizedMode === 'overlay') {
-            const settings = refs.globalSettings.get();
-            const leftWidth = parseFloat(leftSidebar?.style.width)
-                || settings.sidebarWidth
-                || 260;
-            const rightWidth = parseFloat(notificationsSidebar?.style.width)
-                || settings.notificationsSidebarWidth
-                || 310;
-            document.documentElement.style.setProperty('--vcp-overlay-left-width', `${leftWidth}px`);
-            document.documentElement.style.setProperty('--vcp-overlay-right-width', `${rightWidth}px`);
-        }
-
-        document.body.classList.toggle('vcp-layout-overlay-sidebars', normalizedMode === 'overlay');
-        document.body.dataset.vcpLayoutExperiment = normalizedMode;
-        console.info(`[LayoutExperiment] mode=${normalizedMode}`);
-        return getLayoutExperimentState();
-    };
-
-    const getLayoutExperimentState = () => ({
-        mode: document.body.classList.contains('vcp-layout-overlay-sidebars') ? 'overlay' : 'baseline',
-        leftSidebarActive: leftSidebar?.classList.contains('active') === true,
-        notificationsSidebarActive: notificationsSidebar?.classList.contains('active') === true
-    });
-
-    window.vcpLayoutExperiment = Object.freeze({
-        useBaseline: () => setLayoutExperimentMode('baseline'),
-        useOverlay: () => setLayoutExperimentMode('overlay'),
-        setMode: setLayoutExperimentMode,
-        getState: getLayoutExperimentState
-    });
-    document.body.dataset.vcpLayoutExperiment = 'baseline';
-    console.info('[LayoutExperiment] Ready: vcpLayoutExperiment.useBaseline() / useOverlay()');
 }
-

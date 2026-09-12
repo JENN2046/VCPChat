@@ -6,9 +6,13 @@
     let croppedAgentAvatarFile = null;
     let croppedUserAvatarFile = null;
     let croppedGroupAvatarFile = null;
+    const modalGenerations = new Map();
+    const modalClosePromises = new WeakMap();
 
     const uiHelperFunctions = {};
     const textareaResizeStates = new WeakMap();
+    const chatScrollStates = new WeakMap();
+    const CHAT_BOTTOM_THRESHOLD_PX = 50;
     const REGEX_CACHE_MAX_ENTRIES = 512;
     const regexCompileCache = new Map();
     const filePreviewIconMarkup = `
@@ -256,26 +260,175 @@
         regexCompileCache.clear();
     };
 
+    function getChatScrollContainer() {
+        return document.querySelector('.chat-messages-container');
+    }
+
+    function getDistanceFromChatBottom(container) {
+        return Math.max(0, container.scrollHeight - container.clientHeight - container.scrollTop);
+    }
+
+    function isChatNearBottom(container, threshold = CHAT_BOTTOM_THRESHOLD_PX) {
+        return getDistanceFromChatBottom(container) <= threshold;
+    }
+
+    function getChatScrollState(container) {
+        let state = chatScrollStates.get(container);
+        if (state) return state;
+
+        state = {
+            followBottom: true,
+            generation: 0,
+            programmatic: false,
+            frameId: 0,
+            requestedGeneration: null
+        };
+        chatScrollStates.set(container, state);
+
+        const markUserIntent = () => {
+            state.programmatic = false;
+            state.generation += 1;
+            if (state.frameId) {
+                cancelAnimationFrame(state.frameId);
+                state.frameId = 0;
+                state.requestedGeneration = null;
+            }
+        };
+
+        container.addEventListener('wheel', (event) => {
+            markUserIntent();
+            if (event.deltaY < 0) {
+                state.followBottom = false;
+            } else {
+                requestAnimationFrame(() => {
+                    if (container.isConnected) {
+                        state.followBottom = isChatNearBottom(container);
+                    }
+                });
+            }
+        }, { passive: true });
+
+        container.addEventListener('touchstart', markUserIntent, { passive: true });
+        container.addEventListener('pointerdown', (event) => {
+            // 普通内容点击不改变跟随状态；只把滚动条槽附近的按下视为滚动意图。
+            const scrollbarWidth = Math.max(0, container.offsetWidth - container.clientWidth);
+            const rect = container.getBoundingClientRect();
+            if (scrollbarWidth > 0 && event.clientX >= rect.right - scrollbarWidth - 2) {
+                markUserIntent();
+            }
+        }, { passive: true });
+
+        container.addEventListener('scroll', () => {
+            if (state.programmatic) return;
+            state.followBottom = isChatNearBottom(container);
+        }, { passive: true });
+
+        return state;
+    }
+
     /**
-     * Scrolls the chat messages div to the bottom.
+     * Captures the Surface-level bottom-follow intent before a DOM mutation.
+     * The generation prevents a deferred programmatic scroll from overriding
+     * user input that occurs between the mutation and the next animation frame.
      */
-    uiHelperFunctions.scrollToBottom = function() {
-        const parentContainer = document.querySelector('.chat-messages-container');
-        if (!parentContainer) return;
+    uiHelperFunctions.captureChatScrollFollow = function() {
+        const container = getChatScrollContainer();
+        if (!container) return { followBottom: false, generation: -1 };
+        const state = getChatScrollState(container);
+        return {
+            followBottom: state.followBottom,
+            generation: state.generation
+        };
+    };
 
-        const scrollThreshold = 50;
-        const isNearBottom = () => (
-            parentContainer.scrollHeight - parentContainer.clientHeight
-            <= parentContainer.scrollTop + scrollThreshold
-        );
+    uiHelperFunctions.isNearChatBottom = function(threshold = CHAT_BOTTOM_THRESHOLD_PX) {
+        const container = getChatScrollContainer();
+        return !!container && isChatNearBottom(container, threshold);
+    };
 
-        if (isNearBottom()) {
+    uiHelperFunctions.resetChatScrollFollow = function() {
+        const container = getChatScrollContainer();
+        if (!container) return;
+        const state = getChatScrollState(container);
+        state.generation += 1;
+        state.followBottom = true;
+        state.programmatic = false;
+        state.requestedGeneration = null;
+        if (state.frameId) {
+            cancelAnimationFrame(state.frameId);
+            state.frameId = 0;
+        }
+    };
+
+    /**
+     * Scrolls the chat Surface to the bottom when bottom-follow is active.
+     * Calls in one paint frame are normally coalesced. `force` bypasses the
+     * current geometry check, while `expectedGeneration` still protects user
+     * intent. `immediate` is reserved for callers already executing inside an
+     * animation frame: it commits the post-mutation scroll position before
+     * that frame is painted instead of introducing one extra visible frame.
+     */
+    uiHelperFunctions.scrollToBottom = function(options = {}) {
+        const container = getChatScrollContainer();
+        if (!container) return false;
+
+        const state = getChatScrollState(container);
+        const force = options?.force === true;
+        const immediate = options?.immediate === true;
+        const expectedGeneration = Number.isInteger(options?.expectedGeneration)
+            ? options.expectedGeneration
+            : null;
+
+        if (expectedGeneration !== null && state.generation !== expectedGeneration) {
+            return false;
+        }
+        if (!force && !state.followBottom && !isChatNearBottom(container)) {
+            return false;
+        }
+
+        state.followBottom = true;
+        state.requestedGeneration = expectedGeneration ?? state.generation;
+
+        const commitScroll = () => {
+            const requestedGeneration = state.requestedGeneration;
+            state.requestedGeneration = null;
+            if (
+                !container.isConnected
+                || requestedGeneration !== state.generation
+                || !state.followBottom
+            ) {
+                return;
+            }
+
+            state.programmatic = true;
+            container.scrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
             requestAnimationFrame(() => {
-                if (parentContainer.isConnected && isNearBottom()) {
-                    parentContainer.scrollTop = parentContainer.scrollHeight;
+                state.programmatic = false;
+                if (container.isConnected) {
+                    state.followBottom = isChatNearBottom(container);
                 }
             });
+        };
+
+        if (immediate) {
+            // A deferred request from an earlier mutation is now superseded by
+            // this frame's newer geometry. Commit synchronously so Chromium
+            // cannot paint the grown stream tail at the old scroll position.
+            if (state.frameId) {
+                cancelAnimationFrame(state.frameId);
+                state.frameId = 0;
+            }
+            commitScroll();
+            return true;
         }
+
+        if (state.frameId) return true;
+
+        state.frameId = requestAnimationFrame(() => {
+            state.frameId = 0;
+            commitScroll();
+        });
+        return true;
     };
 
     /**
@@ -342,7 +495,12 @@
         }
 
         if (modalElement) {
+            const generation = (modalGenerations.get(modalId) || 0) + 1;
+            modalGenerations.set(modalId, generation);
             modalElement.classList.add('active');
+            document.dispatchEvent(new CustomEvent('modal-visibility-changed', {
+                detail: { modalId, active: true, root: modalElement, generation }
+            }));
             // 确保新打开的模态框获得焦点
             modalElement.focus();
         } else {
@@ -356,7 +514,26 @@
      */
     uiHelperFunctions.closeModal = function(modalId) {
         const modalElement = document.getElementById(modalId);
-        if (modalElement) modalElement.classList.remove('active');
+        if (!modalElement) return Promise.resolve(false);
+        const existingClose = modalClosePromises.get(modalElement);
+        if (existingClose) return existingClose;
+        const finishClose = () => {
+            if (!modalElement.isConnected) return false;
+            modalElement.classList.remove('active');
+            document.dispatchEvent(new CustomEvent('modal-visibility-changed', {
+                detail: { modalId, active: false, root: modalElement, generation: modalGenerations.get(modalId) || 0 }
+            }));
+            return true;
+        };
+        if (modalId === 'globalSettingsModal' && modalElement.classList.contains('active')) {
+            const coordinator = window.VCPUISettingsBridge?.flush;
+            if (typeof coordinator === 'function') {
+                Promise.resolve().then(() => coordinator()).catch(error => {
+                    console.warn('[UI Helper] Settings close flush failed:', error);
+                });
+            }
+        }
+        return finishClose();
     };
 
     /**
@@ -365,6 +542,11 @@
      * @param {number} [duration=3000] The duration in milliseconds.
      */
     uiHelperFunctions.showToastNotification = function(message, type = 'info', duration = 3000) {
+        if (window.VCPUI?.feedback?.toast) {
+            const variant = type === 'error' ? 'error' : ['info', 'success', 'warning'].includes(type) ? type : 'info';
+            return window.VCPUI.feedback.toast(String(message), { variant, duration });
+        }
+
         const container = document.getElementById('floating-toast-notifications-container');
         if (!container) {
             console.warn("Toast notification container not found.");
@@ -629,8 +811,9 @@
      * Updates the attachment preview area with current attached files.
      * @param {Array} attachedFiles Array of attached file objects.
      * @param {HTMLElement} attachmentPreviewArea The preview area element.
+     * @param {function(number): boolean} [removeAttachmentAt] Owner command for immutable attachment state.
      */
-    uiHelperFunctions.updateAttachmentPreview = function(attachedFiles, attachmentPreviewArea) {
+    uiHelperFunctions.updateAttachmentPreview = function(attachedFiles, attachmentPreviewArea, removeAttachmentAt = null) {
         if (!attachmentPreviewArea) {
             console.error('[UI Helper] updateAttachmentPreview: attachmentPreviewArea is null or undefined!');
             return;
@@ -679,10 +862,17 @@
             prevDiv.appendChild(nameSpan);
     
             const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
             removeBtn.className = 'file-preview-remove-btn';
             removeBtn.innerHTML = '×';
             removeBtn.title = '移除此附件';
-            removeBtn.onclick = () => {
+            removeBtn.onclick = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof removeAttachmentAt === 'function') {
+                    removeAttachmentAt(index);
+                    return;
+                }
                 attachedFiles.splice(index, 1);
                 uiHelperFunctions.updateAttachmentPreview(attachedFiles, attachmentPreviewArea);
             };
@@ -766,51 +956,18 @@
     };
 
     uiHelperFunctions.prepareGroupSettingsDOM = function() {
-        // This function is called early in DOMContentLoaded.
-        // It ensures the container for group settings exists.
-        // The actual content (form fields) will be managed by GroupRenderer.
+        // The host is static in main.html so renderer bindings can capture it
+        // before DOMContentLoaded. Keep this fallback for embedded/legacy hosts.
         if (!document.getElementById('groupSettingsContainer')) {
             const settingsTab = document.getElementById('tabContentSettings');
             if (settingsTab) {
-                const groupContainerHTML = `<div id="groupSettingsContainer" style="display: none;"></div>`;
+                const groupContainerHTML = '<div id="groupSettingsContainer" class="settings-sidebar-surface-view" data-settings-view="group"></div>';
                 settingsTab.insertAdjacentHTML('beforeend', groupContainerHTML);
                 console.log("[UI Helper] groupSettingsContainer placeholder created.");
             } else {
                 console.error("[UI Helper] Could not find tabContentSettings to append group settings DOM placeholder.");
             }
         }
-         // Ensure createNewGroupBtn has its text updated
-         const createNewAgentBtn = document.getElementById('createNewAgentBtn');
-         const createNewGroupBtn = document.getElementById('createNewGroupBtn');
-         if (createNewAgentBtn) {
-             createNewAgentBtn.innerHTML = `
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                     <path d="M2 21a8 8 0 0 1 13.292-6"></path>
-                     <circle cx="10" cy="8" r="5"></circle>
-                     <path d="M19 16v6"></path>
-                     <path d="M22 19h-6"></path>
-                 </svg>
-                 <span class="sidebar-button-label">
-                     <span class="sidebar-button-prefix">&#21019;&#24314;</span>
-                     <span class="sidebar-button-keyword">Agent</span>
-                 </span>
-             `;
-         }
-         if (createNewGroupBtn) {
-             createNewGroupBtn.innerHTML = `
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                     <path d="M18 21a8 8 0 0 0-16 0"></path>
-                     <circle cx="10" cy="8" r="5"></circle>
-                     <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path>
-                 </svg>
-                 <span class="sidebar-button-label">
-                     <span class="sidebar-button-prefix">&#21019;&#24314;</span>
-                     <span class="sidebar-button-keyword">Group</span>
-                 </span>
-             `;
-             console.log('[UI Helper prepareGroupSettingsDOM] createNewGroupBtn icon content applied');
-             createNewGroupBtn.style.display = 'inline-flex'; // Make it visible
-         }
     };
 
     uiHelperFunctions.addNetworkPathInput = function(path = '') {
@@ -840,21 +997,34 @@
     };
 
     uiHelperFunctions.filterAgentList = function(searchTerm) {
-        const lowerCaseSearchTerm = searchTerm.toLowerCase().trim();
+        const lowerCaseSearchTerm = String(searchTerm ?? '').toLowerCase().trim();
         const itemListUl = document.getElementById('agentList'); // Renamed from agentListUl to itemListUl
         if (!itemListUl) return;
         const items = itemListUl.querySelectorAll('li'); // Get all list items
-    
+
+        if (!lowerCaseSearchTerm) {
+            items.forEach(item => { item.style.display = ''; });
+            return;
+        }
+
+        const terms = lowerCaseSearchTerm.split(/\s+/).filter(Boolean);
         items.forEach(item => {
             const nameElement = item.querySelector('.agent-name');
-            if (nameElement) {
-                const name = nameElement.textContent.toLowerCase();
-                if (name.includes(lowerCaseSearchTerm)) {
-                    item.style.display = ''; // Reset to default display style from CSS
-                } else {
-                    item.style.display = 'none';
+            if (!nameElement) return;
+            const name = (nameElement.textContent || '').toLowerCase();
+
+            // Check if all search terms match the name (via substring or ordered-subsequence)
+            const allMatch = terms.every(term => {
+                if (name.includes(term)) return true;
+                // Ordered subsequence matching
+                let termIdx = 0;
+                for (let i = 0; i < name.length && termIdx < term.length; i++) {
+                    if (name[i] === term[termIdx]) termIdx++;
                 }
-            }
+                return termIdx === term.length;
+            });
+
+            item.style.display = allMatch ? '' : 'none';
         });
     };
 
@@ -888,6 +1058,7 @@
      */
     uiHelperFunctions.showConfirmDialog = function(message, title = '确认', confirmText = '确定', cancelText = '取消', isDanger = false) {
         return new Promise((resolve) => {
+            const previousFocus = document.activeElement;
             // 创建模态框容器
             const overlay = document.createElement('div');
             overlay.id = 'confirm-dialog-overlay';
@@ -896,10 +1067,15 @@
             // 创建对话框
             const dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
+            dialog.setAttribute('role', 'dialog');
+            dialog.setAttribute('aria-modal', 'true');
+            const titleId = `confirm-dialog-title-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            dialog.setAttribute('aria-labelledby', titleId);
             
             // 标题
             const titleEl = document.createElement('div');
             titleEl.className = 'confirm-dialog-title';
+            titleEl.id = titleId;
             titleEl.textContent = title;
             dialog.appendChild(titleEl);
             
@@ -936,24 +1112,30 @@
             dialog.appendChild(buttonsEl);
             overlay.appendChild(dialog);
             document.body.appendChild(overlay);
-            
-            // 显示动画
-            requestAnimationFrame(() => {
-                overlay.classList.add('visible');
-                confirmBtn.focus();
-            });
+            // Publish the active state synchronously so a same-frame Escape
+            // cannot close the owning settings modal underneath this dialog.
+            overlay.classList.add('visible');
+            confirmBtn.focus();
             
             // 键盘事件
             const handleKeydown = (e) => {
                 if (e.key === 'Escape') {
+                    e.preventDefault();
                     cleanup();
                     resolve(false);
                 } else if (e.key === 'Enter') {
+                    e.preventDefault();
                     cleanup();
                     resolve(true);
+                } else if (e.key === 'Tab') {
+                    const focusables = [cancelBtn, confirmBtn];
+                    const current = focusables.indexOf(document.activeElement);
+                    if (current < 0) return;
+                    e.preventDefault();
+                    focusables[(current + (e.shiftKey ? -1 : 1) + focusables.length) % focusables.length].focus();
                 }
             };
-            document.addEventListener('keydown', handleKeydown);
+            document.addEventListener('keydown', handleKeydown, true);
             
             // 点击遮罩关闭
             overlay.onclick = (e) => {
@@ -965,16 +1147,35 @@
             
             // 清理函数
             function cleanup() {
-                document.removeEventListener('keydown', handleKeydown);
+                document.removeEventListener('keydown', handleKeydown, true);
                 overlay.classList.remove('visible');
                 setTimeout(() => {
                     if (overlay.parentNode) {
                         overlay.parentNode.removeChild(overlay);
                     }
+                    if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
                 }, 200);
             }
         });
     };
+
+    // Global capture-phase close delegation for modal close buttons.
+    // Ensures clicking any close button (or inner SVG) immediately closes the modal,
+    // unaffected by DOM transformations, event bubbling stops, or late bindings.
+    if (typeof document !== 'undefined') {
+        document.addEventListener('click', (e) => {
+            const closeBtn = e.target?.closest?.('.close-button, .vcp-uiux-settings-close');
+            if (closeBtn) {
+                const modal = closeBtn.closest('.modal, [role="dialog"], .vcp-uiux-settings-root');
+                const modalId = modal?.id || (modal?.classList?.contains('vcp-uiux-settings-root') ? 'globalSettingsModal' : null);
+                if (modalId) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uiHelperFunctions.closeModal(modalId);
+                }
+            }
+        }, true);
+    }
 
     window.uiHelperFunctions = uiHelperFunctions;
 

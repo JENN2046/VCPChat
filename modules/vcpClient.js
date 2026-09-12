@@ -58,7 +58,7 @@ function hashSentMessage(message) {
     return `sha256:${crypto.createHash('sha256').update(extractTextForHash(message.content), 'utf8').digest('hex')}`;
 }
 
-function buildVcpChatExtensionsFromMessages(messages) {
+function buildVcpChatExtensionsFromMessages(messages, context = null, requestId = null) {
     const messageTimestampBindings = [];
     messages.forEach((message, index) => {
         const meta = message && message.__vcpchatTimestampMeta;
@@ -76,14 +76,33 @@ function buildVcpChatExtensionsFromMessages(messages) {
         });
     });
 
-    if (messageTimestampBindings.length === 0) {
+    const requestContext = buildRequestContext(context, requestId);
+    if (messageTimestampBindings.length === 0 && !requestContext) {
         return null;
     }
 
     return {
         schemaVersion: 1,
         messageMetadataMode: 'hash_only',
-        messageTimestampBindings
+        ...(messageTimestampBindings.length > 0 ? { messageTimestampBindings } : {}),
+        ...(requestContext ? { requestContext } : {})
+    };
+}
+
+function buildRequestContext(context, requestId) {
+    if (!context || typeof context !== 'object') return null;
+    const agentId = typeof context.agentId === 'string' ? context.agentId.trim() : '';
+    const agentName = typeof context.agentName === 'string' ? context.agentName.trim() : '';
+    const topicId = typeof context.topicId === 'string' ? context.topicId.trim() : '';
+    if (!agentId && !topicId) return null;
+
+    return {
+        requestId: typeof requestId === 'string' ? requestId : undefined,
+        agentId: agentId || undefined,
+        agentName: agentName || undefined,
+        topicId: topicId || undefined,
+        ownerType: context.isGroupMessage === true ? 'group' : 'agent',
+        isGroupMessage: context.isGroupMessage === true
     };
 }
 
@@ -163,20 +182,48 @@ function sendResidentPresentation({
     messageId,
     presentation,
     streamChannel,
-    webContents
+    webContents,
+    sendPayload
 }) {
     if (!presentation
         || !webContents
         || webContents.isDestroyed()) {
         return false;
     }
-    webContents.send(streamChannel, {
+    const payload = {
         type: 'ephemeral_presentation',
         messageId,
         context,
         presentation
-    });
+    };
+    if (typeof sendPayload === 'function') return sendPayload(payload);
+    webContents.send(streamChannel, payload);
     return true;
+}
+
+function omitUnsetOptionalModelParams(modelConfig = {}) {
+    const normalizedConfig = { ...modelConfig };
+    const optionalParamKeys = [
+        'temperature',
+        'contextTokenLimit',
+        'max_tokens',
+        'top_p',
+        'top_k'
+    ];
+
+    optionalParamKeys.forEach(key => {
+        const value = normalizedConfig[key];
+        if (
+            value === null ||
+            value === undefined ||
+            value === '' ||
+            (typeof value === 'number' && !Number.isFinite(value))
+        ) {
+            delete normalizedConfig[key];
+        }
+    });
+
+    return normalizedConfig;
 }
 
 /**
@@ -210,13 +257,15 @@ async function sendToVCP(params) {
         vcpUrl,
         vcpApiKey,
         messages: originalMessages,
-        modelConfig,
+        modelConfig: rawModelConfig,
         messageId,
         context = null,
         webContents = null,
         streamChannel = 'vcp-stream-event',
         onStreamEnd = null
     } = params;
+
+    const modelConfig = omitUnsetOptionalModelParams(rawModelConfig);
 
     console.log(`[VCPClient] sendToVCP called for messageId: ${messageId}, context:`, context);
 
@@ -337,26 +386,7 @@ async function sendToVCP(params) {
         }
     }
 
-    // === Agent Bubble Theme 注入 ===
-    try {
-        if (settings.enableAgentBubbleTheme) {
-            let systemMsgIndex = messages.findIndex(m => m.role === 'system');
-            if (systemMsgIndex === -1) {
-                messages.unshift({ role: 'system', content: '' });
-                systemMsgIndex = 0;
-            }
-            
-            const injection = '输出规范要求：{{VarDivRender}}';
-            if (!messages[systemMsgIndex].content.includes(injection)) {
-                messages[systemMsgIndex].content += `\n\n${injection}`;
-                messages[systemMsgIndex].content = messages[systemMsgIndex].content.trim();
-            }
-        }
-    } catch (e) {
-        console.error('[VCPClient] Failed to inject bubble theme info:', e);
-    }
-
-    const vcpchatExtensions = buildVcpChatExtensionsFromMessages(messages);
+    const vcpchatExtensions = buildVcpChatExtensionsFromMessages(messages, context, messageId);
     messages = stripInternalMessageMetadata(messages);
 
     // === 准备请求体 ===
@@ -549,7 +579,6 @@ async function sendToVCP(params) {
                                             );
                                         console.error(
                                             `[VCPClient] Failed to parse stream chunk for messageId: ${messageId}:`,
-                                            e,
                                             '原始数据:',
                                             redactedDiagnostic
                                         );

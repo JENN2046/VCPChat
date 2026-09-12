@@ -6,6 +6,7 @@
 
 const { BrowserWindow, ipcMain, app, screen, shell, dialog, nativeTheme } = require('electron');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const fs = require('fs-extra');
 const desktopMetrics = require('./desktopMetrics');
 const windowService = require('../services/windowService');
@@ -36,11 +37,11 @@ let vchatPluginManagerWindow = null;
 
 // --- 收藏系统路径 - 使用项目根目录的 AppData ---
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const DESKTOP_WIDGETS_DIR = path.join(PROJECT_ROOT, 'AppData', 'DesktopWidgets');
-const DESKTOP_DATA_DIR = path.join(PROJECT_ROOT, 'AppData', 'DesktopData');
-const DOCK_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'dock.json');
-const LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
-const CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
+let DESKTOP_WIDGETS_DIR = path.join(PROJECT_ROOT, 'AppData', 'DesktopWidgets');
+let DESKTOP_DATA_DIR = path.join(PROJECT_ROOT, 'AppData', 'DesktopData');
+let DOCK_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'dock.json');
+let LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
+let CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
 
 // --- 布局文件写锁/队列 ---
 let layoutOpQueue = Promise.resolve();
@@ -82,6 +83,40 @@ function findExistingManifestPath(pluginDir) {
     if (fs.pathExistsSync(enabledPath)) return { path: enabledPath, enabled: true, fileName: 'plugin-manifest.json' };
     if (fs.pathExistsSync(disabledPath)) return { path: disabledPath, enabled: false, fileName: 'plugin-manifest.json.block' };
     return { path: enabledPath, enabled: true, fileName: 'plugin-manifest.json' };
+}
+
+function resolveFrontendPluginResource(pluginDir, folderName, fileName) {
+    if (typeof fileName !== 'string' || fileName !== path.basename(fileName) || !fileName) return null;
+    const fullPath = path.join(pluginDir, fileName);
+    const relative = path.relative(pluginDir, fullPath);
+    if (relative.startsWith('..') || path.isAbsolute(relative) || !fs.pathExistsSync(fullPath)) return null;
+    return `VCPDistributedServer/Plugin/${folderName}/${fileName}`;
+}
+
+async function listEnabledFrontendPlugins() {
+    const pluginsRoot = path.join(PROJECT_ROOT, 'VCPDistributedServer', 'Plugin');
+    await fs.ensureDir(pluginsRoot);
+    const entries = await fs.readdir(pluginsRoot, { withFileTypes: true });
+    const plugins = [];
+
+    for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+        const manifestPath = path.join(pluginsRoot, entry.name, 'plugin-manifest.json');
+        if (!await fs.pathExists(manifestPath)) continue;
+        try {
+            const manifest = await fs.readJson(manifestPath);
+            if (!manifest.frontend || typeof manifest.frontend !== 'object') continue;
+            const pluginDir = path.join(pluginsRoot, entry.name);
+            const style = resolveFrontendPluginResource(pluginDir, entry.name, manifest.frontend.style);
+            const script = resolveFrontendPluginResource(pluginDir, entry.name, manifest.frontend.script);
+            if (!script) continue;
+            plugins.push({ id: manifest.name || entry.name, style, script });
+        } catch (error) {
+            console.warn(`[PluginManager] 跳过无效前端插件 ${entry.name}:`, error.message);
+        }
+    }
+
+    return plugins;
 }
 
 async function readVcpPluginEntry(entry, pluginsRoot) {
@@ -741,10 +776,53 @@ function resolveAppActionToAppId(appAction) {
             return WINDOW_APP_IDS.TASK;
         case 'open-plugin-manager-window':
             return WINDOW_APP_IDS.PLUGIN_MANAGER;
+        case 'open-scriptorium-window':
+            return WINDOW_APP_IDS.DOCX;
         case 'open-desktop-window':
             return WINDOW_APP_IDS.DESKTOP;
         default:
             return null;
+    }
+}
+
+async function launchVchatApp(appAction) {
+    try {
+        console.log(`[DesktopHandlers] Launching VChat app via WindowService: ${appAction}`);
+
+        const appId = resolveAppActionToAppId(appAction);
+        if (appId) {
+            await windowService.open(appId);
+            return { success: true, appId };
+        }
+
+        if (appAction === 'launch-human-toolbox') {
+            return await launchStandaloneElectronApp('VCPHumanToolBox', 'Human Toolbox');
+        }
+
+        if (appAction === 'launch-vchat-manager') {
+            return await launchStandaloneElectronApp('VchatManager', 'VchatManager');
+        }
+
+        if (appAction === 'open-powershell-executor-terminal') {
+            const powerShellExecutor = require(path.join(PROJECT_ROOT, 'VCPDistributedServer', 'Plugin', 'PowerShellExecutor', 'PowerShellExecutor.js'));
+            if (typeof powerShellExecutor.openGuiTerminal !== 'function') {
+                return { success: false, error: 'PowerShellExecutor GUI entry is not available.' };
+            }
+
+            powerShellExecutor.openGuiTerminal();
+            return { success: true };
+        }
+
+        if (appAction && appAction.startsWith('open-system-tool:')) {
+            const cmd = appAction.substring('open-system-tool:'.length);
+            return await launchSystemTool(cmd);
+        }
+
+        console.warn(`[DesktopHandlers] Unknown VChat app action: ${appAction}`);
+        return { success: false, error: `Unknown app action: ${appAction}` };
+    } catch (err) {
+        console.error(`[DesktopHandlers] VChat app launch error (${appAction}):`, err);
+        return { success: false, error: err.message };
     }
 }
 
@@ -882,6 +960,13 @@ function initialize(params) {
     mainWindow = params.mainWindow;
     openChildWindows = params.openChildWindows;
     appSettingsManager = params.settingsManager;
+    const appDataRoot = params.APP_DATA_ROOT_IN_PROJECT
+        || path.join(PROJECT_ROOT, 'AppData');
+    DESKTOP_WIDGETS_DIR = path.join(appDataRoot, 'DesktopWidgets');
+    DESKTOP_DATA_DIR = path.join(appDataRoot, 'DesktopData');
+    DOCK_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'dock.json');
+    LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
+    CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
     registerManagedWindows();
 
     if (!standaloneProcessCleanupRegistered) {
@@ -1258,16 +1343,16 @@ function initialize(params) {
 
             console.log(`[DesktopHandlers] Capturing widget area:`, captureRect);
             const image = await desktopWindow.webContents.capturePage(captureRect);
-            
+
             // 缩放到合理的缩略图尺寸
             const MAX_THUMB = 300;
             const scale = Math.min(MAX_THUMB / captureRect.width, MAX_THUMB / captureRect.height, 1);
             const thumbWidth = Math.round(captureRect.width * scale);
             const thumbHeight = Math.round(captureRect.height * scale);
-            
+
             const resized = image.resize({ width: thumbWidth, height: thumbHeight, quality: 'good' });
             const dataUrl = `data:image/png;base64,${resized.toPNG().toString('base64')}`;
-            
+
             console.log(`[DesktopHandlers] Widget captured: ${thumbWidth}x${thumbHeight}, data length: ${dataUrl.length}`);
             return { success: true, thumbnail: dataUrl };
         } catch (err) {
@@ -1327,46 +1412,7 @@ function initialize(params) {
     });
 
     ipcMain.removeHandler('desktop-launch-vchat-app');
-    ipcMain.handle('desktop-launch-vchat-app', async (event, appAction) => {
-        try {
-            console.log(`[DesktopHandlers] Launching VChat app via WindowService: ${appAction}`);
-
-            const appId = resolveAppActionToAppId(appAction);
-            if (appId) {
-                await windowService.open(appId);
-                return { success: true, appId };
-            }
-
-            if (appAction === 'launch-human-toolbox') {
-                return await launchStandaloneElectronApp('VCPHumanToolBox', 'Human Toolbox');
-            }
-
-            if (appAction === 'launch-vchat-manager') {
-                return await launchStandaloneElectronApp('VchatManager', 'VchatManager');
-            }
-
-            if (appAction === 'open-powershell-executor-terminal') {
-                const powerShellExecutor = require(path.join(PROJECT_ROOT, 'VCPDistributedServer', 'Plugin', 'PowerShellExecutor', 'PowerShellExecutor.js'));
-                if (typeof powerShellExecutor.openGuiTerminal !== 'function') {
-                    return { success: false, error: 'PowerShellExecutor GUI entry is not available.' };
-                }
-
-                powerShellExecutor.openGuiTerminal();
-                return { success: true };
-            }
-
-            if (appAction && appAction.startsWith('open-system-tool:')) {
-                const cmd = appAction.substring('open-system-tool:'.length);
-                return await launchSystemTool(cmd);
-            }
-
-            console.warn(`[DesktopHandlers] Unknown VChat app action: ${appAction}`);
-            return { success: false, error: `Unknown app action: ${appAction}` };
-        } catch (err) {
-            console.error(`[DesktopHandlers] VChat app launch error (${appAction}):`, err);
-            return { success: false, error: err.message };
-        }
-    });
+    ipcMain.handle('desktop-launch-vchat-app', (_event, appAction) => launchVchatApp(appAction));
 
     // ============================================================
     // --- IPC: 快捷方式解析 & 启动 ---
@@ -1822,7 +1868,7 @@ function initialize(params) {
                 if (await fs.pathExists(LAYOUT_CONFIG_PATH)) {
                     current = await fs.readJson(LAYOUT_CONFIG_PATH);
                 }
-                
+
                 // 合并补丁
                 const updated = {
                     ...current,
@@ -2089,9 +2135,49 @@ function initialize(params) {
         }
     });
 
+    ipcMain.handle('vchat-wallpaper-select-directory', async (event, savedDirectoryPath = '') => {
+        try {
+            let directoryPath = typeof savedDirectoryPath === 'string' ? savedDirectoryPath.trim() : '';
+            if (!directoryPath) {
+                const result = await dialog.showOpenDialog(mainWindow, {
+                    title: '选择 VChat 动态壁纸文件夹',
+                    buttonLabel: '选择文件夹',
+                    properties: ['openDirectory']
+                });
+                if (result.canceled || !result.filePaths?.length) return { success: false, canceled: true };
+                [directoryPath] = result.filePaths;
+            }
+
+            const stat = await fs.stat(directoryPath);
+            if (!stat.isDirectory()) return { success: false, error: '所选路径不是文件夹' };
+            const supportedExtensions = new Set(['.mp4', '.webm', '.mov', '.mkv', '.avi']);
+            const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+            const files = entries
+                .filter((entry) => entry.isFile() && supportedExtensions.has(path.extname(entry.name).toLowerCase()))
+                .map((entry) => ({
+                    name: entry.name,
+                    url: pathToFileURL(path.join(directoryPath, entry.name)).toString()
+                }))
+                .sort((a, b) => a.name.localeCompare(b.name, 'zh-CN', { numeric: true }));
+            return { success: true, directoryPath, files };
+        } catch (error) {
+            console.error('[DynamicWallpaper] Select or scan directory error:', error);
+            return { success: false, error: error.message };
+        }
+    });
+
     // ============================================================
     // --- IPC: VCP 插件管理器 ---
     // ============================================================
+
+    ipcMain.handle('list-enabled-frontend-plugins', async () => {
+        try {
+            return { success: true, plugins: await listEnabledFrontendPlugins() };
+        } catch (error) {
+            console.error('[PluginManager] List frontend plugins error:', error);
+            return { success: false, error: error.message, plugins: [] };
+        }
+    });
 
     ipcMain.handle('plugin-manager-list-plugins', async () => {
         try {
@@ -2574,4 +2660,5 @@ module.exports = {
     getDesktopWindow,
     generateCatalog,
     cleanupStandaloneAppProcesses,
+    launchVchatApp,
 };

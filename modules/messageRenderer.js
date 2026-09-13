@@ -3778,6 +3778,18 @@ function appendStreamChunk(messageId, chunkData, context) {
     streamManager.appendStreamChunk(messageId, chunkData, context);
 }
 
+function renderResidentEphemeralPresentation(
+    messageId,
+    presentation,
+    context
+) {
+    return streamManager.renderResidentEphemeralPresentation(
+        messageId,
+        presentation,
+        context
+    );
+}
+
 function projectStreamTerminal(messageId, finishReason, context, finalPayload = null) {
     return streamManager.projectStreamTerminal(messageId, finishReason, context, finalPayload);
 }
@@ -4324,6 +4336,7 @@ const messageRenderer = {
     renderMessageBatch, // Expose batch rendering utility
     startStreamingMessage,
     discardStreamingMessage,
+    renderResidentEphemeralPresentation,
     appendStreamChunk,
     projectStreamTerminal,
     renderFullMessage,

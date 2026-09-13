@@ -695,6 +695,9 @@ mainChatSettingsPresentationOwner.configureStartup({
     mainChatEventBridge = createMainChatEventBridge({
         chatAPI,
         acceptStreamEvent: eventData => mainChatAdapter?.acceptStreamEvent(eventData) === true,
+        consumeEphemeralPresentation: eventData => streamManager.renderResidentEphemeralPresentation(
+            eventData.messageId, eventData.presentation, eventData.context
+        ),
         consumeNonStreamingEvent: eventData => nonStreamingEventConsumer?.consume(eventData),
     });
 

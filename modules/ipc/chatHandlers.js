@@ -4,6 +4,13 @@ const fs = require('fs-extra');
 const path = require('path');
 const crypto = require('crypto');
 const contextSanitizer = require('../contextSanitizer');
+const {
+    RESIDENT_PRESENTATION_CHANNEL_HEADER,
+    redactResidentPresentationDiagnostic,
+    sendResidentPresentation,
+    takeResidentPresentationFromChunk,
+    takeResidentPresentationsFromResponse
+} = require('../vcpClient');
 const { SenderTaskRegistry } = require('../services/senderTaskRegistry');
 const {
     resolveRememberedAttachmentDirectory,
@@ -1164,7 +1171,9 @@ function initialize(mainWindow, context) {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
+                const errorText = redactResidentPresentationDiagnostic(
+                    await response.text()
+                );
                 console.error(`[Main - sendToVCP] VCP请求失败. Status: ${response.status}, Response Text:`, errorText);
                 let errorData = { message: `服务器返回状态 ${response.status}`, details: errorText };
                 try {
@@ -1221,6 +1230,11 @@ function initialize(mainWindow, context) {
                 throw err;
             }
 
+            const residentPresentationChannel =
+                response.headers?.get?.(
+                    RESIDENT_PRESENTATION_CHANNEL_HEADER
+                ) || null;
+
             if (modelConfig.stream === true) {
                 console.log(`VCP响应: 开始流式处理 for ${messageId} on channel ${streamChannel}`);
                 const reader = response.body.getReader();
@@ -1260,11 +1274,32 @@ function initialize(mainWindow, context) {
                                     }
                                     try {
                                         const parsedChunk = JSON.parse(jsonData);
+                                        const residentPresentation =
+                                            takeResidentPresentationFromChunk(
+                                                parsedChunk,
+                                                residentPresentationChannel
+                                            );
+                                        if (residentPresentation.handled) {
+                                            if (residentPresentation.presentation) {
+                                                sendResidentPresentation({
+                                                    context,
+                                                    messageId,
+                                                    presentation:
+                                                        residentPresentation.presentation,
+                                                    streamChannel,
+                                                    webContents: event.sender,
+                                                    sendPayload: sendStreamPayload
+                                                });
+                                            }
+                                            continue;
+                                        }
                                         const dataPayload = { type: 'data', chunk: parsedChunk, messageId: messageId, context };
                                         sendStreamPayload(dataPayload);
                                     } catch (e) {
-                                        console.error(`解析VCP流数据块JSON失败 for messageId: ${messageId}:`, e, '原始数据:', jsonData);
-                                        const errorChunkPayload = { type: 'data', chunk: { raw: jsonData, error: 'json_parse_error' }, messageId: messageId, context };
+                                        const redactedDiagnostic = redactResidentPresentationDiagnostic(jsonData);
+                                        // JSON parser diagnostics can echo the challenge too.
+                                        console.error(`解析VCP流数据块JSON失败 for messageId: ${messageId}:`, '原始数据:', redactedDiagnostic);
+                                        const errorChunkPayload = { type: 'data', chunk: { raw: redactedDiagnostic, error: 'json_parse_error' }, messageId: messageId, context };
                                         sendStreamPayload(errorChunkPayload);
                                     }
                                 }
@@ -1308,6 +1343,21 @@ function initialize(mainWindow, context) {
             } else { // Non-streaming
                 console.log('VCP响应: 非流式处理');
                 const vcpResponse = await response.json();
+                const residentPresentations =
+                    takeResidentPresentationsFromResponse(
+                        vcpResponse,
+                        residentPresentationChannel
+                    );
+                for (const presentation of residentPresentations) {
+                    sendResidentPresentation({
+                        context,
+                        messageId,
+                        presentation,
+                        streamChannel,
+                        webContents: event.sender,
+                        sendPayload: sendStreamPayload
+                    });
+                }
                 // For non-streaming, wrap the response with the original context
                 // so the renderer knows where to save the history.
                 return { response: vcpResponse, context };

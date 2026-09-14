@@ -1,4 +1,4 @@
-name: PR49 Guarded Mobile Contract Admission
+name: PR49 Source Manifest Pin Diagnostic
 
 on:
   push:
@@ -6,104 +6,22 @@ on:
       - '.github/workflows/pr49_mobile_contract_admission.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  admit:
+  pin:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact PR branch
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: codex/update-vcpchat-20260912
-          fetch-depth: 0
-
-      - name: Admit exact new MobileSync test dependencies
+          fetch-depth: 1
+      - name: Report exact manifest pin
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = '143ceea88d90e501ea74a357ff2021eddaf25abd'
-          test "$(git hash-object ci/source-entry/projection_manifest.json)" = 'e64ff9850690b04637115deac05a4911f46e9aa7'
-
-          python3 - <<'PY'
-          import hashlib
-          import json
-          import subprocess
-          from pathlib import Path
-
-          manifest_path = Path('ci/source-entry/projection_manifest.json')
-          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
-          profile = manifest['profiles']['mobile-contracts']
-          entries = profile['entries']
-          by_path = {entry['path']: entry for entry in entries}
-          additions = [
-              'VCPDistributedServer/Plugin/VCPMobileSync/fixtures/topic_canonical_contract.json',
-              'VCPDistributedServer/Plugin/VCPMobileSync/fixtures/version_handshake_contract.json',
-              'modules/services/chatDataService/index.js',
-          ]
-          if len(entries) != 45:
-              raise SystemExit(f'unexpected mobile-contracts count: {len(entries)}')
-          if any(path in by_path for path in additions):
-              raise SystemExit('one or more exact additions are already admitted')
-
-          for path in additions:
-              raw = subprocess.check_output(['git', 'ls-tree', '-l', 'HEAD', '--', path], text=True).strip()
-              if not raw:
-                  raise SystemExit(f'missing exact dependency: {path}')
-              meta, actual_path = raw.split('\t', 1)
-              mode, kind, blob, size_text = meta.split()
-              if actual_path != path or kind != 'blob' or mode not in {'100644', '100755'}:
-                  raise SystemExit(f'unsupported exact dependency identity: {path}')
-              size = int(size_text)
-              data = subprocess.check_output(['git', 'cat-file', 'blob', blob])
-              if len(data) != size:
-                  raise SystemExit(f'blob size mismatch: {path}')
-              entries.append({
-                  'path': path,
-                  'mode': mode,
-                  'type': 'blob',
-                  'blob': blob,
-                  'size': size,
-                  'sha256': hashlib.sha256(data).hexdigest(),
-                  'kind': 'source',
-              })
-
-          entries.sort(key=lambda entry: entry['path'])
-          if len(entries) != 48 or len({entry['path'] for entry in entries}) != 48:
-              raise SystemExit('mobile-contracts exact admission count mismatch')
-          manifest['reviewed_baseline'] = '143ceea88d90e501ea74a357ff2021eddaf25abd'
-          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-
-          readme_path = Path('ci/source-entry/README.md')
-          text = readme_path.read_text(encoding='utf-8')
-          replacements = {
-              'The nine native code assets require their separate exact identity and format\n':
-                  'The ten native code assets require their separate exact identity and format\n',
-              'The four current profiles contain 45, 18, 962 and 828 paths respectively. Their\n'
-              'deduplicated body counts are 45, 18, 950 and 827. Running all four jobs makes 20\n'
-              'Git Data REST metadata requests and 1,860 public raw body requests including\n':
-                  'The four current profiles contain 48, 18, 962 and 828 paths respectively. Their\n'
-                  'deduplicated body counts are 48, 18, 950 and 827. Running all four jobs makes 20\n'
-                  'Git Data REST metadata requests and 1,863 public raw body requests including\n',
-          }
-          for old, new in replacements.items():
-              if text.count(old) != 1:
-                  raise SystemExit('README expected text not found exactly once')
-              text = text.replace(old, new)
-          readme_path.write_text(text, encoding='utf-8')
-          PY
-
-          python3 -m unittest discover -s ci/source-entry/tests -p 'test_*.py'
-          python3 -m json.tool ci/source-entry/projection_manifest.json >/dev/null
-          git diff --check
-          test "$(git diff --name-only | sort)" = "$(printf '%s\n' ci/source-entry/README.md ci/source-entry/projection_manifest.json | sort)"
-
-      - name: Commit exact admission
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ci/source-entry/README.md ci/source-entry/projection_manifest.json
-          git commit -m 'Admit new MobileSync contract test inputs'
-          git push origin HEAD:codex/update-vcpchat-20260912
+          test "$(git hash-object ci/source-entry/projection_manifest.json)" = 'c95b76d9cd84ca380eaa80c665d2661ebf4f7e70'
+          printf 'MANIFEST_SIZE=%s\n' "$(wc -c < ci/source-entry/projection_manifest.json)"
+          printf 'MANIFEST_BLOB=%s\n' "$(git hash-object ci/source-entry/projection_manifest.json)"
+          printf 'MANIFEST_SHA256=%s\n' "$(sha256sum ci/source-entry/projection_manifest.json | awk '{print $1}')"

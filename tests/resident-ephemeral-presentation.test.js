@@ -134,3 +134,140 @@ test('projection owns ephemeral DOM, expiry and teardown without creating histor
         domB.window.close();
     }
 });
+
+async function withResidentProjectionFixture(run) {
+    const dom = new JSDOM('<!doctype html><div id="chat"></div>');
+    const previousWindow = global.window;
+    global.window = dom.window;
+    const timers = new Map();
+    const callbacks = new Map();
+    let sequence = 0;
+    let current = true;
+    let scrolls = 0;
+    dom.window.setTimeout = (callback, delay) => {
+        const id = ++sequence;
+        timers.set(id, { callback, delay });
+        callbacks.set(id, callback);
+        return id;
+    };
+    dom.window.clearTimeout = id => timers.delete(id);
+    const { createStreamProjection } = await import('../modules/renderer/streamManager.js');
+    const projection = createStreamProjection();
+    const context = { agentId: 'visible', topicId: 'topic' };
+    const container = dom.window.document.getElementById('chat');
+    projection.attachStreamProjection({
+        chatMessagesDiv: container,
+        viewAuthority: { isCurrent: value => current && value?.agentId === context.agentId && value?.topicId === context.topicId },
+        transientStreamHistory: {
+            prepare() { assert.fail('consent replacement touched history'); },
+            finalize() { assert.fail('consent replacement touched history'); },
+            pendingCount: 0,
+        },
+        electronAPI: { onDesktopStatus: () => () => {} },
+        uiHelper: { scrollToBottom() { scrolls++; } },
+    });
+    try {
+        await run({
+            projection, context, container, timers, callbacks,
+            card: () => container.querySelector('.agents-os-resident-consent-presentation'),
+            setCurrent(value) { current = value; },
+            scrollCount: () => scrolls,
+        });
+    } finally {
+        await projection.dispose();
+        global.window = previousWindow;
+        dom.window.close();
+    }
+}
+
+test('same-request consent deduplicates the validated payload and replaces different content without renewing duplicates', async () => {
+    await withResidentProjectionFixture(({ projection, context, container, timers, card, scrollCount }) => {
+        assert.equal(projection.renderResidentEphemeralPresentation('request', presentation, context), true);
+        const firstCard = card();
+        const firstTimer = timers.keys().next().value;
+        const reordered = Object.fromEntries(Object.entries(presentation).reverse());
+        assert.equal(projection.renderResidentEphemeralPresentation('request', reordered, context), true);
+        assert.equal(card(), firstCard);
+        assert.deepEqual([...timers.keys()], [firstTimer]);
+        assert.equal(timers.get(firstTimer).delay, 1000);
+        assert.equal(scrollCount(), 1);
+
+        const next = { ...presentation, challenge: '确认变更，更新甲、更新乙、更新丙', expiresInSeconds: 2 };
+        assert.equal(projection.renderResidentEphemeralPresentation('request', next, context), true);
+        const replacement = card();
+        assert.notEqual(replacement, firstCard, 'a new challenge must replace the request-owned card');
+        assert.equal(firstCard.isConnected, false);
+        assert.equal(container.querySelectorAll('.agents-os-resident-consent-presentation').length, 1);
+        assert.equal(replacement.querySelector('.agents-os-resident-consent-challenge').textContent, next.challenge);
+        assert.equal(timers.has(firstTimer), false);
+        assert.equal(timers.size, 1);
+        const nextTimer = timers.keys().next().value;
+        assert.equal(timers.get(nextTimer).delay, 2000);
+        assert.equal(scrollCount(), 2);
+        assert.equal(projection.renderResidentEphemeralPresentation('request', { ...next }, context), true);
+        assert.equal(card(), replacement);
+        assert.deepEqual([...timers.keys()], [nextTimer]);
+        assert.equal(scrollCount(), 2);
+        assert.equal(projection.getDiagnostics().contexts, 0);
+        assert.equal(projection.getDiagnostics().pendingHistory, 0);
+    });
+});
+
+test('invalid or non-current replacement cannot evict consent or renew its expiry', async () => {
+    await withResidentProjectionFixture(({ projection, context, timers, card, setCurrent, scrollCount }) => {
+        assert.equal(projection.renderResidentEphemeralPresentation('request', presentation, context), true);
+        const original = card();
+        const timer = timers.keys().next().value;
+        for (const invalid of [
+            { ...presentation, expiresInSeconds: 0 },
+            { ...presentation, expiresInSeconds: 301 },
+            { ...presentation, challenge: '确认创建，测试甲、测试乙、测试丙' },
+            { ...presentation, mutationType: 'UNKNOWN_MUTATION' },
+            { ...presentation, authority: 'not-a-capability' },
+            { ...presentation, challenge: presentation.challenge + '\n' },
+        ]) {
+            assert.equal(projection.renderResidentEphemeralPresentation('request', invalid, context), false);
+            assert.equal(card(), original);
+            assert.deepEqual([...timers.keys()], [timer]);
+        }
+        const next = { ...presentation, challenge: '确认变更，更新甲、更新乙、更新丙' };
+        for (const rejectedContext of [null, { ...context, topicId: 'other' }, { ...context, agentId: 'other' }]) {
+            assert.equal(projection.renderResidentEphemeralPresentation('request', next, rejectedContext), false);
+        }
+        setCurrent(false);
+        assert.equal(projection.renderResidentEphemeralPresentation('request', next, context), false);
+        assert.equal(card(), original);
+        assert.deepEqual([...timers.keys()], [timer]);
+        assert.equal(scrollCount(), 1);
+        assert.equal(projection.getDiagnostics().contexts, 0);
+        assert.equal(projection.getDiagnostics().pendingHistory, 0);
+    });
+});
+
+test('replaced consent expiry cannot clear a newer owner and disposal removes the current view', async () => {
+    await withResidentProjectionFixture(async ({ projection, context, timers, callbacks, card }) => {
+        projection.renderResidentEphemeralPresentation('request', presentation, context);
+        const oldTimer = timers.keys().next().value;
+        const next = { ...presentation, challenge: '确认变更，更新甲、更新乙、更新丙' };
+        projection.renderResidentEphemeralPresentation('request', next, context);
+        assert.equal(card().querySelector('.agents-os-resident-consent-challenge').textContent, next.challenge);
+        callbacks.get(oldTimer)(); // Simulate a previously queued callback after cancellation.
+        assert.equal(card().querySelector('.agents-os-resident-consent-challenge').textContent, next.challenge);
+        const third = { ...presentation, mutationType: 'PAUSE_TASK', challenge: '确认变更，暂停甲、暂停乙、暂停丙' };
+        assert.equal(projection.renderResidentEphemeralPresentation('request', third, context), true);
+        assert.equal(card().querySelector('.agents-os-resident-consent-challenge').textContent, third.challenge);
+        assert.equal(timers.size, 1, 'late expiry must not lose the newer timer owner');
+        const activeTimer = timers.keys().next().value;
+        timers.delete(activeTimer);
+        callbacks.get(activeTimer)();
+        assert.equal(card(), null);
+        assert.equal(projection.renderResidentEphemeralPresentation('request', presentation, context), true);
+        const disposalTimer = timers.keys().next().value;
+        await projection.dispose();
+        assert.equal(card(), null);
+        assert.equal(timers.size, 0);
+        callbacks.get(disposalTimer)();
+        assert.equal(card(), null);
+        assert.equal(projection.renderResidentEphemeralPresentation('request', third, context), false);
+    });
+});

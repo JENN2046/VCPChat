@@ -17,6 +17,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/chat_kernel_ui.yml'
+      - 'ci/source-entry/**'
 
 permissions:
   contents: read
@@ -26,49 +27,199 @@ jobs:
     name: Chat Kernel and UI contracts
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with:
-          fetch-depth: 0
+      - name: Verify and materialize required source
+        id: source
+        env:
+          SOURCE_ENTRY_TOKEN: ${{ github.token }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          python3 -I -B - <<'PY'
+          """Workflow-inline bootstrap template. Replaced constants are reviewed pins."""
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import runpy
+          import sys
+          import tempfile
+          import urllib.parse
+          import urllib.request
+          
+          PINS = {'ci/source-entry/source_projection_policy.py': {'size': 4065, 'blob': 'afd8da3f36bee9199a983e44ac95364ce8b37341', 'sha256': '89d09d459596a8a1d784fa5261b3a7e2ef53b67e6975bd669311c876f21836ff'}, 'ci/source-entry/source_materializer.py': {'size': 8199, 'blob': 'a8e1108fba2df8f38c71e235d52b85c197c9da4f', 'sha256': '376b56b82caaf9df856a619bfb03f8886ed20c4a2fee9e1f444e1f575916b76e'}, 'ci/source-entry/source_writer.py': {'size': 10285, 'blob': '95a172ac42fcd0956647d14d3914df028d8a308c', 'sha256': '74d2d2469c92947d5d58e4784383f787c17bff8e22c0620228052bcc51b9d916'}, 'ci/source-entry/github_source_entry.py': {'size': 21538, 'blob': '786f537080c33dbb61af6321ee58a05e12ff6c04', 'sha256': 'ad71c3e120a3ae227651390f112beee1a51d21f4cd7118cb0f8ad6d205c8f2c5'}, 'ci/source-entry/projection_manifest.json': {'size': 569015, 'blob': 'faaaa18d20369f933adfd7fb4debd099d2138179', 'sha256': 'f9e590c0830a280e87a2acb98fd2df18063f12cd0810786ddde71d2ce5d5aaad'}}
+          PROFILE = 'chat-kernel-ui'
+          REPOSITORY = "JENN2046/VCPChat"
+          
+          
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *_args, **_kwargs):
+                  raise ValueError("redirect refused")
+          
+          
+          def bootstrap(opener=None):
+              event = os.environ["GITHUB_SHA"]
+              if os.environ.get("GITHUB_REPOSITORY") != REPOSITORY or not re.fullmatch("[0-9a-f]{40}", event):
+                  raise ValueError("event binding mismatch")
+              open_url = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect()).open
+              token = os.environ.get("SOURCE_ENTRY_TOKEN", "")
+              if len(token) > 4096 or "\n" in token or "\r" in token:
+                  raise ValueError("invalid token transport")
+          
+              def get(url, limit, metadata=False):
+                  headers = {"User-Agent": "VCPChat-source-bootstrap", "Accept-Encoding": "identity"}
+                  if metadata:
+                      headers.update({"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"})
+                      if token: headers["Authorization"] = "Bearer " + token
+                  request = urllib.request.Request(url, headers=headers, method="GET")
+                  with open_url(request, timeout=30) as response:
+                      if response.status != 200 or response.geturl() != url:
+                          raise ValueError("response destination or status mismatch")
+                      if response.headers.get("Content-Encoding", "identity").lower() != "identity":
+                          raise ValueError("encoded response refused")
+                      length = response.headers.get("Content-Length")
+                      if length is not None and (not re.fullmatch("[0-9]+", length) or int(length) > limit):
+                          raise ValueError("response bound exceeded")
+                      body = response.read(limit + 1)
+                      if len(body) > limit: raise ValueError("response bound exceeded")
+                  return body
+          
+              def unique(pairs):
+                  value = {}
+                  for key, item in pairs:
+                      if key in value: raise ValueError("duplicate metadata key")
+                      value[key] = item
+                  return value
+          
+              def metadata(suffix):
+                  url = f"https://api.github.com/repos/{REPOSITORY}/git/{suffix}"
+                  value = json.loads(get(url, 8 * 1024 * 1024, True), object_pairs_hook=unique)
+                  if not isinstance(value, dict): raise ValueError("invalid metadata")
+                  return value
+          
+              commit = metadata(f"commits/{event}")
+              tree_oid = commit.get("tree", {}).get("sha", "")
+              if commit.get("sha") != event or not re.fullmatch("[0-9a-f]{40}", tree_oid):
+                  raise ValueError("commit identity mismatch")
+              tree = metadata(f"trees/{tree_oid}?recursive=1")
+              if tree.get("sha") != tree_oid or tree.get("truncated") is not False or not isinstance(tree.get("tree"), list):
+                  raise ValueError("incomplete tree")
+              actual = {}
+              for row in tree["tree"]:
+                  path = row.get("path")
+                  if not isinstance(path, str) or path in actual: raise ValueError("duplicate or invalid path")
+                  actual[path] = row
+              pinned_oids = {row["blob"] for row in PINS.values()}
+              # Control bytes must not alias any other event path, including held paths.
+              if any(row.get("sha") in pinned_oids and path not in PINS for path, row in actual.items()):
+                  raise ValueError("control alias refused")
+              for path, pin in PINS.items():
+                  row = actual.get(path, {})
+                  if (row.get("sha"), row.get("size"), row.get("mode"), row.get("type")) != (pin["blob"], pin["size"], "100644", "blob"):
+                      raise ValueError("control identity changed")
+                  parts = path.split("/")
+                  for index in range(1, len(parts)):
+                      parent = actual.get("/".join(parts[:index]), {})
+                      if parent.get("mode") != "040000" or parent.get("type") != "tree":
+                          raise ValueError("control parent identity changed")
+              verified = {}
+              for path, pin in PINS.items():
+                  url = f"https://raw.githubusercontent.com/{REPOSITORY}/{event}/{urllib.parse.quote(path, safe='/')}"
+                  data = get(url, pin["size"])
+                  oid = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+                  if (len(data), oid, hashlib.sha256(data).hexdigest()) != (pin["size"], pin["blob"], pin["sha256"]):
+                      raise ValueError("control body mismatch")
+                  verified[path] = data
+              # No controller or project code runs until every control body is verified.
+              directory = Path(tempfile.mkdtemp(prefix="vcp-source-control-", dir=os.environ["RUNNER_TEMP"]))
+              for path, data in verified.items():
+                  with open(directory / Path(path).name, "xb") as stream:
+                      os.chmod(stream.fileno(), 0o600)
+                      stream.write(data)
+              sys.path.insert(0, str(directory))
+              sys.argv = [str(directory / "github_source_entry.py"), "--manifest", str(directory / "projection_manifest.json"), "--profile", PROFILE]
+              runpy.run_path(sys.argv[0], run_name="__main__")
+          
+          
+          if __name__ == "__main__":
+              try:
+                  bootstrap()
+              except Exception:
+                  raise SystemExit("Verified source bootstrap failed; no checkout or fallback") from None
+          PY
 
       - name: Setup Node 22
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
-          cache: npm
 
       - name: Setup Rust for built-artifact evidence
         uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable 2026-08-11
 
-      - name: Install dependencies (including Electron runtime)
+      - name: Install locked dependencies with lifecycle scripts
         env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
           PUPPETEER_SKIP_DOWNLOAD: 'true'
-        # Electron's postinstall script downloads the runtime used by the
-        # embedded-app contract tests. Do not suppress lifecycle scripts here;
-        # this job does not perform native addon rebuilds.
+        # Preserve the original dependency lifecycle scripts, including native
+        # addon install/build hooks. Electron 44 has no postinstall script;
+        # the next require('electron') step may download its missing runtime.
+        working-directory: ${{ steps.source.outputs.directory }}
         run: npm ci --omit=optional
 
       - name: Verify Electron runtime
+        env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
+        working-directory: ${{ steps.source.outputs.directory }}
         run: node -e "const electron = require('electron'); if (typeof electron !== 'string') { throw new Error('Electron runtime path was not installed'); } console.log(electron)"
 
       - name: Run Chat Kernel tests
+        env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
+        working-directory: ${{ steps.source.outputs.directory }}
         run: npm run test:chat-kernel
 
       - name: Run Chat contract evidence gate
         env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
           VCPCHAT_PACKAGED_ARTIFACT_SMOKE_OUTPUT: ${{ runner.temp }}/packaged-artifact-smoke.json
+        working-directory: ${{ steps.source.outputs.directory }}
         run: npm run check:chat-evidence
 
       - name: Write Chat evidence manifest
         env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
           VCPCHAT_PACKAGED_ARTIFACT_EVIDENCE_INPUT: ${{ runner.temp }}/packaged-artifact-smoke.json
+        working-directory: ${{ steps.source.outputs.directory }}
         run: npm run write:chat-evidence-manifest -- "$RUNNER_TEMP/chat-evidence-manifest.json"
 
       - name: Publish Chat evidence summary
         env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
           CHAT_EVIDENCE_MANIFEST: ${{ runner.temp }}/chat-evidence-manifest.json
+        working-directory: ${{ steps.source.outputs.directory }}
         run: |
-          node -e "const fs=require('fs'); const m=JSON.parse(fs.readFileSync(process.env.CHAT_EVIDENCE_MANIFEST,'utf8')); fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, ['## Chat evidence','', '- status: `'+m.status+'`','- contracts/events: `'+m.checks.contracts+'/'+m.checks.generatedEvents+'`','- dynamic sites: registered `'+m.checks.dynamicSites.registered+'`, undiscovered `'+m.checks.dynamicSites.undiscovered+'`','- artifact plane: `'+m.checks.artifactPlane+'`','- packaged artifact: `'+m.checks.packagedArtifact+'`','- Windows matrix: `'+m.checks.windowsMatrix+'`','- manual soak: `'+m.checks.manualSoak+'`','- real Electron: `'+m.checks.realElectronSequence+'` (manual/platform evidence remains separate)',''].join('\\n'));"
+          node <<'NODE'
+          const fs = require('fs');
+          const m = JSON.parse(fs.readFileSync(process.env.CHAT_EVIDENCE_MANIFEST, 'utf8'));
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, [
+            '## Chat evidence',
+            '',
+            '- status: `' + m.status + '`',
+            '- contracts/events: `' + m.checks.contracts + '/' + m.checks.generatedEvents + '`',
+            '- dynamic sites: registered `' + m.checks.dynamicSites.registered + '`, undiscovered `' + m.checks.dynamicSites.undiscovered + '`',
+            '- artifact plane: `' + m.checks.artifactPlane + '`',
+            '- packaged artifact: `' + m.checks.packagedArtifact + '`',
+            '- Windows matrix: `' + m.checks.windowsMatrix + '`',
+            '- manual soak: `' + m.checks.manualSoak + '`',
+            '- real Electron: `' + m.checks.realElectronSequence + '` (manual/platform evidence remains separate)',
+            ''
+          ].join('\n'));
+          NODE
 
       - name: Upload Chat evidence manifest
         uses: actions/upload-artifact@v4
@@ -84,10 +235,14 @@ jobs:
           name: chat-evidence-bundle
           if-no-files-found: error
           path: |
-            docs/contracts/chat-contract.schema.json
-            docs/contracts/chat-contracts.json
-            docs/contracts/generated/chat-event-graph.json
-            docs/contracts/snapshots/*.json
+            ${{ steps.source.outputs.directory }}/docs/contracts/chat-contract.schema.json
+            ${{ steps.source.outputs.directory }}/docs/contracts/chat-contracts.json
+            ${{ steps.source.outputs.directory }}/docs/contracts/generated/chat-event-graph.json
+            ${{ steps.source.outputs.directory }}/docs/contracts/snapshots/*.json
 
       - name: Run complete UI system gate
+        env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
+        working-directory: ${{ steps.source.outputs.directory }}
         run: npm run check:ui-system

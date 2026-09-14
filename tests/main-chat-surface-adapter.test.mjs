@@ -76,6 +76,7 @@ test('main Surface send state follows the real stream terminal consumer', async 
     const renderer = { initializeMessageRenderer() {}, renderHistory() {}, renderMessage() {} };
     let settled;
     const terminalSettled = new Promise(resolve => { settled = resolve; });
+    const notifications = [];
     const adapter = createMainChatSurfaceAdapter({
         root,
         renderer,
@@ -95,7 +96,10 @@ test('main Surface send state follows the real stream terminal consumer', async 
             messageRenderer: renderer,
             getSelection: () => ({ id: 'agent-a' }),
             getTopicId: () => 'topic-a',
-            notifySendStateChanged: settled,
+            notifySendStateChanged(value) {
+                notifications.push(value);
+                if (value?.event) settled(value);
+            },
         },
         disposeRenderer: async () => {},
     });
@@ -104,6 +108,12 @@ test('main Surface send state follows the real stream terminal consumer', async 
     assert.equal(adapter.acceptStreamEvent({ type: 'end', messageId: 'm1', streamOperationId: 'op1', context, fullResponse: 'done', finish_reason: 'completed' }), true);
     const outcome = await terminalSettled;
     assert.equal(outcome.event.type, 'completed');
+    assert.equal(notifications.length, 2);
+    assert.equal(notifications[0].event, undefined);
+    assert.equal(notifications[0].terminal.kind, 'completed');
+    assert.equal(notifications[0].projected.messageId, 'm1');
+    assert.notEqual(notifications[0], outcome);
+    assert.equal(notifications[1], outcome);
     await adapter.dispose();
     dom.window.close();
 });

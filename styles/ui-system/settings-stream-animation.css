@@ -229,7 +229,7 @@
 
     :is(html, html.vcp-global-settings-host) .vcp-ui-scope#globalSettingsModal #replayStreamAnimationPreview > span {
         display: inline-block;
-        font-size: 1.15em;
+        font-size: var(--vcp-ui-font-replay-preview);
         line-height: 1;
         transition: transform var(--vcp-ui-transition-normal, 180ms);
     }

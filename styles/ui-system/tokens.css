@@ -105,6 +105,7 @@
         --vcp-ui-font-display: 22px;
         --vcp-ui-font-reasoning-icon: 21px;
         --vcp-ui-font-disclosure: 24px;
+        --vcp-ui-font-replay-preview: 1.15em;
         --vcp-ui-font-section: 16px;
         --vcp-ui-font-suppress: 0; /* icon-only controls collapse their intrinsic label */
         --vcp-ui-line-compact: 1.35;
@@ -286,6 +287,7 @@
         --vcp-ui-font-display: 22px;
         --vcp-ui-font-reasoning-icon: 21px;
         --vcp-ui-font-disclosure: 24px;
+        --vcp-ui-font-replay-preview: 1.15em;
         --vcp-ui-font-section: 16px;
         --vcp-ui-font-suppress: 0; /* icon-only controls collapse their intrinsic label */
         --vcp-ui-line-compact: 1.35;

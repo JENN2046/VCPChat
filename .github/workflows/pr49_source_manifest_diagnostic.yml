@@ -1,0 +1,103 @@
+name: PR49 Source Manifest Diagnostic
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pr49_source_manifest_diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout reconciled PR head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: codex/update-vcpchat-20260912
+          fetch-depth: 0
+      - name: Report source-admission drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import subprocess
+          from pathlib import Path
+          import sys
+
+          sys.path.insert(0, str(Path('ci/source-entry').resolve()))
+          from github_source_entry import scanned_paths
+
+          manifest = json.loads(Path('ci/source-entry/projection_manifest.json').read_text(encoding='utf-8'))
+          raw = subprocess.check_output(['git', 'ls-tree', '-r', '-t', '-l', '-z', 'HEAD'])
+          actual = {}
+          for record in raw.split(b'\0'):
+              if not record:
+                  continue
+              meta, path_b = record.split(b'\t', 1)
+              fields = meta.decode('ascii').split()
+              mode, kind, sha = fields[:3]
+              size = None if len(fields) < 4 or fields[3] == '-' else int(fields[3])
+              path = path_b.decode('utf-8')
+              row = {'path': path, 'mode': mode, 'type': kind, 'sha': sha}
+              if size is not None:
+                  row['size'] = size
+              actual[path] = row
+
+          def blob_sha256(sha):
+              return hashlib.sha256(subprocess.check_output(['git', 'cat-file', 'blob', sha])).hexdigest()
+
+          summary = {'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'profiles': {}}
+          for profile_name, profile in manifest['profiles'].items():
+              approved = {entry['path']: entry for entry in profile.get('entries', [])}
+              required = scanned_paths(actual, profile.get('required_scans', []))
+              new_required = sorted(required - set(approved))
+              missing = sorted(path for path in approved if path not in actual)
+              changed = []
+              for path, entry in approved.items():
+                  row = actual.get(path)
+                  if not row or row.get('type') != 'blob':
+                      continue
+                  old = (entry.get('blob'), entry.get('mode'), entry.get('size'))
+                  new = (row.get('sha'), row.get('mode'), row.get('size'))
+                  if old != new:
+                      changed.append({
+                          'path': path,
+                          'kind': entry.get('kind'),
+                          'old_blob': entry.get('blob'),
+                          'new_blob': row.get('sha'),
+                          'old_size': entry.get('size'),
+                          'new_size': row.get('size'),
+                          'new_sha256': blob_sha256(row['sha']),
+                      })
+              new_rows = []
+              for path in new_required:
+                  row = actual[path]
+                  if row.get('type') == 'blob':
+                      new_rows.append({
+                          'path': path,
+                          'mode': row.get('mode'),
+                          'size': row.get('size'),
+                          'blob': row.get('sha'),
+                          'sha256': blob_sha256(row['sha']),
+                      })
+              summary['profiles'][profile_name] = {
+                  'admitted_count': len(approved),
+                  'required_scan_count': len(required),
+                  'changed_existing': changed,
+                  'new_required': new_rows,
+                  'missing_existing': missing,
+              }
+
+          Path('/tmp/pr49-source-drift.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+      - name: Upload drift report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr49-source-drift
+          path: /tmp/pr49-source-drift.json
+          if-no-files-found: error

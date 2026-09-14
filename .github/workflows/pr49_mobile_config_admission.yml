@@ -1,0 +1,108 @@
+name: PR49 Guarded Mobile Config Admission
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pr49_mobile_config_admission.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  admit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: codex/update-vcpchat-20260912
+          fetch-depth: 0
+
+      - name: Admit exact Rust config contract input
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = 'b75638ea09a62fde251b97239bfe9c134d672fe7'
+          test "$(git hash-object ci/source-entry/projection_manifest.json)" = 'c95b76d9cd84ca380eaa80c665d2661ebf4f7e70'
+
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import subprocess
+          from pathlib import Path
+
+          manifest_path = Path('ci/source-entry/projection_manifest.json')
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          profile = manifest['profiles']['mobile-contracts']
+          entries = profile['entries']
+          path = 'rust_chat_data_service/src/config.rs'
+          if len(entries) != 48:
+              raise SystemExit(f'unexpected mobile-contracts count: {len(entries)}')
+          if any(entry['path'] == path for entry in entries):
+              raise SystemExit('config.rs is already admitted')
+
+          raw = subprocess.check_output(['git', 'ls-tree', '-l', 'HEAD', '--', path], text=True).strip()
+          if not raw:
+              raise SystemExit('missing config.rs')
+          meta, actual_path = raw.split('\t', 1)
+          mode, kind, blob, size_text = meta.split()
+          if actual_path != path or kind != 'blob' or mode not in {'100644', '100755'}:
+              raise SystemExit('unsupported config.rs identity')
+          size = int(size_text)
+          data = subprocess.check_output(['git', 'cat-file', 'blob', blob])
+          if len(data) != size:
+              raise SystemExit('config.rs size mismatch')
+          text = data.decode('utf-8')
+          if 'pub const PROTOCOL_VERSION: u32 = 3;' not in text or 'pub const SCHEMA_VERSION: u32 = 3;' not in text:
+              raise SystemExit('unexpected config.rs protocol/schema constants')
+
+          entries.append({
+              'path': path,
+              'mode': mode,
+              'type': 'blob',
+              'blob': blob,
+              'size': size,
+              'sha256': hashlib.sha256(data).hexdigest(),
+              'kind': 'source',
+          })
+          entries.sort(key=lambda entry: entry['path'])
+          if len(entries) != 49 or len({entry['path'] for entry in entries}) != 49:
+              raise SystemExit('mobile-contracts exact admission count mismatch')
+          manifest['reviewed_baseline'] = 'b75638ea09a62fde251b97239bfe9c134d672fe7'
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          readme_path = Path('ci/source-entry/README.md')
+          readme = readme_path.read_text(encoding='utf-8')
+          old = ('The four current profiles contain 48, 18, 962 and 828 paths respectively. Their\n'
+                 'deduplicated body counts are 48, 18, 950 and 827. Running all four jobs makes 20\n'
+                 'Git Data REST metadata requests and 1,863 public raw body requests including\n')
+          new = ('The four current profiles contain 49, 18, 962 and 828 paths respectively. Their\n'
+                 'deduplicated body counts are 49, 18, 950 and 827. Running all four jobs makes 20\n'
+                 'Git Data REST metadata requests and 1,864 public raw body requests including\n')
+          if readme.count(old) != 1:
+              raise SystemExit('README count paragraph not found exactly once')
+          readme_path.write_text(readme.replace(old, new), encoding='utf-8')
+
+          final = manifest_path.read_bytes()
+          print('MANIFEST_SIZE=' + str(len(final)))
+          print('MANIFEST_BLOB=' + hashlib.sha1(b'blob ' + str(len(final)).encode('ascii') + b'\0' + final).hexdigest())
+          print('MANIFEST_SHA256=' + hashlib.sha256(final).hexdigest())
+          print('CONFIG_BLOB=' + blob)
+          print('CONFIG_SIZE=' + str(size))
+          print('CONFIG_SHA256=' + hashlib.sha256(data).hexdigest())
+          PY
+
+          python3 -m unittest discover -s ci/source-entry/tests -p 'test_*.py'
+          python3 -m json.tool ci/source-entry/projection_manifest.json >/dev/null
+          git diff --check
+          test "$(git diff --name-only | sort)" = "$(printf '%s\n' ci/source-entry/README.md ci/source-entry/projection_manifest.json | sort)"
+
+      - name: Commit exact admission
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ci/source-entry/README.md ci/source-entry/projection_manifest.json
+          git commit -m 'Admit Rust config for MobileSync contract test'
+          git push origin HEAD:codex/update-vcpchat-20260912

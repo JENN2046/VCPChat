@@ -1,9 +1,11 @@
+import { loadCiSourceContext } from './ci-source-context.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import postcss from 'postcss';
 
 const root = process.cwd();
+const sourceContext = loadCiSourceContext(root);
 // Pin the reviewed, workflow-free product snapshot. The former subtraction
 // anchor predates several months of upstream product work, while a leftover
 // local `upstream/main` ref may be older still. Both make accepted product
@@ -14,7 +16,8 @@ const sourceRef = process.env.VCP_DESIGN_SOURCE_REF || 'b5931a69d0815a1dfd60c079
 // as the second ancestry boundary. The snapshot is intentionally not itself
 // the upstream ref: this branch may contain unrelated upstream product work
 // that is already present on main and must not be reported as a design delta.
-const upstreamRef = process.env.VCP_UPSTREAM_REF || 'origin/main';
+const upstreamRef = sourceContext?.upstreamCommit || process.env.VCP_UPSTREAM_REF || 'origin/main';
+if (sourceContext && sourceContext.sourceCommit !== sourceRef) throw new Error('CI source comparison baseline mismatch');
 const failures = [];
 
 const forbiddenPaths = [
@@ -37,6 +40,24 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Exact reviewed three-way source, voice-build and CI-entry changes.
+    'modules/renderer/residentEphemeralPresentation.mjs',
+    'modules/vcpClient.js',
+    'rust_voice_input_engine/Cargo.lock',
+    'rust_voice_input_engine/src/main.rs',
+    'styles/messageRenderer.css',
+    'tests/resident-ephemeral-presentation.test.js',
+    '.github/workflows/mobile_sync.yml',
+    'ci/source-entry/source_projection_policy.py',
+    'ci/source-entry/source_materializer.py',
+    'ci/source-entry/source_writer.py',
+    'ci/source-entry/github_source_entry.py',
+    'ci/source-entry/projection_manifest.json',
+    'ci/source-entry/README.md',
+    'ci/source-entry/tests/test_github_source_entry.py',
+    'scripts/ci-source-context.mjs',
+    'tests/ci-source-context.test.mjs',
+    'tests/notification-menu-controller.test.js',
     '.github/workflows/canonical_ui.yml',
     '.github/workflows/chat_kernel_ui.yml',
     '.gitattributes',
@@ -415,7 +436,7 @@ function git(args) {
     return execFileSync('git', ['-c', 'core.quotepath=false', ...args], { cwd: root, encoding: 'utf8' }).trim();
 }
 
-const trackedFiles = git(['ls-files']).split('\n').filter(Boolean);
+const trackedFiles = sourceContext?.trackedFiles || git(['ls-files']).split('\n').filter(Boolean);
 for (const file of trackedFiles) {
     if (forbiddenPaths.some(pattern => pattern.test(file))) failures.push(`${file}: forbidden Build/Codex path remains`);
 }
@@ -504,7 +525,9 @@ for (const file of cssFiles) {
 }
 
 // Inspect the committed theme, not an unrelated user-owned working-tree edit.
-const activeThemeSource = git(['show', 'HEAD:styles/themes.css']);
+const activeThemeSource = sourceContext
+    ? sourceContext.readCommitted('styles/themes.css')
+    : git(['show', 'HEAD:styles/themes.css']);
 if (!activeThemeSource.includes(':focus-visible:not(#messageInput):not(.chat-message-input)')) {
     failures.push('styles/themes.css: design theme must preserve the main composer focus contract');
 }
@@ -538,39 +561,62 @@ for (const [name, command] of Object.entries(packageJson.scripts || {})) {
     }
 }
 
-try {
-    git(['rev-parse', '--verify', sourceRef]);
-    git(['rev-parse', '--verify', upstreamRef]);
-    const filesDifferentFromUpstream = new Set(
-        git(['diff', '--ignore-space-at-eol', '--name-only', upstreamRef, '--'])
-            .split('\n')
-            .filter(Boolean)
-    );
-    const differences = git(['diff', '--ignore-space-at-eol', '--name-only', sourceRef, '--'])
-        .split('\n')
-        .filter(Boolean);
-    for (const file of differences) {
-        const restoredToUpstream = !filesDifferentFromUpstream.has(file);
+if (sourceContext) {
+    // Complete event/baseline tree metadata replaces Git enumeration only in
+    // admitted CI projections. Never treat a partial checkout as full history.
+    for (const file of sourceContext.changedPaths('source')) {
         if (allowedSourceDifferences.has(file)
             || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))
             || forbiddenPaths.some(pattern => pattern.test(file))
-            || restoredToUpstream) continue;
-        failures.push(`${file}: differs from ${sourceRef} outside the subtraction allowlist`);
+            || sourceContext.sameIdentity('upstream', file)) continue;
+        // Metadata proves additions/deletions and mode/type changes. Other
+        // comparisons need admitted historical bytes; ambiguity is a failure,
+        // not the native Git path's optional missing-ref skip.
+        if (sourceContext.definitelyDifferentIgnoringEol('source', file)
+            && sourceContext.definitelyDifferentIgnoringEol('upstream', file)) {
+            failures.push(`${file}: differs from ${sourceRef} outside the subtraction allowlist`);
+        }
     }
-} catch {
-    console.warn(`[DesignBoundary] Source ref ${sourceRef} is unavailable; skipped byte-parity audit.`);
-}
+    for (const file of sourceContext.changedPaths('upstream')) {
+        if (upstreamClassicPatterns.some(pattern => pattern.test(file))) {
+            failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
+        }
+    }
+} else {
+    try {
+        git(['rev-parse', '--verify', sourceRef]);
+        git(['rev-parse', '--verify', upstreamRef]);
+        const filesDifferentFromUpstream = new Set(
+            git(['diff', '--ignore-space-at-eol', '--name-only', upstreamRef, '--'])
+                .split('\n')
+                .filter(Boolean)
+        );
+        const differences = git(['diff', '--ignore-space-at-eol', '--name-only', sourceRef, '--'])
+            .split('\n')
+            .filter(Boolean);
+        for (const file of differences) {
+            const restoredToUpstream = !filesDifferentFromUpstream.has(file);
+            if (allowedSourceDifferences.has(file)
+                || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))
+                || forbiddenPaths.some(pattern => pattern.test(file))
+                || restoredToUpstream) continue;
+            failures.push(`${file}: differs from ${sourceRef} outside the subtraction allowlist`);
+        }
+    } catch {
+        console.warn(`[DesignBoundary] Source ref ${sourceRef} is unavailable; skipped byte-parity audit.`);
+    }
 
-try {
-    git(['rev-parse', '--verify', upstreamRef]);
-    const classicDifferences = git(['diff', '--name-only', upstreamRef, '--'])
-        .split('\n')
-        .filter(file => file && upstreamClassicPatterns.some(pattern => pattern.test(file)));
-    for (const file of classicDifferences) {
-        failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
+    try {
+        git(['rev-parse', '--verify', upstreamRef]);
+        const classicDifferences = git(['diff', '--name-only', upstreamRef, '--'])
+            .split('\n')
+            .filter(file => file && upstreamClassicPatterns.some(pattern => pattern.test(file)));
+        for (const file of classicDifferences) {
+            failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
+        }
+    } catch {
+        console.warn(`[DesignBoundary] Upstream ref ${upstreamRef} is unavailable; skipped Classic parity audit.`);
     }
-} catch {
-    console.warn(`[DesignBoundary] Upstream ref ${upstreamRef} is unavailable; skipped Classic parity audit.`);
 }
 
 if (failures.length) {

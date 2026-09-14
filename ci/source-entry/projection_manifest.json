@@ -1,7 +1,7 @@
 {
   "schema": "vcpchat-ci-source-profiles/v1",
   "repository": "JENN2046/VCPChat",
-  "reviewed_baseline": "143ceea88d90e501ea74a357ff2021eddaf25abd",
+  "reviewed_baseline": "b75638ea09a62fde251b97239bfe9c134d672fe7",
   "profiles": {
     "mobile-contracts": {
       "ready": true,
@@ -355,6 +355,15 @@
           "blob": "55ca6b07acebc0d4c8db0b69b9d2b65d1b4c2d05",
           "size": 3263,
           "sha256": "60a4d441dbb99324242a7064fafa00aad7594fb3d6ddd3a271d0fb635090318e",
+          "kind": "source"
+        },
+        {
+          "path": "rust_chat_data_service/src/config.rs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6a53be9a546d28a2fea1dd35ec79d34393d33905",
+          "size": 3474,
+          "sha256": "afbee4d39842d5be17f5ef59ee53505c2509599290ea2ec3ea600e33293936df",
           "kind": "source"
         },
         {

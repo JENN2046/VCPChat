@@ -307,9 +307,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "b456d64d0c94a5a4213570503dc5e53db0e60715",
-          "size": 14413,
-          "sha256": "d6d87a11f60ab21b2333817016b08f80bdc5dd97130a14aaece0f131833686b1",
+          "blob": "f97e343bbe200abc81d08d404a94f86c96511f71",
+          "size": 14459,
+          "sha256": "a526a1caf4e585dbd24fcc0c2d2b54ac6d97da8e6027e4412d56c489cd9f8a64",
           "kind": "source"
         },
         {
@@ -5134,9 +5134,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "2cee4f40c4f701118f58f7c53af8f6db2560b6cb",
-          "size": 113774,
-          "sha256": "a2c166e67a37fb2b9d57d8eaea2e47bf126a5e8a6b39ba7887a1b71de0d9661c",
+          "blob": "46aeb8da65be4d98e129ca0c9132db7c16b8760d",
+          "size": 114394,
+          "sha256": "3f10291e1b90702214d813f198120483d7a05d10632224aacb61157cc4c8c05d",
           "kind": "source"
         },
         {
@@ -5890,9 +5890,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "b456d64d0c94a5a4213570503dc5e53db0e60715",
-          "size": 14413,
-          "sha256": "d6d87a11f60ab21b2333817016b08f80bdc5dd97130a14aaece0f131833686b1",
+          "blob": "f97e343bbe200abc81d08d404a94f86c96511f71",
+          "size": 14459,
+          "sha256": "a526a1caf4e585dbd24fcc0c2d2b54ac6d97da8e6027e4412d56c489cd9f8a64",
           "kind": "source"
         },
         {
@@ -11176,9 +11176,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "2cee4f40c4f701118f58f7c53af8f6db2560b6cb",
-          "size": 113774,
-          "sha256": "a2c166e67a37fb2b9d57d8eaea2e47bf126a5e8a6b39ba7887a1b71de0d9661c",
+          "blob": "46aeb8da65be4d98e129ca0c9132db7c16b8760d",
+          "size": 114394,
+          "sha256": "3f10291e1b90702214d813f198120483d7a05d10632224aacb61157cc4c8c05d",
           "kind": "source"
         },
         {
@@ -11914,9 +11914,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "b456d64d0c94a5a4213570503dc5e53db0e60715",
-          "size": 14413,
-          "sha256": "d6d87a11f60ab21b2333817016b08f80bdc5dd97130a14aaece0f131833686b1",
+          "blob": "f97e343bbe200abc81d08d404a94f86c96511f71",
+          "size": 14459,
+          "sha256": "a526a1caf4e585dbd24fcc0c2d2b54ac6d97da8e6027e4412d56c489cd9f8a64",
           "kind": "source"
         },
         {
@@ -12372,9 +12372,9 @@
         {
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
-          "size": 6411,
-          "sha256": "84d55aa2d7ab1557f0f24ed92ffa7cdefe608ec42c995b4322d7a13ba977795c",
-          "blob": "10f0d7c1638ca1c886598c1769e44e009b390a40",
+          "size": 6662,
+          "sha256": "59eea52e9f5d19b400cd1b2113f3627c6106707a6a086e7d92591f3771d9c522",
+          "blob": "4cc475c8a9a2a7c53249c6669a2e0f76da678203",
           "type": "blob",
           "kind": "source"
         },
@@ -13870,6 +13870,15 @@
           "blob": "038efaa59daea6a39ea71ba8563c27e61a1c0408",
           "size": 1488,
           "sha256": "8c0fe4ae57cc982623d1fa99dfcde6097dc8c738a6cecb41a8b1500bef43db6e",
+          "kind": "source"
+        },
+        {
+          "path": "tests/resident-ephemeral-presentation.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6d927acc76acce1a8612c098f736fc691576a33c",
+          "size": 15364,
+          "sha256": "43d5ea4cc8abeccca99ad336dae745e4ad23008743c0c517a264c4fcbf25e80e",
           "kind": "source"
         },
         {

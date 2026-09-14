@@ -6,7 +6,8 @@ import { createDesktopPushConsumer } from './desktopPushConsumer.js';
 import { createStreamProjectionRuntime } from './streamProjectionRuntime.js';
 import { collectMarkdownCodeDomains } from './markdownCodeDomainScanner.js';
 import {
-    renderResidentEphemeralPresentation as renderResidentPresentationCard
+    renderResidentEphemeralPresentation as renderResidentPresentationCard,
+    validateResidentEphemeralPresentation as validateResidentPresentation
 } from './residentEphemeralPresentation.mjs';
 
 /** Creates one DOM stream projection owner for one renderer Surface. */
@@ -2298,25 +2299,33 @@ function appendStreamChunk(messageId, chunkData, context, streamOperationId = nu
 
 function renderResidentEphemeralPresentation(messageId, presentation, context) {
     if (disposed || !isMessageForCurrentView(context)) return false;
+    const validated = validateResidentPresentation(presentation);
+    if (validated === null) return false;
+    const presentationKey = JSON.stringify(validated);
+    const existing = residentPresentations.get(messageId);
+    // Deduplicate this payload, not every consent challenge for the request.
+    if (existing?.presentationKey === presentationKey
+        && existing.element.parentNode === refs.chatMessagesDiv) return true;
+    if (existing) {
+        clearOwnedTimeout(existing.timer);
+        existing.element.remove();
+        residentPresentations.delete(messageId);
+    }
     const result = renderResidentPresentationCard({
         container: refs.chatMessagesDiv,
         document: ownerDocument(),
         messageId,
-        presentation
+        presentation: validated
     });
     if (result === null) return false;
     if (!result.rendered) return true;
 
-    const existing = residentPresentations.get(messageId);
-    if (existing) {
-        clearOwnedTimeout(existing.timer);
-        existing.element.remove();
-    }
     const timer = scheduleOwnedTimeout(() => {
+        if (residentPresentations.get(messageId)?.element !== result.element) return;
         result.element.remove();
         residentPresentations.delete(messageId);
     }, result.expiresInMilliseconds);
-    residentPresentations.set(messageId, { timer, element: result.element });
+    residentPresentations.set(messageId, { timer, element: result.element, presentationKey });
     refs.uiHelper?.scrollToBottom?.();
     return true;
 }

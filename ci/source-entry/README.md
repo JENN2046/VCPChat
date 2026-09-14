@@ -54,12 +54,16 @@ body reads if its source identity has not been admitted; a new unrelated file is
 not fetched. Package selection is tied to this manifest's exact package input
 and the reviewed matcher defaults, not a general replacement packaging engine.
 
-The four current profiles contain 45, 18, 846 and 726 paths respectively. Their
-deduplicated body counts are 45, 18, 835 and 725. Running all four jobs makes 20
-Git Data REST metadata requests and 1,643 public raw body requests including
+The four current profiles contain 45, 18, 846 and 727 paths respectively. Their
+deduplicated body counts are 45, 18, 835 and 726. Running all four jobs makes 20
+Git Data REST metadata requests and 1,644 public raw body requests including
 the five bootstrap controls in each job. Bodies do not consume the authenticated
 Git Data request budget. HTTP failures and rate limits still fail the job;
 there is no alternate transport or automatic fallback.
+
+The kernel command retains its original 47 test files in order and appends
+`tests/resident-ephemeral-presentation.test.js` as the 48th file. The Chat profile
+pins that test and its existing Resident presentation dependencies.
 
 Controller tests exercise injected HTTP responses and synthetic temporary files.
 They do not establish that a full package, Electron runtime, all original commands

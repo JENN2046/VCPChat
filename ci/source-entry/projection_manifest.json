@@ -1,7 +1,7 @@
 {
   "schema": "vcpchat-ci-source-profiles/v1",
   "repository": "JENN2046/VCPChat",
-  "reviewed_baseline": "b75638ea09a62fde251b97239bfe9c134d672fe7",
+  "reviewed_baseline": "f1b91696a1f1f29b0ad01f6507bb1cde4012a2d3",
   "profiles": {
     "mobile-contracts": {
       "ready": true,
@@ -15515,9 +15515,9 @@
           "path": "tests/content-pipeline.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "47685d716537d48397566f44d955a10e15f3c580",
-          "size": 2286,
-          "sha256": "fe0ac8332db5c14362b7e6375fc39e527f5e90f01e0a8146dcbf050b82b4151e",
+          "blob": "1535ee160ad7a6ef86a29e51b8dca955c2cd2b32",
+          "size": 2649,
+          "sha256": "76fe3d50ccceb7c090b94e02f396c14bbd55bbf9dc0cc40301bc38f1f2550844",
           "kind": "source"
         },
         {
@@ -15758,9 +15758,9 @@
           "path": "tests/main-chat-surface-adapter.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ba2e6601f5326cb51bb6d66ee1bfd43c32471dad",
-          "size": 5501,
-          "sha256": "ce05d16fe2d56e0f3b696005d99adcba740326e01358562b68a3ba9e00322197",
+          "blob": "b26f3c8f9507fe2d2b00788310a6c0024af7f5aa",
+          "size": 6251,
+          "sha256": "97ecc9313fc33097aba316e07a36bbd06ef9ebd0e5a37c49e0a9edb647258725",
           "kind": "source"
         },
         {

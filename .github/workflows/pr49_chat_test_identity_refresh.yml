@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = 'f1b91696a1f1f29b0ad01f6507bb1cde4012a2d3'
+          test "$(git rev-parse HEAD^)" = '7061758025e663627e554e5621a0436f095f6d46'
           test "$(git hash-object ci/source-entry/projection_manifest.json)" = '8ccd9afd75c0d26d38725143f65455f43a053ba9'
 
           python3 - <<'PY'
@@ -121,7 +121,7 @@ jobs:
           python3 -m unittest discover -s ci/source-entry/tests -p 'test_*.py'
           python3 -m json.tool ci/source-entry/projection_manifest.json >/dev/null
           git diff --check
-          CHANGED="$(git diff --name-only | sort)"
+          CHANGED="$( { git diff --name-only; git ls-files --others --exclude-standard; } | sort )"
           EXPECTED="$(printf '%s\n' ci/source-entry/projection_manifest.json ci/source-entry/pr49-chat-kernel-ui.next.yml ci/source-entry/pr49-mobile-sync.next.yml | sort)"
           test "$CHANGED" = "$EXPECTED"
 

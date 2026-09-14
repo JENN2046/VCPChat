@@ -533,7 +533,7 @@ function getLyricFeatureFlags(result) {
     };
 }
 
-function createAuditedLyrics(candidate, result) {
+function createAuditedLyrics(candidate, result, target = null) {
     const features = getLyricFeatureFlags(result);
     if (!features.valid || Number(candidate?.matchScore) < AUTO_MATCH_MIN_SCORE) return null;
 
@@ -550,7 +550,7 @@ function createAuditedLyrics(candidate, result) {
         matchScore: Number(candidate.matchScore),
         qualityBonus,
         durationDifference: Math.abs(
-            Number(candidate.durationMs || 0) - Number(target.durationMs || 0)
+            Number(candidate.durationMs || 0) - Number(target?.durationMs || 0)
         ),
         auditScore: Number(candidate.matchScore) + qualityBonus
     };
@@ -560,14 +560,13 @@ function rankAuditedLyrics(entries) {
     return (entries || [])
         .filter(Boolean)
         // 自动下载选优规则：
-        // 匹配分数优先；同分时流式逐字符优先；
-        // 仍相同则优先歌词时长与目标音频时长更接近；
-        // 最后才使用质量加分和其他特性打破剩余平局。
+        // 综合审计分优先；综合分相同时优先元数据匹配度；
+        // 仍相同则优先流式逐字符、歌词时长接近度和 AMLL 来源。
         .sort((a, b) =>
-            b.matchScore - a.matchScore
+            b.auditScore - a.auditScore
+            || b.matchScore - a.matchScore
             || Number(b.features?.isWordByWord) - Number(a.features?.isWordByWord)
             || (a.durationDifference || 0) - (b.durationDifference || 0)
-            || b.auditScore - a.auditScore
             || Number(b.result?.source === 'amll') - Number(a.result?.source === 'amll')
         );
 }
@@ -582,7 +581,7 @@ async function autoMatchLyrics(target) {
 
     const probed = await collectProbedLyrics(target);
     const audited = rankAuditedLyrics(
-        probed.map(({ candidate, result }) => createAuditedLyrics(candidate, result))
+        probed.map(({ candidate, result }) => createAuditedLyrics(candidate, result, target))
     );
     const winner = audited[0];
 

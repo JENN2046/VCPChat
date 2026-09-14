@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_PARENT='5d47c59a6e13d144988110b3776b1506561832a0'
+          EXPECTED_PARENT='1e1d037d95b642fb2827e8ba1244290d3b331097'
           ACTUAL_PARENT="$(git rev-parse HEAD^)"
           test "$ACTUAL_PARENT" = "$EXPECTED_PARENT"
 
@@ -185,8 +185,6 @@ jobs:
           if new_native_seen - ALLOWED_NEW_NATIVE:
               raise SystemExit(f'unreviewed new native set: {sorted(new_native_seen)}')
 
-          # Preserve the alias exception boundary. Refresh existing ordinary aliases
-          # if still required, but never create a new alias exception implicitly.
           old_aliases = manifest.get('ordinary_aliases', {})
           needed_aliases = set()
           for profile in manifest['profiles'].values():
@@ -281,6 +279,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/chat_kernel_ui.yml .github/workflows/mobile_sync.yml ci/source-entry/README.md ci/source-entry/projection_manifest.json
+          git restore .github/workflows/chat_kernel_ui.yml .github/workflows/mobile_sync.yml
+          git add ci/source-entry/README.md ci/source-entry/projection_manifest.json
           git commit -m 'Refresh reviewed CI source manifest for synced tree'
           git push origin HEAD:codex/update-vcpchat-20260912

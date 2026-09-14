@@ -4,6 +4,11 @@
   "description": "一个为VCP服务器打造的AI聊天桌面客户端",
   "main": "main.js",
   "scripts": {
+    "test:chat-kernel": "node --test tests/chat-event-contract.test.mjs tests/notification-renderer-lifecycle.test.mjs tests/enhanced-color-utils-lifecycle.test.mjs tests/input-enhancer-owner.test.mjs tests/chat-context.test.mjs tests/main-chat-state-authority.test.mjs tests/main-chat-attachment-owner.test.mjs tests/main-chat-send-owner.test.mjs tests/main-chat-auxiliary-event-owner.test.mjs tests/main-chat-flowlock-owner.test.mjs tests/forward-message-owner.test.mjs tests/main-chat-settings-owner.test.mjs tests/surface-conversation.test.mjs tests/chat-repository.test.mjs tests/memory-chat-repository.test.mjs tests/chat-history-persistence.test.mjs tests/chat-history-mutation-authority.test.mjs tests/content-runtime.test.mjs tests/content-pipeline.test.mjs tests/chat-dom-renderer.test.mjs tests/chat-surface.test.mjs tests/chat-surface-slots.test.mjs tests/chat-operation.test.mjs tests/chat-presentation-state.test.mjs tests/chat-presentation-skin.test.mjs tests/chat-theme-plugin.test.mjs tests/chat-plugin-manifest.test.mjs tests/stream-session.test.mjs tests/stream-coordinator.test.mjs tests/stream-transient-history.test.mjs tests/vcp-stream-bridge.test.mjs tests/window-stream-runtime.test.mjs tests/stream-consumer-registry.test.mjs tests/render-dependencies.test.mjs tests/render-session-authority.test.mjs tests/surface-task-owner.test.mjs tests/image-handler-owner.test.mjs tests/emoticon-fixer-owner.test.mjs tests/content-processor-owner.test.mjs tests/visibility-optimizer-owner.test.mjs tests/middle-click-owner.test.mjs tests/tts-surface-owner.test.mjs tests/desktop-push-consumer.test.mjs tests/main-chat-surface-adapter.test.mjs tests/main-chat-event-bridge.test.mjs tests/owned-preload-subscription.test.mjs tests/non-streaming-event-consumer.test.mjs tests/resident-ephemeral-presentation.test.js",
+    "guard:ui-interaction": "node scripts/check-ui-interaction-inventory.mjs",
+    "guard:ui-async-state": "node scripts/check-ui-async-state-matrix.mjs",
+    "guard:ui-task-journeys": "node scripts/check-ui-task-journeys.mjs",
+    "guard:theme-provenance": "node scripts/check-theme-provenance.mjs",
     "start": "electron .",
     "doctor": "node scripts/vcpchat-doctor.mjs",
     "start:managed": "node scripts/vcpchat-dev-launcher.mjs",
@@ -185,7 +190,21 @@
       "Notemodules/**/*",
       "Translatormodules/**/*",
       "vendor/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "!ScriptoriumModules/font-name-diagnostics.json",
+      "!ScriptoriumModules/founder-font-conversion-check.json",
+      "!ScriptoriumModules/founder-font-summary.json",
+      "!assets/E1-Vchat主界面.jpg",
+      "!assets/E10-浪潮语义寻址可视化悬浮窗.jpg",
+      "!assets/E2-Vchat主界面.jpg",
+      "!assets/E3-VCP桌面.jpg",
+      "!assets/E4-音乐播放器.jpg",
+      "!assets/E5-V文坊.jpg",
+      "!assets/E6-终端与日志.jpg",
+      "!assets/E7-划词小助手应用于Vscode编程解释和辅助生成代码.jpg",
+      "!assets/E8-基于浪潮的语义级记忆关联可视化神经云图.jpg",
+      "!assets/E9-Agent论坛与留言板系统.jpg",
+      "!audio_engine/.env"
     ],
     "directories": {
       "buildResources": "assets"

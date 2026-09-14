@@ -7,6 +7,7 @@ export function createMainChatEventBridge({
     chatAPI,
     acceptStreamEvent,
     consumeNonStreamingEvent,
+    consumeEphemeralPresentation,
     onUnhandled = console.warn,
 } = {}) {
     if (!chatAPI || typeof chatAPI.onVCPStreamEvent !== 'function') {
@@ -18,9 +19,21 @@ export function createMainChatEventBridge({
     let disposed = false;
     const subscription = chatAPI.onVCPStreamEvent(async eventData => {
         if (disposed) return false;
+        // Consent challenges are UI-only, including invalid/unhandled envelopes.
+        // Never route them into stream/history consumers or diagnostic payloads.
+        if (eventData?.type === 'ephemeral_presentation') {
+            if (typeof eventData.messageId !== 'string' || !eventData.messageId.trim()) return false;
+            try {
+                await consumeEphemeralPresentation?.(eventData);
+                return true;
+            } catch {
+                onUnhandled('[MainChatEventBridge] Ephemeral presentation rejected');
+                return false;
+            }
+        }
         const messageId = String(eventData?.messageId || '').trim();
         if (!messageId) {
-            onUnhandled('[MainChatEventBridge] Ignoring stream event without messageId', eventData);
+            onUnhandled('[MainChatEventBridge] Ignoring stream event without messageId');
             return false;
         }
         if (acceptStreamEvent(eventData)) return true;

@@ -5,6 +5,22 @@ const crypto = require('crypto');
 
 // 全局的 AbortController 映射：messageId -> AbortController
 const activeRequests = new Map();
+const RESIDENT_PRESENTATION_CHANNEL_HEADER =
+    'x-agents-os-resident-presentation-channel';
+const RESIDENT_PRESENTATION_DELTA_FIELD =
+    'vcp_ephemeral_presentation';
+const RESIDENT_NON_STREAM_PRESENTATIONS_FIELD =
+    'vcp_ephemeral_presentations';
+const RESIDENT_PRESENTATION_DIAGNOSTIC_MARKERS = Object.freeze([
+    RESIDENT_PRESENTATION_DELTA_FIELD,
+    RESIDENT_NON_STREAM_PRESENTATIONS_FIELD,
+    'agents-os-resident.host-presentation.v1',
+    'OWNER_CONSENT_CHALLENGE',
+    '确认创建，',
+    '确认变更，',
+    '确认完成，',
+    '确认关闭，'
+]);
 
 // 模块配置（将在初始化时设置）
 let moduleConfig = {
@@ -96,6 +112,93 @@ function stripInternalMessageMetadata(messages) {
         const { __vcpchatTimestampMeta, ...cleanMessage } = message;
         return cleanMessage;
     });
+}
+
+function validResidentPresentationChannel(value) {
+    return typeof value === 'string' && /^[0-9a-f]{32}$/u.test(value);
+}
+
+function redactResidentPresentationDiagnostic(value) {
+    if (typeof value !== 'string') return value;
+    return RESIDENT_PRESENTATION_DIAGNOSTIC_MARKERS.some((marker) =>
+        value.includes(marker))
+        ? '[AGENTSOSResident presentation diagnostic redacted]'
+        : value;
+}
+
+function takeResidentPresentationFromChunk(chunk, expectedChannelId) {
+    const delta = chunk?.choices?.[0]?.delta;
+    if (!delta || !Object.hasOwn(delta, RESIDENT_PRESENTATION_DELTA_FIELD)) {
+        return { handled: false, presentation: null };
+    }
+    const envelope = delta[RESIDENT_PRESENTATION_DELTA_FIELD];
+    const valid = validResidentPresentationChannel(expectedChannelId)
+        && envelope
+        && typeof envelope === 'object'
+        && !Array.isArray(envelope)
+        && envelope.channelId === expectedChannelId
+        && envelope.presentation
+        && typeof envelope.presentation === 'object'
+        && !Array.isArray(envelope.presentation);
+    return {
+        handled: true,
+        presentation: valid ? envelope.presentation : null
+    };
+}
+
+function takeResidentPresentationsFromResponse(
+    response,
+    expectedChannelId
+) {
+    if (!response
+        || typeof response !== 'object'
+        || Array.isArray(response)
+        || !Object.hasOwn(
+            response,
+            RESIDENT_NON_STREAM_PRESENTATIONS_FIELD
+        )) {
+        return [];
+    }
+    const envelopes =
+        response[RESIDENT_NON_STREAM_PRESENTATIONS_FIELD];
+    delete response[RESIDENT_NON_STREAM_PRESENTATIONS_FIELD];
+    if (!validResidentPresentationChannel(expectedChannelId)
+        || !Array.isArray(envelopes)) {
+        return [];
+    }
+    return envelopes
+        .filter((envelope) => envelope
+            && typeof envelope === 'object'
+            && !Array.isArray(envelope)
+            && envelope.channelId === expectedChannelId
+            && envelope.presentation
+            && typeof envelope.presentation === 'object'
+            && !Array.isArray(envelope.presentation))
+        .map((envelope) => envelope.presentation);
+}
+
+function sendResidentPresentation({
+    context,
+    messageId,
+    presentation,
+    streamChannel,
+    webContents,
+    sendPayload
+}) {
+    if (!presentation
+        || !webContents
+        || webContents.isDestroyed()) {
+        return false;
+    }
+    const payload = {
+        type: 'ephemeral_presentation',
+        messageId,
+        context,
+        presentation
+    };
+    if (typeof sendPayload === 'function') return sendPayload(payload);
+    webContents.send(streamChannel, payload);
+    return true;
 }
 
 function omitUnsetOptionalModelParams(modelConfig = {}) {
@@ -332,7 +435,9 @@ async function sendToVCP(params) {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            const errorText = await response.text();
+            const errorText = redactResidentPresentationDiagnostic(
+                await response.text()
+            );
             console.error(`[VCPClient] VCP request failed. Status: ${response.status}, Response Text:`, errorText);
             
             let errorData = { message: `服务器返回状态 ${response.status}`, details: errorText };
@@ -387,6 +492,11 @@ async function sendToVCP(params) {
             throw err;
         }
 
+        const residentPresentationChannel =
+            response.headers?.get?.(
+                RESIDENT_PRESENTATION_CHANNEL_HEADER
+            ) || null;
+
         // === 处理流式响应 ===
         if (modelConfig.stream === true) {
             console.log(`[VCPClient] Starting stream processing for messageId: ${messageId}`);
@@ -426,7 +536,25 @@ async function sendToVCP(params) {
                                 
                                 try {
                                     const parsedChunk = JSON.parse(jsonData);
-                                    
+                                    const residentPresentation =
+                                        takeResidentPresentationFromChunk(
+                                            parsedChunk,
+                                            residentPresentationChannel
+                                        );
+                                    if (residentPresentation.handled) {
+                                        if (residentPresentation.presentation) {
+                                            sendResidentPresentation({
+                                                context,
+                                                messageId,
+                                                presentation:
+                                                    residentPresentation.presentation,
+                                                streamChannel,
+                                                webContents
+                                            });
+                                        }
+                                        continue;
+                                    }
+
                                     // Accumulate content
                                     let textToAppend = "";
                                     if (parsedChunk?.choices?.[0]?.delta?.content) {
@@ -444,9 +572,17 @@ async function sendToVCP(params) {
                                     if (webContents && !webContents.isDestroyed()) {
                                         webContents.send(streamChannel, dataPayload);
                                     }
-                                } catch (e) {
-                                    console.error(`[VCPClient] Failed to parse stream chunk for messageId: ${messageId}:`, e, '原始数据:', jsonData);
-                                    const errorChunkPayload = { type: 'data', chunk: { raw: jsonData, error: 'json_parse_error' }, messageId: messageId, context };
+                                    } catch (e) {
+                                        const redactedDiagnostic =
+                                            redactResidentPresentationDiagnostic(
+                                                jsonData
+                                            );
+                                        console.error(
+                                            `[VCPClient] Failed to parse stream chunk for messageId: ${messageId}:`,
+                                            '原始数据:',
+                                            redactedDiagnostic
+                                        );
+                                        const errorChunkPayload = { type: 'data', chunk: { raw: redactedDiagnostic, error: 'json_parse_error' }, messageId: messageId, context };
                                     if (webContents && !webContents.isDestroyed()) {
                                         webContents.send(streamChannel, errorChunkPayload);
                                     }
@@ -499,6 +635,20 @@ async function sendToVCP(params) {
             // === 处理非流式响应 ===
             console.log('[VCPClient] Processing non-streaming response');
             const vcpResponse = await response.json();
+            const residentPresentations =
+                takeResidentPresentationsFromResponse(
+                    vcpResponse,
+                    residentPresentationChannel
+                );
+            for (const presentation of residentPresentations) {
+                sendResidentPresentation({
+                    context,
+                    messageId,
+                    presentation,
+                    streamChannel,
+                    webContents
+                });
+            }
             return { response: vcpResponse, context };
         }
 
@@ -563,8 +713,13 @@ function getActiveRequestCount() {
 }
 
 module.exports = {
+    RESIDENT_PRESENTATION_CHANNEL_HEADER,
     initialize,
+    sendResidentPresentation,
     sendToVCP,
     interruptRequest,
-    getActiveRequestCount
+    getActiveRequestCount,
+    redactResidentPresentationDiagnostic,
+    takeResidentPresentationFromChunk,
+    takeResidentPresentationsFromResponse
 };

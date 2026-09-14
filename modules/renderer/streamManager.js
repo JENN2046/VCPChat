@@ -5,6 +5,10 @@ import { createContentRuntime } from '../chat/contentRuntime.js';
 import { createDesktopPushConsumer } from './desktopPushConsumer.js';
 import { createStreamProjectionRuntime } from './streamProjectionRuntime.js';
 import { collectMarkdownCodeDomains } from './markdownCodeDomainScanner.js';
+import {
+    renderResidentEphemeralPresentation as renderResidentPresentationCard,
+    validateResidentEphemeralPresentation as validateResidentPresentation
+} from './residentEphemeralPresentation.mjs';
 
 /** Creates one DOM stream projection owner for one renderer Surface. */
 export function createStreamProjection() {
@@ -15,6 +19,7 @@ const {
 } = runtime;
 // Renderer-local active stream facts. This is not durable history.
 const streamMessageModels = new Map();
+const residentPresentations = new Map(); // messageId -> owned timer and ephemeral DOM card
 const STREAM_CODE_LINE_SWEEP_DURATION_MS = 2400;
 const STREAM_CODE_MAX_ACTIVE_SWEEPS = 3;
 
@@ -2292,6 +2297,39 @@ function appendStreamChunk(messageId, chunkData, context, streamOperationId = nu
     }
 }
 
+function renderResidentEphemeralPresentation(messageId, presentation, context) {
+    if (disposed || !isMessageForCurrentView(context)) return false;
+    const validated = validateResidentPresentation(presentation);
+    if (validated === null) return false;
+    const presentationKey = JSON.stringify(validated);
+    const existing = residentPresentations.get(messageId);
+    // Deduplicate this payload, not every consent challenge for the request.
+    if (existing?.presentationKey === presentationKey
+        && existing.element.parentNode === refs.chatMessagesDiv) return true;
+    if (existing) {
+        clearOwnedTimeout(existing.timer);
+        existing.element.remove();
+        residentPresentations.delete(messageId);
+    }
+    const result = renderResidentPresentationCard({
+        container: refs.chatMessagesDiv,
+        document: ownerDocument(),
+        messageId,
+        presentation: validated
+    });
+    if (result === null) return false;
+    if (!result.rendered) return true;
+
+    const timer = scheduleOwnedTimeout(() => {
+        if (residentPresentations.get(messageId)?.element !== result.element) return;
+        result.element.remove();
+        residentPresentations.delete(messageId);
+    }, result.expiresInMilliseconds);
+    residentPresentations.set(messageId, { timer, element: result.element, presentationKey });
+    refs.uiHelper?.scrollToBottom?.();
+    return true;
+}
+
 /**
  * Applies the terminal message model and DOM projection without writing durable history.
  * The StreamCoordinator owns the production commit point.
@@ -2594,6 +2632,8 @@ async function dispose() {
             clearOwnedTimeout(timerId);
         }
         scrollThrottleTimers.clear();
+        for (const { element } of residentPresentations.values()) element.remove();
+        residentPresentations.clear();
         for (const timeout of ownedTimeouts) clearOwnedTimeout(timeout);
         cancelScheduledAnimationFrames();
 
@@ -2701,6 +2741,7 @@ return Object.freeze({
     dispose,
     startStreamingMessage: (...args) => trackAsyncOperation(startStreamingMessage(...args)),
     appendStreamChunk,
+    renderResidentEphemeralPresentation,
     projectStreamTerminal: (...args) => trackAsyncOperation(projectStreamTerminal(...args)),
     discardStreamingMessage,
     getDiagnostics: getStreamDiagnostics,

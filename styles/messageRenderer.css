@@ -1707,6 +1707,62 @@ body:not(.light-theme) .vcp-tool-result-bubble th {
     content-visibility: visible;
 }
 
+/* Request-bound, DOM-only AGENTSOSResident owner-consent presentation. */
+.agents-os-resident-consent-presentation {
+    box-sizing: border-box;
+    width: min(720px, calc(100% - 72px));
+    margin: 10px 24px 14px 72px;
+    padding: 16px 18px;
+    border: 1px solid color-mix(in srgb, var(--highlight-text) 42%, transparent);
+    border-left: 4px solid var(--highlight-text);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--notification-bg) 92%, var(--highlight-text) 8%);
+    color: var(--primary-text);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.agents-os-resident-consent-title {
+    color: var(--highlight-text);
+    font-size: 0.96rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.agents-os-resident-consent-mutation,
+.agents-os-resident-consent-instruction,
+.agents-os-resident-consent-privacy {
+    margin-top: 7px;
+    color: var(--secondary-text);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.agents-os-resident-consent-challenge {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.22);
+    color: var(--primary-text);
+    font-family: var(--vcp-chat-code-font-family, 'Consolas', 'Monaco', monospace);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+
+body.light-theme .agents-os-resident-consent-challenge {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 720px) {
+    .agents-os-resident-consent-presentation {
+        width: calc(100% - 24px);
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+}
+
 /* 🟢 二级展开：大内容截断后的"展开全部"按钮 */
 .vcp-tool-result-truncated-notice {
     display: flex;

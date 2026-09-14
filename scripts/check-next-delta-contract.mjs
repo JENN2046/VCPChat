@@ -276,8 +276,23 @@ assert.match(read('modules/chat/streamConsumerRegistry.js'), /dispose\(\)[\s\S]*
     'registry disposal must revoke routes already captured by stream consumers');
 assert.match(read('modules/renderer/mainChatStreamConsumer.js'), /persistTerminal\(projected\)[\s\S]*catch \(sideEffectError\)[\s\S]*post-commit side effect failed/,
     'post-commit side effects must not rewrite a successful durable outcome');
-assert.doesNotMatch(read('modules/renderer/messageContextMenu.js'), /contextMenuDependencies\.(?:startStreamingMessage|finalizeStreamedMessage)/,
-    'regeneration and context-menu cancellation must use the coordinator-owned bridge');
+const contextMenuSource = read('modules/renderer/messageContextMenu.js');
+// Accepted regeneration initializes its owned visual projection before the
+// provider request, so switching topics cannot lose the thinking placeholder.
+// This does not confer terminal persistence or cancellation authority.
+assert.doesNotMatch(contextMenuSource, /contextMenuDependencies\.finalizeStreamedMessage/,
+    'regeneration must not regain a direct durable terminal facade');
+assert.match(contextMenuSource, /if \(streamingRequested && typeof contextMenuDependencies\.startStreamingMessage === 'function'\) \{\s*await contextMenuDependencies\.startStreamingMessage\(/,
+    'regeneration pre-request projection must be streaming-only and explicitly injected');
+assert.equal((contextMenuSource.match(/contextMenuDependencies\.startStreamingMessage\s*\(/g) || []).length, 1,
+    'regeneration must retain only its reviewed pre-request projection initialization');
+assert.ok(contextMenuSource.indexOf('await contextMenuDependencies.startStreamingMessage(')
+    < contextMenuSource.indexOf('const vcpResult = await electronAPI.sendToVCP('),
+    'the owned thinking projection must exist before the regeneration provider request');
+assert.match(contextMenuSource, /contextMenuDependencies\.cancelStream\?\.\(messageId, reason\)/,
+    'context-menu cancellation must still delegate to the coordinator-owned bridge');
+assert.match(contextMenuSource, /contextMenuDependencies\.acceptStreamEvent\?\.\(\{\s*type: 'error'/,
+    'regeneration stream errors must still enter the coordinator-owned bridge');
 assert.match(read('modules/renderer/mainChatSendOwner.js'), /getAdapter\(\)\?\.cancelStream/,
     'main send-button owner cancellation fallback must use the coordinator-owned operation');
 assert.doesNotMatch(read('renderer.js'), /mainChatAdapter\?\.cancelStream|function\s+interruptActiveResponseFromSendButton/,
@@ -294,6 +309,8 @@ assert.doesNotMatch(rendererStreamHandler, /messageRenderer\.renderFullMessage\(
 assert.doesNotMatch(rendererStreamHandler, /messageRenderer\.removeMessageById\(/,
     'renderer must not retain a non-streaming removal fallback');
 const compositionSource = read('modules/renderer/mainChatComposition.js');
+assert.match(compositionSource, /messageRenderer\.setContextMenuDependencies\(\{[\s\S]*?acceptStreamEvent: event => adapter\.acceptStreamEvent\(event\),[\s\S]*?cancelStream: \(messageId, reason\) => adapter\.cancelStream\(messageId, reason\)/,
+    'regeneration terminal and cancellation capabilities must be bound to the owning adapter');
 assert.match(compositionSource, /createMainChatSurfaceAdapter\(/,
     'main chat must be owned by a real MainChatSurfaceAdapter');
 assert.match(compositionSource, /createChatOperations/,

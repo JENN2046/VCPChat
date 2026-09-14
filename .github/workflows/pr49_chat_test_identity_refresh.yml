@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = '7061758025e663627e554e5621a0436f095f6d46'
+          test "$(git rev-parse HEAD^)" = 'e284fee1f28321e2d41c816d94de9b7465b64e7c'
           test "$(git hash-object ci/source-entry/projection_manifest.json)" = '8ccd9afd75c0d26d38725143f65455f43a053ba9'
 
           python3 - <<'PY'
@@ -118,11 +118,13 @@ jobs:
               target.write_text(next_text, encoding='utf-8')
           PY
 
-          python3 -m unittest discover -s ci/source-entry/tests -p 'test_*.py'
+          PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s ci/source-entry/tests -p 'test_*.py'
           python3 -m json.tool ci/source-entry/projection_manifest.json >/dev/null
           git diff --check
           CHANGED="$( { git diff --name-only; git ls-files --others --exclude-standard; } | sort )"
           EXPECTED="$(printf '%s\n' ci/source-entry/projection_manifest.json ci/source-entry/pr49-chat-kernel-ui.next.yml ci/source-entry/pr49-mobile-sync.next.yml | sort)"
+          printf 'ACTUAL_SCOPE<<EOF\n%s\nEOF\n' "$CHANGED"
+          printf 'EXPECTED_SCOPE<<EOF\n%s\nEOF\n' "$EXPECTED"
           test "$CHANGED" = "$EXPECTED"
 
       - name: Commit manifest and exact next workflow blobs

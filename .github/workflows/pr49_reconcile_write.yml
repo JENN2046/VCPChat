@@ -1,0 +1,181 @@
+name: PR49 Reconcile Write
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pr49_reconcile_write.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: codex/update-vcpchat-20260912
+          fetch-depth: 0
+
+      - name: Merge target and resolve reviewed conflicts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'PR49 Reconciliation'
+          git config user.email 'pr49-reconciliation@users.noreply.github.com'
+          git fetch --no-tags origin NuobaoVCPchat
+
+          expected_target='af76c8798b9e1c8f4795ffb72c0bc5c48aed38c9'
+          actual_target="$(git rev-parse origin/NuobaoVCPchat)"
+          if [ "$actual_target" != "$expected_target" ]; then
+            echo "Target moved: expected $expected_target, got $actual_target" >&2
+            exit 1
+          fi
+
+          set +e
+          git merge --no-ff --no-commit origin/NuobaoVCPchat
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 1 ]; then
+            echo "Expected reviewed conflict merge status 1, got $merge_status" >&2
+            exit 1
+          fi
+
+          actual_conflicts="$(git diff --name-only --diff-filter=U | LC_ALL=C sort)"
+          expected_conflicts="$(cat <<'EOF'
+          modules/ipc/chatHandlers.js
+          modules/renderer/streamManager.js
+          modules/vcpClient.js
+          styles/messageRenderer.css
+          tests/resident-ephemeral-presentation.test.js
+          EOF
+          )"
+          if [ "$actual_conflicts" != "$expected_conflicts" ]; then
+            echo 'Conflict set changed; refusing automatic resolution.' >&2
+            echo 'Actual:' >&2
+            printf '%s\n' "$actual_conflicts" >&2
+            exit 1
+          fi
+
+          # Ours already contains the latest upstream behavior plus the Resident bridge.
+          git checkout --ours modules/ipc/chatHandlers.js
+          git checkout --ours modules/vcpClient.js
+          git checkout --ours styles/messageRenderer.css
+          git checkout --ours modules/renderer/streamManager.js
+
+          # PR48's Resident tests are deliberately stronger than the older overlay copy.
+          git checkout --theirs tests/resident-ephemeral-presentation.test.js
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('modules/renderer/streamManager.js')
+          text = path.read_text(encoding='utf-8')
+
+          old_import = """import {
+              renderResidentEphemeralPresentation as renderResidentPresentationCard
+          } from './residentEphemeralPresentation.mjs';"""
+          new_import = """import {
+              validateResidentEphemeralPresentation as validateResidentPresentation,
+              renderResidentEphemeralPresentation as renderResidentPresentationCard
+          } from './residentEphemeralPresentation.mjs';"""
+          if text.count(old_import) != 1:
+              raise SystemExit(f'expected exactly one old Resident import, found {text.count(old_import)}')
+          text = text.replace(old_import, new_import, 1)
+
+          old_function = """function renderResidentEphemeralPresentation(messageId, presentation, context) {
+              if (disposed || !isMessageForCurrentView(context)) return false;
+              const result = renderResidentPresentationCard({
+                  container: refs.chatMessagesDiv,
+                  document: ownerDocument(),
+                  messageId,
+                  presentation
+              });
+              if (result === null) return false;
+              if (!result.rendered) return true;
+
+              const existing = residentPresentations.get(messageId);
+              if (existing) {
+                  clearOwnedTimeout(existing.timer);
+                  existing.element.remove();
+              }
+              const timer = scheduleOwnedTimeout(() => {
+                  result.element.remove();
+                  residentPresentations.delete(messageId);
+              }, result.expiresInMilliseconds);
+              residentPresentations.set(messageId, { timer, element: result.element });
+              refs.uiHelper?.scrollToBottom?.();
+              return true;
+          }"""
+          new_function = """function renderResidentEphemeralPresentation(messageId, presentation, context) {
+              if (disposed || !isMessageForCurrentView(context)) return false;
+              const validated = validateResidentPresentation(presentation);
+              if (validated === null) return false;
+              const presentationKey = JSON.stringify(validated);
+              const existing = residentPresentations.get(messageId);
+              // Deduplicate this payload, not every consent challenge for the request.
+              if (existing?.presentationKey === presentationKey
+                  && existing.element.parentNode === refs.chatMessagesDiv) return true;
+              if (existing) {
+                  clearOwnedTimeout(existing.timer);
+                  existing.element.remove();
+                  residentPresentations.delete(messageId);
+              }
+              const result = renderResidentPresentationCard({
+                  container: refs.chatMessagesDiv,
+                  document: ownerDocument(),
+                  messageId,
+                  presentation: validated
+              });
+              if (result === null) return false;
+              if (!result.rendered) return true;
+
+              const timer = scheduleOwnedTimeout(() => {
+                  if (residentPresentations.get(messageId)?.element !== result.element) return;
+                  result.element.remove();
+                  residentPresentations.delete(messageId);
+              }, result.expiresInMilliseconds);
+              residentPresentations.set(messageId, { timer, element: result.element, presentationKey });
+              refs.uiHelper?.scrollToBottom?.();
+              return true;
+          }"""
+          if text.count(old_function) != 1:
+              raise SystemExit(f'expected exactly one regressed Resident function, found {text.count(old_function)}')
+          text = text.replace(old_function, new_function, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          # Preserve the explicit DeepMemo 2.0 operational contract from the target.
+          git checkout origin/NuobaoVCPchat -- VCPDistributedServer/Plugin/DeepMemo/config.env
+
+          # Remove temporary diagnostics; the writer itself is removed externally after success.
+          git rm -f .github/workflows/pr49_merge_diagnostic.yml .github/workflows/pr49_merge_diagnostic_v2.yml
+
+          git add \
+            modules/ipc/chatHandlers.js \
+            modules/renderer/streamManager.js \
+            modules/vcpClient.js \
+            styles/messageRenderer.css \
+            tests/resident-ephemeral-presentation.test.js \
+            VCPDistributedServer/Plugin/DeepMemo/config.env
+
+          if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+            echo 'Unmerged paths remain.' >&2
+            git diff --name-only --diff-filter=U >&2
+            exit 1
+          fi
+
+          grep -Fq 'validateResidentEphemeralPresentation as validateResidentPresentation' modules/renderer/streamManager.js
+          grep -Fq 'presentationKey' modules/renderer/streamManager.js
+          grep -Fq 'residentPresentations.get(messageId)?.element !== result.element' modules/renderer/streamManager.js
+          grep -Fq '.agents-os-resident-consent-presentation' styles/messageRenderer.css
+          grep -Fq 'DeepMemoBackend=central' VCPDistributedServer/Plugin/DeepMemo/config.env
+          grep -Fq 'same-request consent deduplicates the validated payload and replaces different content' tests/resident-ephemeral-presentation.test.js
+          node --check modules/lyrics/lyricFetcherUnified.js
+
+          echo '--- FINAL MERGE STATUS ---'
+          git status --short
+          git commit -m 'Merge NuobaoVCPchat and preserve PR48 hardening'
+          git push origin HEAD:codex/update-vcpchat-20260912

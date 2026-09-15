@@ -14171,6 +14171,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/audit-settings-layout.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3457a3f33b13e2a6869989930a939f44b1076455",
+          "size": 12749,
+          "sha256": "3363d03d134234f4bf398e91b7edbf9be441f81d813895c2a7c1ae9118010e12",
+          "kind": "source"
+        },
+        {
           "path": "scripts/build-chat-event-graph.mjs",
           "mode": "100644",
           "type": "blob",
@@ -14261,6 +14270,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/check-global-settings-section-ownership.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b5ce1c892aba9440aa16159017da18aff2ad7e3e",
+          "size": 6161,
+          "sha256": "af7a40d6a9f20b580a050b029cdd30a3c7fe82d29b6e80bc3b09f21242ded5d2",
+          "kind": "source"
+        },
+        {
           "path": "scripts/check-next-delta-contract.mjs",
           "mode": "100644",
           "type": "blob",
@@ -14330,6 +14348,15 @@
           "blob": "e26d8b20d7fb81cbd24cb7b4b7b5356f0f84e085",
           "size": 1634,
           "sha256": "1fae5ee4285407bcb422fe6327a9f58b4fc68c92c2379cd641c1a25788c52be8",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/check-uiux-artifacts.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2880e98842897e84f451d1d964cefde8102dfb7b",
+          "size": 802,
+          "sha256": "a75b8b9eac477b4ec699c74916d75e682048639a80c840e585386e715b38702c",
           "kind": "source"
         },
         {
@@ -14573,6 +14600,15 @@
           "blob": "4fe2184b9d7ae9f445edc073d6afa6601f906169",
           "size": 2797,
           "sha256": "9eb0203d8718e8d81e8e2d084b503111880985d47c102bcc7234af12225e2e29",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-settings-sidebar-parity-electron.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3b3286d21695429d8dcf72ec96dce3817d955a8d",
+          "size": 27550,
+          "sha256": "9a88ae4663697bc18d9f5c3349bc5891031679ea74222b36552bcaf6008734be",
           "kind": "source"
         },
         {

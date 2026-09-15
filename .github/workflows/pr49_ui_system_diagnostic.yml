@@ -1,4 +1,4 @@
-name: PR49 UI System Diagnostic
+name: PR49 UI Source Context Reconciliation
 
 on:
   push:
@@ -6,10 +6,10 @@ on:
       - '.github/workflows/pr49_ui_system_diagnostic.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  reconcile:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact PR branch
@@ -18,39 +18,99 @@ jobs:
           ref: codex/update-vcpchat-20260912
           fetch-depth: 0
 
-      - name: Verify diagnostic parent
+      - name: Reconcile source-context baseline and exact source identities
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = '01acb262ac1709486c7bffde2f5de4432a4bdc91'
+          EXPECTED_PARENT='bd420cb5034dfd2c07a56926c7495d9d7c3eb696'
+          BRANCH='codex/update-vcpchat-20260912'
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_PARENT"
+          test "$(git branch --show-current)" = "$BRANCH"
 
-      - name: Setup Node 22
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: 22
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import re
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable 2026-08-11
+          script_path = Path('scripts/check-design-system-boundary.mjs')
+          text = script_path.read_text(encoding='utf-8')
+          old = """const sourceRef = process.env.VCP_DESIGN_SOURCE_REF || (() => {\n    try {\n        return execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8' }).trim();\n    } catch {\n        return 'HEAD';\n    }\n})();"""
+          new = """const sourceRef = process.env.VCP_DESIGN_SOURCE_REF\n    || sourceContext?.sourceCommit\n    || (() => {\n        try {\n            return execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8' }).trim();\n        } catch {\n            return 'HEAD';\n        }\n    })();"""
+          if text.count(old) != 1:
+              raise SystemExit('expected sourceRef block not found exactly once')
+          text = text.replace(old, new)
+          script_path.write_text(text, encoding='utf-8')
 
-      - name: Install locked dependencies
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
-        run: npm ci --omit=optional
+          def identity(path):
+              data = Path(path).read_bytes()
+              blob = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()
+              return {
+                  'blob': blob,
+                  'size': len(data),
+                  'sha256': hashlib.sha256(data).hexdigest(),
+              }
 
-      - name: Verify Electron runtime
-        run: node -e "const electron = require('electron'); if (typeof electron !== 'string') throw new Error('Electron runtime path missing'); console.log(electron)"
+          script_id = identity(script_path)
+          manifest_path = Path('ci/source-entry/projection_manifest.json')
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          hits = 0
+          for profile_name, profile in manifest['profiles'].items():
+              for entry in profile.get('entries', []):
+                  if entry.get('path') == str(script_path):
+                      if entry.get('mode') != '100644' or entry.get('type') != 'blob' or entry.get('kind') != 'source':
+                          raise SystemExit(f'unexpected manifest contract for {profile_name}')
+                      entry['blob'] = script_id['blob']
+                      entry['size'] = script_id['size']
+                      entry['sha256'] = script_id['sha256']
+                      hits += 1
+          if hits < 1:
+              raise SystemExit('script is not admitted by any source profile')
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
-      - name: Run UI system gate with bounded failure output
-        shell: bash
-        run: |
-          set +e
-          npm run check:ui-system > "$RUNNER_TEMP/ui-system.log" 2>&1
-          status=$?
-          set -e
-          if [ "$status" -ne 0 ]; then
-            echo '=== UI SYSTEM FAILURE TAIL (250 lines) ==='
-            tail -n 250 "$RUNNER_TEMP/ui-system.log"
-            echo '=== END UI SYSTEM FAILURE TAIL ==='
-            exit "$status"
-          fi
-          echo 'UI_SYSTEM_GATE_PASS'
+          manifest_id = identity(manifest_path)
+          workflow_paths = [
+              Path('.github/workflows/chat_kernel_ui.yml'),
+              Path('.github/workflows/mobile_sync.yml'),
+          ]
+          pin_pattern = re.compile(
+              r"('ci/source-entry/projection_manifest\.json': \{'size': )\d+(, 'blob': ')[0-9a-f]{40}(', 'sha256': ')[0-9a-f]{64}('\})"
+          )
+          for workflow_path in workflow_paths:
+              workflow = workflow_path.read_text(encoding='utf-8')
+              replacement = (
+                  rf"\g<1>{manifest_id['size']}\g<2>{manifest_id['blob']}"
+                  rf"\g<3>{manifest_id['sha256']}\g<4>"
+              )
+              workflow, count = pin_pattern.subn(replacement, workflow)
+              if count < 1:
+                  raise SystemExit(f'projection manifest pin not found in {workflow_path}')
+              workflow_path.write_text(workflow, encoding='utf-8')
+
+          # The trust boundary stays intact: only the source-context seam,
+          # the exact manifest identity, and its two bootstrap pins may change.
+          print(json.dumps({'script': script_id, 'manifest': manifest_id, 'manifest_entry_hits': hits}, indent=2))
+          PY
+
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=(
+            '.github/workflows/chat_kernel_ui.yml'
+            '.github/workflows/mobile_sync.yml'
+            'ci/source-entry/projection_manifest.json'
+            'scripts/check-design-system-boundary.mjs'
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          test "${#changed[@]}" -eq "${#expected_sorted[@]}"
+          for i in "${!expected_sorted[@]}"; do
+            test "${changed[$i]}" = "${expected_sorted[$i]}"
+          done
+
+          grep -F "|| sourceContext?.sourceCommit" scripts/check-design-system-boundary.mjs
+          node --check scripts/check-design-system-boundary.mjs
+          python3 -m json.tool ci/source-entry/projection_manifest.json >/dev/null
+
+          git config user.name 'Nuobao CI Reconciler'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -- "${expected[@]}"
+          git commit -m 'fix(ci): honor verified source baseline without git metadata'
+          git push origin HEAD:"$BRANCH"

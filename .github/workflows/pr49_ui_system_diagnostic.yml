@@ -18,11 +18,11 @@ jobs:
           ref: codex/update-vcpchat-20260912
           fetch-depth: 0
 
-      - name: Reconcile source-context baseline and exact source identities
+      - name: Reconcile source-context baseline and exact source identity
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_PARENT='bd420cb5034dfd2c07a56926c7495d9d7c3eb696'
+          EXPECTED_PARENT='ce672bd9ceadf115a9108f446050fc7309adb23b'
           BRANCH='codex/update-vcpchat-20260912'
           test "$(git rev-parse HEAD^)" = "$EXPECTED_PARENT"
           test "$(git branch --show-current)" = "$BRANCH"
@@ -31,7 +31,6 @@ jobs:
           from pathlib import Path
           import hashlib
           import json
-          import re
 
           script_path = Path('scripts/check-design-system-boundary.mjs')
           text = script_path.read_text(encoding='utf-8')
@@ -39,14 +38,12 @@ jobs:
           new = """const sourceRef = process.env.VCP_DESIGN_SOURCE_REF\n    || sourceContext?.sourceCommit\n    || (() => {\n        try {\n            return execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8' }).trim();\n        } catch {\n            return 'HEAD';\n        }\n    })();"""
           if text.count(old) != 1:
               raise SystemExit('expected sourceRef block not found exactly once')
-          text = text.replace(old, new)
-          script_path.write_text(text, encoding='utf-8')
+          script_path.write_text(text.replace(old, new), encoding='utf-8')
 
           def identity(path):
               data = Path(path).read_bytes()
-              blob = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()
               return {
-                  'blob': blob,
+                  'blob': hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest(),
                   'size': len(data),
                   'sha256': hashlib.sha256(data).hexdigest(),
               }
@@ -64,38 +61,14 @@ jobs:
                       entry['size'] = script_id['size']
                       entry['sha256'] = script_id['sha256']
                       hits += 1
-          if hits < 1:
-              raise SystemExit('script is not admitted by any source profile')
+          if hits != 1:
+              raise SystemExit(f'unexpected manifest entry count: {hits}')
           manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-
-          manifest_id = identity(manifest_path)
-          workflow_paths = [
-              Path('.github/workflows/chat_kernel_ui.yml'),
-              Path('.github/workflows/mobile_sync.yml'),
-          ]
-          pin_pattern = re.compile(
-              r"('ci/source-entry/projection_manifest\.json': \{'size': )\d+(, 'blob': ')[0-9a-f]{40}(', 'sha256': ')[0-9a-f]{64}('\})"
-          )
-          for workflow_path in workflow_paths:
-              workflow = workflow_path.read_text(encoding='utf-8')
-              replacement = (
-                  rf"\g<1>{manifest_id['size']}\g<2>{manifest_id['blob']}"
-                  rf"\g<3>{manifest_id['sha256']}\g<4>"
-              )
-              workflow, count = pin_pattern.subn(replacement, workflow)
-              if count < 1:
-                  raise SystemExit(f'projection manifest pin not found in {workflow_path}')
-              workflow_path.write_text(workflow, encoding='utf-8')
-
-          # The trust boundary stays intact: only the source-context seam,
-          # the exact manifest identity, and its two bootstrap pins may change.
-          print(json.dumps({'script': script_id, 'manifest': manifest_id, 'manifest_entry_hits': hits}, indent=2))
+          print(json.dumps({'script': script_id, 'manifest': identity(manifest_path), 'manifest_entry_hits': hits}, indent=2))
           PY
 
           mapfile -t changed < <(git diff --name-only | sort)
           expected=(
-            '.github/workflows/chat_kernel_ui.yml'
-            '.github/workflows/mobile_sync.yml'
             'ci/source-entry/projection_manifest.json'
             'scripts/check-design-system-boundary.mjs'
           )

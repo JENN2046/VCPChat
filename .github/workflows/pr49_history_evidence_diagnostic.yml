@@ -18,11 +18,21 @@ jobs:
           ref: codex/update-vcpchat-20260912
           fetch-depth: 0
 
+      - name: Setup Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install locked dependencies without lifecycle scripts
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm ci --ignore-scripts --omit=optional
+
       - name: Apply reviewed upstream baseline repair
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_PARENT='df7fcbb45410b9896fe7145bffeaaf71ea5b11e1'
+          EXPECTED_PARENT='418d2722502309e2ca98d61ad2cd70dfbbbc9955'
           BRANCH='codex/update-vcpchat-20260912'
           DIAG='.github/workflows/pr49_history_evidence_diagnostic.yml'
           CHAT='.github/workflows/chat_kernel_ui.yml'
@@ -122,8 +132,6 @@ jobs:
           node --check "$CHECKER"
           python3 -m json.tool "$MANIFEST" >/dev/null
 
-          # Validate the final intended repository state, excluding only this
-          # one-time diagnostic/writer workflow which will be deleted after use.
           cp "$DIAG" "$RUNNER_TEMP/pr49-writer.yml"
           rm "$DIAG"
           VCP_DESIGN_SOURCE_REF='b5931a69d0815a1dfd60c079093ed5518a73dc77' \
@@ -141,10 +149,6 @@ jobs:
 
           git config user.name 'Nuobao CI Reconciler'
           git config user.email 'actions@users.noreply.github.com'
-
-          # Build the exact four-file candidate first. GitHub Actions is
-          # expected to reject updating workflow files, but the uploaded
-          # candidate object lets the GitHub connector reuse the exact blobs.
           git add -- "${expected[@]}"
           git commit -m 'fix(ci): align UI subtraction with synchronized upstream'
           candidate="$(git rev-parse HEAD)"
@@ -159,8 +163,6 @@ jobs:
           fi
           echo 'PR49_FULL_CANDIDATE_PUSHED=0'
 
-          # Push only non-workflow source/control changes. The exact workflow
-          # blobs from the candidate are attached separately by the connector.
           git reset --soft HEAD^
           git reset -- "$CHAT" "$MOBILE"
           git commit -m 'fix(ci): align UI baseline with synchronized upstream'

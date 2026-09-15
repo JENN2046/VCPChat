@@ -137,3 +137,65 @@ test('main Surface releases send state at terminal projection before durable per
     await adapter.dispose();
     dom.window.close();
 });
+
+test('main Surface renders terminal stream errors with the initial messageId', async () => {
+    const dom = new JSDOM('<main><div id="root"></div><textarea></textarea></main>');
+    const root = dom.window.document.getElementById('root');
+    const rendered = [];
+    let projectedFullResponse = null;
+    const renderer = {
+        initializeMessageRenderer() {},
+        renderHistory() {},
+        renderMessage(message) { rendered.push(message); },
+    };
+    const adapter = createMainChatSurfaceAdapter({
+        root,
+        renderer,
+        repository: { getHistory: async () => [], saveHistory() {} },
+        focusTarget: dom.window.document.querySelector('textarea'),
+        operations: { dispose: async () => {} },
+        renderDependencies: {},
+        streamServices: {
+            streamProjection: {
+                startStreamingMessage() {},
+                appendStreamChunk() {},
+                projectStreamTerminal: async (messageId, finishReason, context, payload) => {
+                    projectedFullResponse = payload.fullResponse;
+                    return { messageId, content: payload.fullResponse, history: [] };
+                },
+            },
+            historyPersistence: { commit: async projected => projected },
+            messageRenderer: renderer,
+            getSelection: () => ({ id: 'agent-a' }),
+            getTopicId: () => 'topic-a',
+        },
+        disposeRenderer: async () => {},
+    });
+
+    const context = { agentId: 'agent-a', topicId: 'topic-a' };
+    assert.equal(adapter.acceptStreamEvent({ type: 'start', messageId: 'message-42', context }), true);
+    assert.equal(adapter.acceptStreamEvent({
+        type: 'data',
+        messageId: 'message-42',
+        context,
+        chunk: 'partial',
+    }), true);
+    assert.equal(adapter.acceptStreamEvent({
+        type: 'error',
+        messageId: 'message-42',
+        context,
+        error: 'VCP流读取错误: terminated',
+        accumulatedResponse: 'partial',
+    }), true);
+
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(rendered.length, 1);
+    assert.match(rendered[0].content, /流处理错误 \(ID: message-42\)/);
+    assert.doesNotMatch(rendered[0].content, /ID: undefined/);
+    assert.equal(rendered[0].id, 'err_message-42');
+    assert.match(projectedFullResponse, /^partial/);
+    assert.match(projectedFullResponse, /已保存已接收的部分内容/);
+
+    await adapter.dispose();
+    dom.window.close();
+});

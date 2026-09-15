@@ -67,17 +67,18 @@ function createStreamCapabilities(root, services) {
                 if (result.status === 'rejected') reportError('[MainChatSurfaceAdapter] post-commit side effect failed', result.reason);
             });
         },
-        renderError({ event, context }) {
+        renderError({ event, context, messageId }) {
             const selected = services.getSelection();
             const relevant = context && selected
                 && (context.groupId ? context.groupId === selected.id : context.agentId === selected.id)
                 && context.topicId === services.getTopicId();
             if (!relevant) return;
+            const visibleMessageId = messageId || event.messageId || event.sessionId || 'unknown';
             const error = event.outcome?.transport?.error?.message
                 || event.outcome?.transport?.error
                 || event.outcome?.persistence?.error?.message
                 || '未知连接错误';
-            const errorContent = root.querySelector(`.message-item[data-message-id="${event.messageId}"] .md-content`);
+            const errorContent = root.querySelector(`.message-item[data-message-id="${visibleMessageId}"] .md-content`);
             if (errorContent) {
                 const paragraph = ownerDocument.createElement('p');
                 const strong = ownerDocument.createElement('strong');
@@ -86,7 +87,7 @@ function createStreamCapabilities(root, services) {
                 paragraph.appendChild(strong);
                 errorContent.appendChild(paragraph);
             } else {
-                services.messageRenderer.renderMessage({ role: 'system', content: `流处理错误 (ID: ${event.messageId}): ${error}`, timestamp: Date.now(), id: `err_${event.messageId}` });
+                services.messageRenderer.renderMessage({ role: 'system', content: `流处理错误 (ID: ${visibleMessageId}): ${error}`, timestamp: Date.now(), id: `err_${visibleMessageId}` });
             }
         },
     });

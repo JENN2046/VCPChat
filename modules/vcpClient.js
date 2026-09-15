@@ -603,9 +603,19 @@ async function sendToVCP(params) {
                         }
                     }
                 } catch (streamError) {
-                    const streamErrPayload = { 
-                        type: 'error', 
-                        error: `VCP流读取错误: ${streamError.message}`, 
+                    const streamDiagnostic = {
+                        name: String(streamError?.name || 'Error'),
+                        message: String(streamError?.message || streamError || 'Unknown stream error'),
+                        code: streamError?.code || streamError?.cause?.code || null,
+                        cause: streamError?.cause?.message || null
+                    };
+                    console.error(
+                        `[VCPClient] Stream reading error for messageId: ${messageId}:`,
+                        streamDiagnostic
+                    );
+                    const streamErrPayload = {
+                        type: 'error',
+                        error: `VCP流读取错误: ${streamError.message}`,
                         messageId: messageId,
                         accumulatedResponse: accumulatedResponse // Propagate partial data on error
                     };

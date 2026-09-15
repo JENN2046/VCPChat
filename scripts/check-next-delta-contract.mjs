@@ -282,13 +282,18 @@ const contextMenuSource = read('modules/renderer/messageContextMenu.js');
 // This does not confer terminal persistence or cancellation authority.
 assert.doesNotMatch(contextMenuSource, /contextMenuDependencies\.finalizeStreamedMessage/,
     'regeneration must not regain a direct durable terminal facade');
-assert.match(contextMenuSource, /if \(streamingRequested && typeof contextMenuDependencies\.startStreamingMessage === 'function'\) \{\s*await contextMenuDependencies\.startStreamingMessage\(/,
+assert.match(contextMenuSource, /const startStreamFn = typeof contextMenuDependencies\.startStream === 'function'\s*\?\s*contextMenuDependencies\.startStream\s*:\s*contextMenuDependencies\['startStreamingMessage'\];/,
+    'regeneration must resolve stream-start authority only from the injected capability or its reviewed legacy fallback');
+assert.match(contextMenuSource, /if \(streamingRequested && typeof startStreamFn === 'function'\) \{\s*await startStreamFn\(/,
     'regeneration pre-request projection must be streaming-only and explicitly injected');
-assert.equal((contextMenuSource.match(/contextMenuDependencies\.startStreamingMessage\s*\(/g) || []).length, 1,
+assert.equal((contextMenuSource.match(/await startStreamFn\s*\(/g) || []).length, 1,
     'regeneration must retain only its reviewed pre-request projection initialization');
-assert.ok(contextMenuSource.indexOf('await contextMenuDependencies.startStreamingMessage(')
+assert.ok(contextMenuSource.indexOf('await startStreamFn(')
     < contextMenuSource.indexOf('const vcpResult = await electronAPI.sendToVCP('),
     'the owned thinking projection must exist before the regeneration provider request');
+const messageRendererSource = read('modules/messageRenderer.js');
+assert.match(messageRendererSource, /startStreamingMessage:\s*mainRendererReferences\.streamStartCapability \|\| streamManager\.startStreamingMessage,\s*startStream:\s*mainRendererReferences\.streamStartCapability,/,
+    'MessageRenderer must inject the owned stream-start capability while retaining only the reviewed legacy fallback');
 assert.match(contextMenuSource, /contextMenuDependencies\.cancelStream\?\.\(messageId, reason\)/,
     'context-menu cancellation must still delegate to the coordinator-owned bridge');
 assert.match(contextMenuSource, /contextMenuDependencies\.acceptStreamEvent\?\.\(\{\s*type: 'error'/,
@@ -411,14 +416,21 @@ assert.match(read('modules/ui-system/component-showcase.js'), /id: 'ui-component
 assert.match(read('modules/ui-system/next-shell/launchpad-controller.js'), /getInternalApps\(\)\.filter\(app => app\.discoverable !== false\)\.forEach/,
     'Launchpad must expose discoverable internal applications while hiding internal test surfaces');
 
-const eventSource = read('modules/event-listeners.js');
-for (const id of [
-    'enableMiddleClickQuickAction', 'middleClickQuickAction',
-    'enableMiddleClickAdvanced', 'middleClickAdvancedDelay',
-]) {
-    assert.match(eventSource, new RegExp(`getElementById\\('${id}'\\)`),
-        `upstream settings behavior for #${id} must remain wired without a retired toolbar button`);
+const quickActionsSchema = read('modules/settings/schema/quick-actions.js');
+const typedSettingsOwners = read('modules/ui-system/typed-field-owners.js');
+const middleClickHandler = read('modules/renderer/middleClickHandler.js');
+for (const id of ['enableMiddleClickQuickAction', 'middleClickQuickAction', 'enableMiddleClickAdvanced', 'middleClickAdvancedDelay']) {
+    assert.match(quickActionsSchema, new RegExp(`['"]${id}['"]`),
+        `settings schema must declare #${id}`);
+    assert.match(typedSettingsOwners, new RegExp(id),
+        `typed settings owner must retain behavior for #${id}`);
 }
+assert.match(read('modules/messageRenderer.js'), /enableMiddleClickQuickAction|enableMiddleClickAdvanced/,
+    'message renderer must consume middle-click enable settings');
+assert.match(middleClickHandler, /middleClickQuickAction|middleClickAdvancedDelay/,
+    'middle-click business handler must consume action/delay settings');
+assert.doesNotMatch(read('modules/event-listeners.js'), /getElementById\(['"](?:enableMiddleClickQuickAction|middleClickQuickAction|enableMiddleClickAdvanced|middleClickAdvancedDelay)['"]\)/,
+    'middle-click settings must not regress to a second event-listener owner');
 
 const sharedBaseline = JSON.parse(read('scripts/next-delta-shared-baseline.json'));
 for (const [file, entry] of Object.entries(sharedBaseline)) {

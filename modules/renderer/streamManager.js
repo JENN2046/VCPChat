@@ -6,8 +6,8 @@ import { createDesktopPushConsumer } from './desktopPushConsumer.js';
 import { createStreamProjectionRuntime } from './streamProjectionRuntime.js';
 import { collectMarkdownCodeDomains } from './markdownCodeDomainScanner.js';
 import {
-    renderResidentEphemeralPresentation as renderResidentPresentationCard,
-    validateResidentEphemeralPresentation as validateResidentPresentation
+    validateResidentEphemeralPresentation as validateResidentPresentation,
+    renderResidentEphemeralPresentation as renderResidentPresentationCard
 } from './residentEphemeralPresentation.mjs';
 
 /** Creates one DOM stream projection owner for one renderer Surface. */

@@ -103,6 +103,7 @@ function createCatalog(ops) {
         // Shared shell/config/theme helpers
         loadSettings: query(() => ops.invoke('load-settings')),
         saveSettings: query((settings) => ops.invoke('save-settings', settings)),
+        onSettingsExternalUpdated: subscription(ops.subscribe('settings-external-updated', (_event, payload) => payload)),
         saveUserAvatar: query((avatarData) => ops.invoke('save-user-avatar', avatarData)),
         saveAvatarColor: query((data) => ops.invoke('save-avatar-color', data)),
         readImageFromClipboard: query(async () => {
@@ -175,14 +176,12 @@ function createCatalog(ops) {
         onModelsUpdated: subscription(ops.subscribe('models-updated', (_event, models) => models)),
         getAllItems: query(() => ops.invoke('get-all-items')),
         importRegexRules: query((agentId) => ops.invoke('import-regex-rules', agentId)),
-        updateAgentConfig: query((agentId, updates) => ops.invoke('update-agent-config', agentId, updates)),
         getGlobalWarehouse: query(() => ops.invoke('get-global-warehouse')),
         saveGlobalWarehouse: query((data) => ops.invoke('save-global-warehouse', data)),
         loadPresetPrompts: query((presetPath) => ops.invoke('load-preset-prompts', presetPath)),
         loadPresetContent: query((filePath) => ops.invoke('load-preset-content', filePath)),
         selectDirectory: query(() => ops.invoke('select-directory')),
         getActiveSystemPrompt: query((agentId) => ops.invoke('get-active-system-prompt', agentId)),
-        programmaticSetPromptMode: query((agentId, mode) => ops.invoke('programmatic-set-prompt-mode', agentId, mode)),
         onReloadAgentSettings: subscription(ops.subscribe('reload-agent-settings', (_event, data) => data)),
         getAgentTopics: query((agentId) => ops.invoke('get-agent-topics', agentId)),
         createNewTopicForAgent: query((agentId, topicName, isBranch, locked) => ops.invoke('create-new-topic-for-agent', agentId, topicName, isBranch, locked)),

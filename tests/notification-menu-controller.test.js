@@ -7,6 +7,8 @@ function fixture() {
     const dom = new JSDOM(`<!doctype html><body>
       <button id="nextUiNotificationMenuBtn" aria-expanded="false"></button>
       <div id="nextUiNotificationMenu" role="menu" hidden>
+        <button id="nextUiNotificationForum" role="menuitem"></button>
+        <button id="nextUiNotificationMemo" role="menuitem"></button>
         <button id="nextUiNotificationLog" role="menuitem"></button>
         <button id="nextUiNotificationObserver" role="menuitem"></button>
         <button id="nextUiNotificationFilterToggle" role="menuitemcheckbox" aria-checked="false"><span id="nextUiNotificationFilterState"></span></button>
@@ -18,7 +20,7 @@ function fixture() {
     return dom;
 }
 
-test('notification menu owns keyboard focus, commands and Escape cleanup', async () => {
+test('notification menu owns current commands, keyboard focus and lifecycle cleanup', async () => {
     const dom = fixture();
     const calls = [];
     let enabled = false;
@@ -30,6 +32,8 @@ test('notification menu owns keyboard focus, commands and Escape cleanup', async
         window: dom.window,
         document: dom.window.document,
         commands: () => ({
+            openForum: () => calls.push('forum'),
+            openMemo: () => calls.push('memo'),
             openLog: () => calls.push('log'),
             openRagObserver: () => calls.push('observer'),
             toggleNotificationFilter: () => { calls.push('toggle'); enabled = !enabled; },
@@ -47,11 +51,12 @@ test('notification menu owns keyboard focus, commands and Escape cleanup', async
     const trigger = byId('nextUiNotificationMenuBtn');
     const menu = byId('nextUiNotificationMenu');
     controller.open();
-    assert.equal(dom.window.document.activeElement.id, 'nextUiNotificationLog');
+    assert.equal(dom.window.document.activeElement.id, 'nextUiNotificationForum');
     for (const [key, target] of [
-        ['ArrowDown', 'nextUiNotificationObserver'],
+        ['ArrowDown', 'nextUiNotificationMemo'],
+        ['ArrowDown', 'nextUiNotificationLog'],
         ['End', 'nextUiNotificationClear'],
-        ['Home', 'nextUiNotificationLog'],
+        ['Home', 'nextUiNotificationForum'],
         ['ArrowUp', 'nextUiNotificationClear'],
     ]) {
         dom.window.document.activeElement.dispatchEvent(new dom.window.KeyboardEvent('keydown', {
@@ -60,6 +65,8 @@ test('notification menu owns keyboard focus, commands and Escape cleanup', async
         assert.equal(dom.window.document.activeElement.id, target, key);
     }
     for (const [id, action] of [
+        ['nextUiNotificationForum', 'forum'],
+        ['nextUiNotificationMemo', 'memo'],
         ['nextUiNotificationLog', 'log'],
         ['nextUiNotificationObserver', 'observer'],
         ['nextUiNotificationFilterToggle', 'toggle'],
@@ -75,8 +82,23 @@ test('notification menu owns keyboard focus, commands and Escape cleanup', async
         assert.equal(dom.window.document.activeElement.id,
             action === 'filter-settings' ? 'settingsFocusTarget' : 'nextUiNotificationMenuBtn');
     }
-    assert.deepEqual(calls, ['log', 'observer', 'toggle', 'filter-settings', 'clear']);
     assert.equal(byId('nextUiNotificationFilterToggle').getAttribute('aria-checked'), 'true');
+
+    controller.open();
+    const filter = byId('nextUiNotificationFilterToggle');
+    filter.focus();
+    filter.dispatchEvent(new dom.window.KeyboardEvent('keydown', {
+        key: 'ContextMenu', bubbles: true, cancelable: true,
+    }));
+    await Promise.resolve();
+    assert.equal(calls.at(-1), 'filter-settings');
+    assert.equal(menu.hidden, true);
+    assert.equal(dom.window.document.activeElement.id, 'settingsFocusTarget');
+    assert.deepEqual(calls, [
+        'forum', 'memo', 'log', 'observer', 'toggle',
+        'filter-settings', 'clear', 'filter-settings'
+    ]);
+
     trigger.click();
     assert.equal(dispatcher.entry.close(), true);
     assert.equal(trigger.getAttribute('aria-expanded'), 'false');
@@ -84,7 +106,7 @@ test('notification menu owns keyboard focus, commands and Escape cleanup', async
     controller.dispose();
     assert.equal(dispatcher.entry, null);
     const callCount = calls.length;
-    byId('nextUiNotificationLog').click();
+    byId('nextUiNotificationForum').click();
     trigger.click();
     await Promise.resolve();
     assert.equal(calls.length, callCount, 'disposed action listeners must be removed');
@@ -116,8 +138,11 @@ test('notification menu closes and restores focus after a rejected action', asyn
 });
 
 test('notification menu refuses incomplete accepted command markup', () => {
-    for (const id of ['nextUiNotificationLog', 'nextUiNotificationObserver',
-        'nextUiNotificationFilterToggle', 'nextUiNotificationSettings', 'nextUiNotificationClear']) {
+    for (const id of [
+        'nextUiNotificationForum', 'nextUiNotificationMemo',
+        'nextUiNotificationLog', 'nextUiNotificationObserver',
+        'nextUiNotificationFilterToggle', 'nextUiNotificationSettings', 'nextUiNotificationClear'
+    ]) {
         const dom = fixture();
         dom.window.document.getElementById(id).remove();
         const controller = new NotificationMenuController({ window: dom.window });

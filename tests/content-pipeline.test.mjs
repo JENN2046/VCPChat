@@ -30,19 +30,30 @@ test('content pipeline keeps thought, tool, request and code protocols ordered a
     assert.match(result.state.toolRequestMap.values().next().value, /<START>Demo<END>/);
 });
 
-test('stream-fast protocol path is intentionally lightweight and does not create protection maps', () => {
+test('stream-fast stays lightweight for protocols while shielding fenced code from common processors', () => {
     const pipeline = createContentPipeline({
         getToolResultRegex: () => /\[RESULT:[\s\S]*?\]/g,
-        getCodeFenceRegex: () => /```[\s\S]*?```/g
+        applyContentProcessors: value => value.replaceAll('MUTATE_ME', 'changed')
     });
-    const result = pipeline.process('[RESULT: partial]', { mode: PIPELINE_MODES.STREAM_FAST });
+    const input = [
+        '[RESULT: partial]',
+        '```js',
+        'const marker = "MUTATE_ME";',
+        '```',
+        'outside MUTATE_ME'
+    ].join('\n');
+    const result = pipeline.process(input, { mode: PIPELINE_MODES.STREAM_FAST });
     assert.equal(result.state.toolResultMap, null);
-    assert.equal(result.state.codeBlockMap, null);
+    assert.equal(result.state.codeBlockMap.size, 1);
+    assert.match(result.text, /const marker = "MUTATE_ME";/);
+    assert.match(result.text, /outside changed/);
     assert.deepEqual(result.meta.stepsApplied, [
         'strip-persona-backfill-tail',
         'normalize-emoticon-urls',
+        'protect-code-blocks',
         'deindent-misinterpreted-code-blocks',
         'apply-common-content-processors',
-        'normalize-adjacent-bold-boundaries'
+        'normalize-adjacent-bold-boundaries',
+        'restore-code-blocks'
     ]);
 });

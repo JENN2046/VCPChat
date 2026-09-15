@@ -24,7 +24,7 @@ Only required profile inputs are pinned. New unrelated paths are not downloaded;
 they do not require expanding the manifest. Missing or changed required inputs,
 incomplete metadata, unsafe paths, and any alias of held content fail admission.
 Known ordinary aliases are explicit metadata exceptions and remain unmaterialized.
-The nine native code assets require their separate exact identity and format
+The ten native code assets require their separate exact identity and format
 admission; this does not admit new native binaries or prove reproducible builds.
 Runtime configuration, screenshots and font diagnostic reports remain excluded.
 
@@ -54,9 +54,9 @@ body reads if its source identity has not been admitted; a new unrelated file is
 not fetched. Package selection is tied to this manifest's exact package input
 and the reviewed matcher defaults, not a general replacement packaging engine.
 
-The four current profiles contain 45, 18, 846 and 727 paths respectively. Their
-deduplicated body counts are 45, 18, 835 and 726. Running all four jobs makes 20
-Git Data REST metadata requests and 1,644 public raw body requests including
+The four current profiles contain 49, 18, 962 and 828 paths respectively. Their
+deduplicated body counts are 49, 18, 950 and 827. Running all four jobs makes 20
+Git Data REST metadata requests and 1,864 public raw body requests including
 the five bootstrap controls in each job. Bodies do not consume the authenticated
 Git Data request budget. HTTP failures and rate limits still fail the job;
 there is no alternate transport or automatic fallback.

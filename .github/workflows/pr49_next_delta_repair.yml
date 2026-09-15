@@ -1,0 +1,145 @@
+name: PR49 Next Delta Repair
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pr49_next_delta_repair.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: codex/update-vcpchat-20260912
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install locked dependencies without lifecycle scripts
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm ci --ignore-scripts --omit=optional
+
+      - name: Update regeneration contract for injected stream capability
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_PARENT='c1b9a4ed6a8b936e9ec3cb6765e9a9bc7bcd6feb'
+          BRANCH='codex/update-vcpchat-20260912'
+          CHECKER='scripts/check-next-delta-contract.mjs'
+          MANIFEST='ci/source-entry/projection_manifest.json'
+          CHAT='.github/workflows/chat_kernel_ui.yml'
+          MOBILE='.github/workflows/mobile_sync.yml'
+
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_PARENT"
+          test "$(git branch --show-current)" = "$BRANCH"
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import re
+
+          checker_path = Path('scripts/check-next-delta-contract.mjs')
+          text = checker_path.read_text(encoding='utf-8')
+          old = """assert.match(contextMenuSource, /if \\(streamingRequested && typeof contextMenuDependencies\\.startStreamingMessage === 'function'\\) \\{\\s*await contextMenuDependencies\\.startStreamingMessage\\(/,\n    'regeneration pre-request projection must be streaming-only and explicitly injected');\nassert.equal((contextMenuSource.match(/contextMenuDependencies\\.startStreamingMessage\\s*\\(/g) || []).length, 1,\n    'regeneration must retain only its reviewed pre-request projection initialization');\nassert.ok(contextMenuSource.indexOf('await contextMenuDependencies.startStreamingMessage(')\n    < contextMenuSource.indexOf('const vcpResult = await electronAPI.sendToVCP('),\n    'the owned thinking projection must exist before the regeneration provider request');"""
+          new = """assert.match(contextMenuSource, /const startStreamFn = typeof contextMenuDependencies\\.startStream === 'function'\\s*\\?\\s*contextMenuDependencies\\.startStream\\s*:\\s*contextMenuDependencies\\['startStreamingMessage'\\];/,\n    'regeneration must resolve stream-start authority only from the injected capability or its reviewed legacy fallback');\nassert.match(contextMenuSource, /if \\(streamingRequested && typeof startStreamFn === 'function'\\) \\{\\s*await startStreamFn\\(/,\n    'regeneration pre-request projection must be streaming-only and explicitly injected');\nassert.equal((contextMenuSource.match(/await startStreamFn\\s*\\(/g) || []).length, 1,\n    'regeneration must retain only its reviewed pre-request projection initialization');\nassert.ok(contextMenuSource.indexOf('await startStreamFn(')\n    < contextMenuSource.indexOf('const vcpResult = await electronAPI.sendToVCP('),\n    'the owned thinking projection must exist before the regeneration provider request');\nconst messageRendererSource = read('modules/messageRenderer.js');\nassert.match(messageRendererSource, /startStreamingMessage:\\s*mainRendererReferences\\.streamStartCapability \\|\\| streamManager\\.startStreamingMessage,\\s*startStream:\\s*mainRendererReferences\\.streamStartCapability,/,\n    'MessageRenderer must inject the owned stream-start capability while retaining only the reviewed legacy fallback');"""
+          if text.count(old) != 1:
+              raise SystemExit('expected legacy regeneration guard block not found exactly once')
+          text = text.replace(old, new)
+          checker_path.write_text(text, encoding='utf-8')
+
+          def identity(path):
+              data = Path(path).read_bytes()
+              return {
+                  'blob': hashlib.sha1(b'blob ' + str(len(data)).encode('ascii') + b'\0' + data).hexdigest(),
+                  'size': len(data),
+                  'sha256': hashlib.sha256(data).hexdigest(),
+              }
+
+          checker_id = identity(checker_path)
+          manifest_path = Path('ci/source-entry/projection_manifest.json')
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          hits = 0
+          for profile_name, profile in manifest['profiles'].items():
+              for entry in profile.get('entries', []):
+                  if entry.get('path') == str(checker_path):
+                      if entry.get('mode') != '100644' or entry.get('type') != 'blob' or entry.get('kind') != 'source':
+                          raise SystemExit(f'unexpected checker manifest contract for {profile_name}')
+                      entry['blob'] = checker_id['blob']
+                      entry['size'] = checker_id['size']
+                      entry['sha256'] = checker_id['sha256']
+                      hits += 1
+          if hits != 1:
+              raise SystemExit(f'expected exactly one checker manifest entry, found {hits}')
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          manifest_id = identity(manifest_path)
+
+          pin_pattern = re.compile(
+              r"('ci/source-entry/projection_manifest\.json': \{'size': )\d+(, 'blob': ')[0-9a-f]{40}(', 'sha256': ')[0-9a-f]{64}('\})"
+          )
+          counts = {}
+          for workflow in [Path('.github/workflows/chat_kernel_ui.yml'), Path('.github/workflows/mobile_sync.yml')]:
+              workflow_text = workflow.read_text(encoding='utf-8')
+              replacement = (
+                  rf"\g<1>{manifest_id['size']}\g<2>{manifest_id['blob']}"
+                  rf"\g<3>{manifest_id['sha256']}\g<4>"
+              )
+              workflow_text, count = pin_pattern.subn(replacement, workflow_text)
+              expected = 1 if workflow.name == 'chat_kernel_ui.yml' else 3
+              if count != expected:
+                  raise SystemExit(f'unexpected manifest pin count in {workflow}: {count} != {expected}')
+              workflow.write_text(workflow_text, encoding='utf-8')
+              counts[str(workflow)] = count
+
+          print(json.dumps({
+              'checker': checker_id,
+              'manifest': manifest_id,
+              'checker_hits': hits,
+              'pin_counts': counts,
+          }, indent=2))
+          PY
+
+          node --check "$CHECKER"
+          npm run guard:next-delta
+          node --test tests/message-regeneration-stream-animation.test.js
+          python3 -m unittest discover -s ci/source-entry/tests -p 'test_*.py'
+
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=("$CHAT" "$MOBILE" "$MANIFEST" "$CHECKER")
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          test "${#changed[@]}" -eq "${#expected_sorted[@]}"
+          for i in "${!expected_sorted[@]}"; do
+            test "${changed[$i]}" = "${expected_sorted[$i]}"
+          done
+
+          git config user.name 'Nuobao CI Reconciler'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -- "${expected[@]}"
+          git commit -m 'fix(ci): track injected regeneration stream capability'
+          candidate="$(git rev-parse HEAD)"
+          echo "PR49_FULL_CANDIDATE=$candidate"
+
+          set +e
+          git push origin HEAD:"$BRANCH"
+          full_push_status=$?
+          set -e
+          if [ "$full_push_status" -eq 0 ]; then
+            echo 'PR49_FULL_CANDIDATE_PUSHED=1'
+            exit 0
+          fi
+          echo 'PR49_FULL_CANDIDATE_PUSHED=0'
+
+          git reset --soft HEAD^
+          git reset -- "$CHAT" "$MOBILE"
+          git commit -m 'fix(ci): track injected regeneration stream capability'
+          git push origin HEAD:"$BRANCH"
+          echo "PR49_NONWORKFLOW_HEAD=$(git rev-parse HEAD)"

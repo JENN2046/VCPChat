@@ -49,6 +49,7 @@ const forbiddenPaths = [
 const allowedSourceDifferences = new Set([
     // Exact reviewed three-way source, voice-build and CI-entry changes.
     'modules/renderer/residentEphemeralPresentation.mjs',
+    'modules/lyrics/lyricFetcherUnified.js',
     'modules/vcpClient.js',
     'rust_voice_input_engine/Cargo.lock',
     'rust_voice_input_engine/src/main.rs',

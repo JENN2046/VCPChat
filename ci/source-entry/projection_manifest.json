@@ -14255,9 +14255,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "caeecdaad136495e370585f0ff27d0338558bc18",
-          "size": 32592,
-          "sha256": "217c231ecfd3ea732bf385fbb7e4887ed6eaffa58b7a7fda27a63a2d11c5bead",
+          "blob": "a6f172bf5b4b8d2a764ad8d4e227f45035b1f6af",
+          "size": 32637,
+          "sha256": "c2f5cb9732593cfab1e590cef68ecc7d115c9a9dab070214d610c26695894770",
           "kind": "source"
         },
         {
@@ -17055,8 +17055,8 @@
           "tree": "0b75ef6f7e322ed9700d9e955a2b3aa007e758dd"
         },
         "upstream": {
-          "commit": "4b86d06338d2ac9f94aca7f7710f97b3879f79a0",
-          "tree": "96a2ce0eb56ce839d0997303726c0e6265b2519d"
+          "commit": "429a96829da0149ff59b6758748795a2934bdc9d",
+          "tree": "eb0588f4cfdfd7e8edea9a6299e444c1e1b0f82d"
         }
       }
     }

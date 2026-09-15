@@ -282,13 +282,18 @@ const contextMenuSource = read('modules/renderer/messageContextMenu.js');
 // This does not confer terminal persistence or cancellation authority.
 assert.doesNotMatch(contextMenuSource, /contextMenuDependencies\.finalizeStreamedMessage/,
     'regeneration must not regain a direct durable terminal facade');
-assert.match(contextMenuSource, /if \(streamingRequested && typeof contextMenuDependencies\.startStreamingMessage === 'function'\) \{\s*await contextMenuDependencies\.startStreamingMessage\(/,
+assert.match(contextMenuSource, /const startStreamFn = typeof contextMenuDependencies\.startStream === 'function'\s*\?\s*contextMenuDependencies\.startStream\s*:\s*contextMenuDependencies\['startStreamingMessage'\];/,
+    'regeneration must resolve stream-start authority only from the injected capability or its reviewed legacy fallback');
+assert.match(contextMenuSource, /if \(streamingRequested && typeof startStreamFn === 'function'\) \{\s*await startStreamFn\(/,
     'regeneration pre-request projection must be streaming-only and explicitly injected');
-assert.equal((contextMenuSource.match(/contextMenuDependencies\.startStreamingMessage\s*\(/g) || []).length, 1,
+assert.equal((contextMenuSource.match(/await startStreamFn\s*\(/g) || []).length, 1,
     'regeneration must retain only its reviewed pre-request projection initialization');
-assert.ok(contextMenuSource.indexOf('await contextMenuDependencies.startStreamingMessage(')
+assert.ok(contextMenuSource.indexOf('await startStreamFn(')
     < contextMenuSource.indexOf('const vcpResult = await electronAPI.sendToVCP('),
     'the owned thinking projection must exist before the regeneration provider request');
+const messageRendererSource = read('modules/messageRenderer.js');
+assert.match(messageRendererSource, /startStreamingMessage:\s*mainRendererReferences\.streamStartCapability \|\| streamManager\.startStreamingMessage,\s*startStream:\s*mainRendererReferences\.streamStartCapability,/,
+    'MessageRenderer must inject the owned stream-start capability while retaining only the reviewed legacy fallback');
 assert.match(contextMenuSource, /contextMenuDependencies\.cancelStream\?\.\(messageId, reason\)/,
     'context-menu cancellation must still delegate to the coordinator-owned bridge');
 assert.match(contextMenuSource, /contextMenuDependencies\.acceptStreamEvent\?\.\(\{\s*type: 'error'/,

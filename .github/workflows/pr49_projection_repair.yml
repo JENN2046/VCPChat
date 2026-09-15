@@ -1,0 +1,142 @@
+name: PR49 UI Projection Repair
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pr49_projection_repair.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: codex/update-vcpchat-20260912
+          fetch-depth: 0
+
+      - name: Admit exact missing UI script inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_PARENT='6ca8393244d1ad156acc5c0fdde41fd7453ba340'
+          BRANCH='codex/update-vcpchat-20260912'
+          MANIFEST='ci/source-entry/projection_manifest.json'
+          CHAT='.github/workflows/chat_kernel_ui.yml'
+          MOBILE='.github/workflows/mobile_sync.yml'
+
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_PARENT"
+          test "$(git branch --show-current)" = "$BRANCH"
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import re
+          import subprocess
+
+          required = [
+              'scripts/check-uiux-artifacts.mjs',
+              'scripts/check-global-settings-section-ownership.mjs',
+              'scripts/audit-settings-layout.mjs',
+              'scripts/test-settings-sidebar-parity-electron.mjs',
+          ]
+
+          def identity(path):
+              data = Path(path).read_bytes()
+              blob = hashlib.sha1(b'blob ' + str(len(data)).encode('ascii') + b'\0' + data).hexdigest()
+              index = subprocess.check_output(['git', 'ls-files', '-s', '--', path], text=True).strip().split()
+              if len(index) < 2 or index[0] != '100644' or index[1] != blob:
+                  raise SystemExit(f'git identity mismatch for {path}')
+              return {
+                  'path': path,
+                  'mode': '100644',
+                  'type': 'blob',
+                  'blob': blob,
+                  'size': len(data),
+                  'sha256': hashlib.sha256(data).hexdigest(),
+                  'kind': 'source',
+              }
+
+          manifest_path = Path('ci/source-entry/projection_manifest.json')
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          profile = manifest['profiles']['chat-kernel-ui']
+          if profile.get('ready') is not True:
+              raise SystemExit('chat-kernel-ui profile is not ready')
+          entries = profile.get('entries')
+          if not isinstance(entries, list):
+              raise SystemExit('chat-kernel-ui entries missing')
+          existing = {entry.get('path') for entry in entries}
+          overlap = sorted(existing.intersection(required))
+          if overlap:
+              raise SystemExit(f'paths unexpectedly already admitted: {overlap}')
+
+          new_entries = [identity(path) for path in required]
+          entries.extend(new_entries)
+          entries.sort(key=lambda row: row['path'])
+          if len({entry['path'] for entry in entries}) != len(entries):
+              raise SystemExit('duplicate profile entry after repair')
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          data = manifest_path.read_bytes()
+          manifest_id = {
+              'size': len(data),
+              'blob': hashlib.sha1(b'blob ' + str(len(data)).encode('ascii') + b'\0' + data).hexdigest(),
+              'sha256': hashlib.sha256(data).hexdigest(),
+          }
+          pattern = re.compile(
+              r"('ci/source-entry/projection_manifest\.json': \{'size': )\d+(, 'blob': ')[0-9a-f]{40}(', 'sha256': ')[0-9a-f]{64}('\})"
+          )
+          counts = {}
+          for workflow in [Path('.github/workflows/chat_kernel_ui.yml'), Path('.github/workflows/mobile_sync.yml')]:
+              text = workflow.read_text(encoding='utf-8')
+              replacement = (
+                  rf"\g<1>{manifest_id['size']}\g<2>{manifest_id['blob']}"
+                  rf"\g<3>{manifest_id['sha256']}\g<4>"
+              )
+              text, count = pattern.subn(replacement, text)
+              expected = 1 if workflow.name == 'chat_kernel_ui.yml' else 3
+              if count != expected:
+                  raise SystemExit(f'unexpected manifest pin count in {workflow}: {count} != {expected}')
+              workflow.write_text(text, encoding='utf-8')
+              counts[str(workflow)] = count
+
+          print(json.dumps({'admitted': new_entries, 'manifest': manifest_id, 'pin_counts': counts}, indent=2))
+          PY
+
+          python3 -m json.tool "$MANIFEST" >/dev/null
+          python3 -m unittest discover -s ci/source-entry/tests -p 'test_*.py'
+
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=("$CHAT" "$MOBILE" "$MANIFEST")
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          test "${#changed[@]}" -eq "${#expected_sorted[@]}"
+          for i in "${!expected_sorted[@]}"; do
+            test "${changed[$i]}" = "${expected_sorted[$i]}"
+          done
+
+          git config user.name 'Nuobao CI Reconciler'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -- "${expected[@]}"
+          git commit -m 'fix(ci): admit missing UI script inputs'
+          candidate="$(git rev-parse HEAD)"
+          echo "PR49_FULL_CANDIDATE=$candidate"
+
+          set +e
+          git push origin HEAD:"$BRANCH"
+          full_push_status=$?
+          set -e
+          if [ "$full_push_status" -eq 0 ]; then
+            echo 'PR49_FULL_CANDIDATE_PUSHED=1'
+            exit 0
+          fi
+          echo 'PR49_FULL_CANDIDATE_PUSHED=0'
+
+          git reset --soft HEAD^
+          git reset -- "$CHAT" "$MOBILE"
+          git commit -m 'fix(ci): admit missing UI script inputs'
+          git push origin HEAD:"$BRANCH"
+          echo "PR49_NONWORKFLOW_HEAD=$(git rev-parse HEAD)"

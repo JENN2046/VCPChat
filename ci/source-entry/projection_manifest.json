@@ -14255,9 +14255,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2f8eb17a3910a0ba9fbc4c7f128f86bac6c35d6f",
-          "size": 32529,
-          "sha256": "56bac807f4fb2a4f398eef2eb41a58fd50b0b8ccfe8aa3d14485d0c585677cc9",
+          "blob": "caeecdaad136495e370585f0ff27d0338558bc18",
+          "size": 32592,
+          "sha256": "217c231ecfd3ea732bf385fbb7e4887ed6eaffa58b7a7fda27a63a2d11c5bead",
           "kind": "source"
         },
         {

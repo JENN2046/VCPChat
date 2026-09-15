@@ -11,13 +11,15 @@ const sourceContext = loadCiSourceContext(root);
 // local `upstream/main` ref may be older still. Both make accepted product
 // changes look like design-system violations. Environment overrides remain
 // available when a PR intentionally audits against a newly reviewed snapshot.
-const sourceRef = process.env.VCP_DESIGN_SOURCE_REF || (() => {
-    try {
-        return execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8' }).trim();
-    } catch {
-        return 'HEAD';
-    }
-})();
+const sourceRef = process.env.VCP_DESIGN_SOURCE_REF
+    || sourceContext?.sourceCommit
+    || (() => {
+        try {
+            return execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8' }).trim();
+        } catch {
+            return 'HEAD';
+        }
+    })();
 // Compare the reviewed subtraction snapshot against the current product main
 // as the second ancestry boundary. The snapshot is intentionally not itself
 // the upstream ref: this branch may contain unrelated upstream product work

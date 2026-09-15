@@ -154,8 +154,10 @@ assert.match(nextCss, /data-vcp-wallpaper-scope="global"\] \.next-ui-navigation-
     'global wallpaper disables the viewport-sized material filter');
 assert.match(nextCss, /data-vcp-wallpaper-scope="global"\] \.next-ui-topbar\s*\{[^}]*backdrop-filter:\s*var\(--next-backdrop-filter\)/s,
     'global wallpaper applies glass locally to the topbar');
-assert.match(nextCss, /data-vcp-wallpaper-scope="global"\] \.sidebar\s*\{[^}]*backdrop-filter:\s*var\(--next-backdrop-filter\)/s,
-    'global wallpaper applies glass locally to the sidebar');
+assert.match(nextCss, /data-vcp-wallpaper-scope="global"\] \.sidebar\s*\{[^}]*background:\s*transparent\s*!important;[^}]*backdrop-filter:\s*none\s*!important/s,
+    'global wallpaper keeps the sidebar transparent so the shared material plane is not double-painted');
+assert.match(nextCss, /data-vcp-wallpaper-scope="global"\] \.container::before\s*\{[^}]*background-image:\s*var\(--next-material-sheen\);[^}]*backdrop-filter:\s*var\(--next-backdrop-filter\)/s,
+    'global wallpaper applies sidebar and corner glass on one continuous container material plane');
 assert.match(nextCss, /data-vcp-wallpaper-scope="global"\] \.next-ui-main-panel\s*\{[^}]*backdrop-filter:\s*none\s*!important/s,
     'global wallpaper keeps the main chat wallpaper sharp');
 assert.match(nextCss, /#vcp-we-wallpaper-web/, 'dynamic and web wallpaper planes share the resolved geometry contract');

@@ -1,0 +1,65 @@
+name: PR49 History Evidence Diagnostic
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pr49_history_evidence_diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: codex/update-vcpchat-20260912
+          fetch-depth: 0
+
+      - name: Verify diagnostic parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = '4b9c558014ae47f8998db73fe53f6336b15df365'
+
+      - name: Setup Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install locked dependencies without lifecycle scripts
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm ci --ignore-scripts --omit=optional
+
+      - name: Enumerate exact historical evidence paths
+        shell: bash
+        env:
+          VCP_DESIGN_SOURCE_REF: b5931a69d0815a1dfd60c079093ed5518a73dc77
+          VCP_UPSTREAM_REF: 4b86d06338d2ac9f94aca7f7710f97b3879f79a0
+        run: |
+          set -euo pipefail
+          cp scripts/check-design-system-boundary.mjs scripts/.pr49-history-diagnostic.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/.pr49-history-diagnostic.mjs')
+          text = p.read_text(encoding='utf-8')
+          needle = """        const differences = git(['diff', '--ignore-space-at-eol', '--name-only', sourceRef, '--'])\n            .split('\\n')\n            .filter(Boolean);\n        for (const file of differences) {"""
+          replacement = """        const differences = git(['diff', '--ignore-space-at-eol', '--name-only', sourceRef, '--'])\n            .split('\\n')\n            .filter(Boolean);\n        const normalizedSourceDifferences = new Set(differences);\n        const exactUpstreamDifferences = new Set(\n            git(['diff', '--name-only', upstreamRef, '--'])\n                .split('\\n')\n                .filter(Boolean)\n        );\n        const exactSourceDifferences = git(['diff', '--name-only', sourceRef, '--'])\n            .split('\\n')\n            .filter(Boolean);\n        for (const file of exactSourceDifferences) {\n            const restoredExactlyToUpstream = !exactUpstreamDifferences.has(file);\n            if (allowedSourceDifferences.has(file)\n                || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))\n                || forbiddenPaths.some(pattern => pattern.test(file))\n                || restoredExactlyToUpstream) continue;\n            console.log(`PR49_HISTORY_EVIDENCE\\t${file}\\tsourceNormalizedDifferent=${normalizedSourceDifferences.has(file) ? 1 : 0}\\tupstreamNormalizedDifferent=${filesDifferentFromUpstream.has(file) ? 1 : 0}`);\n        }\n        for (const file of differences) {"""
+          if text.count(needle) != 1:
+              raise SystemExit('diagnostic seam not found exactly once')
+          p.write_text(text.replace(needle, replacement), encoding='utf-8')
+          PY
+          set +e
+          node scripts/.pr49-history-diagnostic.mjs > "$RUNNER_TEMP/pr49-history.log" 2>&1
+          status=$?
+          set -e
+          echo '=== PR49 HISTORY EVIDENCE ==='
+          grep '^PR49_HISTORY_EVIDENCE' "$RUNNER_TEMP/pr49-history.log" || true
+          echo '=== NATIVE DESIGN BOUNDARY RESULT ==='
+          tail -n 80 "$RUNNER_TEMP/pr49-history.log"
+          echo '=== END ==='
+          rm -f scripts/.pr49-history-diagnostic.mjs
+          exit "$status"

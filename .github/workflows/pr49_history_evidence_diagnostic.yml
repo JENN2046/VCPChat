@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = '4b9c558014ae47f8998db73fe53f6336b15df365'
+          test "$(git rev-parse HEAD^)" = '2e4ca9b4601afcf816860d8330fbad529ce51e06'
 
       - name: Setup Node 22
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -38,7 +38,7 @@ jobs:
         shell: bash
         env:
           VCP_DESIGN_SOURCE_REF: b5931a69d0815a1dfd60c079093ed5518a73dc77
-          VCP_UPSTREAM_REF: 4b86d06338d2ac9f94aca7f7710f97b3879f79a0
+          VCP_UPSTREAM_REF: 429a96829da0149ff59b6758748795a2934bdc9d
         run: |
           set -euo pipefail
           cp scripts/check-design-system-boundary.mjs scripts/.pr49-history-diagnostic.mjs
@@ -59,7 +59,7 @@ jobs:
           echo '=== PR49 HISTORY EVIDENCE ==='
           grep '^PR49_HISTORY_EVIDENCE' "$RUNNER_TEMP/pr49-history.log" || true
           echo '=== NATIVE DESIGN BOUNDARY RESULT ==='
-          tail -n 80 "$RUNNER_TEMP/pr49-history.log"
+          tail -n 120 "$RUNNER_TEMP/pr49-history.log"
           echo '=== END ==='
           rm -f scripts/.pr49-history-diagnostic.mjs
           exit "$status"

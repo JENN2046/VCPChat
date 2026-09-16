@@ -7,7 +7,7 @@ const test = require('node:test');
 const vm = require('node:vm');
 const { JSDOM } = require('jsdom');
 
-function loadRenderedTextModule() {
+function loadRenderedTextHarness() {
     const dom = new JSDOM('<!doctype html><body></body>', {
         url: 'https://scriptorium.local/',
     });
@@ -33,7 +33,14 @@ function loadRenderedTextModule() {
     vm.runInContext(source, context, {
         filename: 'scriptorium-rendered-text.js',
     });
-    return context.window.ScriptoriumRenderedText;
+    return {
+        document: dom.window.document,
+        renderedText: context.window.ScriptoriumRenderedText,
+    };
+}
+
+function loadRenderedTextModule() {
+    return loadRenderedTextHarness().renderedText;
 }
 
 test('island sequence mapping disambiguates short JS-injected text', () => {
@@ -291,4 +298,79 @@ test('island-local source fields preserve full-document offsets', () => {
         fullDocument.slice(absoluteStart, absoluteEnd),
         '动态目标'
     );
+});
+
+test('scan fingerprint context preserves hidden structural text semantics', () => {
+    const { document, renderedText } = loadRenderedTextHarness();
+    const root = document.createElement('div');
+    root.innerHTML = '<span>dup</span>'
+        + '<span style="display:none">dup</span>'
+        + '<span>dup</span>';
+    document.body.appendChild(root);
+    const options = { editable: false };
+    const records = renderedText.createController().scan(root, options);
+
+    assert.equal(records.length, 2);
+    records.forEach((record) => {
+        const uncached = renderedText.fingerprint(root, record.node, options);
+        assert.deepStrictEqual(record.snapshot, uncached);
+    });
+    assert.equal(records[1].snapshot.ordinal, 2);
+    assert.equal(records[1].snapshot.sameTextOrdinal, 2);
+    assert.equal(records[1].snapshot.previousText, 'dup');
+});
+
+test('scan fingerprint context matches uncached representative fingerprints', () => {
+    const { document, renderedText } = loadRenderedTextHarness();
+    const root = document.createElement('div');
+    root.innerHTML = '<section>开场 Alpha '
+        + '<span>重复值</span> sibling text '
+        + '<span style="visibility:hidden">隐藏结构</span>'
+        + '<span>重复值</span>'
+        + '<div>嵌套 <span>Nested English 中文</span> 结束</div>'
+        + '<script>排除脚本文字</script>'
+        + '</section>';
+    document.body.appendChild(root);
+    const options = { editable: false };
+    const records = renderedText.createController().scan(root, options);
+
+    assert.ok(records.length > 4);
+    records.forEach((record) => {
+        const uncached = renderedText.fingerprint(root, record.node, options);
+        assert.deepStrictEqual(record.snapshot, uncached);
+    });
+});
+
+test('controller scan rebuilds fingerprint context after DOM mutation', () => {
+    const { document, renderedText } = loadRenderedTextHarness();
+    const root = document.createElement('div');
+    root.innerHTML = '<span>first</span><span>target</span>';
+    document.body.appendChild(root);
+    const options = { editable: false };
+    const controller = renderedText.createController();
+    const firstRecords = controller.scan(root, options);
+    const firstTarget = firstRecords.find(
+        (record) => record.node.nodeValue === 'target'
+    );
+    const firstTargetOrdinal = firstTarget.snapshot.ordinal;
+
+    const hidden = document.createElement('span');
+    hidden.style.display = 'none';
+    hidden.textContent = 'inserted structural text';
+    root.insertBefore(hidden, root.lastElementChild);
+
+    const secondRecords = controller.scan(root, options);
+    const secondTarget = secondRecords.find(
+        (record) => record.node.nodeValue === 'target'
+    );
+    const uncached = renderedText.fingerprint(
+        root,
+        secondTarget.node,
+        options
+    );
+
+    assert.equal(firstTargetOrdinal, 1);
+    assert.equal(secondTarget.snapshot.ordinal, 2);
+    assert.equal(secondTarget.snapshot.previousText, 'inserted structural text');
+    assert.deepStrictEqual(secondTarget.snapshot, uncached);
 });

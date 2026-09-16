@@ -103,6 +103,29 @@
         return node?.nodeType === Node.TEXT_NODE ? node : null;
     }
 
+    function buildFingerprintContext(root, options = {}) {
+        const nodes = textNodes(root, {
+            ...options,
+            requireLayout: false,
+        });
+        const ordinalByNode = new Map();
+        const sameTextOrdinalByNode = new Map();
+        const textCounts = new Map();
+        nodes.forEach((node, ordinal) => {
+            const text = node.nodeValue;
+            const sameTextOrdinal = textCounts.get(text) || 0;
+            ordinalByNode.set(node, ordinal);
+            sameTextOrdinalByNode.set(node, sameTextOrdinal);
+            textCounts.set(text, sameTextOrdinal + 1);
+        });
+        return {
+            root,
+            nodes,
+            ordinalByNode,
+            sameTextOrdinalByNode,
+        };
+    }
+
     function fingerprint(root, node, options = {}) {
         if (!root || !isVisibleTextNode(node, {
             ...options,
@@ -110,17 +133,28 @@
         })) {
             return null;
         }
-        const nodes = textNodes(root, {
-            ...options,
-            requireLayout: false,
-        });
-        const ordinal = nodes.indexOf(node);
+        const context = options.fingerprintContext;
+        const contextOrdinal = context?.root === root
+            ? context.ordinalByNode?.get?.(node)
+            : undefined;
+        const useContext = Number.isInteger(contextOrdinal)
+            && context.nodes?.[contextOrdinal] === node
+            && context.sameTextOrdinalByNode?.has?.(node);
+        const nodes = useContext
+            ? context.nodes
+            : textNodes(root, {
+                ...options,
+                requireLayout: false,
+            });
+        const ordinal = useContext ? contextOrdinal : nodes.indexOf(node);
         if (ordinal < 0) return null;
         const text = normalizedText(node.nodeValue);
-        const sameTextOrdinal = nodes
-            .slice(0, ordinal + 1)
-            .filter((candidate) => candidate.nodeValue === text)
-            .length - 1;
+        const sameTextOrdinal = useContext
+            ? context.sameTextOrdinalByNode.get(node)
+            : nodes
+                .slice(0, ordinal + 1)
+                .filter((candidate) => candidate.nodeValue === text)
+                .length - 1;
         return {
             text,
             ordinal,
@@ -416,10 +450,18 @@
         function scan(root, scanOptions = {}) {
             if (!root) return [];
             const nodes = textNodes(root, scanOptions);
+            const fingerprintContext = buildFingerprintContext(
+                root,
+                scanOptions
+            );
+            const fingerprintOptions = {
+                ...scanOptions,
+                fingerprintContext,
+            };
             const discovered = [];
             nodes.forEach((node) => {
                 const existing = records.get(node);
-                const snapshot = fingerprint(root, node, scanOptions);
+                const snapshot = fingerprint(root, node, fingerprintOptions);
                 if (!snapshot) return;
                 const record = existing || {
                     root,

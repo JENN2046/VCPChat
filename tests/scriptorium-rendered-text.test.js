@@ -375,6 +375,67 @@ test('controller scan rebuilds fingerprint context after DOM mutation', () => {
     assert.deepStrictEqual(secondTarget.snapshot, uncached);
 });
 
+test('rendered text scan keeps eager proof and authorization ordering', () => {
+    const { document, renderedText } = loadRenderedTextHarness();
+    const root = document.createElement('div');
+    root.innerHTML = '<div data-vdoc-edit-key="island"'
+        + ' data-vdoc-edit-type="island">'
+        + '<div data-vdoc-island="proof-split">'
+        + '<p>可编辑静态文字</p>'
+        + '<p><span>混合</span><span>宿主</span></p>'
+        + '<button>交互文字</button>'
+        + '</div></div>';
+    document.body.appendChild(root);
+    const source = '<div><p>可编辑静态文字</p>'
+        + '<p><span>混合</span><span>宿主</span></p>'
+        + '<button>交互文字</button></div>';
+    const adapter = {
+        kind: 'flow',
+        compile() {
+            return {
+                editRegions: [{
+                    type: 'island',
+                    islandId: 'proof-split',
+                    sourceRange: { start: 0, end: source.length },
+                }],
+            };
+        },
+        currentSource() {
+            return source;
+        },
+        replaceCurrentSource() {
+            return true;
+        },
+    };
+    const controller = renderedText.createRenderedTextController({});
+    assert.equal(controller.activate({ root, adapter, kind: 'flow' }), true);
+
+    const editableHosts = [
+        ...root.querySelectorAll('[data-vdoc-rendered-text-editable="true"]'),
+    ];
+    assert.equal(editableHosts.length, 3);
+    assert.ok(editableHosts.some((host) =>
+        host.textContent === '可编辑静态文字'
+    ));
+    editableHosts.forEach((host) => {
+        assert.equal(host.contentEditable, 'true');
+        assert.equal(host.getAttribute('role'), 'textbox');
+    });
+    assert.equal(
+        root.querySelector('button').hasAttribute(
+            'data-vdoc-rendered-text-editable'
+        ),
+        false
+    );
+    assert.equal(
+        root.querySelector('p:nth-of-type(2)').hasAttribute(
+            'data-vdoc-rendered-text-editable'
+        ),
+        false
+    );
+    controller.dispose();
+});
+
 test('fingerprint safely falls back for unusable optional contexts', () => {
     const { document, renderedText } = loadRenderedTextHarness();
     const root = document.createElement('div');

@@ -323,7 +323,9 @@
         const text = normalizedText(snapshot?.text).trim();
         if (!source || !text) return null;
 
-        const fields = sourceTextFields(source);
+        const fields = Array.isArray(options.sourceFields)
+            ? options.sourceFields
+            : sourceTextFields(source);
         if (!fields.length) return null;
 
         const visualOrdinal = Number.isFinite(snapshot?.ordinal)
@@ -642,6 +644,7 @@
                 if (!scoped) return [];
                 const records = controller.scan(scope, scanOptions);
                 const textNodeCount = records.length;
+                const sourceFields = sourceTextFields(scoped.source);
                 records.forEach((record) => {
                     const host = editableHostFor(
                         record.node,
@@ -663,7 +666,7 @@
                     let sequenceRange = sequenceSourceRange(
                         scoped.source,
                         sourceSnapshot,
-                        { textNodeCount }
+                        { textNodeCount, sourceFields }
                     );
                     let standardRange = controller.resolveSourceRange(
                         scoped.source,
@@ -688,7 +691,7 @@
                         sequenceRange = sequenceSourceRange(
                             scoped.source,
                             sourceSnapshot,
-                            { textNodeCount }
+                            { textNodeCount, sourceFields }
                         );
                         standardRange = controller.resolveSourceRange(
                             scoped.source,

@@ -124,3 +124,124 @@ test('source field extraction preserves offsets after style blocks', () => {
         '动态文字'
     );
 });
+
+test('precomputed source fields preserve sequence mapping decisions', () => {
+    const renderedText = loadRenderedTextModule();
+    const source = [
+        '<div data-vdoc-island="source-index-equivalence">',
+        '<h1>唯一静态文字</h1>',
+        '<p>前置锚点</p>',
+        '<p>重复文字</p>',
+        '<p>中间锚点</p>',
+        '<p>重复文字</p>',
+        '<p>后置锚点</p>',
+        '<script>',
+        'const labels = ["脚本前锚点", "短文", "脚本后锚点", "核心可见文字"];',
+        '</script>',
+        '</div>',
+    ].join('\n');
+    const visibleTexts = [
+        '唯一静态文字',
+        '前置锚点',
+        '重复文字',
+        '中间锚点',
+        '重复文字',
+        '后置锚点',
+        '脚本前锚点',
+        '短文',
+        '脚本后锚点',
+        '核心可见文字',
+    ];
+    const sourceFields = renderedText.sourceTextFields(source);
+    const originalFields = JSON.parse(JSON.stringify(sourceFields));
+    const cases = [
+        {
+            name: 'unique static HTML text',
+            snapshot: {
+                text: '唯一静态文字',
+                ordinal: 0,
+                sameTextOrdinal: 0,
+                previousText: '',
+                nextText: '前置锚点',
+            },
+        },
+        {
+            name: 'repeated text with previous and next anchors',
+            snapshot: {
+                text: '重复文字',
+                ordinal: 4,
+                sameTextOrdinal: 1,
+                previousText: '中间锚点',
+                nextText: '后置锚点',
+            },
+        },
+        {
+            name: 'short JavaScript-injected text',
+            snapshot: {
+                text: '短文',
+                ordinal: 7,
+                sameTextOrdinal: 0,
+                previousText: '脚本前锚点',
+                nextText: '脚本后锚点',
+            },
+        },
+        {
+            name: 'trimmed fallback-compatible content',
+            snapshot: {
+                text: '\n  核心可见文字  \n',
+                ordinal: 9,
+                sameTextOrdinal: 0,
+                previousText: '脚本后锚点',
+                nextText: '',
+            },
+        },
+    ];
+
+    cases.forEach(({ name, snapshot }) => {
+        const options = { textNodeCount: visibleTexts.length };
+        const uncached = renderedText.sequenceSourceRange(
+            source,
+            snapshot,
+            options
+        );
+        const cached = renderedText.sequenceSourceRange(
+            source,
+            snapshot,
+            { ...options, sourceFields }
+        );
+        assert.deepEqual(cached, uncached, name);
+        assert.ok(cached, `${name} should remain resolvable`);
+    });
+
+    assert.deepEqual(JSON.parse(JSON.stringify(sourceFields)), originalFields);
+});
+
+test('precomputed source fields preserve unresolved ambiguous mappings', () => {
+    const renderedText = loadRenderedTextModule();
+    const source = [
+        '<div data-vdoc-island="ambiguous-source-index">',
+        '<p>相同文字</p>',
+        '<p>相同文字</p>',
+        '</div>',
+    ].join('\n');
+    const snapshot = {
+        text: '相同文字',
+        ordinal: 0,
+        sameTextOrdinal: 0,
+        previousText: '',
+        nextText: '',
+    };
+    const options = { textNodeCount: 2 };
+    const sourceFields = renderedText.sourceTextFields(source);
+    const originalFields = JSON.parse(JSON.stringify(sourceFields));
+    const uncached = renderedText.sequenceSourceRange(source, snapshot, options);
+    const cached = renderedText.sequenceSourceRange(
+        source,
+        snapshot,
+        { ...options, sourceFields }
+    );
+
+    assert.equal(uncached, null);
+    assert.deepEqual(cached, uncached);
+    assert.deepEqual(JSON.parse(JSON.stringify(sourceFields)), originalFields);
+});

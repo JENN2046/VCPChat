@@ -644,7 +644,13 @@
                 if (!scoped) return [];
                 const records = controller.scan(scope, scanOptions);
                 const textNodeCount = records.length;
-                const sourceFields = sourceTextFields(scoped.source);
+                let sourceFields = null;
+                const getSourceFields = () => {
+                    if (sourceFields === null) {
+                        sourceFields = sourceTextFields(scoped.source);
+                    }
+                    return sourceFields;
+                };
                 records.forEach((record) => {
                     const host = editableHostFor(
                         record.node,
@@ -666,7 +672,7 @@
                     let sequenceRange = sequenceSourceRange(
                         scoped.source,
                         sourceSnapshot,
-                        { textNodeCount, sourceFields }
+                        { textNodeCount, sourceFields: getSourceFields() }
                     );
                     let standardRange = controller.resolveSourceRange(
                         scoped.source,
@@ -691,7 +697,7 @@
                         sequenceRange = sequenceSourceRange(
                             scoped.source,
                             sourceSnapshot,
-                            { textNodeCount, sourceFields }
+                            { textNodeCount, sourceFields: getSourceFields() }
                         );
                         standardRange = controller.resolveSourceRange(
                             scoped.source,

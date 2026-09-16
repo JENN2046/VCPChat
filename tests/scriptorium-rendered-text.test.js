@@ -245,3 +245,50 @@ test('precomputed source fields preserve unresolved ambiguous mappings', () => {
     assert.deepEqual(cached, uncached);
     assert.deepEqual(JSON.parse(JSON.stringify(sourceFields)), originalFields);
 });
+
+test('island-local source fields preserve full-document offsets', () => {
+    const renderedText = loadRenderedTextModule();
+    const prefix = '<!doctype html>\r\n<section>文档前缀</section>\n';
+    const scopedSource = [
+        '  \r\n<div data-vdoc-island="offset-model">',
+        '<style>\r\n.target::before { content: "样式遮罩"; }\n</style>',
+        '<h1>静态锚点</h1>\r\n',
+        '<script>\n',
+        'const labels = ["脚本前锚点", "动态目标", "脚本后锚点"];\r\n',
+        '</script>',
+        '</div>\r\n  ',
+    ].join('');
+    const suffix = '\n<footer>文档后缀</footer>\r\n';
+    const fullDocument = prefix + scopedSource + suffix;
+    const islandStart = prefix.length;
+    const snapshot = {
+        text: '动态目标',
+        ordinal: 2,
+        sameTextOrdinal: 0,
+        previousText: '脚本前锚点',
+        nextText: '脚本后锚点',
+    };
+    const textNodeCount = 4;
+    const sourceFields = renderedText.sourceTextFields(scopedSource);
+    const uncached = renderedText.sequenceSourceRange(
+        scopedSource,
+        snapshot,
+        { textNodeCount }
+    );
+    const cached = renderedText.sequenceSourceRange(
+        scopedSource,
+        snapshot,
+        { textNodeCount, sourceFields }
+    );
+
+    assert.deepStrictEqual(cached, uncached);
+    assert.ok(cached);
+    assert.ok(islandStart > 0);
+    assert.ok(cached.start > 0);
+    const absoluteStart = islandStart + cached.start;
+    const absoluteEnd = islandStart + cached.end;
+    assert.equal(
+        fullDocument.slice(absoluteStart, absoluteEnd),
+        '动态目标'
+    );
+});

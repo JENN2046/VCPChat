@@ -686,19 +686,12 @@
                 acceptHost: (host, node) =>
                     editableIslandHost(host, node, root),
             };
-            const scanScope = (scope) => {
-                if (!scope?.isConnected || !root.contains(scope)) return [];
+            function discoverScope(scope) {
+                if (!scope?.isConnected || !root.contains(scope)) return null;
                 const scoped = islandSource(adapter, scope);
-                if (!scoped) return [];
+                if (!scoped) return null;
                 const records = controller.scan(scope, scanOptions);
-                const textNodeCount = records.length;
-                let sourceFields = null;
-                const getSourceFields = () => {
-                    if (sourceFields === null) {
-                        sourceFields = sourceTextFields(scoped.source);
-                    }
-                    return sourceFields;
-                };
+                const candidates = [];
                 records.forEach((record) => {
                     const host = editableHostFor(
                         record.node,
@@ -712,68 +705,112 @@
                     // 混合父元素整体改写；各 span 叶子仍会分别参与后续扫描。
                     const nodeText = normalizedText(record.node.nodeValue);
                     if (normalizedText(host.textContent) !== nodeText) return;
+                    candidates.push({ record, host, nodeText });
+                });
+                return {
+                    scope,
+                    scoped,
+                    records,
+                    textNodeCount: records.length,
+                    candidates,
+                };
+            }
 
-                    // 第一层：保留原始空白的节点级匹配。第二层：HTML 解析可能
-                    // 将 CRLF、缩进或标签外围换行规范化，此时改用核心可见文本
-                    // 匹配，并在提交时只投影用户编辑后的核心文字，保留源码排版。
-                    let sourceSnapshot = record.snapshot;
-                    let sequenceRange = sequenceSourceRange(
+            function createScanProofContext(discovery) {
+                let sourceFields = null;
+                const getSourceFields = () => {
+                    if (sourceFields === null) {
+                        sourceFields = sourceTextFields(discovery.scoped.source);
+                    }
+                    return sourceFields;
+                };
+                return {
+                    scoped: discovery.scoped,
+                    textNodeCount: discovery.textNodeCount,
+                    getSourceFields,
+                };
+            }
+
+            function proveTextCandidate(candidate, proofContext) {
+                const { record, nodeText } = candidate;
+                const { scoped, textNodeCount, getSourceFields } = proofContext;
+
+                // 第一层：保留原始空白的节点级匹配。第二层：HTML 解析可能
+                // 将 CRLF、缩进或标签外围换行规范化，此时改用核心可见文本
+                // 匹配，并在提交时只投影用户编辑后的核心文字，保留源码排版。
+                let sourceSnapshot = record.snapshot;
+                let sequenceRange = sequenceSourceRange(
+                    scoped.source,
+                    sourceSnapshot,
+                    { textNodeCount, sourceFields: getSourceFields() }
+                );
+                let standardRange = controller.resolveSourceRange(
+                    scoped.source,
+                    sourceSnapshot,
+                    { textNodeCount }
+                );
+                let range = sequenceRange || standardRange;
+                record.preferSequence = Boolean(sequenceRange);
+                if (!range) {
+                    const coreText = nodeText.trim();
+                    if (!coreText) return null;
+                    sourceSnapshot = {
+                        ...record.snapshot,
+                        text: coreText,
+                        previousText: normalizedText(
+                            record.snapshot.previousText
+                        ).trim(),
+                        nextText: normalizedText(
+                            record.snapshot.nextText
+                        ).trim(),
+                    };
+                    sequenceRange = sequenceSourceRange(
                         scoped.source,
                         sourceSnapshot,
                         { textNodeCount, sourceFields: getSourceFields() }
                     );
-                    let standardRange = controller.resolveSourceRange(
+                    standardRange = controller.resolveSourceRange(
                         scoped.source,
                         sourceSnapshot,
                         { textNodeCount }
                     );
-                    let range = sequenceRange || standardRange;
+                    range = sequenceRange || standardRange;
                     record.preferSequence = Boolean(sequenceRange);
-                    if (!range) {
-                        const coreText = nodeText.trim();
-                        if (!coreText) return;
-                        sourceSnapshot = {
-                            ...record.snapshot,
-                            text: coreText,
-                            previousText: normalizedText(
-                                record.snapshot.previousText
-                            ).trim(),
-                            nextText: normalizedText(
-                                record.snapshot.nextText
-                            ).trim(),
-                        };
-                        sequenceRange = sequenceSourceRange(
-                            scoped.source,
-                            sourceSnapshot,
-                            { textNodeCount, sourceFields: getSourceFields() }
-                        );
-                        standardRange = controller.resolveSourceRange(
-                            scoped.source,
-                            sourceSnapshot,
-                            { textNodeCount }
-                        );
-                        range = sequenceRange || standardRange;
-                        record.preferSequence = Boolean(sequenceRange);
-                        if (range) {
-                            record.projectEditedText = (value) =>
-                                normalizedText(value).trim();
-                        }
+                    if (range) {
+                        record.projectEditedText = (value) =>
+                            normalizedText(value).trim();
                     }
-                    if (!range) {
-                        // 占位符或纯计算结果仍可参与浏览器原生选择，但不会进入
-                        // 输入态；“可见文字”与“可可靠写回源码”在这里明确解耦。
-                        return;
-                    }
-                    record.sourceSnapshot = sourceSnapshot;
-                    record.sourceRange = range;
-                    record.host = makeEditable(
-                        record.node,
-                        scope,
-                        scanOptions
-                    );
-                    if (record.host) hostRecords.set(record.host, record);
+                }
+                if (!range) {
+                    // 占位符或纯计算结果仍可参与浏览器原生选择，但不会进入
+                    // 输入态；“可见文字”与“可可靠写回源码”在这里明确解耦。
+                    return null;
+                }
+                return { sourceSnapshot, sourceRange: range };
+            }
+
+            function authorizeTextCandidate(candidate, proofResult, discovery) {
+                const { record } = candidate;
+                record.sourceSnapshot = proofResult.sourceSnapshot;
+                record.sourceRange = proofResult.sourceRange;
+                record.host = makeEditable(
+                    record.node,
+                    discovery.scope,
+                    scanOptions
+                );
+                if (record.host) hostRecords.set(record.host, record);
+            }
+
+            const scanScope = (scope) => {
+                const discovery = discoverScope(scope);
+                if (!discovery) return [];
+                const proofContext = createScanProofContext(discovery);
+                discovery.candidates.forEach((candidate) => {
+                    const proof = proveTextCandidate(candidate, proofContext);
+                    if (!proof) return;
+                    authorizeTextCandidate(candidate, proof, discovery);
                 });
-                return records;
+                return discovery.records;
             };
             scopes.forEach(scanScope);
 

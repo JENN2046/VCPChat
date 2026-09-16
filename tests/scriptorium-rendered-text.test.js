@@ -374,3 +374,67 @@ test('controller scan rebuilds fingerprint context after DOM mutation', () => {
     assert.equal(secondTarget.snapshot.previousText, 'inserted structural text');
     assert.deepStrictEqual(secondTarget.snapshot, uncached);
 });
+
+test('fingerprint safely falls back for unusable optional contexts', () => {
+    const { document, renderedText } = loadRenderedTextHarness();
+    const root = document.createElement('div');
+    root.innerHTML = '<span>before</span><span>target</span>';
+    const otherRoot = document.createElement('div');
+    document.body.append(root, otherRoot);
+    const node = root.lastElementChild.firstChild;
+    const options = { editable: false };
+    const legacy = renderedText.fingerprint(root, node, options);
+    const contexts = [
+        {
+            root: otherRoot,
+            nodes: [node],
+            ordinalByNode: new Map([[node, 0]]),
+            sameTextOrdinalByNode: new Map([[node, 0]]),
+        },
+        {
+            root,
+            nodes: [],
+            ordinalByNode: new Map(),
+            sameTextOrdinalByNode: new Map(),
+        },
+        {
+            root,
+            nodes: [node],
+            ordinalByNode: new Map([[node, 0]]),
+        },
+    ];
+
+    contexts.forEach((fingerprintContext) => {
+        const actual = renderedText.fingerprint(root, node, {
+            ...options,
+            fingerprintContext,
+        });
+        assert.deepStrictEqual(actual, legacy);
+    });
+});
+
+test('fingerprint context preserves exact whitespace-sensitive nodeValue keys', () => {
+    const { document, renderedText } = loadRenderedTextHarness();
+    const root = document.createElement('div');
+    root.innerHTML = '<span>dup</span><span> dup </span><span>dup</span>'
+        + '<span>中文 English mixed</span>'
+        + '<span data-accept="no">filtered text</span>';
+    document.body.appendChild(root);
+    const options = {
+        editable: false,
+        acceptNode: (node) => node.parentElement?.dataset.accept !== 'no',
+    };
+    const records = renderedText.createController().scan(root, options);
+
+    records.forEach((record) => {
+        const uncached = renderedText.fingerprint(root, record.node, options);
+        assert.deepStrictEqual(record.snapshot, uncached);
+    });
+    assert.equal(records[0].snapshot.sameTextOrdinal, 0);
+    assert.equal(records[1].snapshot.text, ' dup ');
+    assert.equal(records[1].snapshot.sameTextOrdinal, 0);
+    assert.equal(records[2].snapshot.sameTextOrdinal, 1);
+    assert.equal(records.some(
+        (record) => record.node.nodeValue === 'filtered text'
+    ), false);
+});

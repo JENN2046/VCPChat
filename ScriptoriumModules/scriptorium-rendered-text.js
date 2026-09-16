@@ -450,17 +450,23 @@
         function scan(root, scanOptions = {}) {
             if (!root) return [];
             const nodes = textNodes(root, scanOptions);
-            const fingerprintContext = buildFingerprintContext(
-                root,
-                scanOptions
-            );
+            let fingerprintContext = null;
+            const getFingerprintContext = () => {
+                if (fingerprintContext === null) {
+                    fingerprintContext = buildFingerprintContext(
+                        root,
+                        scanOptions
+                    );
+                }
+                return fingerprintContext;
+            };
             const fingerprintOptions = {
                 ...scanOptions,
-                fingerprintContext,
             };
             const discovered = [];
             nodes.forEach((node) => {
                 const existing = records.get(node);
+                fingerprintOptions.fingerprintContext = getFingerprintContext();
                 const snapshot = fingerprint(root, node, fingerprintOptions);
                 if (!snapshot) return;
                 const record = existing || {

@@ -5536,6 +5536,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/services/shootingPlannerSyncService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bad4853ae46966e9088def702fa242c19108bc1",
+          "size": 5804,
+          "sha256": "879872ce2e8bbad997a6c42fade19de2237330626c72bb71cfb5b2fa4dd3533e",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/windowAppIds.js",
           "mode": "100644",
           "type": "blob",
@@ -12569,6 +12578,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/services/shootingPlannerSyncService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bad4853ae46966e9088def702fa242c19108bc1",
+          "size": 5804,
+          "sha256": "879872ce2e8bbad997a6c42fade19de2237330626c72bb71cfb5b2fa4dd3533e",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/windowAppIds.js",
           "mode": "100644",
           "type": "blob",
@@ -15509,6 +15527,15 @@
           "blob": "a14c2e9c236d73832b559611f3d68ed3240aa613",
           "size": 1038,
           "sha256": "f2f10d381359e88b5278685f478022f99a998eae5f9c8e60327ab95743d5cf17",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chat-shooting-planner-sync-service.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c8aa01b9b6d4428cb1aa8158cd674ffe9a1d0fa0",
+          "size": 5683,
+          "sha256": "82de6fafbf444125007e4ecff76a9f95919d6aa0d665677f41bd959498f19893",
           "kind": "source"
         },
         {

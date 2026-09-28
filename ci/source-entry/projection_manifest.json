@@ -5536,6 +5536,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/services/shootingPlannerSyncService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bad4853ae46966e9088def702fa242c19108bc1",
+          "size": 5804,
+          "sha256": "879872ce2e8bbad997a6c42fade19de2237330626c72bb71cfb5b2fa4dd3533e",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/windowAppIds.js",
           "mode": "100644",
           "type": "blob",

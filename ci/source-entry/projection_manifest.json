@@ -9545,6 +9545,69 @@
           "kind": "source"
         },
         {
+          "path": "assets/font/Orbitron.ttf",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "edb1a6fce1dc38e15727c293bfdea5c4154b2480",
+          "size": 16884,
+          "sha256": "27cd313045d12280384256b4fba922366a4883e32ffb866b9acd62c5a859de61",
+          "kind": "source"
+        },
+        {
+          "path": "assets/font/vcp-ui/material-symbols-outlined.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6a570b58c7d7dc5d4c554a75a576ff696f625015",
+          "size": 314604,
+          "sha256": "42c53db99a4c4a3e47a65a0848db29c5c7e61f8c7e310cd3b0cd3ce01de64b72",
+          "kind": "source"
+        },
+        {
+          "path": "assets/font/vcp-ui/noto-sans-sc.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "63978af7fda802b2f70075d13d4d0d0531b99a35",
+          "size": 101092,
+          "sha256": "1b9017c0a6153a34c45790d1a4a9f922f16b26d4facdc214fd35f171d8cb5fba",
+          "kind": "source"
+        },
+        {
+          "path": "assets/nova_button_light.png",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9521e73333ec848c32af78d9ff97424f515424ac",
+          "size": 2099464,
+          "sha256": "0dd15d79f1a686260bacfead1db23d5b3c33acfd1f71acf191d8dd96f275c767",
+          "kind": "source"
+        },
+        {
+          "path": "assets/nova_button.png",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d4a19a50cf2409e060283b03922fe3cf6bf8d3fc",
+          "size": 724993,
+          "sha256": "fbaf75a630a1cecc9401154fd7986328805f48540da90df06b636d0cdbf5918c",
+          "kind": "source"
+        },
+        {
+          "path": "assets/svg/acrylic-noise.svg",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "561377ca79c02698842d07dcddc9fab4bbe5045c",
+          "size": 432,
+          "sha256": "15412a63c0496e7e80bdb91b203b903c4a37e9d9a5c1ed54752f4744def3b9a2",
+          "kind": "source"
+        },
+        {
+          "path": "bootstrap/recovery.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ab5cbe956e3f6abc9ca5cca29af4e1a1364fc0cc",
+          "size": 4637,
+          "sha256": "6a278071a7c687fa03485ba04dfe23eee61b31d3cfa7e75545ca3c7dda046291",
+          "kind": "source"
+        },
+        {
           "path": "Canvasmodules/canvas.css",
           "mode": "100644",
           "type": "blob",
@@ -9614,1365 +9677,6 @@
           "blob": "f75191ca5860e086b1769fb05c82fc68c2a10a2b",
           "size": 24178,
           "sha256": "1fb1e88de4e5d9c56feb7d025c3edb2c6847599604dc57b4fa2b9185a6de3ada",
-          "kind": "source"
-        },
-        {
-          "path": "Flowlockmodules/flowlock-integration.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "93b5e064caab96048d825958eb140248496b95b3",
-          "size": 19390,
-          "sha256": "fcf9277ca497d6c47cd362d7bad02d78511c07f7851069ae5400b13f9ff0b16a",
-          "kind": "source"
-        },
-        {
-          "path": "Flowlockmodules/flowlock-protocol.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "e60a9ba367199dd138dfb8a2c98e2bc226e48612",
-          "size": 14920,
-          "sha256": "93eab67a01e0aa9e36967acd526885ee9e292b53dfaf07fc27cf46817719238d",
-          "kind": "source"
-        },
-        {
-          "path": "Flowlockmodules/flowlock.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "f83cd0ae3f5621157b86b1c78428cffd10d4a6a7",
-          "size": 30099,
-          "sha256": "aed1afb9cf110c67d4871fc20f1122ad584d3a4466064ff7c4fc6ab35439de44",
-          "kind": "source"
-        },
-        {
-          "path": "Forummodules/forum.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "c418b21e3df422360270c61056f4c048d8d29730",
-          "size": 31544,
-          "sha256": "4d547161d5596958dfff28d8eeb1d0633850711a6d20dc24644bd020c86d135b",
-          "kind": "source"
-        },
-        {
-          "path": "Forummodules/forum.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "68937b93e7ed11110317c506bf6f7fd05a3720d4",
-          "size": 11222,
-          "sha256": "c7bc9c779d433de918d386f96b7b3ccbcf6d84aaed98893735528514b02ff807",
-          "kind": "source"
-        },
-        {
-          "path": "Forummodules/forum.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "bc04ce8e1066bdb85d62a860d849e4f4cb166668",
-          "size": 71217,
-          "sha256": "a7dfb1b7978a42432665e999c95aacd7da8ced02cdad38ae5941b975db7a217c",
-          "kind": "source"
-        },
-        {
-          "path": "Groupmodules/grouprenderer.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "838df205760511cd8a2b8d88fd6cedbc80814281",
-          "size": 75038,
-          "sha256": "8a674c4cb051840394559ee0ccc7e7f6f07bf820f9248b516cf1808cf4c71312",
-          "kind": "source"
-        },
-        {
-          "path": "Logmodules/log.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ccc5ade925aa338d9ff5d0d02537fa98a0657705",
-          "size": 10181,
-          "sha256": "a0e45cd1380b5ec9573a6b4ebb332e1dd63053fcc597431d9ae51a94574b9001",
-          "kind": "source"
-        },
-        {
-          "path": "Logmodules/log.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8c4f83afe637bc4f08bdbcda1dd5d147f45ba6a4",
-          "size": 5157,
-          "sha256": "d04c1fe8c89aeaa27a58d17a13ecd64c4054d612f4c586b9984cad30db07e154",
-          "kind": "source"
-        },
-        {
-          "path": "Logmodules/log.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "54bb2ce6a0825b731d00d2c0e62fb91e0bc17345",
-          "size": 16698,
-          "sha256": "4a1e30a121e83f9c2812efde5416a27cf437177f7f141f0be09df1d49edc3197",
-          "kind": "source"
-        },
-        {
-          "path": "Memomodules/memo-graph.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "09e81c0f7d922323ce8405fd4bb3e330b776383d",
-          "size": 27269,
-          "sha256": "f5180c28990a88e3e2dd6f366cb257077d58fa2b7609b8418255f840bd3385ec",
-          "kind": "source"
-        },
-        {
-          "path": "Memomodules/memo-workbench.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "29239138e4d95a27678921b562b0253337b8f08b",
-          "size": 14085,
-          "sha256": "f6e0266fa07c8e6b6e9ccc8885c0ccadc425628b2337f150e4a9c926542f42a8",
-          "kind": "source"
-        },
-        {
-          "path": "Memomodules/memo.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6884c3fd14c83f13505afc60358306e520912713",
-          "size": 29362,
-          "sha256": "d1a2bdd6526b20fd8888a377cdaa83b162fbab60e0ee4efc7338452be40ed1f1",
-          "kind": "source"
-        },
-        {
-          "path": "Memomodules/memo.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "2ea120c0649cbaa736c184683a42054f9188f511",
-          "size": 30841,
-          "sha256": "48837edc1e8d6b57abcd3bf2784087ea9d1f86db91f0c046b710bc6e83ab328a",
-          "kind": "source"
-        },
-        {
-          "path": "Memomodules/memo.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "bfee11edc58e3f8f2161085c9ce725394fea2f92",
-          "size": 61304,
-          "sha256": "6f6147dfb954f3d61b9b613e09cea00056e9e0338ffb9cc18f53f52a364ec7ac",
-          "kind": "source"
-        },
-        {
-          "path": "Notemodules/notemini.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "dc7001a0f2795c294acf07589f25b1a828279e21",
-          "size": 4142,
-          "sha256": "84d07f23129162f99bc78cbdce1f077682ef91ed2b7cfec9f1f8de19169a71e2",
-          "kind": "source"
-        },
-        {
-          "path": "Notemodules/notemini.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "00490dcb1efad89abd3338d6abf09abaf374a4ee",
-          "size": 1564,
-          "sha256": "ca1526d315b276a583e4ee99fa74c180569e86ae00ace7dd1310385f1a0b03fa",
-          "kind": "source"
-        },
-        {
-          "path": "Notemodules/notemini.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "2a4de26e5162279703252d6449f50c2b57d95d5c",
-          "size": 3818,
-          "sha256": "4a04495453304eaf424d03812a19b74b56e00e7ad414b9d7cdc8d348125034f5",
-          "kind": "source"
-        },
-        {
-          "path": "Notemodules/notes.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6224a9e06faaa19ed80488f207b73ee9ec661c01",
-          "size": 31793,
-          "sha256": "2094977d914092538859e426ce04d8bda674d68fe6f6a066e5bcf61c8f3704c3",
-          "kind": "source"
-        },
-        {
-          "path": "Notemodules/notes.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "2b9b8360005d3b12d09bdfedd7157f1e2ccc9bd1",
-          "size": 13804,
-          "sha256": "7c1c508b436bb200a6f32fc614191b8fea39cb4202afe67493a369d14f8cbbe8",
-          "kind": "source"
-        },
-        {
-          "path": "Notemodules/notes.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "b976ed97527c122640146516549d5b513e2e6b61",
-          "size": 94936,
-          "sha256": "7083de2288afcee28f60a1ac0208c485e096bcb3af3c7db0325cb9751640a70e",
-          "kind": "source"
-        },
-        {
-          "path": "PluginManagerModules/plugin-manager.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "d2ec34216e375debba9e6b166cf172bd34a63b4b",
-          "size": 16541,
-          "sha256": "85b7fc37a640fce37d79727063859942c06ef6cef1ab00a475e80b0493ca1f68",
-          "kind": "source"
-        },
-        {
-          "path": "PluginManagerModules/plugin-manager.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "7066e5189a4f5fd45aefff797945273bf2bbe7dc",
-          "size": 7245,
-          "sha256": "0df0197316b027bec1e95dfaa2d9dc306fbf4f961b81f13c086d2a57bdcf41ae",
-          "kind": "source"
-        },
-        {
-          "path": "PluginManagerModules/plugin-manager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "bfaf75f3026b708cabad1d23ea89781e31edd473",
-          "size": 19930,
-          "sha256": "2ab2250065a7b9c86475e77698706eea2a68362fd405ffc8f7e459ca11d9f128",
-          "kind": "source"
-        },
-        {
-          "path": "RAGmodules/RAG_Observer.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "633a3dcdb3a5193f9a36c9ad0dcc1ceb87e1c07e",
-          "size": 169947,
-          "sha256": "c9e8a15f19737bb92ab2dd9ccf3b7661ac21023f442ae52dff5a0a77c96e4f8c",
-          "kind": "source"
-        },
-        {
-          "path": "RAGmodules/RAG_Overlay.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "66ed723fe4cf14055ca4285d965804f67c7e293d",
-          "size": 23908,
-          "sha256": "1a6cf4f7d263abedfffdd09821f31192bcd9dc359c93921fe3e58f7e6de03ad1",
-          "kind": "source"
-        },
-        {
-          "path": "RAGmodules/rag-observer-config.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "e59faea9111868d56169d6d59571c6b1f7bdbe1d",
-          "size": 13560,
-          "sha256": "42475d6e93f422a7dd73ef8719c28703b084d0215b49288224efc13877be616a",
-          "kind": "source"
-        },
-        {
-          "path": "Translatormodules/translator.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "e6c2514aadcbe1cd9b0b8b4656b688a38e4f3699",
-          "size": 12278,
-          "sha256": "17731a01d3d57001f8fa25b1b3f0b72722633ddf452ca57beaa64db579bcc52a",
-          "kind": "source"
-        },
-        {
-          "path": "Translatormodules/translator.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "0c73584a0659d1aac93618e2444aab758324f500",
-          "size": 6923,
-          "sha256": "d2a9d9339f566b260a8304d1413e9136caba6e954c4419fadabc97b9ebb6bae5",
-          "kind": "source"
-        },
-        {
-          "path": "Translatormodules/translator.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6a8f2430d44bfba818f694357c05a93a69e923c0",
-          "size": 17798,
-          "sha256": "d05504aa60a410e0be0281b70c13aa0dfecc9484edfaf717dd66fc7d51ade4e1",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin.js",
-          "mode": "100755",
-          "type": "blob",
-          "blob": "266cdd8b1762edee0cd9fc0c8bb41cc3cad66133",
-          "size": 30931,
-          "sha256": "f219d81a1bc7ba4b9a93151dcb710be6cc59ffc2e4bdc4b2cc1d41895dc6cd42",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/ChatRoomViewer/ChatRoomViewer.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "dd268452e1de30994ab579d9e6451c5f485d04e9",
-          "size": 58486,
-          "sha256": "372328ddbc27450056986d1a2bd83a849b806bc45c4f04900cc565817dc2b42f",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/DeepMemo/DeepMemo.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ec1e2d822ca4a1e4e7e4bca0ed048b38232cdfc0",
-          "size": 25989,
-          "sha256": "e9c097a119c422f464b7e8deb68ed49ebed876c90874c0683c4506781e5669fc",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "562039c47c81dc3c95210b782c1afef511a4fb5b",
-          "size": 22653,
-          "sha256": "b5ba9bc3fa60c0a2a2d14a728d2c35e0f82bb9c55f9c7719006f71d09bd454d7",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "638072a5ee2749577b22faac8474fc6c7cdacadd",
-          "size": 9348,
-          "sha256": "40052843d63dbf14c04316877b5063c4b2db938dc99e1ed896f7b73718f1457f",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/DistImageServer/image-server.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "92567fbc2b76dc554487106e38ffa47fc6f1caa1",
-          "size": 2114,
-          "sha256": "73f4433b89fcb7ebaffc716994073398e4972c6cb0ad0941448da97ac1aad000",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/FileOperator/CodeValidator.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "9a25e3ed88243020a1992f79a9e044eced638c66",
-          "size": 4513,
-          "sha256": "b7e6c5343fd165cf6e9086d831d9965d36eba2adaab9a4f05e9be74903cc599e",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/FileOperator/FileOperator.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "c7d0bfc3f5fa473939ef1b90045117e86db76931",
-          "size": 65603,
-          "sha256": "eaf11d69e5a7282ca82d7b5284a5a30ef1a49c11f33f16718558651df2e1f063",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/LoomController/LoomControllerService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "f052f5ec7fafc37dc0889b11e4bb1885342e28ed",
-          "size": 32936,
-          "sha256": "e4daed424a6e86d22f543435bb23a4493748c4bc642734250a2b3224fa50b425",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/LoomController/LoomSkillService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "46372cf6048026d38deffb152e1103b0194cbffc",
-          "size": 15170,
-          "sha256": "029589819ca09844d3ac4ff0bee85fc7c461cc85e726331a90cd7d3e4a6083c7",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/MusicController/music-controller.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "4cda903a6d5ef99d83f0947d85b400b8fd2ce2ca",
-          "size": 3500,
-          "sha256": "5de9b7584bde1b22f949447e3e6a6e956c82a015eee0cccf780a4a007218e501",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/OldPowerShellExecutor/PowerShellExecutor.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "e4ee4ca002266910b3f17957f58d89cdf5ab14cf",
-          "size": 7671,
-          "sha256": "d4d93d7ee2c4a799f8867e91fdc87ba2bf26b41bc11a435dd9ae4a096ee8f849",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "82b657ce24beb962609e1e812ee05b0c1107afaa",
-          "size": 56794,
-          "sha256": "c1d1daa08798a55bd8a28ede5243d48d14335ff734298f03b2b731dd61ab24d0",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "9d03a2384a4dde50bee3c9454b593fda92adbcea",
-          "size": 1769,
-          "sha256": "8b35975189fcefacd83df6543536ecdff07abc09a36bfe42e8684029c28249f2",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/PluginErrorReporter.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "82ea212d77acce1c59e09a12b9ce846e5471eab9",
-          "size": 9462,
-          "sha256": "6138166fe7a8ed23472540eab26b83e03dd354beec5ea6c9c13f7e9d4af5cacd",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/ShellViewer.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "554b02e5270e825df61ef384a4a6efd26c577293",
-          "size": 14486,
-          "sha256": "ddbb637c6efba2b2f76ef92610db3192865f25f16ec59397e9ad9acb596df89c",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "12e52fe8ea414569d6fd59622a427a6a5b25f577",
-          "size": 3387,
-          "sha256": "8d268b48783cc2b2aa13ec833b42092e4ed62bb37566d4435318703fbebcba82",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PluginSourceViewer/PluginSourceViewer.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ffd78966d49adeba90dc30d1ffb4c2f46577a642",
-          "size": 14808,
-          "sha256": "f587caf882f5c6f3df18ba043c377fb62087638645c23216d097c82f12cc5252",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8d1761b0dc104f6d4a53bca022dd423c133548ef",
-          "size": 71602,
-          "sha256": "58496f4fff8a4d963b468a0139c29f895ddcae95f16d21d97a281d5bf730570c",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "a0da988dbf5b09f1eecee4339d1111207cc51ef2",
-          "size": 12092,
-          "sha256": "2398ce62d566790647dea537aa07225ef4c1be0cab3782694aa53daf438e46b8",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "dd9ce2b8f325a194abdc6d38ea2499175f648935",
-          "size": 1928,
-          "sha256": "5beccee4d6eefe4e10e67c6fa989a8ad284240fdc29a7a6dbf35ac4d5097de3a",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/test_interactive_sequence.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "cbf19521eda8985e787dfb8cb74c557e98595f15",
-          "size": 3808,
-          "sha256": "61894e95d47df664f349f0844f0d46a7622c15a1a79e1b52ac70ad44175cd59f",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/test_security_check.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "a4e07d70850e0b41fb460d44b1c77af2731cc449",
-          "size": 8723,
-          "sha256": "9e44a26a1da4f5c5b840328aafd2090e1fe361ce911c8c3f875b6f23f9a002fd",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PromptSponsor/prompt-sponsor-service.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "e9ffd11c81f6e62ddef55fe0ecc679d8f74a4e90",
-          "size": 648,
-          "sha256": "8f9251f19b240cf0b43c8ac0e6043f34bce8a9f27d208c43fccf0331f93e948e",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/PromptSponsor/prompt-sponsor.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "67f67a131e0c9bea25bf7758516995c142fe2293",
-          "size": 33323,
-          "sha256": "0c5dd6fa98dff5c52a56199208d5390106afc67c903ec5c916c7812f4d65d67f",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/ScriptoriumCollaborator/ScriptoriumCollaboratorService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "a842eaf743b12d4d138a68074228570afefc31eb",
-          "size": 38916,
-          "sha256": "1f1b1402f4356a5fd106752cd45accdfe340a22cb414324c398f9ed33b8d6841",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/TopicMemo/TopicMemo.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "7a5e9eae99d7474824f81212e40d23348c143ffe",
-          "size": 8504,
-          "sha256": "c1f66874dd0c4f310de7838e2b4ae5f5ec38282f2d060e0e16e9eb04cdd7112f",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/TopicSponsor/topicsponsor-service.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "3ce4f188e83d334c802313978165979c94659c20",
-          "size": 645,
-          "sha256": "ec3d8b5301235e9bc3d4f8f9ccc544d3c47a8edd633ef464d0db1d7fad7d48f1",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/TopicSponsor/topicsponsor.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "f0a16d2dfd93d63cab6911b57849923f5ec654b5",
-          "size": 25875,
-          "sha256": "0651b6e6baa65e6dd7cdf22f88be0b771408d1545862242eb57d92aec6dce007",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPEverything/local-search-controller.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "7f6cde3b6e3268a37dd0f5d5b4ffd76623b1f7bc",
-          "size": 5263,
-          "sha256": "f565a8ce90f9d0f052457cc0dfc7e3fa08380bd5fe3296f1e02f0686ab7c4715",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/config/defaults.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8059345948ca0feaced09ddded25fa55bf7467c4",
-          "size": 6992,
-          "sha256": "723c10d89a0d072afeec15f25771b7ba3851e75f6cc1214073f9d8f1492d5bbd",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/db.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "b0e621c0ecb42c1e894f2559138f81229a8ea400",
-          "size": 22908,
-          "sha256": "5fa298053ddc9ad578923a8c4696586c4ff9c15ab8cbbe47d3c36c8cb22dbdcc",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/hash.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "3993b97b30ba6b7e2f57c290def4e88e3dd09803",
-          "size": 4355,
-          "sha256": "1d8accca65491332f2462cc8c735998444be782dfd59e7933195155a09489d37",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/idempotency.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "49135857cc7226333fdd3d2000a7f9be249f4d1b",
-          "size": 1333,
-          "sha256": "41500466e205375667110d0b83e71288292f8db0aaefea4e25e63247a0a5cd24",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/logger.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "1c7936eb72be5e5eeb1af9f250994fa9b3d1319a",
-          "size": 8458,
-          "sha256": "16fe30e905a9837384eef96307f5e25d03555d5bf15779203a8b4024ca7eb85a",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/agent.dto.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "521813b26b1e414a20e4b40ad3b01ee24fb20f9e",
-          "size": 1348,
-          "sha256": "ea6cbb8ee13e7565e4941ef46434b93d3b4eebbfff74a5659d3fa22eceec8e53",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/group.dto.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "f43be74489f7c5ed356c92637ea370b4b4350e2a",
-          "size": 1390,
-          "sha256": "e728e80245f38dc14f9e4bc535f9117de29c5edde862f250b3d1d50604f60853",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/index.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "0469c100ed57c81c517e2f5f70715a720bbf2c67",
-          "size": 603,
-          "sha256": "a137e2872a48d48db82d28587f1a29904efefbf47e05f06a4fffd72ae8de35af",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/topic.dto.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "4ec449bca02de1629cf9c05202fe6b542f4872fe",
-          "size": 1888,
-          "sha256": "53b6787988dc55c90fe3c0804b2c845331dd69f8599693a633b35c7f2b9964d4",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/error-contract.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "04643affde0c9ceebab6bdd4928572f2d398bd3c",
-          "size": 13886,
-          "sha256": "fcb79d0bf903aad3fa270a4722d9fd55ac148951963938512a483ff7a5961cae",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/fixtures/message_canonical_contract.json",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "03ebe21d5de5fb3d8f556e743fe375d36bf81cc2",
-          "size": 7262,
-          "sha256": "d7e7303371db5454fd27fe1acce0830d49db6d47c5230cdd29411c2263b144da",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/fixtures/message_diff_matrix.json",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "c2d989886ee68e3026ca2cfa2ca992f3298d8c72",
-          "size": 4721,
-          "sha256": "d30089c1fcc252c88f8b87e462a349cd9ac68c6022405b56854904f7c24749b1",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/index.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "43ebcb299ade88efe963a3b898959247b8bf7440",
-          "size": 49123,
-          "sha256": "1d0ddee1aab74371709956ccb14392c81b837db582ac4a34f377015c4e0bbdfe",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/protocol.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "7465e0c1bea584de7dff0df6e56ab161f1ec9375",
-          "size": 10384,
-          "sha256": "1f58ae5ff7e845ebb264eca09f4a6071070143bdeb65cace961e02207dcb2575",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/canonical.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6d855e716fa5ccc1de9044a34af0ed9ed7f758a7",
-          "size": 11919,
-          "sha256": "186fcfd0b020d8a3dad4d626f98b4ba200af7457bfa87effb812bb00202721d0",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/central.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "e80da661706930937ed22a4a78b047d146d5a831",
-          "size": 38449,
-          "sha256": "b1288e1c7ac93b4446768be42a01d303881acaac833934586c1de712921faf18",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/diff.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "3141551e192f9f180c2870ec0ef53b13d3d6527e",
-          "size": 13421,
-          "sha256": "80fd34b7bdd6497b2c2743633b191baf1fc8878159a639ae66d928faf57c8401",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/entity.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "b3c4d8ee7907adc98beedf32ceffb91ea54d4843",
-          "size": 67496,
-          "sha256": "c6650bda4592ad49a76ce98fc59e8b3e9f2e478b6f9aced8cbc394abd2a2100b",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/manifest.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "2f58c85173eafbb7be9dae4e61758ae6be7ed8b4",
-          "size": 15960,
-          "sha256": "8b1a5d0927f73e4243270bc20473fadd85d2488e1df97e05a7c93f1a7285484e",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/message.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "32b3e2f93867bb312e53d93b86c48f9f7d39f65a",
-          "size": 36325,
-          "sha256": "a9504b716f510111bf899281d6942c1c91da241ef69c0244876cdfaff20ccb49",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/projection.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8b2ffd80e6070c13d61299457e9c8bd8111aa629",
-          "size": 9266,
-          "sha256": "16081b514699f855afe77b126b85c173866b20e1dd7fe9fe3c116c3ac42f2082",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/transport/ndjson.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "23399e687843072aa15053e7c9b357660c5e493a",
-          "size": 4163,
-          "sha256": "3e7fb511d9605b83583dedc8060358679b555ff82a4ef1eb7e9d6dbfa3192a39",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/transport/routes.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ed390ddcae9885a2a5660cc5828a31e188829e5a",
-          "size": 18602,
-          "sha256": "d57260d3998fa5a8ec44ce827598b15915890a659506d23b9c927de89d4afeb5",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/transport/websocket.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "61d5c99062d77dc21c8dfb80701cc2a9abe0e289",
-          "size": 10779,
-          "sha256": "c23b4aeeb867f4ca23fb1b74bf6c6a0cf391052ae671334307adf887256074e1",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/utils/lock.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "26471994463c9f1434fa2c025da900284cebc1cf",
-          "size": 698,
-          "sha256": "a5660c8e2e455e0adb7046f2c688310b44d51539eafab05663a5f277abdf646d",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPMobileSync/utils/mime.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "872eae7d1f0541950f060ad615000b3ba8c0e69c",
-          "size": 1894,
-          "sha256": "4c2677ff54785278b2fada818d7af7d230bfe088e39834beb2a2aa3aa203f91d",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPSuperDice/example.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "01972bd985d435ca7f8d6e8e743b314494f1e486",
-          "size": 1983,
-          "sha256": "bd77f9846deca2dacda41442cc6dbf5c4eace7998e852e85c01b26def1a65abb",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPSuperDice/superdice.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "9f313e11140aba9db92ca5b4605d94aaf37bbfa8",
-          "size": 3310,
-          "sha256": "597268257d35f020ad8be1712297c52c0d7ae901f16cee89e3382d8532729e7d",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/inventory.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "b75e60e2b5bb5aacdf137b5650d7640baff2230e",
-          "size": 5326,
-          "sha256": "71446e7ea6fa9b5295ad5bc0c63b4ffa75c090c3c91567c318d00d293bcaef11",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/locate.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8cef174ef275562c7f166148a2e0257fcd2dc35f",
-          "size": 3890,
-          "sha256": "47f3c3353d01ce29be494bad70a463ae8f02d1a9e8fc1393eb1af6726a5f99d2",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/media-server.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "07c12d16fa93afc291a72096015352144dc16f73",
-          "size": 11632,
-          "sha256": "2885a9126607c3b43165fa8d58b06390c82fba8f1c17b0b5613157d7f010b98b",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/we-api-shim.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "5a4ff2393259e2a94abf993a61c546ba5a798e5d",
-          "size": 5168,
-          "sha256": "2518ec221882f9e698dae3f7e011fc3ff5949e882fdb7dc76a7c7c95037ba58e",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/we-wallpaper-service.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "83a7dcbf12dc3b4056b862539f988660155d3757",
-          "size": 1085,
-          "sha256": "34e9e21af9cdd6dd3bf47777e72adb4c591cffbde6abd38ed449117f9363fe99",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VCPWEWallpaperUI/plugin.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6fc2afb7815c714c525873dbd4aba7bb0f9acb18",
-          "size": 41362,
-          "sha256": "940d84b98bd7e209ce010f7cd94202569ae8d69d735e5b14ca3cebc8952b6f10",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VChatAutoTTS/plugin.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "a22d0ff7d9764848a82d9c6815c5e36356bcec48",
-          "size": 9861,
-          "sha256": "92f630ecaed38e737784e12240e15e971c8020ba68853090abb5b34fc1061ce2",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/VChatDynamicWallpaper/plugin.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "45d92efdf7e02e8ec4d5de6b1daf561a16432f51",
-          "size": 20211,
-          "sha256": "d8b78812cdd500d45b01ebb71bb131593a125801572a571eb153c26e74b70ca7",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/Plugin/WindowSensor/sensor-wrapper.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "b423b8107409d13675fd0a4523a005933adf894a",
-          "size": 4077,
-          "sha256": "d3218a6050cad53c5e7864fee9b3445f53f14d00b8ecae5c2db43600af62ed26",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/VCPDistributedServer.js",
-          "mode": "100755",
-          "type": "blob",
-          "blob": "b52a8d302a4d2c7eea8e246255ad7cddf6ff6546",
-          "size": 41700,
-          "sha256": "3c4c07d3393e9fb44314a34056ba10d69f369af2af89ab64f537b4d387c54d59",
-          "kind": "source"
-        },
-        {
-          "path": "VCPDistributedServer/frontend-plugin-loader.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "4af8a625b523f77623566c935f8d0fc23bd2826a",
-          "size": 2464,
-          "sha256": "4a5a86bcbec48a526d213d796f0cb1f8f4e424b191c39b55c5628b26cd1f5856",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUILoader.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "5dd5b9abeb49b138c7a8088705de095b2029445d",
-          "size": 5214,
-          "sha256": "4a80b1d3af485139f9dcd9b84a595065b1e6dc5b010bb70468a1ac5da875740d",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUI_StateManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "11469d236aebfebf79e2fe97066d7c3edb211ea8",
-          "size": 4544,
-          "sha256": "b74c99ec327710282e7d64f33952af77b91420b78156bb8e92a1850236c366f7",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUI_UIManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "b2c765ab7705f2531524ec8801104636faebdf33",
-          "size": 32339,
-          "sha256": "45c933cf762716bc2ae9926c40e33bd426effd22a579bc4621e0690821039c68",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/ComfyUImodules/PathResolver.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "2e34364aa63da3ae51cc6a2b8ce3e4337c8e0319",
-          "size": 7826,
-          "sha256": "a80db291ad067f83e387fca07e77ee2ed43cb5d36de49cb37fb8e9934157265e",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/ComfyUImodules/comfyUIConfig.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "4f6812f073dfce5c6bbf30dc6cb0351f0c005fef",
-          "size": 16103,
-          "sha256": "645914d25c9fdeb9e57848dca20f8424a11c7a7f7681a905d6a9717fd5876896",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/ComfyUImodules/comfyui-ipc.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "a07d5f8a69dd31f525a041c3e96217c9371ab317",
-          "size": 15290,
-          "sha256": "a1cc84fc0a1468ff99f67dc2a15f90112d40d687241f6b90d555d99c8c811e09",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/ComfyUImodules/comfyui.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "9fb7980310633fcbe953c8a847154798e9ab88f2",
-          "size": 19324,
-          "sha256": "215b45ed569520006047bb9f2fd534bfaccd99645032842e68d57ed5fe0aca8b",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditorLoader.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "437595b678eef3c624f020b791b4c9d56ef6c9bd",
-          "size": 10219,
-          "sha256": "0e195368efa6a66526a129288c44d7fb3274a19189210d53774cecec4b17d215",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditorLoader_Simplified.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "5300fd35573b07f7aafa0fa734c12c7fc5890bf2",
-          "size": 9216,
-          "sha256": "24c244757c18b45ad60e10517711148d6359b5dbcfdd6681709170c77085facb",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ApiConfigDialog.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "f582178038522cbd3d01af4afa5ad118540a4b5d",
-          "size": 6510,
-          "sha256": "f3eaf0878cea57db89a147ec5116a33093175d335ca5ee6ab1728ede20e48761",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ApiConfigDialog.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "43349fb825ff21f0612757f27040728983134245",
-          "size": 20400,
-          "sha256": "d0431edd9782a80539330622de9988a9fa879f8a28d5d5063507e24c276a0c66",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_CanvasManager_JSPlumb.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "bcaa60239aebe49bb219b91ff7caebb369929477",
-          "size": 122382,
-          "sha256": "b8d34af6004082209a348e1aeabf1a9183fae2018c00bebdcf060995e1015692",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_Config.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "877eeea13e9c2357cf0ae14e6052b84d0bed9baa",
-          "size": 13674,
-          "sha256": "6041d28b1ca06e7eb476b093e69976b2562736a3a6791c1092e77b5303d827bf",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ConnectionManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "c79f0db9f2f39824ad9418c5d301b1eabda560bc",
-          "size": 21035,
-          "sha256": "555db53cf748acef272b89970e73e59dc9fd3f1188ea9004d2845710bbeb2672",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ConnectionManager_Simplified.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "e1fc440ab4cd9dfb92b2672c6f85dbddd248400a",
-          "size": 7694,
-          "sha256": "51f4449c19f27c1493b518885e359f9d3ec99177692cc5cd449d69c0b5d046ae",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ExecutionEngine.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "2004f7cc5075bf32d2082aa2f4152ec704619465",
-          "size": 128800,
-          "sha256": "747488c714488d43479b97f0170064667f70f20fe5beaddab64e07b2e815d3fa",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8213dcb8748c2e44101cd381b6c557b0826358ea",
-          "size": 89958,
-          "sha256": "12a5b2d5e432be8f61151ee03babfc87e2ec0ea4cf58bbd4baf2b8a9b433c136",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLExtractor.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "3d770da9c61f5e5fd8dff0e70f9d26c84c4c4d2e",
-          "size": 21067,
-          "sha256": "9622d6c687a2db09dff4259d9d1c71ba439c6e2847b2312593cc2b8d12ac1717",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLExtractor_Integration.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "c5dccda3b9bffdf93969d430dd31dc95fe18e129",
-          "size": 405,
-          "sha256": "0db4d9b15dcac09d1f878efe179727b88a699935cd1670c41572e4676b4bce28",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLRenderer_Patch.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8a90639bad5ff3eefe15a4bb6d19f2c07551fe91",
-          "size": 47866,
-          "sha256": "d740f17d5191c2bc1687b0d633074362fd53e3e8a2ad16df765d7e7a72bf3212",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_PluginDialog.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "570bae70f211462a637e35dbf17bfb3075911c04",
-          "size": 28026,
-          "sha256": "1c1b9bd5b65f96cdd6cbd6b35f87da3824477ca494ddeb45cf65e7c0453c4568",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_PluginManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "db484a9e224720b387153598844f2ed42848ce20",
-          "size": 34012,
-          "sha256": "4d5ec101b16a555ec12842ff6e070fbdaf2635c05e989c92339a5bc05495420e",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_StateManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6e1b3745bae363de9559d8ce65f0908ede0ef75e",
-          "size": 31253,
-          "sha256": "de2141468f4a7f074587c941c79a8402b105eacedf2359c714fd9de6293acce6",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_UIManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "a8055462dd10879e980929b36b6c29e6824bcea6",
-          "size": 125167,
-          "sha256": "3fa70988c93d97506fa2181a028e7fc57706040c31bc5c67ded1fc609b6fc223",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/ai/AiClientFactory.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6aa6d5529dc70f8535535e9fff9bc69a29e74619",
-          "size": 1597,
-          "sha256": "2f99d7c2899fb8f1854bad6347d17217eb7a40e3af8979e08b8e6129357ec867",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/ai/HttpAiClient.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "877044e6194bb78037f6d6582ae210523c877402",
-          "size": 4119,
-          "sha256": "efc612108befa086ef858777bad732f535918403016adb735c64561192702e19",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/jsplumb.min.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "f092c5050884f471f52b7b4e84c768485ad24d17",
-          "size": 215838,
-          "sha256": "c91a0c8c8172640a3ae12f933b5a0642412625486f256561e6437cae3c38fa64",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/WorkflowEditormodules/workflow-editor.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "dd2de16fcaa3f1de23552c46e5845d9a1bb16a72",
-          "size": 33070,
-          "sha256": "43b6dcc773422961fc4e4bede2f115ebc7570b214904e3abbda5f1d675be66d2",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/index.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "d6e5126c0c771be3a01dd2afa56b2c7f3af0ab4f",
-          "size": 3519,
-          "sha256": "ed697f668cddd06e7ea74a24ddfeb7016a7ced49ecfca601abd3d10ae5cd5415",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/main.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "bfe5036fe1a66ba7504fe5c46df5192347373e58",
-          "size": 13865,
-          "sha256": "ca9592dd20b0def2cd506ea0147769763ec767f7b81cd469cc238e3f5891c5d9",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/preload.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "a228663904220d65e5b7af22d9724e797359ed74",
-          "size": 3884,
-          "sha256": "d2cdff5a8cd5df0c3a2a502d71bad5e3e33981615d48002eb7dbe78f8977022d",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/renderer.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "44af73d22dc5073a41c7e26c6d0762382b297baa",
-          "size": 73752,
-          "sha256": "615fedae58eb2e9eb351af2025c8228af0ec8476415a0e259653080c1de5e9b2",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/renderer_modules/config.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "744832f6bf5882c3fbd8778bb0f3b7e81babaaa8",
-          "size": 78705,
-          "sha256": "595abc7e4ad8176b1bf023cb04d2c0962c567fb895fdbfa605812f8c8c26b255",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/renderer_modules/tool-manager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8dc3de5f9a33891e54c60f9ae1bb0c17e24de1c2",
-          "size": 55216,
-          "sha256": "8eb1f9f814b9a3c5b24a6f3e8f601ac8c5858d5e7fae8511925a8837794a7ba9",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/renderer_modules/ui/canvas-editor.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "b3f57b34acd9c807cf64f0d84dd93eb8af3a5ebf",
-          "size": 54452,
-          "sha256": "1edabb3f7662a4c0921a658aafb737ccb39e5dbc3d2d32708303a954ea6b6442",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/renderer_modules/ui/canvas-handler.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "dd4b23215ae067337edceb6aea630833cd95b2eb",
-          "size": 17872,
-          "sha256": "bac7d13cf9f7799b8b6f810b4d5bbeadd20c613e60dac29bb7a184a2e2d7a58d",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/renderer_modules/ui/dynamic-image-handler.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "4603df282076b47070be1ca03521e6fb451a4075",
-          "size": 19804,
-          "sha256": "e3be946df345e13b5d87ebf02078bb79730023572d0264ca33841586a6992496",
-          "kind": "source"
-        },
-        {
-          "path": "VCPHumanToolBox/style.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "eb193ad62220cc261c3eb889814c985dfc4494b4",
-          "size": 34039,
-          "sha256": "b782dde0faa93e33a82d3ea96ac4ebffc39e62095d3e14071257eed31f0b2577",
-          "kind": "source"
-        },
-        {
-          "path": "VchatManager/consistency-checker.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "1b5ab5ec9b8fdc827659a666e86095ca40c5e463",
-          "size": 22376,
-          "sha256": "17e714bb915e363efc9d7b015577364c6bf0b46912a95ccad4424833da7b850c",
-          "kind": "source"
-        },
-        {
-          "path": "VchatManager/index.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "7c18964aba496c7acf245731860a6c1fc1eba192",
-          "size": 4221,
-          "sha256": "052ec084e482a82a9ba7152102f25a0e7aa2a8c7f04b59e6053b78b95e8d641d",
-          "kind": "source"
-        },
-        {
-          "path": "VchatManager/main.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "65f0a0ef62cdd87008ae9ad5aff68552f24be22f",
-          "size": 3621,
-          "sha256": "e0a753f4e093f94b3e7742a5b54773b517e33d35403ce7fccd3ba9560226c424",
-          "kind": "source"
-        },
-        {
-          "path": "VchatManager/preload.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "7b5f1e35e385ef6887f5a79cc194d17ba7d750f0",
-          "size": 718,
-          "sha256": "1b17f4f4ecf152d51ebbe12ed048f670dbd827a7536ae0f2312e554a910a2434",
-          "kind": "source"
-        },
-        {
-          "path": "VchatManager/script.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "d7d192c240f55c74ad7c414d9133397b62fa4d81",
-          "size": 38646,
-          "sha256": "8a083fbd8a23b1c3e660d8d7431f320eea75fe4b09a5afc1b8b82998847fbfe4",
-          "kind": "source"
-        },
-        {
-          "path": "VchatManager/style.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "d06505664d03b3e7c248a976cc302b58998feb99",
-          "size": 12716,
-          "sha256": "c2ed173085f15fa71a03b9c8d9fe9281802e443003f486626983671e7ee5e9e4",
-          "kind": "source"
-        },
-        {
-          "path": "Voicechatmodules/voicechat.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "8a63306346da44507eeb5972943b7ae4ce094346",
-          "size": 30511,
-          "sha256": "98f61072f5be3d3e6c6e2d8d91e9be10c2d0f5113004b808b04666ce9c999a58",
-          "kind": "source"
-        },
-        {
-          "path": "assets/font/Orbitron.ttf",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "edb1a6fce1dc38e15727c293bfdea5c4154b2480",
-          "size": 16884,
-          "sha256": "27cd313045d12280384256b4fba922366a4883e32ffb866b9acd62c5a859de61",
-          "kind": "source"
-        },
-        {
-          "path": "assets/font/vcp-ui/material-symbols-outlined.woff2",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "6a570b58c7d7dc5d4c554a75a576ff696f625015",
-          "size": 314604,
-          "sha256": "42c53db99a4c4a3e47a65a0848db29c5c7e61f8c7e310cd3b0cd3ce01de64b72",
-          "kind": "source"
-        },
-        {
-          "path": "assets/font/vcp-ui/noto-sans-sc.css",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "63978af7fda802b2f70075d13d4d0d0531b99a35",
-          "size": 101092,
-          "sha256": "1b9017c0a6153a34c45790d1a4a9f922f16b26d4facdc214fd35f171d8cb5fba",
-          "kind": "source"
-        },
-        {
-          "path": "assets/nova_button.png",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "d4a19a50cf2409e060283b03922fe3cf6bf8d3fc",
-          "size": 724993,
-          "sha256": "fbaf75a630a1cecc9401154fd7986328805f48540da90df06b636d0cdbf5918c",
-          "kind": "source"
-        },
-        {
-          "path": "assets/nova_button_light.png",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "9521e73333ec848c32af78d9ff97424f515424ac",
-          "size": 2099464,
-          "sha256": "0dd15d79f1a686260bacfead1db23d5b3c33acfd1f71acf191d8dd96f275c767",
-          "kind": "source"
-        },
-        {
-          "path": "assets/svg/acrylic-noise.svg",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "561377ca79c02698842d07dcddc9fab4bbe5045c",
-          "size": 432,
-          "sha256": "15412a63c0496e7e80bdb91b203b903c4a37e9d9a5c1ed54752f4744def3b9a2",
-          "kind": "source"
-        },
-        {
-          "path": "bootstrap/recovery.html",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ab5cbe956e3f6abc9ca5cca29af4e1a1364fc0cc",
-          "size": 4637,
-          "sha256": "6a278071a7c687fa03485ba04dfe23eee61b31d3cfa7e75545ca3c7dda046291",
           "kind": "source"
         },
         {
@@ -11048,6 +9752,69 @@
           "kind": "source"
         },
         {
+          "path": "Flowlockmodules/flowlock-integration.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93b5e064caab96048d825958eb140248496b95b3",
+          "size": 19390,
+          "sha256": "fcf9277ca497d6c47cd362d7bad02d78511c07f7851069ae5400b13f9ff0b16a",
+          "kind": "source"
+        },
+        {
+          "path": "Flowlockmodules/flowlock-protocol.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e60a9ba367199dd138dfb8a2c98e2bc226e48612",
+          "size": 14920,
+          "sha256": "93eab67a01e0aa9e36967acd526885ee9e292b53dfaf07fc27cf46817719238d",
+          "kind": "source"
+        },
+        {
+          "path": "Flowlockmodules/flowlock.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f83cd0ae3f5621157b86b1c78428cffd10d4a6a7",
+          "size": 30099,
+          "sha256": "aed1afb9cf110c67d4871fc20f1122ad584d3a4466064ff7c4fc6ab35439de44",
+          "kind": "source"
+        },
+        {
+          "path": "Forummodules/forum.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c418b21e3df422360270c61056f4c048d8d29730",
+          "size": 31544,
+          "sha256": "4d547161d5596958dfff28d8eeb1d0633850711a6d20dc24644bd020c86d135b",
+          "kind": "source"
+        },
+        {
+          "path": "Forummodules/forum.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "68937b93e7ed11110317c506bf6f7fd05a3720d4",
+          "size": 11222,
+          "sha256": "c7bc9c779d433de918d386f96b7b3ccbcf6d84aaed98893735528514b02ff807",
+          "kind": "source"
+        },
+        {
+          "path": "Forummodules/forum.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bc04ce8e1066bdb85d62a860d849e4f4cb166668",
+          "size": 71217,
+          "sha256": "a7dfb1b7978a42432665e999c95aacd7da8ced02cdad38ae5941b975db7a217c",
+          "kind": "source"
+        },
+        {
+          "path": "Groupmodules/grouprenderer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "838df205760511cd8a2b8d88fd6cedbc80814281",
+          "size": 75038,
+          "sha256": "8a674c4cb051840394559ee0ccc7e7f6f07bf820f9248b516cf1808cf4c71312",
+          "kind": "source"
+        },
+        {
           "path": "launchers/VCPChat-Launcher.command",
           "mode": "100755",
           "type": "blob",
@@ -11084,6 +9851,33 @@
           "kind": "source"
         },
         {
+          "path": "Logmodules/log.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ccc5ade925aa338d9ff5d0d02537fa98a0657705",
+          "size": 10181,
+          "sha256": "a0e45cd1380b5ec9573a6b4ebb332e1dd63053fcc597431d9ae51a94574b9001",
+          "kind": "source"
+        },
+        {
+          "path": "Logmodules/log.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8c4f83afe637bc4f08bdbcda1dd5d147f45ba6a4",
+          "size": 5157,
+          "sha256": "d04c1fe8c89aeaa27a58d17a13ecd64c4054d612f4c586b9984cad30db07e154",
+          "kind": "source"
+        },
+        {
+          "path": "Logmodules/log.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "54bb2ce6a0825b731d00d2c0e62fb91e0bc17345",
+          "size": 16698,
+          "sha256": "4a1e30a121e83f9c2812efde5416a27cf437177f7f141f0be09df1d49edc3197",
+          "kind": "source"
+        },
+        {
           "path": "main.html",
           "mode": "100755",
           "type": "blob",
@@ -11102,12 +9896,48 @@
           "kind": "source"
         },
         {
-          "path": "modules/SovitsTTS.js",
+          "path": "Memomodules/memo-graph.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "90ddc388aeb7a27d643c0a4921bafbddff3d3c67",
-          "size": 34885,
-          "sha256": "7b3122544f5582ab13cadcd61a3099d4e406b9077804ac37b522ea0ffe00cf27",
+          "blob": "09e81c0f7d922323ce8405fd4bb3e330b776383d",
+          "size": 27269,
+          "sha256": "f5180c28990a88e3e2dd6f366cb257077d58fa2b7609b8418255f840bd3385ec",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo-workbench.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "29239138e4d95a27678921b562b0253337b8f08b",
+          "size": 14085,
+          "sha256": "f6e0266fa07c8e6b6e9ccc8885c0ccadc425628b2337f150e4a9c926542f42a8",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6884c3fd14c83f13505afc60358306e520912713",
+          "size": 29362,
+          "sha256": "d1a2bdd6526b20fd8888a377cdaa83b162fbab60e0ee4efc7338452be40ed1f1",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2ea120c0649cbaa736c184683a42054f9188f511",
+          "size": 30841,
+          "sha256": "48837edc1e8d6b57abcd3bf2784087ea9d1f86db91f0c046b710bc6e83ab328a",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bfee11edc58e3f8f2161085c9ce725394fea2f92",
+          "size": 61304,
+          "sha256": "6f6147dfb954f3d61b9b613e09cea00056e9e0338ffb9cc18f53f52a364ec7ac",
           "kind": "source"
         },
         {
@@ -12569,6 +11399,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/services/shootingPlannerSyncService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bad4853ae46966e9088def702fa242c19108bc1",
+          "size": 5804,
+          "sha256": "879872ce2e8bbad997a6c42fade19de2237330626c72bb71cfb5b2fa4dd3533e",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/windowAppIds.js",
           "mode": "100644",
           "type": "blob",
@@ -12767,6 +11606,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/SovitsTTS.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "90ddc388aeb7a27d643c0a4921bafbddff3d3c67",
+          "size": 34885,
+          "sha256": "7b3122544f5582ab13cadcd61a3099d4e406b9077804ac37b522ea0ffe00cf27",
+          "kind": "source"
+        },
+        {
           "path": "modules/speechRecognizer.js",
           "mode": "100644",
           "type": "blob",
@@ -12803,15 +11651,6 @@
           "kind": "source"
         },
         {
-          "path": "modules/topTabManager.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "0a076445051013b9b39ca014daddc2319503c542",
-          "size": 1293,
-          "sha256": "f0284af50b992efe0e22e8fe78b34ecc9a9951138783ad03939b5effadfe5faa",
-          "kind": "source"
-        },
-        {
           "path": "modules/topicListManager.js",
           "mode": "100644",
           "type": "blob",
@@ -12827,6 +11666,15 @@
           "blob": "b246a8cf7956f1ffb9c9cf71dfb10d4391a52719",
           "size": 5432,
           "sha256": "eaa3fdbec40465199919cbe16e9a21c1213acf3506a8320b9d1679f50fd716e3",
+          "kind": "source"
+        },
+        {
+          "path": "modules/topTabManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a076445051013b9b39ca014daddc2319503c542",
+          "size": 1293,
+          "sha256": "f0284af50b992efe0e22e8fe78b34ecc9a9951138783ad03939b5effadfe5faa",
           "kind": "source"
         },
         {
@@ -13901,6 +12749,60 @@
           "kind": "source"
         },
         {
+          "path": "Notemodules/notemini.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dc7001a0f2795c294acf07589f25b1a828279e21",
+          "size": 4142,
+          "sha256": "84d07f23129162f99bc78cbdce1f077682ef91ed2b7cfec9f1f8de19169a71e2",
+          "kind": "source"
+        },
+        {
+          "path": "Notemodules/notemini.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "00490dcb1efad89abd3338d6abf09abaf374a4ee",
+          "size": 1564,
+          "sha256": "ca1526d315b276a583e4ee99fa74c180569e86ae00ace7dd1310385f1a0b03fa",
+          "kind": "source"
+        },
+        {
+          "path": "Notemodules/notemini.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2a4de26e5162279703252d6449f50c2b57d95d5c",
+          "size": 3818,
+          "sha256": "4a04495453304eaf424d03812a19b74b56e00e7ad414b9d7cdc8d348125034f5",
+          "kind": "source"
+        },
+        {
+          "path": "Notemodules/notes.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6224a9e06faaa19ed80488f207b73ee9ec661c01",
+          "size": 31793,
+          "sha256": "2094977d914092538859e426ce04d8bda674d68fe6f6a066e5bcf61c8f3704c3",
+          "kind": "source"
+        },
+        {
+          "path": "Notemodules/notes.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2b9b8360005d3b12d09bdfedd7157f1e2ccc9bd1",
+          "size": 13804,
+          "sha256": "7c1c508b436bb200a6f32fc614191b8fea39cb4202afe67493a369d14f8cbbe8",
+          "kind": "source"
+        },
+        {
+          "path": "Notemodules/notes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b976ed97527c122640146516549d5b513e2e6b61",
+          "size": 94936,
+          "sha256": "7083de2288afcee28f60a1ac0208c485e096bcb3af3c7db0325cb9751640a70e",
+          "kind": "source"
+        },
+        {
           "path": "package-lock.json",
           "mode": "100644",
           "type": "blob",
@@ -13916,6 +12818,33 @@
           "blob": "2fe60e826523b0063779f18ece9021903f9401f4",
           "size": 16566,
           "sha256": "9993d3b2861426d60ffbeb420462206efffa606ebe32b96ed78a42a59b8474af",
+          "kind": "source"
+        },
+        {
+          "path": "PluginManagerModules/plugin-manager.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d2ec34216e375debba9e6b166cf172bd34a63b4b",
+          "size": 16541,
+          "sha256": "85b7fc37a640fce37d79727063859942c06ef6cef1ab00a475e80b0493ca1f68",
+          "kind": "source"
+        },
+        {
+          "path": "PluginManagerModules/plugin-manager.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7066e5189a4f5fd45aefff797945273bf2bbe7dc",
+          "size": 7245,
+          "sha256": "0df0197316b027bec1e95dfaa2d9dc306fbf4f961b81f13c086d2a57bdcf41ae",
+          "kind": "source"
+        },
+        {
+          "path": "PluginManagerModules/plugin-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bfaf75f3026b708cabad1d23ea89781e31edd473",
+          "size": 19930,
+          "sha256": "2ab2250065a7b9c86475e77698706eea2a68362fd405ffc8f7e459ca11d9f128",
           "kind": "source"
         },
         {
@@ -14009,6 +12938,33 @@
           "kind": "source"
         },
         {
+          "path": "RAGmodules/RAG_Observer.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "633a3dcdb3a5193f9a36c9ad0dcc1ceb87e1c07e",
+          "size": 169947,
+          "sha256": "c9e8a15f19737bb92ab2dd9ccf3b7661ac21023f442ae52dff5a0a77c96e4f8c",
+          "kind": "source"
+        },
+        {
+          "path": "RAGmodules/RAG_Overlay.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "66ed723fe4cf14055ca4285d965804f67c7e293d",
+          "size": 23908,
+          "sha256": "1a6cf4f7d263abedfffdd09821f31192bcd9dc359c93921fe3e58f7e6de03ad1",
+          "kind": "source"
+        },
+        {
+          "path": "RAGmodules/rag-observer-config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e59faea9111868d56169d6d59571c6b1f7bdbe1d",
+          "size": 13560,
+          "sha256": "42475d6e93f422a7dd73ef8719c28703b084d0215b49288224efc13877be616a",
+          "kind": "source"
+        },
+        {
           "path": "renderer.js",
           "mode": "100755",
           "type": "blob",
@@ -14024,6 +12980,15 @@
           "blob": "d2bedb1b66bb8713930c83e2d4975b7c707d898f",
           "size": 23720,
           "sha256": "982c85e8c1ba2e76e9c5485b2e858326cd86db3fe13c5339ba8ffbf1a60f4a0f",
+          "kind": "source"
+        },
+        {
+          "path": "rust_chat_data_service/build-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "55ca6b07acebc0d4c8db0b69b9d2b65d1b4c2d05",
+          "size": 3263,
+          "sha256": "60a4d441dbb99324242a7064fafa00aad7594fb3d6ddd3a271d0fb635090318e",
           "kind": "source"
         },
         {
@@ -14051,15 +13016,6 @@
           "blob": "bcf7992fe768477c93639227aa7d7f2962077fe5",
           "size": 10662,
           "sha256": "71608aad4d51888138399f0530d7c894063ba16fea01dd870fd8332c35a70bcb",
-          "kind": "source"
-        },
-        {
-          "path": "rust_chat_data_service/build-runtime.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "55ca6b07acebc0d4c8db0b69b9d2b65d1b4c2d05",
-          "size": 3263,
-          "sha256": "60a4d441dbb99324242a7064fafa00aad7594fb3d6ddd3a271d0fb635090318e",
           "kind": "source"
         },
         {
@@ -14144,21 +13100,21 @@
           "kind": "source"
         },
         {
-          "path": "rust_chat_data_service/src/sync.rs",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "d0f1e1d7ee1b3fc45def4f80c001b7689a8ca8bf",
-          "size": 167052,
-          "sha256": "fc96efd77b63e785d285319a1499efd486ebd8acca82185cbdd66f6b9a5ac87e",
-          "kind": "source"
-        },
-        {
           "path": "rust_chat_data_service/src/sync_wire.rs",
           "mode": "100644",
           "type": "blob",
           "blob": "d4c930cfd7f9f47437564709962767ced3b87435",
           "size": 17444,
           "sha256": "4584f75ace8481fe6580578f83c2fe9573401a412c4e3e3289ec2e952f68ef57",
+          "kind": "source"
+        },
+        {
+          "path": "rust_chat_data_service/src/sync.rs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d0f1e1d7ee1b3fc45def4f80c001b7689a8ca8bf",
+          "size": 167052,
+          "sha256": "fc96efd77b63e785d285319a1499efd486ebd8acca82185cbdd66f6b9a5ac87e",
           "kind": "source"
         },
         {
@@ -15512,6 +14468,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/chat-shooting-planner-sync-service.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c8aa01b9b6d4428cb1aa8158cd674ffe9a1d0fa0",
+          "size": 5683,
+          "sha256": "82de6fafbf444125007e4ecff76a9f95919d6aa0d665677f41bd959498f19893",
+          "kind": "source"
+        },
+        {
           "path": "tests/chat-surface-slots.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -16121,6 +15086,1050 @@
           "blob": "15abccba2da6fd83877d9605047ce22c02b78f48",
           "size": 5603,
           "sha256": "bcfca6cb31b006471b187cff87a6fe1d98880463afddac8a3ad3fa01f73e7e64",
+          "kind": "source"
+        },
+        {
+          "path": "Translatormodules/translator.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e6c2514aadcbe1cd9b0b8b4656b688a38e4f3699",
+          "size": 12278,
+          "sha256": "17731a01d3d57001f8fa25b1b3f0b72722633ddf452ca57beaa64db579bcc52a",
+          "kind": "source"
+        },
+        {
+          "path": "Translatormodules/translator.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0c73584a0659d1aac93618e2444aab758324f500",
+          "size": 6923,
+          "sha256": "d2a9d9339f566b260a8304d1413e9136caba6e954c4419fadabc97b9ebb6bae5",
+          "kind": "source"
+        },
+        {
+          "path": "Translatormodules/translator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6a8f2430d44bfba818f694357c05a93a69e923c0",
+          "size": 17798,
+          "sha256": "d05504aa60a410e0be0281b70c13aa0dfecc9484edfaf717dd66fc7d51ade4e1",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/consistency-checker.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1b5ab5ec9b8fdc827659a666e86095ca40c5e463",
+          "size": 22376,
+          "sha256": "17e714bb915e363efc9d7b015577364c6bf0b46912a95ccad4424833da7b850c",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7c18964aba496c7acf245731860a6c1fc1eba192",
+          "size": 4221,
+          "sha256": "052ec084e482a82a9ba7152102f25a0e7aa2a8c7f04b59e6053b78b95e8d641d",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/main.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "65f0a0ef62cdd87008ae9ad5aff68552f24be22f",
+          "size": 3621,
+          "sha256": "e0a753f4e093f94b3e7742a5b54773b517e33d35403ce7fccd3ba9560226c424",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/preload.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7b5f1e35e385ef6887f5a79cc194d17ba7d750f0",
+          "size": 718,
+          "sha256": "1b17f4f4ecf152d51ebbe12ed048f670dbd827a7536ae0f2312e554a910a2434",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/script.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d7d192c240f55c74ad7c414d9133397b62fa4d81",
+          "size": 38646,
+          "sha256": "8a083fbd8a23b1c3e660d8d7431f320eea75fe4b09a5afc1b8b82998847fbfe4",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/style.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d06505664d03b3e7c248a976cc302b58998feb99",
+          "size": 12716,
+          "sha256": "c2ed173085f15fa71a03b9c8d9fe9281802e443003f486626983671e7ee5e9e4",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/frontend-plugin-loader.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4af8a625b523f77623566c935f8d0fc23bd2826a",
+          "size": 2464,
+          "sha256": "4a5a86bcbec48a526d213d796f0cb1f8f4e424b191c39b55c5628b26cd1f5856",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin.js",
+          "mode": "100755",
+          "type": "blob",
+          "blob": "266cdd8b1762edee0cd9fc0c8bb41cc3cad66133",
+          "size": 30931,
+          "sha256": "f219d81a1bc7ba4b9a93151dcb710be6cc59ffc2e4bdc4b2cc1d41895dc6cd42",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/ChatRoomViewer/ChatRoomViewer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dd268452e1de30994ab579d9e6451c5f485d04e9",
+          "size": 58486,
+          "sha256": "372328ddbc27450056986d1a2bd83a849b806bc45c4f04900cc565817dc2b42f",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/DeepMemo/DeepMemo.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ec1e2d822ca4a1e4e7e4bca0ed048b38232cdfc0",
+          "size": 25989,
+          "sha256": "e9c097a119c422f464b7e8deb68ed49ebed876c90874c0683c4506781e5669fc",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "562039c47c81dc3c95210b782c1afef511a4fb5b",
+          "size": 22653,
+          "sha256": "b5ba9bc3fa60c0a2a2d14a728d2c35e0f82bb9c55f9c7719006f71d09bd454d7",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "638072a5ee2749577b22faac8474fc6c7cdacadd",
+          "size": 9348,
+          "sha256": "40052843d63dbf14c04316877b5063c4b2db938dc99e1ed896f7b73718f1457f",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/DistImageServer/image-server.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "92567fbc2b76dc554487106e38ffa47fc6f1caa1",
+          "size": 2114,
+          "sha256": "73f4433b89fcb7ebaffc716994073398e4972c6cb0ad0941448da97ac1aad000",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/FileOperator/CodeValidator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9a25e3ed88243020a1992f79a9e044eced638c66",
+          "size": 4513,
+          "sha256": "b7e6c5343fd165cf6e9086d831d9965d36eba2adaab9a4f05e9be74903cc599e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/FileOperator/FileOperator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c7d0bfc3f5fa473939ef1b90045117e86db76931",
+          "size": 65603,
+          "sha256": "eaf11d69e5a7282ca82d7b5284a5a30ef1a49c11f33f16718558651df2e1f063",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/LoomController/LoomControllerService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f052f5ec7fafc37dc0889b11e4bb1885342e28ed",
+          "size": 32936,
+          "sha256": "e4daed424a6e86d22f543435bb23a4493748c4bc642734250a2b3224fa50b425",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/LoomController/LoomSkillService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "46372cf6048026d38deffb152e1103b0194cbffc",
+          "size": 15170,
+          "sha256": "029589819ca09844d3ac4ff0bee85fc7c461cc85e726331a90cd7d3e4a6083c7",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/MusicController/music-controller.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4cda903a6d5ef99d83f0947d85b400b8fd2ce2ca",
+          "size": 3500,
+          "sha256": "5de9b7584bde1b22f949447e3e6a6e956c82a015eee0cccf780a4a007218e501",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/OldPowerShellExecutor/PowerShellExecutor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e4ee4ca002266910b3f17957f58d89cdf5ab14cf",
+          "size": 7671,
+          "sha256": "d4d93d7ee2c4a799f8867e91fdc87ba2bf26b41bc11a435dd9ae4a096ee8f849",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PluginSourceViewer/PluginSourceViewer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ffd78966d49adeba90dc30d1ffb4c2f46577a642",
+          "size": 14808,
+          "sha256": "f587caf882f5c6f3df18ba043c377fb62087638645c23216d097c82f12cc5252",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a0da988dbf5b09f1eecee4339d1111207cc51ef2",
+          "size": 12092,
+          "sha256": "2398ce62d566790647dea537aa07225ef4c1be0cab3782694aa53daf438e46b8",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dd9ce2b8f325a194abdc6d38ea2499175f648935",
+          "size": 1928,
+          "sha256": "5beccee4d6eefe4e10e67c6fa989a8ad284240fdc29a7a6dbf35ac4d5097de3a",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8d1761b0dc104f6d4a53bca022dd423c133548ef",
+          "size": 71602,
+          "sha256": "58496f4fff8a4d963b468a0139c29f895ddcae95f16d21d97a281d5bf730570c",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/test_interactive_sequence.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cbf19521eda8985e787dfb8cb74c557e98595f15",
+          "size": 3808,
+          "sha256": "61894e95d47df664f349f0844f0d46a7622c15a1a79e1b52ac70ad44175cd59f",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/test_security_check.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a4e07d70850e0b41fb460d44b1c77af2731cc449",
+          "size": 8723,
+          "sha256": "9e44a26a1da4f5c5b840328aafd2090e1fe361ce911c8c3f875b6f23f9a002fd",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PromptSponsor/prompt-sponsor-service.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e9ffd11c81f6e62ddef55fe0ecc679d8f74a4e90",
+          "size": 648,
+          "sha256": "8f9251f19b240cf0b43c8ac0e6043f34bce8a9f27d208c43fccf0331f93e948e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PromptSponsor/prompt-sponsor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67f67a131e0c9bea25bf7758516995c142fe2293",
+          "size": 33323,
+          "sha256": "0c5dd6fa98dff5c52a56199208d5390106afc67c903ec5c916c7812f4d65d67f",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "12e52fe8ea414569d6fd59622a427a6a5b25f577",
+          "size": 3387,
+          "sha256": "8d268b48783cc2b2aa13ec833b42092e4ed62bb37566d4435318703fbebcba82",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/ShellViewer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "554b02e5270e825df61ef384a4a6efd26c577293",
+          "size": 14486,
+          "sha256": "ddbb637c6efba2b2f76ef92610db3192865f25f16ec59397e9ad9acb596df89c",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/PluginErrorReporter.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "82ea212d77acce1c59e09a12b9ce846e5471eab9",
+          "size": 9462,
+          "sha256": "6138166fe7a8ed23472540eab26b83e03dd354beec5ea6c9c13f7e9d4af5cacd",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "82b657ce24beb962609e1e812ee05b0c1107afaa",
+          "size": 56794,
+          "sha256": "c1d1daa08798a55bd8a28ede5243d48d14335ff734298f03b2b731dd61ab24d0",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9d03a2384a4dde50bee3c9454b593fda92adbcea",
+          "size": 1769,
+          "sha256": "8b35975189fcefacd83df6543536ecdff07abc09a36bfe42e8684029c28249f2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/ScriptoriumCollaborator/ScriptoriumCollaboratorService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a842eaf743b12d4d138a68074228570afefc31eb",
+          "size": 38916,
+          "sha256": "1f1b1402f4356a5fd106752cd45accdfe340a22cb414324c398f9ed33b8d6841",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/TopicMemo/TopicMemo.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a5e9eae99d7474824f81212e40d23348c143ffe",
+          "size": 8504,
+          "sha256": "c1f66874dd0c4f310de7838e2b4ae5f5ec38282f2d060e0e16e9eb04cdd7112f",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/TopicSponsor/topicsponsor-service.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3ce4f188e83d334c802313978165979c94659c20",
+          "size": 645,
+          "sha256": "ec3d8b5301235e9bc3d4f8f9ccc544d3c47a8edd633ef464d0db1d7fad7d48f1",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/TopicSponsor/topicsponsor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f0a16d2dfd93d63cab6911b57849923f5ec654b5",
+          "size": 25875,
+          "sha256": "0651b6e6baa65e6dd7cdf22f88be0b771408d1545862242eb57d92aec6dce007",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VChatAutoTTS/plugin.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a22d0ff7d9764848a82d9c6815c5e36356bcec48",
+          "size": 9861,
+          "sha256": "92f630ecaed38e737784e12240e15e971c8020ba68853090abb5b34fc1061ce2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VChatDynamicWallpaper/plugin.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "45d92efdf7e02e8ec4d5de6b1daf561a16432f51",
+          "size": 20211,
+          "sha256": "d8b78812cdd500d45b01ebb71bb131593a125801572a571eb153c26e74b70ca7",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPEverything/local-search-controller.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7f6cde3b6e3268a37dd0f5d5b4ffd76623b1f7bc",
+          "size": 5263,
+          "sha256": "f565a8ce90f9d0f052457cc0dfc7e3fa08380bd5fe3296f1e02f0686ab7c4715",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/config/defaults.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8059345948ca0feaced09ddded25fa55bf7467c4",
+          "size": 6992,
+          "sha256": "723c10d89a0d072afeec15f25771b7ba3851e75f6cc1214073f9d8f1492d5bbd",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/db.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b0e621c0ecb42c1e894f2559138f81229a8ea400",
+          "size": 22908,
+          "sha256": "5fa298053ddc9ad578923a8c4696586c4ff9c15ab8cbbe47d3c36c8cb22dbdcc",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/hash.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3993b97b30ba6b7e2f57c290def4e88e3dd09803",
+          "size": 4355,
+          "sha256": "1d8accca65491332f2462cc8c735998444be782dfd59e7933195155a09489d37",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/idempotency.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "49135857cc7226333fdd3d2000a7f9be249f4d1b",
+          "size": 1333,
+          "sha256": "41500466e205375667110d0b83e71288292f8db0aaefea4e25e63247a0a5cd24",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/core/logger.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1c7936eb72be5e5eeb1af9f250994fa9b3d1319a",
+          "size": 8458,
+          "sha256": "16fe30e905a9837384eef96307f5e25d03555d5bf15779203a8b4024ca7eb85a",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/agent.dto.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "521813b26b1e414a20e4b40ad3b01ee24fb20f9e",
+          "size": 1348,
+          "sha256": "ea6cbb8ee13e7565e4941ef46434b93d3b4eebbfff74a5659d3fa22eceec8e53",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/group.dto.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f43be74489f7c5ed356c92637ea370b4b4350e2a",
+          "size": 1390,
+          "sha256": "e728e80245f38dc14f9e4bc535f9117de29c5edde862f250b3d1d50604f60853",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/index.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0469c100ed57c81c517e2f5f70715a720bbf2c67",
+          "size": 603,
+          "sha256": "a137e2872a48d48db82d28587f1a29904efefbf47e05f06a4fffd72ae8de35af",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/dto/topic.dto.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4ec449bca02de1629cf9c05202fe6b542f4872fe",
+          "size": 1888,
+          "sha256": "53b6787988dc55c90fe3c0804b2c845331dd69f8599693a633b35c7f2b9964d4",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/error-contract.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "04643affde0c9ceebab6bdd4928572f2d398bd3c",
+          "size": 13886,
+          "sha256": "fcb79d0bf903aad3fa270a4722d9fd55ac148951963938512a483ff7a5961cae",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/fixtures/message_canonical_contract.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "03ebe21d5de5fb3d8f556e743fe375d36bf81cc2",
+          "size": 7262,
+          "sha256": "d7e7303371db5454fd27fe1acce0830d49db6d47c5230cdd29411c2263b144da",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/fixtures/message_diff_matrix.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c2d989886ee68e3026ca2cfa2ca992f3298d8c72",
+          "size": 4721,
+          "sha256": "d30089c1fcc252c88f8b87e462a349cd9ac68c6022405b56854904f7c24749b1",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/index.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "43ebcb299ade88efe963a3b898959247b8bf7440",
+          "size": 49123,
+          "sha256": "1d0ddee1aab74371709956ccb14392c81b837db582ac4a34f377015c4e0bbdfe",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/protocol.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7465e0c1bea584de7dff0df6e56ab161f1ec9375",
+          "size": 10384,
+          "sha256": "1f58ae5ff7e845ebb264eca09f4a6071070143bdeb65cace961e02207dcb2575",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/canonical.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6d855e716fa5ccc1de9044a34af0ed9ed7f758a7",
+          "size": 11919,
+          "sha256": "186fcfd0b020d8a3dad4d626f98b4ba200af7457bfa87effb812bb00202721d0",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/central.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e80da661706930937ed22a4a78b047d146d5a831",
+          "size": 38449,
+          "sha256": "b1288e1c7ac93b4446768be42a01d303881acaac833934586c1de712921faf18",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/diff.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3141551e192f9f180c2870ec0ef53b13d3d6527e",
+          "size": 13421,
+          "sha256": "80fd34b7bdd6497b2c2743633b191baf1fc8878159a639ae66d928faf57c8401",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/entity.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b3c4d8ee7907adc98beedf32ceffb91ea54d4843",
+          "size": 67496,
+          "sha256": "c6650bda4592ad49a76ce98fc59e8b3e9f2e478b6f9aced8cbc394abd2a2100b",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/manifest.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2f58c85173eafbb7be9dae4e61758ae6be7ed8b4",
+          "size": 15960,
+          "sha256": "8b1a5d0927f73e4243270bc20473fadd85d2488e1df97e05a7c93f1a7285484e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/message.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "32b3e2f93867bb312e53d93b86c48f9f7d39f65a",
+          "size": 36325,
+          "sha256": "a9504b716f510111bf899281d6942c1c91da241ef69c0244876cdfaff20ccb49",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/sync/projection.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8b2ffd80e6070c13d61299457e9c8bd8111aa629",
+          "size": 9266,
+          "sha256": "16081b514699f855afe77b126b85c173866b20e1dd7fe9fe3c116c3ac42f2082",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/transport/ndjson.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "23399e687843072aa15053e7c9b357660c5e493a",
+          "size": 4163,
+          "sha256": "3e7fb511d9605b83583dedc8060358679b555ff82a4ef1eb7e9d6dbfa3192a39",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/transport/routes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ed390ddcae9885a2a5660cc5828a31e188829e5a",
+          "size": 18602,
+          "sha256": "d57260d3998fa5a8ec44ce827598b15915890a659506d23b9c927de89d4afeb5",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/transport/websocket.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "61d5c99062d77dc21c8dfb80701cc2a9abe0e289",
+          "size": 10779,
+          "sha256": "c23b4aeeb867f4ca23fb1b74bf6c6a0cf391052ae671334307adf887256074e1",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/utils/lock.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "26471994463c9f1434fa2c025da900284cebc1cf",
+          "size": 698,
+          "sha256": "a5660c8e2e455e0adb7046f2c688310b44d51539eafab05663a5f277abdf646d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPMobileSync/utils/mime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "872eae7d1f0541950f060ad615000b3ba8c0e69c",
+          "size": 1894,
+          "sha256": "4c2677ff54785278b2fada818d7af7d230bfe088e39834beb2a2aa3aa203f91d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPSuperDice/example.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "01972bd985d435ca7f8d6e8e743b314494f1e486",
+          "size": 1983,
+          "sha256": "bd77f9846deca2dacda41442cc6dbf5c4eace7998e852e85c01b26def1a65abb",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPSuperDice/superdice.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9f313e11140aba9db92ca5b4605d94aaf37bbfa8",
+          "size": 3310,
+          "sha256": "597268257d35f020ad8be1712297c52c0d7ae901f16cee89e3382d8532729e7d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/inventory.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b75e60e2b5bb5aacdf137b5650d7640baff2230e",
+          "size": 5326,
+          "sha256": "71446e7ea6fa9b5295ad5bc0c63b4ffa75c090c3c91567c318d00d293bcaef11",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/locate.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8cef174ef275562c7f166148a2e0257fcd2dc35f",
+          "size": 3890,
+          "sha256": "47f3c3353d01ce29be494bad70a463ae8f02d1a9e8fc1393eb1af6726a5f99d2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/media-server.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "07c12d16fa93afc291a72096015352144dc16f73",
+          "size": 11632,
+          "sha256": "2885a9126607c3b43165fa8d58b06390c82fba8f1c17b0b5613157d7f010b98b",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/lib/we-api-shim.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5a4ff2393259e2a94abf993a61c546ba5a798e5d",
+          "size": 5168,
+          "sha256": "2518ec221882f9e698dae3f7e011fc3ff5949e882fdb7dc76a7c7c95037ba58e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPWEWallpaper/we-wallpaper-service.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "83a7dcbf12dc3b4056b862539f988660155d3757",
+          "size": 1085,
+          "sha256": "34e9e21af9cdd6dd3bf47777e72adb4c591cffbde6abd38ed449117f9363fe99",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/VCPWEWallpaperUI/plugin.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6fc2afb7815c714c525873dbd4aba7bb0f9acb18",
+          "size": 41362,
+          "sha256": "940d84b98bd7e209ce010f7cd94202569ae8d69d735e5b14ca3cebc8952b6f10",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/WindowSensor/sensor-wrapper.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b423b8107409d13675fd0a4523a005933adf894a",
+          "size": 4077,
+          "sha256": "d3218a6050cad53c5e7864fee9b3445f53f14d00b8ecae5c2db43600af62ed26",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/VCPDistributedServer.js",
+          "mode": "100755",
+          "type": "blob",
+          "blob": "b52a8d302a4d2c7eea8e246255ad7cddf6ff6546",
+          "size": 41700,
+          "sha256": "3c4c07d3393e9fb44314a34056ba10d69f369af2af89ab64f537b4d387c54d59",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUI_StateManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "11469d236aebfebf79e2fe97066d7c3edb211ea8",
+          "size": 4544,
+          "sha256": "b74c99ec327710282e7d64f33952af77b91420b78156bb8e92a1850236c366f7",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUI_UIManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b2c765ab7705f2531524ec8801104636faebdf33",
+          "size": 32339,
+          "sha256": "45c933cf762716bc2ae9926c40e33bd426effd22a579bc4621e0690821039c68",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/comfyui-ipc.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a07d5f8a69dd31f525a041c3e96217c9371ab317",
+          "size": 15290,
+          "sha256": "a1cc84fc0a1468ff99f67dc2a15f90112d40d687241f6b90d555d99c8c811e09",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/comfyui.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9fb7980310633fcbe953c8a847154798e9ab88f2",
+          "size": 19324,
+          "sha256": "215b45ed569520006047bb9f2fd534bfaccd99645032842e68d57ed5fe0aca8b",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/comfyUIConfig.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4f6812f073dfce5c6bbf30dc6cb0351f0c005fef",
+          "size": 16103,
+          "sha256": "645914d25c9fdeb9e57848dca20f8424a11c7a7f7681a905d6a9717fd5876896",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUILoader.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5dd5b9abeb49b138c7a8088705de095b2029445d",
+          "size": 5214,
+          "sha256": "4a80b1d3af485139f9dcd9b84a595065b1e6dc5b010bb70468a1ac5da875740d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/PathResolver.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e34364aa63da3ae51cc6a2b8ce3e4337c8e0319",
+          "size": 7826,
+          "sha256": "a80db291ad067f83e387fca07e77ee2ed43cb5d36de49cb37fb8e9934157265e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6e5126c0c771be3a01dd2afa56b2c7f3af0ab4f",
+          "size": 3519,
+          "sha256": "ed697f668cddd06e7ea74a24ddfeb7016a7ced49ecfca601abd3d10ae5cd5415",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/main.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bfe5036fe1a66ba7504fe5c46df5192347373e58",
+          "size": 13865,
+          "sha256": "ca9592dd20b0def2cd506ea0147769763ec767f7b81cd469cc238e3f5891c5d9",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/preload.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a228663904220d65e5b7af22d9724e797359ed74",
+          "size": 3884,
+          "sha256": "d2cdff5a8cd5df0c3a2a502d71bad5e3e33981615d48002eb7dbe78f8977022d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "744832f6bf5882c3fbd8778bb0f3b7e81babaaa8",
+          "size": 78705,
+          "sha256": "595abc7e4ad8176b1bf023cb04d2c0962c567fb895fdbfa605812f8c8c26b255",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/tool-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8dc3de5f9a33891e54c60f9ae1bb0c17e24de1c2",
+          "size": 55216,
+          "sha256": "8eb1f9f814b9a3c5b24a6f3e8f601ac8c5858d5e7fae8511925a8837794a7ba9",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/ui/canvas-editor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b3f57b34acd9c807cf64f0d84dd93eb8af3a5ebf",
+          "size": 54452,
+          "sha256": "1edabb3f7662a4c0921a658aafb737ccb39e5dbc3d2d32708303a954ea6b6442",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/ui/canvas-handler.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dd4b23215ae067337edceb6aea630833cd95b2eb",
+          "size": 17872,
+          "sha256": "bac7d13cf9f7799b8b6f810b4d5bbeadd20c613e60dac29bb7a184a2e2d7a58d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/ui/dynamic-image-handler.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4603df282076b47070be1ca03521e6fb451a4075",
+          "size": 19804,
+          "sha256": "e3be946df345e13b5d87ebf02078bb79730023572d0264ca33841586a6992496",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "44af73d22dc5073a41c7e26c6d0762382b297baa",
+          "size": 73752,
+          "sha256": "615fedae58eb2e9eb351af2025c8228af0ec8476415a0e259653080c1de5e9b2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/style.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "eb193ad62220cc261c3eb889814c985dfc4494b4",
+          "size": 34039,
+          "sha256": "b782dde0faa93e33a82d3ea96ac4ebffc39e62095d3e14071257eed31f0b2577",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/ai/AiClientFactory.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6aa6d5529dc70f8535535e9fff9bc69a29e74619",
+          "size": 1597,
+          "sha256": "2f99d7c2899fb8f1854bad6347d17217eb7a40e3af8979e08b8e6129357ec867",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/ai/HttpAiClient.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "877044e6194bb78037f6d6582ae210523c877402",
+          "size": 4119,
+          "sha256": "efc612108befa086ef858777bad732f535918403016adb735c64561192702e19",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/jsplumb.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f092c5050884f471f52b7b4e84c768485ad24d17",
+          "size": 215838,
+          "sha256": "c91a0c8c8172640a3ae12f933b5a0642412625486f256561e6437cae3c38fa64",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/workflow-editor.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dd2de16fcaa3f1de23552c46e5845d9a1bb16a72",
+          "size": 33070,
+          "sha256": "43b6dcc773422961fc4e4bede2f115ebc7570b214904e3abbda5f1d675be66d2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ApiConfigDialog.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f582178038522cbd3d01af4afa5ad118540a4b5d",
+          "size": 6510,
+          "sha256": "f3eaf0878cea57db89a147ec5116a33093175d335ca5ee6ab1728ede20e48761",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ApiConfigDialog.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "43349fb825ff21f0612757f27040728983134245",
+          "size": 20400,
+          "sha256": "d0431edd9782a80539330622de9988a9fa879f8a28d5d5063507e24c276a0c66",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_CanvasManager_JSPlumb.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bcaa60239aebe49bb219b91ff7caebb369929477",
+          "size": 122382,
+          "sha256": "b8d34af6004082209a348e1aeabf1a9183fae2018c00bebdcf060995e1015692",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_Config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "877eeea13e9c2357cf0ae14e6052b84d0bed9baa",
+          "size": 13674,
+          "sha256": "6041d28b1ca06e7eb476b093e69976b2562736a3a6791c1092e77b5303d827bf",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ConnectionManager_Simplified.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e1fc440ab4cd9dfb92b2672c6f85dbddd248400a",
+          "size": 7694,
+          "sha256": "51f4449c19f27c1493b518885e359f9d3ec99177692cc5cd449d69c0b5d046ae",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ConnectionManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c79f0db9f2f39824ad9418c5d301b1eabda560bc",
+          "size": 21035,
+          "sha256": "555db53cf748acef272b89970e73e59dc9fd3f1188ea9004d2845710bbeb2672",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ExecutionEngine.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2004f7cc5075bf32d2082aa2f4152ec704619465",
+          "size": 128800,
+          "sha256": "747488c714488d43479b97f0170064667f70f20fe5beaddab64e07b2e815d3fa",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLExtractor_Integration.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c5dccda3b9bffdf93969d430dd31dc95fe18e129",
+          "size": 405,
+          "sha256": "0db4d9b15dcac09d1f878efe179727b88a699935cd1670c41572e4676b4bce28",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLExtractor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3d770da9c61f5e5fd8dff0e70f9d26c84c4c4d2e",
+          "size": 21067,
+          "sha256": "9622d6c687a2db09dff4259d9d1c71ba439c6e2847b2312593cc2b8d12ac1717",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLRenderer_Patch.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8a90639bad5ff3eefe15a4bb6d19f2c07551fe91",
+          "size": 47866,
+          "sha256": "d740f17d5191c2bc1687b0d633074362fd53e3e8a2ad16df765d7e7a72bf3212",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8213dcb8748c2e44101cd381b6c557b0826358ea",
+          "size": 89958,
+          "sha256": "12a5b2d5e432be8f61151ee03babfc87e2ec0ea4cf58bbd4baf2b8a9b433c136",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_PluginDialog.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "570bae70f211462a637e35dbf17bfb3075911c04",
+          "size": 28026,
+          "sha256": "1c1b9bd5b65f96cdd6cbd6b35f87da3824477ca494ddeb45cf65e7c0453c4568",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_PluginManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "db484a9e224720b387153598844f2ed42848ce20",
+          "size": 34012,
+          "sha256": "4d5ec101b16a555ec12842ff6e070fbdaf2635c05e989c92339a5bc05495420e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_StateManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6e1b3745bae363de9559d8ce65f0908ede0ef75e",
+          "size": 31253,
+          "sha256": "de2141468f4a7f074587c941c79a8402b105eacedf2359c714fd9de6293acce6",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_UIManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a8055462dd10879e980929b36b6c29e6824bcea6",
+          "size": 125167,
+          "sha256": "3fa70988c93d97506fa2181a028e7fc57706040c31bc5c67ded1fc609b6fc223",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditorLoader_Simplified.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5300fd35573b07f7aafa0fa734c12c7fc5890bf2",
+          "size": 9216,
+          "sha256": "24c244757c18b45ad60e10517711148d6359b5dbcfdd6681709170c77085facb",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditorLoader.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "437595b678eef3c624f020b791b4c9d56ef6c9bd",
+          "size": 10219,
+          "sha256": "0e195368efa6a66526a129288c44d7fb3274a19189210d53774cecec4b17d215",
           "kind": "source"
         },
         {
@@ -16994,6 +17003,15 @@
           "blob": "294c41796eea8ac80e885721c395dc9d25f59e6e",
           "size": 4637,
           "sha256": "77f3fb0710ce1a3eca08133157b7fa0dc075f9349aeebb0e146e84ab22c526b1",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8a63306346da44507eeb5972943b7ae4ce094346",
+          "size": 30511,
+          "sha256": "98f61072f5be3d3e6c6e2d8d91e9be10c2d0f5113004b808b04666ce9c999a58",
           "kind": "source"
         },
         {

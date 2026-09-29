@@ -11810,9 +11810,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "963db23c6642f8e172670a97a2350a69fb5770e7",
+          "blob": "13b3b7c75ce641e09380b8b183feb1f19ff24f6a",
           "size": 246271,
-          "sha256": "22103c579ff0cbeb5d1f2fc1e95ed62cf8720e9e11918ab85c981e35e10b7861",
+          "sha256": "00286f884b64525ba3a70e2a1ae6d692c231bf50cf4045561fb1a79be6213215",
           "kind": "source"
         },
         {
@@ -15482,9 +15482,9 @@
           "path": "scripts/build-chat-event-graph.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5d91544f73eb042b642a1a2379d9fb17a45cedda",
-          "size": 5440,
-          "sha256": "e1f104763186bfca455f52cf2fbf6dbc4d3cf18732a0753c93b7dedf02462709",
+          "blob": "6c0d912d35f7d1d407157cc9d8bad6ddfa41f62b",
+          "size": 5562,
+          "sha256": "917d0b60c2398ef7e601ea13083dd44c0cd078b1cd48431fa3e813abfc65700f",
           "kind": "source"
         },
         {

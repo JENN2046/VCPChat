@@ -478,6 +478,130 @@
   ],
   "events": [
     {
+      "name": "Modal",
+      "producers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 356,
+          "kind": "ipc-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 356,
+          "kind": "custom-event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 356,
+          "kind": "custom-event-listener",
+          "match": "on('Modal'"
+        },
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 356,
+          "kind": "ipc-send",
+          "match": "on('Modal'"
+        }
+      ]
+    },
+    {
+      "name": "SettingsActionBar",
+      "producers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 285,
+          "kind": "ipc-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 285,
+          "kind": "custom-event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 285,
+          "kind": "custom-event-listener",
+          "match": "on('SettingsActionBar'"
+        },
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 285,
+          "kind": "ipc-send",
+          "match": "on('SettingsActionBar'"
+        }
+      ]
+    },
+    {
+      "name": "SettingsSection",
+      "producers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 274,
+          "kind": "ipc-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 274,
+          "kind": "custom-event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 274,
+          "kind": "custom-event-listener",
+          "match": "on('SettingsSection'"
+        },
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 274,
+          "kind": "ipc-send",
+          "match": "on('SettingsSection'"
+        }
+      ]
+    },
+    {
+      "name": "WindowControls",
+      "producers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 429,
+          "kind": "ipc-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 429,
+          "kind": "custom-event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 429,
+          "kind": "custom-event-listener",
+          "match": "on('WindowControls'"
+        },
+        {
+          "file": "modules/ui-system/component-showcase.js",
+          "line": 429,
+          "kind": "ipc-send",
+          "match": "on('WindowControls'"
+        }
+      ]
+    },
+    {
       "name": "appearance-settings",
       "producers": [
         {
@@ -1058,13 +1182,13 @@
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
-          "line": 66,
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
+          "line": 785,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
-          "line": 785,
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
+          "line": 66,
           "kind": "ipc-send"
         }
       ],
@@ -1112,12 +1236,6 @@
           "match": "on('close-window'"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
-          "line": 66,
-          "kind": "ipc-send",
-          "match": "send('close-window'"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
           "line": 785,
           "kind": "custom-event-listener",
@@ -1128,6 +1246,12 @@
           "line": 785,
           "kind": "ipc-send",
           "match": "on('close-window'"
+        },
+        {
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
+          "line": 66,
+          "kind": "ipc-send",
+          "match": "send('close-window'"
         }
       ]
     },
@@ -3518,13 +3642,13 @@
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
-          "line": 65,
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
+          "line": 780,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
-          "line": 780,
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
+          "line": 65,
           "kind": "ipc-send"
         }
       ],
@@ -3578,12 +3702,6 @@
           "match": "on('maximize-window'"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
-          "line": 65,
-          "kind": "ipc-send",
-          "match": "send('maximize-window'"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
           "line": 780,
           "kind": "custom-event-listener",
@@ -3594,6 +3712,12 @@
           "line": 780,
           "kind": "ipc-send",
           "match": "on('maximize-window'"
+        },
+        {
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
+          "line": 65,
+          "kind": "ipc-send",
+          "match": "send('maximize-window'"
         }
       ]
     },
@@ -4315,13 +4439,13 @@
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
-          "line": 64,
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
+          "line": 777,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
-          "line": 777,
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
+          "line": 64,
           "kind": "ipc-send"
         }
       ],
@@ -4375,53 +4499,22 @@
           "match": "on('minimize-window'"
         },
         {
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
+          "line": 777,
+          "kind": "custom-event-listener",
+          "match": "on('minimize-window'"
+        },
+        {
+          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
+          "line": 777,
+          "kind": "ipc-send",
+          "match": "on('minimize-window'"
+        },
+        {
           "file": "VCPDistributedServer/Plugin/PTYShellExecutor/gui/preload.js",
           "line": 64,
           "kind": "ipc-send",
           "match": "send('minimize-window'"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
-          "line": 777,
-          "kind": "custom-event-listener",
-          "match": "on('minimize-window'"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
-          "line": 777,
-          "kind": "ipc-send",
-          "match": "on('minimize-window'"
-        }
-      ]
-    },
-    {
-      "name": "Modal",
-      "producers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 356,
-          "kind": "ipc-send"
-        }
-      ],
-      "consumers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 356,
-          "kind": "custom-event-listener"
-        }
-      ],
-      "evidence": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 356,
-          "kind": "custom-event-listener",
-          "match": "on('Modal'"
-        },
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 356,
-          "kind": "ipc-send",
-          "match": "on('Modal'"
         }
       ]
     },
@@ -5863,13 +5956,13 @@
       "name": "powershell-window:close",
       "producers": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
-          "line": 51,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 296,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 296,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
+          "line": 51,
           "kind": "ipc-send"
         }
       ],
@@ -5882,12 +5975,6 @@
       ],
       "evidence": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
-          "line": 51,
-          "kind": "ipc-send",
-          "match": "send('powershell-window:close'"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
           "line": 296,
           "kind": "custom-event-listener",
@@ -5898,6 +5985,12 @@
           "line": 296,
           "kind": "ipc-send",
           "match": "on('powershell-window:close'"
+        },
+        {
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
+          "line": 51,
+          "kind": "ipc-send",
+          "match": "send('powershell-window:close'"
         }
       ]
     },
@@ -5905,13 +5998,13 @@
       "name": "powershell-window:minimize",
       "producers": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
-          "line": 49,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 278,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 278,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
+          "line": 49,
           "kind": "ipc-send"
         }
       ],
@@ -5924,12 +6017,6 @@
       ],
       "evidence": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
-          "line": 49,
-          "kind": "ipc-send",
-          "match": "send('powershell-window:minimize'"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
           "line": 278,
           "kind": "custom-event-listener",
@@ -5940,6 +6027,12 @@
           "line": 278,
           "kind": "ipc-send",
           "match": "on('powershell-window:minimize'"
+        },
+        {
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
+          "line": 49,
+          "kind": "ipc-send",
+          "match": "send('powershell-window:minimize'"
         }
       ]
     },
@@ -5947,13 +6040,13 @@
       "name": "powershell-window:toggle-maximize",
       "producers": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
-          "line": 50,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 284,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 284,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
+          "line": 50,
           "kind": "ipc-send"
         }
       ],
@@ -5966,12 +6059,6 @@
       ],
       "evidence": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
-          "line": 50,
-          "kind": "ipc-send",
-          "match": "send('powershell-window:toggle-maximize'"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
           "line": 284,
           "kind": "custom-event-listener",
@@ -5982,6 +6069,12 @@
           "line": 284,
           "kind": "ipc-send",
           "match": "on('powershell-window:toggle-maximize'"
+        },
+        {
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/preload.js",
+          "line": 50,
+          "kind": "ipc-send",
+          "match": "send('powershell-window:toggle-maximize'"
         }
       ]
     },
@@ -6785,68 +6878,6 @@
       ]
     },
     {
-      "name": "SettingsActionBar",
-      "producers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 285,
-          "kind": "ipc-send"
-        }
-      ],
-      "consumers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 285,
-          "kind": "custom-event-listener"
-        }
-      ],
-      "evidence": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 285,
-          "kind": "custom-event-listener",
-          "match": "on('SettingsActionBar'"
-        },
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 285,
-          "kind": "ipc-send",
-          "match": "on('SettingsActionBar'"
-        }
-      ]
-    },
-    {
-      "name": "SettingsSection",
-      "producers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 274,
-          "kind": "ipc-send"
-        }
-      ],
-      "consumers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 274,
-          "kind": "custom-event-listener"
-        }
-      ],
-      "evidence": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 274,
-          "kind": "custom-event-listener",
-          "match": "on('SettingsSection'"
-        },
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 274,
-          "kind": "ipc-send",
-          "match": "on('SettingsSection'"
-        }
-      ]
-    },
-    {
       "name": "start-jev-group-chat",
       "producers": [
         {
@@ -6869,13 +6900,13 @@
       "name": "terminal-paste-complete",
       "producers": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
-          "line": 215,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 250,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 250,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
+          "line": 215,
           "kind": "ipc-send"
         }
       ],
@@ -6888,12 +6919,6 @@
       ],
       "evidence": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
-          "line": 215,
-          "kind": "ipc-send",
-          "match": "send('terminal-paste-complete'"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
           "line": 250,
           "kind": "custom-event-listener",
@@ -6904,6 +6929,12 @@
           "line": 250,
           "kind": "ipc-send",
           "match": "on('terminal-paste-complete'"
+        },
+        {
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
+          "line": 215,
+          "kind": "ipc-send",
+          "match": "send('terminal-paste-complete'"
         }
       ]
     },
@@ -6911,13 +6942,13 @@
       "name": "terminal-paste-request",
       "producers": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
-          "line": 205,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 1421,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 1421,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
+          "line": 205,
           "kind": "ipc-send"
         }
       ],
@@ -6930,6 +6961,12 @@
       ],
       "evidence": [
         {
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 1421,
+          "kind": "ipc-send",
+          "match": "send('terminal-paste-request'"
+        },
+        {
           "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
           "line": 205,
           "kind": "custom-event-listener",
@@ -6940,12 +6977,6 @@
           "line": 205,
           "kind": "ipc-send",
           "match": "on('terminal-paste-request'"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 1421,
-          "kind": "ipc-send",
-          "match": "send('terminal-paste-request'"
         }
       ]
     },
@@ -6953,13 +6984,13 @@
       "name": "theme-init",
       "producers": [
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
-          "line": 230,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 128,
           "kind": "ipc-send"
         },
         {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 128,
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
+          "line": 230,
           "kind": "ipc-send"
         }
       ],
@@ -6972,6 +7003,12 @@
       ],
       "evidence": [
         {
+          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
+          "line": 128,
+          "kind": "ipc-send",
+          "match": "send('theme-init'"
+        },
+        {
           "file": "VCPDistributedServer/Plugin/PowerShellExecutor/gui/PowerShellViewer.js",
           "line": 230,
           "kind": "custom-event-listener",
@@ -6982,12 +7019,6 @@
           "line": 230,
           "kind": "ipc-send",
           "match": "on('theme-init'"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
-          "line": 128,
-          "kind": "ipc-send",
-          "match": "send('theme-init'"
         }
       ]
     },
@@ -9149,37 +9180,6 @@
           "line": 822,
           "kind": "ipc-send",
           "match": "send('window-unmaximized'"
-        }
-      ]
-    },
-    {
-      "name": "WindowControls",
-      "producers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 429,
-          "kind": "ipc-send"
-        }
-      ],
-      "consumers": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 429,
-          "kind": "custom-event-listener"
-        }
-      ],
-      "evidence": [
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 429,
-          "kind": "custom-event-listener",
-          "match": "on('WindowControls'"
-        },
-        {
-          "file": "modules/ui-system/component-showcase.js",
-          "line": 429,
-          "kind": "ipc-send",
-          "match": "on('WindowControls'"
         }
       ]
     },

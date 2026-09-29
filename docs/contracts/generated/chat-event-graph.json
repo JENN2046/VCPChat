@@ -7755,7 +7755,7 @@
       "producers": [
         {
           "file": "modules/ui-system/settings/group-slots.js",
-          "line": 495,
+          "line": 494,
           "kind": "custom-event-dispatch"
         }
       ],
@@ -7763,7 +7763,7 @@
       "evidence": [
         {
           "file": "modules/ui-system/settings/group-slots.js",
-          "line": 495,
+          "line": 494,
           "kind": "custom-event-dispatch",
           "match": "dispatchEvent(new CustomEvent('vcp-group-settings-slots-ready'"
         }

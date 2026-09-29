@@ -143,7 +143,6 @@
         svg.setAttribute('stroke-linejoin', 'round');
         svg.setAttribute('aria-hidden', 'true');
         svg.setAttribute('focusable', 'false');
-        svg.style.flex = '0 0 auto';
 
         const paths = type === 'start'
             ? [

@@ -533,9 +533,10 @@ function getLyricFeatureFlags(result) {
     };
 }
 
-function createAuditedLyrics(candidate, result, target = null) {
+function createAuditedLyrics(candidate, result, target = {}) {
     const features = getLyricFeatureFlags(result);
-    if (!features.valid || Number(candidate?.matchScore) < AUTO_MATCH_MIN_SCORE) return null;
+    if (!features.valid || !Number.isFinite(Number(candidate?.matchScore))
+        || Number(candidate.matchScore) < AUTO_MATCH_MIN_SCORE) return null;
 
     const qualityBonus =
         (features.isWordByWord ? LYRIC_QUALITY_BONUS.wordByWord : 0)
@@ -549,9 +550,9 @@ function createAuditedLyrics(candidate, result, target = null) {
         features,
         matchScore: Number(candidate.matchScore),
         qualityBonus,
-        durationDifference: Math.abs(
-            Number(candidate.durationMs || 0) - Number(target?.durationMs || 0)
-        ),
+        durationDifference: target?.durationMs > 0 && candidate.durationMs > 0
+            ? Math.abs(Number(candidate.durationMs) - Number(target.durationMs))
+            : Infinity,
         auditScore: Number(candidate.matchScore) + qualityBonus
     };
 }
@@ -560,13 +561,14 @@ function rankAuditedLyrics(entries) {
     return (entries || [])
         .filter(Boolean)
         // 自动下载选优规则：
-        // 综合审计分优先；综合分相同时优先元数据匹配度；
-        // 仍相同则优先流式逐字符、歌词时长接近度和 AMLL 来源。
+        // 匹配分数优先；同分时流式逐字符优先；
+        // 仍相同则优先歌词时长与目标音频时长更接近；
+        // 最后才使用质量加分和其他特性打破剩余平局。
         .sort((a, b) =>
-            b.auditScore - a.auditScore
-            || b.matchScore - a.matchScore
+            b.matchScore - a.matchScore
             || Number(b.features?.isWordByWord) - Number(a.features?.isWordByWord)
             || (a.durationDifference || 0) - (b.durationDifference || 0)
+            || b.auditScore - a.auditScore
             || Number(b.result?.source === 'amll') - Number(a.result?.source === 'amll')
         );
 }

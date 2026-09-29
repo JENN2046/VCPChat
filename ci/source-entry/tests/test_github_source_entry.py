@@ -368,6 +368,9 @@ class ManifestRefreshTests(unittest.TestCase):
         self.assertTrue(required)
         admitted = {row["path"] for row in self.manifest["profiles"]["chat-kernel-ui"]["entries"]}
         self.assertTrue(required <= admitted, sorted(required - admitted))
+        rules = self.manifest["profiles"]["chat-kernel-ui"]["required_scans"]
+        kernel_rule = next(rule for rule in rules if rule["name"] == "reviewed-effective-kernel-test-inputs")
+        self.assertEqual(set(kernel_rule["files"]), required)
 
     def test_all_bootstrap_manifest_pins_match_exact_git_bytes(self):
         import ast

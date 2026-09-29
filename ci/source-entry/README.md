@@ -63,8 +63,8 @@ there is no alternate transport or automatic fallback.
 
 The effective kernel command is the final `test:chat-kernel` value parsed from
 `package.json` (which currently contains a duplicate script key). Its glob and
-explicit arguments select 102 current test files. The Chat profile includes all
-102, retains the earlier Resident presentation fixture, and records the exact
+explicit arguments select 40 unique current test files. The Chat profile includes
+all 40, retains the earlier Resident presentation fixture, and records the exact
 reviewed input list. The maintainer test compares the effective command with the
 complete staged tree so newly matching tests cannot be silently omitted during a
 refresh. This does not change Node's command or fix the duplicate key.

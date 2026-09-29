@@ -296,7 +296,7 @@ class ManifestRefreshTests(unittest.TestCase):
             if size != "-":
                 row["size"] = int(size)
             rows.append(row)
-        cls.manifest = json.loads((cls.root / "ci/source-entry/projection_manifest.json").read_text(encoding="utf-8"))
+        cls.manifest = json.loads(git("show", ":ci/source-entry/projection_manifest.json"))
         cls.tree = {"sha": tree_id, "truncated": False, "tree": rows}
         cls.commit = {"sha": COMMIT, "tree": {"sha": tree_id}}
         cls.previous = json.loads(git("show", "b02741fc5198659855eb892f55c220371167352b:ci/source-entry/projection_manifest.json"))
@@ -346,7 +346,7 @@ class ManifestRefreshTests(unittest.TestCase):
         self.assertTrue(set(self.previous["denied_blobs"]) <= set(self.manifest["denied_blobs"]))
         screenshot = "assets/E1.5-Vchat前端应用群.jpg"
         self.assertIn(screenshot, self.manifest["denied_paths"])
-        pkg = json.loads((self.root / "package.json").read_text(encoding="utf-8"))
+        pkg = json.loads(self.git("show", ":package.json"))
         self.assertIn("!" + screenshot, pkg["build"]["files"])
         for name, profile in self.manifest["profiles"].items():
             paths = {row["path"] for row in profile["entries"]}
@@ -362,7 +362,7 @@ class ManifestRefreshTests(unittest.TestCase):
 
     def test_effective_kernel_command_has_complete_test_projection(self):
         import fnmatch
-        pkg = json.loads((self.root / "package.json").read_text(encoding="utf-8"))
+        pkg = json.loads(self.git("show", ":package.json"))
         patterns = [part for part in pkg["scripts"]["test:chat-kernel"].split() if part.startswith("tests/")]
         required = {row["path"] for row in self.tree["tree"] if any(fnmatch.fnmatchcase(row["path"], p) for p in patterns)}
         self.assertTrue(required)

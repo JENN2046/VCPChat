@@ -378,7 +378,7 @@ class ManifestRefreshTests(unittest.TestCase):
         data = self.git("show", ":ci/source-entry/projection_manifest.json")
         expected = {"size": len(data), "blob": hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest(), "sha256": hashlib.sha256(data).hexdigest()}
         for workflow, count in [("mobile_sync.yml", 3), ("chat_kernel_ui.yml", 1)]:
-            body = (self.root / ".github/workflows" / workflow).read_text(encoding="utf-8")
+            body = self.git("show", f":.github/workflows/{workflow}").decode("utf-8")
             pins = re.findall(r"^\s+PINS = (.+)$", body, re.M)
             self.assertEqual(len(pins), count)
             for value in pins:

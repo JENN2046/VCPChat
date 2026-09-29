@@ -268,4 +268,118 @@ class EntryTests(unittest.TestCase):
         self.assertEqual(server.bodies,[])
 
 
+class ManifestRefreshTests(unittest.TestCase):
+    """Read-only maintainer checks against staged Git metadata; no source hydration.
+
+    Run from a reviewed checkout after staging the refresh. The source-entry
+    controller and CI jobs still never use Git or read unadmitted file bodies.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import subprocess
+        cls.root = Path(__file__).resolve().parents[3]
+        cls.git_args = ["git", "-c", "safe.directory=" + cls.root.as_posix(), "-C", str(cls.root)]
+        def git(*args):
+            return subprocess.check_output(cls.git_args + list(args))
+        cls.git = staticmethod(git)
+        if not (cls.root / ".git").exists():
+            raise unittest.SkipTest("maintainer metadata checks require a reviewed Git checkout")
+        tree_id = git("write-tree").decode().strip()
+        rows = []
+        for raw in git("ls-tree", "-r", "-t", "-l", "-z", tree_id).decode().split("\0"):
+            if not raw:
+                continue
+            metadata, path = raw.split("\t")
+            mode, kind, oid, size = metadata.split()
+            row = {"path": path, "mode": mode, "type": kind, "sha": oid}
+            if size != "-":
+                row["size"] = int(size)
+            rows.append(row)
+        cls.manifest = json.loads((cls.root / "ci/source-entry/projection_manifest.json").read_text(encoding="utf-8"))
+        cls.tree = {"sha": tree_id, "truncated": False, "tree": rows}
+        cls.commit = {"sha": COMMIT, "tree": {"sha": tree_id}}
+        cls.previous = json.loads(git("show", "b02741fc5198659855eb892f55c220371167352b:ci/source-entry/projection_manifest.json"))
+
+    def transport(self, tree=None):
+        from unittest.mock import Mock
+        api = Mock()
+        api.get_commit.return_value = self.commit
+        api.get_tree.return_value = tree or self.tree
+        return api
+
+    def test_all_current_profiles_pass_metadata_admission(self):
+        for name in self.manifest["profiles"]:
+            with self.subTest(profile=name):
+                api = self.transport()
+                policy, _, _ = entry.prepare_event_policy(self.manifest, COMMIT, name, api)
+                self.assertEqual(len(policy["approved"]), len(self.manifest["profiles"][name]["entries"]))
+                api.get_blob.assert_not_called()
+
+    def test_changed_required_identity_still_fails_before_bodies(self):
+        tree = copy.deepcopy(self.tree)
+        next(row for row in tree["tree"] if row["path"] == "package.json")["sha"] = "e" * 40
+        api = self.transport(tree)
+        with self.assertRaises(AdmissionError):
+            entry.prepare_event_policy(self.manifest, COMMIT, "mobile-contracts", api)
+        api.admit_blobs.assert_not_called()
+
+    def test_unreviewed_file_inside_required_scan_still_fails(self):
+        tree = copy.deepcopy(self.tree)
+        tree["tree"].append({"path": "preloads/api/unreviewed.js", "mode": "100644", "type": "blob", "sha": "e"*40, "size": 1})
+        api = self.transport(tree)
+        with self.assertRaises(AdmissionError):
+            entry.prepare_event_policy(self.manifest, COMMIT, "package-smoke", api)
+        api.admit_blobs.assert_not_called()
+
+    def test_held_alias_still_fails(self):
+        tree = copy.deepcopy(self.tree)
+        selected = self.manifest["profiles"]["mobile-contracts"]["entries"][0]
+        tree["tree"].append({"path": "state-private/alias.js", "mode": "100644", "type": "blob", "sha": selected["blob"], "size": selected["size"]})
+        api = self.transport(tree)
+        with self.assertRaises(AdmissionError):
+            entry.prepare_event_policy(self.manifest, COMMIT, "mobile-contracts", api)
+        api.admit_blobs.assert_not_called()
+
+    def test_exclusions_and_native_path_boundary_are_preserved(self):
+        self.assertTrue(set(self.previous["denied_paths"]) <= set(self.manifest["denied_paths"]))
+        self.assertTrue(set(self.previous["denied_blobs"]) <= set(self.manifest["denied_blobs"]))
+        screenshot = "assets/E1.5-Vchat前端应用群.jpg"
+        self.assertIn(screenshot, self.manifest["denied_paths"])
+        pkg = json.loads((self.root / "package.json").read_text(encoding="utf-8"))
+        self.assertIn("!" + screenshot, pkg["build"]["files"])
+        for name, profile in self.manifest["profiles"].items():
+            paths = {row["path"] for row in profile["entries"]}
+            self.assertNotIn(screenshot, paths)
+            self.assertFalse(any(entry.protected_name(path) for path in paths))
+            self.assertFalse(any(path.startswith("artifacts/diorama/") for path in paths))
+            native = {row["path"]: row for row in profile["static_native_assets"]}
+            old = {row["path"]: row for row in self.previous["profiles"][name]["static_native_assets"]}
+            self.assertEqual(set(native), set(old))
+            for path in native:
+                if path != "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
+                    self.assertEqual(native[path], old[path])
+
+    def test_effective_kernel_command_has_complete_test_projection(self):
+        import fnmatch
+        pkg = json.loads((self.root / "package.json").read_text(encoding="utf-8"))
+        patterns = [part for part in pkg["scripts"]["test:chat-kernel"].split() if part.startswith("tests/")]
+        required = {row["path"] for row in self.tree["tree"] if any(fnmatch.fnmatchcase(row["path"], p) for p in patterns)}
+        self.assertTrue(required)
+        admitted = {row["path"] for row in self.manifest["profiles"]["chat-kernel-ui"]["entries"]}
+        self.assertTrue(required <= admitted, sorted(required - admitted))
+
+    def test_all_bootstrap_manifest_pins_match_exact_git_bytes(self):
+        import ast
+        import re
+        data = self.git("show", ":ci/source-entry/projection_manifest.json")
+        expected = {"size": len(data), "blob": hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest(), "sha256": hashlib.sha256(data).hexdigest()}
+        for workflow, count in [("mobile_sync.yml", 3), ("chat_kernel_ui.yml", 1)]:
+            body = (self.root / ".github/workflows" / workflow).read_text(encoding="utf-8")
+            pins = re.findall(r"^\s+PINS = (.+)$", body, re.M)
+            self.assertEqual(len(pins), count)
+            for value in pins:
+                self.assertEqual(ast.literal_eval(value)["ci/source-entry/projection_manifest.json"], expected)
+
+
 if __name__ == "__main__": unittest.main()

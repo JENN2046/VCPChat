@@ -54,16 +54,56 @@ body reads if its source identity has not been admitted; a new unrelated file is
 not fetched. Package selection is tied to this manifest's exact package input
 and the reviewed matcher defaults, not a general replacement packaging engine.
 
-The four current profiles contain 49, 18, 962 and 828 paths respectively. Their
-deduplicated body counts are 49, 18, 950 and 827. Running all four jobs makes 20
-Git Data REST metadata requests and 1,864 public raw body requests including
+The four current profiles contain 49, 18, 1030 and 912 paths respectively. Their
+deduplicated body counts are 49, 18, 1018 and 911. Running all four jobs makes 20
+Git Data REST metadata requests and 2,016 public raw body requests including
 the five bootstrap controls in each job. Bodies do not consume the authenticated
 Git Data request budget. HTTP failures and rate limits still fail the job;
 there is no alternate transport or automatic fallback.
 
-The kernel command retains its original 47 test files in order and appends
-`tests/resident-ephemeral-presentation.test.js` as the 48th file. The Chat profile
-pins that test and its existing Resident presentation dependencies.
+The effective kernel command is the final `test:chat-kernel` value parsed from
+`package.json` (which currently contains a duplicate script key). Its glob and
+explicit arguments select 102 current test files. The Chat profile includes all
+102, retains the earlier Resident presentation fixture, and records the exact
+reviewed input list. The maintainer test compares the effective command with the
+complete staged tree so newly matching tests cannot be silently omitted during a
+refresh. This does not change Node's command or fix the duplicate key.
+
+## September 29 identity refresh
+
+The product comparison frame is the previously delivered and locally validated
+`b02741fc5198659855eb892f55c220371167352b` (tree
+`dccf74d99cf206a75d57695108bbd57e9d6d7dd9`). The independent upstream frame is
+`a5c26ff01601e8d1e51f6056a31e1f90937ca067`. Neither frame is the CI-refresh
+commit. This preserves the existing difference and upstream Classic parity
+guards without adding guard exceptions for the already-delivered lyric fixture
+and delivery note. These CI comparison frames do not establish the separate
+workspace-wide accepted-upstream baseline or runtime activation.
+
+The refresh admits the new role-preload sources and current Chart packaging
+roots, removes only the three deleted shared-preload entries, and refreshes
+required source identities. The new author showcase image
+`assets/E1.5-Vchat前端应用群.jpg` is excluded both by the package definition and
+the exact admission rules; diorama screenshots remain outside the projection.
+All existing held paths and object identities are retained.
+
+The set of ten separately admitted native paths is unchanged. Only the existing
+Windows voice executable's exact identity changes to the author's tracked
+artifact; PE classification remains required. No binary is executed by admission,
+and this update is not a reproducible-build or native runtime acceptance claim.
+
+The four bootstrap manifest pins change together. No controller, writer,
+permission, transport, fallback or product test command changes are included.
+Maintainers can stage the reviewed refresh and run:
+
+```sh
+python3 -B -m unittest discover -s ci/source-entry/tests -p test_github_source_entry.py -k ManifestRefreshTests -v
+```
+
+These metadata-only checks can run on Windows. The full original writer suite
+requires Linux and its POSIX directory-safety primitives; do not weaken it to
+make Windows placement succeed. Hosted source placement and downstream product
+gates must still be observed separately.
 
 Controller tests exercise injected HTTP responses and synthetic temporary files.
 They do not establish that a full package, Electron runtime, all original commands

@@ -92,8 +92,13 @@ Windows voice executable's exact identity changes to the author's tracked
 artifact; PE classification remains required. No binary is executed by admission,
 and this update is not a reproducible-build or native runtime acceptance claim.
 
-The four bootstrap manifest pins change together. No controller, writer,
-permission, transport, fallback or product test command changes are included.
+The four bootstrap manifest pins change together. A separately authorized
+equivalent guard adaptation checks the new `preloads/api/*.js` declarations
+instead of the deleted shared catalog. Both retired presentation-subscription
+patterns remain forbidden, and empty declarations now fail explicitly. This does
+not refresh the separate shared-business hash baseline.
+No controller, writer, permission, transport, fallback or product test command
+changes are included.
 Maintainers can stage the reviewed refresh and run:
 
 ```sh

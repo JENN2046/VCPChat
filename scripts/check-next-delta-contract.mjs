@@ -24,8 +24,13 @@ for (const retiredFile of [
     assert.equal(exists(retiredFile), false, `${retiredFile} must not return without a production consumer`);
 }
 assert.equal(document.documentElement.dataset.uiMode, 'next', 'main.html must declare the canonical presentation');
-assert.doesNotMatch(read('preloads/shared/catalog.js'), /onUiModeUpdated|ui-mode-updated/,
-    'preload must not expose a presentation subscription without a sender and consumer');
+const preloadApiFiles = fs.readdirSync(new URL('../preloads/api/', import.meta.url))
+    .filter(name => name.endsWith('.js')).sort();
+assert.ok(preloadApiFiles.length > 0, 'preload API declarations must not be missing');
+for (const file of preloadApiFiles) {
+    assert.doesNotMatch(read(`preloads/api/${file}`), /onUiModeUpdated|ui-mode-updated/,
+        'preload must not expose a presentation subscription without a sender and consumer');
+}
 assert.doesNotMatch(read('modules/renderer/streamManager.js'), /\binitStreamManager\b/,
     'StreamProjection must not retain the retired initStreamManager compatibility facade');
 

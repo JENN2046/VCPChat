@@ -5125,9 +5125,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d802aad1404b5ebf6280863ce13f13a7842f4072",
-          "size": 218660,
-          "sha256": "575a3ba96051d5ad62b7202b1a77772c6dcec31fb2b69a8dd855b97155f6036b",
+          "blob": "b095960272977b418132a11bd69a9050c1b1ea67",
+          "size": 218617,
+          "sha256": "e9c5f4034ad078b93124a6614151e65efea50fe7cadd638d57b15bead713859b",
           "kind": "source"
         },
         {
@@ -12872,9 +12872,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d802aad1404b5ebf6280863ce13f13a7842f4072",
-          "size": 218660,
-          "sha256": "575a3ba96051d5ad62b7202b1a77772c6dcec31fb2b69a8dd855b97155f6036b",
+          "blob": "b095960272977b418132a11bd69a9050c1b1ea67",
+          "size": 218617,
+          "sha256": "e9c5f4034ad078b93124a6614151e65efea50fe7cadd638d57b15bead713859b",
           "kind": "source"
         },
         {
@@ -15581,9 +15581,9 @@
           "path": "scripts/check-next-delta-contract.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "79019209c3fad9a0dbf1087056cdaaaa1f744761",
-          "size": 35468,
-          "sha256": "ce673be9b0492dd7b0718db07c14296f8d5e48ea3ab913eacdb95f07ee2e5fba",
+          "blob": "df648fb6387ac6f446fecd2738438cfd7833f8d0",
+          "size": 35617,
+          "sha256": "9d38c4955f31708687e2dd7e1938a6bc4cea902871d24f77eedb928f4dedd4f2",
           "kind": "source"
         },
         {
@@ -15698,9 +15698,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "db47e5f3bb84b897c9d977dcb03740841099f1f3",
-          "size": 7093,
-          "sha256": "1370dcabc6279de0c6187558e7e04cfa0ce7eb8ff5eadb6a579361ffad85891c",
+          "blob": "e8f2fa57164de807100ef6081de7fe7888c8c0ba",
+          "size": 7267,
+          "sha256": "11b7a69461bb33981d16a3c7dd8052f5d19ca6984d3f0d4ca3f2c20a8722090b",
           "kind": "source"
         },
         {

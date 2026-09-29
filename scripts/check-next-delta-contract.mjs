@@ -297,6 +297,8 @@ assert.ok(contextMenuSource.indexOf('await startStreamFn(')
     < contextMenuSource.indexOf('const vcpResult = await electronAPI.sendToVCP('),
     'the owned thinking projection must exist before the regeneration provider request');
 const messageRendererSource = read('modules/messageRenderer.js');
+assert.doesNotMatch(messageRendererSource, /file:\/\/\/[A-Za-z]:\//i,
+    'MessageRenderer must not construct machine-specific absolute file URLs');
 assert.match(messageRendererSource, /startStreamingMessage:\s*mainRendererReferences\.streamStartCapability \|\| streamManager\.startStreamingMessage,\s*startStream:\s*mainRendererReferences\.streamStartCapability,/,
     'MessageRenderer must inject the owned stream-start capability while retaining only the reviewed legacy fallback');
 assert.match(contextMenuSource, /contextMenuDependencies\.cancelStream\?\.\(messageId, reason\)/,

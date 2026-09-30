@@ -54,9 +54,9 @@ body reads if its source identity has not been admitted; a new unrelated file is
 not fetched. Package selection is tied to this manifest's exact package input
 and the reviewed matcher defaults, not a general replacement packaging engine.
 
-The four current profiles contain 49, 18, 1030 and 912 paths respectively. Their
-deduplicated body counts are 49, 18, 1018 and 911. Running all four jobs makes 20
-Git Data REST metadata requests and 2,016 public raw body requests including
+The four current profiles contain 49, 18, 1041 and 919 paths respectively. Their
+deduplicated body counts are 49, 18, 1029 and 918. Running all four jobs makes 20
+Git Data REST metadata requests and 2,034 public raw body requests including
 the five bootstrap controls in each job. Bodies do not consume the authenticated
 Git Data request budget. HTTP failures and rate limits still fail the job;
 there is no alternate transport or automatic fallback.

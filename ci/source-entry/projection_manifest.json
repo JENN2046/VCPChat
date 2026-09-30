@@ -7858,6 +7858,78 @@
           "kind": "source"
         },
         {
+          "path": "rust_projectforge_indexer/Cargo.lock",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f1076391d57119c5bde7089234f0b8f8f301a6d5",
+          "size": 12697,
+          "sha256": "30d5c31d15e12f374e319a1094f9077c898aef58ef9ad89e693eb56baf070bd4",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/Cargo.toml",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b17e307b1da5f4f2272931c167ea4f330956e84b",
+          "size": 920,
+          "sha256": "9c9df7989e87e0929504ea447eb0e543ae390d762610f41430a8e7a426cbc90f",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/build-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "36b68938957723090a57197128014111e5105829",
+          "size": 3592,
+          "sha256": "9ca47bd74e9809b49ef53bb21ac7d670d38debf165903aab9b1faf57f9391271",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/src/facts.rs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67ca9e5d7631d8765e320828ee92f8326e7868f0",
+          "size": 37100,
+          "sha256": "b3e91396019aa22dd64defde988f10194d7480610d0cb4c19ea4e7a2ad4f3df3",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/src/lang.rs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c96cd205775aeff2025265284bcadec47651bdd9",
+          "size": 2783,
+          "sha256": "b5be664c9f93f2071922d1e8b08144122aede8e2b6a896d04c40aea0722d61b8",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/src/main.rs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f99c7904aced7b3582a7ebb811a9656126275a7b",
+          "size": 7731,
+          "sha256": "b4d2944d2235441794df9797b1d2b62dddf04be450b242e358d7e1aa897c1a4d",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/src/scan.rs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d04c2669931f680e4fc3ed5ee6183c37390c7335",
+          "size": 12495,
+          "sha256": "e2bfee6ba2f7ffaa4849ab32a2b14e06cf71e4a162593ce059f6f1ac1bd4c811",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/src/symbols.rs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "303a9d5570540016daf7fa6952b59e6bf4897409",
+          "size": 27836,
+          "sha256": "e287ebf5e74dae831f36938d801d4b4e58a58a32a8eb2852ef38009ea250252f",
+          "kind": "source"
+        },
+        {
           "path": "rust_voice_input_engine/Cargo.lock",
           "mode": "100644",
           "type": "blob",
@@ -10152,6 +10224,20 @@
             "build",
             "dist",
             ".yarn"
+          ]
+        },
+        {
+          "name": "projectforge-locked-build-inputs",
+          "roots": [
+            "rust_projectforge_indexer/src"
+          ],
+          "files": [
+            "rust_projectforge_indexer/Cargo.lock",
+            "rust_projectforge_indexer/Cargo.toml",
+            "rust_projectforge_indexer/build-runtime.js"
+          ],
+          "suffixes": [
+            ".rs"
           ]
         }
       ]
@@ -15788,9 +15874,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "b633dccbed34e03d46340d6d8b9a19fa7261cadb",
-          "size": 7425,
-          "sha256": "f240cf9ccb7fcf2ec52d0f411c9dab218e74b54f3befa57bc389142603a02978",
+          "blob": "5f2bf9f93481ffe30cf2a3acbd643e29bf48a669",
+          "size": 7907,
+          "sha256": "dd6906809fa4436cb9f5f40a9815bb1fefa23a1179015c66968ef9ba67296ec0",
           "kind": "source"
         },
         {

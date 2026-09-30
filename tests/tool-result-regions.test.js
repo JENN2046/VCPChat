@@ -30,6 +30,19 @@ test('nested literal markers are absorbed into the outermost tool result', async
     assert.equal(text.slice(ranges[0].end), '\n后文');
 });
 
+test('a lone start-marker literal inside FileReader data cannot swallow the outer end', async () => {
+    const { collectToolResultRanges, collectClosedToolResultRanges } = await loadRegions();
+    const { findUnclosedToolResult } = await loadScanner();
+    const sourceLine = `export const TOOL_RESULT_START_MARKER = '${START}';`;
+    const text = `${wrapToolResult(sourceLine)}\nassistant text`;
+    const ranges = collectToolResultRanges(text);
+    assert.equal(ranges.length, 1);
+    assert.equal(ranges[0].closed, true);
+    assert.equal(ranges[0].end, text.indexOf(END) + END.length);
+    assert.equal(collectClosedToolResultRanges(text).length, 1);
+    assert.equal(findUnclosedToolResult(text), null);
+});
+
 test('explicitly nested start/end pairs close only at depth zero', async () => {
     const { collectToolResultRanges } = await loadRegions();
     const text = `${START}\n${START}\ninner\n${END}\nouter tail\n${END}\nafter`;

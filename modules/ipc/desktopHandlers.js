@@ -12,6 +12,7 @@ const desktopMetrics = require('./desktopMetrics');
 const windowService = require('../services/windowService');
 const WINDOW_APP_IDS = require('../services/windowAppIds');
 const { PRELOAD_ROLES, resolveAppPreload } = require('../services/preloadPaths');
+const { installProjectForgeCloseGuard } = require('./projectForgeCloseGuard');
 
 // --- 模块状态 ---
 let desktopWindow = null;
@@ -456,6 +457,10 @@ function createOrFocusChildWindow(existingWindow, options) {
         show: false,
     });
 
+    if (options.guardUnsavedSource) {
+        installProjectForgeCloseGuard(win, dialog);
+    }
+
     // 构建 URL
     let url = `file://${options.htmlPath}`;
     if (options.queryParams) {
@@ -763,6 +768,7 @@ function registerManagedWindows() {
             vchatProjectForgeWindow = createOrFocusChildWindow(vchatProjectForgeWindow, {
                 width: 1320, height: 860, minWidth: 960, minHeight: 620,
                 title: 'ProjectForge 施工图',
+                guardUnsavedSource: true,
                 htmlPath: path.join(app.getAppPath(), 'ProjectForgemodules', 'projectforge.html'),
             });
             return vchatProjectForgeWindow;

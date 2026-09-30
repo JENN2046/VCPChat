@@ -938,14 +938,12 @@
             if (isSourceTab()) checkDiskChange();
         });
 
-        // 关闭窗口前确认未保存的修改（捕获阶段先于 projectforge.js 的关闭处理执行）
-        $('close-btn').addEventListener('click', async e => {
+        // Alt+F4、任务栏关闭、应用退出和按钮关闭统一走 Electron 卸载确认。
+        window.addEventListener('beforeunload', event => {
             if (!isDirty()) return;
-            e.stopImmediatePropagation();
-            if (!(await confirmDiscard())) return;
-            if (api?.closeWindow) api.closeWindow();
-            else window.close();
-        }, true);
+            event.preventDefault();
+            event.returnValue = false;
+        });
     }
 
     // ============================ 初始化 ============================

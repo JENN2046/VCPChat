@@ -179,7 +179,8 @@
       "modules/services/chatDataService/bin/**/*",
       "audio_engine/**/*",
       "rust_assistant_engine/runtime/**/*",
-      "rust_voice_input_engine/runtime/**/*"
+      "rust_voice_input_engine/runtime/**/*",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe"
     ],
     "files": [
       "main.js",
@@ -201,10 +202,15 @@
       "VCPDistributedServer/Plugin/VChatDynamicWallpaper/**/*",
       "VCPDistributedServer/Plugin/VChatAutoTTS/**/*",
       "assets/",
+      "VCPDistributedServer/Plugin/ProjectForge/*.js",
+      "VCPDistributedServer/Plugin/ProjectForge/plugin-manifest.json",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
+      "VCPDistributedServer/shared/fileKit/*.js",
       "modules/**/*",
       "Groupmodules/**/*",
       "Flowlockmodules/**/*",
       "Promptmodules/**/*",
+      "ProjectForgemodules/**/*",
       "ScriptoriumModules/**/*",
       "Tavernmodules/**/*",
       "rust_assistant_engine/ui/**/*",

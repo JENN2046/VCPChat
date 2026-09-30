@@ -25,17 +25,31 @@ export const TOOL_RESULT_END_MARKER = 'VCP调用结果结束]]';
 export function findToolResultEnd(text, startIndex) {
     let depth = 1;
     let cursor = startIndex + TOOL_RESULT_START_MARKER.length;
-    // 缓存下一个起始标记位置，避免每次迭代都从 cursor 重新扫描到文末。
-    let nextStart = text.indexOf(TOOL_RESULT_START_MARKER, cursor);
+    // Canonical tool-result blocks use line-framed markers. A marker string inside
+    // a source line is payload, not a nested protocol boundary. Retain compact
+    // single-line compatibility for older callers.
+    const framed = (startIndex === 0 || text[startIndex - 1] === '\n') &&
+        (text[cursor] === '\n' || text[cursor] === '\r');
+    const nextMarker = (marker, from) => {
+        let index = text.indexOf(marker, from);
+        while (framed && index !== -1) {
+            const lineStart = index === 0 || text[index - 1] === '\n';
+            const next = text[index + marker.length];
+            if (lineStart && (marker !== TOOL_RESULT_START_MARKER || next === '\n' || next === '\r')) break;
+            index = text.indexOf(marker, index + marker.length);
+        }
+        return index;
+    };
+    let nextStart = nextMarker(TOOL_RESULT_START_MARKER, cursor);
 
     while (cursor <= text.length) {
-        const nextEnd = text.indexOf(TOOL_RESULT_END_MARKER, cursor);
+        const nextEnd = nextMarker(TOOL_RESULT_END_MARKER, cursor);
         if (nextEnd === -1) return -1;
 
         if (nextStart !== -1 && nextStart < nextEnd) {
             depth += 1;
             cursor = nextStart + TOOL_RESULT_START_MARKER.length;
-            nextStart = text.indexOf(TOOL_RESULT_START_MARKER, cursor);
+            nextStart = nextMarker(TOOL_RESULT_START_MARKER, cursor);
             continue;
         }
 
@@ -43,7 +57,7 @@ export function findToolResultEnd(text, startIndex) {
         cursor = nextEnd + TOOL_RESULT_END_MARKER.length;
         if (depth === 0) return cursor;
         if (nextStart !== -1 && nextStart < cursor) {
-            nextStart = text.indexOf(TOOL_RESULT_START_MARKER, cursor);
+            nextStart = nextMarker(TOOL_RESULT_START_MARKER, cursor);
         }
     }
 

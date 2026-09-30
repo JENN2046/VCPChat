@@ -53,6 +53,7 @@ const allowedSourceDifferences = new Set([
     '.github/workflows/projectforge-windows.yml',
     // PR #52 reviewed tool-result framing and ProjectForge native-close fixes.
     'ProjectForgemodules/projectforge-source.js',
+    'modules/ipc/projectForgeHandlers.js',
     'modules/ipc/projectForgeCloseGuard.js',
     'modules/renderer/toolResultRegions.js',
     'modules/renderer/desktopPushConsumer.js',

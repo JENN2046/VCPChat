@@ -180,7 +180,12 @@
       "audio_engine/**/*",
       "rust_assistant_engine/runtime/**/*",
       "rust_voice_input_engine/runtime/**/*",
-      "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe"
+      "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/win32-arm64/projectforge_indexer.exe",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/darwin-x64/projectforge_indexer",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/darwin-arm64/projectforge_indexer",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/linux-x64/projectforge_indexer",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/linux-arm64/projectforge_indexer"
     ],
     "files": [
       "main.js",
@@ -205,6 +210,11 @@
       "VCPDistributedServer/Plugin/ProjectForge/*.js",
       "VCPDistributedServer/Plugin/ProjectForge/plugin-manifest.json",
       "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/win32-arm64/projectforge_indexer.exe",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/darwin-x64/projectforge_indexer",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/darwin-arm64/projectforge_indexer",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/linux-x64/projectforge_indexer",
+      "VCPDistributedServer/Plugin/ProjectForge/bin/linux-arm64/projectforge_indexer",
       "VCPDistributedServer/shared/fileKit/*.js",
       "modules/**/*",
       "Groupmodules/**/*",

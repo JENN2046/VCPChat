@@ -7,6 +7,7 @@
 const { ipcMain, webContents } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { fileURLToPath } = require('url');
 
 const PLUGIN_DIR = path.join(__dirname, '..', '..', 'VCPDistributedServer', 'Plugin', 'ProjectForge');
 const CHANNELS = [
@@ -69,8 +70,30 @@ function forge() {
     return forgeModule.gui;
 }
 
-function wrap(fn) {
-    return async (_event, ...args) => {
+function isProjectForgeSender(event) {
+    const expected = path.resolve(__dirname, '..', '..', 'ProjectForgemodules', 'projectforge.html');
+    const matches = raw => {
+        try {
+            const url = new URL(String(raw || ''));
+            if (url.protocol !== 'file:') return false;
+            const actual = path.resolve(fileURLToPath(url));
+            return process.platform === 'win32'
+                ? actual.toLowerCase() === expected.toLowerCase() : actual === expected;
+        } catch (_) { return false; }
+    };
+    // A shared utility preload does not grant ProjectForge authority. Check the
+    // window AND the calling frame; an untrusted frame cannot inherit its host.
+    try {
+        return matches(event?.sender?.getURL?.()) &&
+            (!event.senderFrame || matches(event.senderFrame.url));
+    } catch (_) { return false; }
+}
+
+function wrap(fn, projectForgeOnly = false) {
+    return async (event, ...args) => {
+        if (projectForgeOnly && !isProjectForgeSender(event)) {
+            return { success: false, error: '当前窗口无权删除 ProjectForge 项目。' };
+        }
         try {
             return { success: true, data: await fn(...args) };
         } catch (error) {
@@ -101,7 +124,7 @@ function initialize({ workspaceService = null } = {}) {
             force: p.force === true,
         });
     }));
-    ipcMain.handle('project-forge:delete-project', wrap((projectId, signature) => forge().deleteProject(projectId, signature)));
+    ipcMain.handle('project-forge:delete-project', wrap((projectId, signature) => forge().deleteProject(projectId, signature), true));
 }
 
 module.exports = { initialize };

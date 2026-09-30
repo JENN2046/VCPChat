@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e5da4d57c77e1fc3d70801a82b5965292e28875d",
-          "size": 17599,
-          "sha256": "d6e1415a41ef4c1925ca954da3a2bb8f4e218a6b761f40d1fe71640d628fdeca",
+          "blob": "7dc18a832604d41a89dedde70a13dcaba4608b40",
+          "size": 18473,
+          "sha256": "dbd2665a2da9e48718545d40aab6f7116a551dcfe25c1bb5a6942cba01a03f48",
           "kind": "source"
         },
         {
@@ -5072,9 +5072,9 @@
           "path": "modules/ipc/projectForgeHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "fa6f382d8cad58cca16029459c780014a15058ea",
-          "size": 4279,
-          "sha256": "4607a544f826da39da2d8d927b95690cc2e2fd55b717e86a0455ddce813e65c8",
+          "blob": "137141823480282c7040a341d85b2a69c51a33aa",
+          "size": 5388,
+          "sha256": "c7bc4f4f931f504be017f9be15cc74151834e5c528b6bbbc1018f2333d534f21",
           "kind": "source"
         },
         {
@@ -7475,9 +7475,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e5da4d57c77e1fc3d70801a82b5965292e28875d",
-          "size": 17599,
-          "sha256": "d6e1415a41ef4c1925ca954da3a2bb8f4e218a6b761f40d1fe71640d628fdeca",
+          "blob": "7dc18a832604d41a89dedde70a13dcaba4608b40",
+          "size": 18473,
+          "sha256": "dbd2665a2da9e48718545d40aab6f7116a551dcfe25c1bb5a6942cba01a03f48",
           "kind": "source"
         },
         {
@@ -13072,9 +13072,9 @@
           "path": "modules/ipc/projectForgeHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "fa6f382d8cad58cca16029459c780014a15058ea",
-          "size": 4279,
-          "sha256": "4607a544f826da39da2d8d927b95690cc2e2fd55b717e86a0455ddce813e65c8",
+          "blob": "137141823480282c7040a341d85b2a69c51a33aa",
+          "size": 5388,
+          "sha256": "c7bc4f4f931f504be017f9be15cc74151834e5c528b6bbbc1018f2333d534f21",
           "kind": "source"
         },
         {
@@ -15448,9 +15448,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e5da4d57c77e1fc3d70801a82b5965292e28875d",
-          "size": 17599,
-          "sha256": "d6e1415a41ef4c1925ca954da3a2bb8f4e218a6b761f40d1fe71640d628fdeca",
+          "blob": "7dc18a832604d41a89dedde70a13dcaba4608b40",
+          "size": 18473,
+          "sha256": "dbd2665a2da9e48718545d40aab6f7116a551dcfe25c1bb5a6942cba01a03f48",
           "kind": "source"
         },
         {
@@ -15985,6 +15985,15 @@
           "kind": "source"
         },
         {
+          "path": "rust_projectforge_indexer/build-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "size": 3592,
+          "blob": "36b68938957723090a57197128014111e5105829",
+          "sha256": "9ca47bd74e9809b49ef53bb21ac7d670d38debf165903aab9b1faf57f9391271",
+          "kind": "source"
+        },
+        {
           "path": "scripts/audit-settings-layout.mjs",
           "mode": "100644",
           "type": "blob",
@@ -16078,9 +16087,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f43eeeeee6062aa30ec24a3caab507584b6c92e4",
-          "size": 33343,
-          "sha256": "cd155abb909465737708f2bf7c8d5d055abd9e0848e1810ed2a534a115602f3f",
+          "blob": "44af1ec66d3e7c798de23ca4d35eb96ecb305d6e",
+          "size": 33386,
+          "sha256": "7bc7a91c14518e86802af3b2f967639d24c0d5dceecf6b6d935bdd8cb1c30697",
           "kind": "source"
         },
         {
@@ -17725,9 +17734,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6bb6692af804e68c2935a33b55f8402aced9735a",
-          "size": 7772,
-          "sha256": "eb9e6e221466f027051061fe7cd3b5b4de53143b9ee2c25ed49eecc63b01c552",
+          "blob": "c2c689ded0140d10f1ae4c5dd6e1e6a5aab8362f",
+          "size": 11742,
+          "sha256": "fc2347354ec4ebf94e37887cd05214b8730276678632d8f84ab9d722355b564a",
           "kind": "source"
         },
         {

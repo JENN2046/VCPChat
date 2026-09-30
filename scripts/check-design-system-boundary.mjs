@@ -48,6 +48,10 @@ const forbiddenPaths = [
 
 const allowedSourceDifferences = new Set([
     // Exact reviewed three-way source, voice-build and CI-entry changes.
+    // This batch's native rebuild and its verification are not design-system UI.
+    '.github/scripts/verify-windows-pe.cjs',
+    '.github/workflows/projectforge-windows.yml',
+    'VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe',
     'modules/renderer/residentEphemeralPresentation.mjs',
     'modules/lyrics/lyricFetcherUnified.js',
     'modules/vcpClient.js',

@@ -126,3 +126,14 @@ temporary database and runtime effects need their own results. The summary step
 uses a quoted Node heredoc so Markdown backticks are written literally and all
 eight evidence fields retain their original meaning. A source-entry
 test result is not a CI result, release approval or runtime readiness claim.
+
+## September 30 upstream comparison refresh
+
+The delivered-product comparison stays at `b02741fc5198659855eb892f55c220371167352b`.
+For this frozen update batch, the independent author comparison advances from
+`a5c26ff01601e8d1e51f6056a31e1f90937ca067` to
+`190f754500a3b0448d22e7501c0fc245bbbbfcd2` (tree
+`cfc7b52d895e3e1c3db1a7b567e410abb9b75fa3`).
+Only the Windows ProjectForge rebuild, its verification script and workflow
+are exact design-subtraction exceptions. The forbidden-path and Classic parity
+checks remain active. The package profile now admits the eight locked

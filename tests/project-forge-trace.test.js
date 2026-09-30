@@ -28,17 +28,12 @@ function write(rel, content) {
 test.before(() => {
     tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-trace-test-'));
     repo = path.join(tmp, 'repo');
-    write('preloads/core/registry.js', `'use strict';
-module.exports = {
-    ROLE_GLOBALS: { chat: 'chatAPI', utility: 'utilityAPI' },
-    describeApis: () => [
-        { name: 'saveSettings', domain: 'settings', kind: 'query', channel: 'save-settings', roles: ['chat'] },
-        { name: 'onTick', domain: 'settings', kind: 'subscription', channel: 'tick', roles: ['chat'] },
-        { name: 'orphanApi', domain: 'settings', kind: 'query', channel: 'orphan', roles: ['utility'] },
-    ],
-};
-`);
-    write('preloads/api/settings.js', "'use strict';\nmodule.exports = {};\n");
+    write('preloads/core/registry.js', "const ROLE_GLOBALS = { chat: 'chatAPI', utility: 'utilityAPI' };\n");
+    write('preloads/api/settings.js', `const { invoke, on } = require('../core/define');
+module.exports = { roles: ['chat'], api: {
+    saveSettings: invoke('save-settings'), onTick: on('tick'),
+    orphanApi: invoke('orphan').roles('utility'),
+} };`);
     write('main/handlers.js', `const { ipcMain } = require('electron');
 const util = require('./util');
 function handle(channel, fn) {
@@ -119,13 +114,13 @@ test('buildGraph：页面顺序告警、别名只在同页生效、param 不计�
     assert.equal(LG.parseTarget('nope:x'), null);
 });
 
-test('loadPreloadDecls：无声明表时 absent；子进程取数并缓存', async () => {
+test('loadPreloadDecls：无声明表时 absent；静态提取声明', async () => {
     assert.equal((await LG.loadPreloadDecls(tmp)).status, 'absent');
     const d = await LG.loadPreloadDecls(repo);
     assert.equal(d.status, 'ok', d.error);
     assert.equal(d.apis.length, 3);
     assert.deepEqual(LG.bridgeGlobalsOf(d), ['chatAPI', 'utilityAPI', 'electronAPI']);
-    assert.ok(LG._test.declCache.has(repo));
+    assert.equal(d.source, 'static');
 });
 
 // ---------------- 端到端 ----------------

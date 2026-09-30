@@ -1589,9 +1589,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/linkGraph.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "042843bdaf649340d38fe81585afa185afe0d4ad",
-          "size": 27152,
-          "sha256": "c39fc81d5a8690abdc43c1e6a15e0a520b7c2cb4d9bd705f5cdbfccacd3408fd",
+          "blob": "7c0d8175584dc35e4a409acaa00231f302d0a862",
+          "size": 25328,
+          "sha256": "01427f30a5646904364828f545c94959eb93f4765f892635d6e6a06b26785312",
           "kind": "source"
         },
         {
@@ -1601,6 +1601,15 @@
           "blob": "11ff54776ab1db1eacedc54074a79b7bc9745f08",
           "size": 23115,
           "sha256": "76cd1f695e09bebde2996c50bcad125679840db882375101787c1bba2b5285d2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/ProjectForge/staticPreloadDecls.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "be22bbf7c60a97636c0ed0e2e1e081034dc09419",
+          "size": 6096,
+          "sha256": "4a60b26edba0f352f9150733b9525584fd8d9eeca0c5216bb2fd90704ca71ec5",
           "kind": "source"
         },
         {
@@ -11254,9 +11263,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/linkGraph.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "042843bdaf649340d38fe81585afa185afe0d4ad",
-          "size": 27152,
-          "sha256": "c39fc81d5a8690abdc43c1e6a15e0a520b7c2cb4d9bd705f5cdbfccacd3408fd",
+          "blob": "7c0d8175584dc35e4a409acaa00231f302d0a862",
+          "size": 25328,
+          "sha256": "01427f30a5646904364828f545c94959eb93f4765f892635d6e6a06b26785312",
           "kind": "source"
         },
         {
@@ -11266,6 +11275,15 @@
           "blob": "11ff54776ab1db1eacedc54074a79b7bc9745f08",
           "size": 23115,
           "sha256": "76cd1f695e09bebde2996c50bcad125679840db882375101787c1bba2b5285d2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/ProjectForge/staticPreloadDecls.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "be22bbf7c60a97636c0ed0e2e1e081034dc09419",
+          "size": 6096,
+          "sha256": "4a60b26edba0f352f9150733b9525584fd8d9eeca0c5216bb2fd90704ca71ec5",
           "kind": "source"
         },
         {
@@ -12289,9 +12307,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "12b22b7c7a080c606a865c16dccb8e8a40ae4dac",
-          "size": 246373,
-          "sha256": "c1ccd961d1fadb38fb58d831f0ff6b40d9c96da91829df66660388b096c5095c",
+          "blob": "442c3a2a0a12ba3cc00770d099d641bb67ee123c",
+          "size": 246443,
+          "sha256": "4a36d1d49602546df83229605bc8822e66e063717ea6e1be6e4199fa295404eb",
           "kind": "source"
         },
         {
@@ -16087,9 +16105,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ad162ce49a1e49ab5d8753cf095ea27ead538b3a",
-          "size": 33427,
-          "sha256": "accc406012cb87ec1c724012b6e08d36cda3dacd8be5301b22b488c49dbdf312",
+          "blob": "a4ed4005def12fe271502174438d555095781027",
+          "size": 33674,
+          "sha256": "c92cc1b4abf35af22aac5ba9bd35ae49fcc55cc3ac7e6f464b84c1724d8ec278",
           "kind": "source"
         },
         {
@@ -17734,9 +17752,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c2c689ded0140d10f1ae4c5dd6e1e6a5aab8362f",
-          "size": 11742,
-          "sha256": "fc2347354ec4ebf94e37887cd05214b8730276678632d8f84ab9d722355b564a",
+          "blob": "5196efe74915a65f8cc8ed26367b67256e9e65f0",
+          "size": 15318,
+          "sha256": "cea89b440e8188ef15ad2aab6cb18c449a90a7d3933f55b1c7d1cde12e0949b8",
           "kind": "source"
         },
         {

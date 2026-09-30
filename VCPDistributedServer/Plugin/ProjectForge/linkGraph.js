@@ -9,56 +9,23 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execFile } = require('child_process');
+const { readStaticPreloadDecls } = require('./staticPreloadDecls');
 
 const JS_EXT = ['.js', '.mjs', '.cjs', '.jsx', '.ts', '.mts', '.cts', '.tsx'];
 const DEFAULT_ROLE_GLOBALS = Object.freeze({ chat: 'chatAPI', utility: 'utilityAPI', desktop: 'desktopAPI' });
 const COMPAT_GLOBAL = 'electronAPI';
 const LIMIT = 30;
 
-// ---------------- preload 声明表（子进程取数，不在插件进程执行被分析工程的代码） ----------------
-
-const declCache = new Map();
-const DECL_SCRIPT = 'const r=require(process.argv[1]);process.stdout.write(JSON.stringify({apis:r.describeApis(),roleGlobals:r.ROLE_GLOBALS||null}))';
-
-function registrySignature(root) {
-    const reg = path.join(root, 'preloads', 'core', 'registry.js');
-    if (!fs.existsSync(reg)) return null;
-    const parts = [];
-    const add = f => { try { const s = fs.statSync(f); parts.push(`${path.basename(f)}:${s.mtimeMs}:${s.size}`); } catch (_e) { /* 忽略 */ } };
-    add(reg);
-    add(path.join(root, 'preloads', 'core', 'define.js'));
-    const apiDir = path.join(root, 'preloads', 'api');
-    try { for (const n of fs.readdirSync(apiDir).sort()) if (n.endsWith('.js')) add(path.join(apiDir, n)); } catch (_e) { /* 无 api 目录 */ }
-    return { reg, key: parts.join('|') };
-}
+// ---------------- preload 声明表（仅解析源码，绝不执行被分析工程） ----------------
 
 /** @returns {Promise<{status:'ok'|'absent'|'failed', apis:Array, roleGlobals:object|null, error?:string}>} */
-function loadPreloadDecls(root, { timeoutMs = 5000 } = {}) {
-    const sig = registrySignature(root);
-    if (!sig) return Promise.resolve({ status: 'absent', apis: [], roleGlobals: null });
-    const hit = declCache.get(root);
-    if (hit && hit.key === sig.key) return Promise.resolve(hit.value);
-    return new Promise(resolve => {
-        execFile(process.execPath, ['-e', DECL_SCRIPT, sig.reg], {
-            cwd: root, timeout: timeoutMs, windowsHide: true, maxBuffer: 16 * 1024 * 1024,
-            env: { ...process.env, ELECTRON_RUN_AS_NODE: '1', NODE_OPTIONS: '' },
-        }, (err, stdout, stderr) => {
-            let value;
-            if (err) {
-                value = { status: 'failed', error: String(stderr || err.message).trim().split('\n').slice(-3).join(' | '), apis: [], roleGlobals: null };
-            } else {
-                try {
-                    const d = JSON.parse(stdout);
-                    value = { status: 'ok', apis: Array.isArray(d.apis) ? d.apis : [], roleGlobals: d.roleGlobals || null };
-                } catch (e) {
-                    value = { status: 'failed', error: `输出不是 JSON：${e.message}`, apis: [], roleGlobals: null };
-                }
-            }
-            if (value.status === 'ok') declCache.set(root, { key: sig.key, value });
-            resolve(value);
-        });
-    });
+async function loadPreloadDecls(root) {
+    try {
+        return readStaticPreloadDecls(root);
+    } catch (_error) {
+        // Do not disclose workspace source or parser diagnostics in tool output.
+        return { status: 'failed', error: '无法静态解析 preload 声明；未执行工作区代码。', apis: [], roleGlobals: null };
+    }
 }
 
 function bridgeGlobalsOf(decls) {
@@ -479,5 +446,5 @@ function trace(g, kind, value) {
 module.exports = {
     TRACE_KINDS, COMPAT_GLOBAL, DEFAULT_ROLE_GLOBALS,
     loadPreloadDecls, bridgeGlobalsOf, aliasNames, buildGraph, parseTarget, trace,
-    _test: { declCache, positionIn, findPage },
+    _test: { positionIn, findPage },
 };

@@ -48,6 +48,7 @@
     "VCPDistributedServer/Plugin/ProjectForge/engine.js",
     "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
     "VCPDistributedServer/Plugin/ProjectForge/linkGraph.js",
+    "VCPDistributedServer/Plugin/ProjectForge/staticPreloadDecls.js",
     "VCPDistributedServer/Plugin/ProjectForge/store.js",
     "VCPDistributedServer/Plugin/ProjectForge/symbolResolver.js",
     "VCPDistributedServer/Plugin/ProjectForge/tickets.js",

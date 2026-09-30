@@ -61,6 +61,10 @@ const allowedSourceDifferences = new Set([
     'Flowlockmodules/flowlock-protocol.js',
     'modules/ipc/mainChatVoiceCoordinator.js',
     'tests/projectforge-delivery.test.js',
+    // Trace P1: parse workspace declarations as data, never execute them.
+    'VCPDistributedServer/Plugin/ProjectForge/linkGraph.js',
+    'VCPDistributedServer/Plugin/ProjectForge/staticPreloadDecls.js',
+    'tests/project-forge-trace.test.js',
     'tests/tool-result-regions.test.js',
     'VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe',
     'modules/renderer/residentEphemeralPresentation.mjs',

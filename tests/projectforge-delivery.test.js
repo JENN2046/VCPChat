@@ -9,6 +9,63 @@ const { installProjectForgeCloseGuard } = require('../modules/ipc/projectForgeCl
 const { minimatch } = require('minimatch');
 const build = require('../package.json').build;
 
+test('Trace statically reads declarations without executing registry, helpers or API side effects', async t => {
+    const os = require('node:os');
+    const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-static-security-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    fs.mkdirSync(path.join(root, 'preloads/core'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'preloads/api'));
+    const sentinel = path.join(root, 'executed');
+    const attack = `require('node:fs').writeFileSync(${JSON.stringify(sentinel)}, 'executed');`;
+    fs.writeFileSync(path.join(root, 'preloads/core/registry.js'), `${attack}\nconst ROLE_GLOBALS = Object.freeze({chat: 'chatAPI'});`);
+    fs.writeFileSync(path.join(root, 'preloads/core/define.js'), attack);
+    const api = path.join(root, 'preloads/api/demo.js');
+    fs.writeFileSync(api, `${attack}\nconst {invoke,on,custom}=require('../core/define');
+module.exports={roles:['chat'],api:{save:invoke('save').mapResult(()=>{${attack}}),tick:on('tick').roles('chat'),local:custom('query',null,()=>{${attack}})}};`);
+    const result = await loadPreloadDecls(root);
+    assert.equal(result.status, 'ok', result.error);
+    assert.equal(result.source, 'static');
+    assert.deepEqual(result.apis.map(({ name, kind, channel, roles }) => ({ name, kind, channel, roles })), [
+        {name: 'save', kind: 'query', channel: 'save', roles: ['chat']},
+        {name: 'tick', kind: 'subscription', channel: 'tick', roles: ['chat']},
+        {name: 'local', kind: 'query', channel: null, roles: ['chat']},
+    ]);
+    assert.equal(fs.existsSync(sentinel), false);
+    for (const source of [
+        `${attack}\nmodule.exports = makeDeclaration();`,
+        `const {invoke}=require('../core/define');module.exports={roles:['chat'],api:{save:invoke(getChannel())}};`,
+        'not valid JavaScript {{{',
+        'x'.repeat(1024 * 1024 + 1),
+    ]) {
+        fs.writeFileSync(api, source);
+        const failed = await loadPreloadDecls(root);
+        assert.equal(failed.status, 'failed');
+        assert.deepEqual(failed.apis, []);
+        assert.equal(fs.existsSync(sentinel), false);
+    }
+});
+
+test('Trace extracts the shipped preload metadata without requiring workspace modules', async () => {
+    const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');
+    const result = await loadPreloadDecls(path.join(__dirname, '..'));
+    assert.equal(result.status, 'ok', result.error);
+    assert.equal(result.apis.length, 401);
+    assert.ok(result.apis.some(api => api.name === 'projectForgeDeleteProject' && api.channel === 'project-forge:delete-project'));
+});
+
+test('Trace refuses a linked declaration directory and does not return stale metadata', async t => {
+    const os = require('node:os');
+    const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-static-link-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    fs.mkdirSync(path.join(root, 'preloads/core'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'external'));
+    fs.writeFileSync(path.join(root, 'preloads/core/registry.js'), "const ROLE_GLOBALS={chat:'chatAPI'};");
+    fs.symlinkSync(path.join(root, 'external'), path.join(root, 'preloads/api'), process.platform === 'win32' ? 'junction' : 'dir');
+    assert.equal((await loadPreloadDecls(root)).status, 'failed');
+});
+
 test('ProjectForge package includes only required runtime source and verified sidecars', () => {
     const files = new Set(build.files);
     for (const pattern of [

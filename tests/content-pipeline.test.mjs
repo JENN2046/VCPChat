@@ -4,14 +4,14 @@ import { createContentPipeline, PIPELINE_MODES } from '../modules/renderer/conte
 
 test('content pipeline keeps thought, tool, request and code protocols ordered and isolated', () => {
     const pipeline = createContentPipeline({
-        getToolResultRegex: () => /\[RESULT:[\s\S]*?\]/g,
+        getToolResultRegex: () => /\[\[VCP调用结果信息汇总:[\s\S]*?VCP调用结果结束\]\]/g,
         getToolRequestRegex: () => /<<<\[TOOL_REQUEST\]>>>[\s\S]*?<<<\[END_TOOL_REQUEST\]>>>/g,
         getCodeFenceRegex: () => /```[\s\S]*?```/g,
         processStartEndMarkers: value => value.replace('「始」', '<START>').replace('「末」', '<END>')
     });
     const input = [
         '<think>\nprivate reasoning\n</think>',
-        '[RESULT: **raw tool output**]',
+        '[[VCP调用结果信息汇总:\n- 工具名称: Demo\n- 返回内容: **raw tool output**\nVCP调用结果结束]]',
         '<<<[TOOL_REQUEST]>>> tool_name:「始」Demo「末」 <<<[END_TOOL_REQUEST]>>>',
         '```js\nconst marker = "not a tool result";\n```'
     ].join('\n');

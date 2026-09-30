@@ -1,0 +1,49 @@
+name: ProjectForge Windows source verification
+
+on:
+  pull_request:
+    paths:
+      - 'rust_projectforge_indexer/**'
+      - 'VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/**'
+      - '.github/workflows/projectforge-windows.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Record compiler and test locked source
+        shell: pwsh
+        run: |
+          rustc --version --verbose
+          cargo test --locked --manifest-path rust_projectforge_indexer/Cargo.toml
+      - name: Build locked source
+        shell: pwsh
+        run: cargo build --locked --release --manifest-path rust_projectforge_indexer/Cargo.toml
+      - name: Preserve rebuilt artifact for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: projectforge-windows-rebuilt
+          path: rust_projectforge_indexer/target/release/projectforge_indexer.exe
+          if-no-files-found: error
+          retention-days: 1
+      - name: Compare bundled executable and smoke test
+        shell: pwsh
+        run: |
+          $rebuilt = 'rust_projectforge_indexer/target/release/projectforge_indexer.exe'
+          $bundled = 'VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe'
+          $rebuiltHash = (Get-FileHash -Algorithm SHA256 $rebuilt).Hash.ToLowerInvariant()
+          $bundledHash = (Get-FileHash -Algorithm SHA256 $bundled).Hash.ToLowerInvariant()
+          Write-Output "rebuilt SHA256: $rebuiltHash"
+          Write-Output "bundled SHA256: $bundledHash"
+          if ($rebuiltHash -ne $bundledHash) {
+            throw 'Bundled ProjectForge differs from the locked-source Windows rebuild.'
+          }
+          $lines = '{"id":1,"method":"ping","params":{}}' | & $rebuilt
+          if ($lines.Count -lt 2) { throw 'ProjectForge emitted no READY/response pair.' }
+          $ready = $lines[0] | ConvertFrom-Json
+          $answer = $lines[1] | ConvertFrom-Json

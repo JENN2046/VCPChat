@@ -2,7 +2,7 @@ import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.
 import { createImageHandler } from './renderer/imageHandler.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
 import { createVisibilityOptimizer } from './renderer/visibilityOptimizer.js';
-import { createMessageSkeleton, formatMessageTimestamp } from './renderer/domBuilder.js';
+import { createMessageSkeleton, fixVoiceChatAssetPath, formatMessageTimestamp } from './renderer/domBuilder.js';
 import { createEmoticonUrlFixer } from './renderer/emoticonUrlFixer.js';
 import { createContentPipeline, PIPELINE_MODES } from './renderer/contentPipeline.js';
 import { createContentRuntime } from './chat/contentRuntime.js';
@@ -3679,8 +3679,8 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                         avatarUrlToUse = matchedItem.avatarUrl;
                         avatarColorToUse = matchedItem.avatarColor || matchedItem.avatarCalculatedColor || avatarColorToUse;
                     } else if (message.agentId && message.agentId !== currentSelectedItem.id) {
-                        // 防线 2: 若已知发送者 agentId，直接组装标准的 file:// 物理头像路径兜底
-                        avatarUrlToUse = `file:///D:/VCP/VCP_itself_2nd/VCPChat/AppData/Agents/${message.agentId}/avatar.png`;
+                        // 防线 2: 发送者已知但缓存中没有可用头像时，使用随应用打包的可移植默认头像。
+                        avatarUrlToUse = 'assets/default_avatar.png';
                     }
                 }
 
@@ -3706,6 +3706,10 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 }
             }
         }
+    }
+
+    if (avatarImg && avatarUrlToUse) {
+        avatarImg.src = fixVoiceChatAssetPath(avatarUrlToUse, mainRendererReferences.window);
     }
 
     // 先添加到DOM

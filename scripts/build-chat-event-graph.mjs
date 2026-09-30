@@ -10,13 +10,14 @@ const dynamicRegistrations = registeredContracts.flatMap(contract =>
 const sourceRoots = ['main.js', 'renderer.js', 'preloads', 'modules', 'Flowlockmodules', 'VCPDistributedServer'];
 const ignored = /(?:^|[\\/])(?:tests?|node_modules|vendor|artifacts|docs)(?:[\\/]|$)/;
 const files = [];
+const compareText = (left, right) => left < right ? -1 : left > right ? 1 : 0;
 
 function walk(relative) {
     const absolute = path.join(root, relative);
     if (!fs.existsSync(absolute)) return;
     const stat = fs.statSync(absolute);
     if (stat.isFile()) { if (/\.(?:js|mjs|cjs)$/.test(relative)) files.push(relative.replaceAll('\\', '/')); return; }
-    for (const entry of fs.readdirSync(absolute, { withFileTypes: true })) {
+    for (const entry of fs.readdirSync(absolute, { withFileTypes: true }).sort((a, b) => compareText(a.name, b.name))) {
         const child = path.join(relative, entry.name).replaceAll('\\', '/');
         if (!ignored.test(child)) walk(child);
     }
@@ -76,7 +77,7 @@ const graph = {
         ...node,
         producers: [...new Map(node.producers.map(item => [`${item.file}:${item.line}:${item.kind}`, item])).values()],
         consumers: [...new Map(node.consumers.map(item => [`${item.file}:${item.line}:${item.kind}`, item])).values()]
-    })).sort((a, b) => a.name.localeCompare(b.name)),
+    })).sort((a, b) => compareText(a.name, b.name)),
     registeredDynamic: [...new Map(registeredDynamic.map(item => [`${item.file}:${item.line}`, item])).values()],
     undiscovered: [...new Map(undiscovered.map(item => [`${item.file}:${item.line}`, item])).values()]
 };

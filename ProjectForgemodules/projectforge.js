@@ -106,6 +106,46 @@ function isLightTheme() {
     return document.body.classList.contains('light-theme');
 }
 
+/** CodeMirror 按 \n 分行并丢弃 \r；diff 必须在同样的文本上计算，否则 CRLF 文件字级标记错位、甚至整篇标红。 */
+function normalizeEol(text) {
+    return String(text || '').replace(/\r\n?/g, '\n');
+}
+
+function countLines(text) {
+    let n = 1;
+    for (let i = text.indexOf('\n'); i !== -1; i = text.indexOf('\n', i + 1)) n++;
+    return n;
+}
+
+// 不超过该行数时一次性渲染全部行（相同段落已折叠，实际 DOM 量通常很小）
+const DIFF_FULL_RENDER_MAX_LINES = 1500;
+
+/** 施工图节点与 Git 侧栏共用的只读 MergeView。left = 改动前，right = 改动后。 */
+function createDiffMergeView(container, { left, right, filePath }) {
+    const lines = Math.max(countLines(left), countLines(right));
+    return CodeMirror.MergeView(container, {
+        // origLeft = 改动前（删除标红），value = 改动后（新增标绿）。
+        // value=前 / orig=后 会让 MergeView 把增删方向完全颠倒。
+        origLeft: left,
+        value: right,
+        connect: 'align',
+        mode: modeForPath(filePath),
+        theme: isLightTheme() ? 'default' : 'material-darker',
+        lineNumbers: true,
+        readOnly: true,
+        revertButtons: false,
+        highlightDifferences: true,
+        collapseIdentical: 4,
+        lineWrapping: state.diffWrap,
+        // 中小文件全量渲染：滚动时两侧编辑器不再重绘，行高也不再变化，
+        // 避免 align 模式在滚动中反复清空并重建所有对齐占位（换行模式下最明显）
+        viewportMargin: lines <= DIFF_FULL_RENDER_MAX_LINES ? Infinity : 30,
+        // 语法高亮后台任务切成短片，避免默认 100ms 的长任务卡帧
+        workTime: 16,
+        workDelay: 50,
+    });
+}
+
 // ============================ 署名 ============================
 
 function getSignature() {
@@ -165,7 +205,19 @@ function renderProjectList() {
         <li class="project-item${p.id === state.currentId ? ' active' : ''}${p.deleted_at ? ' deleted' : ''}" data-id="${escapeHtml(p.id)}">
             <div class="row"><span class="name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</span>${statusBadge(p)}</div>
             <div class="sub"><code>${escapeHtml(p.id)}</code> · ${escapeHtml(p.workspace_alias || '-')} · Todo ${escapeHtml(p.progress?.text || '无')}</div>
-            <div class="sub">${p.stats?.nodeCount || 0} 次变动 · 最近 ${escapeHtml(fmtTime(p.stats?.lastAt || p.updated_at))}</div>
+            <div class="sub meta-line">
+                <span>${p.stats?.nodeCount || 0} 次变动 · 最近 ${escapeHtml(fmtTime(p.stats?.lastAt || p.updated_at))}</span>
+                ${p.status === 'accepted' && !p.deleted_at ? `
+                <div class="project-delete-wrap" data-id="${escapeHtml(p.id)}">
+                    <button class="project-delete-trigger" type="button" title="删除工程" aria-label="删除工程">
+                        <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                    </button>
+                    <button class="project-delete-confirm" type="button" data-id="${escapeHtml(p.id)}">是否删除工程？</button>
+                </div>` : ''}
+            </div>
             ${progressBar(p.progress)}
         </li>`).join('');
 }
@@ -374,28 +426,16 @@ function buildDiffView({ topLine = null } = {}) {
     const { node, before, after } = detail;
     destroyDiffView();
     const note = (b, label) => (b.exists ? (b.truncated ? `\n\n/* …${label}内容超过 2MB，已截断显示 */` : '') : '');
-    // origLeft = 改动前（删除标红），value = 改动后（新增标绿）。
-    // value=前 / orig=后 会让 MergeView 把增删方向完全颠倒。
-    state.diffView = CodeMirror.MergeView($('diff-view'), {
-        origLeft: before.exists ? before.text + note(before, '改动前') : '',
-        value: after.exists ? after.text + note(after, '改动后') : '',
-        connect: 'align',
-        mode: modeForPath(node.file_path),
-        theme: isLightTheme() ? 'default' : 'material-darker',
-        lineNumbers: true,
-        readOnly: true,
-        revertButtons: false,
-        highlightDifferences: true,
-        collapseIdentical: 4,
-        lineWrapping: state.diffWrap,
+    state.diffView = createDiffMergeView($('diff-view'), {
+        left: before.exists ? normalizeEol(before.text) + note(before, '改动前') : '',
+        right: after.exists ? normalizeEol(after.text) + note(after, '改动后') : '',
+        filePath: node.file_path,
     });
-    requestAnimationFrame(() => {
-        const editor = state.diffView?.editor();
-        if (!editor) return;
-        editor.refresh();
-        state.diffView.leftOriginal()?.refresh();
-        if (topLine != null) editor.scrollTo(null, editor.heightAtLine(topLine, 'local'));
-    });
+    // 容器在创建前已可见，尺寸测量正确，无需 refresh（refresh 会让两侧编辑器整体重测重绘一遍）
+    if (topLine != null) {
+        const editor = state.diffView.editor();
+        editor.scrollTo(null, editor.heightAtLine(topLine, 'local'));
+    }
 }
 
 function toggleDiffWrap() {
@@ -555,7 +595,67 @@ function bindEvents() {
     $('project-search').addEventListener('input', debounce(renderProjectList, 120));
     $('include-deleted').addEventListener('change', loadProjects);
 
-    $('project-list').addEventListener('click', e => {
+    let activeDeleteWrap = null;
+    let activeDeleteTimer = null;
+
+    function collapseActiveDelete() {
+        if (activeDeleteTimer) {
+            clearTimeout(activeDeleteTimer);
+            activeDeleteTimer = null;
+        }
+        if (activeDeleteWrap) {
+            activeDeleteWrap.classList.remove('expanded');
+            activeDeleteWrap = null;
+        }
+    }
+
+    document.addEventListener('click', e => {
+        if (activeDeleteWrap && !activeDeleteWrap.contains(e.target)) {
+            collapseActiveDelete();
+        }
+    });
+
+    $('project-list').addEventListener('click', async e => {
+        const trigger = e.target.closest('.project-delete-trigger');
+        if (trigger) {
+            e.stopPropagation();
+            const wrap = trigger.closest('.project-delete-wrap');
+            if (!wrap) return;
+            if (activeDeleteWrap && activeDeleteWrap !== wrap) collapseActiveDelete();
+            wrap.classList.add('expanded');
+            activeDeleteWrap = wrap;
+            activeDeleteTimer = setTimeout(() => collapseActiveDelete(), 3000);
+            return;
+        }
+
+        const confirmBtn = e.target.closest('.project-delete-confirm');
+        if (confirmBtn) {
+            e.stopPropagation();
+            collapseActiveDelete();
+            const projectId = confirmBtn.dataset.id;
+            if (!projectId) return;
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = '删除中...';
+            try {
+                await call(api.projectForgeDeleteProject(projectId, getSignature()));
+                toast('工程已删除（仅数据库记录）', 'info');
+                await loadProjects();
+                if (state.currentId === projectId) {
+                    if ($('include-deleted').checked) {
+                        await selectProject(projectId, { keepTab: true });
+                    } else {
+                        state.currentId = null;
+                        showProjectView(false);
+                    }
+                }
+            } catch (err) {
+                toast(`删除工程失败：${err.message}`, 'error');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = '是否删除工程？';
+            }
+            return;
+        }
+
         const item = e.target.closest('.project-item');
         if (item) selectProject(item.dataset.id);
     });
@@ -613,6 +713,22 @@ function bindEvents() {
         lastFocusRefresh = Date.now();
         loadProjects();
     });
+    // 监听主进程广播的工程变动（反向 IPC 推送，防抖 160ms）
+    const scheduleAutoRefresh = debounce(async payload => {
+        if (!$('node-modal').hidden) return;
+        await loadProjects();
+        if (state.currentId) {
+            if (!payload?.projectId || payload.projectId === state.currentId) {
+                await selectProject(state.currentId, { keepTab: true });
+            }
+        }
+    }, 160);
+
+    if (typeof api?.onProjectForgeChanged === 'function') {
+        api.onProjectForgeChanged(payload => {
+            scheduleAutoRefresh(payload);
+        });
+    }
 }
 
 function applyTheme(theme) {

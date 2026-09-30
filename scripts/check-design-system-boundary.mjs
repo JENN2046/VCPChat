@@ -48,6 +48,21 @@ const forbiddenPaths = [
 
 const allowedSourceDifferences = new Set([
     // Exact reviewed three-way source, voice-build and CI-entry changes.
+    // This batch's native rebuild and its verification are not design-system UI.
+    '.github/scripts/verify-windows-pe.cjs',
+    '.github/workflows/projectforge-windows.yml',
+    // PR #52 reviewed tool-result framing and ProjectForge native-close fixes.
+    'ProjectForgemodules/projectforge-source.js',
+    'modules/ipc/projectForgeHandlers.js',
+    'modules/ipc/projectForgeCloseGuard.js',
+    'modules/renderer/toolResultRegions.js',
+    'modules/renderer/streamManager.js',
+    'modules/renderer/desktopPushConsumer.js',
+    'Flowlockmodules/flowlock-protocol.js',
+    'modules/ipc/mainChatVoiceCoordinator.js',
+    'tests/projectforge-delivery.test.js',
+    'tests/tool-result-regions.test.js',
+    'VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe',
     'modules/renderer/residentEphemeralPresentation.mjs',
     'modules/lyrics/lyricFetcherUnified.js',
     'modules/vcpClient.js',

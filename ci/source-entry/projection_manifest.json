@@ -12289,9 +12289,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "3f5118bf2076685cb2ac0b3747dedb055d7df7d8",
-          "size": 246328,
-          "sha256": "56d6a8d13dd764c8d5aa1f50be58ff230e3a9b855e0cb481065dea8dc83d5087",
+          "blob": "1b3fe0167acc3a69356cddaf50972f4d1dde31bd",
+          "size": 246373,
+          "sha256": "1fb8026a68bfd1e2b53eadd745259657632224069ce73892bf3de450d43c2fc0",
           "kind": "source"
         },
         {
@@ -18999,13 +18999,11 @@
             "tests/message-edit-watcher-failure.test.js",
             "tests/non-streaming-event-consumer.test.mjs",
             "tests/owned-preload-subscription.test.mjs",
-            "tests/projectforge-delivery.test.js",
             "tests/stream-consumer-registry.test.mjs",
             "tests/stream-coordinator.test.mjs",
             "tests/stream-manager-terminal-cleanup.test.js",
             "tests/stream-session.test.mjs",
             "tests/stream-transient-history.test.mjs",
-            "tests/tool-result-regions.test.js",
             "tests/topic-selection-readiness.test.mjs",
             "tests/ui-helper-chat-scroll-follow.test.js"
           ]
@@ -19016,6 +19014,13 @@
             "ProjectForgemodules",
             "VCPDistributedServer/Plugin/ProjectForge",
             "VCPDistributedServer/shared/fileKit"
+          ]
+        },
+        {
+          "name": "reviewed-projectforge-delivery-test-inputs",
+          "files": [
+            "tests/projectforge-delivery.test.js",
+            "tests/tool-result-regions.test.js"
           ]
         }
       ],

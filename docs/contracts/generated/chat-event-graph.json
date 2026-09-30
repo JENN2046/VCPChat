@@ -179,6 +179,7 @@
     "modules/ipc/memoHandlers.js",
     "modules/ipc/musicHandlers.js",
     "modules/ipc/notesHandlers.js",
+    "modules/ipc/projectForgeCloseGuard.js",
     "modules/ipc/projectForgeHandlers.js",
     "modules/ipc/promptHandlers.js",
     "modules/ipc/ragHandlers.js",
@@ -1870,14 +1871,14 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1037,
+          "line": 1043,
           "kind": "ipc-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1037,
+          "line": 1043,
           "kind": "custom-event-listener"
         }
       ],
@@ -1890,13 +1891,13 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1037,
+          "line": 1043,
           "kind": "custom-event-listener",
           "match": "on('desktop-push'"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1037,
+          "line": 1043,
           "kind": "ipc-send",
           "match": "on('desktop-push'"
         }
@@ -1912,17 +1913,12 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1048,
+          "line": 1054,
           "kind": "ipc-send"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1053,
-          "kind": "ipc-send"
-        },
-        {
-          "file": "modules/ipc/desktopHandlers.js",
-          "line": 1058,
+          "line": 1059,
           "kind": "ipc-send"
         },
         {
@@ -1932,22 +1928,27 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2490,
+          "line": 1070,
           "kind": "ipc-send"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2495,
+          "line": 2496,
           "kind": "ipc-send"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2500,
+          "line": 2501,
           "kind": "ipc-send"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2866,
+          "line": 2506,
+          "kind": "ipc-send"
+        },
+        {
+          "file": "modules/ipc/desktopHandlers.js",
+          "line": 2872,
           "kind": "ipc-send"
         }
       ],
@@ -1973,19 +1974,13 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1048,
+          "line": 1054,
           "kind": "ipc-send",
           "match": "send('desktop-push-to-canvas'"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 1053,
-          "kind": "ipc-send",
-          "match": "send('desktop-push-to-canvas'"
-        },
-        {
-          "file": "modules/ipc/desktopHandlers.js",
-          "line": 1058,
+          "line": 1059,
           "kind": "ipc-send",
           "match": "send('desktop-push-to-canvas'"
         },
@@ -1997,25 +1992,31 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2490,
+          "line": 1070,
           "kind": "ipc-send",
           "match": "send('desktop-push-to-canvas'"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2495,
+          "line": 2496,
           "kind": "ipc-send",
           "match": "send('desktop-push-to-canvas'"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2500,
+          "line": 2501,
           "kind": "ipc-send",
           "match": "send('desktop-push-to-canvas'"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2866,
+          "line": 2506,
+          "kind": "ipc-send",
+          "match": "send('desktop-push-to-canvas'"
+        },
+        {
+          "file": "modules/ipc/desktopHandlers.js",
+          "line": 2872,
           "kind": "ipc-send",
           "match": "send('desktop-push-to-canvas'"
         }
@@ -2332,17 +2333,17 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2591,
+          "line": 2597,
           "kind": "ipc-send"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2595,
+          "line": 2601,
           "kind": "ipc-send"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2648,
+          "line": 2654,
           "kind": "ipc-send"
         }
       ],
@@ -2368,19 +2369,19 @@
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2591,
+          "line": 2597,
           "kind": "ipc-send",
           "match": "send('desktop-status'"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2595,
+          "line": 2601,
           "kind": "ipc-send",
           "match": "send('desktop-status'"
         },
         {
           "file": "modules/ipc/desktopHandlers.js",
-          "line": 2648,
+          "line": 2654,
           "kind": "ipc-send",
           "match": "send('desktop-status'"
         }

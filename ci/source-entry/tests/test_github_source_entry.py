@@ -355,10 +355,23 @@ class ManifestRefreshTests(unittest.TestCase):
             self.assertFalse(any(path.startswith("artifacts/diorama/") for path in paths))
             native = {row["path"]: row for row in profile["static_native_assets"]}
             old = {row["path"]: row for row in self.previous["profiles"][name]["static_native_assets"]}
-            self.assertEqual(set(native), set(old))
-            for path in native:
+            reviewed_forge = (
+                "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe"
+            )
+            allowed_additions = {reviewed_forge} if name in {"package-smoke", "chat-kernel-ui"} else set()
+            self.assertEqual(set(native), set(old) | allowed_additions)
+            for path in old:
                 if path != "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
                     self.assertEqual(native[path], old[path])
+            if reviewed_forge in allowed_additions:
+                self.assertEqual(native[reviewed_forge], {
+                    "path": reviewed_forge,
+                    "mode": "100644", "type": "blob",
+                    "blob": "5c8ce39418052313ee84abdc4972ebdbd2a361be",
+                    "size": 7389696,
+                    "sha256": "cbb84371a943e37a5071cba7bf229c1324874d3987130dcb3b59fdb2dbe192f9",
+                    "kind": "static-native", "format": "PE",
+                })
 
     def test_effective_kernel_command_has_complete_test_projection(self):
         import fnmatch

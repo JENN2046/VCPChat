@@ -51,6 +51,12 @@ const allowedSourceDifferences = new Set([
     // This batch's native rebuild and its verification are not design-system UI.
     '.github/scripts/verify-windows-pe.cjs',
     '.github/workflows/projectforge-windows.yml',
+    // PR #52 reviewed tool-result framing and ProjectForge native-close fixes.
+    'ProjectForgemodules/projectforge-source.js',
+    'modules/ipc/projectForgeCloseGuard.js',
+    'modules/renderer/toolResultRegions.js',
+    'tests/projectforge-delivery.test.js',
+    'tests/tool-result-regions.test.js',
     'VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe',
     'modules/renderer/residentEphemeralPresentation.mjs',
     'modules/lyrics/lyricFetcherUnified.js',

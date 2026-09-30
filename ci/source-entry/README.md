@@ -54,9 +54,9 @@ body reads if its source identity has not been admitted; a new unrelated file is
 not fetched. Package selection is tied to this manifest's exact package input
 and the reviewed matcher defaults, not a general replacement packaging engine.
 
-The four current profiles contain 49, 18, 1041 and 919 paths respectively. Their
-deduplicated body counts are 49, 18, 1029 and 918. Running all four jobs makes 20
-Git Data REST metadata requests and 2,034 public raw body requests including
+The four current profiles contain 49, 18, 1067 and 931 paths respectively. Their
+deduplicated body counts are 49, 18, 1055 and 930. Running all four jobs makes 20
+Git Data REST metadata requests and 2,072 public raw body requests including
 the five bootstrap controls in each job. Bodies do not consume the authenticated
 Git Data request budget. HTTP failures and rate limits still fail the job;
 there is no alternate transport or automatic fallback.
@@ -134,6 +134,11 @@ For this frozen update batch, the independent author comparison advances from
 `a5c26ff01601e8d1e51f6056a31e1f90937ca067` to
 `190f754500a3b0448d22e7501c0fc245bbbbfcd2` (tree
 `cfc7b52d895e3e1c3db1a7b567e410abb9b75fa3`).
-Only the Windows ProjectForge rebuild, its verification script and workflow
-are exact design-subtraction exceptions. The forbidden-path and Classic parity
-checks remain active. The package profile now admits the eight locked
+The Windows ProjectForge rebuild and its verification files have exact
+design-subtraction exceptions. PR #52 also admits five exact reviewed paths
+for tool-result framing and dirty-editor close protection. The forbidden-path
+and Classic parity checks remain active. The package profile includes the
+locked ProjectForge Rust build inputs. Both package and Chat profiles admit
+the source-verified Windows indexer at its pinned identity; generated Linux
+binaries and config.env are excluded. Run manifest refresh tests after staging:
+the maintainer checks intentionally audit the Git index, not unstaged files.

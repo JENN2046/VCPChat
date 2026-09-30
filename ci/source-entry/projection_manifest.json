@@ -16222,9 +16222,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "5f2bf9f93481ffe30cf2a3acbd643e29bf48a669",
-          "size": 7907,
-          "sha256": "dd6906809fa4436cb9f5f40a9815bb1fefa23a1179015c66968ef9ba67296ec0",
+          "blob": "c73c442b4fd9854c14f9d55dd394dbbbaaf6a6e3",
+          "size": 8100,
+          "sha256": "16ec5ab25e94a29260aca7533725d1575d34a732975318aecda9ab40ff6a1b93",
           "kind": "source"
         },
         {

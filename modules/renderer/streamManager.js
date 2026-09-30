@@ -479,6 +479,8 @@ function getOrCreateStreamSegmentState(messageId) {
             // toolResultDepth 为当前未闭合工具结果的嵌套深度，0 表示不在区间内；
             // toolResultScannedTo 为已计数标记的末尾偏移，防止回看窗口重复计数同一标记。
             toolResultDepth: 0,
+            toolResultFramed: false,
+            toolResultPendingStart: null,
             toolResultScannedTo: 0
         };
         streamSegmentStates.set(messageId, state);
@@ -2226,6 +2228,13 @@ function trackToolResultRegion(messageId, accumulatedText, chunkLength) {
     const segmentState = getOrCreateStreamSegmentState(messageId);
     const previousLength = accumulatedText.length - chunkLength;
     let touched = segmentState.toolResultDepth > 0;
+    const pending = segmentState.toolResultPendingStart;
+    if (pending && accumulatedText.length > pending.end) {
+        const newline = /[\r\n]/.test(accumulatedText[pending.end]);
+        if (pending.outer) segmentState.toolResultFramed = pending.lineStart && newline;
+        else if (newline) segmentState.toolResultDepth += 1;
+        segmentState.toolResultPendingStart = null;
+    }
     // 回看窗口捕获跨分片的标记；已计数的标记末尾之前不再扫描，避免重复计数。
     let cursor = Math.max(0, segmentState.toolResultScannedTo, previousLength - TOOL_RESULT_MARKER_OVERLAP);
 
@@ -2237,11 +2246,26 @@ function trackToolResultRegion(messageId, accumulatedText, chunkLength) {
         if (nextStart === -1 && nextEnd === -1) break;
 
         if (nextStart !== -1 && (nextEnd === -1 || nextStart < nextEnd)) {
-            segmentState.toolResultDepth += 1;
-            touched = true;
+            const outer = segmentState.toolResultDepth === 0;
+            const lineStart = nextStart === 0 || accumulatedText[nextStart - 1] === '\n';
             cursor = nextStart + TOOL_RESULT_START.length;
+            const hasNext = cursor < accumulatedText.length;
+            const newline = hasNext && /[\r\n]/.test(accumulatedText[cursor]);
+            if (outer) {
+                segmentState.toolResultDepth = 1;
+                segmentState.toolResultFramed = lineStart && newline;
+                touched = true;
+            } else if (!segmentState.toolResultFramed || (lineStart && newline)) {
+                segmentState.toolResultDepth += 1;
+            }
+            // The newline deciding canonical framing may arrive in the next chunk.
+            if (!hasNext && (outer || (segmentState.toolResultFramed && lineStart))) {
+                segmentState.toolResultPendingStart = { outer, lineStart, end: cursor };
+            }
         } else {
-            segmentState.toolResultDepth -= 1;
+            if (!segmentState.toolResultFramed || nextEnd === 0 || accumulatedText[nextEnd - 1] === '\n') {
+                segmentState.toolResultDepth -= 1;
+            }
             cursor = nextEnd + TOOL_RESULT_END.length;
         }
         segmentState.toolResultScannedTo = cursor;

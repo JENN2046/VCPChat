@@ -5720,9 +5720,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f7e2776071c7ffe9de86fbc39d2a4bfc46dde022",
-          "size": 120137,
-          "sha256": "d9d34f1459b0f854a616ce5a4362060af578c247195e5113b89b7edf56a4b36b",
+          "blob": "cf294aeba2c47b367e5db6973c8121b733fb2710",
+          "size": 121575,
+          "sha256": "3db9e2a30464d44a9a29c16fefbdfdf719b3eb26c154dd0f1d0225bdda1122e7",
           "kind": "source"
         },
         {
@@ -13720,9 +13720,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f7e2776071c7ffe9de86fbc39d2a4bfc46dde022",
-          "size": 120137,
-          "sha256": "d9d34f1459b0f854a616ce5a4362060af578c247195e5113b89b7edf56a4b36b",
+          "blob": "cf294aeba2c47b367e5db6973c8121b733fb2710",
+          "size": 121575,
+          "sha256": "3db9e2a30464d44a9a29c16fefbdfdf719b3eb26c154dd0f1d0225bdda1122e7",
           "kind": "source"
         },
         {
@@ -16087,9 +16087,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "44af1ec66d3e7c798de23ca4d35eb96ecb305d6e",
-          "size": 33386,
-          "sha256": "7bc7a91c14518e86802af3b2f967639d24c0d5dceecf6b6d935bdd8cb1c30697",
+          "blob": "ad162ce49a1e49ab5d8753cf095ea27ead538b3a",
+          "size": 33427,
+          "sha256": "accc406012cb87ec1c724012b6e08d36cda3dacd8be5301b22b488c49dbdf312",
           "kind": "source"
         },
         {
@@ -17905,9 +17905,9 @@
           "path": "tests/tool-result-regions.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "bcd62253a4142071eaed5cf8ab56176499d0758c",
-          "size": 4804,
-          "sha256": "4bcfbdbe98319308771356144d9a6f62ae889bb423b06767981bf83e17bb57be",
+          "blob": "f76fd7535a94d2e8139ae4e3f43afba67a5fdb0c",
+          "size": 7343,
+          "sha256": "3784e515ab3eb42c876ada24ac173c0666e6e180d8dd85251a79bab18567106b",
           "kind": "source"
         },
         {

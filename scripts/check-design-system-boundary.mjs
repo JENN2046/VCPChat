@@ -56,6 +56,7 @@ const allowedSourceDifferences = new Set([
     'modules/ipc/projectForgeHandlers.js',
     'modules/ipc/projectForgeCloseGuard.js',
     'modules/renderer/toolResultRegions.js',
+    'modules/renderer/streamManager.js',
     'modules/renderer/desktopPushConsumer.js',
     'Flowlockmodules/flowlock-protocol.js',
     'modules/ipc/mainChatVoiceCoordinator.js',

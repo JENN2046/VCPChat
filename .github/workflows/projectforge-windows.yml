@@ -49,3 +49,7 @@ jobs:
           if ($lines.Count -lt 2) { throw 'ProjectForge emitted no READY/response pair.' }
           $ready = $lines[0] | ConvertFrom-Json
           $answer = $lines[1] | ConvertFrom-Json
+          if ($ready.type -ne 'ready' -or $ready.protocolVersion -ne 1) {
+            throw 'ProjectForge READY smoke failed.'
+          }
+          if (-not $answer.ok -or -not $answer.result.pong) { throw 'ProjectForge ping smoke failed.' }

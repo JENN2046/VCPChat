@@ -101,7 +101,6 @@ class MainChatVoiceCoordinator {
         this.deps = deps;
         this.activeSession = null;
         this.sessionSequence = 0;
-        this.configuredHotkeyCache = null;
     }
 
     getActiveSession() {
@@ -163,11 +162,9 @@ class MainChatVoiceCoordinator {
         this.deps.ensureEngineEvents?.();
 
         const shortcut = String(settings?.voiceInputShortcut || this.deps.getConfiguredShortcut?.() || 'F7').trim();
-        const cacheKey = `${shortcut}:${mode}`;
-        if (this.configuredHotkeyCache !== cacheKey) {
-            await engine.configureHotkey({ shortcut, mode });
-            this.configuredHotkeyCache = cacheKey;
-        }
+        // start() may have replaced a crashed native process. Reapply session
+        // configuration rather than caching state outside the process lifetime.
+        await engine.configureHotkey({ shortcut, mode });
 
         const initialIdle = Number(options.idleTimeoutMs)
             || (Number(settings?.mainChatVoiceInitialIdleTimeout) ? Number(settings.mainChatVoiceInitialIdleTimeout) * 1000 : MAIN_CHAT_INITIAL_IDLE_MS);

@@ -45,11 +45,24 @@
         let depth = 1;
         let cursor = contentStart;
 
+        const startIndex = contentStart - TOKENS.toolResultStart.length;
+        const framed = (startIndex === 0 || text[startIndex - 1] === '\n') &&
+            (text[contentStart] === '\n' || text[contentStart] === '\r');
+        const nextMarker = (marker, from) => {
+            let index = text.indexOf(marker, from);
+            while (framed && index !== -1) {
+                const lineStart = index === 0 || text[index - 1] === '\n';
+                const next = text[index + marker.length];
+                if (lineStart && (marker !== TOKENS.toolResultStart || next === '\n' || next === '\r')) break;
+                index = text.indexOf(marker, index + marker.length);
+            }
+            return index;
+        };
         while (cursor < text.length) {
-            const nextEnd = text.indexOf(TOKENS.toolResultEnd, cursor);
+            const nextEnd = nextMarker(TOKENS.toolResultEnd, cursor);
             if (nextEnd === -1) return text.length;
 
-            const nextStart = text.indexOf(TOKENS.toolResultStart, cursor);
+            const nextStart = nextMarker(TOKENS.toolResultStart, cursor);
             if (nextStart !== -1 && nextStart < nextEnd) {
                 depth += 1;
                 cursor = nextStart + TOKENS.toolResultStart.length;

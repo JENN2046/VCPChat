@@ -3479,7 +3479,7 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 272,
+          "line": 269,
           "kind": "ipc-send"
         }
       ],
@@ -3505,7 +3505,7 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 272,
+          "line": 269,
           "kind": "ipc-send",
           "match": "send('main-chat-voice:captured-text'"
         }
@@ -3521,12 +3521,12 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 278,
+          "line": 275,
           "kind": "ipc-send"
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 322,
+          "line": 319,
           "kind": "ipc-send"
         }
       ],
@@ -3552,13 +3552,13 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 278,
+          "line": 275,
           "kind": "ipc-send",
           "match": "send('main-chat-voice:session-ended'"
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 322,
+          "line": 319,
           "kind": "ipc-send",
           "match": "send('main-chat-voice:session-ended'"
         }
@@ -4808,14 +4808,14 @@
       "consumers": [
         {
           "file": "modules/renderer/desktopPushConsumer.js",
-          "line": 76,
+          "line": 93,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/renderer/desktopPushConsumer.js",
-          "line": 76,
+          "line": 93,
           "kind": "preload-subscription",
           "match": "onDesktopStatus("
         }
@@ -5255,7 +5255,7 @@
       "consumers": [
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 220,
+          "line": 217,
           "kind": "preload-subscription"
         },
         {
@@ -5272,7 +5272,7 @@
       "evidence": [
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 220,
+          "line": 217,
           "kind": "preload-subscription",
           "match": "onVoiceCaptureWindow("
         },
@@ -8551,7 +8551,7 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 226,
+          "line": 223,
           "kind": "ipc-send"
         },
         {
@@ -8587,7 +8587,7 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 226,
+          "line": 223,
           "kind": "ipc-send",
           "match": "send('voice-input-capture:prepare'"
         },
@@ -8657,7 +8657,7 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 249,
+          "line": 246,
           "kind": "ipc-send"
         },
         {
@@ -8688,7 +8688,7 @@
         },
         {
           "file": "modules/ipc/mainChatVoiceCoordinator.js",
-          "line": 249,
+          "line": 246,
           "kind": "ipc-send",
           "match": "send('voice-input-capture:stop'"
         },

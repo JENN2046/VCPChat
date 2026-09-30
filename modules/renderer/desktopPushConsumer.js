@@ -16,14 +16,31 @@ const TOOL_RESULT_WINDOW_LENGTH = Math.max(TOOL_RESULT_START_MARKER.length, TOOL
  * 结束标记深度 -1，深度回到 0 才离开区间；深度为 0 时的孤立结束标记忽略。
  */
 function trackToolResultChar(state, char) {
-    state.toolResultWindow = (state.toolResultWindow + char).slice(-TOOL_RESULT_WINDOW_LENGTH);
+    // Delay framing until the character after a start marker arrives, including
+    // across stream chunks. The outer block is already masked during this wait.
+    if (state.toolResultPendingStart) {
+        const pending = state.toolResultPendingStart;
+        const newline = char === '\n' || char === '\r';
+        if (pending.outer) state.toolResultFramed = pending.lineStart && newline;
+        else if (newline) state.toolResultDepth += 1;
+        state.toolResultPendingStart = null;
+    }
+    state.toolResultSeen = (state.toolResultSeen || 0) + 1;
+    state.toolResultWindow = (state.toolResultWindow + char).slice(-TOOL_RESULT_WINDOW_LENGTH - 1);
+    const lineStart = marker => state.toolResultSeen === marker.length ||
+        state.toolResultWindow.at(-marker.length - 1) === '\n';
     if (state.toolResultWindow.endsWith(TOOL_RESULT_START_MARKER)) {
-        state.toolResultDepth += 1;
-        // 清空窗口：同一段字符不会被重复计数。
-        state.toolResultWindow = '';
-    } else if (state.toolResultDepth > 0 && state.toolResultWindow.endsWith(TOOL_RESULT_END_MARKER)) {
+        if (state.toolResultDepth === 0) {
+            state.toolResultDepth = 1;
+            state.toolResultPendingStart = { outer: true, lineStart: lineStart(TOOL_RESULT_START_MARKER) };
+        } else if (!state.toolResultFramed) {
+            state.toolResultDepth += 1;
+        } else if (lineStart(TOOL_RESULT_START_MARKER)) {
+            state.toolResultPendingStart = { outer: false };
+        }
+    } else if (state.toolResultDepth > 0 && state.toolResultWindow.endsWith(TOOL_RESULT_END_MARKER) &&
+        (!state.toolResultFramed || lineStart(TOOL_RESULT_END_MARKER))) {
         state.toolResultDepth -= 1;
-        state.toolResultWindow = '';
     }
 }
 

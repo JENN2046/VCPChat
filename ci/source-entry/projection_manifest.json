@@ -706,9 +706,9 @@
           "path": "Flowlockmodules/flowlock-protocol.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b9a2339ffe05982992ceaee647ec034afd6d7b44",
-          "size": 16537,
-          "sha256": "e34ad8188d6022115308c5aa007d581a8b0ec5587c945f3781cda0a6f3439718",
+          "blob": "53cd27e2f898703f284ff0a628b49d477de60f50",
+          "size": 17266,
+          "sha256": "000036a0c8e0fe342350d7d2b245f72549e726e1ec86650c1c7357936a2bf5df",
           "kind": "source"
         },
         {
@@ -895,9 +895,9 @@
           "path": "ProjectForgemodules/projectforge-source.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7f4720f9b290691107beedf36c9c8ec24f8a4e4e",
-          "size": 39708,
-          "sha256": "d528a7dc9e4c8018e00a9f134795a8d37c411255139431031e733c681ef2d6cf",
+          "blob": "09094a647101a3699f3f5fb0a788b2697e967a6d",
+          "size": 39833,
+          "sha256": "87fb8c213a967a27fe802dd135a15b50839c95278412a1f3f7f3eb7568b23f9a",
           "kind": "source"
         },
         {
@@ -5027,9 +5027,9 @@
           "path": "modules/ipc/mainChatVoiceCoordinator.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4f44754db2d280f81bdc6752b4ba0e1914dc2aa0",
-          "size": 13503,
-          "sha256": "2f7e6c9d70598ba6405939e67036204761fe489d7ea0ef058d978f0c06544d7f",
+          "blob": "50ae7e367eca35b2a5068f6650e66cad4d0b0bac",
+          "size": 13452,
+          "sha256": "1cd91c2d694d06ee32efae0e22f53b877e6517b386243b22868949aab67bc18b",
           "kind": "source"
         },
         {
@@ -5441,9 +5441,9 @@
           "path": "modules/renderer/desktopPushConsumer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c47d3d55d792adc21d7e96ee7916502962d4e1cb",
-          "size": 11219,
-          "sha256": "52eb978695630427b17d6cf7c3c2a3fd4a01cccb169771c4a624f39bf37a472f",
+          "blob": "a38a4fbb5ea2f83bb25a2dc848cba146dfbef798",
+          "size": 12223,
+          "sha256": "3052da5ec2989577f6d17891641ca12bac2dd4662aab90b5452b66ed6774b79d",
           "kind": "source"
         },
         {
@@ -10605,9 +10605,9 @@
           "path": "Flowlockmodules/flowlock-protocol.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b9a2339ffe05982992ceaee647ec034afd6d7b44",
-          "size": 16537,
-          "sha256": "e34ad8188d6022115308c5aa007d581a8b0ec5587c945f3781cda0a6f3439718",
+          "blob": "53cd27e2f898703f284ff0a628b49d477de60f50",
+          "size": 17266,
+          "sha256": "000036a0c8e0fe342350d7d2b245f72549e726e1ec86650c1c7357936a2bf5df",
           "kind": "source"
         },
         {
@@ -10830,9 +10830,9 @@
           "path": "ProjectForgemodules/projectforge-source.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7f4720f9b290691107beedf36c9c8ec24f8a4e4e",
-          "size": 39708,
-          "sha256": "d528a7dc9e4c8018e00a9f134795a8d37c411255139431031e733c681ef2d6cf",
+          "blob": "09094a647101a3699f3f5fb0a788b2697e967a6d",
+          "size": 39833,
+          "sha256": "87fb8c213a967a27fe802dd135a15b50839c95278412a1f3f7f3eb7568b23f9a",
           "kind": "source"
         },
         {
@@ -12289,9 +12289,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "1b3fe0167acc3a69356cddaf50972f4d1dde31bd",
+          "blob": "12b22b7c7a080c606a865c16dccb8e8a40ae4dac",
           "size": 246373,
-          "sha256": "1fb8026a68bfd1e2b53eadd745259657632224069ce73892bf3de450d43c2fc0",
+          "sha256": "c1ccd961d1fadb38fb58d831f0ff6b40d9c96da91829df66660388b096c5095c",
           "kind": "source"
         },
         {
@@ -13027,9 +13027,9 @@
           "path": "modules/ipc/mainChatVoiceCoordinator.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4f44754db2d280f81bdc6752b4ba0e1914dc2aa0",
-          "size": 13503,
-          "sha256": "2f7e6c9d70598ba6405939e67036204761fe489d7ea0ef058d978f0c06544d7f",
+          "blob": "50ae7e367eca35b2a5068f6650e66cad4d0b0bac",
+          "size": 13452,
+          "sha256": "1cd91c2d694d06ee32efae0e22f53b877e6517b386243b22868949aab67bc18b",
           "kind": "source"
         },
         {
@@ -13441,9 +13441,9 @@
           "path": "modules/renderer/desktopPushConsumer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c47d3d55d792adc21d7e96ee7916502962d4e1cb",
-          "size": 11219,
-          "sha256": "52eb978695630427b17d6cf7c3c2a3fd4a01cccb169771c4a624f39bf37a472f",
+          "blob": "a38a4fbb5ea2f83bb25a2dc848cba146dfbef798",
+          "size": 12223,
+          "sha256": "3052da5ec2989577f6d17891641ca12bac2dd4662aab90b5452b66ed6774b79d",
           "kind": "source"
         },
         {
@@ -16078,9 +16078,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3bd63b98ace0b196042dbc7bcc7c0954b0b33d7d",
-          "size": 33205,
-          "sha256": "b657fe76b4a962105c6b63d2926c63c183dd17ab727ae8fc18960ac096bf9778",
+          "blob": "f43eeeeee6062aa30ec24a3caab507584b6c92e4",
+          "size": 33343,
+          "sha256": "cd155abb909465737708f2bf7c8d5d055abd9e0848e1810ed2a534a115602f3f",
           "kind": "source"
         },
         {
@@ -17725,9 +17725,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7be7be361e215c3b8a9da27a64c9c7dd6a9ecafb",
-          "size": 2679,
-          "sha256": "4288a9e7d9c750d22d6ea5de72093b286043937453db6645fb6e8bc251e68bc2",
+          "blob": "6bb6692af804e68c2935a33b55f8402aced9735a",
+          "size": 7772,
+          "sha256": "eb9e6e221466f027051061fe7cd3b5b4de53143b9ee2c25ed49eecc63b01c552",
           "kind": "source"
         },
         {

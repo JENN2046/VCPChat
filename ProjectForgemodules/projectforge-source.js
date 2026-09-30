@@ -339,15 +339,17 @@
         setLoading(true);
         try {
             const data = await srcCall(api.gitListWorkspaces());
-            src.workspaces = data.workspaces || [];
-            const valid = id => src.workspaces.some(ws => ws.id === id);
+            const workspaces = data.workspaces || [];
+            const valid = id => workspaces.some(ws => ws.id === id);
             const saved = localStorage.getItem(WS_KEY);
             let nextId = null;
             if (valid(src.workspaceId)) nextId = src.workspaceId;
             else if (valid(saved)) nextId = saved;
             else if (valid(data.activeWorkspaceId)) nextId = data.activeWorkspaceId;
-            else if (src.workspaces.length) nextId = src.workspaces[0].id;
+            else if (workspaces.length) nextId = workspaces[0].id;
 
+            if (nextId !== src.workspaceId && isDirty() && !(await confirmDiscard())) return;
+            src.workspaces = workspaces;
             if (nextId !== src.workspaceId) {
                 src.workspaceId = nextId;
                 src.expanded = loadExpanded(nextId);

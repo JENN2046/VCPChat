@@ -42,8 +42,9 @@ jobs:
           $bundledHash = (Get-FileHash -Algorithm SHA256 $bundled).Hash.ToLowerInvariant()
           Write-Output "rebuilt SHA256: $rebuiltHash"
           Write-Output "bundled SHA256: $bundledHash"
-          if ($rebuiltHash -ne $bundledHash) {
-            throw 'Bundled ProjectForge differs from the locked-source Windows rebuild.'
+          node .github/scripts/verify-windows-pe.cjs $bundled $rebuilt
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Bundled ProjectForge code differs from the locked-source Windows rebuild.'
           }
           $lines = '{"id":1,"method":"ping","params":{}}' | & $rebuilt
           if ($lines.Count -lt 2) { throw 'ProjectForge emitted no READY/response pair.' }

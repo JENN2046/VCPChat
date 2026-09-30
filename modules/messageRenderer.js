@@ -2,7 +2,7 @@ import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.
 import { createImageHandler } from './renderer/imageHandler.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
 import { createVisibilityOptimizer } from './renderer/visibilityOptimizer.js';
-import { createMessageSkeleton, formatMessageTimestamp } from './renderer/domBuilder.js';
+import { createMessageSkeleton, fixVoiceChatAssetPath, formatMessageTimestamp } from './renderer/domBuilder.js';
 import { createEmoticonUrlFixer } from './renderer/emoticonUrlFixer.js';
 import { createContentPipeline, PIPELINE_MODES } from './renderer/contentPipeline.js';
 import { createContentRuntime } from './chat/contentRuntime.js';
@@ -3706,6 +3706,10 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 }
             }
         }
+    }
+
+    if (avatarImg && avatarUrlToUse) {
+        avatarImg.src = fixVoiceChatAssetPath(avatarUrlToUse, mainRendererReferences.window);
     }
 
     // 先添加到DOM

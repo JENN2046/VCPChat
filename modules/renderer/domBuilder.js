@@ -20,7 +20,7 @@
  * }} An object containing the created DOM elements.
  */
 
-function fixVoiceChatAssetPath(url, ownerWindow = null) {
+export function fixVoiceChatAssetPath(url, ownerWindow = null) {
     if (!url) return url;
     const pathname = ownerWindow?.location?.pathname || '';
     const isVoiceChatPage = pathname.replace(/\\/g, '/').includes('/Voicechatmodules/');

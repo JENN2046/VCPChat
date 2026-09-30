@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {
     assertChatEventContract,
     normalizeChatTerminal,
@@ -17,4 +18,12 @@ test('chat terminal normalization rejects unknown values at the contract seam', 
     assert.deepEqual(normalizeChatTerminal({ type: 'error', message: 'x' }), { type: 'error', message: 'x', kind: 'failed' });
     assert.throws(() => normalizeChatTerminal('mystery'), /unknown chat stream terminal/);
     assert.deepEqual(STREAM_TERMINAL_KINDS, ['completed', 'failed', 'cancelled', 'discarded']);
+});
+
+test('resolved cross-agent avatar is projected back into the rendered image', () => {
+    const source = fs.readFileSync(new URL('../modules/messageRenderer.js', import.meta.url), 'utf8');
+    assert.match(
+        source,
+        /avatarImg\.src\s*=\s*fixVoiceChatAssetPath\(avatarUrlToUse,\s*mainRendererReferences\.window\)/,
+    );
 });

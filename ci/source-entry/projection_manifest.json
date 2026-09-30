@@ -5125,9 +5125,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b095960272977b418132a11bd69a9050c1b1ea67",
-          "size": 218617,
-          "sha256": "e9c5f4034ad078b93124a6614151e65efea50fe7cadd638d57b15bead713859b",
+          "blob": "087d4b3823b3b05cb573e33b886acbc677d7b0a5",
+          "size": 218779,
+          "sha256": "839028b49feb1bb77468d41011ea9ac51e3f77084177aa0613950f564352c6d0",
           "kind": "source"
         },
         {
@@ -5206,9 +5206,9 @@
           "path": "modules/renderer/domBuilder.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1677547e0e0debc9e97c8b6bbb3bbef9935c9746",
-          "size": 6235,
-          "sha256": "f5eda3d65794a56d7149f90e8d4820f00c4e602bc859ca979949b4964ddc3603",
+          "blob": "6376ec6b5b124abb93b2c051c3ac5e842fe4ce78",
+          "size": 6242,
+          "sha256": "e21624c9fb0393f09513ec6ce4fdba88c86e6d7e8058cf6608fe05c8d5c240b8",
           "kind": "source"
         },
         {
@@ -12872,9 +12872,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b095960272977b418132a11bd69a9050c1b1ea67",
-          "size": 218617,
-          "sha256": "e9c5f4034ad078b93124a6614151e65efea50fe7cadd638d57b15bead713859b",
+          "blob": "087d4b3823b3b05cb573e33b886acbc677d7b0a5",
+          "size": 218779,
+          "sha256": "839028b49feb1bb77468d41011ea9ac51e3f77084177aa0613950f564352c6d0",
           "kind": "source"
         },
         {
@@ -12953,9 +12953,9 @@
           "path": "modules/renderer/domBuilder.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1677547e0e0debc9e97c8b6bbb3bbef9935c9746",
-          "size": 6235,
-          "sha256": "f5eda3d65794a56d7149f90e8d4820f00c4e602bc859ca979949b4964ddc3603",
+          "blob": "6376ec6b5b124abb93b2c051c3ac5e842fe4ce78",
+          "size": 6242,
+          "sha256": "e21624c9fb0393f09513ec6ce4fdba88c86e6d7e8058cf6608fe05c8d5c240b8",
           "kind": "source"
         },
         {
@@ -15698,9 +15698,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e8f2fa57164de807100ef6081de7fe7888c8c0ba",
-          "size": 7267,
-          "sha256": "11b7a69461bb33981d16a3c7dd8052f5d19ca6984d3f0d4ca3f2c20a8722090b",
+          "blob": "b633dccbed34e03d46340d6d8b9a19fa7261cadb",
+          "size": 7425,
+          "sha256": "f240cf9ccb7fcf2ec52d0f411c9dab218e74b54f3befa57bc389142603a02978",
           "kind": "source"
         },
         {
@@ -16733,9 +16733,9 @@
           "path": "tests/chat-event-contract.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "47c4ef1108eca61d165b39e7f29cc471a93a4650",
-          "size": 1184,
-          "sha256": "337be55567b9deb7e35b0f928db0ffd076bca479a2f71db11b7792de996bab48",
+          "blob": "64a264c48e221c7b749b9f536eb0693438fb6a2b",
+          "size": 1551,
+          "sha256": "f3096be4841de98e5fd2d96962d11dd69a049fa94b9cc7c671338bde37ae1251",
           "kind": "source"
         },
         {

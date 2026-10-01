@@ -419,7 +419,9 @@ class SuveiHumanAuthorizationService {
         const ttlMs = normalizedTtl(approvalData.approvalTtlMs);
         const requestStartedAt = Date.parse(String(approvalData.timestamp || ""));
         const deadlineBase = Number.isFinite(requestStartedAt) ? requestStartedAt : this.now();
-        const toolApprovalDeadline = deadlineBase + ttlMs;
+        const toolApprovalDeadline = reconciliation
+            ? Math.min(deadlineBase + ttlMs, committedExpiry)
+            : deadlineBase + ttlMs;
         if (this.now() + MIN_TOOL_REMAINING_MS > toolApprovalDeadline) fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         const toolApprovalExpiresAt = new Date(toolApprovalDeadline).toISOString();
         const packet = {
@@ -462,6 +464,11 @@ class SuveiHumanAuthorizationService {
             pending.expectedAction,
             ["AUTHORIZED"],
         );
+        const committedExpiry = Date.parse(String(intent.authorizationExpiresAt || ""));
+        if (!Number.isFinite(committedExpiry)
+            || this.now() + MIN_TOOL_REMAINING_MS > committedExpiry) {
+            fail("SUVEI_COMMITTED_AUTHORIZATION_EXPIRED");
+        }
         if (intent.revision !== pending.authorization.expectedRevision + 1
             || intent.requestFingerprint !== pending.authorization.requestFingerprint
             || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId

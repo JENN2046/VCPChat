@@ -9,9 +9,20 @@ function initialize({ mainWindow, getMainWindow, settingsManager, service } = {}
     if (initialized) return;
     initialized = true;
     const resolvedService = service || new SuveiHumanAuthorizationService({ settingsManager });
+    let cleanupWindow = null;
+    const bindWindowCleanup = current => {
+        if (!current || current === cleanupWindow) return current;
+        cleanupWindow = current;
+        current.webContents?.once?.("destroyed", () => {
+            if (cleanupWindow !== current) return;
+            cleanupWindow = null;
+            void resolvedService.logout();
+        });
+        return current;
+    };
     const resolveMainWindow = () => {
         const current = typeof getMainWindow === "function" ? getMainWindow() : mainWindow;
-        return current && !current.isDestroyed() ? current : null;
+        return current && !current.isDestroyed() ? bindWindowCleanup(current) : null;
     };
     const isMainRenderer = event => {
         const current = resolveMainWindow();
@@ -48,10 +59,8 @@ function initialize({ mainWindow, getMainWindow, settingsManager, service } = {}
     ipcMain.handle("suvei-human-authorization:decide", (event, payload = {}) =>
         result(event, async () => ({ decision: await resolvedService.decide(payload) })));
 
-    const initialWindow = resolveMainWindow();
-    initialWindow?.webContents?.once?.("destroyed", () => {
-        void resolvedService.logout();
-    });
+    // Bind the initial window now; later IPC calls bind any recreated main window.
+    resolveMainWindow();
 }
 
 module.exports = { initialize };

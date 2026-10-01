@@ -12334,9 +12334,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "442c3a2a0a12ba3cc00770d099d641bb67ee123c",
-          "size": 246443,
-          "sha256": "4a36d1d49602546df83229605bc8822e66e063717ea6e1be6e4199fa295404eb",
+          "blob": "4d4b33647115daccdfb0fc92d823a13ce5de7389",
+          "size": 247034,
+          "sha256": "171ee3b863467402cbee5f1c4ca45c739f9bd46ae8ba008c98a3fde44a13ca5f",
           "kind": "source"
         },
         {

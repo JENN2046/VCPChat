@@ -252,6 +252,24 @@ function sendToolApprovalResponse(requestId, approved, reason = '') {
     return true;
 }
 
+async function sendSuveiToolApprovalResponseConfirmed(requestId, approved, reason = '') {
+    if (!requestId || !notificationRendererApi
+        || typeof notificationRendererApi.sendVCPLogMessageConfirmed !== 'function') {
+        return false;
+    }
+    const responseData = {
+        requestId,
+        approved: approved === true
+    };
+    const trimmedReason = typeof reason === 'string' ? reason.trim() : '';
+    if (trimmedReason) responseData.reason = trimmedReason;
+    const result = await notificationRendererApi.sendVCPLogMessageConfirmed({
+        type: 'tool_approval_response',
+        data: responseData
+    });
+    return result?.success === true && result?.queued === true;
+}
+
 function setSuveiModalOpen(modal, open) {
     if (!modal) return;
     modal.classList.toggle('active', open);
@@ -474,7 +492,7 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
                     `${response?.code || 'DECISION_FAILED'}: ${response?.error || 'SUVEI Core 决策失败'}`;
                 return;
             }
-            const transported = onCommitted?.(approved, reason);
+            const transported = await onCommitted?.(approved, reason);
             if (transported === false) {
                 errorElement.textContent =
                     'SUVEI Core 已完成决策，但 VCPLog transport 当前不可用。请保持窗口，不要重复 Core 授权。';
@@ -770,6 +788,20 @@ function renderVCPLogNotification(logData, originalRawMessage = null, notificati
                 return true;
             };
 
+            const finishSuveiApproval = async (approved, suppliedReason = reasonInput.value) => {
+                const requestId = logData.data.requestId;
+                if (handledToolApprovalRequestIds.has(requestId)) return false;
+                const sent = await sendSuveiToolApprovalResponseConfirmed(
+                    requestId,
+                    approved,
+                    suppliedReason
+                );
+                if (!sent) return false;
+                handledToolApprovalRequestIds.add(requestId);
+                dismissToolApprovalNotifications(requestId);
+                return true;
+            };
+
             if (isSuveiAuthorityRequest) {
                 const authorityStatus = document.createElement('div');
                 authorityStatus.classList.add('notification-approval-reason-hint');
@@ -785,7 +817,7 @@ function renderVCPLogNotification(logData, originalRawMessage = null, notificati
                     void openSuveiHumanAuthorizationReview(
                         logData.data,
                         reasonInput.value,
-                        (approved, reason) => finishApproval(approved, reason),
+                        (approved, reason) => finishSuveiApproval(approved, reason),
                         authorityStatus
                     );
                 };

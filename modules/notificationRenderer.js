@@ -53,6 +53,19 @@ function updateVCPLogStatus(statusUpdate, vcpLogConnectionStatusDiv) {
 
 const handledToolApprovalRequestIds = new Set();
 const TOOL_CHANGE_DIFF_MATRIX_LIMIT = 120000;
+const SUVEI_HUMAN_AUTHORIZATION_COMMANDS = new Set([
+    'ExecuteAuthorizedGeneration',
+    'ExecuteAuthorizedCorrection'
+]);
+
+function isSuveiHumanAuthorizationRequest(approvalData) {
+    return Boolean(
+        approvalData
+        && approvalData.toolName === 'SUVEIStudio'
+        && approvalData.args
+        && SUVEI_HUMAN_AUTHORIZATION_COMMANDS.has(approvalData.args.command)
+    );
+}
 
 function formatToolChangePreviewValue(value) {
     if (typeof value === 'string') return value;
@@ -239,6 +252,244 @@ function sendToolApprovalResponse(requestId, approved, reason = '') {
     return true;
 }
 
+function setSuveiModalOpen(modal, open) {
+    if (!modal) return;
+    modal.classList.toggle('active', open);
+    modal.style.display = open ? 'flex' : 'none';
+    modal.setAttribute('aria-hidden', open ? 'false' : 'true');
+}
+
+function ensureSuveiOwnerLoginModal() {
+    let modal = document.getElementById('suveiOwnerLoginModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'suveiOwnerLoginModal';
+    modal.className = 'modal vcp-ui-scope';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'suveiOwnerLoginTitle');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.style.display = 'none';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 520px;">
+            <button class="close-button" type="button" id="closeSuveiOwnerLogin" aria-label="关闭">×</button>
+            <h2 id="suveiOwnerLoginTitle">SUVEI Human Owner 登录</h2>
+            <p>使用“服务器连接 → SUVEI 人类授权”中绑定的 Owner。密码只用于本次应用会话，不写入 settings.json。</p>
+            <div class="form-group">
+                <label for="suveiOwnerSessionPassword">Owner 密码</label>
+                <input id="suveiOwnerSessionPassword" type="password" autocomplete="current-password" maxlength="128">
+            </div>
+            <div id="suveiOwnerLoginError" role="alert" style="min-height: 1.5em;"></div>
+            <div class="form-actions">
+                <button type="button" class="button-secondary" id="cancelSuveiOwnerLogin">取消</button>
+                <button type="button" class="button-primary" id="confirmSuveiOwnerLogin">验证 Owner 身份</button>
+            </div>
+        </div>`;
+    (document.getElementById('modal-container') || document.body).appendChild(modal);
+    return modal;
+}
+
+function ensureSuveiAuthorityReviewModal() {
+    let modal = document.getElementById('suveiHumanAuthorizationModal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'suveiHumanAuthorizationModal';
+    modal.className = 'modal vcp-ui-scope';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'suveiHumanAuthorizationTitle');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.style.display = 'none';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 760px;">
+            <button class="close-button" type="button" id="closeSuveiHumanAuthorization" aria-label="关闭">×</button>
+            <h2 id="suveiHumanAuthorizationTitle">SUVEI 人类授权审视</h2>
+            <p>以下内容来自 SUVEI Core 当前 canonical Intent。批准只绑定这里显示的 exact target。</p>
+            <pre id="suveiHumanAuthorizationPacket" style="max-height: 52vh; overflow: auto; white-space: pre-wrap;"></pre>
+            <div class="form-group">
+                <label for="suveiHumanAuthorizationReason">审核理由 <small>可选；拒绝时会写入 Core 决策理由</small></label>
+                <textarea id="suveiHumanAuthorizationReason" maxlength="1000" rows="3"></textarea>
+            </div>
+            <div id="suveiHumanAuthorizationError" role="alert" style="min-height: 1.5em;"></div>
+            <div class="form-actions">
+                <button type="button" class="button-secondary" id="cancelSuveiHumanAuthorization">稍后处理</button>
+                <button type="button" class="vcp-btn vcp-btn-danger" id="rejectSuveiHumanAuthorization">拒绝</button>
+                <button type="button" class="vcp-btn vcp-btn-success" id="approveSuveiHumanAuthorization">批准并执行</button>
+            </div>
+        </div>`;
+    (document.getElementById('modal-container') || document.body).appendChild(modal);
+    return modal;
+}
+
+function formatSuveiAuthorityPacket(packet) {
+    const intent = packet?.intent || {};
+    const authorization = packet?.authorization || {};
+    const action = intent.action === 'inpaint_candidate' ? '单步 Candidate 修正' : '生成 Candidate';
+    const lines = [
+        `动作: ${action}`,
+        `Project: ${packet?.projectId || '—'}`,
+        `Intent: ${packet?.intentId || '—'}`,
+        `Revision: ${intent.revision ?? '—'}`,
+        `Request Fingerprint: ${intent.requestFingerprint || '—'}`,
+        `Agent / Delegate: ${intent.delegateUserId || '—'}`,
+        `Production Unit: ${intent.productionUnitId || '—'}`,
+        `Recipe: ${intent.recipeId || '—'}`,
+        `Recipe Digest: ${intent.recipeDigest || '—'}`,
+        `Capability: ${intent.capabilityId || '—'} @ ${intent.capabilityVersion || '—'}`,
+        `输出: ${intent.requestedOutputCount ?? '—'} × ${intent.resolution || '—'} (${intent.aspectRatio || '—'})`,
+        `Agent 理由: ${intent.normalizedReason || '—'}`,
+    ];
+    if (intent.action === 'inpaint_candidate') {
+        lines.push(
+            `Source Candidate: ${intent.sourceCandidateId || '—'} rev ${intent.sourceCandidateRevision ?? '—'}`,
+            `Source Critic: ${intent.sourceCriticResultId || '—'}`,
+            `Mask: ${intent.maskMediaObjectId || '—'}`,
+            `修正指令: ${intent.editInstruction || '—'}`
+        );
+    }
+    lines.push(
+        '',
+        '授权上限（本次批准绑定以下 exact terms）',
+        `有效至: ${authorization.expiresAt || '—'}`,
+        `最大 attempts: ${authorization.maxAttempts ?? '—'}`,
+        `最大 outputs: ${authorization.maxOutputCount ?? '—'}`,
+        `最大 credits: ${authorization.maxTotalCredits ?? '—'}`,
+        `最大并发 attempts: ${authorization.maxConcurrentAttempts ?? '—'}`,
+        `最大 wall clock: ${authorization.maxWallClockMs ?? '—'} ms`,
+        `每 attempt 最大 adapter calls: ${authorization.maxAdapterCallsPerAttempt ?? '—'}`,
+        '',
+        `Authority Target Digest: ${packet?.authorityTargetDigest || '—'}`,
+        `Tool approval expires: ${packet?.toolApprovalExpiresAt || '—'}`
+    );
+    return lines.join('\n');
+}
+
+async function openSuveiOwnerLogin(onAuthenticated, statusElement) {
+    if (!notificationRendererApi || typeof notificationRendererApi.loginSuveiHumanOwner !== 'function') {
+        if (statusElement) statusElement.textContent = '当前 preload 未暴露 SUVEI Human Authorization API。';
+        return false;
+    }
+    const modal = ensureSuveiOwnerLoginModal();
+    const input = document.getElementById('suveiOwnerSessionPassword');
+    const error = document.getElementById('suveiOwnerLoginError');
+    const confirm = document.getElementById('confirmSuveiOwnerLogin');
+    const close = () => {
+        input.value = '';
+        error.textContent = '';
+        setSuveiModalOpen(modal, false);
+    };
+    document.getElementById('closeSuveiOwnerLogin').onclick = close;
+    document.getElementById('cancelSuveiOwnerLogin').onclick = close;
+    confirm.onclick = async () => {
+        const password = input.value;
+        input.value = '';
+        error.textContent = '';
+        confirm.disabled = true;
+        try {
+            const response = await notificationRendererApi.loginSuveiHumanOwner({ password });
+            if (!response?.success) {
+                error.textContent = `${response?.code || 'LOGIN_FAILED'}: ${response?.error || 'Owner 登录失败'}`;
+                return;
+            }
+            close();
+            if (statusElement) statusElement.textContent = 'Owner 身份已验证，正在重新读取 canonical Intent…';
+            await onAuthenticated?.();
+        } catch (loginError) {
+            error.textContent = loginError?.message || 'Owner 登录失败';
+        } finally {
+            confirm.disabled = false;
+        }
+    };
+    setSuveiModalOpen(modal, true);
+    input.focus();
+    return true;
+}
+
+async function openSuveiHumanAuthorizationReview(approvalData, initialReason, onCommitted, statusElement) {
+    if (!notificationRendererApi || typeof notificationRendererApi.prepareSuveiHumanAuthorization !== 'function'
+        || typeof notificationRendererApi.decideSuveiHumanAuthorization !== 'function') {
+        if (statusElement) statusElement.textContent = '当前 VCPChat 未加载 SUVEI Human Authorization API。';
+        return false;
+    }
+    if (statusElement) statusElement.textContent = '正在从 SUVEI Core 读取 exact pending target…';
+    let prepared;
+    try {
+        prepared = await notificationRendererApi.prepareSuveiHumanAuthorization(approvalData);
+    } catch (error) {
+        if (statusElement) statusElement.textContent = error?.message || '读取 SUVEI authority target 失败。';
+        return false;
+    }
+    if (!prepared?.success) {
+        if (prepared?.code === 'SUVEI_OWNER_SESSION_REQUIRED') {
+            if (statusElement) statusElement.textContent = '需要验证 Human Owner 身份。';
+            return openSuveiOwnerLogin(
+                () => openSuveiHumanAuthorizationReview(approvalData, initialReason, onCommitted, statusElement),
+                statusElement
+            );
+        }
+        if (statusElement) statusElement.textContent =
+            `${prepared?.code || 'PREPARE_FAILED'}: ${prepared?.error || '无法准备 SUVEI 授权包'}`;
+        return false;
+    }
+
+    const packet = prepared.packet;
+    const modal = ensureSuveiAuthorityReviewModal();
+    const packetElement = document.getElementById('suveiHumanAuthorizationPacket');
+    const reasonInput = document.getElementById('suveiHumanAuthorizationReason');
+    const errorElement = document.getElementById('suveiHumanAuthorizationError');
+    const approveButton = document.getElementById('approveSuveiHumanAuthorization');
+    const rejectButton = document.getElementById('rejectSuveiHumanAuthorization');
+    packetElement.textContent = formatSuveiAuthorityPacket(packet);
+    reasonInput.value = typeof initialReason === 'string' ? initialReason : '';
+    errorElement.textContent = '';
+    if (statusElement) statusElement.textContent = `已绑定 exact target: ${packet.authorityTargetDigest}`;
+
+    const close = () => setSuveiModalOpen(modal, false);
+    document.getElementById('closeSuveiHumanAuthorization').onclick = close;
+    document.getElementById('cancelSuveiHumanAuthorization').onclick = close;
+
+    const decide = async (approved) => {
+        approveButton.disabled = true;
+        rejectButton.disabled = true;
+        errorElement.textContent = '';
+        try {
+            const reason = reasonInput.value;
+            const response = await notificationRendererApi.decideSuveiHumanAuthorization({
+                requestId: approvalData.requestId,
+                approved,
+                reason
+            });
+            if (!response?.success) {
+                errorElement.textContent =
+                    `${response?.code || 'DECISION_FAILED'}: ${response?.error || 'SUVEI Core 决策失败'}`;
+                return;
+            }
+            const transported = onCommitted?.(approved, reason);
+            if (transported === false) {
+                errorElement.textContent =
+                    'SUVEI Core 已完成决策，但 VCPLog transport 当前不可用。请保持窗口，不要重复 Core 授权。';
+                return;
+            }
+            if (statusElement) {
+                statusElement.textContent = approved
+                    ? 'SUVEI Core 已授权，Agent 调用已放行。'
+                    : 'SUVEI Core 已拒绝，Agent 调用已阻断。';
+            }
+            close();
+        } catch (decisionError) {
+            errorElement.textContent = decisionError?.message || 'SUVEI Core 决策失败';
+        } finally {
+            approveButton.disabled = false;
+            rejectButton.disabled = false;
+        }
+    };
+    approveButton.onclick = () => void decide(true);
+    rejectButton.onclick = () => void decide(false);
+    setSuveiModalOpen(modal, true);
+    reasonInput.focus();
+    return true;
+}
+
 /**
  * Renders a VCPLog notification in the notifications list.
  * @param {VCPLogData|string} logData - The parsed JSON log data or a raw string message.
@@ -248,7 +499,10 @@ function sendToolApprovalResponse(requestId, approved, reason = '') {
  */
 function renderVCPLogNotification(logData, originalRawMessage = null, notificationsListUl, themeColors = {}) {
     if (logData && typeof logData === 'object' && logData.type === 'tool_approval_request' && logData.data && typeof logData.data === 'object') {
-        const autoApprovalResult = (filterManagerCapability || window.filterManager)?.checkToolAutoApproval?.(logData.data);
+        const isSuveiAuthorityRequest = isSuveiHumanAuthorizationRequest(logData.data);
+        const autoApprovalResult = isSuveiAuthorityRequest
+            ? null
+            : (filterManagerCapability || window.filterManager)?.checkToolAutoApproval?.(logData.data);
         if (autoApprovalResult && autoApprovalResult.action === 'approve') {
             const sent = sendToolApprovalResponse(logData.data.requestId, true);
             const autoApprovalLog = {
@@ -414,8 +668,13 @@ function renderVCPLogNotification(logData, originalRawMessage = null, notificati
         }
     } else if (logData && typeof logData === 'object' && logData.type === 'tool_approval_request' && logData.data && typeof logData.data === 'object') {
         const approvalData = logData.data;
-        titleText = `🛠️ 审核请求: ${approvalData.toolName}`;
-        mainContent = `助手: ${approvalData.maid}\n命令: ${approvalData.args?.command || JSON.stringify(approvalData.args)}\n时间: ${approvalData.timestamp}`;
+        if (isSuveiHumanAuthorizationRequest(approvalData)) {
+            titleText = '🔐 SUVEI Human Owner 授权';
+            mainContent = `助手: ${approvalData.maid || '—'}\n动作: ${approvalData.args?.command || '—'}\nProject: ${approvalData.args?.projectId || '—'}\nIntent: ${approvalData.args?.intentId || '—'}\n\n必须先读取 SUVEI Core 当前 canonical Intent，再由 Human Owner 明确批准或拒绝。现有自动允许规则对此请求无效。`;
+        } else {
+            titleText = `🛠️ 审核请求: ${approvalData.toolName}`;
+            mainContent = `助手: ${approvalData.maid}\n命令: ${approvalData.args?.command || JSON.stringify(approvalData.args)}\n时间: ${approvalData.timestamp}`;
+        }
         contentIsPreformatted = true;
     } else { // Fallback for other structures or plain string
         titleText = 'VCP 消息:';
@@ -425,6 +684,7 @@ function renderVCPLogNotification(logData, originalRawMessage = null, notificati
     // --- End Content Parsing ---
 
     const isToolApprovalRequest = logData && logData.type === 'tool_approval_request';
+    const isSuveiAuthorityRequest = isToolApprovalRequest && isSuveiHumanAuthorizationRequest(logData.data);
     const hasToolChangePreview = isToolApprovalRequest
         && logData.data?.changePreview
         && typeof logData.data.changePreview === 'object'
@@ -496,40 +756,62 @@ function renderVCPLogNotification(logData, originalRawMessage = null, notificati
                 return true;
             };
 
-            if (hasToolChangePreview) {
-                const auditBtn = document.createElement('button');
-                auditBtn.type = 'button';
-                auditBtn.textContent = '审计';
-                auditBtn.classList.add('vcp-btn', 'vcp-btn-audit');
-                auditBtn.setAttribute('aria-label', `审计 ${logData.data.toolName || '工具'} 的内容变更`);
-                auditBtn.onclick = (event) => {
+            if (isSuveiAuthorityRequest) {
+                const authorityStatus = document.createElement('div');
+                authorityStatus.classList.add('notification-approval-reason-hint');
+                authorityStatus.textContent = '等待 Human Owner 审视 canonical authority target。';
+                element.appendChild(authorityStatus);
+
+                const reviewBtn = document.createElement('button');
+                reviewBtn.type = 'button';
+                reviewBtn.textContent = '审视 SUVEI 授权';
+                reviewBtn.classList.add('vcp-btn', 'vcp-btn-audit');
+                reviewBtn.onclick = (event) => {
                     event.stopPropagation();
-                    openToolChangeAuditModal(logData.data, {
-                        reason: reasonInput.value,
-                        onDecision: (approved, reason) => finishApproval(approved, reason)
-                    });
+                    void openSuveiHumanAuthorizationReview(
+                        logData.data,
+                        reasonInput.value,
+                        (approved, reason) => finishApproval(approved, reason),
+                        authorityStatus
+                    );
                 };
-                approvalActions.appendChild(auditBtn);
+                approvalActions.appendChild(reviewBtn);
+            } else {
+                if (hasToolChangePreview) {
+                    const auditBtn = document.createElement('button');
+                    auditBtn.type = 'button';
+                    auditBtn.textContent = '审计';
+                    auditBtn.classList.add('vcp-btn', 'vcp-btn-audit');
+                    auditBtn.setAttribute('aria-label', `审计 ${logData.data.toolName || '工具'} 的内容变更`);
+                    auditBtn.onclick = (event) => {
+                        event.stopPropagation();
+                        openToolChangeAuditModal(logData.data, {
+                            reason: reasonInput.value,
+                            onDecision: (approved, reason) => finishApproval(approved, reason)
+                        });
+                    };
+                    approvalActions.appendChild(auditBtn);
+                }
+
+                const allowBtn = document.createElement('button');
+                allowBtn.textContent = '允许';
+                allowBtn.classList.add('vcp-btn', 'vcp-btn-success');
+                allowBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    finishApproval(true);
+                };
+
+                const rejectBtn = document.createElement('button');
+                rejectBtn.textContent = '拒绝';
+                rejectBtn.classList.add('vcp-btn', 'vcp-btn-danger');
+                rejectBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    finishApproval(false);
+                };
+
+                approvalActions.appendChild(allowBtn);
+                approvalActions.appendChild(rejectBtn);
             }
-
-            const allowBtn = document.createElement('button');
-            allowBtn.textContent = '允许';
-            allowBtn.classList.add('vcp-btn', 'vcp-btn-success');
-            allowBtn.onclick = (e) => {
-                e.stopPropagation();
-                finishApproval(true);
-            };
-
-            const rejectBtn = document.createElement('button');
-            rejectBtn.textContent = '拒绝';
-            rejectBtn.classList.add('vcp-btn', 'vcp-btn-danger');
-            rejectBtn.onclick = (e) => {
-                e.stopPropagation();
-                finishApproval(false);
-            };
-
-            approvalActions.appendChild(allowBtn);
-            approvalActions.appendChild(rejectBtn);
             element.appendChild(approvalActions);
         }
 
@@ -788,6 +1070,9 @@ window.notificationRenderer = {
     clearPersistentNotifications,
     buildToolChangeDiff,
     openToolChangeAuditModal,
+    isSuveiHumanAuthorizationRequest,
+    formatSuveiAuthorityPacket,
+    openSuveiHumanAuthorizationReview,
     configureCapabilities({ filterManager = null, listenerOwner = null } = {}) {
         filterManagerCapability = filterManager;
         notificationLifecycleOwner = listenerOwner;

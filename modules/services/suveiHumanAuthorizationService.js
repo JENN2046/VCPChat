@@ -210,6 +210,7 @@ class SuveiHumanAuthorizationService {
         this.identity = null;
         this.binding = null;
         this.loginPromise = null;
+        this.sessionGeneration = 0;
         this.pending = new Map();
     }
 
@@ -226,6 +227,7 @@ class SuveiHumanAuthorizationService {
     }
 
     clearSession() {
+        this.sessionGeneration += 1;
         this.token = null;
         this.identity = null;
         this.binding = null;
@@ -334,6 +336,7 @@ class SuveiHumanAuthorizationService {
             fail("SUVEI_OWNER_PASSWORD_INVALID");
         }
         if (this.loginPromise) return this.loginPromise;
+        const loginGeneration = this.sessionGeneration;
         this.loginPromise = (async () => {
             const binding = await this.readBinding();
             const login = await this.request("/api/v1/auth/local/login", {
@@ -351,6 +354,9 @@ class SuveiHumanAuthorizationService {
                 || exactUuid(session.userId, "SUVEI_OWNER_SESSION_INVALID") !== binding.expectedOwnerUserId
                 || exactUuid(session.organizationId, "SUVEI_OWNER_SESSION_INVALID") !== binding.expectedOrganizationId) {
                 fail("SUVEI_OWNER_SESSION_IDENTITY_MISMATCH");
+            }
+            if (loginGeneration !== this.sessionGeneration) {
+                fail("SUVEI_OWNER_LOGIN_CANCELLED");
             }
             this.token = login.accessToken;
             this.identity = {

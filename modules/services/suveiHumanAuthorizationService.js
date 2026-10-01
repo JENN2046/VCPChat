@@ -52,6 +52,10 @@ function normalizeBaseUrl(value) {
         || (url.pathname && url.pathname !== "/")) {
         fail("SUVEI_OWNER_BASE_URL_INVALID");
     }
+    const loopbackHosts = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+    if (url.protocol === "http:" && !loopbackHosts.has(url.hostname.toLowerCase())) {
+        fail("SUVEI_OWNER_TLS_REQUIRED");
+    }
     return url.origin;
 }
 
@@ -417,11 +421,16 @@ class SuveiHumanAuthorizationService {
             authorization,
         });
         const ttlMs = normalizedTtl(approvalData.approvalTtlMs);
+        const receivedAt = this.now();
         const requestStartedAt = Date.parse(String(approvalData.timestamp || ""));
-        const deadlineBase = Number.isFinite(requestStartedAt) ? requestStartedAt : this.now();
+        const localDeadline = receivedAt + ttlMs;
+        const callerDeadline = Number.isFinite(requestStartedAt)
+            ? requestStartedAt + ttlMs
+            : localDeadline;
+        const boundedToolDeadline = Math.min(localDeadline, callerDeadline);
         const toolApprovalDeadline = reconciliation
-            ? Math.min(deadlineBase + ttlMs, committedExpiry)
-            : deadlineBase + ttlMs;
+            ? Math.min(boundedToolDeadline, committedExpiry)
+            : boundedToolDeadline;
         if (this.now() + MIN_TOOL_REMAINING_MS > toolApprovalDeadline) fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         const toolApprovalExpiresAt = new Date(toolApprovalDeadline).toISOString();
         const packet = {
@@ -500,6 +509,45 @@ class SuveiHumanAuthorizationService {
         }
     }
 
+    assertRevokedAuthorization(intent, pending, authorizedIntent) {
+        assertIntentShape(
+            intent,
+            this.binding,
+            pending.projectId,
+            pending.intentId,
+            pending.expectedAction,
+            ["REVOKED"],
+        );
+        if (intent.revision !== authorizedIntent.revision + 1
+            || intent.requestFingerprint !== pending.authorization.requestFingerprint
+            || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
+            || String(intent.authorizationTermsDigest || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
+            || String(intent.executionGrantId || "").toLowerCase() !== String(authorizedIntent.executionGrantId || "").toLowerCase()
+            || intent.executionOperationId !== null
+            || intent.executionCommandId !== null) {
+            fail("SUVEI_REVOCATION_RECEIPT_INVALID");
+        }
+        return intent;
+    }
+
+    async reconcileRevocation(pending, authorizedIntent, originalError) {
+        try {
+            const current = await this.getIntent(pending.projectId, pending.intentId);
+            if (current?.proposalState === "REVOKED") {
+                return this.assertRevokedAuthorization(current, pending, authorizedIntent);
+            }
+            if (current?.proposalState === "AUTHORIZED") throw originalError;
+            fail("SUVEI_REVOCATION_OUTCOME_CONFLICT");
+        } catch (reconcileError) {
+            if (reconcileError === originalError) throw originalError;
+            if (reconcileError?.code === "SUVEI_REVOCATION_RECEIPT_INVALID"
+                || reconcileError?.code === "SUVEI_REVOCATION_OUTCOME_CONFLICT") {
+                throw reconcileError;
+            }
+            throw originalError;
+        }
+    }
+
     async decide({ requestId: requestIdValue, approved, reason = "" } = {}) {
         await this.verifyOwnerSession();
         const requestId = exactString(requestIdValue, "SUVEI_APPROVAL_REQUEST_ID_REQUIRED");
@@ -543,20 +591,29 @@ class SuveiHumanAuthorizationService {
             }
         } else if (current.proposalState === "AUTHORIZED") {
             current = this.assertCommittedAuthorization(current, pending);
-            updated = await this.request(
-                `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/revoke`,
-                {
-                    method: "POST",
-                    body: {
-                        expectedRevision: current.revision,
-                        reason: normalizedReason || "Revoked from VCPChat human authorization recovery surface.",
+            try {
+                updated = await this.request(
+                    `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/revoke`,
+                    {
+                        method: "POST",
+                        body: {
+                            expectedRevision: current.revision,
+                            reason: normalizedReason || "Revoked from VCPChat human authorization recovery surface.",
+                        },
                     },
-                },
-            );
-            if (!updated || updated.proposalState !== "REVOKED"
-                || String(updated.id).toLowerCase() !== pending.intentId) {
-                fail("SUVEI_REVOCATION_RECEIPT_INVALID");
+                );
+                updated = this.assertRevokedAuthorization(updated, pending, current);
+            } catch (error) {
+                updated = await this.reconcileRevocation(pending, current, error);
             }
+        } else if (current.proposalState === "REVOKED" && approved !== true) {
+            const authorizedRevision = pending.authorization.expectedRevision + 1;
+            const authorizedIntent = {
+                ...current,
+                proposalState: "AUTHORIZED",
+                revision: authorizedRevision,
+            };
+            updated = this.assertRevokedAuthorization(current, pending, authorizedIntent);
         } else {
             assertIntentShape(
                 current,

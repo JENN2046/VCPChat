@@ -378,7 +378,7 @@ test('SUVEI recovery surface distinguishes resume from a fresh authorization', a
     dom.window.close();
 });
 
-test('SUVEI modal stays open when confirmed VCPLog transport is unavailable after Core commit', async () => {
+test('SUVEI transport failure reparses committed Core state into recovery mode', async () => {
     const { dom, window, sentMessages } = createAuditDom();
     const packet = {
         schemaVersion: 'suvei_human_authorization_preview.v1',
@@ -419,7 +419,26 @@ test('SUVEI modal stays open when confirmed VCPLog transport is unavailable afte
             maxAdapterCallsPerAttempt: 1
         }
     };
-    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    const recoveryPacket = {
+        ...packet,
+        decisionMode: 'reconcile_authorized',
+        authorizationCommitted: true,
+        authorityTargetDigest: 'a'.repeat(64),
+        intent: {
+            ...packet.intent,
+            proposalState: 'AUTHORIZED',
+            revision: 1,
+            authorizedBy: '11111111-1111-4111-8111-111111111111',
+            authorizationExpiresAt: packet.authorization.expiresAt,
+            authorizationTermsDigest: 'b'.repeat(64),
+            executionGrantId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+        }
+    };
+    let prepareCalls = 0;
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({
+        success: true,
+        packet: ++prepareCalls === 1 ? packet : recoveryPacket
+    });
     window.chatAPI.decideSuveiHumanAuthorization = async () => ({
         success: true,
         decision: { approved: true, proposalState: 'AUTHORIZED' }
@@ -459,12 +478,191 @@ test('SUVEI modal stays open when confirmed VCPLog transport is unavailable afte
     await new Promise(resolve => setImmediate(resolve));
     await new Promise(resolve => setImmediate(resolve));
 
+    assert.equal(prepareCalls, 2);
     assert.equal(modal.style.display, 'flex');
     assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), []);
-    assert.match(
-        window.document.getElementById('suveiHumanAuthorizationError').textContent,
-        /transport/
+    assert.equal(window.document.getElementById('approveSuveiHumanAuthorization').textContent, '继续执行（恢复）');
+    assert.match(window.document.getElementById('suveiHumanAuthorizationPacket').textContent, /Core state: AUTHORIZED/);
+    dom.window.close();
+});
+
+test('SUVEI correction review displays exact source and mask content hashes', async () => {
+    const { dom, window } = createAuditDom();
+    const packet = {
+        schemaVersion: 'suvei_human_authorization_preview.v1',
+        requestId: 'suvei-correction-hashes',
+        projectId: '33333333-3333-4333-8333-333333333333',
+        intentId: '44444444-4444-5444-8444-444444444444',
+        decisionMode: 'authorize',
+        authorizationCommitted: false,
+        authorityTargetDigest: 'f'.repeat(64),
+        toolApprovalExpiresAt: '2026-10-01T14:05:00.000Z',
+        intent: {
+            id: '44444444-4444-5444-8444-444444444444',
+            projectId: '33333333-3333-4333-8333-333333333333',
+            proposalState: 'PENDING',
+            action: 'inpaint_candidate',
+            revision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            delegateUserId: '55555555-5555-4555-8555-555555555555',
+            productionUnitId: '99999999-9999-4999-8999-999999999999',
+            recipeId: '66666666-6666-4666-8666-666666666666',
+            recipeDigest: 'a'.repeat(64),
+            capabilityId: 'newapi.gpt-image-2.5-flare.v1',
+            capabilityVersion: '1',
+            requestedOutputCount: 1,
+            resolution: '1024x1024',
+            aspectRatio: '1:1',
+            normalizedReason: 'One exact correction',
+            sourceCandidateId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+            sourceCandidateRevision: 2,
+            sourceCandidateSha256: '1'.repeat(64),
+            sourceCriticResultId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+            maskMediaObjectId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+            maskContentSha256: '2'.repeat(64),
+            editInstruction: 'Repair only the masked edge'
+        },
+        authorization: {
+            expectedRevision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            expiresAt: '2026-10-01T14:30:00.000Z',
+            maxAttempts: 1,
+            maxOutputCount: 1,
+            maxTotalCredits: 1,
+            maxConcurrentAttempts: 1,
+            maxWallClockMs: 300000,
+            maxAdapterCallsPerAttempt: 1
+        }
+    };
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async () => ({ success: false });
+    window.chatAPI.loginSuveiHumanOwner = async () => ({ success: true });
+
+    const request = {
+        type: 'tool_approval_request',
+        data: {
+            requestId: packet.requestId,
+            toolName: 'SUVEIStudio',
+            maid: 'Nova',
+            args: {
+                command: 'ExecuteAuthorizedCorrection',
+                projectId: packet.projectId,
+                intentId: packet.intentId
+            },
+            timestamp: '2026-10-01T14:00:00.000Z',
+            approvalTtlMs: 300000
+        }
+    };
+    window.notificationRenderer.renderVCPLogNotification(
+        request,
+        JSON.stringify(request),
+        window.document.getElementById('notificationsList')
     );
+    Array.from(window.document.querySelectorAll('.notification-actions button'))
+        .find(button => button.textContent === '审视 SUVEI 授权').click();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const text = window.document.getElementById('suveiHumanAuthorizationPacket').textContent;
+    assert.match(text, /Source Candidate SHA256: 1{64}/);
+    assert.match(text, /Mask SHA256: 2{64}/);
+    dom.window.close();
+});
+
+test('SUVEI committed revocation recovery can only confirm approved=false to ToolBox', async () => {
+    const { dom, window, sentMessages } = createAuditDom();
+    const packet = {
+        schemaVersion: 'suvei_human_authorization_preview.v1',
+        requestId: 'suvei-revoked-recovery',
+        projectId: '33333333-3333-4333-8333-333333333333',
+        intentId: '44444444-4444-5444-8444-444444444444',
+        decisionMode: 'reconcile_revoked',
+        authorizationCommitted: false,
+        revocationCommitted: true,
+        authorityTargetDigest: 'd'.repeat(64),
+        expectedAuthorizationTermsDigest: 'b'.repeat(64),
+        toolApprovalExpiresAt: '2026-10-01T14:05:00.000Z',
+        intent: {
+            id: '44444444-4444-5444-8444-444444444444',
+            projectId: '33333333-3333-4333-8333-333333333333',
+            proposalState: 'REVOKED',
+            action: 'generate_candidate',
+            revision: 2,
+            requestFingerprint: 'e'.repeat(64),
+            delegateUserId: '55555555-5555-4555-8555-555555555555',
+            productionUnitId: '99999999-9999-4999-8999-999999999999',
+            recipeId: '66666666-6666-4666-8666-666666666666',
+            recipeDigest: 'a'.repeat(64),
+            capabilityId: 'newapi.gpt-image-2.5-flare.v1',
+            capabilityVersion: '1',
+            requestedOutputCount: 1,
+            resolution: '1024x1024',
+            aspectRatio: '1:1',
+            normalizedReason: 'Revoked exact work'
+        },
+        authorization: {
+            expectedRevision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            expiresAt: '2026-10-01T14:30:00.000Z',
+            maxAttempts: 1,
+            maxOutputCount: 1,
+            maxTotalCredits: 1,
+            maxConcurrentAttempts: 1,
+            maxWallClockMs: 300000,
+            maxAdapterCallsPerAttempt: 1
+        }
+    };
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async ({ approved }) => {
+        assert.equal(approved, false);
+        return {
+            success: true,
+            decision: {
+                approved: false,
+                reconciled: true,
+                proposalState: 'REVOKED',
+                authorityTargetDigest: packet.authorityTargetDigest
+            }
+        };
+    };
+    window.chatAPI.loginSuveiHumanOwner = async () => ({ success: true });
+
+    const request = {
+        type: 'tool_approval_request',
+        data: {
+            requestId: packet.requestId,
+            toolName: 'SUVEIStudio',
+            maid: 'Nova',
+            args: {
+                command: 'ExecuteAuthorizedGeneration',
+                projectId: packet.projectId,
+                intentId: packet.intentId
+            },
+            timestamp: '2026-10-01T14:00:00.000Z',
+            approvalTtlMs: 300000
+        }
+    };
+    window.notificationRenderer.renderVCPLogNotification(
+        request,
+        JSON.stringify(request),
+        window.document.getElementById('notificationsList')
+    );
+    Array.from(window.document.querySelectorAll('.notification-actions button'))
+        .find(button => button.textContent === '审视 SUVEI 授权').click();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const approve = window.document.getElementById('approveSuveiHumanAuthorization');
+    const reject = window.document.getElementById('rejectSuveiHumanAuthorization');
+    assert.equal(approve.disabled, true);
+    assert.equal(approve.textContent, 'Core 已撤销');
+    assert.equal(reject.textContent, '确认撤销并通知 ToolBox');
+
+    reject.click();
+    await new Promise(resolve => setImmediate(resolve));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), [{
+        type: 'tool_approval_response',
+        data: { requestId: packet.requestId, approved: false }
+    }]);
     dom.window.close();
 });
 

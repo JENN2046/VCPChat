@@ -485,3 +485,101 @@ test('RAG approval surfaces cannot emit generic approval for protected SUVEI exe
     assert.match(handlers, /Refused SUVEI protected approval relay/);
 });
 
+test('SUVEI committed rejection recovery can only confirm approved=false to ToolBox', async () => {
+    const { dom, window, sentMessages } = createAuditDom();
+    const packet = {
+        schemaVersion: 'suvei_human_authorization_preview.v1',
+        requestId: 'suvei-rejected-recovery',
+        projectId: '33333333-3333-4333-8333-333333333333',
+        intentId: '44444444-4444-5444-8444-444444444444',
+        decisionMode: 'reconcile_rejected',
+        authorizationCommitted: false,
+        authorityTargetDigest: 'd'.repeat(64),
+        expectedAuthorizationTermsDigest: null,
+        toolApprovalExpiresAt: '2026-10-01T14:05:00.000Z',
+        intent: {
+            id: '44444444-4444-5444-8444-444444444444',
+            projectId: '33333333-3333-4333-8333-333333333333',
+            proposalState: 'REJECTED',
+            action: 'generate_candidate',
+            revision: 1,
+            requestFingerprint: 'e'.repeat(64),
+            delegateUserId: '55555555-5555-4555-8555-555555555555',
+            productionUnitId: '99999999-9999-4999-899d-2de959482469',
+            recipeId: '66666666-6666-4666-8666-666666666666',
+            recipeDigest: 'a'.repeat(64),
+            capabilityId: 'newapi.gpt-image-2.5-flare.v1',
+            capabilityVersion: '1',
+            requestedOutputCount: 1,
+            resolution: '1024x1024',
+            aspectRatio: '1:1',
+            normalizedReason: 'Rejected exact work'
+        },
+        authorization: null
+    };
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async ({ approved }) => {
+        assert.equal(approved, false);
+        return {
+            success: true,
+            decision: {
+                approved: false,
+                reconciled: true,
+                proposalState: 'REJECTED',
+                authorityTargetDigest: packet.authorityTargetDigest
+            }
+        };
+    };
+    window.chatAPI.loginSuveiHumanOwner = async () => ({ success: true });
+
+    const request = {
+        type: 'tool_approval_request',
+        data: {
+            requestId: packet.requestId,
+            toolName: 'SUVEIStudio',
+            maid: 'Nova',
+            args: {
+                command: 'ExecuteAuthorizedGeneration',
+                projectId: packet.projectId,
+                intentId: packet.intentId
+            },
+            timestamp: '2026-10-01T14:00:00.000Z',
+            approvalTtlMs: 300000
+        }
+    };
+
+    window.notificationRenderer.renderVCPLogNotification(
+        request,
+        JSON.stringify(request),
+        window.document.getElementById('notificationsList')
+    );
+    const reviewButton = Array.from(window.document.querySelectorAll('.notification-actions button'))
+        .find(button => button.textContent === '审视 SUVEI 授权');
+    assert.ok(reviewButton);
+    reviewButton.click();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const approve = window.document.getElementById('approveSuveiHumanAuthorization');
+    const reject = window.document.getElementById('rejectSuveiHumanAuthorization');
+    const packetText = window.document.getElementById('suveiHumanAuthorizationPacket').textContent;
+    assert.equal(approve.disabled, true);
+    assert.equal(approve.textContent, 'Core 已拒绝');
+    assert.equal(reject.textContent, '确认拒绝并通知 ToolBox');
+    assert.match(packetText, /Core state: REJECTED/);
+    assert.match(packetText, /Decision mode: reconcile_rejected/);
+
+    reject.click();
+    await new Promise(resolve => setImmediate(resolve));
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), [{
+        type: 'tool_approval_response',
+        data: {
+            requestId: packet.requestId,
+            approved: false
+        }
+    }]);
+
+    dom.window.close();
+});
+

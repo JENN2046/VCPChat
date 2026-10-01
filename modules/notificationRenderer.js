@@ -343,10 +343,13 @@ function formatSuveiAuthorityPacket(packet) {
     const intent = packet?.intent || {};
     const authorization = packet?.authorization || {};
     const action = intent.action === 'inpaint_candidate' ? '单步 Candidate 修正' : '生成 Candidate';
-    const recovery = packet?.decisionMode === 'reconcile_authorized' || packet?.authorizationCommitted === true;
+    const authorizedRecovery = packet?.decisionMode === 'reconcile_authorized'
+        || packet?.authorizationCommitted === true;
+    const rejectedRecovery = packet?.decisionMode === 'reconcile_rejected';
+    const recovery = authorizedRecovery || rejectedRecovery;
     const lines = [
         `动作: ${action}`,
-        `Core state: ${intent.proposalState || '—'}${recovery ? '（已存在 exact authorization，当前是恢复流程）' : ''}`,
+        `Core state: ${intent.proposalState || '—'}${authorizedRecovery ? '（已存在 exact authorization，当前是恢复流程）' : ''}${rejectedRecovery ? '（Core 已拒绝，当前只恢复拒绝通知）' : ''}`,
         `Decision mode: ${packet?.decisionMode || 'authorize'}`,
         `Project: ${packet?.projectId || '—'}`,
         `Intent: ${packet?.intentId || '—'}`,
@@ -460,16 +463,26 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
     const errorElement = document.getElementById('suveiHumanAuthorizationError');
     const approveButton = document.getElementById('approveSuveiHumanAuthorization');
     const rejectButton = document.getElementById('rejectSuveiHumanAuthorization');
-    const recovery = packet?.decisionMode === 'reconcile_authorized' || packet?.authorizationCommitted === true;
+    const authorizedRecovery = packet?.decisionMode === 'reconcile_authorized'
+        || packet?.authorizationCommitted === true;
+    const rejectedRecovery = packet?.decisionMode === 'reconcile_rejected';
+    const recovery = authorizedRecovery || rejectedRecovery;
     packetElement.textContent = formatSuveiAuthorityPacket(packet);
     reasonInput.value = typeof initialReason === 'string' ? initialReason : '';
     errorElement.textContent = '';
-    approveButton.textContent = recovery ? '继续执行（恢复）' : '批准并执行';
-    rejectButton.textContent = recovery ? '撤销授权并拒绝' : '拒绝';
+    approveButton.textContent = rejectedRecovery
+        ? 'Core 已拒绝'
+        : (authorizedRecovery ? '继续执行（恢复）' : '批准并执行');
+    rejectButton.textContent = rejectedRecovery
+        ? '确认拒绝并通知 ToolBox'
+        : (authorizedRecovery ? '撤销授权并拒绝' : '拒绝');
+    approveButton.disabled = rejectedRecovery;
     if (statusElement) {
-        statusElement.textContent = recovery
-            ? `SUVEI Core 已存在这次 exact authorization；当前只恢复 ToolBox transport。Target: ${packet.authorityTargetDigest}`
-            : `已绑定 exact target: ${packet.authorityTargetDigest}`;
+        statusElement.textContent = rejectedRecovery
+            ? `SUVEI Core 已提交拒绝；当前只恢复 ToolBox 的 approved=false。Target: ${packet.authorityTargetDigest}`
+            : (authorizedRecovery
+                ? `SUVEI Core 已存在这次 exact authorization；当前只恢复 ToolBox transport。Target: ${packet.authorityTargetDigest}`
+                : `已绑定 exact target: ${packet.authorityTargetDigest}`);
     }
 
     const close = () => setSuveiModalOpen(modal, false);
@@ -500,22 +513,24 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             }
             if (statusElement) {
                 statusElement.textContent = approved
-                    ? (recovery
+                    ? (authorizedRecovery
                         ? '已确认恢复：没有重复授权，Agent 调用继续。'
                         : 'SUVEI Core 已授权，Agent 调用已放行。')
-                    : (recovery
-                        ? 'SUVEI Core 的既有授权已撤销，Agent 调用已阻断。'
-                        : 'SUVEI Core 已拒绝，Agent 调用已阻断。');
+                    : (rejectedRecovery
+                        ? '已确认恢复：没有重复拒绝，ToolBox 已收到阻断决定。'
+                        : (authorizedRecovery
+                            ? 'SUVEI Core 的既有授权已撤销，Agent 调用已阻断。'
+                            : 'SUVEI Core 已拒绝，Agent 调用已阻断。'));
             }
             close();
         } catch (decisionError) {
             errorElement.textContent = decisionError?.message || 'SUVEI Core 决策失败';
         } finally {
-            approveButton.disabled = false;
+            approveButton.disabled = rejectedRecovery;
             rejectButton.disabled = false;
         }
     };
-    approveButton.onclick = () => void decide(true);
+    approveButton.onclick = rejectedRecovery ? null : () => void decide(true);
     rejectButton.onclick = () => void decide(false);
     setSuveiModalOpen(modal, true);
     reasonInput.focus();

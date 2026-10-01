@@ -88,7 +88,9 @@ function intent(overrides = {}) {
 function harness({
     now = Date.parse("2026-10-01T14:00:00.000Z"),
     authorizeMode = "success",
+    revokeMode = "success",
 } = {}) {
+    let clock = now;
     let currentIntent = intent();
     const calls = [];
     const settingsManager = { readSettings: async () => settings() };
@@ -142,8 +144,8 @@ function harness({
                 ...currentIntent,
                 proposalState: "REVOKED",
                 revision: currentIntent.revision + 1,
-                executionGrantId: null,
             };
+            if (revokeMode === "throw_after_commit") throw new Error("revoke response lost after commit");
             return json(currentIntent);
         }
         throw new Error(`unexpected request ${method} ${pathname}`);
@@ -151,13 +153,14 @@ function harness({
     const service = new SuveiHumanAuthorizationService({
         settingsManager,
         fetchImpl,
-        now: () => now,
+        now: () => clock,
     });
     return {
         service,
         calls,
         getIntent: () => currentIntent,
         setIntent: value => { currentIntent = value; },
+        setNow: value => { clock = value; },
     };
 }
 
@@ -424,5 +427,99 @@ test("correction authorization binds exact Candidate, Critic, mask and one-step 
     const authorize = calls.find(call => call.pathname.endsWith("/authorize"));
     assert.ok(authorize);
     assert.deepEqual(authorize.body, packet.authorization);
+});
+
+test("non-loopback HTTP Core endpoint is rejected before Owner credentials are sent", async () => {
+    let fetchCalled = false;
+    const service = new SuveiHumanAuthorizationService({
+        settingsManager: {
+            readSettings: async () => ({
+                ...settings(),
+                suveiHumanAuthorizationBaseUrl: "http://10.0.0.5:33103",
+            }),
+        },
+        fetchImpl: async () => {
+            fetchCalled = true;
+            throw new Error("must not fetch");
+        },
+    });
+    await assert.rejects(
+        service.login("exact owner password"),
+        error => error?.code === "SUVEI_OWNER_TLS_REQUIRED"
+    );
+    assert.equal(fetchCalled, false);
+});
+
+test("future ToolBox timestamp cannot extend approval beyond local receipt TTL", async () => {
+    const now = Date.parse("2026-10-01T14:00:00.000Z");
+    const { service } = harness({ now });
+    await service.login("exact owner password");
+    const packet = await service.prepare({
+        requestId: "approval-future-clock",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T18:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    assert.equal(packet.toolApprovalExpiresAt, "2026-10-01T14:01:00.000Z");
+});
+
+test("committed authorization cannot resume after the Core grant expiry", async () => {
+    const start = Date.parse("2026-10-01T14:00:00.000Z");
+    const { service, setNow } = harness({ now: start });
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-expiry-source",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    await service.decide({ requestId: "approval-expiry-source", approved: true });
+    setNow(Date.parse("2026-10-01T14:29:50.000Z"));
+    await service.prepare({
+        requestId: "approval-expiry-recovery",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:29:50.000Z",
+        approvalTtlMs: 60000,
+    });
+    setNow(Date.parse("2026-10-01T14:30:01.000Z"));
+    await assert.rejects(
+        service.decide({ requestId: "approval-expiry-recovery", approved: true }),
+        error => error?.code === "SUVEI_APPROVAL_PACKET_EXPIRED"
+            || error?.code === "SUVEI_COMMITTED_AUTHORIZATION_EXPIRED"
+    );
+});
+
+test("ambiguous revoke POST reconciles the exact committed REVOKED state", async () => {
+    const { service, calls } = harness({ revokeMode: "throw_after_commit" });
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-revoke-source-ambiguous",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    await service.decide({ requestId: "approval-revoke-source-ambiguous", approved: true });
+    await service.prepare({
+        requestId: "approval-revoke-ambiguous",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:10.000Z",
+        approvalTtlMs: 60000,
+    });
+    const decision = await service.decide({
+        requestId: "approval-revoke-ambiguous",
+        approved: false,
+        reason: "Stop exact authorized work.",
+    });
+    assert.equal(decision.approved, false);
+    assert.equal(decision.proposalState, "REVOKED");
+    assert.equal(calls.filter(call => call.pathname.endsWith("/revoke")).length, 1);
+    assert.ok(calls.filter(call =>
+        call.pathname === `/api/v1/projects/${PROJECT}/agent-execution-intents/${INTENT}`
+    ).length >= 4);
 });
 

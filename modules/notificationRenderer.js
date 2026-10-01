@@ -325,8 +325,11 @@ function formatSuveiAuthorityPacket(packet) {
     const intent = packet?.intent || {};
     const authorization = packet?.authorization || {};
     const action = intent.action === 'inpaint_candidate' ? '单步 Candidate 修正' : '生成 Candidate';
+    const recovery = packet?.decisionMode === 'reconcile_authorized' || packet?.authorizationCommitted === true;
     const lines = [
         `动作: ${action}`,
+        `Core state: ${intent.proposalState || '—'}${recovery ? '（已存在 exact authorization，当前是恢复流程）' : ''}`,
+        `Decision mode: ${packet?.decisionMode || 'authorize'}`,
         `Project: ${packet?.projectId || '—'}`,
         `Intent: ${packet?.intentId || '—'}`,
         `Revision: ${intent.revision ?? '—'}`,
@@ -439,10 +442,17 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
     const errorElement = document.getElementById('suveiHumanAuthorizationError');
     const approveButton = document.getElementById('approveSuveiHumanAuthorization');
     const rejectButton = document.getElementById('rejectSuveiHumanAuthorization');
+    const recovery = packet?.decisionMode === 'reconcile_authorized' || packet?.authorizationCommitted === true;
     packetElement.textContent = formatSuveiAuthorityPacket(packet);
     reasonInput.value = typeof initialReason === 'string' ? initialReason : '';
     errorElement.textContent = '';
-    if (statusElement) statusElement.textContent = `已绑定 exact target: ${packet.authorityTargetDigest}`;
+    approveButton.textContent = recovery ? '继续执行（恢复）' : '批准并执行';
+    rejectButton.textContent = recovery ? '撤销授权并拒绝' : '拒绝';
+    if (statusElement) {
+        statusElement.textContent = recovery
+            ? `SUVEI Core 已存在这次 exact authorization；当前只恢复 ToolBox transport。Target: ${packet.authorityTargetDigest}`
+            : `已绑定 exact target: ${packet.authorityTargetDigest}`;
+    }
 
     const close = () => setSuveiModalOpen(modal, false);
     document.getElementById('closeSuveiHumanAuthorization').onclick = close;
@@ -472,8 +482,12 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             }
             if (statusElement) {
                 statusElement.textContent = approved
-                    ? 'SUVEI Core 已授权，Agent 调用已放行。'
-                    : 'SUVEI Core 已拒绝，Agent 调用已阻断。';
+                    ? (recovery
+                        ? '已确认恢复：没有重复授权，Agent 调用继续。'
+                        : 'SUVEI Core 已授权，Agent 调用已放行。')
+                    : (recovery
+                        ? 'SUVEI Core 的既有授权已撤销，Agent 调用已阻断。'
+                        : 'SUVEI Core 已拒绝，Agent 调用已阻断。');
             }
             close();
         } catch (decisionError) {

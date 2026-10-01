@@ -56,6 +56,7 @@ const fileManager = require('./modules/fileManager'); // Import the new file man
 const groupChat = require('./Groupmodules/groupchat'); // Import the group chat module
 const windowHandlers = require('./modules/ipc/windowHandlers'); // Import window IPC handlers
 const settingsHandlers = require('./modules/ipc/settingsHandlers'); // Import settings IPC handlers
+const suveiHumanAuthorizationHandlers = require('./modules/ipc/suveiHumanAuthorizationHandlers'); // SUVEI Human Owner authority
 const fileDialogHandlers = require('./modules/ipc/fileDialogHandlers'); // Import file dialog handlers
 const deepWikiHandlers = require('./modules/ipc/deepWikiHandlers'); // Ask Nova DeepWiki MCP handlers
 const { getAgentConfigById, ...agentHandlers } = require('./modules/ipc/agentHandlers'); // Import agent handlers
@@ -1147,6 +1148,7 @@ if (!gotTheLock) {
         agentConfigManager.startCleanupTimer(); // Start agent config cleanup
 
         settingsHandlers.initialize({ SETTINGS_FILE, USER_AVATAR_FILE, AGENT_DIR, settingsManager: appSettingsManager, agentConfigManager, mainWindow }); // Initialize settings handlers
+        suveiHumanAuthorizationHandlers.initialize({ mainWindow, settingsManager: appSettingsManager });
         for (const channel of ['jev:get-status', 'jev:decide']) {
             ipcMain.removeHandler(channel);
         }

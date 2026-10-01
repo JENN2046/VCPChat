@@ -19,6 +19,9 @@ const SPEC_VERSION = "88888888-8888-4888-8888-888888888888";
 const UNIT = "99999999-9999-4999-8999-999999999999";
 const SCRATCHPAD = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const GRANT = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+const SOURCE_CANDIDATE = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const SOURCE_CRITIC = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
+const MASK_MEDIA = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
 const SHA = "a".repeat(64);
 
 function json(data, status = 200) {
@@ -361,5 +364,65 @@ test("mismatched Core authorization terms digest fails closed", async () => {
         service.decide({ requestId: "approval-bad-digest", approved: true }),
         error => error?.code === "SUVEI_AUTHORIZATION_RECEIPT_INVALID"
     );
+});
+
+test("correction authorization binds exact Candidate, Critic, mask and one-step limits", async () => {
+    const { service, calls, setIntent } = harness();
+    const correction = intent({
+        action: "inpaint_candidate",
+        requestedOutputCount: 1,
+        normalizedReason: "Repair only the bounded local defect",
+        sourceCandidateId: SOURCE_CANDIDATE,
+        sourceCandidateRevision: 2,
+        sourceCandidateSha256: "1".repeat(64),
+        sourceCriticResultId: SOURCE_CRITIC,
+        maskMediaObjectId: MASK_MEDIA,
+        maskContentSha256: "2".repeat(64),
+        editInstruction: "Repair only the bounded local defect",
+    });
+    setIntent(correction);
+    await service.login("exact owner password");
+    const packet = await service.prepare({
+        requestId: "approval-correction",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedCorrection", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+
+    assert.equal(packet.intent.action, "inpaint_candidate");
+    assert.equal(packet.intent.sourceCandidateId, SOURCE_CANDIDATE);
+    assert.equal(packet.intent.sourceCandidateRevision, 2);
+    assert.equal(packet.intent.sourceCriticResultId, SOURCE_CRITIC);
+    assert.equal(packet.intent.maskMediaObjectId, MASK_MEDIA);
+    assert.equal(packet.intent.maskContentSha256, "2".repeat(64));
+    assert.equal(packet.intent.editInstruction, "Repair only the bounded local defect");
+    assert.deepEqual({
+        maxAttempts: packet.authorization.maxAttempts,
+        maxOutputCount: packet.authorization.maxOutputCount,
+        maxTotalCredits: packet.authorization.maxTotalCredits,
+        maxConcurrentAttempts: packet.authorization.maxConcurrentAttempts,
+        maxAdapterCallsPerAttempt: packet.authorization.maxAdapterCallsPerAttempt,
+    }, {
+        maxAttempts: 1,
+        maxOutputCount: 1,
+        maxTotalCredits: 1,
+        maxConcurrentAttempts: 1,
+        maxAdapterCallsPerAttempt: 1,
+    });
+    assert.equal(
+        packet.expectedAuthorizationTermsDigest,
+        authorizationTermsDigest(correction, OWNER, packet.authorization)
+    );
+
+    const decision = await service.decide({
+        requestId: "approval-correction",
+        approved: true,
+        reason: "Exact mask and single-step correction reviewed.",
+    });
+    assert.equal(decision.proposalState, "AUTHORIZED");
+    const authorize = calls.find(call => call.pathname.endsWith("/authorize"));
+    assert.ok(authorize);
+    assert.deepEqual(authorize.body, packet.authorization);
 });
 

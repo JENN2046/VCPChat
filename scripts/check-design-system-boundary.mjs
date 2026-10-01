@@ -92,6 +92,19 @@ const allowedSourceDifferences = new Set([
     '.gitignore',
     'README.md',
     'RAGmodules/RAG_Observer.html',
+    // SUVEI conversational Human Owner authority surfaces. These exact paths
+    // are reviewed as one bounded cross-surface authorization slice; do not
+    // replace them with directory-wide exemptions.
+    'RAGmodules/RAG_Overlay.html',
+    'modules/ipc/ragHandlers.js',
+    'modules/ipc/suveiHumanAuthorizationHandlers.js',
+    'modules/services/suveiHumanAuthorizationService.js',
+    'preloads/api/suveiHumanAuthorization.js',
+    'preloads/api/vcpLog.js',
+    'rust_chat_data_service/src/sync_wire.rs',
+    'tests/notification-change-audit.test.js',
+    'tests/suvei-human-authorization.test.js',
+    'scripts/check-design-system-boundary.mjs',
     // Deletion side of the 2026-08 documentation archive moves. Current
     // content is allowed only through the archive path pattern below.
     'docs/next-ui-webawesome-roadmap.md',

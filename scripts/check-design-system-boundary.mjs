@@ -516,6 +516,20 @@ const upstreamClassicPatterns = [
     /^RAGmodules\/RAG_Observer\.html$/,
 ];
 
+// These two legacy RAG surfaces must change only to close the reviewed SUVEI
+// Human-authorization bypass. Keep this file-level exception separate from the
+// Classic path patterns so no RAG directory or unrelated legacy surface gains
+// a parity exemption.
+const reviewedClassicSecurityExceptions = new Set([
+    'RAGmodules/RAG_Observer.html',
+    'RAGmodules/RAG_Overlay.html',
+]);
+for (const file of reviewedClassicSecurityExceptions) {
+    if (!allowedSourceDifferences.has(file)) {
+        failures.push(`${file}: reviewed Classic security exception must also be present in the source-difference allowlist`);
+    }
+}
+
 function git(args) {
     return execFileSync('git', ['-c', 'core.quotepath=false', ...args], { cwd: root, encoding: 'utf8' }).trim();
 }
@@ -662,7 +676,8 @@ if (sourceContext) {
         }
     }
     for (const file of sourceContext.changedPaths('upstream')) {
-        if (upstreamClassicPatterns.some(pattern => pattern.test(file))) {
+        if (upstreamClassicPatterns.some(pattern => pattern.test(file))
+            && !reviewedClassicSecurityExceptions.has(file)) {
             failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
         }
     }
@@ -694,7 +709,9 @@ if (sourceContext) {
         git(['rev-parse', '--verify', upstreamRef]);
         const classicDifferences = git(['diff', '--name-only', upstreamRef, '--'])
             .split('\n')
-            .filter(file => file && upstreamClassicPatterns.some(pattern => pattern.test(file)));
+            .filter(file => file
+                && upstreamClassicPatterns.some(pattern => pattern.test(file))
+                && !reviewedClassicSecurityExceptions.has(file));
         for (const file of classicDifferences) {
             failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
         }

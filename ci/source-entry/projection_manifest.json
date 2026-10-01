@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "7dc18a832604d41a89dedde70a13dcaba4608b40",
-          "size": 18473,
-          "sha256": "dbd2665a2da9e48718545d40aab6f7116a551dcfe25c1bb5a6942cba01a03f48",
+          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
+          "size": 18553,
+          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
           "kind": "source"
         },
         {

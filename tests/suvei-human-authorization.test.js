@@ -4,6 +4,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
     SuveiHumanAuthorizationService,
+    authorizationTermsDigest,
 } = require("../modules/services/suveiHumanAuthorizationService");
 
 const TOKEN = `suvei_local_v1_${"A".repeat(43)}`;
@@ -81,7 +82,10 @@ function intent(overrides = {}) {
     };
 }
 
-function harness({ now = Date.parse("2026-10-01T14:00:00.000Z") } = {}) {
+function harness({
+    now = Date.parse("2026-10-01T14:00:00.000Z"),
+    authorizeMode = "success",
+} = {}) {
     let currentIntent = intent();
     const calls = [];
     const settingsManager = { readSettings: async () => settings() };
@@ -116,13 +120,27 @@ function harness({ now = Date.parse("2026-10-01T14:00:00.000Z") } = {}) {
                 proposalState: "AUTHORIZED",
                 revision: currentIntent.revision + 1,
                 authorizedBy: OWNER,
+                authorizedAt: new Date(now).toISOString(),
+                authorizationExpiresAt: body.expiresAt,
                 executionGrantId: GRANT,
-                authorizationTermsDigest: "f".repeat(64),
+                authorizationTermsDigest: authorizeMode === "bad_digest"
+                    ? "0".repeat(64)
+                    : authorizationTermsDigest(currentIntent, OWNER, body),
             };
+            if (authorizeMode === "throw_after_commit") throw new Error("transport lost after commit");
             return json(currentIntent);
         }
         if (pathname.endsWith("/reject") && method === "POST") {
             currentIntent = { ...currentIntent, proposalState: "REJECTED", revision: currentIntent.revision + 1 };
+            return json(currentIntent);
+        }
+        if (pathname.endsWith("/revoke") && method === "POST") {
+            currentIntent = {
+                ...currentIntent,
+                proposalState: "REVOKED",
+                revision: currentIntent.revision + 1,
+                executionGrantId: null,
+            };
             return json(currentIntent);
         }
         throw new Error(`unexpected request ${method} ${pathname}`);
@@ -256,3 +274,92 @@ test("expired ToolBox approval cannot create a fresh Core authority window", asy
         error => error?.code === "SUVEI_APPROVAL_PACKET_EXPIRED"
     );
 });
+
+test("ambiguous authorize POST reconciles exact committed Core authority without resubmission", async () => {
+    const { service, calls } = harness({ authorizeMode: "throw_after_commit" });
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-ambiguous",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    const decision = await service.decide({ requestId: "approval-ambiguous", approved: true });
+    assert.equal(decision.proposalState, "AUTHORIZED");
+    assert.equal(calls.filter(call => call.pathname.endsWith("/authorize")).length, 1);
+    assert.ok(calls.filter(call => call.pathname === `/api/v1/projects/${PROJECT}/agent-execution-intents/${INTENT}`).length >= 2);
+});
+
+test("new ToolBox request can reconcile an already committed exact authorization without another authorize POST", async () => {
+    const { service, calls } = harness();
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-first",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    await service.decide({ requestId: "approval-first", approved: true });
+
+    const second = await service.prepare({
+        requestId: "approval-transport-recovery",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:10.000Z",
+        approvalTtlMs: 60000,
+    });
+    assert.equal(second.decisionMode, "reconcile_authorized");
+    assert.equal(second.authorizationCommitted, true);
+    const decision = await service.decide({ requestId: "approval-transport-recovery", approved: true });
+    assert.equal(decision.reconciled, true);
+    assert.equal(decision.proposalState, "AUTHORIZED");
+    assert.equal(calls.filter(call => call.pathname.endsWith("/authorize")).length, 1);
+});
+
+test("recovery rejection revokes the already committed Core authorization", async () => {
+    const { service, calls } = harness();
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-before-revoke",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    await service.decide({ requestId: "approval-before-revoke", approved: true });
+    await service.prepare({
+        requestId: "approval-revoke-recovery",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:10.000Z",
+        approvalTtlMs: 60000,
+    });
+    const decision = await service.decide({
+        requestId: "approval-revoke-recovery",
+        approved: false,
+        reason: "Do not continue.",
+    });
+    assert.equal(decision.proposalState, "REVOKED");
+    const revoke = calls.find(call => call.pathname.endsWith("/revoke"));
+    assert.ok(revoke);
+    assert.equal(revoke.body.reason, "Do not continue.");
+});
+
+test("mismatched Core authorization terms digest fails closed", async () => {
+    const { service } = harness({ authorizeMode: "bad_digest" });
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-bad-digest",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    await assert.rejects(
+        service.decide({ requestId: "approval-bad-digest", approved: true }),
+        error => error?.code === "SUVEI_AUTHORIZATION_RECEIPT_INVALID"
+    );
+});
+

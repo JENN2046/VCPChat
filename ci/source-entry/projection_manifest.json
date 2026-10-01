@@ -601,9 +601,9 @@
           "path": "rust_chat_data_service/src/sync_wire.rs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4c930cfd7f9f47437564709962767ced3b87435",
-          "size": 17444,
-          "sha256": "4584f75ace8481fe6580578f83c2fe9573401a412c4e3e3289ec2e952f68ef57",
+          "blob": "c558e392a658c645fa494b50398c672bda8d0046",
+          "size": 17450,
+          "sha256": "e1277eba91607aa0ee46e3802fe905e94244c8f1907913ffdbbf945cecba3c0c",
           "kind": "source"
         },
         {
@@ -8087,9 +8087,9 @@
           "path": "rust_chat_data_service/src/sync_wire.rs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4c930cfd7f9f47437564709962767ced3b87435",
-          "size": 17444,
-          "sha256": "4584f75ace8481fe6580578f83c2fe9573401a412c4e3e3289ec2e952f68ef57",
+          "blob": "c558e392a658c645fa494b50398c672bda8d0046",
+          "size": 17450,
+          "sha256": "e1277eba91607aa0ee46e3802fe905e94244c8f1907913ffdbbf945cecba3c0c",
           "kind": "source"
         },
         {
@@ -16015,9 +16015,9 @@
           "path": "rust_chat_data_service/src/sync_wire.rs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4c930cfd7f9f47437564709962767ced3b87435",
-          "size": 17444,
-          "sha256": "4584f75ace8481fe6580578f83c2fe9573401a412c4e3e3289ec2e952f68ef57",
+          "blob": "c558e392a658c645fa494b50398c672bda8d0046",
+          "size": 17450,
+          "sha256": "e1277eba91607aa0ee46e3802fe905e94244c8f1907913ffdbbf945cecba3c0c",
           "kind": "source"
         },
         {

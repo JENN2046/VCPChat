@@ -749,3 +749,45 @@ test("trusted IPC binds cleanup to each recreated main window", () => {
     assert.match(handlers, /return current && !current\.isDestroyed\(\) \? bindWindowCleanup\(current\) : null/);
 });
 
+test("logout invalidates an in-flight Owner login before it can commit credentials", async () => {
+    let releaseSession;
+    let markSessionStarted;
+    const sessionStarted = new Promise(resolve => { markSessionStarted = resolve; });
+    const sessionGate = new Promise(resolve => { releaseSession = resolve; });
+    const service = new SuveiHumanAuthorizationService({
+        settingsManager: { readSettings: async () => settings() },
+        fetchImpl: async (url, options = {}) => {
+            if (url.pathname === "/api/v1/auth/local/login") {
+                return json({ accessToken: TOKEN });
+            }
+            if (url.pathname === "/api/v1/auth/session") {
+                markSessionStarted();
+                await sessionGate;
+                return json({
+                    authenticated: true,
+                    userId: OWNER,
+                    organizationId: ORG,
+                    role: "owner",
+                    authSource: "local",
+                    userName: "Owner",
+                });
+            }
+            throw new Error(`unexpected request ${options.method || "GET"} ${url.pathname}`);
+        },
+    });
+
+    const login = service.login("exact owner password");
+    await sessionStarted;
+    const loggedOut = await service.logout();
+    assert.equal(loggedOut.authenticated, false);
+
+    releaseSession();
+    await assert.rejects(
+        login,
+        error => error?.code === "SUVEI_OWNER_LOGIN_CANCELLED"
+    );
+    assert.equal(service.status().authenticated, false);
+    assert.equal(service.status().identity, null);
+    assert.equal(service.status().binding, null);
+});
+

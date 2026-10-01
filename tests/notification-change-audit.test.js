@@ -130,3 +130,146 @@ test('ordinary tool approval does not expose change audit', () => {
 
     dom.window.close();
 });
+
+test('SUVEI Human authorization is never consumed by generic auto-approval rules', () => {
+    const { dom, window, sentMessages } = createAuditDom();
+    window.notificationRenderer.configureCapabilities({
+        filterManager: {
+            checkToolAutoApproval: () => ({ action: 'approve', rule: { name: 'unsafe catch-all' } }),
+            checkMessageFilter: () => null
+        }
+    });
+    const request = {
+        type: 'tool_approval_request',
+        data: {
+            requestId: 'suvei-human-approval-no-auto',
+            toolName: 'SUVEIStudio',
+            maid: 'Nova',
+            args: {
+                command: 'ExecuteAuthorizedGeneration',
+                projectId: '33333333-3333-4333-8333-333333333333',
+                intentId: '44444444-4444-5444-8444-444444444444'
+            },
+            timestamp: '2026-10-01T14:00:00.000Z',
+            approvalTtlMs: 300000
+        }
+    };
+
+    window.notificationRenderer.renderVCPLogNotification(
+        request,
+        JSON.stringify(request),
+        window.document.getElementById('notificationsList')
+    );
+
+    assert.deepEqual(sentMessages, [], 'SUVEI authority must never be auto-approved');
+    const actionLabels = Array.from(
+        window.document.querySelectorAll('.notification-actions button'),
+        button => button.textContent
+    );
+    assert.deepEqual(actionLabels, ['审视 SUVEI 授权']);
+    assert.match(window.document.querySelector('.notification-content').textContent, /canonical Intent/);
+
+    dom.window.close();
+});
+
+test('SUVEI Core authorization must commit before ToolBox receives approved=true', async () => {
+    const { dom, window, sentMessages } = createAuditDom();
+    let resolveDecision;
+    const decisionPromise = new Promise(resolve => { resolveDecision = resolve; });
+    const packet = {
+        schemaVersion: 'suvei_human_authorization_preview.v1',
+        requestId: 'suvei-core-before-toolbox',
+        projectId: '33333333-3333-4333-8333-333333333333',
+        intentId: '44444444-4444-5444-8444-444444444444',
+        authorityTargetDigest: 'f'.repeat(64),
+        toolApprovalExpiresAt: '2026-10-01T14:05:00.000Z',
+        intent: {
+            id: '44444444-4444-5444-8444-444444444444',
+            projectId: '33333333-3333-4333-8333-333333333333',
+            action: 'generate_candidate',
+            revision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            delegateUserId: '55555555-5555-4555-8555-555555555555',
+            productionUnitId: '99999999-9999-4999-8999-999999999999',
+            recipeId: '66666666-6666-4666-8666-666666666666',
+            recipeDigest: 'a'.repeat(64),
+            capabilityId: 'newapi.gpt-image-2.5-flare.v1',
+            capabilityVersion: '1',
+            requestedOutputCount: 1,
+            resolution: '1024x1024',
+            aspectRatio: '1:1',
+            normalizedReason: 'One bounded output'
+        },
+        authorization: {
+            expectedRevision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            expiresAt: '2026-10-01T14:30:00.000Z',
+            maxAttempts: 1,
+            maxOutputCount: 1,
+            maxTotalCredits: 1,
+            maxConcurrentAttempts: 1,
+            maxWallClockMs: 300000,
+            maxAdapterCallsPerAttempt: 1
+        }
+    };
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async () => decisionPromise;
+    window.chatAPI.loginSuveiHumanOwner = async () => ({ success: true });
+
+    const request = {
+        type: 'tool_approval_request',
+        data: {
+            requestId: packet.requestId,
+            toolName: 'SUVEIStudio',
+            maid: 'Nova',
+            args: {
+                command: 'ExecuteAuthorizedGeneration',
+                projectId: packet.projectId,
+                intentId: packet.intentId
+            },
+            timestamp: '2026-10-01T14:00:00.000Z',
+            approvalTtlMs: 300000
+        }
+    };
+
+    window.notificationRenderer.renderVCPLogNotification(
+        request,
+        JSON.stringify(request),
+        window.document.getElementById('notificationsList')
+    );
+
+    const reviewButton = Array.from(window.document.querySelectorAll('.notification-actions button'))
+        .find(button => button.textContent === '审视 SUVEI 授权');
+    assert.ok(reviewButton);
+    reviewButton.click();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const modal = window.document.getElementById('suveiHumanAuthorizationModal');
+    assert.ok(modal);
+    assert.equal(modal.style.display, 'flex');
+    assert.match(window.document.getElementById('suveiHumanAuthorizationPacket').textContent, /Authority Target Digest/);
+
+    window.document.getElementById('approveSuveiHumanAuthorization').click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(sentMessages, [], 'ToolBox must stay blocked while Core authorization is pending');
+
+    resolveDecision({
+        success: true,
+        decision: {
+            approved: true,
+            proposalState: 'AUTHORIZED',
+            authorityTargetDigest: packet.authorityTargetDigest
+        }
+    });
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.deepEqual(sentMessages, [{
+        type: 'tool_approval_response',
+        data: {
+            requestId: packet.requestId,
+            approved: true
+        }
+    }]);
+
+    dom.window.close();
+});

@@ -4370,9 +4370,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8dc8270ef862407c3a2ab5d1b9b9ff6497902563",
-          "size": 94137,
-          "sha256": "acb4113358abc4b1ab26e60bfeb0746aca954076d4052d0969707575f7a90b6a",
+          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
+          "size": 95787,
+          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
           "kind": "source"
         },
         {
@@ -5099,9 +5099,9 @@
           "path": "modules/ipc/ragHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "404445c5067a29fa5b807d4da01aaf5adc5b402d",
-          "size": 18705,
-          "sha256": "66f948ee98bd8cc3a3a94cb8ffcdc55cd1f0ffdf635fe15f1862bb5c604fa303",
+          "blob": "2d177c5106f5b2ae2e61f58d2cae48037d78c50f",
+          "size": 19541,
+          "sha256": "1ff9732fa291b70ce6c987c56727da75a5a1a49e3560bf610a800f0b69a7f43d",
           "kind": "source"
         },
         {
@@ -5405,9 +5405,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "55329ac822f2e8da878fff963d17d4b789302c6f",
-          "size": 55779,
-          "sha256": "c170f723d5aad769a1260c211a02865ce18d31a62b8724399c3c82f3f38e9eb0",
+          "blob": "60e964c6a2f50f7e7a69df5ab73ccb36516b6d31",
+          "size": 57121,
+          "sha256": "73a030263817a34a362497b805867f8d00f0369df77d38abb18e1f45e293968b",
           "kind": "source"
         },
         {
@@ -7727,9 +7727,9 @@
           "path": "preloads/api/vcpLog.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c1ba80e7350c4e3b41d769e19961ef5008c74b68",
-          "size": 795,
-          "sha256": "b54e8d1fea6850cc61f2d3028a920128f2b44b3bade0ce46b000311def6caff7",
+          "blob": "b04d1bf8e0298db4326f6efcf91b78b42d3275e2",
+          "size": 902,
+          "sha256": "77e68bc1b1224e5bb7180a30994f826f7f4d4eb94646d3f10901011e325c8c1c",
           "kind": "source"
         },
         {
@@ -10238,18 +10238,18 @@
           "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b952d4640d16cff1dafa2e09c4b4e5ce3898b3e6",
-          "size": 2158,
-          "sha256": "a3560f7a258cd3f41b353d93f7dd4734da6aeb98b9400edc744a7d8db5b67513",
+          "blob": "5e5707d48c0fbbf1e100a4f7124b09a183775117",
+          "size": 2431,
+          "sha256": "ab97d3371b7aa40de1995738f6072c7f24f98ea154bcaeef52d5947445a28617",
           "kind": "source"
         },
         {
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "20737f2a1367038f0fd26d5e4362dda5abed91d9",
-          "size": 27534,
-          "sha256": "bf89e5c4c2fd7f1a28d8728a48b19ac54b442612843d21bcd2777c578d2986e2",
+          "blob": "5b1363bcbc1c7b3281a7e84757e3ab888767d0d5",
+          "size": 30232,
+          "sha256": "709c6659eabb32496b09ab07b4cc67c7bfa7f7d4d665f61dc16d85a2a4cb8ced",
           "kind": "source"
         },
         {
@@ -10902,18 +10902,18 @@
           "path": "RAGmodules/RAG_Observer.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "633a3dcdb3a5193f9a36c9ad0dcc1ceb87e1c07e",
-          "size": 169947,
-          "sha256": "c9e8a15f19737bb92ab2dd9ccf3b7661ac21023f442ae52dff5a0a77c96e4f8c",
+          "blob": "f9bce3b58bc7b39aff44e84c461b9d635a907a68",
+          "size": 171629,
+          "sha256": "266d54a65c61e2535c8627b37083539a86cf44b9e6b2f55077847fd2a8562499",
           "kind": "source"
         },
         {
           "path": "RAGmodules/RAG_Overlay.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "66ed723fe4cf14055ca4285d965804f67c7e293d",
-          "size": 23908,
-          "sha256": "1a6cf4f7d263abedfffdd09821f31192bcd9dc359c93921fe3e58f7e6de03ad1",
+          "blob": "f94b8a63b80f8137f5a76fa303be8d57804ba64a",
+          "size": 25032,
+          "sha256": "ef97141d204fdc87afc50268e8d5d77e33ee82ebd9f9b9ec69051c942c0e9142",
           "kind": "source"
         },
         {
@@ -12424,9 +12424,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8dc8270ef862407c3a2ab5d1b9b9ff6497902563",
-          "size": 94137,
-          "sha256": "acb4113358abc4b1ab26e60bfeb0746aca954076d4052d0969707575f7a90b6a",
+          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
+          "size": 95787,
+          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
           "kind": "source"
         },
         {
@@ -13135,9 +13135,9 @@
           "path": "modules/ipc/ragHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "404445c5067a29fa5b807d4da01aaf5adc5b402d",
-          "size": 18705,
-          "sha256": "66f948ee98bd8cc3a3a94cb8ffcdc55cd1f0ffdf635fe15f1862bb5c604fa303",
+          "blob": "2d177c5106f5b2ae2e61f58d2cae48037d78c50f",
+          "size": 19541,
+          "sha256": "1ff9732fa291b70ce6c987c56727da75a5a1a49e3560bf610a800f0b69a7f43d",
           "kind": "source"
         },
         {
@@ -13441,9 +13441,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "55329ac822f2e8da878fff963d17d4b789302c6f",
-          "size": 55779,
-          "sha256": "c170f723d5aad769a1260c211a02865ce18d31a62b8724399c3c82f3f38e9eb0",
+          "blob": "60e964c6a2f50f7e7a69df5ab73ccb36516b6d31",
+          "size": 57121,
+          "sha256": "73a030263817a34a362497b805867f8d00f0369df77d38abb18e1f45e293968b",
           "kind": "source"
         },
         {
@@ -15718,9 +15718,9 @@
           "path": "preloads/api/vcpLog.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c1ba80e7350c4e3b41d769e19961ef5008c74b68",
-          "size": 795,
-          "sha256": "b54e8d1fea6850cc61f2d3028a920128f2b44b3bade0ce46b000311def6caff7",
+          "blob": "b04d1bf8e0298db4326f6efcf91b78b42d3275e2",
+          "size": 902,
+          "sha256": "77e68bc1b1224e5bb7180a30994f826f7f4d4eb94646d3f10901011e325c8c1c",
           "kind": "source"
         },
         {
@@ -18931,18 +18931,18 @@
           "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b952d4640d16cff1dafa2e09c4b4e5ce3898b3e6",
-          "size": 2158,
-          "sha256": "a3560f7a258cd3f41b353d93f7dd4734da6aeb98b9400edc744a7d8db5b67513",
+          "blob": "5e5707d48c0fbbf1e100a4f7124b09a183775117",
+          "size": 2431,
+          "sha256": "ab97d3371b7aa40de1995738f6072c7f24f98ea154bcaeef52d5947445a28617",
           "kind": "source"
         },
         {
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "20737f2a1367038f0fd26d5e4362dda5abed91d9",
-          "size": 27534,
-          "sha256": "bf89e5c4c2fd7f1a28d8728a48b19ac54b442612843d21bcd2777c578d2986e2",
+          "blob": "5b1363bcbc1c7b3281a7e84757e3ab888767d0d5",
+          "size": 30232,
+          "sha256": "709c6659eabb32496b09ab07b4cc67c7bfa7f7d4d665f61dc16d85a2a4cb8ced",
           "kind": "source"
         },
         {
@@ -18958,18 +18958,18 @@
           "path": "tests/notification-change-audit.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4848abcbdcf253878c4666163a9f0d8795d330cd",
-          "size": 14340,
-          "sha256": "eeec2b86d3c7a16d1ef95c783a6e870e5e1952425a0e438a480ab56e5a3c9c32",
+          "blob": "c4e8dd70ffd8f4cc14bfb3f1fe7611b5d6b9ece6",
+          "size": 19045,
+          "sha256": "753d250e11d226298e9ff040e3741ea5d8ae97bdc5ffa1cb9f1b900c5dbc60c5",
           "kind": "source"
         },
         {
           "path": "tests/suvei-human-authorization.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4b11fef6d981b1cfe2c0d66c7cb79a5bca59f20d",
-          "size": 18079,
-          "sha256": "2c00b0ba594aed4ee305c3d1e5a4b2a0f5335784d155780e1f3e8f92e3b444e1",
+          "blob": "b7ab335d03363c77d29933b745d5587514b5ef54",
+          "size": 23310,
+          "sha256": "75be43c6a7eedf93ba92dc6062c4610b7261cd154c85dbc83ea8cf4e2fc7feb5",
           "kind": "source"
         }
       ],

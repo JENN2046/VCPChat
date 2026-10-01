@@ -248,41 +248,74 @@ class SuveiHumanAuthorizationService {
         if (!baseUrl) fail("SUVEI_OWNER_BASE_URL_REQUIRED");
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-        let response;
+        timer.unref?.();
         try {
-            response = await this.fetchImpl(new URL(pathname, baseUrl), {
-                method,
-                redirect: "error",
-                signal: controller.signal,
-                headers: {
-                    accept: "application/json",
-                    ...(body !== undefined ? { "content-type": "application/json" } : {}),
-                    ...(token ? { authorization: `Bearer ${token}` } : {}),
-                },
-                body: body === undefined ? undefined : JSON.stringify(body),
-            });
-        } catch (error) {
-            if (error?.name === "AbortError") fail("SUVEI_OWNER_CORE_TIMEOUT");
-            fail("SUVEI_OWNER_CORE_UNAVAILABLE");
+            let response;
+            try {
+                response = await this.fetchImpl(new URL(pathname, baseUrl), {
+                    method,
+                    redirect: "error",
+                    signal: controller.signal,
+                    headers: {
+                        accept: "application/json",
+                        ...(body !== undefined ? { "content-type": "application/json" } : {}),
+                        ...(token ? { authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: body === undefined ? undefined : JSON.stringify(body),
+                });
+            } catch (error) {
+                if (error?.name === "AbortError" || controller.signal.aborted) {
+                    fail("SUVEI_OWNER_CORE_TIMEOUT");
+                }
+                fail("SUVEI_OWNER_CORE_UNAVAILABLE");
+            }
+
+            if (response.status === 401 && token && token === this.token) this.clearSession();
+            if (!response.ok) {
+                try { await response.body?.cancel?.(); } catch {}
+                fail(`CORE_HTTP_${response.status}`, "SUVEI Core request failed", response.status);
+            }
+
+            const contentLengthHeader = response.headers?.get?.("content-length");
+            if (contentLengthHeader !== null && contentLengthHeader !== undefined && contentLengthHeader !== "") {
+                if (!/^[0-9]+$/.test(contentLengthHeader)
+                    || Number(contentLengthHeader) > RESPONSE_MAX_BYTES) {
+                    try { await response.body?.cancel?.(); } catch {}
+                    fail("SUVEI_OWNER_RESPONSE_TOO_LARGE");
+                }
+            }
+
+            const reader = response.body?.getReader?.();
+            if (!reader) fail("SUVEI_OWNER_RESPONSE_INVALID");
+            const chunks = [];
+            let total = 0;
+            try {
+                while (true) {
+                    const next = await reader.read();
+                    if (next.done) break;
+                    const chunk = Buffer.from(next.value);
+                    total += chunk.length;
+                    if (total > RESPONSE_MAX_BYTES) {
+                        try { await reader.cancel(); } catch {}
+                        fail("SUVEI_OWNER_RESPONSE_TOO_LARGE");
+                    }
+                    chunks.push(chunk);
+                }
+            } catch (error) {
+                if (error instanceof SuveiHumanAuthorizationError) throw error;
+                if (error?.name === "AbortError" || controller.signal.aborted) {
+                    fail("SUVEI_OWNER_CORE_TIMEOUT");
+                }
+                fail("SUVEI_OWNER_CORE_UNAVAILABLE");
+            }
+
+            const text = Buffer.concat(chunks, total).toString("utf8");
+            let parsed;
+            try { parsed = JSON.parse(text); } catch { fail("SUVEI_OWNER_RESPONSE_INVALID"); }
+            return unwrap(parsed);
         } finally {
             clearTimeout(timer);
         }
-
-        if (response.status === 401 && token && token === this.token) this.clearSession();
-        if (!response.ok) {
-            try { await response.body?.cancel?.(); } catch {}
-            fail(`CORE_HTTP_${response.status}`, "SUVEI Core request failed", response.status);
-        }
-        const contentLength = Number(response.headers?.get?.("content-length") || 0);
-        if (contentLength > RESPONSE_MAX_BYTES) {
-            try { await response.body?.cancel?.(); } catch {}
-            fail("SUVEI_OWNER_RESPONSE_TOO_LARGE");
-        }
-        const text = await response.text();
-        if (Buffer.byteLength(text) > RESPONSE_MAX_BYTES) fail("SUVEI_OWNER_RESPONSE_TOO_LARGE");
-        let parsed;
-        try { parsed = JSON.parse(text); } catch { fail("SUVEI_OWNER_RESPONSE_INVALID"); }
-        return unwrap(parsed);
     }
 
     async login(password) {

@@ -90,7 +90,7 @@ test('main-window tool approval exposes change audit and submits modal reason', 
     window.document.getElementById('toolChangeAuditReason').value = '已核对新增代码，可以执行。';
     window.document.getElementById('approveToolChangeAudit').click();
 
-    assert.deepEqual(sentMessages, [{
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), [{
         type: 'tool_approval_response',
         data: {
             requestId: 'approve-change-audit-test',
@@ -161,7 +161,7 @@ test('SUVEI Human authorization is never consumed by generic auto-approval rules
         window.document.getElementById('notificationsList')
     );
 
-    assert.deepEqual(sentMessages, [], 'SUVEI authority must never be auto-approved');
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), [], 'SUVEI authority must never be auto-approved');
     const actionLabels = Array.from(
         window.document.querySelectorAll('.notification-actions button'),
         button => button.textContent
@@ -251,7 +251,7 @@ test('SUVEI Core authorization must commit before ToolBox receives approved=true
 
     window.document.getElementById('approveSuveiHumanAuthorization').click();
     await new Promise(resolve => setImmediate(resolve));
-    assert.deepEqual(sentMessages, [], 'ToolBox must stay blocked while Core authorization is pending');
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), [], 'ToolBox must stay blocked while Core authorization is pending');
 
     resolveDecision({
         success: true,
@@ -263,7 +263,7 @@ test('SUVEI Core authorization must commit before ToolBox receives approved=true
     });
     await new Promise(resolve => setImmediate(resolve));
 
-    assert.deepEqual(sentMessages, [{
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), [{
         type: 'tool_approval_response',
         data: {
             requestId: packet.requestId,

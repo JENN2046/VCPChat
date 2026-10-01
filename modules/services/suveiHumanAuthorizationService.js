@@ -400,17 +400,18 @@ class SuveiHumanAuthorizationService {
         const projectId = exactUuid(args.projectId, "SUVEI_APPROVAL_PROJECT_ID_INVALID");
         const intentId = exactUuid(args.intentId, "SUVEI_APPROVAL_INTENT_ID_INVALID");
         const intent = await this.getIntent(projectId, intentId);
-        assertIntentShape(intent, this.binding, projectId, intentId, expectedAction, ["PENDING", "AUTHORIZED"]);
+        assertIntentShape(intent, this.binding, projectId, intentId, expectedAction, ["PENDING", "AUTHORIZED", "REJECTED"]);
 
         const requested = intent.requestedOutputCount;
         const reconciliation = intent.proposalState === "AUTHORIZED";
+        const rejectionReconciliation = intent.proposalState === "REJECTED";
         const committedExpiry = reconciliation ? Date.parse(String(intent.authorizationExpiresAt || "")) : NaN;
         if (reconciliation && (!Number.isFinite(committedExpiry)
             || this.now() + MIN_TOOL_REMAINING_MS > committedExpiry
             || intent.revision < 1)) {
             fail("SUVEI_COMMITTED_AUTHORIZATION_EXPIRED");
         }
-        const authorization = {
+        const authorization = rejectionReconciliation ? null : {
             expectedRevision: reconciliation ? intent.revision - 1 : intent.revision,
             requestFingerprint: intent.requestFingerprint,
             expiresAt: reconciliation
@@ -423,11 +424,19 @@ class SuveiHumanAuthorizationService {
             maxWallClockMs: MAX_WALL_CLOCK_MS,
             maxAdapterCallsPerAttempt: 1,
         };
-        const expectedAuthorizationTermsDigest = authorizationTermsDigest(
-            intent,
-            this.identity.userId,
-            authorization,
-        );
+        const expectedAuthorizationTermsDigest = rejectionReconciliation
+            ? null
+            : authorizationTermsDigest(intent, this.identity.userId, authorization);
+
+        if (rejectionReconciliation) {
+            this.assertCommittedRejection(intent, {
+                projectId,
+                intentId,
+                expectedAction,
+                rejectionExpectedRevision: intent.revision - 1,
+                requestFingerprint: intent.requestFingerprint,
+            });
+        }
 
         if (reconciliation) {
             if (String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
@@ -441,7 +450,9 @@ class SuveiHumanAuthorizationService {
 
         const intentSnapshot = canonicalIntentSnapshot(intent);
         const canonicalIntentDigest = canonicalDigest(intentSnapshot);
-        const decisionMode = reconciliation ? "reconcile_authorized" : "authorize";
+        const decisionMode = rejectionReconciliation
+            ? "reconcile_rejected"
+            : (reconciliation ? "reconcile_authorized" : "authorize");
         const authorityTargetDigest = canonicalDigest({
             schemaVersion: "suvei_human_authorization_target.v1",
             requestId,
@@ -492,6 +503,8 @@ class SuveiHumanAuthorizationService {
             authorityTargetDigest,
             expectedAuthorizationTermsDigest,
             authorization,
+            rejectionExpectedRevision: rejectionReconciliation ? intent.revision - 1 : null,
+            requestFingerprint: intent.requestFingerprint,
             toolApprovalDeadline,
         });
         return packet;
@@ -536,6 +549,49 @@ class SuveiHumanAuthorizationService {
             if (reconcileError === originalError) throw originalError;
             if (reconcileError?.code === "SUVEI_AUTHORIZATION_RECEIPT_INVALID"
                 || reconcileError?.code === "SUVEI_AUTHORIZATION_OUTCOME_CONFLICT") {
+                throw reconcileError;
+            }
+            throw originalError;
+        }
+    }
+
+    assertCommittedRejection(intent, pending) {
+        assertIntentShape(
+            intent,
+            this.binding,
+            pending.projectId,
+            pending.intentId,
+            pending.expectedAction,
+            ["REJECTED"],
+        );
+        if (!Number.isInteger(pending.rejectionExpectedRevision)
+            || pending.rejectionExpectedRevision < 0
+            || intent.revision !== pending.rejectionExpectedRevision + 1
+            || intent.requestFingerprint !== pending.requestFingerprint
+            || intent.authorizedBy !== null
+            || intent.authorizedAt !== null
+            || intent.authorizationExpiresAt !== null
+            || intent.authorizationTermsDigest !== null
+            || intent.executionGrantId !== null
+            || intent.executionOperationId !== null
+            || intent.executionCommandId !== null) {
+            fail("SUVEI_REJECTION_RECEIPT_INVALID");
+        }
+        return intent;
+    }
+
+    async reconcileRejection(pending, originalError) {
+        try {
+            const current = await this.getIntent(pending.projectId, pending.intentId);
+            if (current?.proposalState === "REJECTED") {
+                return this.assertCommittedRejection(current, pending);
+            }
+            if (current?.proposalState === "PENDING") throw originalError;
+            fail("SUVEI_REJECTION_OUTCOME_CONFLICT");
+        } catch (reconcileError) {
+            if (reconcileError === originalError) throw originalError;
+            if (reconcileError?.code === "SUVEI_REJECTION_RECEIPT_INVALID"
+                || reconcileError?.code === "SUVEI_REJECTION_OUTCOME_CONFLICT") {
                 throw reconcileError;
             }
             throw originalError;
@@ -595,7 +651,10 @@ class SuveiHumanAuthorizationService {
         let current = await this.getIntent(pending.projectId, pending.intentId);
         let updated;
 
-        if (approved === true) {
+        if (current.proposalState === "REJECTED") {
+            if (approved === true) fail("SUVEI_REJECTED_INTENT_CANNOT_APPROVE");
+            updated = this.assertCommittedRejection(current, pending);
+        } else if (approved === true) {
             if (current.proposalState === "AUTHORIZED") {
                 updated = this.assertCommittedAuthorization(current, pending);
             } else {
@@ -639,8 +698,9 @@ class SuveiHumanAuthorizationService {
             } catch (error) {
                 updated = await this.reconcileRevocation(pending, current, error);
             }
-        } else if (current.proposalState === "REVOKED" && approved !== true) {
-            const authorizedRevision = pending.authorization.expectedRevision + 1;
+        } else if (current.proposalState === "REVOKED") {
+            const authorizedRevision = pending.authorization?.expectedRevision + 1;
+            if (!Number.isInteger(authorizedRevision)) fail("SUVEI_REVOCATION_RECEIPT_INVALID");
             const authorizedIntent = {
                 ...current,
                 proposalState: "AUTHORIZED",
@@ -661,19 +721,28 @@ class SuveiHumanAuthorizationService {
                 this.pending.delete(requestId);
                 fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
             }
-            updated = await this.request(
-                `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/reject`,
-                {
-                    method: "POST",
-                    body: {
-                        expectedRevision: pending.authorization.expectedRevision,
-                        reason: normalizedReason || "Rejected from VCPChat human authorization surface.",
+            try {
+                updated = await this.request(
+                    `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/reject`,
+                    {
+                        method: "POST",
+                        body: {
+                            expectedRevision: pending.authorization.expectedRevision,
+                            reason: normalizedReason || "Rejected from VCPChat human authorization surface.",
+                        },
                     },
-                },
-            );
-            if (!updated || updated.proposalState !== "REJECTED"
-                || String(updated.id).toLowerCase() !== pending.intentId) {
-                fail("SUVEI_REJECTION_RECEIPT_INVALID");
+                );
+                updated = this.assertCommittedRejection(updated, {
+                    ...pending,
+                    rejectionExpectedRevision: pending.authorization.expectedRevision,
+                    requestFingerprint: pending.authorization.requestFingerprint,
+                });
+            } catch (error) {
+                updated = await this.reconcileRejection({
+                    ...pending,
+                    rejectionExpectedRevision: pending.authorization.expectedRevision,
+                    requestFingerprint: pending.authorization.requestFingerprint,
+                }, error);
             }
         }
 
@@ -682,7 +751,10 @@ class SuveiHumanAuthorizationService {
             schemaVersion: "suvei_human_authorization_decision.v1",
             requestId,
             approved: approved === true,
-            reconciled: pending.decisionMode === "reconcile_authorized" || (approved === true && current.proposalState === "AUTHORIZED"),
+            reconciled: pending.decisionMode === "reconcile_authorized"
+                || pending.decisionMode === "reconcile_rejected"
+                || (approved === true && current.proposalState === "AUTHORIZED")
+                || (approved !== true && current.proposalState === "REJECTED"),
             authorityTargetDigest: pending.authorityTargetDigest,
             intentId: pending.intentId,
             projectId: pending.projectId,

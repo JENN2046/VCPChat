@@ -333,7 +333,11 @@ class SuveiHumanAuthorizationService {
             authorization,
         });
         const ttlMs = normalizedTtl(approvalData.approvalTtlMs);
-        const toolApprovalExpiresAt = new Date(this.now() + ttlMs).toISOString();
+        const requestStartedAt = Date.parse(String(approvalData.timestamp || ""));
+        const deadlineBase = Number.isFinite(requestStartedAt) ? requestStartedAt : this.now();
+        const toolApprovalDeadline = deadlineBase + ttlMs;
+        if (this.now() + MIN_TOOL_REMAINING_MS > toolApprovalDeadline) fail("SUVEI_APPROVAL_PACKET_EXPIRED");
+        const toolApprovalExpiresAt = new Date(toolApprovalDeadline).toISOString();
         const packet = {
             schemaVersion: "suvei_human_authorization_preview.v1",
             requestId,
@@ -355,7 +359,7 @@ class SuveiHumanAuthorizationService {
             canonicalIntentDigest,
             authorityTargetDigest,
             authorization,
-            toolApprovalDeadline: this.now() + ttlMs,
+            toolApprovalDeadline,
         });
         return packet;
     }

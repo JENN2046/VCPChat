@@ -24,6 +24,7 @@ let mainWindow = null;
 let openChildWindows = [];
 let SETTINGS_FILE = '';
 let ipcHandlersRegistered = false;
+const protectedSuveiApprovalRequestIds = new Set();
 
 function normalizeRagOverlayState(rawState = {}) {
     const state = rawState && typeof rawState === 'object' ? rawState : {};
@@ -346,6 +347,14 @@ function initialize(params) {
 
     ipcMain.on('rag-overlay-show', (event, payload = {}) => {
         if (ragOverlayState.enabled === false) return;
+        if (Array.isArray(payload.pendingApprovals)) {
+            protectedSuveiApprovalRequestIds.clear();
+            for (const approval of payload.pendingApprovals) {
+                if (approval?.requiresTrustedHumanAuthorization === true && approval.requestId) {
+                    protectedSuveiApprovalRequestIds.add(String(approval.requestId));
+                }
+            }
+        }
 
         const overlayWin = ensureRagOverlayWindow();
         if (!overlayWin || overlayWin.isDestroyed()) return;
@@ -489,11 +498,20 @@ function initialize(params) {
     });
 
     ipcMain.on('rag-overlay-approval-action', (event, payload = {}) => {
+        if (!ragOverlayWindow || ragOverlayWindow.isDestroyed()
+            || event?.sender !== ragOverlayWindow.webContents) {
+            return;
+        }
+        const requestId = String(payload.requestId || '');
+        if (protectedSuveiApprovalRequestIds.has(requestId)) {
+            console.warn('[RAG Overlay] Refused SUVEI protected approval relay:', requestId);
+            return;
+        }
         if (ragObserverWindow && !ragObserverWindow.isDestroyed()) {
             const reasonRaw = typeof payload.reason === 'string' ? payload.reason : '';
             const reason = reasonRaw.trim().slice(0, 1000);
             ragObserverWindow.webContents.send('rag-overlay-approval-action', {
-                requestId: payload.requestId,
+                requestId,
                 approved: !!payload.approved,
                 reason
             });

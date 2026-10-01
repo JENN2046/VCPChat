@@ -2,6 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
 const {
     SuveiHumanAuthorizationService,
     authorizationTermsDigest,
@@ -521,5 +522,22 @@ test("ambiguous revoke POST reconciles the exact committed REVOKED state", async
     assert.ok(calls.filter(call =>
         call.pathname === `/api/v1/projects/${PROJECT}/agent-execution-intents/${INTENT}`
     ).length >= 4);
+});
+
+test("trusted Human authorization IPC follows the current main window and confirmed VCPLog send is chat-only", () => {
+    const main = fs.readFileSync("main.js", "utf8");
+    const handlers = fs.readFileSync("modules/ipc/suveiHumanAuthorizationHandlers.js", "utf8");
+    const vcpLogPreload = fs.readFileSync("preloads/api/vcpLog.js", "utf8");
+
+    const createIndex = main.indexOf("createWindow({ deferLoad: true })");
+    const initIndex = main.indexOf("suveiHumanAuthorizationHandlers.initialize({");
+    assert.ok(createIndex >= 0 && initIndex > createIndex);
+    assert.match(main, /getMainWindow:\s*\(\) => mainWindow/);
+    assert.match(handlers, /typeof getMainWindow === "function" \? getMainWindow\(\) : mainWindow/);
+
+    assert.match(main, /ipcMain\.handle\('send-vcplog-message-confirmed'/);
+    assert.match(main, /event\?\.sender !== mainWindow\.webContents/);
+    assert.match(vcpLogPreload, /sendVCPLogMessageConfirmed:\s*invoke\('send-vcplog-message-confirmed'/);
+    assert.match(vcpLogPreload, /\.roles\('chat'\)/);
 });
 

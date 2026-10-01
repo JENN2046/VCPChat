@@ -89,6 +89,7 @@ function intent(overrides = {}) {
 function harness({
     now = Date.parse("2026-10-01T14:00:00.000Z"),
     authorizeMode = "success",
+    rejectMode = "success",
     revokeMode = "success",
 } = {}) {
     let clock = now;
@@ -138,6 +139,7 @@ function harness({
         }
         if (pathname.endsWith("/reject") && method === "POST") {
             currentIntent = { ...currentIntent, proposalState: "REJECTED", revision: currentIntent.revision + 1 };
+            if (rejectMode === "throw_after_commit") throw new Error("reject response lost after commit");
             return json(currentIntent);
         }
         if (pathname.endsWith("/revoke") && method === "POST") {
@@ -539,5 +541,107 @@ test("trusted Human authorization IPC follows the current main window and confir
     assert.match(main, /event\?\.sender !== mainWindow\.webContents/);
     assert.match(vcpLogPreload, /sendVCPLogMessageConfirmed:\s*invoke\('send-vcplog-message-confirmed'/);
     assert.match(vcpLogPreload, /\.roles\('chat'\)/);
+});
+
+test("ambiguous reject POST reconciles exact committed REJECTED state without replay", async () => {
+    const { service, calls } = harness({ rejectMode: "throw_after_commit" });
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-reject-ambiguous",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    const decision = await service.decide({
+        requestId: "approval-reject-ambiguous",
+        approved: false,
+        reason: "Reject exact pending intent.",
+    });
+    assert.equal(decision.proposalState, "REJECTED");
+    assert.equal(decision.approved, false);
+    assert.equal(calls.filter(call => call.pathname.endsWith("/reject")).length, 1);
+    assert.ok(calls.filter(call =>
+        call.pathname === `/api/v1/projects/${PROJECT}/agent-execution-intents/${INTENT}`
+    ).length >= 2);
+});
+
+test("new ToolBox request can recover an already committed rejection but cannot reverse it", async () => {
+    const { service, calls } = harness();
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-reject-first",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    await service.decide({
+        requestId: "approval-reject-first",
+        approved: false,
+        reason: "Reject once.",
+    });
+
+    const packet = await service.prepare({
+        requestId: "approval-reject-recovery",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:10.000Z",
+        approvalTtlMs: 60000,
+    });
+    assert.equal(packet.decisionMode, "reconcile_rejected");
+    assert.equal(packet.intent.proposalState, "REJECTED");
+    assert.equal(packet.authorization, null);
+
+    await assert.rejects(
+        service.decide({ requestId: "approval-reject-recovery", approved: true }),
+        error => error?.code === "SUVEI_REJECTED_INTENT_CANNOT_APPROVE"
+    );
+
+    const secondPacket = await service.prepare({
+        requestId: "approval-reject-recovery-2",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:10.000Z",
+        approvalTtlMs: 60000,
+    });
+    assert.equal(secondPacket.decisionMode, "reconcile_rejected");
+    const decision = await service.decide({
+        requestId: "approval-reject-recovery-2",
+        approved: false,
+    });
+    assert.equal(decision.reconciled, true);
+    assert.equal(decision.proposalState, "REJECTED");
+    assert.equal(calls.filter(call => call.pathname.endsWith("/reject")).length, 1);
+});
+
+test("Core response streaming is bounded even without Content-Length", async () => {
+    let cancelled = false;
+    let pulls = 0;
+    const stream = new ReadableStream({
+        pull(controller) {
+            pulls += 1;
+            controller.enqueue(new Uint8Array(600_000));
+        },
+        cancel() {
+            cancelled = true;
+        },
+    });
+    const service = new SuveiHumanAuthorizationService({
+        settingsManager: { readSettings: async () => settings() },
+        fetchImpl: async () => new Response(stream, {
+            status: 200,
+            headers: { "content-type": "application/json" },
+        }),
+    });
+    await assert.rejects(
+        service.request("/bounded-stream", {
+            token: null,
+            baseUrl: "https://suvei.example.invalid",
+        }),
+        error => error?.code === "SUVEI_OWNER_RESPONSE_TOO_LARGE"
+    );
+    assert.ok(pulls >= 2);
+    assert.equal(cancelled, true);
 });
 

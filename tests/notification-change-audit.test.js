@@ -31,6 +31,10 @@ function createAuditDom() {
     window.chatAPI = {
         sendVCPLogMessage(message) {
             sentMessages.push(message);
+        },
+        async sendVCPLogMessageConfirmed(message) {
+            sentMessages.push(message);
+            return { success: true, queued: true };
         }
     };
     window.CSS ||= {};
@@ -372,5 +376,112 @@ test('SUVEI recovery surface distinguishes resume from a fresh authorization', a
     }]);
 
     dom.window.close();
+});
+
+test('SUVEI modal stays open when confirmed VCPLog transport is unavailable after Core commit', async () => {
+    const { dom, window, sentMessages } = createAuditDom();
+    const packet = {
+        schemaVersion: 'suvei_human_authorization_preview.v1',
+        requestId: 'suvei-confirmed-transport-failure',
+        projectId: '33333333-3333-4333-8333-333333333333',
+        intentId: '44444444-4444-5444-8444-444444444444',
+        decisionMode: 'authorize',
+        authorizationCommitted: false,
+        authorityTargetDigest: 'f'.repeat(64),
+        toolApprovalExpiresAt: '2026-10-01T14:05:00.000Z',
+        intent: {
+            id: '44444444-4444-5444-8444-444444444444',
+            projectId: '33333333-3333-4333-8333-333333333333',
+            proposalState: 'PENDING',
+            action: 'generate_candidate',
+            revision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            delegateUserId: '55555555-5555-4555-8555-555555555555',
+            productionUnitId: '99999999-9999-4999-8999-999999999999',
+            recipeId: '66666666-6666-4666-8666-666666666666',
+            recipeDigest: 'a'.repeat(64),
+            capabilityId: 'newapi.gpt-image-2.5-flare.v1',
+            capabilityVersion: '1',
+            requestedOutputCount: 1,
+            resolution: '1024x1024',
+            aspectRatio: '1:1',
+            normalizedReason: 'One bounded output'
+        },
+        authorization: {
+            expectedRevision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            expiresAt: '2026-10-01T14:30:00.000Z',
+            maxAttempts: 1,
+            maxOutputCount: 1,
+            maxTotalCredits: 1,
+            maxConcurrentAttempts: 1,
+            maxWallClockMs: 300000,
+            maxAdapterCallsPerAttempt: 1
+        }
+    };
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async () => ({
+        success: true,
+        decision: { approved: true, proposalState: 'AUTHORIZED' }
+    });
+    window.chatAPI.loginSuveiHumanOwner = async () => ({ success: true });
+    window.chatAPI.sendVCPLogMessageConfirmed = async () => ({
+        success: false,
+        code: 'VCPLOG_NOT_CONNECTED'
+    });
+
+    const request = {
+        type: 'tool_approval_request',
+        data: {
+            requestId: packet.requestId,
+            toolName: 'SUVEIStudio',
+            maid: 'Nova',
+            args: {
+                command: 'ExecuteAuthorizedGeneration',
+                projectId: packet.projectId,
+                intentId: packet.intentId
+            },
+            timestamp: '2026-10-01T14:00:00.000Z',
+            approvalTtlMs: 300000
+        }
+    };
+    window.notificationRenderer.renderVCPLogNotification(
+        request,
+        JSON.stringify(request),
+        window.document.getElementById('notificationsList')
+    );
+    const reviewButton = Array.from(window.document.querySelectorAll('.notification-actions button'))
+        .find(button => button.textContent === '审视 SUVEI 授权');
+    reviewButton.click();
+    await new Promise(resolve => setImmediate(resolve));
+    const modal = window.document.getElementById('suveiHumanAuthorizationModal');
+    window.document.getElementById('approveSuveiHumanAuthorization').click();
+    await new Promise(resolve => setImmediate(resolve));
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.equal(modal.style.display, 'flex');
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), []);
+    assert.match(
+        window.document.getElementById('suveiHumanAuthorizationError').textContent,
+        /transport/
+    );
+    dom.window.close();
+});
+
+test('RAG approval surfaces cannot emit generic approval for protected SUVEI execution', () => {
+    const observer = source('RAGmodules/RAG_Observer.html');
+    const overlay = source('RAGmodules/RAG_Overlay.html');
+    const handlers = source('modules/ipc/ragHandlers.js');
+
+    assert.match(observer, /protectedSuveiApprovalRequestIds/);
+    assert.match(observer, /SUVEI protected approval must be completed in the trusted main VCPChat surface/);
+    assert.match(observer, /requiresTrustedHumanAuthorization/);
+
+    assert.match(overlay, /requiresTrustedHumanAuthorization/);
+    assert.match(overlay, /请回主窗口审视/);
+    assert.match(overlay, /只能在 VCPChat 主窗口审视 canonical authority target/);
+
+    assert.match(handlers, /protectedSuveiApprovalRequestIds/);
+    assert.match(handlers, /Refused SUVEI protected approval relay/);
 });
 

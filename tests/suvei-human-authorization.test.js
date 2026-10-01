@@ -665,7 +665,7 @@ test("explicit nonpositive or malformed ToolBox TTL fails closed instead of refr
 });
 
 test("decision rechecks ToolBox deadline after canonical Intent read and never mutates Core after expiry", async () => {
-    const { service, calls } = harness({ advanceOnIntentGetMs: 56000 });
+    const { service, calls } = harness({ advanceOnIntentGetMs: 59000 });
     await service.login("exact owner password");
     // prepare GET advances the clock, so use a long enough request for prepare itself.
     const packet = await service.prepare({

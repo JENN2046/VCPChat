@@ -5,15 +5,18 @@ const { SuveiHumanAuthorizationService } = require("../services/suveiHumanAuthor
 
 let initialized = false;
 
-function initialize({ mainWindow, settingsManager, service } = {}) {
+function initialize({ mainWindow, getMainWindow, settingsManager, service } = {}) {
     if (initialized) return;
     initialized = true;
     const resolvedService = service || new SuveiHumanAuthorizationService({ settingsManager });
-    const isMainRenderer = event => Boolean(
-        mainWindow
-        && !mainWindow.isDestroyed()
-        && event?.sender === mainWindow.webContents
-    );
+    const resolveMainWindow = () => {
+        const current = typeof getMainWindow === "function" ? getMainWindow() : mainWindow;
+        return current && !current.isDestroyed() ? current : null;
+    };
+    const isMainRenderer = event => {
+        const current = resolveMainWindow();
+        return Boolean(current && event?.sender === current.webContents);
+    };
     const result = async (event, operation) => {
         if (!isMainRenderer(event)) {
             return { success: false, code: "SUVEI_TRUSTED_CLIENT_REQUIRED", error: "SUVEI human authorization is restricted to the main VCPChat surface." };
@@ -45,7 +48,8 @@ function initialize({ mainWindow, settingsManager, service } = {}) {
     ipcMain.handle("suvei-human-authorization:decide", (event, payload = {}) =>
         result(event, async () => ({ decision: await resolvedService.decide(payload) })));
 
-    mainWindow?.webContents?.once?.("destroyed", () => {
+    const initialWindow = resolveMainWindow();
+    initialWindow?.webContents?.once?.("destroyed", () => {
         void resolvedService.logout();
     });
 }

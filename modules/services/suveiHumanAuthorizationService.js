@@ -65,6 +65,55 @@ function stableDigest(value) {
     return crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
+function canonicalJson(value) {
+    if (value === null) return "null";
+    if (typeof value === "string") return JSON.stringify(value);
+    if (typeof value === "boolean") return value ? "true" : "false";
+    if (typeof value === "number") {
+        if (!Number.isFinite(value)) fail("SUVEI_AUTHORIZATION_TERMS_INVALID");
+        return JSON.stringify(value);
+    }
+    if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+    if (!value || typeof value !== "object"
+        || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) {
+        fail("SUVEI_AUTHORIZATION_TERMS_INVALID");
+    }
+    const keys = Object.keys(value).sort();
+    return `{${keys.map(key => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+}
+
+function canonicalDigest(value) {
+    return crypto.createHash("sha256").update(canonicalJson(value), "utf8").digest("hex");
+}
+
+function authorizationTerms(intent, ownerUserId, authorization) {
+    return {
+        schemaVersion: "agent_generation_authorization.v1",
+        intentId: intent.id,
+        requestFingerprint: intent.requestFingerprint,
+        delegateUserId: intent.delegateUserId,
+        authorizedBy: ownerUserId,
+        expiresAt: authorization.expiresAt,
+        maxAttempts: authorization.maxAttempts,
+        maxOutputCount: authorization.maxOutputCount,
+        maxTotalCredits: authorization.maxTotalCredits,
+        maxConcurrentAttempts: authorization.maxConcurrentAttempts,
+        maxWallClockMs: authorization.maxWallClockMs,
+        maxAdapterCallsPerAttempt: authorization.maxAdapterCallsPerAttempt,
+        ...(intent.action === "inpaint_candidate" ? {
+            action: intent.action,
+            sourceCandidateId: intent.sourceCandidateId,
+            sourceCandidateSha256: intent.sourceCandidateSha256,
+            sourceCriticResultId: intent.sourceCriticResultId,
+            maskContentSha256: intent.maskContentSha256,
+        } : {}),
+    };
+}
+
+function authorizationTermsDigest(intent, ownerUserId, authorization) {
+    return canonicalDigest(authorizationTerms(intent, ownerUserId, authorization));
+}
+
 function normalizedTtl(value) {
     const parsed = Number(value);
     if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_TOOL_APPROVAL_TTL_MS;
@@ -98,6 +147,13 @@ function canonicalIntentSnapshot(intent) {
         intentCommandId: intent.intentCommandId,
         proposalState: intent.proposalState,
         revision: intent.revision,
+        authorizedBy: intent.authorizedBy ?? null,
+        authorizedAt: intent.authorizedAt ?? null,
+        authorizationExpiresAt: intent.authorizationExpiresAt ?? null,
+        authorizationTermsDigest: intent.authorizationTermsDigest ?? null,
+        executionGrantId: intent.executionGrantId ?? null,
+        executionOperationId: intent.executionOperationId ?? null,
+        executionCommandId: intent.executionCommandId ?? null,
         sourceCandidateId: intent.sourceCandidateId ?? null,
         sourceCandidateRevision: intent.sourceCandidateRevision ?? null,
         sourceCandidateSha256: intent.sourceCandidateSha256 ?? null,
@@ -108,7 +164,7 @@ function canonicalIntentSnapshot(intent) {
     };
 }
 
-function assertIntentShape(intent, binding, projectId, intentId, expectedAction) {
+function assertIntentShape(intent, binding, projectId, intentId, expectedAction, allowedStates = ["PENDING"]) {
     if (!intent || typeof intent !== "object" || Array.isArray(intent)
         || intent.schemaVersion !== "agent_execution_intent.v1"
         || exactUuid(intent.id, "SUVEI_INTENT_IDENTITY_INVALID") !== intentId
@@ -116,7 +172,7 @@ function assertIntentShape(intent, binding, projectId, intentId, expectedAction)
         || exactUuid(intent.organizationId, "SUVEI_INTENT_ORGANIZATION_INVALID") !== binding.expectedOrganizationId
         || !UUID_RE.test(String(intent.delegateUserId || ""))
         || intent.action !== expectedAction
-        || intent.proposalState !== "PENDING"
+        || !allowedStates.includes(intent.proposalState)
         || !Number.isInteger(intent.revision) || intent.revision < 0
         || typeof intent.requestFingerprint !== "string" || !/^[0-9a-f]{64}$/.test(intent.requestFingerprint)
         || !Number.isInteger(intent.requestedOutputCount)
@@ -307,13 +363,22 @@ class SuveiHumanAuthorizationService {
         const projectId = exactUuid(args.projectId, "SUVEI_APPROVAL_PROJECT_ID_INVALID");
         const intentId = exactUuid(args.intentId, "SUVEI_APPROVAL_INTENT_ID_INVALID");
         const intent = await this.getIntent(projectId, intentId);
-        assertIntentShape(intent, this.binding, projectId, intentId, expectedAction);
+        assertIntentShape(intent, this.binding, projectId, intentId, expectedAction, ["PENDING", "AUTHORIZED"]);
 
         const requested = intent.requestedOutputCount;
+        const reconciliation = intent.proposalState === "AUTHORIZED";
+        const committedExpiry = reconciliation ? Date.parse(String(intent.authorizationExpiresAt || "")) : NaN;
+        if (reconciliation && (!Number.isFinite(committedExpiry)
+            || this.now() + MIN_TOOL_REMAINING_MS > committedExpiry
+            || intent.revision < 1)) {
+            fail("SUVEI_COMMITTED_AUTHORIZATION_EXPIRED");
+        }
         const authorization = {
-            expectedRevision: intent.revision,
+            expectedRevision: reconciliation ? intent.revision - 1 : intent.revision,
             requestFingerprint: intent.requestFingerprint,
-            expiresAt: new Date(this.now() + AUTHORIZATION_VALIDITY_MS).toISOString(),
+            expiresAt: reconciliation
+                ? new Date(committedExpiry).toISOString()
+                : new Date(this.now() + AUTHORIZATION_VALIDITY_MS).toISOString(),
             maxAttempts: requested,
             maxOutputCount: requested,
             maxTotalCredits: requested,
@@ -321,15 +386,34 @@ class SuveiHumanAuthorizationService {
             maxWallClockMs: MAX_WALL_CLOCK_MS,
             maxAdapterCallsPerAttempt: 1,
         };
+        const expectedAuthorizationTermsDigest = authorizationTermsDigest(
+            intent,
+            this.identity.userId,
+            authorization,
+        );
+
+        if (reconciliation) {
+            if (String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
+                || String(intent.authorizationTermsDigest || "").toLowerCase() !== expectedAuthorizationTermsDigest
+                || !UUID_RE.test(String(intent.executionGrantId || ""))
+                || intent.executionOperationId !== null
+                || intent.executionCommandId !== null) {
+                fail("SUVEI_COMMITTED_AUTHORIZATION_MISMATCH");
+            }
+        }
+
         const intentSnapshot = canonicalIntentSnapshot(intent);
-        const canonicalIntentDigest = stableDigest(intentSnapshot);
-        const authorityTargetDigest = stableDigest({
+        const canonicalIntentDigest = canonicalDigest(intentSnapshot);
+        const decisionMode = reconciliation ? "reconcile_authorized" : "authorize";
+        const authorityTargetDigest = canonicalDigest({
             schemaVersion: "suvei_human_authorization_target.v1",
             requestId,
             command,
             projectId,
             intentId,
+            decisionMode,
             canonicalIntentDigest,
+            expectedAuthorizationTermsDigest,
             authorization,
         });
         const ttlMs = normalizedTtl(approvalData.approvalTtlMs);
@@ -344,7 +428,10 @@ class SuveiHumanAuthorizationService {
             command,
             projectId,
             intentId,
+            decisionMode,
+            authorizationCommitted: reconciliation,
             authorityTargetDigest,
+            expectedAuthorizationTermsDigest,
             toolApprovalExpiresAt,
             owner: { ...this.identity },
             intent: intentSnapshot,
@@ -356,12 +443,54 @@ class SuveiHumanAuthorizationService {
             projectId,
             intentId,
             expectedAction,
+            decisionMode,
             canonicalIntentDigest,
             authorityTargetDigest,
+            expectedAuthorizationTermsDigest,
             authorization,
             toolApprovalDeadline,
         });
         return packet;
+    }
+
+    assertCommittedAuthorization(intent, pending) {
+        assertIntentShape(
+            intent,
+            this.binding,
+            pending.projectId,
+            pending.intentId,
+            pending.expectedAction,
+            ["AUTHORIZED"],
+        );
+        if (intent.revision !== pending.authorization.expectedRevision + 1
+            || intent.requestFingerprint !== pending.authorization.requestFingerprint
+            || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
+            || String(intent.authorizationTermsDigest || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
+            || new Date(intent.authorizationExpiresAt).toISOString() !== pending.authorization.expiresAt
+            || !UUID_RE.test(String(intent.executionGrantId || ""))
+            || intent.executionOperationId !== null
+            || intent.executionCommandId !== null) {
+            fail("SUVEI_AUTHORIZATION_RECEIPT_INVALID");
+        }
+        return intent;
+    }
+
+    async reconcileAuthorization(pending, originalError) {
+        try {
+            const current = await this.getIntent(pending.projectId, pending.intentId);
+            if (current?.proposalState === "AUTHORIZED") {
+                return this.assertCommittedAuthorization(current, pending);
+            }
+            if (current?.proposalState === "PENDING") throw originalError;
+            fail("SUVEI_AUTHORIZATION_OUTCOME_CONFLICT");
+        } catch (reconcileError) {
+            if (reconcileError === originalError) throw originalError;
+            if (reconcileError?.code === "SUVEI_AUTHORIZATION_RECEIPT_INVALID"
+                || reconcileError?.code === "SUVEI_AUTHORIZATION_OUTCOME_CONFLICT") {
+                throw reconcileError;
+            }
+            throw originalError;
+        }
     }
 
     async decide({ requestId: requestIdValue, approved, reason = "" } = {}) {
@@ -373,29 +502,68 @@ class SuveiHumanAuthorizationService {
             this.pending.delete(requestId);
             fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         }
-        const intent = await this.getIntent(pending.projectId, pending.intentId);
-        assertIntentShape(intent, this.binding, pending.projectId, pending.intentId, pending.expectedAction);
-        const currentDigest = stableDigest(canonicalIntentSnapshot(intent));
-        if (currentDigest !== pending.canonicalIntentDigest) {
-            this.pending.delete(requestId);
-            fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
-        }
 
         const normalizedReason = typeof reason === "string" ? reason.trim().slice(0, 1000) : "";
+        let current = await this.getIntent(pending.projectId, pending.intentId);
         let updated;
+
         if (approved === true) {
+            if (current.proposalState === "AUTHORIZED") {
+                updated = this.assertCommittedAuthorization(current, pending);
+            } else {
+                assertIntentShape(
+                    current,
+                    this.binding,
+                    pending.projectId,
+                    pending.intentId,
+                    pending.expectedAction,
+                    ["PENDING"],
+                );
+                const currentDigest = canonicalDigest(canonicalIntentSnapshot(current));
+                if (currentDigest !== pending.canonicalIntentDigest) {
+                    this.pending.delete(requestId);
+                    fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
+                }
+                try {
+                    updated = await this.request(
+                        `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/authorize`,
+                        { method: "POST", body: pending.authorization },
+                    );
+                    updated = this.assertCommittedAuthorization(updated, pending);
+                } catch (error) {
+                    updated = await this.reconcileAuthorization(pending, error);
+                }
+            }
+        } else if (current.proposalState === "AUTHORIZED") {
+            current = this.assertCommittedAuthorization(current, pending);
             updated = await this.request(
-                `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/authorize`,
-                { method: "POST", body: pending.authorization },
+                `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/revoke`,
+                {
+                    method: "POST",
+                    body: {
+                        expectedRevision: current.revision,
+                        reason: normalizedReason || "Revoked from VCPChat human authorization recovery surface.",
+                    },
+                },
             );
-            if (!updated || updated.proposalState !== "AUTHORIZED"
-                || String(updated.id).toLowerCase() !== pending.intentId
-                || String(updated.requestFingerprint).toLowerCase() !== pending.authorization.requestFingerprint
-                || String(updated.authorizedBy).toLowerCase() !== this.identity.userId
-                || !updated.executionGrantId) {
-                fail("SUVEI_AUTHORIZATION_RECEIPT_INVALID");
+            if (!updated || updated.proposalState !== "REVOKED"
+                || String(updated.id).toLowerCase() !== pending.intentId) {
+                fail("SUVEI_REVOCATION_RECEIPT_INVALID");
             }
         } else {
+            assertIntentShape(
+                current,
+                this.binding,
+                pending.projectId,
+                pending.intentId,
+                pending.expectedAction,
+                ["PENDING"],
+            );
+            const currentDigest = canonicalDigest(canonicalIntentSnapshot(current));
+            if (currentDigest !== pending.canonicalIntentDigest) {
+                this.pending.delete(requestId);
+                fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
+            }
             updated = await this.request(
                 `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/reject`,
                 {
@@ -411,11 +579,13 @@ class SuveiHumanAuthorizationService {
                 fail("SUVEI_REJECTION_RECEIPT_INVALID");
             }
         }
+
         this.pending.delete(requestId);
         return {
             schemaVersion: "suvei_human_authorization_decision.v1",
             requestId,
             approved: approved === true,
+            reconciled: pending.decisionMode === "reconcile_authorized" || (approved === true && current.proposalState === "AUTHORIZED"),
             authorityTargetDigest: pending.authorityTargetDigest,
             intentId: pending.intentId,
             projectId: pending.projectId,
@@ -425,6 +595,7 @@ class SuveiHumanAuthorizationService {
             executionGrantId: updated.executionGrantId ?? null,
         };
     }
+
 }
 
 module.exports = {
@@ -433,6 +604,7 @@ module.exports = {
     SUPPORTED_COMMANDS,
     SuveiHumanAuthorizationError,
     SuveiHumanAuthorizationService,
+    authorizationTermsDigest,
     canonicalIntentSnapshot,
     stableDigest,
 };

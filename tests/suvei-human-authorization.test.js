@@ -91,6 +91,7 @@ function harness({
     authorizeMode = "success",
     rejectMode = "success",
     revokeMode = "success",
+    advanceOnIntentGetMs = 0,
 } = {}) {
     let clock = now;
     let currentIntent = intent();
@@ -119,6 +120,7 @@ function harness({
             });
         }
         if (pathname === `/api/v1/projects/${PROJECT}/agent-execution-intents/${INTENT}` && method === "GET") {
+            if (advanceOnIntentGetMs > 0) clock += advanceOnIntentGetMs;
             return json(currentIntent);
         }
         if (pathname.endsWith("/authorize") && method === "POST") {
@@ -127,7 +129,7 @@ function harness({
                 proposalState: "AUTHORIZED",
                 revision: currentIntent.revision + 1,
                 authorizedBy: OWNER,
-                authorizedAt: new Date(now).toISOString(),
+                authorizedAt: new Date(clock).toISOString(),
                 authorizationExpiresAt: body.expiresAt,
                 executionGrantId: GRANT,
                 authorizationTermsDigest: authorizeMode === "bad_digest"
@@ -643,5 +645,107 @@ test("Core response streaming is bounded even without Content-Length", async () 
     );
     assert.ok(pulls >= 2);
     assert.equal(cancelled, true);
+});
+
+test("explicit nonpositive or malformed ToolBox TTL fails closed instead of refreshing to the default", async () => {
+    for (const approvalTtlMs of [0, -1, "not-a-number"]) {
+        const { service } = harness();
+        await service.login("exact owner password");
+        await assert.rejects(
+            service.prepare({
+                requestId: `approval-invalid-ttl-${String(approvalTtlMs).replace(/[^a-z0-9]/gi, "_")}`,
+                toolName: "SUVEIStudio",
+                args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+                timestamp: "2026-10-01T14:00:00.000Z",
+                approvalTtlMs,
+            }),
+            error => error?.code === "SUVEI_APPROVAL_TTL_INVALID"
+        );
+    }
+});
+
+test("decision rechecks ToolBox deadline after canonical Intent read and never mutates Core after expiry", async () => {
+    const { service, calls } = harness({ advanceOnIntentGetMs: 56000 });
+    await service.login("exact owner password");
+    // prepare GET advances the clock, so use a long enough request for prepare itself.
+    const packet = await service.prepare({
+        requestId: "approval-deadline-recheck",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 120000,
+    });
+    assert.ok(packet.toolApprovalExpiresAt);
+    await assert.rejects(
+        service.decide({ requestId: "approval-deadline-recheck", approved: true }),
+        error => error?.code === "SUVEI_APPROVAL_PACKET_EXPIRED"
+    );
+    assert.equal(calls.some(call => call.pathname.endsWith("/authorize")), false);
+});
+
+test("new ToolBox request resumes an exact committed REVOKED decision without replaying revoke", async () => {
+    const { service, calls } = harness();
+    await service.login("exact owner password");
+    await service.prepare({
+        requestId: "approval-revoked-source",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:00.000Z",
+        approvalTtlMs: 60000,
+    });
+    await service.decide({ requestId: "approval-revoked-source", approved: true });
+    await service.prepare({
+        requestId: "approval-revoked-first",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:10.000Z",
+        approvalTtlMs: 60000,
+    });
+    await service.decide({
+        requestId: "approval-revoked-first",
+        approved: false,
+        reason: "Revoke exact authority.",
+    });
+
+    const packet = await service.prepare({
+        requestId: "approval-revoked-recovery",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:20.000Z",
+        approvalTtlMs: 60000,
+    });
+    assert.equal(packet.decisionMode, "reconcile_revoked");
+    assert.equal(packet.revocationCommitted, true);
+    assert.equal(packet.intent.proposalState, "REVOKED");
+
+    await assert.rejects(
+        service.decide({ requestId: "approval-revoked-recovery", approved: true }),
+        error => error?.code === "SUVEI_REVOKED_INTENT_CANNOT_APPROVE"
+    );
+
+    const packet2 = await service.prepare({
+        requestId: "approval-revoked-recovery-2",
+        toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT },
+        timestamp: "2026-10-01T14:00:20.000Z",
+        approvalTtlMs: 60000,
+    });
+    assert.equal(packet2.decisionMode, "reconcile_revoked");
+    const decision = await service.decide({
+        requestId: "approval-revoked-recovery-2",
+        approved: false,
+    });
+    assert.equal(decision.reconciled, true);
+    assert.equal(decision.proposalState, "REVOKED");
+    assert.equal(calls.filter(call => call.pathname.endsWith("/revoke")).length, 1);
+});
+
+test("trusted IPC binds cleanup to each recreated main window", () => {
+    const handlers = fs.readFileSync("modules/ipc/suveiHumanAuthorizationHandlers.js", "utf8");
+    assert.match(handlers, /let cleanupWindow = null/);
+    assert.match(handlers, /current\.webContents\?\.once\?\.\("destroyed"/);
+    assert.match(handlers, /if \(cleanupWindow !== current\) return/);
+    assert.match(handlers, /void resolvedService\.logout\(\)/);
+    assert.match(handlers, /return current && !current\.isDestroyed\(\) \? bindWindowCleanup\(current\) : null/);
 });
 

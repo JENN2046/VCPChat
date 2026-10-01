@@ -273,3 +273,104 @@ test('SUVEI Core authorization must commit before ToolBox receives approved=true
 
     dom.window.close();
 });
+
+test('SUVEI recovery surface distinguishes resume from a fresh authorization', async () => {
+    const { dom, window, sentMessages } = createAuditDom();
+    const packet = {
+        schemaVersion: 'suvei_human_authorization_preview.v1',
+        requestId: 'suvei-authorized-recovery',
+        projectId: '33333333-3333-4333-8333-333333333333',
+        intentId: '44444444-4444-5444-8444-444444444444',
+        decisionMode: 'reconcile_authorized',
+        authorizationCommitted: true,
+        authorityTargetDigest: 'a'.repeat(64),
+        expectedAuthorizationTermsDigest: 'b'.repeat(64),
+        toolApprovalExpiresAt: '2026-10-01T14:05:00.000Z',
+        intent: {
+            id: '44444444-4444-5444-8444-444444444444',
+            projectId: '33333333-3333-4333-8333-333333333333',
+            proposalState: 'AUTHORIZED',
+            action: 'generate_candidate',
+            revision: 1,
+            requestFingerprint: 'e'.repeat(64),
+            delegateUserId: '55555555-5555-4555-8555-555555555555',
+            productionUnitId: '99999999-9999-4999-8999-999999999999',
+            recipeId: '66666666-6666-4666-8666-666666666666',
+            recipeDigest: 'c'.repeat(64),
+            capabilityId: 'newapi.gpt-image-2.5-flare.v1',
+            capabilityVersion: '1',
+            requestedOutputCount: 1,
+            resolution: '1024x1024',
+            aspectRatio: '1:1',
+            normalizedReason: 'Recover exact approved work'
+        },
+        authorization: {
+            expectedRevision: 0,
+            requestFingerprint: 'e'.repeat(64),
+            expiresAt: '2026-10-01T14:30:00.000Z',
+            maxAttempts: 1,
+            maxOutputCount: 1,
+            maxTotalCredits: 1,
+            maxConcurrentAttempts: 1,
+            maxWallClockMs: 300000,
+            maxAdapterCallsPerAttempt: 1
+        }
+    };
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async () => ({
+        success: true,
+        decision: {
+            approved: true,
+            reconciled: true,
+            proposalState: 'AUTHORIZED',
+            authorityTargetDigest: packet.authorityTargetDigest
+        }
+    });
+    window.chatAPI.loginSuveiHumanOwner = async () => ({ success: true });
+
+    const request = {
+        type: 'tool_approval_request',
+        data: {
+            requestId: packet.requestId,
+            toolName: 'SUVEIStudio',
+            maid: 'Nova',
+            args: {
+                command: 'ExecuteAuthorizedGeneration',
+                projectId: packet.projectId,
+                intentId: packet.intentId
+            },
+            timestamp: '2026-10-01T14:00:00.000Z',
+            approvalTtlMs: 300000
+        }
+    };
+
+    window.notificationRenderer.renderVCPLogNotification(
+        request,
+        JSON.stringify(request),
+        window.document.getElementById('notificationsList')
+    );
+    const reviewButton = Array.from(window.document.querySelectorAll('.notification-actions button'))
+        .find(button => button.textContent === '审视 SUVEI 授权');
+    assert.ok(reviewButton);
+    reviewButton.click();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const packetText = window.document.getElementById('suveiHumanAuthorizationPacket').textContent;
+    assert.match(packetText, /Core state: AUTHORIZED/);
+    assert.match(packetText, /Decision mode: reconcile_authorized/);
+    assert.equal(window.document.getElementById('approveSuveiHumanAuthorization').textContent, '继续执行（恢复）');
+    assert.equal(window.document.getElementById('rejectSuveiHumanAuthorization').textContent, '撤销授权并拒绝');
+
+    window.document.getElementById('approveSuveiHumanAuthorization').click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), [{
+        type: 'tool_approval_response',
+        data: {
+            requestId: packet.requestId,
+            approved: true
+        }
+    }]);
+
+    dom.window.close();
+});
+

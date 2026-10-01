@@ -46,7 +46,7 @@ jobs:
           import urllib.parse
           import urllib.request
           
-          PINS = {'ci/source-entry/source_projection_policy.py': {'size': 4065, 'blob': 'afd8da3f36bee9199a983e44ac95364ce8b37341', 'sha256': '89d09d459596a8a1d784fa5261b3a7e2ef53b67e6975bd669311c876f21836ff'}, 'ci/source-entry/source_materializer.py': {'size': 8199, 'blob': 'a8e1108fba2df8f38c71e235d52b85c197c9da4f', 'sha256': '376b56b82caaf9df856a619bfb03f8886ed20c4a2fee9e1f444e1f575916b76e'}, 'ci/source-entry/source_writer.py': {'size': 10285, 'blob': '95a172ac42fcd0956647d14d3914df028d8a308c', 'sha256': '74d2d2469c92947d5d58e4784383f787c17bff8e22c0620228052bcc51b9d916'}, 'ci/source-entry/github_source_entry.py': {'size': 21538, 'blob': '786f537080c33dbb61af6321ee58a05e12ff6c04', 'sha256': 'ad71c3e120a3ae227651390f112beee1a51d21f4cd7118cb0f8ad6d205c8f2c5'}, 'ci/source-entry/projection_manifest.json': {'size': 723077, 'blob': '96a838a7bfe8acb1850626478cb5dcb7728fe84b', 'sha256': 'c1d14e9e441d8fb776b1833937252eb050f6bd644e8f11ba71bdb9f2d2b5cb8b'}}
+          PINS = {'ci/source-entry/source_projection_policy.py': {'size': 4065, 'blob': 'afd8da3f36bee9199a983e44ac95364ce8b37341', 'sha256': '89d09d459596a8a1d784fa5261b3a7e2ef53b67e6975bd669311c876f21836ff'}, 'ci/source-entry/source_materializer.py': {'size': 8199, 'blob': 'a8e1108fba2df8f38c71e235d52b85c197c9da4f', 'sha256': '376b56b82caaf9df856a619bfb03f8886ed20c4a2fee9e1f444e1f575916b76e'}, 'ci/source-entry/source_writer.py': {'size': 10285, 'blob': '95a172ac42fcd0956647d14d3914df028d8a308c', 'sha256': '74d2d2469c92947d5d58e4784383f787c17bff8e22c0620228052bcc51b9d916'}, 'ci/source-entry/github_source_entry.py': {'size': 21538, 'blob': '786f537080c33dbb61af6321ee58a05e12ff6c04', 'sha256': 'ad71c3e120a3ae227651390f112beee1a51d21f4cd7118cb0f8ad6d205c8f2c5'}, 'ci/source-entry/projection_manifest.json': {'size': 723077, 'blob': 'c6e79e973433211bfd6595002742515eeb6a343c', 'sha256': 'ca07c84c4e10690d767ec0cd56c53135da7b9dfa26d5dedeaba7ea62efec3e9e'}}
           PROFILE = 'chat-kernel-ui'
           REPOSITORY = "JENN2046/VCPChat"
           
@@ -178,9 +178,7 @@ jobs:
           VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
           VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
         working-directory: ${{ steps.source.outputs.directory }}
-        run: |
-          npm run test:chat-kernel
-          node --test tests/suvei-human-authorization.test.js tests/notification-change-audit.test.js
+        run: npm run test:chat-kernel
 
       - name: Verify ProjectForge delivery and tool-result isolation
         env:

@@ -1148,7 +1148,6 @@ if (!gotTheLock) {
         agentConfigManager.startCleanupTimer(); // Start agent config cleanup
 
         settingsHandlers.initialize({ SETTINGS_FILE, USER_AVATAR_FILE, AGENT_DIR, settingsManager: appSettingsManager, agentConfigManager, mainWindow }); // Initialize settings handlers
-        suveiHumanAuthorizationHandlers.initialize({ mainWindow, settingsManager: appSettingsManager });
         for (const channel of ['jev:get-status', 'jev:decide']) {
             ipcMain.removeHandler(channel);
         }
@@ -1241,6 +1240,10 @@ if (!gotTheLock) {
 
         // Create the native window first, but load the renderer only after IPC registration.
         createWindow({ deferLoad: true });
+        suveiHumanAuthorizationHandlers.initialize({
+            getMainWindow: () => mainWindow,
+            settingsManager: appSettingsManager
+        });
         createTray();
         reportLauncherProgress('window-created', 0.38, '主窗口骨架已创建');
         // --- Application Menu ---
@@ -2014,6 +2017,48 @@ if (!gotTheLock) {
         } else {
             console.warn('VCPLog WebSocket 未连接或未就绪，无法发送消息:', data);
         }
+    });
+
+    ipcMain.removeHandler('send-vcplog-message-confirmed');
+    ipcMain.handle('send-vcplog-message-confirmed', async (event, data) => {
+        if (!mainWindow || mainWindow.isDestroyed() || event?.sender !== mainWindow.webContents) {
+            return { success: false, code: 'VCPLOG_TRUSTED_CLIENT_REQUIRED' };
+        }
+        if (!vcpLogWebSocket || vcpLogWebSocket.readyState !== 1) {
+            return { success: false, code: 'VCPLOG_NOT_CONNECTED' };
+        }
+        let payload;
+        try {
+            payload = JSON.stringify(data);
+        } catch {
+            return { success: false, code: 'VCPLOG_MESSAGE_INVALID' };
+        }
+        return await new Promise(resolve => {
+            let settled = false;
+            const finish = result => {
+                if (settled) return;
+                settled = true;
+                resolve(result);
+            };
+            const timer = setTimeout(
+                () => finish({ success: false, code: 'VCPLOG_SEND_TIMEOUT' }),
+                5000
+            );
+            timer.unref?.();
+            try {
+                vcpLogWebSocket.send(payload, error => {
+                    clearTimeout(timer);
+                    if (error) {
+                        finish({ success: false, code: 'VCPLOG_SEND_FAILED' });
+                        return;
+                    }
+                    finish({ success: true, queued: true });
+                });
+            } catch {
+                clearTimeout(timer);
+                finish({ success: false, code: 'VCPLOG_SEND_FAILED' });
+            }
+        });
     });
 
 }

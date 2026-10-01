@@ -346,10 +346,11 @@ function formatSuveiAuthorityPacket(packet) {
     const authorizedRecovery = packet?.decisionMode === 'reconcile_authorized'
         || packet?.authorizationCommitted === true;
     const rejectedRecovery = packet?.decisionMode === 'reconcile_rejected';
-    const recovery = authorizedRecovery || rejectedRecovery;
+    const revokedRecovery = packet?.decisionMode === 'reconcile_revoked'
+        || packet?.revocationCommitted === true;
     const lines = [
         `动作: ${action}`,
-        `Core state: ${intent.proposalState || '—'}${authorizedRecovery ? '（已存在 exact authorization，当前是恢复流程）' : ''}${rejectedRecovery ? '（Core 已拒绝，当前只恢复拒绝通知）' : ''}`,
+        `Core state: ${intent.proposalState || '—'}${authorizedRecovery ? '（已存在 exact authorization，当前是恢复流程）' : ''}${rejectedRecovery ? '（Core 已拒绝，当前只恢复拒绝通知）' : ''}${revokedRecovery ? '（Core 已撤销，当前只恢复阻断通知）' : ''}`,
         `Decision mode: ${packet?.decisionMode || 'authorize'}`,
         `Project: ${packet?.projectId || '—'}`,
         `Intent: ${packet?.intentId || '—'}`,
@@ -366,8 +367,10 @@ function formatSuveiAuthorityPacket(packet) {
     if (intent.action === 'inpaint_candidate') {
         lines.push(
             `Source Candidate: ${intent.sourceCandidateId || '—'} rev ${intent.sourceCandidateRevision ?? '—'}`,
+            `Source Candidate SHA256: ${intent.sourceCandidateSha256 || '—'}`,
             `Source Critic: ${intent.sourceCriticResultId || '—'}`,
             `Mask: ${intent.maskMediaObjectId || '—'}`,
+            `Mask SHA256: ${intent.maskContentSha256 || '—'}`,
             `修正指令: ${intent.editInstruction || '—'}`
         );
     }
@@ -387,7 +390,6 @@ function formatSuveiAuthorityPacket(packet) {
     );
     return lines.join('\n');
 }
-
 async function openSuveiOwnerLogin(onAuthenticated, statusElement) {
     if (!notificationRendererApi || typeof notificationRendererApi.loginSuveiHumanOwner !== 'function') {
         if (statusElement) statusElement.textContent = '当前 preload 未暴露 SUVEI Human Authorization API。';
@@ -466,23 +468,30 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
     const authorizedRecovery = packet?.decisionMode === 'reconcile_authorized'
         || packet?.authorizationCommitted === true;
     const rejectedRecovery = packet?.decisionMode === 'reconcile_rejected';
-    const recovery = authorizedRecovery || rejectedRecovery;
+    const revokedRecovery = packet?.decisionMode === 'reconcile_revoked'
+        || packet?.revocationCommitted === true;
     packetElement.textContent = formatSuveiAuthorityPacket(packet);
     reasonInput.value = typeof initialReason === 'string' ? initialReason : '';
     errorElement.textContent = '';
     approveButton.textContent = rejectedRecovery
         ? 'Core 已拒绝'
-        : (authorizedRecovery ? '继续执行（恢复）' : '批准并执行');
+        : (revokedRecovery
+            ? 'Core 已撤销'
+            : (authorizedRecovery ? '继续执行（恢复）' : '批准并执行'));
     rejectButton.textContent = rejectedRecovery
         ? '确认拒绝并通知 ToolBox'
-        : (authorizedRecovery ? '撤销授权并拒绝' : '拒绝');
-    approveButton.disabled = rejectedRecovery;
+        : (revokedRecovery
+            ? '确认撤销并通知 ToolBox'
+            : (authorizedRecovery ? '撤销授权并拒绝' : '拒绝'));
+    approveButton.disabled = rejectedRecovery || revokedRecovery;
     if (statusElement) {
         statusElement.textContent = rejectedRecovery
             ? `SUVEI Core 已提交拒绝；当前只恢复 ToolBox 的 approved=false。Target: ${packet.authorityTargetDigest}`
-            : (authorizedRecovery
-                ? `SUVEI Core 已存在这次 exact authorization；当前只恢复 ToolBox transport。Target: ${packet.authorityTargetDigest}`
-                : `已绑定 exact target: ${packet.authorityTargetDigest}`);
+            : (revokedRecovery
+                ? `SUVEI Core 已撤销这次 exact authorization；当前只恢复 ToolBox 的 approved=false。Target: ${packet.authorityTargetDigest}`
+                : (authorizedRecovery
+                    ? `SUVEI Core 已存在这次 exact authorization；当前只恢复 ToolBox transport。Target: ${packet.authorityTargetDigest}`
+                    : `已绑定 exact target: ${packet.authorityTargetDigest}`));
     }
 
     const close = () => setSuveiModalOpen(modal, false);
@@ -493,6 +502,7 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
         approveButton.disabled = true;
         rejectButton.disabled = true;
         errorElement.textContent = '';
+        let handedOffToRecovery = false;
         try {
             const reason = reasonInput.value;
             const response = await notificationRendererApi.decideSuveiHumanAuthorization({
@@ -508,7 +518,17 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             const transported = await onCommitted?.(approved, reason);
             if (transported === false) {
                 errorElement.textContent =
-                    'SUVEI Core 已完成决策，但 VCPLog transport 当前不可用。请保持窗口，不要重复 Core 授权。';
+                    'SUVEI Core 已完成决策，但 VCPLog transport 当前不可用。正在重新读取 committed Core state…';
+                handedOffToRecovery = await openSuveiHumanAuthorizationReview(
+                    approvalData,
+                    reason,
+                    onCommitted,
+                    statusElement
+                ) === true;
+                if (!handedOffToRecovery) {
+                    errorElement.textContent =
+                        'Core 决策已提交，但恢复审批包失败。请关闭并重新打开该审批请求；不要重复 Core 决策。';
+                }
                 return;
             }
             if (statusElement) {
@@ -518,25 +538,28 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
                         : 'SUVEI Core 已授权，Agent 调用已放行。')
                     : (rejectedRecovery
                         ? '已确认恢复：没有重复拒绝，ToolBox 已收到阻断决定。'
-                        : (authorizedRecovery
-                            ? 'SUVEI Core 的既有授权已撤销，Agent 调用已阻断。'
-                            : 'SUVEI Core 已拒绝，Agent 调用已阻断。'));
+                        : (revokedRecovery
+                            ? '已确认恢复：没有重复撤销，ToolBox 已收到阻断决定。'
+                            : (authorizedRecovery
+                                ? 'SUVEI Core 的既有授权已撤销，Agent 调用已阻断。'
+                                : 'SUVEI Core 已拒绝，Agent 调用已阻断。')));
             }
             close();
         } catch (decisionError) {
             errorElement.textContent = decisionError?.message || 'SUVEI Core 决策失败';
         } finally {
-            approveButton.disabled = rejectedRecovery;
-            rejectButton.disabled = false;
+            if (!handedOffToRecovery) {
+                approveButton.disabled = rejectedRecovery || revokedRecovery;
+                rejectButton.disabled = false;
+            }
         }
     };
-    approveButton.onclick = rejectedRecovery ? null : () => void decide(true);
+    approveButton.onclick = (rejectedRecovery || revokedRecovery) ? null : () => void decide(true);
     rejectButton.onclick = () => void decide(false);
     setSuveiModalOpen(modal, true);
     reasonInput.focus();
     return true;
 }
-
 /**
  * Renders a VCPLog notification in the notifications list.
  * @param {VCPLogData|string} logData - The parsed JSON log data or a raw string message.

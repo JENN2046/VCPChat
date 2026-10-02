@@ -1,5 +1,3 @@
-[Reading 468 lines from start (total: 468 lines, 0 remaining)]
-
 name: VCPMobileSync
 
 on:
@@ -468,5 +466,3 @@ jobs:
           VCP_UNPACKED_DIR: dist/linux-unpacked
         working-directory: ${{ steps.source.outputs.directory }}
         run: node --test tests/mobile-sync-package.test.js
-
-[executed on device: jenn-System-Product-Name (e56edfbb-b399-4aa6-b25e-322be9e0bde3)]

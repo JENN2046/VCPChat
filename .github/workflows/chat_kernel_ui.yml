@@ -1,5 +1,3 @@
-[Reading 255 lines from start (total: 255 lines, 0 remaining)]
-
 name: Chat Kernel and UI gates
 
 on:
@@ -255,5 +253,3 @@ jobs:
           VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
         working-directory: ${{ steps.source.outputs.directory }}
         run: npm run check:ui-system
-
-[executed on device: jenn-System-Product-Name (e56edfbb-b399-4aa6-b25e-322be9e0bde3)]

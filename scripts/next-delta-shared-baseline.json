@@ -32,8 +32,8 @@
     "reason": "shared filter authority; canonical menu calls its public API; filter persistence now uses operation-aware path patches to avoid complete-snapshot overwrite"
   },
   "modules/notificationRenderer.js": {
-    "sha256": "3499fcb55270d12a2f32b33d6e7f08d8cbc72fc43bdb2e0e11c28104c72e0f37",
-    "reason": "reviewed notification rendering after injected filtering and owner-scoped toast timers and transition listeners replaced ambient lifecycle effects; SUVEI generation/correction execution is now excluded from generic auto-approval, presents the exact Human Owner authority target and bounded terms in the trusted main-window review surface, commits Core authorize/reject/revoke before any confirmed ToolBox resume/reject transport, exposes committed-state recovery without replaying authority mutations, and blocks legacy RAG approval surfaces from bypassing the canonical SUVEI Core decision path"
+    "sha256": "d7641dee529afe33c57984ddf4d7191207a98526aba2a57c3e844b255b475353",
+    "reason": "reviewed notification rendering after injected filtering and owner-scoped toast timers and transition listeners replaced ambient lifecycle effects; SUVEI generation/correction execution is excluded from generic auto-approval, presents the exact Human Owner authority target and bounded terms in the trusted main-window review surface, commits Core authorize/reject/revoke before any confirmed ToolBox resume/reject transport, exposes committed-state recovery without replaying authority mutations, and blocks legacy RAG approval surfaces from bypassing the canonical SUVEI Core decision path; R1A Manual GUI recovery follow-up explicitly re-enables only the Human Owner revoke/reject control when a fresh reconcile_authorized packet reuses the modal after confirmed VCPLog transport loss, so an already-committed exact authorization can be revoked without creating a second authority path or weakening Core authority"
   },
   "VCPDistributedServer/frontend-plugin-loader.js": {
     "sha256": "0987ee41ed76c8b4f0963353c4b387f0b46a6202b9e8516aa02cce27568862ca",

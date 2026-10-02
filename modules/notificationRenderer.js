@@ -1,5 +1,3 @@
-[Reading 1174 lines from start (total: 1174 lines, 0 remaining)]
-
 // modules/notificationRenderer.js
 
 var notificationRendererApi = window.chatAPI || window.electronAPI;
@@ -1174,5 +1172,3 @@ window.notificationRenderer = {
         notificationLifecycleOwner = listenerOwner;
     }
 };
-
-[executed on device: jenn-System-Product-Name (e56edfbb-b399-4aa6-b25e-322be9e0bde3)]

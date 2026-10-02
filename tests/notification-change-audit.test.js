@@ -1,5 +1,3 @@
-[Reading 868 lines from start (total: 868 lines, 0 remaining)]
-
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -868,5 +866,3 @@ test('SUVEI generation review displays exact spec reference scratchpad and conte
     dom.window.close();
 });
 
-
-[executed on device: jenn-System-Product-Name (e56edfbb-b399-4aa6-b25e-322be9e0bde3)]

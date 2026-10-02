@@ -482,6 +482,8 @@ test('SUVEI transport failure reparses committed Core state into recovery mode',
     assert.equal(modal.style.display, 'flex');
     assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), []);
     assert.equal(window.document.getElementById('approveSuveiHumanAuthorization').textContent, '继续执行（恢复）');
+    assert.equal(window.document.getElementById('rejectSuveiHumanAuthorization').textContent, '撤销授权并拒绝');
+    assert.equal(window.document.getElementById('rejectSuveiHumanAuthorization').disabled, false);
     assert.match(window.document.getElementById('suveiHumanAuthorizationPacket').textContent, /Core state: AUTHORIZED/);
     dom.window.close();
 });

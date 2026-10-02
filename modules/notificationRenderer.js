@@ -489,6 +489,11 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             ? '确认撤销并通知 ToolBox'
             : (authorizedRecovery ? '撤销授权并拒绝' : '拒绝'));
     approveButton.disabled = rejectedRecovery || revokedRecovery;
+    // The same modal instance is reused after a committed Core decision when
+    // VCPLog transport fails. The first decision path disables both buttons;
+    // explicitly restore the recovery rejection/revoke control here so the
+    // Human Owner can revoke an already-committed exact authorization.
+    rejectButton.disabled = false;
     if (statusElement) {
         statusElement.textContent = rejectedRecovery
             ? `SUVEI Core 已提交拒绝；当前只恢复 ToolBox 的 approved=false。Target: ${packet.authorityTargetDigest}`

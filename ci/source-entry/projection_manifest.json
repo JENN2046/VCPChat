@@ -5405,9 +5405,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "509e9891a145aa0544dbabd99a82526884b4f531",
-          "size": 60011,
-          "sha256": "d2b4aae794b55dc141ca66ae035f28aa2eaa9bb670830726fd84f36269a2709a",
+          "blob": "52f9828c6651d29eecdf66c51f277eab71de8bd4",
+          "size": 60355,
+          "sha256": "94ac84a7ace898cdcbd29f9cc2fbcfe7da73fab393b3d894706ba28156d77c65",
           "kind": "source"
         },
         {
@@ -13441,9 +13441,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "509e9891a145aa0544dbabd99a82526884b4f531",
-          "size": 60011,
-          "sha256": "d2b4aae794b55dc141ca66ae035f28aa2eaa9bb670830726fd84f36269a2709a",
+          "blob": "52f9828c6651d29eecdf66c51f277eab71de8bd4",
+          "size": 60355,
+          "sha256": "94ac84a7ace898cdcbd29f9cc2fbcfe7da73fab393b3d894706ba28156d77c65",
           "kind": "source"
         },
         {
@@ -16267,9 +16267,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "540c84d0872e26435d43061821cf5089cd3cd968",
-          "size": 8549,
-          "sha256": "cedcf600f63c6fffb3f5ae9a461a9d9c82a76b670f0c5da99ceafc7d4bd9ed87",
+          "blob": "b9b51d9766601689387c0b6eb525cb7165eb6ad1",
+          "size": 8870,
+          "sha256": "5d5ffe01fd3f507d493a94fe77ccf3e7e0bdd5ea6a8347f81ff044e3fe8c0c9a",
           "kind": "source"
         },
         {
@@ -18958,9 +18958,9 @@
           "path": "tests/notification-change-audit.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "85f0fa0c1c110eb2fdb0bef4835d349a36ce9f14",
-          "size": 34856,
-          "sha256": "8f16d09738e9ed5828602b9c9fa1ed18ae33d74282205e313d187ce3fa986311",
+          "blob": "320cb97854cbb7ceecfefaaa1905279418edb1d7",
+          "size": 35075,
+          "sha256": "9407f056b753e6d901371cc92c7d2676c4135d69fb1cc344a923dec3478d8ab6",
           "kind": "source"
         },
         {

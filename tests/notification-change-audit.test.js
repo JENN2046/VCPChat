@@ -1,3 +1,5 @@
+[Reading 868 lines from start (total: 868 lines, 0 remaining)]
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -482,6 +484,8 @@ test('SUVEI transport failure reparses committed Core state into recovery mode',
     assert.equal(modal.style.display, 'flex');
     assert.deepEqual(JSON.parse(JSON.stringify(sentMessages)), []);
     assert.equal(window.document.getElementById('approveSuveiHumanAuthorization').textContent, '继续执行（恢复）');
+    assert.equal(window.document.getElementById('rejectSuveiHumanAuthorization').textContent, '撤销授权并拒绝');
+    assert.equal(window.document.getElementById('rejectSuveiHumanAuthorization').disabled, false);
     assert.match(window.document.getElementById('suveiHumanAuthorizationPacket').textContent, /Core state: AUTHORIZED/);
     dom.window.close();
 });
@@ -864,3 +868,5 @@ test('SUVEI generation review displays exact spec reference scratchpad and conte
     dom.window.close();
 });
 
+
+[executed on device: jenn-System-Product-Name (e56edfbb-b399-4aa6-b25e-322be9e0bde3)]

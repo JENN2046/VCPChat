@@ -1,3 +1,5 @@
+[Reading 1174 lines from start (total: 1174 lines, 0 remaining)]
+
 // modules/notificationRenderer.js
 
 var notificationRendererApi = window.chatAPI || window.electronAPI;
@@ -489,6 +491,11 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             ? '确认撤销并通知 ToolBox'
             : (authorizedRecovery ? '撤销授权并拒绝' : '拒绝'));
     approveButton.disabled = rejectedRecovery || revokedRecovery;
+    // The same modal instance is reused after a committed Core decision when
+    // VCPLog transport fails. The first decision path disables both buttons;
+    // explicitly restore the recovery rejection/revoke control here so the
+    // Human Owner can revoke an already-committed exact authorization.
+    rejectButton.disabled = false;
     if (statusElement) {
         statusElement.textContent = rejectedRecovery
             ? `SUVEI Core 已提交拒绝；当前只恢复 ToolBox 的 approved=false。Target: ${packet.authorityTargetDigest}`
@@ -1167,3 +1174,5 @@ window.notificationRenderer = {
         notificationLifecycleOwner = listenerOwner;
     }
 };
+
+[executed on device: jenn-System-Product-Name (e56edfbb-b399-4aa6-b25e-322be9e0bde3)]

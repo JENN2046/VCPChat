@@ -56,6 +56,7 @@ const fileManager = require('./modules/fileManager'); // Import the new file man
 const groupChat = require('./Groupmodules/groupchat'); // Import the group chat module
 const windowHandlers = require('./modules/ipc/windowHandlers'); // Import window IPC handlers
 const settingsHandlers = require('./modules/ipc/settingsHandlers'); // Import settings IPC handlers
+const suveiHumanAuthorizationHandlers = require('./modules/ipc/suveiHumanAuthorizationHandlers'); // SUVEI Human Owner authority
 const fileDialogHandlers = require('./modules/ipc/fileDialogHandlers'); // Import file dialog handlers
 const deepWikiHandlers = require('./modules/ipc/deepWikiHandlers'); // Ask Nova DeepWiki MCP handlers
 const { getAgentConfigById, ...agentHandlers } = require('./modules/ipc/agentHandlers'); // Import agent handlers
@@ -1239,6 +1240,10 @@ if (!gotTheLock) {
 
         // Create the native window first, but load the renderer only after IPC registration.
         createWindow({ deferLoad: true });
+        suveiHumanAuthorizationHandlers.initialize({
+            getMainWindow: () => mainWindow,
+            settingsManager: appSettingsManager
+        });
         createTray();
         reportLauncherProgress('window-created', 0.38, '主窗口骨架已创建');
         // --- Application Menu ---
@@ -2012,6 +2017,48 @@ if (!gotTheLock) {
         } else {
             console.warn('VCPLog WebSocket 未连接或未就绪，无法发送消息:', data);
         }
+    });
+
+    ipcMain.removeHandler('send-vcplog-message-confirmed');
+    ipcMain.handle('send-vcplog-message-confirmed', async (event, data) => {
+        if (!mainWindow || mainWindow.isDestroyed() || event?.sender !== mainWindow.webContents) {
+            return { success: false, code: 'VCPLOG_TRUSTED_CLIENT_REQUIRED' };
+        }
+        if (!vcpLogWebSocket || vcpLogWebSocket.readyState !== 1) {
+            return { success: false, code: 'VCPLOG_NOT_CONNECTED' };
+        }
+        let payload;
+        try {
+            payload = JSON.stringify(data);
+        } catch {
+            return { success: false, code: 'VCPLOG_MESSAGE_INVALID' };
+        }
+        return await new Promise(resolve => {
+            let settled = false;
+            const finish = result => {
+                if (settled) return;
+                settled = true;
+                resolve(result);
+            };
+            const timer = setTimeout(
+                () => finish({ success: false, code: 'VCPLOG_SEND_TIMEOUT' }),
+                5000
+            );
+            timer.unref?.();
+            try {
+                vcpLogWebSocket.send(payload, error => {
+                    clearTimeout(timer);
+                    if (error) {
+                        finish({ success: false, code: 'VCPLOG_SEND_FAILED' });
+                        return;
+                    }
+                    finish({ success: true, queued: true });
+                });
+            } catch {
+                clearTimeout(timer);
+                finish({ success: false, code: 'VCPLOG_SEND_FAILED' });
+            }
+        });
     });
 
 }

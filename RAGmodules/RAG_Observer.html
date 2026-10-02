@@ -2780,6 +2780,21 @@
         return { title, content, level };
       }
 
+      const SUVEI_HUMAN_AUTHORIZATION_COMMANDS = new Set([
+        "ExecuteAuthorizedGeneration",
+        "ExecuteAuthorizedCorrection",
+      ]);
+      const protectedSuveiApprovalRequestIds = new Set();
+
+      function isSuveiHumanAuthorizationApproval(approvalData) {
+        return Boolean(
+          approvalData &&
+          approvalData.toolName === "SUVEIStudio" &&
+          approvalData.args &&
+          SUVEI_HUMAN_AUTHORIZATION_COMMANDS.has(approvalData.args.command)
+        );
+      }
+
       function buildOverlayPayload(data) {
         const now = new Date().toLocaleTimeString();
         const type = data?.type || "unknown";
@@ -2802,6 +2817,8 @@
               req.args?.command || JSON.stringify(req.args || {}, null, 2) || ""
             ),
             timestamp: req.timestamp || now,
+            requiresTrustedHumanAuthorization:
+              isSuveiHumanAuthorizationApproval(req),
           };
           level = "warning";
         } else if (type === "tool_approval_response") {
@@ -2913,6 +2930,11 @@
                 (p) => p.requestId === requestId
               )
             ) {
+              const requiresTrustedHumanAuthorization =
+                isSuveiHumanAuthorizationApproval(req);
+              if (requiresTrustedHumanAuthorization) {
+                protectedSuveiApprovalRequestIds.add(requestId);
+              }
               overlayState.pendingApprovals.push({
                 requestId,
                 toolName: req.toolName || "未知工具",
@@ -2923,6 +2945,7 @@
                     ""
                 ),
                 timestamp: req.timestamp || new Date().toLocaleTimeString(),
+                requiresTrustedHumanAuthorization,
               });
             }
           }
@@ -2932,6 +2955,7 @@
           const requestId = String(data?.data?.requestId || "");
           if (requestId) {
             overlayState.pendingApprovalIds.delete(requestId);
+            protectedSuveiApprovalRequestIds.delete(requestId);
             overlayState.pendingApprovals =
               overlayState.pendingApprovals.filter(
                 (p) => p.requestId !== requestId
@@ -4375,6 +4399,13 @@
       }
 
       function submitToolApproval(requestId, approved, btnElement = null, reason = "") {
+        if (protectedSuveiApprovalRequestIds.has(requestId)) {
+          console.warn(
+            "[RAG Observer] SUVEI protected approval must be completed in the trusted main VCPChat surface:",
+            requestId
+          );
+          return false;
+        }
         if (!requestId) {
           console.error("[RAG Observer] 工具审核缺少 requestId，无法提交。");
           return false;
@@ -4472,6 +4503,19 @@
         const requestTime =
           approvalData.timestamp || new Date().toLocaleString();
         const encodedRequestId = encodeURIComponent(requestId);
+        const requiresTrustedHumanAuthorization =
+          isSuveiHumanAuthorizationApproval(approvalData);
+        if (requestId && requiresTrustedHumanAuthorization) {
+          protectedSuveiApprovalRequestIds.add(requestId);
+        }
+        const approvalActionsHtml = requiresTrustedHumanAuthorization
+          ? `<div class="approval-actions">
+                <button class="approval-btn" disabled>请在 VCPChat 主窗口审视 SUVEI 授权</button>
+             </div>`
+          : `<div class="approval-actions">
+                <button class="approval-btn approve" onclick="handleToolApprovalAction('${encodedRequestId}', true, this)" ${requestId ? "" : "disabled"}>允许</button>
+                <button class="approval-btn reject" onclick="handleToolApprovalAction('${encodedRequestId}', false, this)" ${requestId ? "" : "disabled"}>拒绝</button>
+             </div>`;
 
         block.innerHTML = `
                       <h3 style="color: var(--accent-notification);">
@@ -4489,14 +4533,7 @@
                             String(command || "(empty command)")
                           )}
                       </div>
-                      <div class="approval-actions">
-                          <button class="approval-btn approve" onclick="handleToolApprovalAction('${encodedRequestId}', true, this)" ${
-          requestId ? "" : "disabled"
-        }>允许</button>
-                          <button class="approval-btn reject" onclick="handleToolApprovalAction('${encodedRequestId}', false, this)" ${
-          requestId ? "" : "disabled"
-        }>拒绝</button>
-                      </div>
+                      ${approvalActionsHtml}
                   `;
 
         if (window.pretextBridge && window.pretextBridge.isReady()) {

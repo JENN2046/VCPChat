@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "7dc18a832604d41a89dedde70a13dcaba4608b40",
-          "size": 18473,
-          "sha256": "dbd2665a2da9e48718545d40aab6f7116a551dcfe25c1bb5a6942cba01a03f48",
+          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
+          "size": 18553,
+          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
           "kind": "source"
         },
         {
@@ -601,9 +601,9 @@
           "path": "rust_chat_data_service/src/sync_wire.rs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4c930cfd7f9f47437564709962767ced3b87435",
-          "size": 17444,
-          "sha256": "4584f75ace8481fe6580578f83c2fe9573401a412c4e3e3289ec2e952f68ef57",
+          "blob": "c558e392a658c645fa494b50398c672bda8d0046",
+          "size": 17450,
+          "sha256": "e1277eba91607aa0ee46e3802fe905e94244c8f1907913ffdbbf945cecba3c0c",
           "kind": "source"
         },
         {
@@ -4370,9 +4370,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "98c49290166baf0edf3b473325884804054c972a",
-          "size": 93903,
-          "sha256": "e22481f4711d865ccfe179d0d347c6ca59b48661308947cab65550cbdb43bcc4",
+          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
+          "size": 95787,
+          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
           "kind": "source"
         },
         {
@@ -5099,9 +5099,9 @@
           "path": "modules/ipc/ragHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "404445c5067a29fa5b807d4da01aaf5adc5b402d",
-          "size": 18705,
-          "sha256": "66f948ee98bd8cc3a3a94cb8ffcdc55cd1f0ffdf635fe15f1862bb5c604fa303",
+          "blob": "2d177c5106f5b2ae2e61f58d2cae48037d78c50f",
+          "size": 19541,
+          "sha256": "1ff9732fa291b70ce6c987c56727da75a5a1a49e3560bf610a800f0b69a7f43d",
           "kind": "source"
         },
         {
@@ -5405,9 +5405,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "8af00fe18a8267d0777766ee1abd056fc741222f",
-          "size": 39959,
-          "sha256": "27a70644d78aebfb38065d0beaced19af7853183af145c589eb6c3da14be796b",
+          "blob": "509e9891a145aa0544dbabd99a82526884b4f531",
+          "size": 60011,
+          "sha256": "d2b4aae794b55dc141ca66ae035f28aa2eaa9bb670830726fd84f36269a2709a",
           "kind": "source"
         },
         {
@@ -6197,9 +6197,9 @@
           "path": "modules/settings/schema/server-connection.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f361003cf2db683a60d8dff8e48f851d0fa42aa1",
-          "size": 3245,
-          "sha256": "0f2357b0b947ea4400315410604e8faa0f18ce395924a9a08afcdf2566cb6bf2",
+          "blob": "1ce6b713acf51844f15f82dfb37d306e36200b1b",
+          "size": 4676,
+          "sha256": "24cdc3fc5458bfcd028a79a95351523473bc0727f184ea289656c061a6d66cd6",
           "kind": "source"
         },
         {
@@ -7484,9 +7484,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "7dc18a832604d41a89dedde70a13dcaba4608b40",
-          "size": 18473,
-          "sha256": "dbd2665a2da9e48718545d40aab6f7116a551dcfe25c1bb5a6942cba01a03f48",
+          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
+          "size": 18553,
+          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
           "kind": "source"
         },
         {
@@ -7727,9 +7727,9 @@
           "path": "preloads/api/vcpLog.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c1ba80e7350c4e3b41d769e19961ef5008c74b68",
-          "size": 795,
-          "sha256": "b54e8d1fea6850cc61f2d3028a920128f2b44b3bade0ce46b000311def6caff7",
+          "blob": "b04d1bf8e0298db4326f6efcf91b78b42d3275e2",
+          "size": 902,
+          "sha256": "77e68bc1b1224e5bb7180a30994f826f7f4d4eb94646d3f10901011e325c8c1c",
           "kind": "source"
         },
         {
@@ -8087,9 +8087,9 @@
           "path": "rust_chat_data_service/src/sync_wire.rs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4c930cfd7f9f47437564709962767ced3b87435",
-          "size": 17444,
-          "sha256": "4584f75ace8481fe6580578f83c2fe9573401a412c4e3e3289ec2e952f68ef57",
+          "blob": "c558e392a658c645fa494b50398c672bda8d0046",
+          "size": 17450,
+          "sha256": "e1277eba91607aa0ee46e3802fe905e94244c8f1907913ffdbbf945cecba3c0c",
           "kind": "source"
         },
         {
@@ -10233,6 +10233,33 @@
           "size": 16293,
           "sha256": "c0e4e7ca6636010df110cbdb8945daea0f97e26d84d039b7679353291aba88cd",
           "kind": "source"
+        },
+        {
+          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
+          "size": 2806,
+          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/suveiHumanAuthorizationService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c37074aede9d98c63c4644c775a86fe81383482d",
+          "size": 37489,
+          "sha256": "e7d90c1574b7c532fea637c66d0d2672bfbae0bd12e6716ce174a6422bf26d82",
+          "kind": "source"
+        },
+        {
+          "path": "preloads/api/suveiHumanAuthorization.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
+          "size": 629,
+          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
+          "kind": "source"
         }
       ],
       "static_native_assets": [
@@ -10875,18 +10902,18 @@
           "path": "RAGmodules/RAG_Observer.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "633a3dcdb3a5193f9a36c9ad0dcc1ceb87e1c07e",
-          "size": 169947,
-          "sha256": "c9e8a15f19737bb92ab2dd9ccf3b7661ac21023f442ae52dff5a0a77c96e4f8c",
+          "blob": "f9bce3b58bc7b39aff44e84c461b9d635a907a68",
+          "size": 171629,
+          "sha256": "266d54a65c61e2535c8627b37083539a86cf44b9e6b2f55077847fd2a8562499",
           "kind": "source"
         },
         {
           "path": "RAGmodules/RAG_Overlay.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "66ed723fe4cf14055ca4285d965804f67c7e293d",
-          "size": 23908,
-          "sha256": "1a6cf4f7d263abedfffdd09821f31192bcd9dc359c93921fe3e58f7e6de03ad1",
+          "blob": "f94b8a63b80f8137f5a76fa303be8d57804ba64a",
+          "size": 25032,
+          "sha256": "ef97141d204fdc87afc50268e8d5d77e33ee82ebd9f9b9ec69051c942c0e9142",
           "kind": "source"
         },
         {
@@ -12307,9 +12334,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "442c3a2a0a12ba3cc00770d099d641bb67ee123c",
-          "size": 246443,
-          "sha256": "4a36d1d49602546df83229605bc8822e66e063717ea6e1be6e4199fa295404eb",
+          "blob": "4d4b33647115daccdfb0fc92d823a13ce5de7389",
+          "size": 247034,
+          "sha256": "171ee3b863467402cbee5f1c4ca45c739f9bd46ae8ba008c98a3fde44a13ca5f",
           "kind": "source"
         },
         {
@@ -12397,9 +12424,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "98c49290166baf0edf3b473325884804054c972a",
-          "size": 93903,
-          "sha256": "e22481f4711d865ccfe179d0d347c6ca59b48661308947cab65550cbdb43bcc4",
+          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
+          "size": 95787,
+          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
           "kind": "source"
         },
         {
@@ -13108,9 +13135,9 @@
           "path": "modules/ipc/ragHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "404445c5067a29fa5b807d4da01aaf5adc5b402d",
-          "size": 18705,
-          "sha256": "66f948ee98bd8cc3a3a94cb8ffcdc55cd1f0ffdf635fe15f1862bb5c604fa303",
+          "blob": "2d177c5106f5b2ae2e61f58d2cae48037d78c50f",
+          "size": 19541,
+          "sha256": "1ff9732fa291b70ce6c987c56727da75a5a1a49e3560bf610a800f0b69a7f43d",
           "kind": "source"
         },
         {
@@ -13414,9 +13441,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "8af00fe18a8267d0777766ee1abd056fc741222f",
-          "size": 39959,
-          "sha256": "27a70644d78aebfb38065d0beaced19af7853183af145c589eb6c3da14be796b",
+          "blob": "509e9891a145aa0544dbabd99a82526884b4f531",
+          "size": 60011,
+          "sha256": "d2b4aae794b55dc141ca66ae035f28aa2eaa9bb670830726fd84f36269a2709a",
           "kind": "source"
         },
         {
@@ -14188,9 +14215,9 @@
           "path": "modules/settings/schema/server-connection.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f361003cf2db683a60d8dff8e48f851d0fa42aa1",
-          "size": 3245,
-          "sha256": "0f2357b0b947ea4400315410604e8faa0f18ce395924a9a08afcdf2566cb6bf2",
+          "blob": "1ce6b713acf51844f15f82dfb37d306e36200b1b",
+          "size": 4676,
+          "sha256": "24cdc3fc5458bfcd028a79a95351523473bc0727f184ea289656c061a6d66cd6",
           "kind": "source"
         },
         {
@@ -15466,9 +15493,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "7dc18a832604d41a89dedde70a13dcaba4608b40",
-          "size": 18473,
-          "sha256": "dbd2665a2da9e48718545d40aab6f7116a551dcfe25c1bb5a6942cba01a03f48",
+          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
+          "size": 18553,
+          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
           "kind": "source"
         },
         {
@@ -15691,9 +15718,9 @@
           "path": "preloads/api/vcpLog.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c1ba80e7350c4e3b41d769e19961ef5008c74b68",
-          "size": 795,
-          "sha256": "b54e8d1fea6850cc61f2d3028a920128f2b44b3bade0ce46b000311def6caff7",
+          "blob": "b04d1bf8e0298db4326f6efcf91b78b42d3275e2",
+          "size": 902,
+          "sha256": "77e68bc1b1224e5bb7180a30994f826f7f4d4eb94646d3f10901011e325c8c1c",
           "kind": "source"
         },
         {
@@ -15988,9 +16015,9 @@
           "path": "rust_chat_data_service/src/sync_wire.rs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4c930cfd7f9f47437564709962767ced3b87435",
-          "size": 17444,
-          "sha256": "4584f75ace8481fe6580578f83c2fe9573401a412c4e3e3289ec2e952f68ef57",
+          "blob": "c558e392a658c645fa494b50398c672bda8d0046",
+          "size": 17450,
+          "sha256": "e1277eba91607aa0ee46e3802fe905e94244c8f1907913ffdbbf945cecba3c0c",
           "kind": "source"
         },
         {
@@ -16105,9 +16132,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a4ed4005def12fe271502174438d555095781027",
-          "size": 33674,
-          "sha256": "c92cc1b4abf35af22aac5ba9bd35ae49fcc55cc3ac7e6f464b84c1724d8ec278",
+          "blob": "2bcb6563c7e1250602471b22d905a6256fcbda40",
+          "size": 35094,
+          "sha256": "8b7a690bb4b904217b8d86d0a329ef75bf8f2c6ea6c1c42fc103ff860186ae0b",
           "kind": "source"
         },
         {
@@ -16240,9 +16267,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "c73c442b4fd9854c14f9d55dd394dbbbaaf6a6e3",
-          "size": 8100,
-          "sha256": "16ec5ab25e94a29260aca7533725d1575d34a732975318aecda9ab40ff6a1b93",
+          "blob": "540c84d0872e26435d43061821cf5089cd3cd968",
+          "size": 8549,
+          "sha256": "cedcf600f63c6fffb3f5ae9a461a9d9c82a76b670f0c5da99ceafc7d4bd9ed87",
           "kind": "source"
         },
         {
@@ -17752,9 +17779,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5196efe74915a65f8cc8ed26367b67256e9e65f0",
-          "size": 15318,
-          "sha256": "cea89b440e8188ef15ad2aab6cb18c449a90a7d3933f55b1c7d1cde12e0949b8",
+          "blob": "84cfa1fa980d54bd77eff010e299e74ac3ada424",
+          "size": 15933,
+          "sha256": "4e1d2d568f5896345697a22045cde45839740a093ac79a91c674f620f1bbd2a8",
           "kind": "source"
         },
         {
@@ -18899,6 +18926,51 @@
           "size": 517,
           "sha256": "de250fabacb1702d6c5ae9a1a56bd73f9785f81b325a76e14b9b855b5fe31096",
           "kind": "source"
+        },
+        {
+          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
+          "size": 2806,
+          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/suveiHumanAuthorizationService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c37074aede9d98c63c4644c775a86fe81383482d",
+          "size": 37489,
+          "sha256": "e7d90c1574b7c532fea637c66d0d2672bfbae0bd12e6716ce174a6422bf26d82",
+          "kind": "source"
+        },
+        {
+          "path": "preloads/api/suveiHumanAuthorization.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
+          "size": 629,
+          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
+          "kind": "source"
+        },
+        {
+          "path": "tests/notification-change-audit.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85f0fa0c1c110eb2fdb0bef4835d349a36ce9f14",
+          "size": 34856,
+          "sha256": "8f16d09738e9ed5828602b9c9fa1ed18ae33d74282205e313d187ce3fa986311",
+          "kind": "source"
+        },
+        {
+          "path": "tests/suvei-human-authorization.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e7be7fc770e773045852383fd3e420cb3102f24b",
+          "size": 33765,
+          "sha256": "6aad5a397bc14a2c1da6b4962cf07a4d2da0d5a429057ed000dda6d07fe3d8c5",
+          "kind": "source"
         }
       ],
       "static_native_assets": [
@@ -19025,12 +19097,14 @@
             "tests/main-chat-theme-owner.test.mjs",
             "tests/message-edit-watcher-failure.test.js",
             "tests/non-streaming-event-consumer.test.mjs",
+            "tests/notification-change-audit.test.js",
             "tests/owned-preload-subscription.test.mjs",
             "tests/stream-consumer-registry.test.mjs",
             "tests/stream-coordinator.test.mjs",
             "tests/stream-manager-terminal-cleanup.test.js",
             "tests/stream-session.test.mjs",
             "tests/stream-transient-history.test.mjs",
+            "tests/suvei-human-authorization.test.js",
             "tests/topic-selection-readiness.test.mjs",
             "tests/ui-helper-chat-scroll-follow.test.js"
           ]

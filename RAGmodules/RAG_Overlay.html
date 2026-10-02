@@ -480,22 +480,28 @@
           navEl.classList.remove("visible");
         }
 
-        // 显示审批按钮（已审核项为只读态）
+        // 显示审批按钮（SUVEI protected request 只能回主窗口审视）
         const isProcessed = state.processedApprovalIds.has(currentId);
+        const requiresTrustedHumanAuthorization =
+          req.requiresTrustedHumanAuthorization === true;
         approvalActions.classList.add("visible");
-        approveBtn.disabled = isProcessed;
-        rejectBtn.disabled = isProcessed;
-        approveBtn.textContent = isProcessed ? "已允许" : "允许";
-        rejectBtn.textContent = isProcessed ? "已拒绝" : "拒绝";
+        approveBtn.disabled = isProcessed || requiresTrustedHumanAuthorization;
+        rejectBtn.disabled = isProcessed || requiresTrustedHumanAuthorization;
+        approveBtn.textContent = requiresTrustedHumanAuthorization
+          ? "请回主窗口审视"
+          : (isProcessed ? "已允许" : "允许");
+        rejectBtn.textContent = requiresTrustedHumanAuthorization
+          ? "SUVEI Core 授权受保护"
+          : (isProcessed ? "已拒绝" : "拒绝");
 
         // 切换 reason 输入框并恢复对应草稿
         if (approvalReasonWrapper && approvalReasonInput) {
           approvalReasonWrapper.classList.add("visible");
           approvalReasonInput.value = state.approvalReasons.get(currentId) || "";
-          approvalReasonInput.disabled = isProcessed;
-          approvalReasonInput.placeholder = isProcessed
-            ? "本次审核已提交"
-            : "可选：告诉 AI 为什么通过或拒绝";
+          approvalReasonInput.disabled = isProcessed || requiresTrustedHumanAuthorization;
+          approvalReasonInput.placeholder = requiresTrustedHumanAuthorization
+            ? "此请求只能在 VCPChat 主窗口完成 Human Owner 授权"
+            : (isProcessed ? "本次审核已提交" : "可选：告诉 AI 为什么通过或拒绝");
         }
       }
 
@@ -530,6 +536,8 @@
                 maid: p.maid || "未知助手",
                 command: p.command || "",
                 timestamp: p.timestamp || "",
+                requiresTrustedHumanAuthorization:
+                  p.requiresTrustedHumanAuthorization === true,
               });
               newIds.push(p.requestId);
             }
@@ -579,6 +587,8 @@
             maid: approval.maid || "未知助手",
             command: approval.command || "",
             timestamp: approval.timestamp || "",
+            requiresTrustedHumanAuthorization:
+              approval.requiresTrustedHumanAuthorization === true,
           });
           state.approvalRequestIds.push(String(approval.requestId));
           renderCurrentApproval();
@@ -611,6 +621,14 @@
         const currentId = ids[state.currentApprovalIndex];
         if (!currentId || !window.electronAPI?.sendRagOverlayApprovalAction)
           return;
+        const req = state.approvalRequests.get(currentId);
+        if (req?.requiresTrustedHumanAuthorization === true) {
+          titleText.textContent = "🔐 SUVEI Human Owner 授权";
+          messageText.textContent =
+            "此请求只能在 VCPChat 主窗口审视 canonical authority target。";
+          setDotColor("warning");
+          return;
+        }
 
         const reasonRaw =
           (approvalReasonInput && approvalReasonInput.value) ||

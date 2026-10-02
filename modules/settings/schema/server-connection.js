@@ -45,6 +45,39 @@ export const serverConnectionSection = section('server-connection', '服务器�
             text('vcpLogKey', { inputType: 'password', label: 'VCP WebSocket鉴权 Key', stacked: true, save: { trim: true } }),
         ],
     }),
+    card('suveiHumanAuthorization', {
+        cardKey: 'suvei-human-authorization',
+        title: 'SUVEI 人类授权',
+        description: '绑定 VCPChat 当前 Human Owner 到 SUVEI Core。密码不保存，仅在本次应用会话登录时进入内存。',
+        fields: [
+            text('suveiHumanAuthorizationBaseUrl', {
+                inputType: 'url',
+                label: 'SUVEI Core URL',
+                placeholder: '例如 https://suvei.example.com',
+                stacked: true,
+                save: { trim: true },
+            }),
+            text('suveiHumanAuthorizationOwnerEmail', {
+                inputType: 'email',
+                label: 'Human Owner 邮箱',
+                stacked: true,
+                save: { trim: true },
+            }),
+            text('suveiHumanAuthorizationExpectedOwnerUserId', {
+                label: 'Expected Owner User ID',
+                placeholder: 'Core User UUID',
+                stacked: true,
+                save: { trim: true },
+            }),
+            text('suveiHumanAuthorizationExpectedOrganizationId', {
+                label: 'Expected Organization ID',
+                placeholder: 'Core Organization UUID',
+                stacked: true,
+                hint: '批准只对 exact pending target 生效；Owner / Organization 任一不匹配都会 fail closed。',
+                save: { trim: true },
+            }),
+        ],
+    }),
     card('networkNotes', {
         cardKey: 'network-notes',
         title: '网络笔记',

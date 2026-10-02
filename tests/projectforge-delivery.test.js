@@ -50,8 +50,18 @@ test('Trace extracts the shipped preload metadata without requiring workspace mo
     const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');
     const result = await loadPreloadDecls(path.join(__dirname, '..'));
     assert.equal(result.status, 'ok', result.error);
-    assert.equal(result.apis.length, 401);
+    assert.equal(result.apis.length, 407);
     assert.ok(result.apis.some(api => api.name === 'projectForgeDeleteProject' && api.channel === 'project-forge:delete-project'));
+    for (const [name, channel] of [
+        ['getSuveiHumanAuthorizationStatus', 'suvei-human-authorization:status'],
+        ['loginSuveiHumanOwner', 'suvei-human-authorization:login'],
+        ['logoutSuveiHumanOwner', 'suvei-human-authorization:logout'],
+        ['prepareSuveiHumanAuthorization', 'suvei-human-authorization:prepare'],
+        ['decideSuveiHumanAuthorization', 'suvei-human-authorization:decide'],
+        ['sendVCPLogMessageConfirmed', 'send-vcplog-message-confirmed'],
+    ]) {
+        assert.ok(result.apis.some(api => api.name === name && api.channel === channel), `${name} missing`);
+    }
 });
 
 test('Trace refuses a linked declaration directory and does not return stale metadata', async t => {

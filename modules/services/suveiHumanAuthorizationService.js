@@ -8,6 +8,7 @@ const REQUEST_ID_RE = /^[A-Za-z0-9:_-]{1,160}$/;
 const SUPPORTED_COMMANDS = Object.freeze({
     ExecuteAuthorizedGeneration: "generate_candidate",
     ExecuteAuthorizedCorrection: "inpaint_candidate",
+    RequestMutationGrantAuthorization: "creative_spec.append_agent_version.v1",
 });
 const RESPONSE_MAX_BYTES = 1024 * 1024;
 const REQUEST_TIMEOUT_MS = 10000;
@@ -90,7 +91,75 @@ function canonicalDigest(value) {
     return crypto.createHash("sha256").update(canonicalJson(value), "utf8").digest("hex");
 }
 
+const MUTATION_ACTION = "creative_spec.append_agent_version.v1";
+const MUTATION_FIELD_KEYS = new Set([
+    "intent", "identity", "structure", "material", "color", "composition",
+    "lighting", "styling", "scene", "camera", "textPolicy", "acceptanceCriteria",
+]);
+
+function mutationProposalTerms(intent) {
+    return {
+        schemaVersion: "agent_mutation_grant_intent.v1", projectId: intent.projectId,
+        creativeSpecId: intent.creativeSpecId, delegateUserId: intent.delegateUserId,
+        action: intent.action, allowedFieldKeys: intent.allowedFieldKeys,
+        baseVersion: intent.baseVersion, maxMutations: intent.maxMutations,
+        expiresAt: intent.expiresAt, normalizedReason: intent.normalizedReason,
+    };
+}
+
+function linkedGrantId(intent) {
+    return intent.action === MUTATION_ACTION ? intent.grantId : intent.executionGrantId;
+}
+
+function unboundExecution(intent) {
+    return intent.action === MUTATION_ACTION
+        || (intent.executionOperationId === null && intent.executionCommandId === null);
+}
+
+function committedTermsDigest(intent) {
+    return intent.action === MUTATION_ACTION ? intent.grantTermsDigest : intent.authorizationTermsDigest;
+}
+
+function intentExpiry(intent) {
+    return intent.action === MUTATION_ACTION ? intent.expiresAt : intent.authorizationExpiresAt;
+}
+
+function assertMutationIntentShape(intent, binding, projectId, intentId, allowedStates) {
+    if (!intent || intent.schemaVersion !== "agent_mutation_grant_intent.v1"
+        || intent.action !== MUTATION_ACTION || intent.id !== intentId || intent.intentCommandId !== intentId
+        || intent.projectId !== projectId || intent.organizationId !== binding.expectedOrganizationId
+        || !UUID_RE.test(String(intent.creativeSpecId || "")) || !UUID_RE.test(String(intent.delegateUserId || ""))
+        || !allowedStates.includes(intent.proposalState) || !Number.isInteger(intent.revision) || intent.revision < 0
+        || !Number.isInteger(intent.baseVersion) || intent.baseVersion < 1 || intent.baseVersion > 2147483600
+        || !Number.isInteger(intent.maxMutations) || intent.maxMutations < 1 || intent.maxMutations > 32
+        || !Array.isArray(intent.allowedFieldKeys) || intent.allowedFieldKeys.length < 1 || intent.allowedFieldKeys.length > 12
+        || new Set(intent.allowedFieldKeys).size !== intent.allowedFieldKeys.length
+        || intent.allowedFieldKeys.some(key => !MUTATION_FIELD_KEYS.has(key))
+        || canonicalJson([...intent.allowedFieldKeys].sort()) !== canonicalJson(intent.allowedFieldKeys)
+        || typeof intent.normalizedReason !== "string" || !intent.normalizedReason.trim() || intent.normalizedReason.length > 2000
+        || !Number.isFinite(Date.parse(String(intent.expiresAt || "")))
+        || new Date(intent.expiresAt).toISOString() !== intent.expiresAt
+        || canonicalDigest(mutationProposalTerms(intent)) !== intent.requestFingerprint) {
+        fail("SUVEI_AUTHORITY_TARGET_INVALID");
+    }
+    const noGrant = ["PENDING", "REJECTED"].includes(intent.proposalState);
+    if (noGrant ? (intent.authorizedBy !== null || intent.authorizedAt !== null || intent.grantId !== null || intent.grantTermsDigest !== null)
+        : (!UUID_RE.test(String(intent.authorizedBy || "")) || !Number.isFinite(Date.parse(String(intent.authorizedAt || "")))
+            || !UUID_RE.test(String(intent.grantId || "")) || !/^[0-9a-f]{64}$/.test(String(intent.grantTermsDigest || "")))) {
+        fail("SUVEI_AUTHORITY_TARGET_INVALID");
+    }
+}
+
 function authorizationTerms(intent, ownerUserId, authorization) {
+    if (intent.action === MUTATION_ACTION) {
+        return {
+            organizationId: intent.organizationId, projectId: intent.projectId,
+            creativeSpecId: intent.creativeSpecId, delegateUserId: intent.delegateUserId,
+            action: intent.action, allowedFieldKeys: intent.allowedFieldKeys,
+            baseVersion: intent.baseVersion, maxMutations: intent.maxMutations,
+            expiresAt: intent.expiresAt, authorizedBy: ownerUserId,
+        };
+    }
     return {
         schemaVersion: "agent_generation_authorization.v1",
         intentId: intent.id,
@@ -127,6 +196,15 @@ function normalizedTtl(value) {
 }
 
 function canonicalIntentSnapshot(intent) {
+    if (intent.action === MUTATION_ACTION) {
+        return {
+            ...mutationProposalTerms(intent), id: intent.id, organizationId: intent.organizationId,
+            intentCommandId: intent.intentCommandId, requestFingerprint: intent.requestFingerprint,
+            proposalState: intent.proposalState, revision: intent.revision,
+            authorizedBy: intent.authorizedBy, authorizedAt: intent.authorizedAt,
+            grantId: intent.grantId, grantTermsDigest: intent.grantTermsDigest,
+        };
+    }
     return {
         schemaVersion: intent.schemaVersion,
         id: intent.id,
@@ -171,6 +249,9 @@ function canonicalIntentSnapshot(intent) {
 }
 
 function assertIntentShape(intent, binding, projectId, intentId, expectedAction, allowedStates = ["PENDING"]) {
+    if (expectedAction === MUTATION_ACTION) {
+        return assertMutationIntentShape(intent, binding, projectId, intentId, allowedStates);
+    }
     if (!intent || typeof intent !== "object" || Array.isArray(intent)
         || intent.schemaVersion !== "agent_execution_intent.v1"
         || exactUuid(intent.id, "SUVEI_INTENT_IDENTITY_INVALID") !== intentId
@@ -400,8 +481,9 @@ class SuveiHumanAuthorizationService {
         return this.identity;
     }
 
-    async getIntent(projectId, intentId) {
-        return this.request(`/api/v1/projects/${projectId}/agent-execution-intents/${intentId}`);
+    async getIntent(projectId, intentId, expectedAction) {
+        const collection = expectedAction === MUTATION_ACTION ? "agent-mutation-grant-intents" : "agent-execution-intents";
+        return this.request(`/api/v1/projects/${projectId}/${collection}/${intentId}`);
     }
 
     async prepare(approvalData = {}) {
@@ -416,7 +498,7 @@ class SuveiHumanAuthorizationService {
         if (!expectedAction) fail("SUVEI_APPROVAL_COMMAND_NOT_SUPPORTED");
         const projectId = exactUuid(args.projectId, "SUVEI_APPROVAL_PROJECT_ID_INVALID");
         const intentId = exactUuid(args.intentId, "SUVEI_APPROVAL_INTENT_ID_INVALID");
-        const intent = await this.getIntent(projectId, intentId);
+        const intent = await this.getIntent(projectId, intentId, expectedAction);
         assertIntentShape(intent, this.binding, projectId, intentId, expectedAction, ["PENDING", "AUTHORIZED", "REJECTED", "REVOKED"]);
 
         const requested = intent.requestedOutputCount;
@@ -424,7 +506,7 @@ class SuveiHumanAuthorizationService {
         const rejectionReconciliation = intent.proposalState === "REJECTED";
         const revocationReconciliation = intent.proposalState === "REVOKED";
         const committedAuthorization = reconciliation || revocationReconciliation;
-        const committedExpiry = committedAuthorization ? Date.parse(String(intent.authorizationExpiresAt || "")) : NaN;
+        const committedExpiry = committedAuthorization ? Date.parse(String(intentExpiry(intent) || "")) : NaN;
         if (reconciliation && (!Number.isFinite(committedExpiry)
             || this.now() + MIN_TOOL_REMAINING_MS > committedExpiry
             || intent.revision < 1)) {
@@ -433,7 +515,11 @@ class SuveiHumanAuthorizationService {
         if (revocationReconciliation && (!Number.isFinite(committedExpiry) || intent.revision < 2)) {
             fail("SUVEI_REVOCATION_RECEIPT_INVALID");
         }
-        const authorization = rejectionReconciliation ? null : {
+        const authorization = rejectionReconciliation ? null : (expectedAction === MUTATION_ACTION ? {
+            expectedRevision: reconciliation ? intent.revision - 1 : (revocationReconciliation ? intent.revision - 2 : intent.revision),
+            requestFingerprint: intent.requestFingerprint,
+            expiresAt: intent.expiresAt,
+        } : {
             expectedRevision: reconciliation
                 ? intent.revision - 1
                 : (revocationReconciliation ? intent.revision - 2 : intent.revision),
@@ -447,7 +533,7 @@ class SuveiHumanAuthorizationService {
             maxConcurrentAttempts: requested,
             maxWallClockMs: MAX_WALL_CLOCK_MS,
             maxAdapterCallsPerAttempt: 1,
-        };
+        });
         const expectedAuthorizationTermsDigest = rejectionReconciliation
             ? null
             : authorizationTermsDigest(intent, this.identity.userId, authorization);
@@ -464,10 +550,9 @@ class SuveiHumanAuthorizationService {
 
         if (committedAuthorization) {
             if (String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
-                || String(intent.authorizationTermsDigest || "").toLowerCase() !== expectedAuthorizationTermsDigest
-                || !UUID_RE.test(String(intent.executionGrantId || ""))
-                || intent.executionOperationId !== null
-                || intent.executionCommandId !== null) {
+                || String(committedTermsDigest(intent) || "").toLowerCase() !== expectedAuthorizationTermsDigest
+                || !UUID_RE.test(String(linkedGrantId(intent) || ""))
+                || !unboundExecution(intent)) {
                 fail(revocationReconciliation
                     ? "SUVEI_REVOCATION_RECEIPT_INVALID"
                     : "SUVEI_COMMITTED_AUTHORIZATION_MISMATCH");
@@ -515,9 +600,9 @@ class SuveiHumanAuthorizationService {
             ? requestStartedAt + ttlMs
             : localDeadline;
         const boundedToolDeadline = Math.min(localDeadline, callerDeadline);
-        const toolApprovalDeadline = reconciliation
-            ? Math.min(boundedToolDeadline, committedExpiry)
-            : boundedToolDeadline;
+        const toolApprovalDeadline = expectedAction === MUTATION_ACTION && !rejectionReconciliation && !revocationReconciliation
+            ? Math.min(boundedToolDeadline, Date.parse(intent.expiresAt))
+            : (reconciliation ? Math.min(boundedToolDeadline, committedExpiry) : boundedToolDeadline);
         if (this.now() + MIN_TOOL_REMAINING_MS > toolApprovalDeadline) fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         const toolApprovalExpiresAt = new Date(toolApprovalDeadline).toISOString();
         const packet = {
@@ -563,7 +648,7 @@ class SuveiHumanAuthorizationService {
             pending.expectedAction,
             ["AUTHORIZED"],
         );
-        const committedExpiry = Date.parse(String(intent.authorizationExpiresAt || ""));
+        const committedExpiry = Date.parse(String(intentExpiry(intent) || ""));
         if (!Number.isFinite(committedExpiry)
             || this.now() + MIN_TOOL_REMAINING_MS > committedExpiry) {
             fail("SUVEI_COMMITTED_AUTHORIZATION_EXPIRED");
@@ -571,11 +656,10 @@ class SuveiHumanAuthorizationService {
         if (intent.revision !== pending.authorization.expectedRevision + 1
             || intent.requestFingerprint !== pending.authorization.requestFingerprint
             || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
-            || String(intent.authorizationTermsDigest || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
-            || new Date(intent.authorizationExpiresAt).toISOString() !== pending.authorization.expiresAt
-            || !UUID_RE.test(String(intent.executionGrantId || ""))
-            || intent.executionOperationId !== null
-            || intent.executionCommandId !== null) {
+            || String(committedTermsDigest(intent) || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
+            || new Date(intentExpiry(intent)).toISOString() !== pending.authorization.expiresAt
+            || !UUID_RE.test(String(linkedGrantId(intent) || ""))
+            || !unboundExecution(intent)) {
             fail("SUVEI_AUTHORIZATION_RECEIPT_INVALID");
         }
         return intent;
@@ -583,7 +667,7 @@ class SuveiHumanAuthorizationService {
 
     async reconcileAuthorization(pending, originalError) {
         try {
-            const current = await this.getIntent(pending.projectId, pending.intentId);
+            const current = await this.getIntent(pending.projectId, pending.intentId, pending.expectedAction);
             if (current?.proposalState === "AUTHORIZED") {
                 return this.assertCommittedAuthorization(current, pending);
             }
@@ -608,6 +692,13 @@ class SuveiHumanAuthorizationService {
             pending.expectedAction,
             ["REJECTED"],
         );
+        if (pending.expectedAction === MUTATION_ACTION) {
+            if (!Number.isInteger(pending.rejectionExpectedRevision) || pending.rejectionExpectedRevision < 0
+                || intent.revision !== pending.rejectionExpectedRevision + 1 || intent.requestFingerprint !== pending.requestFingerprint) {
+                fail("SUVEI_REJECTION_RECEIPT_INVALID");
+            }
+            return intent;
+        }
         if (!Number.isInteger(pending.rejectionExpectedRevision)
             || pending.rejectionExpectedRevision < 0
             || intent.revision !== pending.rejectionExpectedRevision + 1
@@ -617,8 +708,7 @@ class SuveiHumanAuthorizationService {
             || intent.authorizationExpiresAt !== null
             || intent.authorizationTermsDigest !== null
             || intent.executionGrantId !== null
-            || intent.executionOperationId !== null
-            || intent.executionCommandId !== null) {
+            || !unboundExecution(intent)) {
             fail("SUVEI_REJECTION_RECEIPT_INVALID");
         }
         return intent;
@@ -626,7 +716,7 @@ class SuveiHumanAuthorizationService {
 
     async reconcileRejection(pending, originalError) {
         try {
-            const current = await this.getIntent(pending.projectId, pending.intentId);
+            const current = await this.getIntent(pending.projectId, pending.intentId, pending.expectedAction);
             if (current?.proposalState === "REJECTED") {
                 return this.assertCommittedRejection(current, pending);
             }
@@ -654,10 +744,9 @@ class SuveiHumanAuthorizationService {
         if (intent.revision !== authorizedIntent.revision + 1
             || intent.requestFingerprint !== pending.authorization.requestFingerprint
             || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
-            || String(intent.authorizationTermsDigest || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
-            || String(intent.executionGrantId || "").toLowerCase() !== String(authorizedIntent.executionGrantId || "").toLowerCase()
-            || intent.executionOperationId !== null
-            || intent.executionCommandId !== null) {
+            || String(committedTermsDigest(intent) || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
+            || String(linkedGrantId(intent) || "").toLowerCase() !== String(linkedGrantId(authorizedIntent) || "").toLowerCase()
+            || !unboundExecution(intent)) {
             fail("SUVEI_REVOCATION_RECEIPT_INVALID");
         }
         return intent;
@@ -665,7 +754,7 @@ class SuveiHumanAuthorizationService {
 
     async reconcileRevocation(pending, authorizedIntent, originalError) {
         try {
-            const current = await this.getIntent(pending.projectId, pending.intentId);
+            const current = await this.getIntent(pending.projectId, pending.intentId, pending.expectedAction);
             if (current?.proposalState === "REVOKED") {
                 return this.assertRevokedAuthorization(current, pending, authorizedIntent);
             }
@@ -699,8 +788,9 @@ class SuveiHumanAuthorizationService {
             fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         }
 
+        const collection = pending.expectedAction === MUTATION_ACTION ? "agent-mutation-grant-intents" : "agent-execution-intents";
         const normalizedReason = typeof reason === "string" ? reason.trim().slice(0, 1000) : "";
-        let current = await this.getIntent(pending.projectId, pending.intentId);
+        let current = await this.getIntent(pending.projectId, pending.intentId, pending.expectedAction);
         let updated;
 
         if (current.proposalState === "REJECTED") {
@@ -736,8 +826,10 @@ class SuveiHumanAuthorizationService {
                 try {
                     const timeoutMs = this.approvalMutationTimeout(pending);
                     updated = await this.request(
-                        `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/authorize`,
-                        { method: "POST", body: pending.authorization, timeoutMs },
+                        `/api/v1/projects/${pending.projectId}/${collection}/${pending.intentId}/authorize`,
+                        { method: "POST", body: pending.expectedAction === MUTATION_ACTION
+                            ? { expectedRevision: pending.authorization.expectedRevision, requestFingerprint: pending.authorization.requestFingerprint }
+                            : pending.authorization, timeoutMs },
                     );
                     updated = this.assertCommittedAuthorization(updated, pending);
                 } catch (error) {
@@ -749,7 +841,7 @@ class SuveiHumanAuthorizationService {
             try {
                 const timeoutMs = this.approvalMutationTimeout(pending);
                 updated = await this.request(
-                    `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/revoke`,
+                    `/api/v1/projects/${pending.projectId}/${collection}/${pending.intentId}/revoke`,
                     {
                         method: "POST",
                         timeoutMs,
@@ -780,7 +872,7 @@ class SuveiHumanAuthorizationService {
             try {
                 const timeoutMs = this.approvalMutationTimeout(pending);
                 updated = await this.request(
-                    `/api/v1/projects/${pending.projectId}/agent-execution-intents/${pending.intentId}/reject`,
+                    `/api/v1/projects/${pending.projectId}/${collection}/${pending.intentId}/reject`,
                     {
                         method: "POST",
                         timeoutMs,
@@ -819,8 +911,11 @@ class SuveiHumanAuthorizationService {
             projectId: pending.projectId,
             proposalState: updated.proposalState,
             revision: updated.revision,
-            authorizationTermsDigest: updated.authorizationTermsDigest ?? null,
+            authorizationTermsDigest: committedTermsDigest(updated) ?? null,
             executionGrantId: updated.executionGrantId ?? null,
+            ...(pending.expectedAction === MUTATION_ACTION ? {
+                grantId: updated.grantId ?? null, grantTermsDigest: updated.grantTermsDigest ?? null,
+            } : {}),
         };
     }
 

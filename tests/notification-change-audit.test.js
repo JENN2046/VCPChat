@@ -866,3 +866,76 @@ test('SUVEI generation review displays exact spec reference scratchpad and conte
     dom.window.close();
 });
 
+
+
+function mutationReviewPacket(mode = 'authorize') {
+    return {
+        schemaVersion: 'suvei_human_authorization_preview.v1', requestId: 'mutation-review',
+        command: 'RequestMutationGrantAuthorization', projectId: '33333333-3333-4333-8333-333333333333',
+        intentId: '44444444-4444-5444-8444-444444444444', decisionMode: mode,
+        authorizationCommitted: mode === 'reconcile_authorized', revocationCommitted: mode === 'reconcile_revoked',
+        authorityTargetDigest: 'a'.repeat(64), expectedAuthorizationTermsDigest: 'b'.repeat(64),
+        toolApprovalExpiresAt: '2026-10-03T14:05:00.000Z',
+        intent: {
+            schemaVersion: 'agent_mutation_grant_intent.v1', id: '44444444-4444-5444-8444-444444444444',
+            action: 'creative_spec.append_agent_version.v1', creativeSpecId: '77777777-7777-4777-8777-777777777777',
+            delegateUserId: '55555555-5555-4555-8555-555555555555',
+            proposalState: mode === 'authorize' ? 'PENDING' : (mode === 'reconcile_revoked' ? 'REVOKED' : 'AUTHORIZED'),
+            revision: mode === 'authorize' ? 0 : (mode === 'reconcile_revoked' ? 2 : 1),
+            allowedFieldKeys: ['lighting', 'styling'], baseVersion: 3, maxMutations: 2,
+            expiresAt: '2026-10-03T14:30:00.000Z', normalizedReason: 'Bounded creative adjustment',
+            requestFingerprint: 'c'.repeat(64), grantId: mode === 'authorize' ? null : 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+            grantTermsDigest: mode === 'authorize' ? null : 'b'.repeat(64),
+        },
+        authorization: { expectedRevision: 0, requestFingerprint: 'c'.repeat(64), expiresAt: '2026-10-03T14:30:00.000Z' },
+    };
+}
+async function openMutationReview(window, packet) {
+    const request = { type: 'tool_approval_request', data: {
+        requestId: packet.requestId, toolName: 'SUVEIStudio', maid: 'Nova',
+        args: { command: packet.command, projectId: packet.projectId, intentId: packet.intentId },
+        timestamp: '2026-10-03T14:00:00.000Z', approvalTtlMs: 300000,
+    } };
+    window.notificationRenderer.renderVCPLogNotification(request, JSON.stringify(request), window.document.getElementById('notificationsList'));
+    Array.from(window.document.querySelectorAll('.notification-actions button')).find(b => b.textContent === '审视 SUVEI 授权').click();
+    await new Promise(resolve => setImmediate(resolve));
+}
+test('mutation review shows exact field scope count base version and expiry before approval', async () => {
+    const { dom, window, sentMessages } = createAuditDom();
+    const packet = mutationReviewPacket(); const order = [];
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async ({ approved }) => {
+        assert.equal(approved, true); order.push('Core AUTHORIZED');
+        return { success: true, decision: { approved: true, proposalState: 'AUTHORIZED' } };
+    };
+    window.chatAPI.sendVCPLogMessageConfirmed = async message => { order.push('ToolBox approved'); sentMessages.push(message); return { success: true }; };
+    await openMutationReview(window, packet);
+    const text = window.document.getElementById('suveiHumanAuthorizationPacket').textContent;
+    assert.match(text, /可修改字段: lighting, styling/); assert.match(text, /最多修改次数: 2/);
+    assert.match(text, /基础版本: 3/); assert.match(text, /有效至: 2026-10-03T14:30:00.000Z/);
+    assert.doesNotMatch(text, /最大 outputs|Recipe:|Capability:/);
+    const approve = window.document.getElementById('approveSuveiHumanAuthorization');
+    assert.equal(approve.textContent, '批准修改授权'); approve.click();
+    await new Promise(resolve => setImmediate(resolve)); await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(order, ['Core AUTHORIZED', 'ToolBox approved']);
+    assert.equal(sentMessages[0].data.approved, true); dom.window.close();
+});
+test('mutation committed authorization recovery offers return or revoke without another grant', async () => {
+    const { dom, window, sentMessages } = createAuditDom(); const packet = mutationReviewPacket('reconcile_authorized');
+    window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+    window.chatAPI.decideSuveiHumanAuthorization = async ({ approved }) => {
+        assert.equal(approved, false); return { success: true, decision: { approved: false, proposalState: 'REVOKED' } };
+    };
+    await openMutationReview(window, packet);
+    assert.equal(window.document.getElementById('approveSuveiHumanAuthorization').textContent, '返回授权（恢复）');
+    const revoke = window.document.getElementById('rejectSuveiHumanAuthorization');
+    assert.equal(revoke.disabled, false); assert.equal(revoke.textContent, '撤销授权并拒绝'); revoke.click();
+    await new Promise(resolve => setImmediate(resolve)); await new Promise(resolve => setImmediate(resolve));
+    assert.equal(sentMessages[0].data.approved, false); dom.window.close();
+});
+test('mutation requests are protected in main review and RAG observer surfaces', () => {
+    const { dom, window } = createAuditDom();
+    assert.equal(window.notificationRenderer.isSuveiHumanAuthorizationRequest({ toolName: 'SUVEIStudio', args: { command: 'RequestMutationGrantAuthorization' } }), true);
+    assert.match(source('RAGmodules/RAG_Observer.html'), /"RequestMutationGrantAuthorization"/);
+    dom.window.close();
+});

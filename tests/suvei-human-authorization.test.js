@@ -6,6 +6,7 @@ const fs = require("node:fs");
 const {
     SuveiHumanAuthorizationService,
     authorizationTermsDigest,
+    canonicalIntentSnapshot,
 } = require("../modules/services/suveiHumanAuthorizationService");
 
 const TOKEN = `suvei_local_v1_${"A".repeat(43)}`;
@@ -86,15 +87,39 @@ function intent(overrides = {}) {
     };
 }
 
+function mutationIntent(overrides = {}) {
+    const value = {
+        schemaVersion: "agent_mutation_grant_intent.v1", id: INTENT, intentCommandId: INTENT,
+        organizationId: ORG, projectId: PROJECT, creativeSpecId: SPEC, delegateUserId: DELEGATE,
+        action: "creative_spec.append_agent_version.v1", allowedFieldKeys: ["lighting", "styling"],
+        baseVersion: 3, maxMutations: 2, expiresAt: "2026-10-01T14:30:00.000Z",
+        normalizedReason: "Bounded creative adjustment", proposalState: "PENDING", revision: 0,
+        authorizedBy: null, authorizedAt: null, grantId: null, grantTermsDigest: null, ...overrides,
+    };
+    const terms = { schemaVersion: value.schemaVersion, projectId: value.projectId,
+        creativeSpecId: value.creativeSpecId, delegateUserId: value.delegateUserId, action: value.action,
+        allowedFieldKeys: value.allowedFieldKeys, baseVersion: value.baseVersion, maxMutations: value.maxMutations,
+        expiresAt: value.expiresAt, normalizedReason: value.normalizedReason };
+    const sorted = Object.fromEntries(Object.keys(terms).sort().map(key => [key, terms[key]]));
+    value.requestFingerprint = require("node:crypto").createHash("sha256").update(JSON.stringify(sorted)).digest("hex");
+    return value;
+}
+function mutationApproval(requestId = "mutation-approval") {
+    return { requestId, toolName: "SUVEIStudio", args: {
+        command: "RequestMutationGrantAuthorization", projectId: PROJECT, intentId: INTENT,
+    } };
+}
+
 function harness({
     now = Date.parse("2026-10-01T14:00:00.000Z"),
     authorizeMode = "success",
     rejectMode = "success",
     revokeMode = "success",
     advanceOnIntentGetMs = 0,
+    mutation = false,
 } = {}) {
     let clock = now;
-    let currentIntent = intent();
+    let currentIntent = mutation ? mutationIntent() : intent();
     const calls = [];
     const settingsManager = { readSettings: async () => settings() };
     const fetchImpl = async (url, options = {}) => {
@@ -119,7 +144,7 @@ function harness({
                 userName: "Owner",
             });
         }
-        if (pathname === `/api/v1/projects/${PROJECT}/agent-execution-intents/${INTENT}` && method === "GET") {
+        if (pathname === `/api/v1/projects/${PROJECT}/${mutation ? "agent-mutation-grant-intents" : "agent-execution-intents"}/${INTENT}` && method === "GET") {
             if (advanceOnIntentGetMs > 0) clock += advanceOnIntentGetMs;
             return json(currentIntent);
         }
@@ -136,6 +161,14 @@ function harness({
                     ? "0".repeat(64)
                     : authorizationTermsDigest(currentIntent, OWNER, body),
             };
+            if (mutation) {
+                assert.deepEqual(Object.keys(body).sort(), ["expectedRevision", "requestFingerprint"]);
+                currentIntent.grantId = GRANT;
+                currentIntent.grantTermsDigest = currentIntent.authorizationTermsDigest;
+                delete currentIntent.authorizationExpiresAt;
+                delete currentIntent.authorizationTermsDigest;
+                delete currentIntent.executionGrantId;
+            }
             if (authorizeMode === "throw_after_commit") throw new Error("transport lost after commit");
             return json(currentIntent);
         }
@@ -791,3 +824,106 @@ test("logout invalidates an in-flight Owner login before it can commit credentia
     assert.equal(service.status().binding, null);
 });
 
+
+
+test("mutation prepare displays immutable scope and creates no grant", async () => {
+    const h = harness({ mutation: true }); await h.service.login("exact owner password");
+    const packet = await h.service.prepare(mutationApproval());
+    assert.equal(packet.intent.schemaVersion, "agent_mutation_grant_intent.v1");
+    assert.deepEqual(packet.intent.allowedFieldKeys, ["lighting", "styling"]);
+    assert.equal(packet.intent.maxMutations, 2); assert.equal(packet.intent.baseVersion, 3);
+    assert.equal(packet.authorization.expiresAt, packet.intent.expiresAt);
+    assert.equal(h.calls.filter(c => c.pathname.endsWith("/authorize")).length, 0);
+    assert.equal(packet.intent.grantId, null);
+});
+
+test("mutation authorize commits exact existing-engine grant before returning approval", async () => {
+    const h = harness({ mutation: true }); await h.service.login("exact owner password");
+    const packet = await h.service.prepare(mutationApproval());
+    const decision = await h.service.decide({ requestId: packet.requestId, approved: true });
+    assert.equal(decision.proposalState, "AUTHORIZED"); assert.equal(decision.grantId, GRANT);
+    assert.equal(decision.grantTermsDigest, packet.expectedAuthorizationTermsDigest);
+    assert.equal(decision.approved, true);
+    const post = h.calls.find(c => c.pathname.endsWith("/authorize"));
+    assert.match(post.pathname, /agent-mutation-grant-intents/);
+    assert.deepEqual(post.body, { expectedRevision: 0, requestFingerprint: packet.intent.requestFingerprint });
+});
+
+test("mutation rejection creates zero grant and exact Core REJECTED state", async () => {
+    const h = harness({ mutation: true }); await h.service.login("exact owner password");
+    const packet = await h.service.prepare(mutationApproval());
+    const decision = await h.service.decide({ requestId: packet.requestId, approved: false });
+    assert.equal(decision.proposalState, "REJECTED"); assert.equal(decision.grantId, null);
+    assert.equal(decision.approved, false);
+    assert.equal(h.calls.filter(c => c.pathname.endsWith("/authorize")).length, 0);
+});
+
+test("mutation committed authorization recovery resumes or atomically revokes the exact grant", async () => {
+    for (const approved of [true, false]) {
+        const h = harness({ mutation: true }); await h.service.login("exact owner password");
+        const first = await h.service.prepare(mutationApproval("first"));
+        await h.service.decide({ requestId: first.requestId, approved: true });
+        const recovered = await h.service.prepare(mutationApproval("recovered"));
+        assert.equal(recovered.decisionMode, "reconcile_authorized");
+        const decision = await h.service.decide({ requestId: recovered.requestId, approved });
+        assert.equal(decision.proposalState, approved ? "AUTHORIZED" : "REVOKED");
+        assert.equal(decision.grantId, GRANT);
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/authorize")).length, 1);
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, approved ? 0 : 1);
+    }
+});
+
+test("mutation decision reconciles lost authorize reject and revoke responses without resubmission", async () => {
+    for (const mode of ["authorize", "reject", "revoke"]) {
+        const h = harness({ mutation: true, [`${mode}Mode`]: "throw_after_commit" });
+        await h.service.login("exact owner password");
+        const packet = await h.service.prepare(mutationApproval());
+        await h.service.decide({ requestId: packet.requestId, approved: mode !== "reject" });
+        if (mode === "revoke") {
+            const recovered = await h.service.prepare(mutationApproval("revoke"));
+            await h.service.decide({ requestId: recovered.requestId, approved: false });
+        }
+        assert.equal(h.calls.filter(c => c.pathname.endsWith(`/${mode}`) && c.method === "POST").length, 1);
+        assert.equal(h.getIntent().proposalState, mode === "authorize" ? "AUTHORIZED" : (mode === "reject" ? "REJECTED" : "REVOKED"));
+    }
+});
+
+test("mutation approval rejects changed canonical scope and cannot approve after expiry", async () => {
+    for (const change of [{ allowedFieldKeys: ["lighting"] }, { baseVersion: 4 }, { maxMutations: 3 }]) {
+        const h = harness({ mutation: true }); await h.service.login("exact owner password");
+        const packet = await h.service.prepare(mutationApproval());
+        h.setIntent(mutationIntent(change));
+        await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: true }), { code: "SUVEI_AUTHORITY_TARGET_DRIFTED" });
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/authorize")).length, 0);
+    }
+    const h = harness({ mutation: true }); await h.service.login("exact owner password");
+    const packet = await h.service.prepare(mutationApproval()); h.setNow(Date.parse(packet.intent.expiresAt));
+    await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: true }), { code: "SUVEI_APPROVAL_PACKET_EXPIRED" });
+});
+
+test("mutation recovery rejects another authorizer or mismatched committed grant digest", async () => {
+    const h = harness({ mutation: true }); await h.service.login("exact owner password");
+    const packet = await h.service.prepare(mutationApproval());
+    await h.service.decide({ requestId: packet.requestId, approved: true });
+    for (const change of [{ authorizedBy: DELEGATE }, { grantTermsDigest: "0".repeat(64) }]) {
+        const original = h.getIntent(); h.setIntent({ ...original, ...change });
+        await assert.rejects(h.service.prepare(mutationApproval("wrong-recovery")), { code: "SUVEI_COMMITTED_AUTHORIZATION_MISMATCH" });
+        h.setIntent(original);
+    }
+});
+
+test("mutation committed reject and revoke recover only a blocking decision", async () => {
+    for (const state of ["REJECTED", "REVOKED"]) {
+        const h = harness({ mutation: true }); await h.service.login("exact owner password");
+        const first = await h.service.prepare(mutationApproval("first"));
+        await h.service.decide({ requestId: first.requestId, approved: state === "REVOKED" });
+        if (state === "REVOKED") {
+            const revoke = await h.service.prepare(mutationApproval("revoke"));
+            await h.service.decide({ requestId: revoke.requestId, approved: false });
+        }
+        const recovered = await h.service.prepare(mutationApproval("recovered"));
+        assert.equal(recovered.decisionMode, state === "REJECTED" ? "reconcile_rejected" : "reconcile_revoked");
+        await assert.rejects(h.service.decide({ requestId: recovered.requestId, approved: true }));
+        assert.equal((await h.service.decide({ requestId: recovered.requestId, approved: false })).proposalState, state);
+    }
+});

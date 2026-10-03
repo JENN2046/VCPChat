@@ -55,7 +55,8 @@ const handledToolApprovalRequestIds = new Set();
 const TOOL_CHANGE_DIFF_MATRIX_LIMIT = 120000;
 const SUVEI_HUMAN_AUTHORIZATION_COMMANDS = new Set([
     'ExecuteAuthorizedGeneration',
-    'ExecuteAuthorizedCorrection'
+    'ExecuteAuthorizedCorrection',
+    'RequestMutationGrantAuthorization'
 ]);
 
 function isSuveiHumanAuthorizationRequest(approvalData) {
@@ -342,7 +343,8 @@ function ensureSuveiAuthorityReviewModal() {
 function formatSuveiAuthorityPacket(packet) {
     const intent = packet?.intent || {};
     const authorization = packet?.authorization || {};
-    const action = intent.action === 'inpaint_candidate' ? '单步 Candidate 修正' : '生成 Candidate';
+    const mutation = intent.action === 'creative_spec.append_agent_version.v1';
+    const action = mutation ? '授权修改 Creative Spec' : (intent.action === 'inpaint_candidate' ? '单步 Candidate 修正' : '生成 Candidate');
     const authorizedRecovery = packet?.decisionMode === 'reconcile_authorized'
         || packet?.authorizationCommitted === true;
     const rejectedRecovery = packet?.decisionMode === 'reconcile_rejected';
@@ -369,6 +371,29 @@ function formatSuveiAuthorityPacket(packet) {
         `输出: ${intent.requestedOutputCount ?? '—'} × ${intent.resolution || '—'} (${intent.aspectRatio || '—'})`,
         `Agent 理由: ${intent.normalizedReason || '—'}`,
     ];
+    if (mutation) {
+        return [
+            `动作: ${action}`,
+            `Core state: ${intent.proposalState || '—'}`,
+            `Decision mode: ${packet?.decisionMode || 'authorize'}`,
+            `Project: ${packet?.projectId || '—'}`,
+            `Creative Spec: ${intent.creativeSpecId || '—'}`,
+            `Intent: ${packet?.intentId || '—'}`,
+            `Revision: ${intent.revision ?? '—'}`,
+            `Agent / Delegate: ${intent.delegateUserId || '—'}`,
+            `基础版本: ${intent.baseVersion ?? '—'}`,
+            `可修改字段: ${(intent.allowedFieldKeys || []).join(', ')}`,
+            `最多修改次数: ${intent.maxMutations ?? '—'}`,
+            `有效至: ${intent.expiresAt || '—'}`,
+            `Agent 理由: ${intent.normalizedReason || '—'}`,
+            `Grant: ${intent.grantId || '尚未创建'}`,
+            `Request Fingerprint: ${intent.requestFingerprint || '—'}`,
+            `Grant Terms Digest: ${intent.grantTermsDigest || packet?.expectedAuthorizationTermsDigest || '—'}`,
+            `Authority Target Digest: ${packet?.authorityTargetDigest || '—'}`,
+            `Tool approval expires: ${packet?.toolApprovalExpiresAt || '—'}`,
+            authorizedRecovery ? '恢复会返回 Core 已提交的授权；撤销会停止后续修改。' : (rejectedRecovery || revokedRecovery ? '此申请已关闭，不能恢复修改授权。' : '批准会创建以上范围的修改授权；助手随后才能请求修改预览与执行。'),
+        ].join('\n');
+    }
     if (intent.action === 'inpaint_candidate') {
         lines.push(
             `Source Candidate: ${intent.sourceCandidateId || '—'} rev ${intent.sourceCandidateRevision ?? '—'}`,
@@ -482,7 +507,7 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
         ? 'Core 已拒绝'
         : (revokedRecovery
             ? 'Core 已撤销'
-            : (authorizedRecovery ? '继续执行（恢复）' : '批准并执行'));
+            : (authorizedRecovery ? (packet.command === 'RequestMutationGrantAuthorization' ? '返回授权（恢复）' : '继续执行（恢复）') : (packet.command === 'RequestMutationGrantAuthorization' ? '批准修改授权' : '批准并执行')));
     rejectButton.textContent = rejectedRecovery
         ? '确认拒绝并通知 ToolBox'
         : (revokedRecovery

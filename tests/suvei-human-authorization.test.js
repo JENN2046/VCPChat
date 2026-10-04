@@ -120,6 +120,7 @@ function harness({
 } = {}) {
     let clock = now;
     let currentIntent = mutation ? mutationIntent() : intent();
+    let intentReadHook = null;
     const calls = [];
     const settingsManager = { readSettings: async () => settings() };
     const fetchImpl = async (url, options = {}) => {
@@ -145,6 +146,8 @@ function harness({
             });
         }
         if (pathname === `/api/v1/projects/${PROJECT}/${mutation ? "agent-mutation-grant-intents" : "agent-execution-intents"}/${INTENT}` && method === "GET") {
+            const hook = intentReadHook; intentReadHook = null;
+            if (hook) await hook();
             if (advanceOnIntentGetMs > 0) clock += advanceOnIntentGetMs;
             return json(currentIntent);
         }
@@ -200,6 +203,7 @@ function harness({
         getIntent: () => currentIntent,
         setIntent: value => { currentIntent = value; },
         setNow: value => { clock = value; },
+        setIntentReadHook: hook => { intentReadHook = hook; },
     };
 }
 
@@ -1049,5 +1053,23 @@ test("uncertain revoke cannot resubmit from concurrent, repeated or reopened sam
     const reconciled = await decide();
     assert.equal(reconciled.approved, false);
     assert.equal(reconciled.proposalState, "REVOKED");
+    assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
+});
+
+test("reopening a review during in-flight canonical GET shares the one-dispatch boundary", async () => {
+    const h = await expiredAuthorization({ revokeMode: "throw_before_commit" });
+    const packet = await h.service.prepare(h.approval);
+    let release, started;
+    const entered = new Promise(resolve => { started = resolve; });
+    const gate = new Promise(resolve => { release = resolve; });
+    h.setIntentReadHook(async () => { started(); await gate; });
+    const first = h.service.decide({ requestId: packet.requestId, approved: false });
+    const rejected = assert.rejects(first, { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
+    await entered;
+    await h.service.prepare(h.approval);
+    release();
+    await rejected;
+    await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: false }),
+        { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
     assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
 });

@@ -625,11 +625,11 @@ class SuveiHumanAuthorizationService {
             authorization,
         };
         const previous = this.pending.get(requestId);
-        if (previous?.revocationAttempted
+        if (previous
             && (previous.projectId !== projectId || previous.intentId !== intentId
                 || previous.expectedAction !== expectedAction)) fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
         this.pending.set(requestId, {
-            revocationAttempted: previous?.revocationAttempted === true,
+            revocationDispatch: previous?.revocationDispatch || { attempted: false },
             requestId,
             command,
             projectId,
@@ -824,7 +824,7 @@ class SuveiHumanAuthorizationService {
         const normalizedReason = typeof reason === "string" ? reason.trim().slice(0, 1000) : "";
         let current = await this.getIntent(pending.projectId, pending.intentId, pending.expectedAction);
         let updated;
-        if (pending.revocationAttempted && current.proposalState !== "REVOKED") {
+        if (pending.revocationDispatch.attempted && current.proposalState !== "REVOKED") {
             fail("SUVEI_REVOCATION_OUTCOME_UNKNOWN");
         }
 
@@ -876,7 +876,7 @@ class SuveiHumanAuthorizationService {
             try {
                 const timeoutMs = this.approvalMutationTimeout(pending);
                 // One dispatch per prepared request, including concurrent decisions.
-                pending.revocationAttempted = true;
+                pending.revocationDispatch.attempted = true;
                 updated = await this.request(
                     `/api/v1/projects/${pending.projectId}/${collection}/${pending.intentId}/revoke`,
                     {

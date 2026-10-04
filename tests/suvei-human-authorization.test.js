@@ -115,11 +115,13 @@ function harness({
     authorizeMode = "success",
     rejectMode = "success",
     revokeMode = "success",
+    afterRevokeCommit = null,
     advanceOnIntentGetMs = 0,
     mutation = false,
 } = {}) {
     let clock = now;
     let currentIntent = mutation ? mutationIntent() : intent();
+    let intentReadHook = null;
     const calls = [];
     const settingsManager = { readSettings: async () => settings() };
     const fetchImpl = async (url, options = {}) => {
@@ -145,6 +147,8 @@ function harness({
             });
         }
         if (pathname === `/api/v1/projects/${PROJECT}/${mutation ? "agent-mutation-grant-intents" : "agent-execution-intents"}/${INTENT}` && method === "GET") {
+            const hook = intentReadHook; intentReadHook = null;
+            if (hook) await hook();
             if (advanceOnIntentGetMs > 0) clock += advanceOnIntentGetMs;
             return json(currentIntent);
         }
@@ -178,11 +182,13 @@ function harness({
             return json(currentIntent);
         }
         if (pathname.endsWith("/revoke") && method === "POST") {
+            if (revokeMode === "throw_before_commit") throw new Error("revoke outcome unknown");
             currentIntent = {
                 ...currentIntent,
                 proposalState: "REVOKED",
                 revision: currentIntent.revision + 1,
             };
+            if (afterRevokeCommit) await afterRevokeCommit();
             if (revokeMode === "throw_after_commit") throw new Error("revoke response lost after commit");
             return json(currentIntent);
         }
@@ -199,6 +205,7 @@ function harness({
         getIntent: () => currentIntent,
         setIntent: value => { currentIntent = value; },
         setNow: value => { clock = value; },
+        setIntentReadHook: hook => { intentReadHook = hook; },
     };
 }
 
@@ -927,3 +934,166 @@ test("mutation committed reject and revoke recover only a blocking decision", as
         assert.equal((await h.service.decide({ requestId: recovered.requestId, approved: false })).proposalState, state);
     }
 });
+
+async function expiredAuthorization(options = {}) {
+    const h = harness({ mutation: true, ...options });
+    await h.service.login("exact owner password");
+    h.approval = options.mutation === false
+        ? { requestId: "expired-review", toolName: "SUVEIStudio", args: {
+            command: "ExecuteAuthorizedGeneration", projectId: PROJECT, intentId: INTENT } }
+        : mutationApproval("expired-review");
+    const first = await h.service.prepare({ ...h.approval, requestId: "initial" });
+    await h.service.decide({ requestId: first.requestId, approved: true });
+    h.expiry = Date.parse(h.getIntent().expiresAt || h.getIntent().authorizationExpiresAt);
+    h.setNow(h.expiry + 1000);
+    return h;
+}
+
+test("expired AUTHORIZED prepares bounded revoke-only and cannot recover any execution permission", async () => {
+    const h = await expiredAuthorization();
+    const packet = await h.service.prepare(h.approval);
+    assert.equal(packet.decisionMode, "reconcile_authorized_expired_revoke_only");
+    assert.equal(packet.authorizationExpired, true);
+    assert.equal(packet.revokeOnly, true);
+    assert.equal(packet.authorization.expiresAt, h.getIntent().expiresAt);
+    assert.ok(Date.parse(packet.toolApprovalExpiresAt) > h.expiry + 1000);
+    assert.ok(Date.parse(packet.toolApprovalExpiresAt) <= h.expiry + 301000);
+    const before = h.calls.length;
+    await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: true }),
+        { code: "SUVEI_EXPIRED_AUTHORIZATION_CANNOT_RECOVER" });
+    assert.equal(h.calls.slice(before).filter(c => c.method === "POST").length, 0);
+    assert.equal(h.getIntent().proposalState, "AUTHORIZED");
+    assert.equal(h.getIntent().revision, 1);
+    h.setNow(Date.parse(packet.toolApprovalExpiresAt));
+    await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: false }),
+        { code: "SUVEI_APPROVAL_PACKET_EXPIRED" });
+});
+
+for (const revokeMode of ["success", "throw_after_commit", "throw_before_commit"]) {
+    test("expired exact Owner revoke: " + revokeMode, async () => {
+        const h = await expiredAuthorization({ revokeMode });
+        const packet = await h.service.prepare(h.approval);
+        const result = h.service.decide({ requestId: packet.requestId, approved: false, reason: "Cleanup expired authorization" });
+        if (revokeMode === "throw_before_commit") {
+            await assert.rejects(result, { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
+            assert.equal(h.getIntent().proposalState, "AUTHORIZED");
+        } else {
+            const decision = await result;
+            assert.equal(decision.approved, false);
+            assert.equal(decision.proposalState, "REVOKED");
+            assert.equal(decision.revision, 2);
+            assert.equal(decision.grantId, GRANT);
+        }
+        const posts = h.calls.filter(c => c.pathname.endsWith("/revoke"));
+        assert.equal(posts.length, 1);
+        assert.equal(posts[0].pathname, `/api/v1/projects/${PROJECT}/agent-mutation-grant-intents/${INTENT}/revoke`);
+        assert.deepEqual(posts[0].body, { expectedRevision: 1, reason: "Cleanup expired authorization" });
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/authorize")).length, 1);
+    });
+}
+
+for (const [field, value] of Object.entries({
+    authorizedBy: DELEGATE, organizationId: PROJECT, projectId: ORG, id: PROJECT,
+    revision: 2, requestFingerprint: "0".repeat(64), grantTermsDigest: "0".repeat(64),
+    grantId: SPEC, allowedFieldKeys: ["lighting"], expiresAt: "2026-10-01T14:29:00.000Z",
+})) {
+    test("expired revocation rejects fresh canonical drift: " + field, async () => {
+        const h = await expiredAuthorization();
+        const packet = await h.service.prepare(h.approval);
+        h.setIntent({ ...h.getIntent(), [field]: value });
+        await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: false }));
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 0);
+    });
+}
+
+for (const change of [{ authorizedBy: DELEGATE }, { organizationId: PROJECT }, { grantTermsDigest: "0".repeat(64) }]) {
+    test("expired prepare still validates Owner organization and terms " + Object.keys(change)[0], async () => {
+        const h = await expiredAuthorization();
+        h.setIntent({ ...h.getIntent(), ...change });
+        await assert.rejects(h.service.prepare(h.approval));
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 0);
+    });
+}
+
+test("expired review cannot renew an expired caller approval TTL", async () => {
+    const h = await expiredAuthorization();
+    await assert.rejects(h.service.prepare({ ...h.approval,
+        timestamp: new Date(h.expiry - 300000).toISOString(), approvalTtlMs: 300000 }),
+        { code: "SUVEI_APPROVAL_PACKET_EXPIRED" });
+});
+
+test("expired execution authorization is revoke-only and still requires unbound execution", async () => {
+    for (const bound of [false, true]) {
+        const h = await expiredAuthorization({ mutation: false });
+        const packet = await h.service.prepare(h.approval);
+        assert.equal(packet.revokeOnly, true);
+        await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: true }),
+            { code: "SUVEI_EXPIRED_AUTHORIZATION_CANNOT_RECOVER" });
+        if (bound) {
+            h.setIntent({ ...h.getIntent(), executionOperationId: SPEC });
+            await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: false }));
+            assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 0);
+        } else {
+            const result = await h.service.decide({ requestId: packet.requestId, approved: false });
+            assert.equal(result.approved, false);
+            assert.equal(result.proposalState, "REVOKED");
+        }
+    }
+});
+
+test("uncertain revoke cannot resubmit from concurrent, repeated or reopened same-request decisions", async () => {
+    const h = await expiredAuthorization({ revokeMode: "throw_before_commit" });
+    const packet = await h.service.prepare(h.approval);
+    const decide = () => h.service.decide({ requestId: packet.requestId, approved: false });
+    const results = await Promise.allSettled([decide(), decide()]);
+    assert.equal(results.every(r => r.status === "rejected"), true);
+    await assert.rejects(decide(), { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
+    await h.service.prepare(h.approval);
+    await assert.rejects(decide(), { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
+    assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
+    h.setIntent({ ...h.getIntent(), proposalState: "REVOKED", revision: 2 });
+    const reconciled = await decide();
+    assert.equal(reconciled.approved, false);
+    assert.equal(reconciled.proposalState, "REVOKED");
+    assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
+});
+
+test("reopening a review during in-flight canonical GET shares the one-dispatch boundary", async () => {
+    const h = await expiredAuthorization({ revokeMode: "throw_before_commit" });
+    const packet = await h.service.prepare(h.approval);
+    let release, started;
+    const entered = new Promise(resolve => { started = resolve; });
+    const gate = new Promise(resolve => { release = resolve; });
+    h.setIntentReadHook(async () => { started(); await gate; });
+    const first = h.service.decide({ requestId: packet.requestId, approved: false });
+    const rejected = assert.rejects(first, { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
+    await entered;
+    await h.service.prepare(h.approval);
+    release();
+    await rejected;
+    await assert.rejects(h.service.decide({ requestId: packet.requestId, approved: false }),
+        { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
+    assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
+});
+
+for (const mutation of [false, true]) {
+    test("completed revoke preserves a concurrently reopened recovery packet; mutation=" + mutation, async () => {
+        let release, started;
+        const entered = new Promise(resolve => { started = resolve; });
+        const gate = new Promise(resolve => { release = resolve; });
+        const h = await expiredAuthorization({ mutation, afterRevokeCommit: async () => { started(); await gate; } });
+        const packet = await h.service.prepare(h.approval);
+        const first = h.service.decide({ requestId: packet.requestId, approved: false });
+        await entered;
+        const reopened = await h.service.prepare(h.approval);
+        assert.equal(reopened.decisionMode, "reconcile_revoked");
+        release();
+        assert.equal((await first).proposalState, "REVOKED");
+        const recovered = await h.service.decide({ requestId: reopened.requestId, approved: false });
+        assert.equal(recovered.approved, false);
+        assert.equal(recovered.proposalState, "REVOKED");
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
+        await assert.rejects(h.service.decide({ requestId: reopened.requestId, approved: false }),
+            { code: "SUVEI_APPROVAL_PACKET_NOT_PREPARED" });
+    });
+}

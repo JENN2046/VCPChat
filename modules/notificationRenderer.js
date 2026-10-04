@@ -345,6 +345,8 @@ function formatSuveiAuthorityPacket(packet) {
     const authorization = packet?.authorization || {};
     const mutation = intent.action === 'creative_spec.append_agent_version.v1';
     const action = mutation ? '授权修改 Creative Spec' : (intent.action === 'inpaint_candidate' ? '单步 Candidate 修正' : '生成 Candidate');
+    const revokeOnly = packet?.revokeOnly === true
+        || packet?.decisionMode === 'reconcile_authorized_expired_revoke_only';
     const authorizedRecovery = packet?.decisionMode === 'reconcile_authorized'
         || packet?.authorizationCommitted === true;
     const rejectedRecovery = packet?.decisionMode === 'reconcile_rejected';
@@ -352,7 +354,8 @@ function formatSuveiAuthorityPacket(packet) {
         || packet?.revocationCommitted === true;
     const lines = [
         `动作: ${action}`,
-        `Core state: ${intent.proposalState || '—'}${authorizedRecovery ? '（已存在 exact authorization，当前是恢复流程）' : ''}${rejectedRecovery ? '（Core 已拒绝，当前只恢复拒绝通知）' : ''}${revokedRecovery ? '（Core 已撤销，当前只恢复阻断通知）' : ''}`,
+        `Core state: ${intent.proposalState || '—'}${authorizedRecovery && !revokeOnly ? '（已存在 exact authorization，当前是恢复流程）' : ''}${rejectedRecovery ? '（Core 已拒绝，当前只恢复拒绝通知）' : ''}${revokedRecovery ? '（Core 已撤销，当前只恢复阻断通知）' : ''}`,
+        ...(revokeOnly ? ['Authorization: EXPIRED', '当前授权不可再使用', 'Owner 仍可显式撤销 canonical authorization'] : []),
         `Decision mode: ${packet?.decisionMode || 'authorize'}`,
         `Project: ${packet?.projectId || '—'}`,
         `Intent: ${packet?.intentId || '—'}`,
@@ -375,6 +378,7 @@ function formatSuveiAuthorityPacket(packet) {
         return [
             `动作: ${action}`,
             `Core state: ${intent.proposalState || '—'}`,
+            ...(revokeOnly ? ['Authorization: EXPIRED', '当前授权不可再使用', 'Owner 仍可显式撤销 canonical authorization'] : []),
             `Decision mode: ${packet?.decisionMode || 'authorize'}`,
             `Project: ${packet?.projectId || '—'}`,
             `Creative Spec: ${intent.creativeSpecId || '—'}`,
@@ -391,7 +395,7 @@ function formatSuveiAuthorityPacket(packet) {
             `Grant Terms Digest: ${intent.grantTermsDigest || packet?.expectedAuthorizationTermsDigest || '—'}`,
             `Authority Target Digest: ${packet?.authorityTargetDigest || '—'}`,
             `Tool approval expires: ${packet?.toolApprovalExpiresAt || '—'}`,
-            authorizedRecovery ? '恢复会返回 Core 已提交的授权；撤销会停止后续修改。' : (rejectedRecovery || revokedRecovery ? '此申请已关闭，不能恢复修改授权。' : '批准会创建以上范围的修改授权；助手随后才能请求修改预览与执行。'),
+            revokeOnly ? '授权已过期，不能恢复；仅可显式撤销。' : authorizedRecovery ? '恢复会返回 Core 已提交的授权；撤销会停止后续修改。' : (rejectedRecovery || revokedRecovery ? '此申请已关闭，不能恢复修改授权。' : '批准会创建以上范围的修改授权；助手随后才能请求修改预览与执行。'),
         ].join('\n');
     }
     if (intent.action === 'inpaint_candidate') {
@@ -495,6 +499,8 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
     const errorElement = document.getElementById('suveiHumanAuthorizationError');
     const approveButton = document.getElementById('approveSuveiHumanAuthorization');
     const rejectButton = document.getElementById('rejectSuveiHumanAuthorization');
+    const revokeOnly = packet?.revokeOnly === true
+        || packet?.decisionMode === 'reconcile_authorized_expired_revoke_only';
     const authorizedRecovery = packet?.decisionMode === 'reconcile_authorized'
         || packet?.authorizationCommitted === true;
     const rejectedRecovery = packet?.decisionMode === 'reconcile_rejected';
@@ -503,7 +509,7 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
     packetElement.textContent = formatSuveiAuthorityPacket(packet);
     reasonInput.value = typeof initialReason === 'string' ? initialReason : '';
     errorElement.textContent = '';
-    approveButton.textContent = rejectedRecovery
+    approveButton.textContent = revokeOnly ? '授权已过期（不可恢复）' : rejectedRecovery
         ? 'Core 已拒绝'
         : (revokedRecovery
             ? 'Core 已撤销'
@@ -512,15 +518,17 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
         ? '确认拒绝并通知 ToolBox'
         : (revokedRecovery
             ? '确认撤销并通知 ToolBox'
-            : (authorizedRecovery ? '撤销授权并拒绝' : '拒绝'));
-    approveButton.disabled = rejectedRecovery || revokedRecovery;
+            : (revokeOnly || authorizedRecovery ? '撤销授权并拒绝' : '拒绝'));
+    approveButton.disabled = revokeOnly || rejectedRecovery || revokedRecovery;
     // The same modal instance is reused after a committed Core decision when
     // VCPLog transport fails. The first decision path disables both buttons;
     // explicitly restore the recovery rejection/revoke control here so the
     // Human Owner can revoke an already-committed exact authorization.
     rejectButton.disabled = false;
     if (statusElement) {
-        statusElement.textContent = rejectedRecovery
+        statusElement.textContent = revokeOnly
+            ? '当前授权已过期，不可使用或恢复；Owner 仍可显式撤销 canonical authorization。'
+            : rejectedRecovery
             ? `SUVEI Core 已提交拒绝；当前只恢复 ToolBox 的 approved=false。Target: ${packet.authorityTargetDigest}`
             : (revokedRecovery
                 ? `SUVEI Core 已撤销这次 exact authorization；当前只恢复 ToolBox 的 approved=false。Target: ${packet.authorityTargetDigest}`
@@ -529,11 +537,17 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
                     : `已绑定 exact target: ${packet.authorityTargetDigest}`));
     }
 
+    let revocationUnknown = packet?.revocationOutcomeUnknown === true;
+    if (revocationUnknown) {
+        approveButton.disabled = true;
+        rejectButton.textContent = '重新核对撤销结果';
+    }
     const close = () => setSuveiModalOpen(modal, false);
     document.getElementById('closeSuveiHumanAuthorization').onclick = close;
     document.getElementById('cancelSuveiHumanAuthorization').onclick = close;
 
     const decide = async (approved) => {
+        if ((revokeOnly || revocationUnknown) && approved === true) return;
         approveButton.disabled = true;
         rejectButton.disabled = true;
         errorElement.textContent = '';
@@ -546,6 +560,12 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
                 reason
             });
             if (!response?.success) {
+                if (response?.code === 'SUVEI_REVOCATION_OUTCOME_UNKNOWN') {
+                    revocationUnknown = true;
+                    rejectButton.textContent = '重新核对撤销结果';
+                    errorElement.textContent = '撤销结果未知；后续只读取 Core 核对，不重复提交撤销。';
+                    return;
+                }
                 errorElement.textContent =
                     `${response?.code || 'DECISION_FAILED'}: ${response?.error || 'SUVEI Core 决策失败'}`;
                 return;
@@ -584,12 +604,12 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             errorElement.textContent = decisionError?.message || 'SUVEI Core 决策失败';
         } finally {
             if (!handedOffToRecovery) {
-                approveButton.disabled = rejectedRecovery || revokedRecovery;
+                approveButton.disabled = revocationUnknown || revokeOnly || rejectedRecovery || revokedRecovery;
                 rejectButton.disabled = false;
             }
         }
     };
-    approveButton.onclick = (rejectedRecovery || revokedRecovery) ? null : () => void decide(true);
+    approveButton.onclick = (revokeOnly || rejectedRecovery || revokedRecovery) ? null : () => void decide(true);
     rejectButton.onclick = () => void decide(false);
     setSuveiModalOpen(modal, true);
     reasonInput.focus();

@@ -395,7 +395,7 @@ function formatSuveiAuthorityPacket(packet) {
             `Grant Terms Digest: ${intent.grantTermsDigest || packet?.expectedAuthorizationTermsDigest || '—'}`,
             `Authority Target Digest: ${packet?.authorityTargetDigest || '—'}`,
             `Tool approval expires: ${packet?.toolApprovalExpiresAt || '—'}`,
-            authorizedRecovery ? '恢复会返回 Core 已提交的授权；撤销会停止后续修改。' : (rejectedRecovery || revokedRecovery ? '此申请已关闭，不能恢复修改授权。' : '批准会创建以上范围的修改授权；助手随后才能请求修改预览与执行。'),
+            revokeOnly ? '授权已过期，不能恢复；仅可显式撤销。' : authorizedRecovery ? '恢复会返回 Core 已提交的授权；撤销会停止后续修改。' : (rejectedRecovery || revokedRecovery ? '此申请已关闭，不能恢复修改授权。' : '批准会创建以上范围的修改授权；助手随后才能请求修改预览与执行。'),
         ].join('\n');
     }
     if (intent.action === 'inpaint_candidate') {

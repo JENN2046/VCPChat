@@ -959,6 +959,8 @@ for (const failDecision of [false, true, "unknown"]) {
         assert.match(text, /Authorization: EXPIRED/);
         assert.match(text, /当前授权不可再使用/);
         assert.match(text, /Owner 仍可显式撤销 canonical authorization/);
+        assert.match(text, /授权已过期，不能恢复；仅可显式撤销。/);
+        assert.doesNotMatch(text, /恢复会返回 Core 已提交的授权|批准会创建/);
         const approve = window.document.getElementById('approveSuveiHumanAuthorization');
         assert.equal(approve.disabled, true);
         assert.equal(approve.onclick, null);

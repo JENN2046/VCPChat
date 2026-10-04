@@ -939,3 +939,46 @@ test('mutation requests are protected in main review and RAG observer surfaces',
     assert.match(source('RAGmodules/RAG_Observer.html'), /"RequestMutationGrantAuthorization"/);
     dom.window.close();
 });
+
+for (const failDecision of [false, true, "unknown"]) {
+    test('expired mutation revoke-only UI never enables recovery; decision failure=' + failDecision, async () => {
+        const { dom, window, sentMessages } = createAuditDom();
+        const packet = { ...mutationReviewPacket('reconcile_authorized_expired_revoke_only'),
+            authorizationExpired: true, revokeOnly: true, authorizationCommitted: true };
+        let decisions = 0;
+        window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+        window.chatAPI.decideSuveiHumanAuthorization = async ({ approved }) => {
+            decisions++;
+            assert.equal(approved, false);
+            return failDecision ? { success: false, code: failDecision === 'unknown' ? 'SUVEI_REVOCATION_OUTCOME_UNKNOWN' : 'CORE_UNAVAILABLE' }
+                : { success: true, decision: { approved: false, proposalState: 'REVOKED' } };
+        };
+        await openMutationReview(window, packet);
+        const text = window.document.getElementById('suveiHumanAuthorizationPacket').textContent;
+        assert.match(text, /Core state: AUTHORIZED/);
+        assert.match(text, /Authorization: EXPIRED/);
+        assert.match(text, /当前授权不可再使用/);
+        assert.match(text, /Owner 仍可显式撤销 canonical authorization/);
+        const approve = window.document.getElementById('approveSuveiHumanAuthorization');
+        assert.equal(approve.disabled, true);
+        assert.equal(approve.onclick, null);
+        assert.doesNotMatch(approve.textContent, /返回授权（恢复）/);
+        approve.click(); assert.equal(decisions, 0);
+        const revoke = window.document.getElementById('rejectSuveiHumanAuthorization');
+        assert.equal(revoke.disabled, false);
+        assert.equal(revoke.textContent, '撤销授权并拒绝');
+        revoke.click();
+        await new Promise(resolve => setImmediate(resolve));
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(decisions, 1);
+        assert.equal(approve.disabled, true);
+        if (failDecision === 'unknown') {
+            assert.equal(revoke.textContent, '重新核对撤销结果');
+            assert.match(window.document.getElementById('suveiHumanAuthorizationError').textContent, /不重复提交撤销/);
+        }
+        assert.equal(sentMessages.some(m => m.data?.approved === true), false);
+        assert.equal(sentMessages.length, failDecision ? 0 : 1);
+        if (!failDecision) assert.equal(sentMessages[0].data.approved, false);
+        dom.window.close();
+    });
+}

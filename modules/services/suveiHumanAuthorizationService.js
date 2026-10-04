@@ -507,8 +507,9 @@ class SuveiHumanAuthorizationService {
         const revocationReconciliation = intent.proposalState === "REVOKED";
         const committedAuthorization = reconciliation || revocationReconciliation;
         const committedExpiry = committedAuthorization ? Date.parse(String(intentExpiry(intent) || "")) : NaN;
+        const revokeOnly = reconciliation && Number.isFinite(committedExpiry) && committedExpiry <= this.now();
         if (reconciliation && (!Number.isFinite(committedExpiry)
-            || this.now() + MIN_TOOL_REMAINING_MS > committedExpiry
+            || (!revokeOnly && this.now() + MIN_TOOL_REMAINING_MS > committedExpiry)
             || intent.revision < 1)) {
             fail("SUVEI_COMMITTED_AUTHORIZATION_EXPIRED");
         }
@@ -580,7 +581,7 @@ class SuveiHumanAuthorizationService {
             ? "reconcile_rejected"
             : (revocationReconciliation
                 ? "reconcile_revoked"
-                : (reconciliation ? "reconcile_authorized" : "authorize"));
+                : (revokeOnly ? "reconcile_authorized_expired_revoke_only" : (reconciliation ? "reconcile_authorized" : "authorize")));
         const authorityTargetDigest = canonicalDigest({
             schemaVersion: "suvei_human_authorization_target.v1",
             requestId,
@@ -600,9 +601,9 @@ class SuveiHumanAuthorizationService {
             ? requestStartedAt + ttlMs
             : localDeadline;
         const boundedToolDeadline = Math.min(localDeadline, callerDeadline);
-        const toolApprovalDeadline = expectedAction === MUTATION_ACTION && !rejectionReconciliation && !revocationReconciliation
+        const toolApprovalDeadline = expectedAction === MUTATION_ACTION && !rejectionReconciliation && !revocationReconciliation && !revokeOnly
             ? Math.min(boundedToolDeadline, Date.parse(intent.expiresAt))
-            : (reconciliation ? Math.min(boundedToolDeadline, committedExpiry) : boundedToolDeadline);
+            : (reconciliation && !revokeOnly ? Math.min(boundedToolDeadline, committedExpiry) : boundedToolDeadline);
         if (this.now() + MIN_TOOL_REMAINING_MS > toolApprovalDeadline) fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         const toolApprovalExpiresAt = new Date(toolApprovalDeadline).toISOString();
         const packet = {
@@ -612,6 +613,8 @@ class SuveiHumanAuthorizationService {
             projectId,
             intentId,
             decisionMode,
+            authorizationExpired: revokeOnly,
+            revokeOnly,
             authorizationCommitted: reconciliation,
             revocationCommitted: revocationReconciliation,
             authorityTargetDigest,
@@ -621,7 +624,12 @@ class SuveiHumanAuthorizationService {
             intent: intentSnapshot,
             authorization,
         };
+        const previous = this.pending.get(requestId);
+        if (previous?.revocationAttempted
+            && (previous.projectId !== projectId || previous.intentId !== intentId
+                || previous.expectedAction !== expectedAction)) fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
         this.pending.set(requestId, {
+            revocationAttempted: previous?.revocationAttempted === true,
             requestId,
             command,
             projectId,
@@ -629,6 +637,8 @@ class SuveiHumanAuthorizationService {
             expectedAction,
             decisionMode,
             canonicalIntentDigest,
+            revokeOnly,
+            linkedGrantId: committedAuthorization ? linkedGrantId(intent) : null,
             authorityTargetDigest,
             expectedAuthorizationTermsDigest,
             authorization,
@@ -659,6 +669,25 @@ class SuveiHumanAuthorizationService {
             || String(committedTermsDigest(intent) || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
             || new Date(intentExpiry(intent)).toISOString() !== pending.authorization.expiresAt
             || !UUID_RE.test(String(linkedGrantId(intent) || ""))
+            || !unboundExecution(intent)) {
+            fail("SUVEI_AUTHORIZATION_RECEIPT_INVALID");
+        }
+        return intent;
+    }
+
+    assertCanonicalAuthorizationForRevocation(intent, pending) {
+        assertIntentShape(intent, this.binding, pending.projectId, pending.intentId,
+            pending.expectedAction, ["AUTHORIZED"]);
+        const expiry = Date.parse(String(intentExpiry(intent) || ""));
+        if (!Number.isFinite(expiry)
+            || intent.revision !== pending.authorization.expectedRevision + 1
+            || intent.requestFingerprint !== pending.authorization.requestFingerprint
+            || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
+            || String(committedTermsDigest(intent) || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
+            || new Date(expiry).toISOString() !== pending.authorization.expiresAt
+            || !UUID_RE.test(String(linkedGrantId(intent) || ""))
+            || (pending.linkedGrantId && linkedGrantId(intent) !== pending.linkedGrantId)
+            || (pending.linkedGrantId && canonicalDigest(canonicalIntentSnapshot(intent)) !== pending.canonicalIntentDigest)
             || !unboundExecution(intent)) {
             fail("SUVEI_AUTHORIZATION_RECEIPT_INVALID");
         }
@@ -745,6 +774,7 @@ class SuveiHumanAuthorizationService {
             || intent.requestFingerprint !== pending.authorization.requestFingerprint
             || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId
             || String(committedTermsDigest(intent) || "").toLowerCase() !== pending.expectedAuthorizationTermsDigest
+            || (pending.linkedGrantId && linkedGrantId(intent) !== pending.linkedGrantId)
             || String(linkedGrantId(intent) || "").toLowerCase() !== String(linkedGrantId(authorizedIntent) || "").toLowerCase()
             || !unboundExecution(intent)) {
             fail("SUVEI_REVOCATION_RECEIPT_INVALID");
@@ -788,10 +818,15 @@ class SuveiHumanAuthorizationService {
             fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         }
 
+        if (pending.revokeOnly && approved === true) fail("SUVEI_EXPIRED_AUTHORIZATION_CANNOT_RECOVER");
+
         const collection = pending.expectedAction === MUTATION_ACTION ? "agent-mutation-grant-intents" : "agent-execution-intents";
         const normalizedReason = typeof reason === "string" ? reason.trim().slice(0, 1000) : "";
         let current = await this.getIntent(pending.projectId, pending.intentId, pending.expectedAction);
         let updated;
+        if (pending.revocationAttempted && current.proposalState !== "REVOKED") {
+            fail("SUVEI_REVOCATION_OUTCOME_UNKNOWN");
+        }
 
         if (current.proposalState === "REJECTED") {
             if (approved === true) fail("SUVEI_REJECTED_INTENT_CANNOT_APPROVE");
@@ -837,9 +872,11 @@ class SuveiHumanAuthorizationService {
                 }
             }
         } else if (current.proposalState === "AUTHORIZED") {
-            current = this.assertCommittedAuthorization(current, pending);
+            current = this.assertCanonicalAuthorizationForRevocation(current, pending);
             try {
                 const timeoutMs = this.approvalMutationTimeout(pending);
+                // One dispatch per prepared request, including concurrent decisions.
+                pending.revocationAttempted = true;
                 updated = await this.request(
                     `/api/v1/projects/${pending.projectId}/${collection}/${pending.intentId}/revoke`,
                     {
@@ -853,7 +890,8 @@ class SuveiHumanAuthorizationService {
                 );
                 updated = this.assertRevokedAuthorization(updated, pending, current);
             } catch (error) {
-                updated = await this.reconcileRevocation(pending, current, error);
+                updated = await this.reconcileRevocation(pending, current,
+                    new SuveiHumanAuthorizationError("SUVEI_REVOCATION_OUTCOME_UNKNOWN"));
             }
         } else {
             assertIntentShape(
@@ -901,7 +939,8 @@ class SuveiHumanAuthorizationService {
             schemaVersion: "suvei_human_authorization_decision.v1",
             requestId,
             approved: approved === true,
-            reconciled: pending.decisionMode === "reconcile_authorized"
+            reconciled: pending.decisionMode === "reconcile_authorized_expired_revoke_only"
+                || pending.decisionMode === "reconcile_authorized"
                 || pending.decisionMode === "reconcile_rejected"
                 || pending.decisionMode === "reconcile_revoked"
                 || (approved === true && current.proposalState === "AUTHORIZED")

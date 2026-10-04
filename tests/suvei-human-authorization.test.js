@@ -115,6 +115,7 @@ function harness({
     authorizeMode = "success",
     rejectMode = "success",
     revokeMode = "success",
+    afterRevokeCommit = null,
     advanceOnIntentGetMs = 0,
     mutation = false,
 } = {}) {
@@ -187,6 +188,7 @@ function harness({
                 proposalState: "REVOKED",
                 revision: currentIntent.revision + 1,
             };
+            if (afterRevokeCommit) await afterRevokeCommit();
             if (revokeMode === "throw_after_commit") throw new Error("revoke response lost after commit");
             return json(currentIntent);
         }
@@ -1073,3 +1075,25 @@ test("reopening a review during in-flight canonical GET shares the one-dispatch 
         { code: "SUVEI_REVOCATION_OUTCOME_UNKNOWN" });
     assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
 });
+
+for (const mutation of [false, true]) {
+    test("completed revoke preserves a concurrently reopened recovery packet; mutation=" + mutation, async () => {
+        let release, started;
+        const entered = new Promise(resolve => { started = resolve; });
+        const gate = new Promise(resolve => { release = resolve; });
+        const h = await expiredAuthorization({ mutation, afterRevokeCommit: async () => { started(); await gate; } });
+        const packet = await h.service.prepare(h.approval);
+        const first = h.service.decide({ requestId: packet.requestId, approved: false });
+        await entered;
+        const reopened = await h.service.prepare(h.approval);
+        assert.equal(reopened.decisionMode, "reconcile_revoked");
+        release();
+        assert.equal((await first).proposalState, "REVOKED");
+        const recovered = await h.service.decide({ requestId: reopened.requestId, approved: false });
+        assert.equal(recovered.approved, false);
+        assert.equal(recovered.proposalState, "REVOKED");
+        assert.equal(h.calls.filter(c => c.pathname.endsWith("/revoke")).length, 1);
+        await assert.rejects(h.service.decide({ requestId: reopened.requestId, approved: false }),
+            { code: "SUVEI_APPROVAL_PACKET_NOT_PREPARED" });
+    });
+}

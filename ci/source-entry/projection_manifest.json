@@ -10247,9 +10247,9 @@
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "fa85b6f0f3f5ea795811d07c0995ee3cbae0dc72",
-          "size": 46233,
-          "sha256": "fe3d6e3a7b4698183685a1dd302e65c1532d9e5272bbcaedee54234592a10cb5",
+          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
+          "size": 46413,
+          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
           "kind": "source"
         },
         {
@@ -18940,9 +18940,9 @@
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "fa85b6f0f3f5ea795811d07c0995ee3cbae0dc72",
-          "size": 46233,
-          "sha256": "fe3d6e3a7b4698183685a1dd302e65c1532d9e5272bbcaedee54234592a10cb5",
+          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
+          "size": 46413,
+          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
           "kind": "source"
         },
         {
@@ -18967,9 +18967,9 @@
           "path": "tests/suvei-human-authorization.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f1acf811e43419895df0c2ebd8db0e3540fab115",
-          "size": 50784,
-          "sha256": "d83a1a87518e7ac4612aba40aae2143c9049a45175b26aa77c38d3581b484217",
+          "blob": "ae33e6db3cdf9fabaa7d8b7eab521b847a1a65a1",
+          "size": 52168,
+          "sha256": "6d47d68d7f87bc6abe0024eff0d8bb7ad1ca8d8f8ce50bcacaac29d4dc51b3b0",
           "kind": "source"
         }
       ],

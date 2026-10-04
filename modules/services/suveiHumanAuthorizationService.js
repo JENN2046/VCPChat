@@ -815,7 +815,7 @@ class SuveiHumanAuthorizationService {
         const pending = this.pending.get(requestId);
         if (!pending) fail("SUVEI_APPROVAL_PACKET_NOT_PREPARED");
         if (this.now() + MIN_TOOL_REMAINING_MS > pending.toolApprovalDeadline) {
-            this.pending.delete(requestId);
+            if (this.pending.get(requestId) === pending) this.pending.delete(requestId);
             fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         }
 
@@ -856,7 +856,7 @@ class SuveiHumanAuthorizationService {
                 );
                 const currentDigest = canonicalDigest(canonicalIntentSnapshot(current));
                 if (currentDigest !== pending.canonicalIntentDigest) {
-                    this.pending.delete(requestId);
+                    if (this.pending.get(requestId) === pending) this.pending.delete(requestId);
                     fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
                 }
                 try {
@@ -905,7 +905,7 @@ class SuveiHumanAuthorizationService {
             );
             const currentDigest = canonicalDigest(canonicalIntentSnapshot(current));
             if (currentDigest !== pending.canonicalIntentDigest) {
-                this.pending.delete(requestId);
+                if (this.pending.get(requestId) === pending) this.pending.delete(requestId);
                 fail("SUVEI_AUTHORITY_TARGET_DRIFTED");
             }
             try {
@@ -935,7 +935,7 @@ class SuveiHumanAuthorizationService {
             }
         }
 
-        this.pending.delete(requestId);
+        if (this.pending.get(requestId) === pending) this.pending.delete(requestId);
         return {
             schemaVersion: "suvei_human_authorization_decision.v1",
             requestId,

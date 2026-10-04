@@ -606,8 +606,10 @@ class SuveiHumanAuthorizationService {
             : (reconciliation && !revokeOnly ? Math.min(boundedToolDeadline, committedExpiry) : boundedToolDeadline);
         if (this.now() + MIN_TOOL_REMAINING_MS > toolApprovalDeadline) fail("SUVEI_APPROVAL_PACKET_EXPIRED");
         const toolApprovalExpiresAt = new Date(toolApprovalDeadline).toISOString();
+        const previous = this.pending.get(requestId);
         const packet = {
             schemaVersion: "suvei_human_authorization_preview.v1",
+            revocationOutcomeUnknown: previous?.revocationDispatch?.attempted === true && reconciliation,
             requestId,
             command,
             projectId,
@@ -624,7 +626,6 @@ class SuveiHumanAuthorizationService {
             intent: intentSnapshot,
             authorization,
         };
-        const previous = this.pending.get(requestId);
         if (previous
             && (previous.projectId !== projectId || previous.intentId !== intentId
                 || previous.expectedAction !== expectedAction)) fail("SUVEI_AUTHORITY_TARGET_DRIFTED");

@@ -982,3 +982,31 @@ for (const failDecision of [false, true, "unknown"]) {
         dom.window.close();
     });
 }
+
+test('live recovery cannot be re-enabled after unknown revoke or reopening its packet', async () => {
+    for (const reopened of [false, true]) {
+        const { dom, window, sentMessages } = createAuditDom();
+        const packet = { ...mutationReviewPacket('reconcile_authorized'), revocationOutcomeUnknown: reopened };
+        let decisions = 0;
+        window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
+        window.chatAPI.decideSuveiHumanAuthorization = async ({ approved }) => {
+            decisions++; assert.equal(approved, false);
+            return { success: false, code: 'SUVEI_REVOCATION_OUTCOME_UNKNOWN' };
+        };
+        await openMutationReview(window, packet);
+        const revoke = window.document.getElementById('rejectSuveiHumanAuthorization');
+        const approve = window.document.getElementById('approveSuveiHumanAuthorization');
+        if (!reopened) {
+            revoke.click(); await new Promise(resolve => setImmediate(resolve));
+        }
+        assert.equal(approve.disabled, true);
+        assert.equal(revoke.textContent, '重新核对撤销结果');
+        approve.click();
+        // Even synthetic invocation of an old handler cannot request recovery.
+        approve.onclick?.();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(decisions, reopened ? 0 : 1);
+        assert.equal(sentMessages.length, 0);
+        dom.window.close();
+    }
+});

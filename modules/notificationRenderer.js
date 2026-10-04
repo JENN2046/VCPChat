@@ -537,12 +537,17 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
                     : `已绑定 exact target: ${packet.authorityTargetDigest}`));
     }
 
+    let revocationUnknown = packet?.revocationOutcomeUnknown === true;
+    if (revocationUnknown) {
+        approveButton.disabled = true;
+        rejectButton.textContent = '重新核对撤销结果';
+    }
     const close = () => setSuveiModalOpen(modal, false);
     document.getElementById('closeSuveiHumanAuthorization').onclick = close;
     document.getElementById('cancelSuveiHumanAuthorization').onclick = close;
 
     const decide = async (approved) => {
-        if (revokeOnly && approved === true) return;
+        if ((revokeOnly || revocationUnknown) && approved === true) return;
         approveButton.disabled = true;
         rejectButton.disabled = true;
         errorElement.textContent = '';
@@ -556,6 +561,7 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             });
             if (!response?.success) {
                 if (response?.code === 'SUVEI_REVOCATION_OUTCOME_UNKNOWN') {
+                    revocationUnknown = true;
                     rejectButton.textContent = '重新核对撤销结果';
                     errorElement.textContent = '撤销结果未知；后续只读取 Core 核对，不重复提交撤销。';
                     return;
@@ -598,7 +604,7 @@ async function openSuveiHumanAuthorizationReview(approvalData, initialReason, on
             errorElement.textContent = decisionError?.message || 'SUVEI Core 决策失败';
         } finally {
             if (!handedOffToRecovery) {
-                approveButton.disabled = revokeOnly || rejectedRecovery || revokedRecovery;
+                approveButton.disabled = revocationUnknown || revokeOnly || rejectedRecovery || revokedRecovery;
                 rejectButton.disabled = false;
             }
         }

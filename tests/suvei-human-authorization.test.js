@@ -1097,3 +1097,76 @@ for (const mutation of [false, true]) {
             { code: "SUVEI_APPROVAL_PACKET_NOT_PREPARED" });
     });
 }
+
+// Independent Core terms fixture: never use the client's digest builder to
+// create the receipt whose compatibility is under test.
+function recoveryReceipt({ omitRiskTerms = false } = {}) {
+    const recoveryContext = {
+        policy: 'G1B_OBSERVED_REJECTION_RISK_REPLACEMENT_R1', version: '1',
+        policyDigest: '3dbe8208a3542aec449c4c3d8ae0cf6c9eef22d47911c2aea354579ca20aad86',
+        projectId: PROJECT, organizationId: ORG, productionUnitId: UNIT,
+        originalReservationCredits: 1, originalOccupiedSlots: 1,
+        replacement: { actualCredits: 0, exposureFloor: 1,
+            upstreamOutcome: 'NONCREATION_UNVERIFIED', upstreamRetryCoverage: 'UNKNOWN' },
+    };
+    const value = intent({ requestedOutputCount: 1, proposalState: 'AUTHORIZED', revision: 1,
+        authorizedBy: OWNER, authorizedAt: '2026-10-01T13:59:00.000Z',
+        authorizationExpiresAt: '2026-10-01T14:30:00.000Z', executionGrantId: GRANT, recoveryContext });
+    const terms = { schemaVersion: 'agent_generation_authorization.v1', intentId: INTENT,
+        requestFingerprint: value.requestFingerprint, delegateUserId: DELEGATE, authorizedBy: OWNER,
+        expiresAt: value.authorizationExpiresAt, maxAttempts: 1, maxOutputCount: 1,
+        maxTotalCredits: 1, maxConcurrentAttempts: 1, maxWallClockMs: 300000, maxAdapterCallsPerAttempt: 1,
+        ...(!omitRiskTerms ? { recoveryContext, acceptUnresolvedPriorOutcome: true,
+            acceptUnverifiedContinuationOutcome: true } : {}) };
+    const canonical = v => Array.isArray(v) ? '[' + v.map(canonical).join(',') + ']'
+        : v && typeof v === 'object' ? '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canonical(v[k])).join(',') + '}'
+            : JSON.stringify(v);
+    value.authorizationTermsDigest = require('node:crypto').createHash('sha256').update(canonical(terms)).digest('hex');
+    return value;
+}
+const recoveryApproval = requestId => ({ requestId, toolName: 'SUVEIStudio', args: {
+    command: 'ExecuteAuthorizedGeneration', projectId: PROJECT, intentId: INTENT,
+} });
+
+test('Workbench dual-risk H0 reconciles without a second authorization POST', async () => {
+    const h = harness(); h.setIntent(recoveryReceipt()); await h.service.login('exact owner password');
+    const p = await h.service.prepare(recoveryApproval('risk-reconcile'));
+    assert.equal(p.decisionMode, 'reconcile_authorized');
+    assert.deepEqual(p.intent.recoveryContext, h.getIntent().recoveryContext);
+    assert.equal(p.expectedAuthorizationTermsDigest, h.getIntent().authorizationTermsDigest);
+    const result = await h.service.decide({ requestId: 'risk-reconcile', approved: true });
+    assert.equal(result.proposalState, 'AUTHORIZED');
+    assert.equal(h.calls.filter(c => c.method === 'POST' && c.pathname !== '/api/v1/auth/local/login').length, 0);
+});
+
+test('risk reconciliation rejects old terms, another Owner, unsupported policy and multiple outputs', async () => {
+    for (const change of [v => recoveryReceipt({ omitRiskTerms: true }),
+        v => ({ ...v, authorizedBy: DELEGATE }),
+        v => ({ ...v, recoveryContext: { ...v.recoveryContext, version: '2' } }),
+        v => ({ ...v, requestedOutputCount: 2 })]) {
+        const h = harness(); h.setIntent(change(recoveryReceipt())); await h.service.login('exact owner password');
+        await assert.rejects(h.service.prepare(recoveryApproval('risk-invalid')), /SUVEI_(COMMITTED_AUTHORIZATION_MISMATCH|RECOVERY_AUTHORIZATION_UNSUPPORTED)/);
+        assert.equal(h.calls.filter(c => c.pathname.endsWith('/authorize')).length, 0);
+    }
+});
+
+test('pending recovery must use Workbench risk confirmation', async () => {
+    const h = harness(); h.setIntent({ ...recoveryReceipt(), proposalState: 'PENDING', revision: 0 });
+    await h.service.login('exact owner password');
+    await assert.rejects(h.service.prepare(recoveryApproval('risk-pending')), /SUVEI_RECOVERY_H0_REQUIRES_WORKBENCH/);
+    assert.equal(h.calls.filter(c => c.pathname.endsWith('/authorize')).length, 0);
+});
+
+test('changed or removed recovery evidence after preview cannot approve committed authority', async () => {
+    for (const remove of [false, true]) {
+        const h = harness(); h.setIntent(recoveryReceipt()); await h.service.login('exact owner password');
+        const p = await h.service.prepare(recoveryApproval('risk-drift'));
+        const altered = structuredClone(h.getIntent());
+        if (remove) delete altered.recoveryContext;
+        else altered.recoveryContext.replacement.exposureFloor = 0;
+        h.setIntent(altered);
+        assert.equal(p.intent.recoveryContext.replacement.exposureFloor, 1);
+        await assert.rejects(h.service.decide({ requestId: 'risk-drift', approved: true }), /SUVEI_AUTHORIZATION_RECEIPT_INVALID/);
+        assert.equal(h.calls.filter(c => c.pathname.endsWith('/authorize')).length, 0);
+    }
+});

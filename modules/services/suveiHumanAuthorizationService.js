@@ -150,6 +150,31 @@ function assertMutationIntentShape(intent, binding, projectId, intentId, allowed
     }
 }
 
+// Recovery H0 is created by Workbench. Chat only reconciles the exact committed
+// dual-risk grant; this path must never synthesize fresh risk acceptance.
+function committedRecoveryTerms(intent, authorization) {
+    const recovery = intent.recoveryContext;
+    if (recovery == null) return {};
+    if (intent.proposalState === "PENDING") fail("SUVEI_RECOVERY_H0_REQUIRES_WORKBENCH");
+    if (intent.action !== "generate_candidate"
+        || recovery.policy !== "G1B_OBSERVED_REJECTION_RISK_REPLACEMENT_R1"
+        || recovery.version !== "1"
+        || recovery.policyDigest !== "3dbe8208a3542aec449c4c3d8ae0cf6c9eef22d47911c2aea354579ca20aad86"
+        || recovery.projectId !== intent.projectId
+        || recovery.organizationId !== intent.organizationId
+        || recovery.productionUnitId !== intent.productionUnitId
+        || !recovery.replacement || typeof recovery.replacement !== "object"
+        || Array.isArray(recovery.replacement)
+        || intent.requestedOutputCount !== 1
+        || ["maxAttempts", "maxOutputCount", "maxTotalCredits", "maxConcurrentAttempts",
+            "maxAdapterCallsPerAttempt"].some(key => authorization[key] !== 1)
+        || authorization.maxWallClockMs !== 300000) {
+        fail("SUVEI_RECOVERY_AUTHORIZATION_UNSUPPORTED");
+    }
+    return { recoveryContext: recovery, acceptUnresolvedPriorOutcome: true,
+        acceptUnverifiedContinuationOutcome: true };
+}
+
 function authorizationTerms(intent, ownerUserId, authorization) {
     if (intent.action === MUTATION_ACTION) {
         return {
@@ -173,6 +198,7 @@ function authorizationTerms(intent, ownerUserId, authorization) {
         maxConcurrentAttempts: authorization.maxConcurrentAttempts,
         maxWallClockMs: authorization.maxWallClockMs,
         maxAdapterCallsPerAttempt: authorization.maxAdapterCallsPerAttempt,
+        ...committedRecoveryTerms(intent, authorization),
         ...(intent.action === "inpaint_candidate" ? {
             action: intent.action,
             sourceCandidateId: intent.sourceCandidateId,
@@ -245,6 +271,9 @@ function canonicalIntentSnapshot(intent) {
         maskMediaObjectId: intent.maskMediaObjectId ?? null,
         maskContentSha256: intent.maskContentSha256 ?? null,
         editInstruction: intent.editInstruction ?? null,
+        ...(intent.recoveryContext == null ? {} : {
+            recoveryContext: JSON.parse(canonicalJson(intent.recoveryContext)),
+        }),
     };
 }
 
@@ -501,6 +530,9 @@ class SuveiHumanAuthorizationService {
         const intent = await this.getIntent(projectId, intentId, expectedAction);
         assertIntentShape(intent, this.binding, projectId, intentId, expectedAction, ["PENDING", "AUTHORIZED", "REJECTED", "REVOKED"]);
 
+        if (intent.recoveryContext != null && intent.proposalState === "PENDING") {
+            fail("SUVEI_RECOVERY_H0_REQUIRES_WORKBENCH");
+        }
         const requested = intent.requestedOutputCount;
         const reconciliation = intent.proposalState === "AUTHORIZED";
         const rejectionReconciliation = intent.proposalState === "REJECTED";
@@ -664,6 +696,8 @@ class SuveiHumanAuthorizationService {
             || this.now() + MIN_TOOL_REMAINING_MS > committedExpiry) {
             fail("SUVEI_COMMITTED_AUTHORIZATION_EXPIRED");
         }
+        if (authorizationTermsDigest(intent, this.identity.userId, pending.authorization)
+                !== pending.expectedAuthorizationTermsDigest) fail("SUVEI_AUTHORIZATION_RECEIPT_INVALID");
         if (intent.revision !== pending.authorization.expectedRevision + 1
             || intent.requestFingerprint !== pending.authorization.requestFingerprint
             || String(intent.authorizedBy || "").toLowerCase() !== this.identity.userId

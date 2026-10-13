@@ -326,6 +326,9 @@ export const chatManager = (() => {
 
         // State References
         currentSelectedItemRef = config.refs.currentSelectedItemRef;
+        if (!Object.getOwnPropertyDescriptor(window, '__jsoConversationContext')) {
+            Object.defineProperty(window, '__jsoConversationContext', {get: () => {const id=currentSelectedItemRef?.get()?.id,topic=currentTopicIdRef?.get();return id&&topic?{conversationId:`${id}:${topic}`}:null;}});
+        }
         currentTopicIdRef = config.refs.currentTopicIdRef;
         currentChatHistoryRef = config.refs.currentChatHistoryRef;
         attachedFilesRef = config.refs.attachedFilesRef;
@@ -1397,6 +1400,11 @@ export const chatManager = (() => {
         }
         pendingSendContexts.add(sendSignature);
         try {
+        let jsoResult = null;
+        if (!request && !attachedFiles.length && currentSelectedItem.type !== 'group' && typeof electronAPI.submitJsoConversation === 'function') {
+            try { jsoResult = await electronAPI.submitJsoConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
+            catch { /* Optional local integration absent: ordinary chat remains unchanged. */ }
+        }
         const uiAttachments = [];
         if (attachedFiles.length > 0) {
             for (const af of attachedFiles) {
@@ -1416,7 +1424,7 @@ export const chatManager = (() => {
             name: globalSettings.userName || '用户',
             content: content, // Use raw content for UI
             timestamp: Date.now(),
-            id: `msg_${Date.now()}_user_${Math.random().toString(36).substring(2, 9)}`,
+            id: jsoResult?.sourceId || `msg_${Date.now()}_user_${Math.random().toString(36).substring(2, 9)}`,
             attachments: uiAttachments
         };
         
@@ -1495,6 +1503,16 @@ export const chatManager = (() => {
             itemListManager.loadItems();
         }
 
+        if (jsoResult?.handled) {
+            try { jsoResult = await electronAPI.executeJsoConversation({sourceId:jsoResult.sourceId}); } catch { jsoResult={code:'RESULT_UNKNOWN',message:'结果暂未确认，请查原操作回执，不要重复提交。'}; }
+            const content = jsoResult.committed
+                ? `已完成排期调整，并已读回确认。${jsoResult.chart?.ok ? '图表已更新。' : '图表刷新暂未完成，正在恢复。'}`
+                : (jsoResult.message || (jsoResult.cancelled ? '已取消待确认方案。' : `尚未完成：${jsoResult.code || '等待进一步说明'}`));
+            const reply = {id:`jso_${Date.now()}_${Math.random().toString(36).slice(2)}`,role:'assistant',content,timestamp:Date.now(),name:currentSelectedItem.name};
+            await persistOutgoingUserMessage(sendContext, reply);
+            if (isSendContextCurrent()) await renderTarget?.renderMessage?.(reply);
+            return jsoResult;
+        }
         const thinkingMessageId = `msg_${Date.now()}_assistant_${Math.random().toString(36).substring(2, 9)}`;
         const thinkingMessage = {
             role: 'assistant',

@@ -1592,6 +1592,8 @@ if (!gotTheLock) {
             openChildWindows,
             logger: console,
         });
+        const jsoConversationHandlers = require('./modules/ipc/jsoConversationHandlers');
+        await jsoConversationHandlers.initialize({mainWindow,chartService,appDataRoot:APP_DATA_ROOT_IN_PROJECT,binding:jsoConversationHandlers.bindingFromEnvironment()});
         configureDocxHandlers({
             mainWindow,
             openChildWindows,

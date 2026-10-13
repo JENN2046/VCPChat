@@ -1,3 +1,4 @@
+import { presentJsoProposal } from './renderer/jsoProposalPresentation.js';
 import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.js';
 import { createImageHandler } from './renderer/imageHandler.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
@@ -4070,6 +4071,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
             force: shouldReengageBottomFollow
         });
     }
+    if (!isInitialLoad && !message.isThinking && message.role === 'assistant') await presentJsoProposal({element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__jsoConversationContext?.conversationId});
     return messageItem;
 }
 
@@ -4213,6 +4215,7 @@ async function renderFullMessage(messageId, fullContent, agentName, agentId, opt
         includeAttachments: !!messageFromHistoryForRegex
     });
 
+    if(messageRoleForRender==='assistant')await presentJsoProposal({element:messageItem,content:fullContent,messageId,api:electronAPI,conversationId:window.__jsoConversationContext?.conversationId});
     mainRendererReferences.uiHelper.scrollToBottom();
 }
 
@@ -4265,6 +4268,7 @@ async function renderFullMessageProjection(messageId, fullContent, agentName, ag
 }
 
 function updateMessageContent(messageId, newContent) {
+    mainRendererReferences.electronAPI?.proposeJsoConversation?.({conversationId:window.__jsoConversationContext?.conversationId,messageId,invalidate:true}).catch(()=>{});
     const { chatMessagesDiv, markedInstance, globalSettingsRef } = mainRendererReferences;
     const messageItem = chatMessagesDiv.querySelector(`.message-item[data-message-id="${messageId}"]`);
     if (!messageItem) return;

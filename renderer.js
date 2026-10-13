@@ -1,3 +1,4 @@
+import { initializeJsoOwnerControls } from './modules/renderer/jsoOwnerControls.js';
 import { createChatHistoryPersistence } from './modules/chat/chatHistoryPersistence.js';
 import { createChatHistoryMutationAuthority } from './modules/chat/chatHistoryMutationAuthority.js';
 import { createSurfaceConversation } from './modules/chat/surfaceConversation.js';
@@ -752,6 +753,7 @@ mainChatSettingsPresentationOwner.configureStartup({
 
     // Initialize ChatManager
     if (chatManager) {
+        initializeJsoOwnerControls(window.chatAPI);
         chatManager.init({
             chatContext,
             chatRepository,

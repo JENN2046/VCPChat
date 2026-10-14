@@ -1,0 +1,22 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),{createRequire}=require('node:module'),{EventEmitter}=require('node:events');
+const file=path.join(__dirname,'../modules/ipc/nativeConversationHandlers.js');
+function setup(transport){const handlers=new Map(),base=createRequire(file),module={exports:{}};let constructions=0,timers=0;
+ const require=p=>p==='electron'?{ipcMain:{handle:(k,v)=>{assert.equal(handlers.has(k),false);handlers.set(k,v)},removeHandler:k=>handlers.delete(k)}}:p.endsWith('/transport.cjs')?{createNativeTransport:()=>{constructions++;return transport}}:p.includes('ChartControllerService')?{initialize(){}}:base(p);
+ vm.runInNewContext(fs.readFileSync(file,'utf8'),{module,exports:module.exports,require,process:{env:{}},setInterval:()=>{timers++;return {unref(){}}},clearInterval:()=>timers--});
+ const makeWindow=()=>{const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async()=>({eligible:true,text:'可以',conversationId:'C'});return {webContents:wc,isFocused:()=>true,isDestroyed:()=>false}};
+ return {handlers,initialize:module.exports.initialize,makeWindow,counts:()=>({constructions,timers})};}
+for(const outcome of ['success','refused','timeout'])test('optional startup probe is nonblocking and native failures stay handled: '+outcome,async()=>{
+ let resolve,reject,calls=0;const gate=new Promise((r,j)=>{resolve=r;reject=j});
+ const fixture=setup({sequence:()=>0,request:async action=>{if(action==='status'){calls++;return gate;}if(action==='prepare'){if(outcome==='success')return {ok:true,handled:false};throw Error(outcome);}return {ok:true}},retryProjections:async()=>{}}),window=fixture.makeWindow();
+ const init=fixture.initialize({mainWindow:window,binding:{toolName:'Example'}});let done=false;init.then(()=>done=true);await new Promise(r=>setImmediate(r));assert.equal(done,true);assert.equal(fixture.handlers.size,5);assert.equal(calls,1);
+ window.webContents.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});const result=await fixture.handlers.get('native-conversation:prepare')({sender:window.webContents,senderFrame:window.webContents.mainFrame},{text:'可以',conversationId:'C'});assert.equal(result.handled,outcome!=='success');if(outcome!=='success')assert.equal(result.code,'NATIVE_TRANSPORT_UNAVAILABLE');
+ if(outcome==='success')resolve({ok:true,sequence:9});else reject(Object.assign(Error(outcome),{name:outcome==='timeout'?'TimeoutError':'Error'}));await new Promise(r=>setImmediate(r));assert.equal(fixture.handlers.size,5);window.webContents.emit('destroyed');assert.equal(fixture.handlers.size,0);
+});
+for(const lateFailure of [false,true])test('duplicate startup and late probe after destroyed window cannot reinstall handlers: '+lateFailure,async()=>{
+ let resolve,reject;const gate=new Promise((r,j)=>{resolve=r;reject=j});const fixture=setup({sequence:()=>0,request:async action=>action==='status'?gate:{ok:true},retryProjections:async()=>{}}),window=fixture.makeWindow();
+ await Promise.all([fixture.initialize({mainWindow:window,binding:{toolName:'Example'}}),fixture.initialize({mainWindow:window,binding:{toolName:'Example'}})]);assert.deepEqual(fixture.counts(),{constructions:1,timers:1});assert.equal(window.webContents.listenerCount('before-input-event'),1);window.webContents.emit('destroyed');assert.deepEqual(fixture.counts(),{constructions:1,timers:0});
+ if(lateFailure)reject(Error('late timeout'));else resolve({ok:true,sequence:50});await new Promise(r=>setImmediate(r));assert.equal(fixture.handlers.size,0);assert.equal(window.webContents.listenerCount('before-input-event'),0);
+ const replacement=fixture.makeWindow();await fixture.initialize({mainWindow:replacement,binding:{toolName:'Example'}});assert.deepEqual(fixture.counts(),{constructions:2,timers:1});assert.equal(fixture.handlers.size,5);replacement.webContents.emit('destroyed');
+});
+test('unconfigured duplicate initialization preserves ordinary-chat opt-out',async()=>{const f=setup({request:()=>assert.fail('unconfigured transport')}),w=f.makeWindow();await f.initialize({mainWindow:w,binding:null});await f.initialize({mainWindow:w,binding:null});assert.equal(f.handlers.size,5);assert.equal((await f.handlers.get('native-conversation:prepare')()).handled,false);assert.equal(f.counts().constructions,0);w.webContents.emit('destroyed');assert.equal(f.handlers.size,0)});

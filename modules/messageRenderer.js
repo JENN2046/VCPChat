@@ -3855,12 +3855,13 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
 
         // Define the post-processing logic as a function.
         // This allows us to control WHEN it gets executed.
+        const nativeHistoryConversationId = isInitialLoad ? window.__nativeConversationContext?.conversationId : null;
         const runPostRenderProcessing = async (postOptions = {}) => {
             if (!isRenderSessionActive(renderSessionId) || !messageItem.isConnected || !contentDiv.isConnected) {
                 return;
             }
 
-            return renderPostProcessedHtml(contentDiv, finalHtml, {
+            await renderPostProcessedHtml(contentDiv, finalHtml, {
                 messageId: message.id,
                 message,
                 settings: globalSettings,
@@ -3868,6 +3869,10 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 runHeavy: postOptions.runHeavy !== false,
                 includeAttachments: true
             });
+            // Historical fragments are inert until mounted and post-processing has finished.
+            if (isInitialLoad && message.role === 'assistant' && !message.isThinking && isRenderSessionActive(renderSessionId) && messageItem.isConnected) {
+                await presentNativeProposal({historical:true,element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:nativeHistoryConversationId});
+            }
         };
 
         messageItem._vcp_activateHeavy = () => {
@@ -4072,7 +4077,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
             force: shouldReengageBottomFollow
         });
     }
-    if (!renderContext.suppressNativePresentation && !message.isThinking && message.role === 'assistant') await presentNativeProposal({historical:isInitialLoad,element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
+    if (!renderContext.suppressNativePresentation && !isInitialLoad && !message.isThinking && message.role === 'assistant') await presentNativeProposal({historical:isInitialLoad,element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
     return messageItem;
 }
 

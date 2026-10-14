@@ -1404,7 +1404,7 @@ export const chatManager = (() => {
         let nativeResult = null;
         if (!request && !attachedFiles.length && currentSelectedItem.type !== 'group' && typeof electronAPI.prepareNativeConversation === 'function') {
             try { nativeResult = await electronAPI.prepareNativeConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
-            catch { /* Optional local integration absent: ordinary chat remains unchanged. */ }
+            catch { nativeResult={handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'}; }
         }
         if (!nativeResult?.handled && !globalSettings.vcpServerUrl) {
             const error = new Error('请先在全局设置中配置 VCP 服务器 URL。');
@@ -1517,7 +1517,7 @@ export const chatManager = (() => {
         if (nativeResult?.handled) {
             try { if (nativeResult.sourceId) nativeResult = await electronAPI.executeNativeConversation({sourceId:nativeResult.sourceId}); } catch { nativeResult={code:'RESULT_UNKNOWN',message:'结果暂未确认，请查原操作回执，不要重复提交。'}; }
             const content = nativeResult.committed
-                ? `已完成操作，并已读回确认。操作编号：${nativeResult.operationId || '请查询原回执'}。${nativeResult.chart?.ok ? '图表已更新。' : '图表刷新暂未完成，正在恢复。'}`
+                ? `已完成操作，并已读回确认。操作编号：${nativeResult.operationId || '请查询原回执'}。${nativeResult.chart?.ok ? '图表已更新。' : nativeResult.chart?.retryPending===true ? '图表刷新暂未完成，正在恢复。' : nativeResult.chart ? '图表刷新未完成。' : ''}`
                 : (nativeResult.reconciliation?.length
                     ? `已进入派发的操作未取消，请勿重复提交；请核对原回执：${nativeResult.reconciliation.map(r => `${r.operationId || '原操作'}（${r.committed ? '已确认完成' : '待核对'}）`).join('、')}。`
                     : nativeResult.message || (nativeResult.cancelled ? '已取消待确认方案。' : `尚未完成：${nativeResult.code || '等待进一步说明'}`));

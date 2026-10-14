@@ -11,6 +11,8 @@ export async function retireNativeProposal(element){
 // Ordinary message text, with a host acknowledgement after exact display readback.
 export async function presentNativeProposal({element,content,messageId,api,conversationId,historical=false}){
  if(!element?.isConnected||!api?.proposeNativeConversation||!conversationId)return;
+ // Native operations are supported only in the primary chat surface.
+ if(!element.ownerDocument?.getElementById('chatMessages')?.contains(element))return;
  const blocks=[...String(content).matchAll(/```vcp-tool-proposal\s*([\s\S]*?)```/g)];
  const key=JSON.stringify([conversationId,messageId]);
  if(blocks.length!==1&&!proposalMessages.has(key))return;

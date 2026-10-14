@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../modules/renderer/nativeConversationPresentation.js'),'utf8');
-const load=()=>new Function(source.replaceAll('export async function','async function')+';return presentNativeProposal')();
+const load=()=>{const fn=new Function(source.replaceAll('export async function','async function')+';return presentNativeProposal')();return args=>{args.element.ownerDocument??={};args.element.ownerDocument.getElementById??=()=>({contains:()=>true});return fn(args);};};
 test('ordinary text with no prior plan never waits on remote invalidation',async()=>{
  let invalidates=0;const present=load();await present({element:{isConnected:true,querySelector:()=>null},content:'普通回答',messageId:'M',conversationId:'C',api:{proposeNativeConversation(){throw Error('unused')},invalidateNativeConversation(){invalidates++;return new Promise(()=>{})}}});assert.equal(invalidates,0);
 });
@@ -18,14 +18,14 @@ test('ordinary edit while first invalidation is pending prevents stale propose',
 });
 test('replacement during display readback prevents acknowledging stale plan',async()=>{
  const present=load();let frame,acks=0,removed=0;
- const element={isConnected:true,querySelector:()=>null,querySelectorAll:()=>[],append(){},ownerDocument:{createElement:()=>({dataset:{},remove(){removed++}}),defaultView:{requestAnimationFrame:cb=>{frame=cb}}}};
+ const element={isConnected:true,querySelector:()=>null,querySelectorAll:()=>[],append(){},ownerDocument:{getElementById:()=>({contains:()=>true}),createElement:()=>({dataset:{},remove(){removed++}}),defaultView:{requestAnimationFrame:cb=>{frame=cb}}}};
  const api={invalidateNativeConversation:async()=>{},proposeNativeConversation:async()=>({ok:true,plan:{id:'old-plan',presentation:'old presentation'}}),presentNativeConversation:async()=>{acks++}};
  const old=present({element,content:'```vcp-tool-proposal\n{"tool":"T","payload":{}}\n```',messageId:'M',conversationId:'C',api});
  while(!frame)await new Promise(r=>setImmediate(r));await present({element:{isConnected:true,querySelector:()=>null},content:'普通文本',messageId:'M',conversationId:'C',api});frame();await old;assert.equal(acks,0);assert.equal(removed,1);
 });
 
 const content='```vcp-tool-proposal\n{"tool":"T","payload":{}}\n```';
-function dom(){const nodes=[];return {nodes,isConnected:true,querySelector:()=>null,querySelectorAll:q=>q==='[data-native-plan-id]'?nodes.filter(n=>!n.removed&&n.dataset.nativePlanId):[],append:n=>nodes.push(n),ownerDocument:{createElement:()=>({dataset:{},remove(){this.removed=true}}),defaultView:{requestAnimationFrame:f=>f()}}};}
+function dom(){const nodes=[];return {nodes,isConnected:true,querySelector:()=>null,querySelectorAll:q=>q==='[data-native-plan-id]'?nodes.filter(n=>!n.removed&&n.dataset.nativePlanId):[],append:n=>nodes.push(n),ownerDocument:{getElementById:()=>({contains:()=>true}),createElement:()=>({dataset:{},remove(){this.removed=true}}),defaultView:{requestAnimationFrame:f=>f()}}};}
 for(const mode of ['reject','denied'])test('failed presentation ack retracts confirmable text: '+mode,async()=>{
  const present=load(),element=dom();let invalidates=0;
  await present({element,content,messageId:'M',conversationId:'C',api:{invalidateNativeConversation:async()=>{invalidates++;return {ok:true}},proposeNativeConversation:async()=>({ok:true,plan:{id:'P',presentation:'回复可以执行'}}),presentNativeConversation:async()=>{if(mode==='reject')throw Error('offline');return {ok:false}}}});

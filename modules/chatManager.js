@@ -1356,8 +1356,6 @@ export const chatManager = (() => {
         }
 
 
-        if (!request?.conversation) setNextUiEmptyStateActive(false);
-
         if (currentSelectedItem.type === 'group' && !globalSettings.vcpServerUrl) {
             const error = new Error('请先在全局设置中配置 VCP 服务器 URL。');
             if (!request?.conversation) {
@@ -1375,6 +1373,7 @@ export const chatManager = (() => {
                 return;
             }
             if (groupRenderer && typeof groupRenderer.handleSendGroupMessage === 'function') {
+                setNextUiEmptyStateActive(false);
                 groupRenderer.handleSendGroupMessage(
                     currentSelectedItem.id,
                     currentTopicId,
@@ -1416,6 +1415,7 @@ export const chatManager = (() => {
             if (request?.propagateError) throw error;
             return;
         }
+        if (!request?.conversation) setNextUiEmptyStateActive(false);
         const uiAttachments = [];
         if (attachedFiles.length > 0) {
             for (const af of attachedFiles) {
@@ -1517,11 +1517,31 @@ export const chatManager = (() => {
         if (nativeResult?.handled) {
             try { if (nativeResult.sourceId) nativeResult = await electronAPI.executeNativeConversation({sourceId:nativeResult.sourceId}); } catch { nativeResult={code:'RESULT_UNKNOWN',message:'结果暂未确认，请查原操作回执，不要重复提交。'}; }
             const content = nativeResult.committed
-                ? `已完成操作，并已读回确认。${nativeResult.chart?.ok ? '图表已更新。' : '图表刷新暂未完成，正在恢复。'}`
-                : (nativeResult.message || (nativeResult.cancelled ? '已取消待确认方案。' : `尚未完成：${nativeResult.code || '等待进一步说明'}`));
+                ? `已完成操作，并已读回确认。操作编号：${nativeResult.operationId || '请查询原回执'}。${nativeResult.chart?.ok ? '图表已更新。' : '图表刷新暂未完成，正在恢复。'}`
+                : (nativeResult.reconciliation?.length
+                    ? `已进入派发的操作未取消，请勿重复提交；请核对原回执：${nativeResult.reconciliation.map(r => `${r.operationId || '原操作'}（${r.committed ? '已确认完成' : '待核对'}）`).join('、')}。`
+                    : nativeResult.message || (nativeResult.cancelled ? '已取消待确认方案。' : `尚未完成：${nativeResult.code || '等待进一步说明'}`));
             const reply = {id:`native_${Date.now()}_${Math.random().toString(36).slice(2)}`,role:'assistant',content,timestamp:Date.now(),name:currentSelectedItem.name};
-            await persistOutgoingUserMessage(sendContext, reply);
-            if (isSendContextCurrent()) await renderTarget?.renderMessage?.(reply);
+            let historySaved = true;
+            try { await persistOutgoingUserMessage(sendContext, reply); }
+            catch {
+                historySaved = false;
+                reply.content += '\n聊天记录保存失败；以上业务结果不变，请勿重复提交原操作。';
+            }
+            let displayed = false;
+            if (isSendContextCurrent()) {
+                try {
+                    if (renderTarget?.renderMessage) {
+                        const replyElement = await renderTarget.renderMessage(reply);
+                        displayed = isSendContextCurrent();
+                        if (!displayed) replyElement?.remove?.();
+                    }
+                }
+                catch { /* Delivery failure must not turn a confirmed operation into a retry. */ }
+            }
+            if (!displayed || !historySaved) {
+                uiHelper.showToastNotification(`话题 ${sendContext.topicId}：${reply.content}`, historySaved ? 'info' : 'warning');
+            }
             return nativeResult;
         }
         const thinkingMessageId = `msg_${Date.now()}_assistant_${Math.random().toString(36).substring(2, 9)}`;

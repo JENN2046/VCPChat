@@ -441,7 +441,7 @@ export function setupEventListeners(deps) {
         }
     });
     addListener(messageInput, 'keydown', (e) => {
-        if (e.defaultPrevented || e.isComposing) return;
+        if (e.defaultPrevented || e.isComposing || e.repeat) return;
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             chatManager.handleSendMessage();

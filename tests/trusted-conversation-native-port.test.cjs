@@ -16,3 +16,10 @@ test('native event retains pre-display sequence across delayed session verificat
  const port=installNativeConversationPort({window:{webContents:wc,isDestroyed:()=>false,isFocused:()=>true},observedSequence:()=>sequence,isSessionCurrent:async()=>{if(first){first=false;await gate;}return true;},snapshot:async()=>({eligible:true,text:'可以',conversationId:'C'})});
  wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});sequence=2;release();const ctx=await port.consume({text:'可以',conversationId:'C'});assert.equal(port.read(ctx).observedSequence,1);port.dispose();
 });
+for(const modifiers of [{control:true},{meta:true},{alt:true},{control:true,alt:true}])test(`composer modifier Enter captures exact source: ${JSON.stringify(modifiers)}`,async()=>{
+ const wc=new EventEmitter(),port=installNativeConversationPort({window:{webContents:wc,isDestroyed:()=>false,isFocused:()=>true},snapshot:async()=>({eligible:true,text:'可以',conversationId:'C'}),isSessionCurrent:async()=>true});
+ wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter',...modifiers});const ctx=await port.consume({text:'可以',conversationId:'C'});assert.equal(port.read(ctx).text,'可以');await assert.rejects(port.consume({text:'可以',conversationId:'C'}));port.dispose();
+});
+for(const modifiers of [{shift:true},{isComposing:true},{isAutoRepeat:true}])test(`non-send Enter does not capture: ${JSON.stringify(modifiers)}`,async()=>{
+ const wc=new EventEmitter(),port=installNativeConversationPort({window:{webContents:wc,isDestroyed:()=>false,isFocused:()=>true},snapshot:async()=>({eligible:true,text:'可以',conversationId:'C'}),isSessionCurrent:async()=>true});wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter',...modifiers});await assert.rejects(port.consume({text:'可以',conversationId:'C'}));port.dispose();
+});

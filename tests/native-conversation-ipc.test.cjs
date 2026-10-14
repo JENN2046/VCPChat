@@ -53,3 +53,28 @@ test('replacement during prepare display snapshot does not invalidate the new pl
  await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame},args={tool:'T',conversationId:'C',messageId:'M',payload:{}};
  try{await handlers.get('native-conversation:propose')(e,args);wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});const pending=handlers.get('native-conversation:prepare')(e,{text:'可以',conversationId:'C'});await started;await handlers.get('native-conversation:propose')(e,args);release();await pending;assert.equal(invalidates,0);}finally{wc.emit('destroyed');}
 });
+
+for(const reverse of [false,true])test('propose request order owns visible plan, reverse responses='+reverse,async()=>{
+ const responses=[],calls=[];let visible='P2';
+ const transport={sequence:()=>0,request:async(action,p)=>{calls.push(action);if(action==='propose')return new Promise(resolve=>responses.push({resolve,p}));return {ok:true}},project:async r=>r};
+ const {handlers,initialize}=load(transport),wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async code=>{if(code==='window.__nativeConversationContext?.conversationId')return 'C';if(code.includes('querySelectorAll'))return code.includes('return {text:')?{text:'current',connected:true,conversationId:'C'}:code.includes(JSON.stringify(visible));return {eligible:true,text:'可以',conversationId:'C'}};
+ await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame},args={tool:'T',conversationId:'C',messageId:'M',payload:{}},propose=()=>handlers.get('native-conversation:propose')(e,args),finish=(i,id)=>responses[i].resolve({ok:true,plan:{id,conversationId:'C',messageId:'M',presentation:'current'}});
+ try{const first=propose();while(responses.length<1)await new Promise(r=>setImmediate(r));
+  if(!reverse){finish(0,'P1');assert.equal((await first).plan.id,'P1');}
+  const second=propose();while(responses.length<2)await new Promise(r=>setImmediate(r));finish(1,'P2');assert.equal((await second).plan.id,'P2');
+  if(reverse){finish(0,'P1');assert.equal((await first).code,'PROPOSAL_SUPERSEDED');}
+  assert.equal((await handlers.get('native-conversation:presented')(e,{planId:'P2'})).ok,true);assert.equal(calls.filter(x=>x==='presented').length,1);
+  assert.equal((await handlers.get('native-conversation:presented')(e,{planId:'P1'})).ok,false);
+  wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});await handlers.get('native-conversation:prepare')(e,{text:'可以',conversationId:'C'});assert.equal(calls.filter(x=>x==='invalidate').length,0);assert.equal(calls.filter(x=>x==='prepare').length,1);
+ }finally{wc.emit('destroyed');}
+});
+for(const wholeConversation of [false,true])test('invalidate retires pending propose response, conversation='+wholeConversation,async()=>{
+ let release,entered;const started=new Promise(r=>entered=r),gate=new Promise(r=>release=r);const {handlers,initialize}=load({sequence:()=>0,request:async action=>{if(action==='propose'){entered();await gate;return {ok:true,plan:{id:'late',messageId:'M',conversationId:'C',presentation:'late'}}}return {ok:true}}});
+ const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async()=> 'C';await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame};
+ try{const pending=handlers.get('native-conversation:propose')(e,{tool:'T',conversationId:'C',messageId:'M',payload:{}});await started;await handlers.get('native-conversation:invalidate')(e,{conversationId:'C',...(wholeConversation?{}:{messageId:'M'})});release();assert.equal((await pending).code,'PROPOSAL_SUPERSEDED');assert.equal((await handlers.get('native-conversation:presented')(e,{planId:'late'})).ok,false);}finally{wc.emit('destroyed');}
+});
+test('request generation is captured before delayed conversation DOM readback',async()=>{
+ let release,entered,reads=0,proposes=0;const started=new Promise(r=>entered=r),gate=new Promise(r=>release=r);const {handlers,initialize}=load({sequence:()=>0,request:async action=>{if(action==='propose'){proposes++;return {ok:true,plan:{id:'current',messageId:'M',conversationId:'C',presentation:'current'}}}return {ok:true}}});
+ const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async()=>{if(++reads===1){entered();await gate;}return 'C'};await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame},p={tool:'T',conversationId:'C',messageId:'M',payload:{}};
+ try{const old=handlers.get('native-conversation:propose')(e,p);await started;assert.equal((await handlers.get('native-conversation:propose')(e,p)).plan.id,'current');release();assert.equal((await old).code,'PROPOSAL_SUPERSEDED');assert.equal(proposes,1);}finally{wc.emit('destroyed');}
+});

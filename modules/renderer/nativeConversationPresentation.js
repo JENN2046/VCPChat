@@ -39,7 +39,7 @@ export async function presentNativeProposal({element,content,messageId,api,conve
  const replace=()=>{for(const code of container.querySelectorAll('pre code'))if(code.textContent.trim()===blocks[0][1].trim())code.closest('pre')?.remove();container.querySelectorAll('[data-native-plan-id]').forEach(e=>e.remove());};
  if(historical){replace();const note=element.ownerDocument.createElement('pre');note.textContent='历史方案已失效。需要调整时，请重新提出要求。';container.append(note);return;}
  let input;try{input=JSON.parse(blocks[0][1]);}catch{return;}
- if(Object.keys(input).sort().join(',')!=='payload,tool')return;
+ if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).sort().join(',')!=='payload,tool')return;
  let text;
  try{const r=await api.proposeNativeConversation({...input,messageId,conversationId});if(!r.ok||!current())return;
  text=element.ownerDocument.createElement('pre');text.textContent=r.plan.presentation;text.dataset.nativePlanId=r.plan.id;

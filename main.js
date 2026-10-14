@@ -1593,7 +1593,7 @@ if (!gotTheLock) {
             logger: console,
         });
         const nativeConversation = require('./modules/ipc/nativeConversationHandlers');
-        await nativeConversation.initialize({mainWindow,chartService,binding:nativeConversation.bindingFromEnvironment()});
+        await nativeConversation.initialize({mainWindow,chartService});
         configureDocxHandlers({
             mainWindow,
             openChildWindows,

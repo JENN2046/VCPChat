@@ -2,14 +2,19 @@
 const fs=require('node:fs'),{ipcMain}=require('electron');
 const {installNativeConversationPort}=require('../services/trustedConversation/nativePort.cjs');
 const {createNativeTransport}=require('../services/trustedConversation/transport.cjs');
-function bindingFromEnvironment(){const file=process.env.VCPCHAT_NATIVE_TOOL_BINDING_FILE;return file?JSON.parse(fs.readFileSync(file,'utf8')):null;}
+function bindingFromEnvironment(){const file=process.env.VCPCHAT_NATIVE_TOOL_BINDING_FILE;if(!file)return null;const binding=JSON.parse(fs.readFileSync(file,'utf8'));if(!binding||typeof binding!=='object'||Array.isArray(binding))throw Error('NATIVE_CONFIGURATION_INVALID');return binding;}
 const initializedWindows=new WeakSet();
 async function initialize({mainWindow,chartService,binding}){
  if(initializedWindows.has(mainWindow)||mainWindow.isDestroyed?.())return;
  const channels=['native-conversation:prepare','native-conversation:execute','native-conversation:propose','native-conversation:presented','native-conversation:invalidate'];
- if(!binding){for(const c of channels)ipcMain.handle(c,()=>({handled:false,ok:false,code:'NOT_CONFIGURED'}));initializedWindows.add(mainWindow);mainWindow.webContents.once('destroyed',()=>{initializedWindows.delete(mainWindow);for(const c of channels)ipcMain.removeHandler(c);});return;}
- const controller=require('../../VCPDistributedServer/Plugin/ChartController/ChartControllerService');controller.initialize({chartService});
- const transport=createNativeTransport({binding,chartService,controller});
+ const unavailable=(code,handled)=>{for(const c of channels)ipcMain.handle(c,()=>({handled,ok:false,code,...(handled?{preserveInput:true,message:'原生排期配置不可用，请检查配置后重启。待发送文本已保留。'}:{})}));initializedWindows.add(mainWindow);mainWindow.webContents.once('destroyed',()=>{initializedWindows.delete(mainWindow);for(const c of channels)ipcMain.removeHandler(c);});};
+ let transport;
+ try{
+  if(binding===undefined)binding=bindingFromEnvironment();
+  if(!binding){unavailable('NOT_CONFIGURED',false);return;}
+  const controller=require('../../VCPDistributedServer/Plugin/ChartController/ChartControllerService');controller.initialize({chartService});
+  transport=createNativeTransport({binding,chartService,controller});
+ }catch{unavailable('NATIVE_CONFIGURATION_UNAVAILABLE',true);return;}
  const wc=mainWindow.webContents,pending=new Map(),plans=new Map(),proposalRequests=new Map();const owned=e=>e.sender===wc&&e.senderFrame===wc.mainFrame&&!mainWindow.isDestroyed();
  const retireRequests=p=>{for(const [key,request] of proposalRequests)if(request.conversationId===p.conversationId&&(!p.messageId||request.messageId===p.messageId))proposalRequests.delete(key);};
  const port=installNativeConversationPort({window:mainWindow,observedSequence:transport.sequence,isSessionCurrent:async()=>!mainWindow.isDestroyed(),snapshot:async(kind,input)=>wc.executeJavaScript(`(()=>{const input=document.getElementById('messageInput'),button=document.getElementById('sendMessageBtn'),c=window.__nativeConversationContext,hit=${kind==='mouse'?`document.elementFromPoint(${Number(input.x)||0},${Number(input.y)||0})`:'null'};return {text:input?.value??'',conversationId:c?.conversationId,eligible:!!c&&(${kind==='keyboard'?`!!button&&!button.disabled&&button.dataset.mode!=='interrupt'&&(document.activeElement===button||(${JSON.stringify(input.key)}==='Enter'&&document.activeElement===input))`:"!!button&&(hit===button||button.contains(hit))&&button.dataset.mode!=='interrupt'"})};})()`)});

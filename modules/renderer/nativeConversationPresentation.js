@@ -1,5 +1,18 @@
 const proposalMessages = new Map();
 const owners = new WeakMap();
+// Inspect only root Markdown tokens; code examples, blockquotes and lists are not proposals.
+function topLevelProposalBlocks(content,parser){
+ if(typeof parser?.lexer!=='function')return [];
+ let tokens;try{tokens=parser.lexer(String(content));}catch{return [];}
+ const candidates=tokens.filter(token=>token.type==='code'&&token.lang==='vcp-tool-proposal');
+ if(candidates.length!==1)return [];
+ const token=candidates[0],lines=token.raw.replace(/\n+$/u,'').split('\n');
+ const opening=/^ {0,3}(`{3,}|~{3,})[ \t]*vcp-tool-proposal[ \t]*$/u.exec(lines[0]);
+ if(!opening||lines.length<3)return [];
+ const closing=/^ {0,3}(`{3,}|~{3,})[ \t]*$/u.exec(lines.at(-1));
+ if(!closing||closing[1][0]!==opening[1][0]||closing[1].length<opening[1].length)return [];
+ return [[token.raw,token.text]];
+}
 // Retiring a DOM view never recreates authorization from its historical text.
 export async function retireNativeProposal(element){
  const owner=owners.get(element);if(!owner)return;
@@ -13,7 +26,7 @@ export async function presentNativeProposal({element,content,messageId,api,conve
  if(!element?.isConnected||!api?.proposeNativeConversation||!conversationId)return;
  // Native operations are supported only in the primary chat surface.
  if(!element.ownerDocument?.getElementById('chatMessages')?.contains(element))return;
- const blocks=[...String(content).matchAll(/```vcp-tool-proposal\s*([\s\S]*?)```/g)];
+ const blocks=topLevelProposalBlocks(content,element.ownerDocument.defaultView?.marked||(typeof marked!=='undefined'?marked:null));
  const key=JSON.stringify([conversationId,messageId]);
  if(blocks.length!==1&&!proposalMessages.has(key))return;
  const generation={};proposalMessages.set(key,generation);

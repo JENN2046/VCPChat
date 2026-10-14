@@ -8,7 +8,7 @@ const deferredStart=source.indexOf('function processDeferredMessageElement('),de
 const modes=['renderMessageBatch','renderHistoryLegacy','renderOlderMessagesInBatches'];
 for(const mode of modes)for(const scenario of ['main','B','revoked-before-mount','revoked-during-process','user'])test(mode+' historical mount: '+scenario,async()=>{
  const dom=new JSDOM('<div id="chatMessages"></div><div id="panelB"></div>');const doc=dom.window.document,root=doc.getElementById(scenario==='B'?'panelB':'chatMessages');let active=true,invalidates=0,proposes=0,presented=0,processing=[];
- const present=new Function(ps.replaceAll('export async function','async function')+';return presentNativeProposal')();
+ const present=new Function('marked',ps.replaceAll('export async function','async function')+';return presentNativeProposal')(require('../vendor/marked.min.js'));
  const refs={chatMessagesDiv:root,electronAPI:{proposeNativeConversation:async()=>{proposes++;throw Error('history cannot propose')},presentNativeConversation:async()=>{presented++;throw Error('history cannot acknowledge')},invalidateNativeConversation:async()=>{invalidates++;return {ok:true}}},uiHelper:{scrollToBottom(){}},messageCommands:{syncNextUiEmptyStateWithMessages(){}}};
  const input='{"tool":"Example","payload":{}}',content='```vcp-tool-proposal\n'+input+'\n```';
  const process=new Function('isRenderSessionActive','visibilityOptimizer','shouldRunHeavyForMessage',source.slice(deferredStart,deferredEnd+2)+';return processDeferredMessageElement')(()=>active,{observeMessage(){}},()=>true);

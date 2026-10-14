@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../modules/renderer/nativeConversationPresentation.js'),'utf8');
-const load=()=>{const fn=new Function(source.replaceAll('export async function','async function')+';return presentNativeProposal')();return args=>{args.element.ownerDocument??={};args.element.ownerDocument.getElementById??=()=>({contains:()=>true});return fn(args);};};
+const load=()=>{const fn=new Function('marked',source.replaceAll('export async function','async function')+';return presentNativeProposal')(require('../vendor/marked.min.js'));return args=>{args.element.ownerDocument??={};args.element.ownerDocument.getElementById??=()=>({contains:()=>true});return fn(args);};};
 test('ordinary text with no prior plan never waits on remote invalidation',async()=>{
  let invalidates=0;const present=load();await present({element:{isConnected:true,querySelector:()=>null},content:'普通回答',messageId:'M',conversationId:'C',api:{proposeNativeConversation(){throw Error('unused')},invalidateNativeConversation(){invalidates++;return new Promise(()=>{})}}});assert.equal(invalidates,0);
 });
@@ -32,7 +32,7 @@ for(const mode of ['reject','denied'])test('failed presentation ack retracts con
  assert.equal(element.querySelectorAll('[data-native-plan-id]').length,0);assert.match(element.nodes[0].textContent,/不能执行/);assert.equal(invalidates,2);
 });
 test('retire during pending ack and historical rebuild never restore authorization',async()=>{
- const {presentNativeProposal:present,retireNativeProposal:retire}=new Function(source.replaceAll('export async function','async function')+';return {presentNativeProposal,retireNativeProposal}')();
+ const {presentNativeProposal:present,retireNativeProposal:retire}=new Function('marked',source.replaceAll('export async function','async function')+';return {presentNativeProposal,retireNativeProposal}')(require('../vendor/marked.min.js'));
  let release,entered,proposes=0,invalidates=0;const started=new Promise(r=>entered=r),gate=new Promise(r=>release=r),element=dom();
  const api={invalidateNativeConversation:async()=>{invalidates++;return {ok:true}},proposeNativeConversation:async()=>{proposes++;return {ok:true,plan:{id:'P',presentation:'回复可以'}}},presentNativeConversation:async()=>{entered();await gate;return {ok:true}}};
  const pending=present({element,content,messageId:'M',conversationId:'C',api});await started;await retire(element);element.isConnected=false;release();await pending;assert.equal(element.nodes[0].removed,true);
@@ -51,7 +51,7 @@ test('stream completion presents once with or without restored DOM using real ho
 });
 
 test('cleanup of replaced DOM does not invalidate the newer generation',async()=>{
- const {presentNativeProposal:present,retireNativeProposal:retire}=new Function(source.replaceAll('export async function','async function')+';return {presentNativeProposal,retireNativeProposal}')();let invalidates=0;
+ const {presentNativeProposal:present,retireNativeProposal:retire}=new Function('marked',source.replaceAll('export async function','async function')+';return {presentNativeProposal,retireNativeProposal}')(require('../vendor/marked.min.js'));let invalidates=0;
  const api={invalidateNativeConversation:async()=>{invalidates++;return {ok:true}},proposeNativeConversation:async()=>({ok:false})},old=dom();await present({element:old,content,messageId:'M',conversationId:'C',api});await present({element:dom(),content,messageId:'M',conversationId:'C',api});await retire(old);assert.equal(invalidates,2);
 });
 

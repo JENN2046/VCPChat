@@ -1,4 +1,4 @@
-import { presentJsoProposal } from './renderer/jsoProposalPresentation.js';
+import { presentNativeProposal } from './renderer/nativeConversationPresentation.js';
 import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.js';
 import { createImageHandler } from './renderer/imageHandler.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
@@ -4071,7 +4071,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
             force: shouldReengageBottomFollow
         });
     }
-    if (!isInitialLoad && !message.isThinking && message.role === 'assistant') await presentJsoProposal({element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__jsoConversationContext?.conversationId});
+    if (!isInitialLoad && !message.isThinking && message.role === 'assistant') await presentNativeProposal({element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
     return messageItem;
 }
 
@@ -4215,7 +4215,7 @@ async function renderFullMessage(messageId, fullContent, agentName, agentId, opt
         includeAttachments: !!messageFromHistoryForRegex
     });
 
-    if(messageRoleForRender==='assistant')await presentJsoProposal({element:messageItem,content:fullContent,messageId,api:electronAPI,conversationId:window.__jsoConversationContext?.conversationId});
+    if(messageRoleForRender==='assistant')await presentNativeProposal({element:messageItem,content:fullContent,messageId,api:electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
     mainRendererReferences.uiHelper.scrollToBottom();
 }
 
@@ -4268,7 +4268,7 @@ async function renderFullMessageProjection(messageId, fullContent, agentName, ag
 }
 
 function updateMessageContent(messageId, newContent) {
-    mainRendererReferences.electronAPI?.proposeJsoConversation?.({conversationId:window.__jsoConversationContext?.conversationId,messageId,invalidate:true}).catch(()=>{});
+    mainRendererReferences.electronAPI?.invalidateNativeConversation?.({conversationId:window.__nativeConversationContext?.conversationId,messageId,invalidate:true}).catch(()=>{});
     const { chatMessagesDiv, markedInstance, globalSettingsRef } = mainRendererReferences;
     const messageItem = chatMessagesDiv.querySelector(`.message-item[data-message-id="${messageId}"]`);
     if (!messageItem) return;

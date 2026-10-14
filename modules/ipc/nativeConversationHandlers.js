@@ -1,0 +1,22 @@
+'use strict';
+const fs=require('node:fs'),{ipcMain}=require('electron');
+const {installNativeConversationPort}=require('../services/trustedConversation/nativePort.cjs');
+const {createNativeTransport}=require('../services/trustedConversation/transport.cjs');
+function bindingFromEnvironment(){const file=process.env.VCPCHAT_NATIVE_TOOL_BINDING_FILE;return file?JSON.parse(fs.readFileSync(file,'utf8')):null;}
+async function initialize({mainWindow,chartService,binding}){
+ const channels=['native-conversation:prepare','native-conversation:execute','native-conversation:propose','native-conversation:presented','native-conversation:invalidate'];
+ if(!binding){for(const c of channels)ipcMain.handle(c,()=>({handled:false,ok:false,code:'NOT_CONFIGURED'}));mainWindow.webContents.once('destroyed',()=>{for(const c of channels)ipcMain.removeHandler(c);});return;}
+ const controller=require('../../VCPDistributedServer/Plugin/ChartController/ChartControllerService');controller.initialize({chartService});
+ const transport=createNativeTransport({binding,chartService,controller});await transport.request('status').catch(()=>{});
+ const wc=mainWindow.webContents,pending=new Map(),plans=new Map();const owned=e=>e.sender===wc&&e.senderFrame===wc.mainFrame&&!mainWindow.isDestroyed();
+ const port=installNativeConversationPort({window:mainWindow,observedSequence:transport.sequence,isSessionCurrent:async()=>!mainWindow.isDestroyed(),snapshot:async(kind,input)=>wc.executeJavaScript(`(()=>{const input=document.getElementById('messageInput'),button=document.getElementById('sendMessageBtn'),c=window.__nativeConversationContext,hit=${kind==='mouse'?`document.elementFromPoint(${Number(input.x)||0},${Number(input.y)||0})`:'null'};return {text:input?.value??'',conversationId:c?.conversationId,eligible:!!c&&(${kind==='keyboard'?"document.activeElement===input&&button?.dataset.mode!=='interrupt'":"!!button&&(hit===button||button.contains(hit))&&button.dataset.mode!=='interrupt'"})};})()`)});
+ ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};let context;try{context=await port.consume(p);}catch{return {handled:false,ok:false,code:'NATIVE_SOURCE_REQUIRED'};}
+  const event=port.read(context),r=await transport.request('prepare',event);if(r.sourceId)pending.set(r.sourceId,event);return r.ok===false?{...r,handled:true}:r;});
+ ipcMain.handle(channels[1],async(e,p={})=>{const event=pending.get(p.sourceId);if(!owned(e)||!event)return {ok:false,code:'SOURCE_UNKNOWN'};pending.delete(p.sourceId);return transport.project(await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId}));});
+ ipcMain.handle(channels[2],async(e,p={})=>{if(!owned(e)||p.tool!==binding.toolName)return {ok:false};const c=await wc.executeJavaScript('window.__nativeConversationContext?.conversationId');if(!c||c!==p.conversationId)return {ok:false};const r=await transport.request('propose',{...p.payload,messageId:p.messageId,conversationId:c});if(r.plan)plans.set(r.plan.id,r.plan);return r;});
+ ipcMain.handle(channels[3],async(e,p={})=>{const plan=plans.get(p.planId);if(!owned(e)||!plan)return {ok:false};const snapshot=await wc.executeJavaScript(`(()=>{const e=[...document.querySelectorAll('[data-native-plan-id]')].find(e=>e.dataset.nativePlanId===${JSON.stringify(p.planId)});return {text:e?.textContent,connected:!!e?.isConnected,conversationId:window.__nativeConversationContext?.conversationId};})()`);if(!snapshot.connected||snapshot.text!==plan.presentation||snapshot.conversationId!==plan.conversationId)return {ok:false,code:'PRESENTATION_MISMATCH'};return transport.request('presented',{planId:plan.id,text:snapshot.text,conversationId:plan.conversationId});});
+ ipcMain.handle(channels[4],async(e,p={})=>{if(!owned(e))return {ok:false};return transport.request('invalidate',p);});
+ const timer=setInterval(async()=>{try{const r=await transport.request('recover');for(const result of r.results||[])await transport.project(result);}catch{}},30000);timer.unref?.();
+ wc.once('destroyed',()=>{clearInterval(timer);port.dispose();pending.clear();plans.clear();for(const c of channels)ipcMain.removeHandler(c);});
+}
+module.exports={initialize,bindingFromEnvironment};

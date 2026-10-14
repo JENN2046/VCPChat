@@ -1,4 +1,4 @@
-import { presentJsoProposal } from './jsoProposalPresentation.js';
+import { presentNativeProposal } from './nativeConversationPresentation.js';
 // modules/renderer/streamManager.js
 import { formatMessageTimestamp } from './domBuilder.js';
 import { createContentPipeline, PIPELINE_MODES } from './contentPipeline.js';
@@ -2656,7 +2656,7 @@ async function projectStreamTerminalInternal(messageId, finishReason, context, f
                 nameTimeBlock.appendChild(timestampDiv);
             }
 
-            if(finishReason==='completed'||finishReason==='stop')await presentJsoProposal({element:messageItem,content:finalFullText,messageId,api:refs.electronAPI,conversationId:`${storedContext.agentId}:${storedContext.topicId}`});
+            if(finishReason==='completed'||finishReason==='stop')await presentNativeProposal({element:messageItem,content:finalFullText,messageId,api:refs.electronAPI,conversationId:`${storedContext.agentId}:${storedContext.topicId}`});
             uiHelper.scrollToBottom();
         }
 

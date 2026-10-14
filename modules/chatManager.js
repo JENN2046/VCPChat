@@ -326,8 +326,8 @@ export const chatManager = (() => {
 
         // State References
         currentSelectedItemRef = config.refs.currentSelectedItemRef;
-        if (!Object.getOwnPropertyDescriptor(window, '__jsoConversationContext')) {
-            Object.defineProperty(window, '__jsoConversationContext', {get: () => {const id=currentSelectedItemRef?.get()?.id,topic=currentTopicIdRef?.get();return id&&topic?{conversationId:`${id}:${topic}`}:null;}});
+        if (!Object.getOwnPropertyDescriptor(window, '__nativeConversationContext')) {
+            Object.defineProperty(window, '__nativeConversationContext', {get: () => {const id=currentSelectedItemRef?.get()?.id,topic=currentTopicIdRef?.get();return id&&topic?{conversationId:`${id}:${topic}`}:null;}});
         }
         currentTopicIdRef = config.refs.currentTopicIdRef;
         currentChatHistoryRef = config.refs.currentChatHistoryRef;
@@ -1354,7 +1354,11 @@ export const chatManager = (() => {
             if (request?.propagateError) throw error;
             return;
         }
-        if (!globalSettings.vcpServerUrl) {
+
+
+        if (!request?.conversation) setNextUiEmptyStateActive(false);
+
+        if (currentSelectedItem.type === 'group' && !globalSettings.vcpServerUrl) {
             const error = new Error('请先在全局设置中配置 VCP 服务器 URL。');
             if (!request?.conversation) {
                 uiHelper.showToastNotification(error.message, 'error');
@@ -1363,8 +1367,6 @@ export const chatManager = (() => {
             if (request?.propagateError) throw error;
             return;
         }
-
-        if (!request?.conversation) setNextUiEmptyStateActive(false);
 
         if (currentSelectedItem.type === 'group') {
             if (request?.conversation) {
@@ -1400,10 +1402,19 @@ export const chatManager = (() => {
         }
         pendingSendContexts.add(sendSignature);
         try {
-        let jsoResult = null;
-        if (!request && !attachedFiles.length && currentSelectedItem.type !== 'group' && typeof electronAPI.submitJsoConversation === 'function') {
-            try { jsoResult = await electronAPI.submitJsoConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
+        let nativeResult = null;
+        if (!request && !attachedFiles.length && currentSelectedItem.type !== 'group' && typeof electronAPI.prepareNativeConversation === 'function') {
+            try { nativeResult = await electronAPI.prepareNativeConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
             catch { /* Optional local integration absent: ordinary chat remains unchanged. */ }
+        }
+        if (!nativeResult?.handled && !globalSettings.vcpServerUrl) {
+            const error = new Error('请先在全局设置中配置 VCP 服务器 URL。');
+            if (!request?.conversation) {
+                uiHelper.showToastNotification(error.message, 'error');
+                uiHelper.openModal('globalSettingsModal');
+            }
+            if (request?.propagateError) throw error;
+            return;
         }
         const uiAttachments = [];
         if (attachedFiles.length > 0) {
@@ -1424,7 +1435,7 @@ export const chatManager = (() => {
             name: globalSettings.userName || '用户',
             content: content, // Use raw content for UI
             timestamp: Date.now(),
-            id: jsoResult?.sourceId || `msg_${Date.now()}_user_${Math.random().toString(36).substring(2, 9)}`,
+            id: nativeResult?.sourceId || `msg_${Date.now()}_user_${Math.random().toString(36).substring(2, 9)}`,
             attachments: uiAttachments
         };
         
@@ -1503,15 +1514,15 @@ export const chatManager = (() => {
             itemListManager.loadItems();
         }
 
-        if (jsoResult?.handled) {
-            try { jsoResult = await electronAPI.executeJsoConversation({sourceId:jsoResult.sourceId}); } catch { jsoResult={code:'RESULT_UNKNOWN',message:'结果暂未确认，请查原操作回执，不要重复提交。'}; }
-            const content = jsoResult.committed
-                ? `已完成排期调整，并已读回确认。${jsoResult.chart?.ok ? '图表已更新。' : '图表刷新暂未完成，正在恢复。'}`
-                : (jsoResult.message || (jsoResult.cancelled ? '已取消待确认方案。' : `尚未完成：${jsoResult.code || '等待进一步说明'}`));
-            const reply = {id:`jso_${Date.now()}_${Math.random().toString(36).slice(2)}`,role:'assistant',content,timestamp:Date.now(),name:currentSelectedItem.name};
+        if (nativeResult?.handled) {
+            try { if (nativeResult.sourceId) nativeResult = await electronAPI.executeNativeConversation({sourceId:nativeResult.sourceId}); } catch { nativeResult={code:'RESULT_UNKNOWN',message:'结果暂未确认，请查原操作回执，不要重复提交。'}; }
+            const content = nativeResult.committed
+                ? `已完成操作，并已读回确认。${nativeResult.chart?.ok ? '图表已更新。' : '图表刷新暂未完成，正在恢复。'}`
+                : (nativeResult.message || (nativeResult.cancelled ? '已取消待确认方案。' : `尚未完成：${nativeResult.code || '等待进一步说明'}`));
+            const reply = {id:`native_${Date.now()}_${Math.random().toString(36).slice(2)}`,role:'assistant',content,timestamp:Date.now(),name:currentSelectedItem.name};
             await persistOutgoingUserMessage(sendContext, reply);
             if (isSendContextCurrent()) await renderTarget?.renderMessage?.(reply);
-            return jsoResult;
+            return nativeResult;
         }
         const thinkingMessageId = `msg_${Date.now()}_assistant_${Math.random().toString(36).substring(2, 9)}`;
         const thinkingMessage = {

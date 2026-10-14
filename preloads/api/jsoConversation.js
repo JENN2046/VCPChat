@@ -1,3 +1,0 @@
-'use strict';
-const {invoke}=require('../core/define');
-module.exports={handlers:['modules/ipc/jsoConversationHandlers.js'],roles:['chat'],api:{getJsoOwnerStatus:invoke('jso-owner:status'),loginJsoOwner:invoke('jso-owner:login'),logoutJsoOwner:invoke('jso-owner:logout'),executeJsoConversation:invoke('jso-conversation:execute','payload'),proposeJsoConversation:invoke('jso-conversation:proposal','payload'),presentJsoConversation:invoke('jso-conversation:presented','payload'),submitJsoConversation:invoke('jso-conversation:submit','payload'),invalidateJsoConversation:invoke('jso-conversation:invalidate','payload')}};

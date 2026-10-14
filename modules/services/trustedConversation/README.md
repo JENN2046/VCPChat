@@ -9,3 +9,7 @@ ToolBox 必须有最小宿主修改：server.js 路由注册、Plugin.js 每调�
 配置默认只读；完整本地链要求显式 native-direct-and-confirm、资源/分钟范围、私有 journal 路径、已有 assistant subject 与默认资源，以及客户端通用 binding。进程异常遗留 journal 锁会拒绝继续写入，需操作者核查无活动进程后恢复；不自动破锁。未知提交仅查原 opID，不重复提交。
 
 通过 VCPCHAT_NATIVE_TOOL_BINDING_FILE 选择 docs/native-conversation-binding.example.json 格式。applicationAuthorizationEnv 引用既有 Bearer 会话字符串，transportTokenEnv 引用既有 ToolBox 凭据。未配置时普通聊天保持原流程；配置后会话校验失败返回聊天错误，不回落模型执行。提案以普通文本展示并由主进程核对展示原文。
+
+本轮修复：已配置链的传输异常留在本地；默认只读策略允许普通聊天，认证失败仍拒绝。已提交业务的图表投影失败由现有30秒恢复计时器重试，按图表和版本去重，不重新提交业务写。待投影队列仅在当前主进程内存中，进程退出后不承诺自动恢复。
+
+先前人工直办及受控提案确认（JSO/回执/VChart rev8/11）属于先前提交的验收，不是本修复提交的新人工或模型验收。本轮只有合成回归，没有新增模型请求。

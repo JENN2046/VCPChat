@@ -1406,6 +1406,10 @@ export const chatManager = (() => {
             try { nativeResult = await electronAPI.prepareNativeConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
             catch { nativeResult={handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'}; }
         }
+        if (nativeResult?.handled && nativeResult.code === 'NATIVE_SOURCE_REQUIRED' && nativeResult.preserveInput) {
+            uiHelper.showToastNotification(nativeResult.message, 'warning');
+            return { handled: true, ok: false, code: nativeResult.code };
+        }
         if (!nativeResult?.handled && !globalSettings.vcpServerUrl) {
             const error = new Error('请先在全局设置中配置 VCP 服务器 URL。');
             if (!request?.conversation) {

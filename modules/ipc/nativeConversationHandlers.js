@@ -14,6 +14,7 @@ async function initialize({mainWindow,chartService,binding}){
   // A removed/failed display cannot remain confirmable even if renderer cleanup lost its IPC.
   for(const [id,plan] of plans){
    const visible=await wc.executeJavaScript(`(()=>{const e=[...document.querySelectorAll('[data-native-plan-id]')].find(e=>e.dataset.nativePlanId===${JSON.stringify(id)});return !!e?.isConnected&&e.textContent===${JSON.stringify(plan.presentation)}&&window.__nativeConversationContext?.conversationId===${JSON.stringify(plan.conversationId)};})()`);
+   if(plans.get(id)!==plan)continue;
    if(!visible){try{const invalidated=await transport.request('invalidate',{conversationId:plan.conversationId,messageId:plan.messageId});if(!invalidated?.ok)return {handled:true,ok:false,code:'PRESENTATION_INVALIDATION_REQUIRED'};plans.delete(id);}catch{return {handled:true,ok:false,code:'PRESENTATION_INVALIDATION_REQUIRED'};}}
   }
   const event=port.read(context);let r;try{r=await transport.request('prepare',event);}catch{return {handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'};}if(r.sourceId)pending.set(r.sourceId,event);return r.ok===false&&!(r.code==='READ_ONLY_POLICY'&&r.handled===false)?{...r,handled:true}:r;});

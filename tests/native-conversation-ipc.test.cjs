@@ -46,3 +46,10 @@ test('replacement proposal retires old main-process record without invalidating 
  await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame},args={tool:'T',conversationId:'C',messageId:'M',payload:{}};
  try{await handlers.get('native-conversation:propose')(e,args);await handlers.get('native-conversation:invalidate')(e,{conversationId:'C',messageId:'M'});await handlers.get('native-conversation:propose')(e,args);wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});await handlers.get('native-conversation:prepare')(e,{text:'可以',conversationId:'C'});assert.equal(prepares,1);assert.equal(invalidates,1);}finally{wc.emit('destroyed');}
 });
+
+test('replacement during prepare display snapshot does not invalidate the new plan',async()=>{
+ let number=0,invalidates=0,release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r);
+ const {handlers,initialize}=load({sequence:()=>0,request:async action=>{if(action==='propose')return {ok:true,plan:{id:'P'+(++number),messageId:'M',conversationId:'C',presentation:'visible'}};if(action==='invalidate')invalidates++;return {ok:true}}});const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async code=>{if(code==='window.__nativeConversationContext?.conversationId')return 'C';if(code.includes('querySelectorAll')){if(code.includes('"P1"')){entered();await gate;return false;}return true;}return {eligible:true,text:'可以',conversationId:'C'}};
+ await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame},args={tool:'T',conversationId:'C',messageId:'M',payload:{}};
+ try{await handlers.get('native-conversation:propose')(e,args);wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});const pending=handlers.get('native-conversation:prepare')(e,{text:'可以',conversationId:'C'});await started;await handlers.get('native-conversation:propose')(e,args);release();await pending;assert.equal(invalidates,0);}finally{wc.emit('destroyed');}
+});

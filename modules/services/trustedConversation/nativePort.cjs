@@ -11,7 +11,7 @@ function installNativeConversationPort({window,snapshot,isSessionCurrent,observe
    return Object.freeze({text:value.text,conversationId:value.conversationId,messageId:'native-'+randomUUID(),observedSequence:sequence,at});
   })().then(value=>{if(n===generation)captured=value;}).catch(clear);
  }
- const key=(_e,i)=>{if(i.type==='keyDown'&&i.key==='Enter'&&!i.shift&&!i.isComposing&&!i.isAutoRepeat)arm('keyboard',i);};
+ const key=(_e,i)=>{if(i.type==='keyDown'&&['Enter',' ','Space'].includes(i.key)&&!i.shift&&!i.isComposing&&!i.isAutoRepeat)arm('keyboard',i);};
  const mouse=(_e,i)=>{if(i.type==='mouseDown'&&i.button==='left')arm('mouse',i);};
  wc.on('before-input-event',key);wc.on('before-mouse-event',mouse);wc.on('blur',clear);wc.on('did-start-navigation',clear);wc.once('destroyed',clear);
  return {

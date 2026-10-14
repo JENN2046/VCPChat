@@ -2586,7 +2586,7 @@ async function projectStreamTerminalInternal(messageId, finishReason, context, f
                 ? refs.chatDomRenderer.renderMessage.bind(refs.chatDomRenderer)
                 : refs.renderMessage;
             if (typeof render === 'function') {
-                messageItem = await render(finalMessage, false);
+                messageItem = await render(finalMessage, false, true, null, {suppressNativePresentation:true});
             }
         }
 

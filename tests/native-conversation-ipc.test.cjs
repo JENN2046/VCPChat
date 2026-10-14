@@ -25,3 +25,24 @@ for(const [name,response,expected] of [
  await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'Example'}});
  try{wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});const result=await handlers.get('native-conversation:prepare')({sender:wc,senderFrame:wc.mainFrame},{text:'你好',conversationId:'C1'});assert.equal(result.handled,expected);if(response instanceof Error)assert.equal(result.code,'NATIVE_TRANSPORT_UNAVAILABLE');}finally{wc.emit('destroyed');}
 });
+
+for(const key of ['Enter',' ','Space'])test('focused Send keyboard activation uses actual DOM snapshot: '+JSON.stringify(key),async()=>{
+ const input={value:'可以'},button={dataset:{},disabled:false},document={activeElement:button,getElementById:id=>id==='messageInput'?input:button};
+ const {handlers,initialize}=load({sequence:()=>0,request:async(action,p)=>action==='prepare'?{ok:true,handled:true,sourceId:p.messageId}:{ok:true}});const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async code=>vm.runInNewContext(code,{document,window:{__nativeConversationContext:{conversationId:'C'}}});
+ await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const event={sender:wc,senderFrame:wc.mainFrame},prepare=()=>handlers.get('native-conversation:prepare')(event,{text:'可以',conversationId:'C'});
+ try{wc.emit('before-input-event',{}, {type:'keyDown',key});assert.ok((await prepare()).sourceId);assert.equal((await prepare()).code,'NATIVE_SOURCE_REQUIRED');
+ for(const variant of ['disabled','interrupt','input']){button.disabled=variant==='disabled';button.dataset.mode=variant==='interrupt'?'interrupt':'';document.activeElement=variant==='input'?input:button;if(variant==='input'&&key==='Enter')continue;wc.emit('before-input-event',{}, {type:'keyDown',key});assert.equal((await prepare()).code,'NATIVE_SOURCE_REQUIRED');}
+ }finally{wc.emit('destroyed');}
+});
+test('removed proposal cannot reach prepare until host invalidation succeeds',async()=>{
+ let invalidates=0,prepares=0,allow=false;const plan={id:'P',presentation:'exact',conversationId:'C',messageId:'M'};
+ const {handlers,initialize}=load({sequence:()=>0,request:async action=>{if(action==='propose')return {ok:true,plan};if(action==='invalidate'){invalidates++;return {ok:allow}}if(action==='prepare'){prepares++;return {ok:true}}return {ok:true}}});const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async code=>code==='window.__nativeConversationContext?.conversationId'?'C':code.includes('querySelectorAll')?false:{eligible:true,text:'可以',conversationId:'C'};
+ await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame};
+ try{await handlers.get('native-conversation:propose')(e,{tool:'T',conversationId:'C',messageId:'M',payload:{}});wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});assert.equal((await handlers.get('native-conversation:prepare')(e,{text:'可以',conversationId:'C'})).code,'PRESENTATION_INVALIDATION_REQUIRED');assert.equal(prepares,0);allow=true;wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});await handlers.get('native-conversation:prepare')(e,{text:'可以',conversationId:'C'});assert.equal(prepares,1);assert.equal(invalidates,2);}finally{wc.emit('destroyed');}
+});
+
+test('replacement proposal retires old main-process record without invalidating visible replacement',async()=>{
+ let number=0,invalidates=0,prepares=0;const {handlers,initialize}=load({sequence:()=>0,request:async action=>{if(action==='propose')return {ok:true,plan:{id:'P'+(++number),messageId:'M',conversationId:'C',presentation:'visible'}};if(action==='invalidate')invalidates++;if(action==='prepare')prepares++;return {ok:true}}});const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async code=>code==='window.__nativeConversationContext?.conversationId'?'C':code.includes('querySelectorAll')?code.includes('"P2"'):{eligible:true,text:'可以',conversationId:'C'};
+ await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const e={sender:wc,senderFrame:wc.mainFrame},args={tool:'T',conversationId:'C',messageId:'M',payload:{}};
+ try{await handlers.get('native-conversation:propose')(e,args);await handlers.get('native-conversation:invalidate')(e,{conversationId:'C',messageId:'M'});await handlers.get('native-conversation:propose')(e,args);wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});await handlers.get('native-conversation:prepare')(e,{text:'可以',conversationId:'C'});assert.equal(prepares,1);assert.equal(invalidates,1);}finally{wc.emit('destroyed');}
+});

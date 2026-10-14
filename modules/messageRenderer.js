@@ -1,4 +1,4 @@
-import { presentNativeProposal } from './renderer/nativeConversationPresentation.js';
+import { presentNativeProposal, retireNativeProposal } from './renderer/nativeConversationPresentation.js';
 import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.js';
 import { createImageHandler } from './renderer/imageHandler.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
@@ -2624,6 +2624,7 @@ function cleanupToolResultFullContentForRoot(root) {
 
 function cleanupMessageDomResources(messageItem, messageId = null) {
     if (!messageItem) return;
+    retireNativeProposal(messageItem);
 
     cleanupToolResultFullContentForRoot(messageItem);
     const contentDiv = messageItem.querySelector('.md-content');
@@ -4071,7 +4072,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
             force: shouldReengageBottomFollow
         });
     }
-    if (!isInitialLoad && !message.isThinking && message.role === 'assistant') await presentNativeProposal({element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
+    if (!renderContext.suppressNativePresentation && !message.isThinking && message.role === 'assistant') await presentNativeProposal({historical:isInitialLoad,element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
     return messageItem;
 }
 

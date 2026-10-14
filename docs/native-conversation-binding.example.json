@@ -1,0 +1,6 @@
+{
+  "toolboxUrl": "http://127.0.0.1:6005",
+  "toolName": "JennShootingOperations",
+  "transportTokenEnv": "EXISTING_VCP_TRANSPORT_TOKEN",
+  "applicationAuthorizationEnv": "EXISTING_JSO_ADMIN_BEARER"
+}

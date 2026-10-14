@@ -1,3 +1,4 @@
+import { presentNativeProposal } from './nativeConversationPresentation.js';
 // modules/renderer/streamManager.js
 import { formatMessageTimestamp } from './domBuilder.js';
 import { createContentPipeline, PIPELINE_MODES } from './contentPipeline.js';
@@ -2585,7 +2586,7 @@ async function projectStreamTerminalInternal(messageId, finishReason, context, f
                 ? refs.chatDomRenderer.renderMessage.bind(refs.chatDomRenderer)
                 : refs.renderMessage;
             if (typeof render === 'function') {
-                messageItem = await render(finalMessage, false);
+                messageItem = await render(finalMessage, false, true, null, {suppressNativePresentation:true});
             }
         }
 
@@ -2655,6 +2656,7 @@ async function projectStreamTerminalInternal(messageId, finishReason, context, f
                 nameTimeBlock.appendChild(timestampDiv);
             }
 
+            if(finishReason==='completed'||finishReason==='stop')await presentNativeProposal({element:messageItem,content:finalFullText,messageId,api:refs.electronAPI,conversationId:`${storedContext.agentId}:${storedContext.topicId}`});
             uiHelper.scrollToBottom();
         }
 

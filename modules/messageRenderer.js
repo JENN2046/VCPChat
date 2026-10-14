@@ -1,3 +1,4 @@
+import { presentNativeProposal, retireNativeProposal } from './renderer/nativeConversationPresentation.js';
 import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.js';
 import { createImageHandler } from './renderer/imageHandler.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
@@ -2623,6 +2624,7 @@ function cleanupToolResultFullContentForRoot(root) {
 
 function cleanupMessageDomResources(messageItem, messageId = null) {
     if (!messageItem) return;
+    retireNativeProposal(messageItem);
 
     cleanupToolResultFullContentForRoot(messageItem);
     const contentDiv = messageItem.querySelector('.md-content');
@@ -3853,12 +3855,13 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
 
         // Define the post-processing logic as a function.
         // This allows us to control WHEN it gets executed.
+        const nativeHistoryConversationId = isInitialLoad ? window.__nativeConversationContext?.conversationId : null;
         const runPostRenderProcessing = async (postOptions = {}) => {
             if (!isRenderSessionActive(renderSessionId) || !messageItem.isConnected || !contentDiv.isConnected) {
                 return;
             }
 
-            return renderPostProcessedHtml(contentDiv, finalHtml, {
+            await renderPostProcessedHtml(contentDiv, finalHtml, {
                 messageId: message.id,
                 message,
                 settings: globalSettings,
@@ -3866,6 +3869,10 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
                 runHeavy: postOptions.runHeavy !== false,
                 includeAttachments: true
             });
+            // Historical fragments are inert until mounted and post-processing has finished.
+            if (isInitialLoad && message.role === 'assistant' && !message.isThinking && isRenderSessionActive(renderSessionId) && messageItem.isConnected) {
+                await presentNativeProposal({historical:true,element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:nativeHistoryConversationId});
+            }
         };
 
         messageItem._vcp_activateHeavy = () => {
@@ -4070,6 +4077,7 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
             force: shouldReengageBottomFollow
         });
     }
+    if (!renderContext.suppressNativePresentation && !isInitialLoad && !message.isThinking && message.role === 'assistant') await presentNativeProposal({historical:isInitialLoad,element:messageItem,content:message.content,messageId:message.id,api:mainRendererReferences.electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
     return messageItem;
 }
 
@@ -4213,6 +4221,7 @@ async function renderFullMessage(messageId, fullContent, agentName, agentId, opt
         includeAttachments: !!messageFromHistoryForRegex
     });
 
+    if(messageRoleForRender==='assistant')await presentNativeProposal({element:messageItem,content:fullContent,messageId,api:electronAPI,conversationId:window.__nativeConversationContext?.conversationId});
     mainRendererReferences.uiHelper.scrollToBottom();
 }
 
@@ -4265,6 +4274,7 @@ async function renderFullMessageProjection(messageId, fullContent, agentName, ag
 }
 
 function updateMessageContent(messageId, newContent) {
+    mainRendererReferences.electronAPI?.invalidateNativeConversation?.({conversationId:window.__nativeConversationContext?.conversationId,messageId,invalidate:true}).catch(()=>{});
     const { chatMessagesDiv, markedInstance, globalSettingsRef } = mainRendererReferences;
     const messageItem = chatMessagesDiv.querySelector(`.message-item[data-message-id="${messageId}"]`);
     if (!messageItem) return;

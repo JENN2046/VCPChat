@@ -6143,9 +6143,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "18c37db3f6f85e6da712448981a6d384aa01dc2c",
-          "size": 9968,
-          "sha256": "8580f43119fff9764ea566069711a5211aed947324609e3eacd7afe35cf07e0b",
+          "blob": "7d9418188bf6cfac38a507d1047b1d4dee8a42e7",
+          "size": 11916,
+          "sha256": "c128ea31a24949912c6336d64f8fcaf3ecc06bcd1c058e3b72ceb3ef53839714",
           "kind": "source"
         },
         {
@@ -15169,9 +15169,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "18c37db3f6f85e6da712448981a6d384aa01dc2c",
-          "size": 9968,
-          "sha256": "8580f43119fff9764ea566069711a5211aed947324609e3eacd7afe35cf07e0b",
+          "blob": "7d9418188bf6cfac38a507d1047b1d4dee8a42e7",
+          "size": 11916,
+          "sha256": "c128ea31a24949912c6336d64f8fcaf3ecc06bcd1c058e3b72ceb3ef53839714",
           "kind": "source"
         },
         {
@@ -19903,9 +19903,9 @@
           "path": "tests/native-conversation-ipc.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "0bf24025b117739827837452e6cfb4a03b109fc1",
-          "size": 21048,
-          "sha256": "ea61ec93ddecd073348e6f53fc8b899482c2bf2f7118acb4f1309b3b6700abde",
+          "blob": "da02a3afd29b542365faedaf20659c8e1bb51f00",
+          "size": 29993,
+          "sha256": "1f503e94d3f0d2a629567484d3805cf0d4d7a1cbc7e0d2ffa9e3a2d4c238474e",
           "kind": "source"
         },
         {
@@ -19975,9 +19975,9 @@
           "path": "tests/native-three-boundaries.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7965f30c7f0c7e5d6f9d4a64a655b3343aa63458",
-          "size": 8627,
-          "sha256": "9ef31236280c3db56b1eed2dc97335ea2dd00db0656c5386414c76a3e049bf57",
+          "blob": "25e5de4b9052e5631bf392573675b5e4aab69d26",
+          "size": 9694,
+          "sha256": "5b53fa1ee2ad5486b36d615af392557c9c55ec2edec1e8e0e8e456eaa8e4127a",
           "kind": "source"
         },
         {

@@ -4,6 +4,9 @@ const {installNativeConversationPort}=require('../services/trustedConversation/n
 const {createNativeTransport}=require('../services/trustedConversation/transport.cjs');
 function bindingFromEnvironment(){const file=process.env.VCPCHAT_NATIVE_TOOL_BINDING_FILE;if(!file)return null;const binding=JSON.parse(fs.readFileSync(file,'utf8'));if(!binding||typeof binding!=='object'||Array.isArray(binding))throw Error('NATIVE_CONFIGURATION_INVALID');return binding;}
 const initializedWindows=new WeakSet();
+// Main-process ownership: destroying a renderer must not forget a failed revoke.
+// Keep bindings separate; only identifiers, never credentials or proposal content.
+const invalidationScopes=new Map();
 async function initialize({mainWindow,chartService,binding}){
  if(initializedWindows.has(mainWindow)||mainWindow.isDestroyed?.())return;
  const channels=['native-conversation:prepare','native-conversation:execute','native-conversation:propose','native-conversation:presented','native-conversation:invalidate'];
@@ -15,14 +18,52 @@ async function initialize({mainWindow,chartService,binding}){
   const controller=require('../../VCPDistributedServer/Plugin/ChartController/ChartControllerService');controller.initialize({chartService});
   transport=createNativeTransport({binding,chartService,controller});
  }catch{unavailable('NATIVE_CONFIGURATION_UNAVAILABLE',true);return;}
- const wc=mainWindow.webContents,pending=new Map(),plans=new Map(),proposalRequests=new Map(),invalidations=new Map(),invalidationVersions=new Map();const owned=e=>e.sender===wc&&e.senderFrame===wc.mainFrame&&!mainWindow.isDestroyed();
+ const scopeKey=JSON.stringify([binding.toolboxUrl,binding.toolName,binding.transportTokenEnv,binding.applicationAuthorizationEnv]);
+ if(!invalidationScopes.has(scopeKey))invalidationScopes.set(scopeKey,{invalidations:new Map(),invalidationVersions:new Map(),synchronized:new Set()});
+ const {invalidations,invalidationVersions,synchronized}=invalidationScopes.get(scopeKey);
+ let disposed=false;
+ const wc=mainWindow.webContents,pending=new Map(),plans=new Map(),proposalRequests=new Map();const owned=e=>!disposed&&e.sender===wc&&e.senderFrame===wc.mainFrame&&!mainWindow.isDestroyed();
  // History can contain a host-side plan absent from this fresh process's plans map.
  // Keep the conversation closed until every requested invalidation is acknowledged.
  const blocked=conversationId=>[...invalidations.values()].some(p=>p.conversationId===conversationId);
  const invalidationRequired=()=>({handled:true,ok:false,code:'PRESENTATION_INVALIDATION_REQUIRED'});
  const retireRequests=p=>{for(const [key,request] of proposalRequests)if(request.conversationId===p.conversationId&&(!p.messageId||request.messageId===p.messageId))proposalRequests.delete(key);};
+ const retirePlans=p=>{for(const [id,plan] of plans)if(plan.conversationId===p.conversationId&&(!p.messageId||plan.messageId===p.messageId))plans.delete(id);};
+ async function sendInvalidation(key,request){
+  if(request.inFlight)return request.inFlight;
+  const attempt=(async()=>{
+   let result;try{result=await transport.request('invalidate',request.payload);}catch{return invalidationRequired();}
+   // A late response may only acknowledge the exact generation that sent it.
+   if(result?.ok===true&&invalidations.get(key)===request){invalidations.delete(key);if(request.coldStart)synchronized.add(request.conversationId);retirePlans(request.payload);return result;}
+   return invalidationRequired();
+  })();
+  request.inFlight=attempt;
+  try{return await attempt;}finally{if(request.inFlight===attempt)request.inFlight=null;}
+ }
+ function queueInvalidation(p,coldStart=false){
+  const payload={conversationId:p.conversationId,...(p.messageId?{messageId:p.messageId}:{})};
+  const key=JSON.stringify([payload.conversationId,payload.messageId||null]),request={conversationId:payload.conversationId,payload,inFlight:null,coldStart};
+  invalidations.set(key,request);invalidationVersions.set(payload.conversationId,{});
+  for(const [id,event] of pending)if(event.conversationId===payload.conversationId)pending.delete(id);
+  retireRequests(payload);
+  return sendInvalidation(key,request);
+ }
+ async function retryInvalidations(){
+  for(const [key,request] of [...invalidations]){
+   if(disposed)return;
+   if(invalidations.get(key)===request)await sendInvalidation(key,request);
+  }
+ }
+ // A fresh process has no tombstones. Reconcile the entire conversation before
+ // creating a new proposal/source, even when the deleted proposal is absent from history.
+ async function synchronizeConversation(conversationId){
+  if(typeof conversationId!=='string'||!conversationId)return invalidationRequired();
+  if(blocked(conversationId))return invalidationRequired();
+  if(synchronized.has(conversationId))return {ok:true};
+  return queueInvalidation({conversationId},true);
+ }
  const port=installNativeConversationPort({window:mainWindow,observedSequence:transport.sequence,isSessionCurrent:async()=>!mainWindow.isDestroyed(),snapshot:async(kind,input)=>wc.executeJavaScript(`(()=>{const input=document.getElementById('messageInput'),button=document.getElementById('sendMessageBtn'),c=window.__nativeConversationContext,hit=${kind==='mouse'?`document.elementFromPoint(${Number(input.x)||0},${Number(input.y)||0})`:'null'};return {text:input?.value??'',conversationId:c?.conversationId,eligible:!!c&&(${kind==='keyboard'?`!!button&&!button.disabled&&button.dataset.mode!=='interrupt'&&(document.activeElement===button||(${JSON.stringify(input.key)}==='Enter'&&document.activeElement===input))`:"!!button&&!button.disabled&&(hit===button||button.contains(hit))&&button.dataset.mode!=='interrupt'"})};})()`)});
- ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};if(blocked(p.conversationId))return invalidationRequired();const version=invalidationVersions.get(p.conversationId);let context;try{context=await port.consume(p);}catch{
+ ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};if(!(await synchronizeConversation(p.conversationId))?.ok||!owned(e))return invalidationRequired();const version=invalidationVersions.get(p.conversationId);let context;try{context=await port.consume(p);}catch{
    // Denial-only recognition: never mint a trusted source from renderer/voice text.
    const text=typeof p.text==='string'?p.text.trim():'',hasPlan=[...plans.values()].some(plan=>plan.conversationId===p.conversationId);
    const nativeIntent=/^把.+(?:延后|推迟|提前)[1-9][0-9]{0,3}分钟[。！!]?$/u.test(text)||/^再(?:延后|推迟|提前)/u.test(text)||(hasPlan&&/^(可以|同意|执行吧|取消|不要|不用了|不同意|改成|改为)/u.test(text));
@@ -32,13 +73,13 @@ async function initialize({mainWindow,chartService,binding}){
   for(const [id,plan] of plans){
    const visible=await wc.executeJavaScript(`(()=>{const e=[...(document.getElementById('chatMessages')?.querySelectorAll('[data-native-plan-id]')||[])].find(e=>e.dataset.nativePlanId===${JSON.stringify(id)});return !!e?.isConnected&&e.textContent===${JSON.stringify(plan.presentation)}&&window.__nativeConversationContext?.conversationId===${JSON.stringify(plan.conversationId)};})()`);
    if(plans.get(id)!==plan)continue;
-   if(!visible){try{const invalidated=await transport.request('invalidate',{conversationId:plan.conversationId,messageId:plan.messageId});if(!invalidated?.ok)return {handled:true,ok:false,code:'PRESENTATION_INVALIDATION_REQUIRED'};plans.delete(id);}catch{return {handled:true,ok:false,code:'PRESENTATION_INVALIDATION_REQUIRED'};}}
+   if(!visible){const invalidated=await queueInvalidation({conversationId:plan.conversationId,messageId:plan.messageId});if(!invalidated?.ok)return invalidationRequired();}
   }
   const event=port.read(context),invalidated=()=>blocked(event.conversationId)||invalidationVersions.get(event.conversationId)!==version;if(invalidated())return invalidationRequired();let r;try{r=await transport.request('prepare',event);}catch{return {handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'};}if(invalidated())return invalidationRequired();if(r.sourceId)pending.set(r.sourceId,event);return r.ok===false&&!(r.code==='READ_ONLY_POLICY'&&r.handled===false)?{...r,handled:true}:r;});
  ipcMain.handle(channels[1],async(e,p={})=>{const event=pending.get(p.sourceId);if(!owned(e)||!event)return {ok:false,code:'SOURCE_UNKNOWN'};pending.delete(p.sourceId);if(blocked(event.conversationId))return invalidationRequired();return transport.project(await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId}));});
  ipcMain.handle(channels[2],async(e,p={})=>{
   if(!owned(e)||p.tool!==binding.toolName)return {ok:false};
-  if(blocked(p.conversationId))return invalidationRequired();
+  if(!(await synchronizeConversation(p.conversationId))?.ok||!owned(e))return invalidationRequired();
   // Register before DOM or transport awaits: request order, never response order, owns this message.
   const key=JSON.stringify([p.conversationId,p.messageId]),request={conversationId:p.conversationId,messageId:p.messageId};proposalRequests.set(key,request);
   const current=()=>owned(e)&&proposalRequests.get(key)===request&&!blocked(p.conversationId);
@@ -51,20 +92,14 @@ async function initialize({mainWindow,chartService,binding}){
  });
  ipcMain.handle(channels[3],async(e,p={})=>{const plan=plans.get(p.planId);if(!owned(e)||!plan)return {ok:false};if(blocked(plan.conversationId))return invalidationRequired();const snapshot=await wc.executeJavaScript(`(()=>{const e=[...(document.getElementById('chatMessages')?.querySelectorAll('[data-native-plan-id]')||[])].find(e=>e.dataset.nativePlanId===${JSON.stringify(p.planId)});return {text:e?.textContent,connected:!!e?.isConnected,conversationId:window.__nativeConversationContext?.conversationId};})()`);if(blocked(plan.conversationId))return invalidationRequired();if(!snapshot.connected||snapshot.text!==plan.presentation||snapshot.conversationId!==plan.conversationId)return {ok:false,code:'PRESENTATION_MISMATCH'};return transport.request('presented',{planId:plan.id,text:snapshot.text,conversationId:plan.conversationId});});
  ipcMain.handle(channels[4],async(e,p={})=>{
-  if(!owned(e)||typeof p.conversationId!=='string'||!p.conversationId)return {ok:false};
-  const key=JSON.stringify([p.conversationId,p.messageId||null]),request={conversationId:p.conversationId};invalidations.set(key,request);
-  invalidationVersions.set(p.conversationId,{});
-  for(const [id,event] of pending)if(event.conversationId===p.conversationId)pending.delete(id);
-  retireRequests(p);
-  const retiring=[...plans].filter(([,plan])=>plan.conversationId===p.conversationId&&(!p.messageId||plan.messageId===p.messageId)).map(([id])=>id);
-  let result;try{result=await transport.request('invalidate',p);}catch{return invalidationRequired();}
-  if(result?.ok===true&&invalidations.get(key)===request){invalidations.delete(key);for(const id of retiring)plans.delete(id);return result;}
-  return invalidationRequired();
+  if(!owned(e)||typeof p.conversationId!=='string'||!p.conversationId||(p.messageId!=null&&typeof p.messageId!=='string'))return {ok:false};
+  return queueInvalidation(p);
  });
- const timer=setInterval(async()=>{try{const r=await transport.request('recover');for(const result of r.results||[])await transport.project(result);}catch{}finally{await transport.retryProjections();}},30000);timer.unref?.();
+ const timer=setInterval(async()=>{try{await retryInvalidations();if(disposed)return;const r=await transport.request('recover');for(const result of r.results||[])await transport.project(result);}catch{}finally{if(!disposed)await transport.retryProjections();}},30000);timer.unref?.();
  initializedWindows.add(mainWindow);
  // Status only refreshes a monotonic sequence; it must not delay window loading.
  void transport.request('status').catch(()=>{});
- wc.once('destroyed',()=>{initializedWindows.delete(mainWindow);clearInterval(timer);port.dispose();pending.clear();plans.clear();proposalRequests.clear();invalidations.clear();invalidationVersions.clear();for(const c of channels)ipcMain.removeHandler(c);});
+ void retryInvalidations();
+ wc.once('destroyed',()=>{disposed=true;initializedWindows.delete(mainWindow);clearInterval(timer);port.dispose();pending.clear();plans.clear();proposalRequests.clear();for(const c of channels)ipcMain.removeHandler(c);});
 }
 module.exports={initialize,bindingFromEnvironment};

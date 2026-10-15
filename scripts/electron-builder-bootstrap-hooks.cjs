@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { createRuntimeClosureManifest, validateRuntimePolicy } = require('../modules/bootstrap/runtime-closure');
 const { readPackagedFile } = require('../modules/bootstrap/packed-runtime');
+const { verifyWindowPackage } = require('./lib/window-package-contract.cjs');
 
 module.exports = async function afterPack(context) {
     const projectRoot = context.packager.projectDir;
@@ -21,6 +22,15 @@ module.exports = async function afterPack(context) {
     const resourcesDirectory = context.electronPlatformName === 'darwin'
         ? path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.app`, 'Contents', 'Resources')
         : path.join(context.appOutDir, 'resources');
+    // A ready main renderer is not proof that auxiliary windows were shipped.
+    // Fail the build on omissions or stale bytes before emitting a closure receipt.
+    verifyWindowPackage({
+        readSource: relative => {
+            const target = path.join(projectRoot, relative);
+            return fs.existsSync(target) ? fs.readFileSync(target) : null;
+        },
+        readPackaged: relative => readPackagedFile({ resourcesDirectory, relativePath: relative }),
+    });
     manifest.files = manifest.files.map(entry => {
         const content = readPackagedFile({ resourcesDirectory, relativePath: entry.path });
         if (!content) throw new Error(`Packaged runtime is missing closure entry: ${entry.path}`);

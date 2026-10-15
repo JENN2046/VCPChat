@@ -47,6 +47,11 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Exact auxiliary-window package contract and isolated artifact acceptance.
+    'scripts/fixtures/window-package-resources.json',
+    'scripts/lib/window-package-contract.cjs',
+    'scripts/test-packaged-window-renderers.cjs',
+    'tests/window-package-contract.test.mjs',
     // Merged PR #58 native-conversation bridge and PR #59 fail-closed repair.
     // Exact source differences only; all forbidden-path/runtime checks remain active.
     'docs/native-conversation-binding.example.json',

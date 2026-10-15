@@ -8,3 +8,18 @@ for(const [name,content] of rejected)test('non-proposal Markdown never proposes/
 test('editing a real proposal into a quoted example retires it without reproposing',async t=>{const f=setup(t);await f.run(proposal);await f.run('````markdown\n'+proposal+'\n````');assert.equal(f.calls.propose,1);assert.equal(f.calls.ack,1);assert.equal(f.calls.invalidate,2);assert.equal(f.element.querySelectorAll('[data-native-plan-id]').length,0)});
 test('historical root proposal expires while literal example remains literal',async t=>{const f=setup(t);await f.run(proposal,true);assert.match(f.element.textContent,/历史方案已失效/);await f.run('````markdown\n'+proposal+'\n````',true);assert.equal(f.calls.propose,0);assert.equal(f.calls.ack,0);assert.match(f.element.textContent,/vcp-tool-proposal/);assert.doesNotMatch(f.element.textContent,/历史方案已失效/)});
 for(const value of ['null','[]','"example"','42','true','{'])test('invalid proposal JSON is inert without rejecting rendering: '+value,async t=>{const f=setup(t);await f.run('```vcp-tool-proposal\n'+value+'\n```');assert.equal(f.calls.propose,0);assert.equal(f.calls.ack,0);assert.equal(f.element.querySelectorAll('[data-native-plan-id]').length,0)});
+
+for(const historical of [false,true])for(const failure of ['denied','throw','missing'])test(`invalidation ${failure}, historical=${historical}: no expiry claim or proposal`,async t=>{
+ const dom=new JSDOM('<div id="chatMessages"><div id="m"><div class="md-content"></div></div></div>',{pretendToBeVisual:true});t.after(()=>dom.window.close());dom.window.marked=marked;
+ const element=dom.window.document.getElementById('m');element.querySelector('.md-content').innerHTML=marked.parse(proposal);let proposes=0,acks=0;
+ const present=new Function(source.replaceAll('export async function','async function')+';return presentNativeProposal')();
+ await present({element,content:proposal,messageId:'M',conversationId:'C',historical,api:{invalidateNativeConversation:async()=>{if(failure==='throw')throw Error('offline');return failure==='missing'?undefined:{ok:false}},proposeNativeConversation:async()=>{proposes++},presentNativeConversation:async()=>{acks++}}});
+ assert.equal(proposes,0);assert.equal(acks,0);assert.equal(element.querySelectorAll('[data-native-plan-id]').length,0);assert.equal(element.querySelectorAll('pre code').length,0);assert.match(element.textContent,/撤销未确认.*不能执行/);assert.doesNotMatch(element.textContent,/历史方案已失效/);
+});
+for(const failure of ['denied','throw','missing'])test('rejected proposal renders inert feedback: '+failure,async t=>{
+ const dom=new JSDOM('<div id="chatMessages"><div id="m"><div class="md-content"></div></div></div>',{pretendToBeVisual:true});t.after(()=>dom.window.close());dom.window.marked=marked;
+ const element=dom.window.document.getElementById('m');element.querySelector('.md-content').innerHTML=marked.parse(proposal);let acks=0;
+ const present=new Function(source.replaceAll('export async function','async function')+';return presentNativeProposal')();
+ await present({element,content:proposal,messageId:'M',conversationId:'C',api:{invalidateNativeConversation:async()=>({ok:true}),proposeNativeConversation:async()=>{if(failure==='throw')throw Error('offline');return failure==='missing'?undefined:{ok:false}},presentNativeConversation:async()=>{acks++}}});
+ assert.equal(acks,0);assert.equal(element.querySelectorAll('[data-native-plan-id]').length,0);assert.equal(element.querySelectorAll('pre code').length,0);assert.match(element.textContent,/不能执行/);assert.doesNotMatch(element.textContent,/"payload"/);
+});

@@ -84,3 +84,33 @@ test('disabled mouse Send leaves no source; a fresh enabled physical click works
  await initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}});const event={sender:wc,senderFrame:wc.mainFrame},prepare=()=>handlers.get('native-conversation:prepare')(event,{text:input.value,conversationId:'C'}),click=()=>wc.emit('before-mouse-event',{}, {type:'mouseDown',button:'left',x:1,y:1});
  try{click();await new Promise(r=>setImmediate(r));button.disabled=false;const refused=await prepare();assert.equal(refused.code,'NATIVE_SOURCE_REQUIRED');assert.equal(refused.handled,true);assert.equal(refused.preserveInput,true);assert.equal(prepares,0);click();assert.ok((await prepare()).sourceId);assert.equal(prepares,1);assert.equal((await prepare()).code,'NATIVE_SOURCE_REQUIRED');}finally{wc.emit('destroyed');}
 });
+
+function isolatedHistory(t,request){
+ const calls=[],wc=new EventEmitter();wc.mainFrame={};let conversationId='C';
+ wc.executeJavaScript=async code=>code==='window.__nativeConversationContext?.conversationId'?conversationId:{eligible:true,text:'可以',conversationId};
+ const f=load({sequence:()=>0,request:async(action,p)=>{calls.push({action,p});return request(action,p);},project:async r=>r});
+ const event={sender:wc,senderFrame:wc.mainFrame};t.after(()=>wc.emit('destroyed'));
+ return {...f,wc,calls,start:()=>f.initialize({mainWindow:{webContents:wc,isFocused:()=>true,isDestroyed:()=>false},binding:{toolName:'T'}}),invoke:(action,p)=>f.handlers.get('native-conversation:'+action)(event,p),async prepare(c='C'){conversationId=c;wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});return this.invoke('prepare',{text:'可以',conversationId:c});}};
+}
+for(const failure of ['denied','throw','missing'])test('fresh process blocks unknown historical plan after invalidation '+failure,async t=>{
+ let allow=false;const f=isolatedHistory(t,async(action,p)=>{if(action==='invalidate'){if(!allow&&failure==='throw')throw Error('offline');return allow?{ok:true}:failure==='missing'?undefined:{ok:false}}return action==='prepare'?{ok:true,handled:true,sourceId:p.messageId}:{ok:true}});await f.start();
+ assert.equal((await f.invoke('invalidate',{conversationId:'C',messageId:'history'})).ok,false);
+ assert.equal((await f.prepare()).code,'PRESENTATION_INVALIDATION_REQUIRED');assert.equal((await f.invoke('propose',{tool:'T',conversationId:'C',messageId:'new',payload:{}})).code,'PRESENTATION_INVALIDATION_REQUIRED');assert.equal(f.calls.filter(c=>['prepare','propose','execute'].includes(c.action)).length,0);
+ assert.ok((await f.prepare('unrelated')).sourceId);allow=true;assert.equal((await f.invoke('invalidate',{conversationId:'C',messageId:'history'})).ok,true);assert.ok((await f.prepare()).sourceId);
+});
+test('pending invalidation blocks prepare and revokes already prepared execution',async t=>{
+ let release;const gate=new Promise(r=>release=r),f=isolatedHistory(t,async(action,p)=>action==='invalidate'?gate:action==='prepare'?{ok:true,sourceId:p.messageId}:{ok:true});await f.start();const ready=await f.prepare();
+ const pending=f.invoke('invalidate',{conversationId:'C',messageId:'history'});assert.equal((await f.prepare()).code,'PRESENTATION_INVALIDATION_REQUIRED');assert.equal((await f.invoke('execute',{sourceId:ready.sourceId})).ok,false);release({ok:true});await pending;assert.equal((await f.invoke('execute',{sourceId:ready.sourceId})).ok,false);assert.equal(f.calls.filter(c=>c.action==='execute').length,0);
+});
+test('late prepare response after acknowledged invalidation cannot yield an executable source',async t=>{
+ let release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r),f=isolatedHistory(t,async(action)=>{if(action==='prepare'){entered();return gate;}return {ok:true}});await f.start();const pending=f.prepare();await started;await f.invoke('invalidate',{conversationId:'C',messageId:'history'});release({ok:true,sourceId:'stale'});assert.equal((await pending).code,'PRESENTATION_INVALIDATION_REQUIRED');assert.equal((await f.invoke('execute',{sourceId:'stale'})).ok,false);assert.equal(f.calls.filter(c=>c.action==='execute').length,0);
+});
+test('old acknowledgement cannot clear newer failed invalidation or another message barrier',async t=>{
+ const responses=[],f=isolatedHistory(t,async(action,p)=>action==='invalidate'?new Promise(r=>responses.push(r)):action==='prepare'?{ok:true,sourceId:p.messageId}:{ok:true});await f.start();
+ const a=f.invoke('invalidate',{conversationId:'C',messageId:'A'}),newer=f.invoke('invalidate',{conversationId:'C',messageId:'A'}),b=f.invoke('invalidate',{conversationId:'C',messageId:'B'});
+ responses[1]({ok:false});await newer;responses[0]({ok:true});assert.equal((await a).ok,false);responses[2]({ok:true});await b;assert.equal((await f.prepare()).code,'PRESENTATION_INVALIDATION_REQUIRED');
+ const retry=f.invoke('invalidate',{conversationId:'C',messageId:'A'});responses[3]({ok:true});await retry;assert.ok((await f.prepare()).sourceId);
+});
+test('unowned invalidation cannot install a barrier',async t=>{
+ const f=isolatedHistory(t,async(action,p)=>action==='prepare'?{ok:true,sourceId:p.messageId}:{ok:true});await f.start();assert.equal((await f.handlers.get('native-conversation:invalidate')({sender:{},senderFrame:{}},{conversationId:'C'})).ok,false);assert.ok((await f.prepare()).sourceId);assert.equal(f.calls.filter(c=>c.action==='invalidate').length,0);
+});

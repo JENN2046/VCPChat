@@ -32,16 +32,18 @@ export async function presentNativeProposal({element,content,messageId,api,conve
  const generation={};proposalMessages.set(key,generation);
  owners.set(element,{key,generation,api,conversationId,messageId});
  const current=()=>proposalMessages.get(key)===generation&&element.isConnected;
- await api.invalidateNativeConversation({conversationId,messageId}).catch(()=>{});
+ const invalidated=await api.invalidateNativeConversation({conversationId,messageId}).catch(()=>null);
  if(!current())return;
- if(blocks.length!==1){proposalMessages.delete(key);return;}
+ if(blocks.length!==1){if(invalidated?.ok===true)proposalMessages.delete(key);return;}
  const container=element.querySelector('.md-content')||element;
  const replace=()=>{for(const code of container.querySelectorAll('pre code'))if(code.textContent.trim()===blocks[0][1].trim())code.closest('pre')?.remove();container.querySelectorAll('[data-native-plan-id]').forEach(e=>e.remove());};
+ const unavailable=message=>{if(!current())return;replace();const note=element.ownerDocument.createElement('pre');note.textContent=message;container.append(note);};
+ if(invalidated?.ok!==true){unavailable('方案撤销未确认，当前不能执行。请恢复连接后重新加载会话。');return;}
  if(historical){replace();const note=element.ownerDocument.createElement('pre');note.textContent='历史方案已失效。需要调整时，请重新提出要求。';container.append(note);return;}
  let input;try{input=JSON.parse(blocks[0][1]);}catch{return;}
  if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).sort().join(',')!=='payload,tool')return;
  let text;
- try{const r=await api.proposeNativeConversation({...input,messageId,conversationId});if(!r.ok||!current())return;
+ try{const r=await api.proposeNativeConversation({...input,messageId,conversationId});if(!current())return;if(r?.ok!==true){unavailable('方案未获接受，当前不能执行。请重新提出要求。');return;}
  text=element.ownerDocument.createElement('pre');text.textContent=r.plan.presentation;text.dataset.nativePlanId=r.plan.id;
  replace();container.append(text);
  await new Promise(resolve=>element.ownerDocument.defaultView.requestAnimationFrame(resolve));
@@ -50,6 +52,7 @@ export async function presentNativeProposal({element,content,messageId,api,conve
  if(!current()){text.remove();return;}
  if(!ack?.ok)throw Error('PRESENTATION_NOT_ACKNOWLEDGED');
  }catch{
+  if(!text)unavailable('方案暂不可用，当前不能执行。请恢复连接后重新提出要求。');
   if(text){delete text.dataset.nativePlanId;if(current())text.textContent='方案展示未确认，当前不能执行。请重新提出要求以获取新方案。';else text.remove();}
   if(current())await api.invalidateNativeConversation({conversationId,messageId}).catch(()=>{});
  }

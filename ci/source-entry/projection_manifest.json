@@ -4370,9 +4370,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
-          "size": 95787,
-          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
+          "blob": "e345aa2079e369c1e1ea1e5003267867fb2d1984",
+          "size": 95949,
+          "sha256": "ed5fc84c40e38623582362e309045fbc0e850c39660a58db9d8719c0c2af058b",
           "kind": "source"
         },
         {
@@ -4766,9 +4766,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "383b9e06a067f4f79b3bc188e670ff35b6d2a9b4",
-          "size": 110447,
-          "sha256": "2dbce45694a20c6370db5259b907c90f6ea037b19adb5ba5cdec73b6b2af8743",
+          "blob": "d9ef46b880355ea299c9ca2e56f7d0a5badef6fb",
+          "size": 114520,
+          "sha256": "e2ffbca9782cf1da20cc2768e30c71ef2e64a63ce87632077d7c3d0ed09fb01b",
           "kind": "source"
         },
         {
@@ -4793,9 +4793,9 @@
           "path": "modules/event-listeners.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6dc8b14df4a7586b28eec67e0f14493babf876ea",
-          "size": 72033,
-          "sha256": "6b193797f273e12e8ed2f8ad8f63308efe40e0baa3191a1ef5952e4065ad58a2",
+          "blob": "619dcd02b8c321f272ba8ef540adb335d81a5b95",
+          "size": 72045,
+          "sha256": "0cd37ea3104e56fdf682991189dd7a309bd91a2e6776779dfe8e289acacd7541",
           "kind": "source"
         },
         {
@@ -5060,6 +5060,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/ipc/nativeConversationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18c37db3f6f85e6da712448981a6d384aa01dc2c",
+          "size": 9968,
+          "sha256": "8580f43119fff9764ea566069711a5211aed947324609e3eacd7afe35cf07e0b",
+          "kind": "source"
+        },
+        {
           "path": "modules/ipc/notesHandlers.js",
           "mode": "100644",
           "type": "blob",
@@ -5138,6 +5147,15 @@
           "blob": "19498c85777f83e209d7d106a0db2ae7b14b5375",
           "size": 2661,
           "sha256": "3d26d82b295dbcd5a4133c3200a576523c37247b59f8da56f85213944223606b",
+          "kind": "source"
+        },
+        {
+          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
+          "size": 2806,
+          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
           "kind": "source"
         },
         {
@@ -5378,9 +5396,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "773c46c9f84210276512c67ff36e3e260cd234e2",
-          "size": 221992,
-          "sha256": "262ca3a7bda6b7a975ff5f7bade15f3ca6ca50b8944fc5c084bb9dcc831c727e",
+          "blob": "4cd59fbe8e29e640bdbd8fcaea1e5ff9c6ad737e",
+          "size": 223481,
+          "sha256": "a597f4e971d92fb6dfa4d6bb68c9a620253629468f2af48124dd18a52324e178",
           "kind": "source"
         },
         {
@@ -5654,6 +5672,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/renderer/nativeConversationPresentation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aab5a3122a9c4e802eaea0d014cd6dcc39f72dcc",
+          "size": 4461,
+          "sha256": "73751fac85290bc6ead9ea16c3b89ae204a3f58442f166b86819ab89f3596aca",
+          "kind": "source"
+        },
+        {
           "path": "modules/renderer/nonStreamingEventConsumer.js",
           "mode": "100644",
           "type": "blob",
@@ -5729,9 +5756,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cf294aeba2c47b367e5db6973c8121b733fb2710",
-          "size": 121575,
-          "sha256": "3db9e2a30464d44a9a29c16fefbdfdf719b3eb26c154dd0f1d0225bdda1122e7",
+          "blob": "fdf74325c3569326897f392ce916565da88d9206",
+          "size": 121938,
+          "sha256": "14bf60642694ae69861e0514aeb3e96a45d29b59fa35276eaaad6146c0b07127",
           "kind": "source"
         },
         {
@@ -6030,6 +6057,42 @@
           "blob": "8948e1ca6bef56cb87da04feb07c1097a9165f01",
           "size": 23109,
           "sha256": "56c4eb0124d93d3828bce4a2f89a98be06b5ffd486c3bcaf57d7b725c197f0aa"
+        },
+        {
+          "path": "modules/services/suveiHumanAuthorizationService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
+          "size": 46413,
+          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/README.md",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9199b7d216ee55f6d39feb89e646a3efeed75250",
+          "size": 2533,
+          "sha256": "2d53f0707c673d84eb959e179dd32fd2d5788f5c6b5af71f6e3668a48315da3f",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/nativePort.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "244919411f4b731cb4e1d591214273e29d0ca921",
+          "size": 2113,
+          "sha256": "4b2d0d91de361e44cd10fc9ce97f5ca5ced9d0c7a85df9b078950380e9d2caf1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/transport.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d43e239af9b0caecf619ceef2524799338feda19",
+          "size": 3747,
+          "sha256": "d3ca4634dabb1dd6bb3bf76c7732e5a87ec77e893e33fa99a1cc796d7d115d92",
+          "kind": "source"
         },
         {
           "path": "modules/services/windowAppIds.js",
@@ -7652,6 +7715,15 @@
           "kind": "source"
         },
         {
+          "path": "preloads/api/nativeConversation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "30d0eea136721eef7f2891cbf769439befc3e3d6",
+          "size": 528,
+          "sha256": "c215eb50d5e6fbf58cb2027f29512d7fb8d9303e4db1d8a96b65a59aa7cf7431",
+          "kind": "source"
+        },
+        {
           "path": "preloads/api/notes.js",
           "mode": "100644",
           "type": "blob",
@@ -7703,6 +7775,15 @@
           "blob": "3c91f6c4a9ba70d1d53b0049e2d7341dce7321a0",
           "size": 1090,
           "sha256": "b8952c931364a2d58c9cb463bd222aa24492d88472f8966a44befb6a3135a650",
+          "kind": "source"
+        },
+        {
+          "path": "preloads/api/suveiHumanAuthorization.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
+          "size": 629,
+          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
           "kind": "source"
         },
         {
@@ -10233,33 +10314,6 @@
           "size": 16293,
           "sha256": "c0e4e7ca6636010df110cbdb8945daea0f97e26d84d039b7679353291aba88cd",
           "kind": "source"
-        },
-        {
-          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
-          "size": 2806,
-          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
-          "kind": "source"
-        },
-        {
-          "path": "modules/services/suveiHumanAuthorizationService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
-          "size": 46413,
-          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
-          "kind": "source"
-        },
-        {
-          "path": "preloads/api/suveiHumanAuthorization.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
-          "size": 629,
-          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
-          "kind": "source"
         }
       ],
       "static_native_assets": [
@@ -12424,9 +12478,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
-          "size": 95787,
-          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
+          "blob": "e345aa2079e369c1e1ea1e5003267867fb2d1984",
+          "size": 95949,
+          "sha256": "ed5fc84c40e38623582362e309045fbc0e850c39660a58db9d8719c0c2af058b",
           "kind": "source"
         },
         {
@@ -12811,9 +12865,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "383b9e06a067f4f79b3bc188e670ff35b6d2a9b4",
-          "size": 110447,
-          "sha256": "2dbce45694a20c6370db5259b907c90f6ea037b19adb5ba5cdec73b6b2af8743",
+          "blob": "d9ef46b880355ea299c9ca2e56f7d0a5badef6fb",
+          "size": 114520,
+          "sha256": "e2ffbca9782cf1da20cc2768e30c71ef2e64a63ce87632077d7c3d0ed09fb01b",
           "kind": "source"
         },
         {
@@ -12838,9 +12892,9 @@
           "path": "modules/event-listeners.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6dc8b14df4a7586b28eec67e0f14493babf876ea",
-          "size": 72033,
-          "sha256": "6b193797f273e12e8ed2f8ad8f63308efe40e0baa3191a1ef5952e4065ad58a2",
+          "blob": "619dcd02b8c321f272ba8ef540adb335d81a5b95",
+          "size": 72045,
+          "sha256": "0cd37ea3104e56fdf682991189dd7a309bd91a2e6776779dfe8e289acacd7541",
           "kind": "source"
         },
         {
@@ -13096,6 +13150,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/ipc/nativeConversationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18c37db3f6f85e6da712448981a6d384aa01dc2c",
+          "size": 9968,
+          "sha256": "8580f43119fff9764ea566069711a5211aed947324609e3eacd7afe35cf07e0b",
+          "kind": "source"
+        },
+        {
           "path": "modules/ipc/notesHandlers.js",
           "mode": "100644",
           "type": "blob",
@@ -13174,6 +13237,15 @@
           "blob": "19498c85777f83e209d7d106a0db2ae7b14b5375",
           "size": 2661,
           "sha256": "3d26d82b295dbcd5a4133c3200a576523c37247b59f8da56f85213944223606b",
+          "kind": "source"
+        },
+        {
+          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
+          "size": 2806,
+          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
           "kind": "source"
         },
         {
@@ -13414,9 +13486,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "773c46c9f84210276512c67ff36e3e260cd234e2",
-          "size": 221992,
-          "sha256": "262ca3a7bda6b7a975ff5f7bade15f3ca6ca50b8944fc5c084bb9dcc831c727e",
+          "blob": "4cd59fbe8e29e640bdbd8fcaea1e5ff9c6ad737e",
+          "size": 223481,
+          "sha256": "a597f4e971d92fb6dfa4d6bb68c9a620253629468f2af48124dd18a52324e178",
           "kind": "source"
         },
         {
@@ -13690,6 +13762,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/renderer/nativeConversationPresentation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aab5a3122a9c4e802eaea0d014cd6dcc39f72dcc",
+          "size": 4461,
+          "sha256": "73751fac85290bc6ead9ea16c3b89ae204a3f58442f166b86819ab89f3596aca",
+          "kind": "source"
+        },
+        {
           "path": "modules/renderer/nonStreamingEventConsumer.js",
           "mode": "100644",
           "type": "blob",
@@ -13765,9 +13846,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cf294aeba2c47b367e5db6973c8121b733fb2710",
-          "size": 121575,
-          "sha256": "3db9e2a30464d44a9a29c16fefbdfdf719b3eb26c154dd0f1d0225bdda1122e7",
+          "blob": "fdf74325c3569326897f392ce916565da88d9206",
+          "size": 121938,
+          "sha256": "14bf60642694ae69861e0514aeb3e96a45d29b59fa35276eaaad6146c0b07127",
           "kind": "source"
         },
         {
@@ -14048,6 +14129,33 @@
           "blob": "8948e1ca6bef56cb87da04feb07c1097a9165f01",
           "size": 23109,
           "sha256": "56c4eb0124d93d3828bce4a2f89a98be06b5ffd486c3bcaf57d7b725c197f0aa"
+        },
+        {
+          "path": "modules/services/suveiHumanAuthorizationService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
+          "size": 46413,
+          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/nativePort.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "244919411f4b731cb4e1d591214273e29d0ca921",
+          "size": 2113,
+          "sha256": "4b2d0d91de361e44cd10fc9ce97f5ca5ced9d0c7a85df9b078950380e9d2caf1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/transport.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d43e239af9b0caecf619ceef2524799338feda19",
+          "size": 3747,
+          "sha256": "d3ca4634dabb1dd6bb3bf76c7732e5a87ec77e893e33fa99a1cc796d7d115d92",
+          "kind": "source"
         },
         {
           "path": "modules/services/windowAppIds.js",
@@ -15643,6 +15751,15 @@
           "kind": "source"
         },
         {
+          "path": "preloads/api/nativeConversation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "30d0eea136721eef7f2891cbf769439befc3e3d6",
+          "size": 528,
+          "sha256": "c215eb50d5e6fbf58cb2027f29512d7fb8d9303e4db1d8a96b65a59aa7cf7431",
+          "kind": "source"
+        },
+        {
           "path": "preloads/api/notes.js",
           "mode": "100644",
           "type": "blob",
@@ -15694,6 +15811,15 @@
           "blob": "3c91f6c4a9ba70d1d53b0049e2d7341dce7321a0",
           "size": 1090,
           "sha256": "b8952c931364a2d58c9cb463bd222aa24492d88472f8966a44befb6a3135a650",
+          "kind": "source"
+        },
+        {
+          "path": "preloads/api/suveiHumanAuthorization.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
+          "size": 629,
+          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
           "kind": "source"
         },
         {
@@ -17713,6 +17839,105 @@
           "kind": "source"
         },
         {
+          "path": "tests/native-config-startup.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b8e84719e411ced045371e6aa78ff8007dca0229",
+          "size": 4936,
+          "sha256": "b8a666095e91d54c52a2ffb474b9cb211b94270e0020bdade8863debe6ce9c9b",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-conversation-ipc.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0bf24025b117739827837452e6cfb4a03b109fc1",
+          "size": 21048,
+          "sha256": "ea61ec93ddecd073348e6f53fc8b899482c2bf2f7118acb4f1309b3b6700abde",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-history-batch.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cd7ca438d3e7be5f37b315456cf08c162d9819b9",
+          "size": 4225,
+          "sha256": "407ed420c1b6386007741c857aff6578fcfcf026afa68faaf1cbf0c70e98dc32",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-markdown-proposals.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "490133ca10eebc93526053541f20b017cc9ead51",
+          "size": 6393,
+          "sha256": "2a95df18527c1e6ae064f4e1324c7f57612bcc02dcef260dc69f11a1d80eae30",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-presentation-lifecycle.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "544b9aa58043370b6c36a22cd8fe3ef5ca7f1470",
+          "size": 9100,
+          "sha256": "dda4d1624a98fd72fdc4bdf4b069dc27c573906acbc4177ea611bedd102ecd17",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-projection-recovery.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cd80ff17b460d4b71de489e7db22308ce54a5400",
+          "size": 1542,
+          "sha256": "306d3729e08de88c5742c9050f4520d6e0f2071fdb440a7b54db56428e9aa7fb",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-result-delivery.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "469a6fc058944b01c52fb79051f0491bc90a95e4",
+          "size": 2756,
+          "sha256": "c3b30d5c493bf44832cf3dd8d83e771af40b99933a914d28474e35ad53b24712",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-send-preflight.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "660e279693a07ab800cdbedba45a5843fbf24fde",
+          "size": 1812,
+          "sha256": "7838d64c055b3ea974e4073447dd8488aab51e0d61c3e9b964180ddac5c8e725",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-startup.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "160451ef794a0e65619e6e38906ade103862004c",
+          "size": 4446,
+          "sha256": "c028542cd22962c751ece010fef7f19259029f8e16e03d5d6c901e1588023920",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-three-boundaries.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7965f30c7f0c7e5d6f9d4a64a655b3343aa63458",
+          "size": 8627,
+          "sha256": "9ef31236280c3db56b1eed2dc97335ea2dd00db0656c5386414c76a3e049bf57",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-voice-send.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e0486a80b2abe9e6bb895831f97403c5d65f353e",
+          "size": 5009,
+          "sha256": "3c889229ba06340c9408d45aabb113ff9290330c3f66caf3dd640ae693c1efb9",
+          "kind": "source"
+        },
+        {
           "path": "tests/next-ui-registries.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -17728,6 +17953,15 @@
           "blob": "a506f10cbb9d821a20355cf652b66d80c3cfda49",
           "size": 1434,
           "sha256": "18663311d015577109be2e411479e076261f832bf6ded1a790582cdfdf3f24fd",
+          "kind": "source"
+        },
+        {
+          "path": "tests/notification-change-audit.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4e2a6ef59ddbaffab17462c22c8cefb05e37aa59",
+          "size": 44780,
+          "sha256": "31540a3670204161ad2e49ce2ff829072c31a32fbdd154c4de9119d7960b95b6",
           "kind": "source"
         },
         {
@@ -17929,6 +18163,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/suvei-human-authorization.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ae33e6db3cdf9fabaa7d8b7eab521b847a1a65a1",
+          "size": 52168,
+          "sha256": "6d47d68d7f87bc6abe0024eff0d8bb7ad1ca8d8f8ce50bcacaac29d4dc51b3b0",
+          "kind": "source"
+        },
+        {
           "path": "tests/task-handle.test.js",
           "mode": "100644",
           "type": "blob",
@@ -17971,6 +18214,15 @@
           "blob": "56f3abe3378bd0e6c74923887f94281a8ac2c0ea",
           "size": 1351,
           "sha256": "1000f299e7293dfe4beb90872a14d83b6d787a50c67d0a326e4725bca1715291",
+          "kind": "source"
+        },
+        {
+          "path": "tests/trusted-conversation-native-port.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4bafb9eb3c70f9f58d661b0d27a0811777d288e9",
+          "size": 3416,
+          "sha256": "475d233783522c304d61f5f480c2789c73639c9aa65bbd0b0ceace5c3035842c",
           "kind": "source"
         },
         {
@@ -18043,6 +18295,15 @@
           "blob": "15abccba2da6fd83877d9605047ce22c02b78f48",
           "size": 5603,
           "sha256": "bcfca6cb31b006471b187cff87a6fe1d98880463afddac8a3ad3fa01f73e7e64",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/marked.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0bb9de457a24c91320ad2cf97ca57d3d5cc8c027",
+          "size": 42836,
+          "sha256": "99dd36ca6ca5120ce725724bce217f24369a2820cb5cadcdd8ee4aa50ead2289",
           "kind": "source"
         },
         {
@@ -18925,51 +19186,6 @@
           "blob": "3f74df291d21232542005ebea68c6e6d90121bcd",
           "size": 517,
           "sha256": "de250fabacb1702d6c5ae9a1a56bd73f9785f81b325a76e14b9b855b5fe31096",
-          "kind": "source"
-        },
-        {
-          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
-          "size": 2806,
-          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
-          "kind": "source"
-        },
-        {
-          "path": "modules/services/suveiHumanAuthorizationService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
-          "size": 46413,
-          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
-          "kind": "source"
-        },
-        {
-          "path": "preloads/api/suveiHumanAuthorization.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
-          "size": 629,
-          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
-          "kind": "source"
-        },
-        {
-          "path": "tests/notification-change-audit.test.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "4e2a6ef59ddbaffab17462c22c8cefb05e37aa59",
-          "size": 44780,
-          "sha256": "31540a3670204161ad2e49ce2ff829072c31a32fbdd154c4de9119d7960b95b6",
-          "kind": "source"
-        },
-        {
-          "path": "tests/suvei-human-authorization.test.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ae33e6db3cdf9fabaa7d8b7eab521b847a1a65a1",
-          "size": 52168,
-          "sha256": "6d47d68d7f87bc6abe0024eff0d8bb7ad1ca8d8f8ce50bcacaac29d4dc51b3b0",
           "kind": "source"
         }
       ],

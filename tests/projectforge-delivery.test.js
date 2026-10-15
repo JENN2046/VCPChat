@@ -50,7 +50,20 @@ test('Trace extracts the shipped preload metadata without requiring workspace mo
     const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');
     const result = await loadPreloadDecls(path.join(__dirname, '..'));
     assert.equal(result.status, 'ok', result.error);
-    assert.equal(result.apis.length, 407);
+    // The merged native-conversation bridge adds five explicit chat-only APIs.
+    assert.equal(result.apis.length, 412);
+    for (const [name, channel] of [
+        ['prepareNativeConversation', 'native-conversation:prepare'],
+        ['executeNativeConversation', 'native-conversation:execute'],
+        ['proposeNativeConversation', 'native-conversation:propose'],
+        ['presentNativeConversation', 'native-conversation:presented'],
+        ['invalidateNativeConversation', 'native-conversation:invalidate'],
+    ]) {
+        const matches = result.apis.filter(api => api.name === name);
+        assert.equal(matches.length, 1, `${name} must be declared exactly once`);
+        assert.equal(matches[0].channel, channel);
+        assert.deepEqual(matches[0].roles, ['chat']);
+    }
     assert.ok(result.apis.some(api => api.name === 'projectForgeDeleteProject' && api.channel === 'project-forge:delete-project'));
     for (const [name, channel] of [
         ['getSuveiHumanAuthorizationStatus', 'suvei-human-authorization:status'],

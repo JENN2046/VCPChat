@@ -1,0 +1,633 @@
+{
+  "schema": 1,
+  "sourceCommit": "110c26876c9c83e4b9c048868c955cc2adf2064b",
+  "windows": [
+    {
+      "id": "themes",
+      "page": "Themesmodules/themes.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "canvas",
+      "page": "Canvasmodules/canvas.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "memo",
+      "page": "Memomodules/memo.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "forum",
+      "page": "Forummodules/forum.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "log",
+      "page": "Logmodules/log.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "tasks",
+      "page": "Agenttaskmodules/task.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "plugins",
+      "page": "PluginManagerModules/plugin-manager.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "desktop",
+      "page": "Desktopmodules/desktop.html",
+      "preload": "preloads/desktop.js"
+    },
+    {
+      "id": "music",
+      "page": "Musicmodules/music.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "rag-observer",
+      "page": "RAGmodules/RAG_Observer.html",
+      "preload": "preloads/utility.js"
+    },
+    {
+      "id": "rag-overlay",
+      "page": "RAGmodules/RAG_Overlay.html",
+      "preload": "preloads/utility.js"
+    }
+  ],
+  "resources": [
+    {
+      "path": "Agenttaskmodules/task.css",
+      "size": 27761,
+      "sha256": "b83a950e272bd801176b754ec673710d1566fc0823db77ffc7f947df42abd086"
+    },
+    {
+      "path": "Agenttaskmodules/task.html",
+      "size": 11823,
+      "sha256": "4350c3ace3d4d9ab9c351a7d27c3bf9c5972f7fe143dd12a6bd37b6f3b36a62e"
+    },
+    {
+      "path": "Agenttaskmodules/task.js",
+      "size": 59244,
+      "sha256": "355f4c29a6b4bbb1c34271c39c1f581b4462405d5296ab9134eee258f5464a13"
+    },
+    {
+      "path": "Canvasmodules/canvas.css",
+      "size": 33106,
+      "sha256": "ff44ded2fa39136db99eb27f65684273b2501f46913fa1bb030c429a810849f6"
+    },
+    {
+      "path": "Canvasmodules/canvas.html",
+      "size": 15839,
+      "sha256": "6d8ada5ccc70583ba7b269f1cfb0b4bbede7ce15bcfc6b6b0a4c7814ab1c1ed0"
+    },
+    {
+      "path": "Canvasmodules/canvas.js",
+      "size": 53220,
+      "sha256": "9ce79d4bae9175c7d3342b2fcb9ef8729d7a57dc925b9b06d6239099cfc9df0d"
+    },
+    {
+      "path": "Canvasmodules/vendor/diff_match_patch.js",
+      "size": 78068,
+      "sha256": "945584f96cba95b7b82de5f67dc3d9cb224c3d37997a1d74b3ef4da303f58a95"
+    },
+    {
+      "path": "Desktopmodules/api/desktopMetrics.js",
+      "size": 10683,
+      "sha256": "715c07ae1d801f1a6fa410e670472bafe540074e9ebcc71cd374f4ce5b8ab0b5"
+    },
+    {
+      "path": "Desktopmodules/api/ipcBridge.js",
+      "size": 19277,
+      "sha256": "74e2509e6ce8739296c89a516cb435058d68e436ec8cc8ab7e49bfa55d8426e7"
+    },
+    {
+      "path": "Desktopmodules/api/vcpProxy.js",
+      "size": 7198,
+      "sha256": "b7c2f5858b3c5ffc0d023bfd31a6ccc737c51d14c1c4d16f270c31538e34eb42"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/appTrayWidget.js",
+      "size": 12402,
+      "sha256": "2984d42bc337f9844c5346f27ef0495e0ab3d956c6bf1ecb209be34069d950d3"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/musicWidget.js",
+      "size": 9083,
+      "sha256": "31e35bfe3d16a9353cb882d4514683f22a64650d42bcfbde08d8e377452ecbf0"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/newsWidget.js",
+      "size": 14122,
+      "sha256": "626ede1d2413c3a15d8492246b368373123b7734f13dde48aefbde3f785f50a0"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/performanceMonitorWidget.js",
+      "size": 12886,
+      "sha256": "3a841f66ee6c614690396cc0b1f632eb00716c7268c8a1fe92297f2b3eec89ea"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/systemMonitorWidget.js",
+      "size": 29834,
+      "sha256": "dec9d24819bba71fcfae08a4c573a1a0b64b41bbd9116927ee471d3c15d124f7"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/translateWidget.js",
+      "size": 18419,
+      "sha256": "ae5d5aa6d82ab04b2f8716942e00b1d7e0a6e0f2c464307de877f4b3ab766fc2"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/vchatApps.js",
+      "size": 33470,
+      "sha256": "d19e9a2d9aed17f547df52c2d8abdde2ec77e57dc21de20ced49c9eca85c9782"
+    },
+    {
+      "path": "Desktopmodules/builtinWidgets/weatherWidget.js",
+      "size": 10252,
+      "sha256": "c3160b28481f25181d86e043c1e8b41d5c7cbb3dfa829be35899267f5137ec38"
+    },
+    {
+      "path": "Desktopmodules/core/dragSystem.js",
+      "size": 3211,
+      "sha256": "1d033a17c62fa354f56f3ebb9edcfba7296891cacad74feb1ec99bcc4182a2db"
+    },
+    {
+      "path": "Desktopmodules/core/performanceManager.js",
+      "size": 4649,
+      "sha256": "39f3906cc1f6642a8818d03d26ccda69e94991af39213e7fda0f107cd8709d0a"
+    },
+    {
+      "path": "Desktopmodules/core/state.js",
+      "size": 4744,
+      "sha256": "ccd651e133ba97920c7fcd9c3cc44e3829a81700b20f776b38349f55911665bc"
+    },
+    {
+      "path": "Desktopmodules/core/statusIndicator.js",
+      "size": 1666,
+      "sha256": "2a48127a7613ca82ec4611d15ba704fe350f381e82aca5356cfbd96d09bee8d0"
+    },
+    {
+      "path": "Desktopmodules/core/styleAutomation.js",
+      "size": 17414,
+      "sha256": "7798be4e4571092222f7d57bb8ca5f699a52a87785c105c19a583c548b6ade46"
+    },
+    {
+      "path": "Desktopmodules/core/theme.js",
+      "size": 1777,
+      "sha256": "c5993ca068c7698805b8efd219e79c6f81c4dc5830b44d47253185b759e07841"
+    },
+    {
+      "path": "Desktopmodules/core/visibilityFreezer.js",
+      "size": 14119,
+      "sha256": "7a8c546a33d1648b91937eb82be983cb7d32ffd133b70115874aaee21bcfc9e9"
+    },
+    {
+      "path": "Desktopmodules/core/wallpaperManager.js",
+      "size": 12426,
+      "sha256": "fe0ee59bb42419acdf44e7587c0b9f68f1c8db2e4a247fd296e352877e3ec27f"
+    },
+    {
+      "path": "Desktopmodules/core/widgetManager.js",
+      "size": 38465,
+      "sha256": "684bf144ea4cda2a74ef275ebee59c00abe66558795b7bda969ae5556b530b3f"
+    },
+    {
+      "path": "Desktopmodules/core/zIndexManager.js",
+      "size": 4971,
+      "sha256": "a45fd27a1a20e80575cc9ce73465bb4e35b0772a8606db5aaa5931f992bdb882"
+    },
+    {
+      "path": "Desktopmodules/css/base.css",
+      "size": 5077,
+      "sha256": "a21a21c5e6ffe063bc08ff21d1cd289d6fa27459d467a9b29e4482c0c750a32d"
+    },
+    {
+      "path": "Desktopmodules/css/dock.css",
+      "size": 12260,
+      "sha256": "86bc4eda633f66c7fc8448685d7e0c19dbff3cfa530016b2afa6635c44c51e49"
+    },
+    {
+      "path": "Desktopmodules/css/icon-picker.css",
+      "size": 6805,
+      "sha256": "0b660e29f910f932be2696b584b2f08017a9784f70fc9648a010ecaef5bc7d93"
+    },
+    {
+      "path": "Desktopmodules/css/living-icons.css",
+      "size": 400,
+      "sha256": "b4fad4de3f2aceb11d8351e9b51cad5d36029d05d7b39301b0ed300ff444389a"
+    },
+    {
+      "path": "Desktopmodules/css/settings.css",
+      "size": 11218,
+      "sha256": "99b09447c7f83d215cda70d7ee8bf8257aba4ed775e634ef6bb013db59328cfe"
+    },
+    {
+      "path": "Desktopmodules/css/shortcuts.css",
+      "size": 3221,
+      "sha256": "15effb2b89552b8764e35a7efa0c041b90ba866217987e100bede1dc5d940723"
+    },
+    {
+      "path": "Desktopmodules/css/sidebar.css",
+      "size": 13017,
+      "sha256": "16edfba201b49646def8ed385f89493546ec71df9a237e7c79e611aa5fe7325b"
+    },
+    {
+      "path": "Desktopmodules/css/theme-overrides.css",
+      "size": 12951,
+      "sha256": "ba5c929b6216529cd4516689bb5e6e9da8247bd827669cc638846f3fc413187d"
+    },
+    {
+      "path": "Desktopmodules/css/ui-components.css",
+      "size": 5682,
+      "sha256": "c925afbe573dad619bb45129df041fa05dd19841ff93eacefba1f976635275e3"
+    },
+    {
+      "path": "Desktopmodules/css/widgets.css",
+      "size": 5151,
+      "sha256": "e25d9e0a78363d2582fd3d1e9dfff4171328a0981fb3e28e89500ae16723c853"
+    },
+    {
+      "path": "Desktopmodules/debug/debugTools.js",
+      "size": 5722,
+      "sha256": "f33b59a560f91665af2bf8d2c32c6c6d9f25a26a87cc652a49d1d30eb4b7388d"
+    },
+    {
+      "path": "Desktopmodules/desktop.css",
+      "size": 1309,
+      "sha256": "01a8502fcd94a66bdea970e561bc297040b5f47864ab7f0991fafcdb0d6e1553"
+    },
+    {
+      "path": "Desktopmodules/desktop.html",
+      "size": 26956,
+      "sha256": "7e2f145f11510183c38257b539e70c4ff5bb07145453798550bce8e9c11f35ed"
+    },
+    {
+      "path": "Desktopmodules/desktop.js",
+      "size": 5763,
+      "sha256": "e0d16857e0579d11c7bb86248048e26ca00209af0c993a069a16413cf7201ed4"
+    },
+    {
+      "path": "Desktopmodules/favorites/favoritesManager.js",
+      "size": 8326,
+      "sha256": "f2cb3bbd6d5387211edc840c09718ab49e555d53357656923159c75d3f78907e"
+    },
+    {
+      "path": "Desktopmodules/favorites/thumbnail.js",
+      "size": 4368,
+      "sha256": "740dca7e2f4e6600c7dbdb876893813dfe68e8a285199b904d3269624d926dcf"
+    },
+    {
+      "path": "Desktopmodules/ui/contextMenu.js",
+      "size": 18428,
+      "sha256": "885bcfff9c85d57c2a20fe31647f61476de62b41b737a0c6a11f43910d3397c0"
+    },
+    {
+      "path": "Desktopmodules/ui/dock.js",
+      "size": 78669,
+      "sha256": "1cd2c41691726a406a0b15c1b0179d25fce0e6304e991d53e4ccf858297a88d5"
+    },
+    {
+      "path": "Desktopmodules/ui/globalSettings.js",
+      "size": 33525,
+      "sha256": "4fed2e4c944dfb47c3665ddefcb613e3967e7967dc62c242b7dd67b363d1a457"
+    },
+    {
+      "path": "Desktopmodules/ui/iconPicker.js",
+      "size": 13451,
+      "sha256": "328fc9a05c0c7fe566a36694755689750af2bf5637dca2e252fdfecf6fb59042"
+    },
+    {
+      "path": "Desktopmodules/ui/livingIcons.js",
+      "size": 3743,
+      "sha256": "d52bf8ae39005096c8b4bde415ff17294e6980fe0acdc97fbbe616e9e0e998c0"
+    },
+    {
+      "path": "Desktopmodules/ui/saveModal.js",
+      "size": 2905,
+      "sha256": "6475bc5fb5ebc66f9930f6cc12a12f0daffeb4e794624121d8758ed0e1fc077c"
+    },
+    {
+      "path": "Desktopmodules/ui/sidebar.js",
+      "size": 43278,
+      "sha256": "841a9f9afc29514820c673f58c03e8248486c274e39cdf0caa40acb3a9e7f17c"
+    },
+    {
+      "path": "Forummodules/forum.css",
+      "size": 31544,
+      "sha256": "4d547161d5596958dfff28d8eeb1d0633850711a6d20dc24644bd020c86d135b"
+    },
+    {
+      "path": "Forummodules/forum.html",
+      "size": 11222,
+      "sha256": "c7bc9c779d433de918d386f96b7b3ccbcf6d84aaed98893735528514b02ff807"
+    },
+    {
+      "path": "Forummodules/forum.js",
+      "size": 71217,
+      "sha256": "a7dfb1b7978a42432665e999c95aacd7da8ced02cdad38ae5941b975db7a217c"
+    },
+    {
+      "path": "Logmodules/log.css",
+      "size": 10181,
+      "sha256": "a0e45cd1380b5ec9573a6b4ebb332e1dd63053fcc597431d9ae51a94574b9001"
+    },
+    {
+      "path": "Logmodules/log.html",
+      "size": 5157,
+      "sha256": "d04c1fe8c89aeaa27a58d17a13ecd64c4054d612f4c586b9984cad30db07e154"
+    },
+    {
+      "path": "Logmodules/log.js",
+      "size": 16698,
+      "sha256": "4a1e30a121e83f9c2812efde5416a27cf437177f7f141f0be09df1d49edc3197"
+    },
+    {
+      "path": "Memomodules/memo-graph.js",
+      "size": 27269,
+      "sha256": "f5180c28990a88e3e2dd6f366cb257077d58fa2b7609b8418255f840bd3385ec"
+    },
+    {
+      "path": "Memomodules/memo-workbench.js",
+      "size": 14085,
+      "sha256": "f6e0266fa07c8e6b6e9ccc8885c0ccadc425628b2337f150e4a9c926542f42a8"
+    },
+    {
+      "path": "Memomodules/memo.css",
+      "size": 29362,
+      "sha256": "d1a2bdd6526b20fd8888a377cdaa83b162fbab60e0ee4efc7338452be40ed1f1"
+    },
+    {
+      "path": "Memomodules/memo.html",
+      "size": 30841,
+      "sha256": "48837edc1e8d6b57abcd3bf2784087ea9d1f86db91f0c046b710bc6e83ab328a"
+    },
+    {
+      "path": "Memomodules/memo.js",
+      "size": 61754,
+      "sha256": "601b1efb3f25dd8f5964e5fea9f3c840f569cabcb738f59d9458b69ac0e1e94f"
+    },
+    {
+      "path": "Musicmodules/music-ambient-pixi.js",
+      "size": 18189,
+      "sha256": "dbbb045fda1410fa23e11366ab19a58efca911d037d89abe3aa361de844fd500"
+    },
+    {
+      "path": "Musicmodules/music-effects.js",
+      "size": 8192,
+      "sha256": "44d34b5a8a6d9b196ec71a0c5e972ff93b28b88f709ca4a7fbf503a41ba19918"
+    },
+    {
+      "path": "Musicmodules/music-lyrics.js",
+      "size": 24392,
+      "sha256": "015228c9fcb6ca97ed2246b228734898e4ea8a7c85585fc8cecb629ceb4a4493"
+    },
+    {
+      "path": "Musicmodules/music-output.js",
+      "size": 3829,
+      "sha256": "9270344ef087d051f2f4b4a368eba3a70f33f4e937ba0fd66c1b3bf68c146755"
+    },
+    {
+      "path": "Musicmodules/music-player.js",
+      "size": 18079,
+      "sha256": "ec5ae9eacc7f709002d95a8c31c4b5427e9a6b77092e6a2c554155fc61bdc3ea"
+    },
+    {
+      "path": "Musicmodules/music-sidebar.js",
+      "size": 10712,
+      "sha256": "3a8a6b83b96909f369efadf2a8362828fe395efc28369e451ac1a065eac255cb"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/cadenza-manager.js",
+      "size": 9694,
+      "sha256": "61da5942ee26d2429824581bcd8ca40900e5b960a06cbfa90d06fedef80d3eb6"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-camera.js",
+      "size": 12994,
+      "sha256": "f88ae35407108a5aab3e7a22635064384ff8e25000ee538d401cead5a22896cc"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-director.js",
+      "size": 16315,
+      "sha256": "e40995a330a71f5a8a2873fb8a09b3745e712a28302ec5c63a1c97cc8b7488f5"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-events.js",
+      "size": 53428,
+      "sha256": "88f6d49237e172e6ec4e2216632e0b278052de00b10eef426e91be289b48b504"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-lyrics.js",
+      "size": 33972,
+      "sha256": "e942833472534502316ed3c7a14e31f3305461772cb0eaa695e16ca1b0fb020d"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-manager.js",
+      "size": 13341,
+      "sha256": "e886442561c4f955a5fb8b37942b2dea242637f8a5c97ea5c0a5fe01de460482"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-optics.js",
+      "size": 3976,
+      "sha256": "4c32e64478c9f7847296031a5fdfd3558074b2563301d61e421dd2c89d3ac981"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-stations.js",
+      "size": 25832,
+      "sha256": "f2d8c641306dd81e250cadc787beee6a4c46ab0bd1f1a07aa219bfe460863719"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/diorama-world.js",
+      "size": 48170,
+      "sha256": "7418389d2ea942f903fb87b8649551277dd463522c0a81de94a047d2f62ef865"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/fume-manager.js",
+      "size": 22092,
+      "sha256": "0cee9da912b47f1649ee059403ee19c300afdfa6d19ca954ecd84c19d33a94a5"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/luminous-manager.js",
+      "size": 3231,
+      "sha256": "a252a4032604de25851eb7b56d8d86583daefeb79f039aa9055bb532f4ba2569"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/partita-manager.js",
+      "size": 3838,
+      "sha256": "adbc943750e390a3bb78e6cdf40e53832dce96fbf9efb910577a0ec7119920df"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/sonnet-manager.js",
+      "size": 4583,
+      "sha256": "8ee8b1fa5d59572f7d6cdce81fe392c4c86e7d41c5e4b2cecff3afa862d84dab"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/sonnet-pixi-core.js",
+      "size": 21049,
+      "sha256": "ddfa06782d64529845c6f2d6cbbb234573bb27f13cb5aac194ea6fec05ab1de9"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/stage-lyric-decor.js",
+      "size": 9874,
+      "sha256": "74617488a3fde6eb4a9be317c007c6547cece42c413958a92ec65e0283b50070"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/stage-lyric-layout.js",
+      "size": 7771,
+      "sha256": "ae65b211526879e5005c5e2dab011dd089b7eec873baa28c7dfa2afbb6741470"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/stage-lyric-performance.css",
+      "size": 7286,
+      "sha256": "a08e0bebb0d9141bae3c1a1be05768176b5eddb70f37500738a0f389d675accb"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/stage-lyric-performance.js",
+      "size": 21258,
+      "sha256": "3f700ce0056b7b1badef620e007bf729cd8f79884c8be448efc18257ef22a4c3"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/stage-mode-utils.js",
+      "size": 6706,
+      "sha256": "e78f0cfba4a5913eacdbd8582ed27a2d4e77606299a5553844f551b8c2f73895"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/stage-pixi-effects.js",
+      "size": 67144,
+      "sha256": "0cc0b0fd5e9f6fd41c9ea0e056c6ae45c81c40d17daa4aa462b7309646aa9fdb"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/tempera-manager.js",
+      "size": 4843,
+      "sha256": "89ec1ecf126f372125c1be1f77f3f98501305b6d79efaedf05eb64050f928cc0"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/tempera-pixi-core.js",
+      "size": 26381,
+      "sha256": "113986fa80b201040feaee4860f6bde60f78108a24418fc5698966e3c18cf0b2"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/tunnel-manager.js",
+      "size": 82260,
+      "sha256": "696a67e06a13716b2059686873f9f1f8e75577d0bd0502fdaa069e1c6e434d9d"
+    },
+    {
+      "path": "Musicmodules/music-stage/music-stage-advanced-modes.js",
+      "size": 1118,
+      "sha256": "401c6b157aafea4881e877b954ecd2e42cd293e7566f96c778121d78dccb087c"
+    },
+    {
+      "path": "Musicmodules/music-stage/music-stage-config.js",
+      "size": 18922,
+      "sha256": "0007ee6e1b6c4beb48409d0e60e68cac1c6a228ef3886b36eee3721822611eb5"
+    },
+    {
+      "path": "Musicmodules/music-stage/music-stage-host.js",
+      "size": 69084,
+      "sha256": "de0717a0d112a1693cf3df902e8c5b4d4493da89ca3ab54b0f6b772d28e0ffb6"
+    },
+    {
+      "path": "Musicmodules/music-stage/music-stage-modes.js",
+      "size": 12247,
+      "sha256": "2e7d46dca846ad9c0716651f35231f41a1b653a7e242c43e6718f669e5c883d5"
+    },
+    {
+      "path": "Musicmodules/music-stage/music-stage-runtime.js",
+      "size": 25074,
+      "sha256": "7ac2955043636e3ff55108817c3fb89b0d368eee8fd94faec76fa6fba54c43af"
+    },
+    {
+      "path": "Musicmodules/music-stage/music-stage.css",
+      "size": 83674,
+      "sha256": "445046ef7fb53979de6f5abacedef8b24c9c0ca2a36f01c4bb2802f64c1560a4"
+    },
+    {
+      "path": "Musicmodules/music-ui.js",
+      "size": 9437,
+      "sha256": "7e46c9900f1d077ca646d70c7279281a23f91a13b8295ce17d971fd4c7319f66"
+    },
+    {
+      "path": "Musicmodules/music-utils.js",
+      "size": 10220,
+      "sha256": "dce014801fffa8826094ccf09d420326323dbda286af7dc602af8d861a0f0faf"
+    },
+    {
+      "path": "Musicmodules/music-visualizer.js",
+      "size": 17036,
+      "sha256": "2a9873e8a2eaaef114dcee1d97bd5e65db7f3c131c3bd4738052c776016afea4"
+    },
+    {
+      "path": "Musicmodules/music-webdav.js",
+      "size": 11924,
+      "sha256": "38ed039d483c3c552f726430f3641cd3b0d9843e2176abae6d0d6418ef2ccb5a"
+    },
+    {
+      "path": "Musicmodules/music.css",
+      "size": 58905,
+      "sha256": "ef533a9f48e2ded3ff70fa343c3c1f7f328714fdcbd08b5f9f5cd6d9d439f08c"
+    },
+    {
+      "path": "Musicmodules/music.html",
+      "size": 51367,
+      "sha256": "b64608fe4e7d7ee5773fd4f9eb9ffe34d321c8fedb14bd37e4376c20725ddcbb"
+    },
+    {
+      "path": "Musicmodules/music.js",
+      "size": 61317,
+      "sha256": "434bd2c4c5d7aea3bb2b0142f020b2a61232af6a16fb39376e6960d76dee51fe"
+    },
+    {
+      "path": "Musicmodules/socket.io.min.js",
+      "size": 49993,
+      "sha256": "73eba16bc895fdfa454e27ecb80def31ede8d861f99e175ff93b110eabec044f"
+    },
+    {
+      "path": "PluginManagerModules/plugin-manager.css",
+      "size": 16541,
+      "sha256": "85b7fc37a640fce37d79727063859942c06ef6cef1ab00a475e80b0493ca1f68"
+    },
+    {
+      "path": "PluginManagerModules/plugin-manager.html",
+      "size": 7245,
+      "sha256": "0df0197316b027bec1e95dfaa2d9dc306fbf4f961b81f13c086d2a57bdcf41ae"
+    },
+    {
+      "path": "PluginManagerModules/plugin-manager.js",
+      "size": 19930,
+      "sha256": "2ab2250065a7b9c86475e77698706eea2a68362fd405ffc8f7e459ca11d9f128"
+    },
+    {
+      "path": "RAGmodules/RAG_Observer.html",
+      "size": 171674,
+      "sha256": "b09a0ec0b52c06c6e38325d5a52105a26e61a07e8765e66301927684387a4d47"
+    },
+    {
+      "path": "RAGmodules/RAG_Overlay.html",
+      "size": 25032,
+      "sha256": "ef97141d204fdc87afc50268e8d5d77e33ee82ebd9f9b9ec69051c942c0e9142"
+    },
+    {
+      "path": "RAGmodules/rag-observer-config.js",
+      "size": 13560,
+      "sha256": "42475d6e93f422a7dd73ef8719c28703b084d0215b49288224efc13877be616a"
+    },
+    {
+      "path": "Themesmodules/themes-module.css",
+      "size": 17895,
+      "sha256": "fb203ac3c9bd12cf97a3fcc685b6a9b05555a198a18791e04214216f9247cbaf"
+    },
+    {
+      "path": "Themesmodules/themes.html",
+      "size": 8409,
+      "sha256": "5bb3641d3e6d1c66d99620eee25f952e2c0d2f0971ef34ba1bcc12cea16ced53"
+    },
+    {
+      "path": "Themesmodules/themes.js",
+      "size": 20785,
+      "sha256": "696b31b8e0320b35a4f70fb497540dbec38b5d0e0a07cc6f161c0fb451be5aff"
+    }
+  ]
+}

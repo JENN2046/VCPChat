@@ -47,6 +47,32 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Exact auxiliary-window package contract and isolated artifact acceptance.
+    'scripts/fixtures/window-package-resources.json',
+    'scripts/lib/window-package-contract.cjs',
+    'scripts/test-packaged-window-renderers.cjs',
+    'tests/window-package-contract.test.mjs',
+    // Merged PR #58 native-conversation bridge and PR #59 fail-closed repair.
+    // Exact source differences only; all forbidden-path/runtime checks remain active.
+    'docs/native-conversation-binding.example.json',
+    'modules/ipc/nativeConversationHandlers.js',
+    'modules/renderer/nativeConversationPresentation.js',
+    'modules/services/trustedConversation/README.md',
+    'modules/services/trustedConversation/nativePort.cjs',
+    'modules/services/trustedConversation/transport.cjs',
+    'preloads/api/nativeConversation.js',
+    'tests/native-config-startup.test.cjs',
+    'tests/native-conversation-ipc.test.cjs',
+    'tests/native-history-batch.test.cjs',
+    'tests/native-markdown-proposals.test.cjs',
+    'tests/native-presentation-lifecycle.test.cjs',
+    'tests/native-projection-recovery.test.cjs',
+    'tests/native-result-delivery.test.cjs',
+    'tests/native-send-preflight.test.cjs',
+    'tests/native-startup.test.cjs',
+    'tests/native-three-boundaries.test.cjs',
+    'tests/native-voice-send.test.cjs',
+    'tests/trusted-conversation-native-port.test.cjs',
     // Exact reviewed three-way source, voice-build and CI-entry changes.
     // This batch's native rebuild and its verification are not design-system UI.
     '.github/scripts/verify-windows-pe.cjs',

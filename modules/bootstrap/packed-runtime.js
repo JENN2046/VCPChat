@@ -12,7 +12,9 @@ function readPackagedFile({ resourcesDirectory, relativePath, asar = null } = {}
     const asarPath = path.join(resourcesDirectory, 'app.asar');
     if (fs.existsSync(asarPath)) {
         const asarApi = asar || require('@electron/asar');
-        try { return asarApi.extractFile(asarPath, relativePath); } catch { return null; }
+        // Closure manifests use portable '/' paths; @electron/asar resolves
+        // archive entries with the host path separator (including on Windows).
+        try { return asarApi.extractFile(asarPath, path.normalize(relativePath)); } catch { return null; }
     }
     return null;
 }

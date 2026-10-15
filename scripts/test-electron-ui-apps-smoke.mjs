@@ -401,6 +401,8 @@ const appData = await fs.mkdtemp(path.join(os.tmpdir(), 'vcpchat-ui-apps-electro
 const nextSettings = {
     uiMode: 'next',
     enableDistributedServer: false,
+    voiceMode: 'local',
+    voiceLocalSettings: { sovitsUrl: process.env.VCPCHAT_TEST_SOVITS_URL || 'http://127.0.0.1:1' },
     // First-run coverage: the canonical shell, settings and embedded IPC must
     // be usable before the user configures a VCP server.
     vcpServerUrl: '',
@@ -773,7 +775,8 @@ try {
         const display = id => getComputedStyle(document.getElementById(id)).display;
         const presentationButton = document.getElementById('nextUiPresentationBtn');
         const presentationSwitcher = document.getElementById('nextUiChatPresentationSwitcher');
-        presentationButton?.click();
+        // Hover/focus owns the quick switcher; click now opens Appearance Studio.
+        presentationButton?.focus();
         const presentationOpened = presentationSwitcher?.classList.contains('is-open') === true
             && presentationButton?.getAttribute('aria-expanded') === 'true';
         document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', {
@@ -781,6 +784,20 @@ try {
         }));
         const presentationClosedByEscape = presentationSwitcher?.classList.contains('is-open') === false
             && presentationButton?.getAttribute('aria-expanded') === 'false'
+            && document.activeElement === presentationButton;
+        presentationButton?.click();
+        // The dialog takes focus on its reveal animation frame.
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const appearanceOpened = window.VCPAppearanceStudio?.isOpen() === true
+            && presentationSwitcher?.classList.contains('is-open') === false;
+        document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'Escape', bubbles: true, cancelable: true
+        }));
+        for (let attempt = 0; attempt < 100 && (window.VCPAppearanceStudio?.isOpen()
+            || document.activeElement !== presentationButton); attempt += 1) {
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        const appearanceClosedByEscape = window.VCPAppearanceStudio?.isOpen() === false
             && document.activeElement === presentationButton;
 
         const originalTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
@@ -864,6 +881,8 @@ try {
             calls,
             presentationOpened,
             presentationClosedByEscape,
+            appearanceOpened,
+            appearanceClosedByEscape,
             darkThemeActionLabel,
             lightThemeActionLabel,
             firstFocus,
@@ -887,6 +906,8 @@ try {
     ], `Next parity controls routed to the wrong commands: ${JSON.stringify(parityControls)}`);
     assert.equal(parityControls.presentationOpened, true, `presentation popup did not open explicitly: ${JSON.stringify(parityControls)}`);
     assert.equal(parityControls.presentationClosedByEscape, true, `presentation popup did not close on Escape: ${JSON.stringify(parityControls)}`);
+    assert.equal(parityControls.appearanceOpened, true, 'presentation click must open Appearance Studio');
+    assert.equal(parityControls.appearanceClosedByEscape, true, 'Appearance Studio must close on Escape and restore focus');
     assert.equal(parityControls.darkThemeActionLabel, '切换为浅色模式', `dark theme action state is stale: ${JSON.stringify(parityControls)}`);
     assert.equal(parityControls.lightThemeActionLabel, '切换为深色模式', `light theme action state is stale: ${JSON.stringify(parityControls)}`);
     assert.equal(parityControls.firstFocus, 'nextUiNotificationForum', `notification menu initial focus is wrong: ${JSON.stringify(parityControls)}`);
@@ -1477,7 +1498,9 @@ try {
     // Focus lands on the first field inside the open modal.
     const settingsFocus = await page.evaluate(() => {
         const modal = document.getElementById('globalSettingsModal');
-        const input = modal?.querySelector('input:not([type="hidden"]):not([hidden]):not([disabled])');
+        const input = [...(modal?.querySelectorAll('input:not([type="hidden"]):not([hidden]):not([disabled])') || [])]
+            .find(candidate => candidate.getClientRects().length > 0
+                && !candidate.closest('[hidden], [inert]'));
         if (!input) return { focused: false };
         input.focus();
         return { focused: document.activeElement === input, active: document.activeElement?.id || '' };
@@ -1662,7 +1685,7 @@ try {
     const unifiedSettingsNavigation = await page.evaluate(async () => {
         const modal = document.getElementById('globalSettingsModal');
         const navItems = [...modal.querySelectorAll('.vcp-uiux-settings-nav-cell')];
-        const target = navItems[1];
+        const target = modal.querySelector('#vcpSettingsTab-server-connection');
         target?.click();
         await new Promise(resolve => setTimeout(resolve, 220));
         return {
@@ -1676,7 +1699,7 @@ try {
     assert.equal(unifiedSettingsNavigation.nextShell, true, `canonical SettingsShell was not retained: ${JSON.stringify(unifiedSettingsNavigation)}`);
     const unifiedAppearanceSettings = await page.evaluate(async () => {
         const modal = document.getElementById('globalSettingsModal');
-        const appearanceNav = [...modal.querySelectorAll('.vcp-uiux-settings-nav-cell')][2];
+        const appearanceNav = modal.querySelector('#vcpSettingsTab-appearance-settings');
         appearanceNav?.click();
         await new Promise(resolve => setTimeout(resolve, 220));
         const workbench = modal.querySelector('.appearance-workbench-card');

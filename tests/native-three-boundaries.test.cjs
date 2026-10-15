@@ -13,14 +13,21 @@ async function ipc(port,document,context={conversationId:'A:T'}){
 }
 function documentFixture(){const input={value:'可以'},button={dataset:{},disabled:false},messages=[],plans=[],root={contains:e=>e.surface==='main',querySelectorAll:q=>q==='.message-item'?messages:plans};return {input,button,messages,plans,root,activeElement:input,getElementById:id=>id==='chatMessages'?root:id==='messageInput'?input:button};}
 test('real HTTP failure and invalid protocol -> real IPC -> actual send branch never reaches ordinary chat',async t=>{
- let status=401,body={error:'Unauthorized (Bearer token required)'};
+ let status=401,body={error:'Unauthorized (Bearer token required)'},coldFailure=false;const actions=[];
  // Use the paired server's actual Bearer guard when the local integration source is available.
  const toolbox=process.env.JSO_TOOLBOX_ROOT;let guard;
  if(toolbox){const s=fs.readFileSync(path.join(toolbox,'server.js'),'utf8'),start=s.indexOf('    const authHeader = req.headers.authorization;',s.indexOf('// General API authentication')),end=s.indexOf('\n});',start);assert.ok(start>0);guard=new Function('req','res','next','serverKey',s.slice(start,end));}
- const server=http.createServer((req,res)=>{const adapter={status(n){res.statusCode=n;return this},json(value){res.end(JSON.stringify(value))}};if(status===401&&guard)return guard(req,adapter,()=>assert.fail('synthetic wrong key admitted'),'correct-synthetic');res.statusCode=status;res.end(typeof body==='string'?body:JSON.stringify(body));});await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));
+ const server=http.createServer(async(req,res)=>{let raw='';for await(const chunk of req)raw+=chunk;const {action}=JSON.parse(raw);actions.push(action);if(action==='invalidate'&&!coldFailure){res.end(JSON.stringify({ok:true}));return;}const adapter={status(n){res.statusCode=n;return this},json(value){res.end(JSON.stringify(value))}};if(status===401&&guard)return guard(req,adapter,()=>assert.fail('synthetic wrong key admitted'),'correct-synthetic');res.statusCode=status;res.end(typeof body==='string'?body:JSON.stringify(body));});await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));
  for(const fixture of [[401,{}],[403,{error:'forbidden'}],[500,{error:'failure'}],[200,{error:'wrong protocol'}],[200,null],[200,{ok:true}],[200,{ok:true,handled:true}],[200,{ok:true,handled:false,sequence:-1}],[200,'not JSON']]){
   [status,body]=fixture;const api=await ipc(transport(`http://127.0.0.1:${server.address().port}`),documentFixture());try{api.wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});let rendered;const result=await send({prepareNativeConversation:p=>api.call('prepare',p)},null,{renderMessage:async r=>rendered=r.content});assert.notEqual(result.ordinaryBranch,true,JSON.stringify(fixture));assert.equal(result.handled,true);assert.match(rendered,/NATIVE_TRANSPORT_UNAVAILABLE/);}finally{api.wc.emit('destroyed');}
  }
+ // Transport failures during cold reconciliation must remain handled and never reach prepare.
+ coldFailure=true;
+ for(const fixture of [[401,{}],[403,{}],[500,{}],[200,{error:'wrong protocol'}],[200,null],[200,{ok:false}],[200,'not JSON']]){
+  [status,body]=fixture;actions.length=0;const api=await ipc(transport(`http://127.0.0.1:${server.address().port}`),documentFixture());
+  try{api.wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});let rendered;const result=await send({prepareNativeConversation:p=>api.call('prepare',p)},null,{renderMessage:async r=>rendered=r.content});assert.equal(result.handled,true);assert.match(rendered,/PRESENTATION_INVALIDATION_REQUIRED/);assert.equal(actions.includes('prepare'),false);assert.equal(actions.includes('execute'),false);}finally{api.wc.emit('destroyed');}
+ }
+ coldFailure=false;
  for(const response of [{ok:true,handled:false},{ok:false,handled:false,code:'READ_ONLY_POLICY'}]){status=200;body=response;const api=await ipc(transport(`http://127.0.0.1:${server.address().port}`),documentFixture());try{api.wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});assert.equal((await send({prepareNativeConversation:p=>api.call('prepare',p)},null,{})).ordinaryBranch,true);}finally{api.wc.emit('destroyed');}}
 });
 test('IPC rejection is locally handled; independent ordinary chat never enters native prepare',async()=>{

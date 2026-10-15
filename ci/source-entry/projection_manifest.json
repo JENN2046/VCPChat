@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
-          "size": 18553,
-          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
+          "blob": "f3a70802009a0fa1c1593dcc6dfab969a13b9219",
+          "size": 24143,
+          "sha256": "7b8d8788b32a1f6d7c8b30c16bdec8e767f6b4509d4fe142c458ae3d46e0ca1f",
           "kind": "source"
         },
         {
@@ -622,6 +622,69 @@
       "ready": true,
       "entries": [
         {
+          "path": "Agenttaskmodules/task.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9f8071cc6de0d79aa8fb83f04a4bf794018aa4ed",
+          "size": 27761,
+          "sha256": "b83a950e272bd801176b754ec673710d1566fc0823db77ffc7f947df42abd086",
+          "kind": "source"
+        },
+        {
+          "path": "Agenttaskmodules/task.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8f2ccfeab276b0d56f7edff169b50da79a507156",
+          "size": 11823,
+          "sha256": "4350c3ace3d4d9ab9c351a7d27c3bf9c5972f7fe143dd12a6bd37b6f3b36a62e",
+          "kind": "source"
+        },
+        {
+          "path": "Agenttaskmodules/task.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fbef8da86ca7443bc5cd53d52ace8e7ca140e63b",
+          "size": 59244,
+          "sha256": "355f4c29a6b4bbb1c34271c39c1f581b4462405d5296ab9134eee258f5464a13",
+          "kind": "source"
+        },
+        {
+          "path": "Canvasmodules/canvas.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e139d41f45aa8a644b9d5093ffa24a6acfab3a4a",
+          "size": 33106,
+          "sha256": "ff44ded2fa39136db99eb27f65684273b2501f46913fa1bb030c429a810849f6",
+          "kind": "source"
+        },
+        {
+          "path": "Canvasmodules/canvas.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4be1632ee12336afb12ec59e8e572ee8b15d3e2f",
+          "size": 15839,
+          "sha256": "6d8ada5ccc70583ba7b269f1cfb0b4bbede7ce15bcfc6b6b0a4c7814ab1c1ed0",
+          "kind": "source"
+        },
+        {
+          "path": "Canvasmodules/canvas.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "de54224d0fe92cc78731fba3f8ef952d9faa12ad",
+          "size": 53220,
+          "sha256": "9ce79d4bae9175c7d3342b2fcb9ef8729d7a57dc925b9b06d6239099cfc9df0d",
+          "kind": "source"
+        },
+        {
+          "path": "Canvasmodules/vendor/diff_match_patch.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5bd82ebe074125c9b0d7c5d26c156da8f819997",
+          "size": 78068,
+          "sha256": "945584f96cba95b7b82de5f67dc3d9cb224c3d37997a1d74b3ef4da303f58a95",
+          "kind": "source"
+        },
+        {
           "path": "Chartmodules/README.md",
           "mode": "100644",
           "type": "blob",
@@ -685,6 +748,402 @@
           "kind": "source"
         },
         {
+          "path": "Desktopmodules/api/desktopMetrics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "414deb4d22e3add4e7b38eed7b7d026276b857cc",
+          "size": 10683,
+          "sha256": "715c07ae1d801f1a6fa410e670472bafe540074e9ebcc71cd374f4ce5b8ab0b5",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/api/ipcBridge.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f429c458a32cb489f994825ea96f908c5860b743",
+          "size": 19277,
+          "sha256": "74e2509e6ce8739296c89a516cb435058d68e436ec8cc8ab7e49bfa55d8426e7",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/api/vcpProxy.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9c665002c44345b697a3853cc88ff55d956f0344",
+          "size": 7198,
+          "sha256": "b7c2f5858b3c5ffc0d023bfd31a6ccc737c51d14c1c4d16f270c31538e34eb42",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/appTrayWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2f79511fb2963489133dfc0d7f811d89bd70c3db",
+          "size": 12402,
+          "sha256": "2984d42bc337f9844c5346f27ef0495e0ab3d956c6bf1ecb209be34069d950d3",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/musicWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a08bd71066267df795c86ef5a8b135b5676b861a",
+          "size": 9083,
+          "sha256": "31e35bfe3d16a9353cb882d4514683f22a64650d42bcfbde08d8e377452ecbf0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/newsWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "712bef46c2a03f525000bfe43dc6967bd4a5b7ca",
+          "size": 14122,
+          "sha256": "626ede1d2413c3a15d8492246b368373123b7734f13dde48aefbde3f785f50a0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/performanceMonitorWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "01a396c38c5a885530e0f5fef76fafca0de37afa",
+          "size": 12886,
+          "sha256": "3a841f66ee6c614690396cc0b1f632eb00716c7268c8a1fe92297f2b3eec89ea",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/systemMonitorWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d59da5eadf09dc4a80bf25284fab164aeb4a47b5",
+          "size": 29834,
+          "sha256": "dec9d24819bba71fcfae08a4c573a1a0b64b41bbd9116927ee471d3c15d124f7",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/translateWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "195f3f14dcab08f60abae54b546308a7574af5bc",
+          "size": 18419,
+          "sha256": "ae5d5aa6d82ab04b2f8716942e00b1d7e0a6e0f2c464307de877f4b3ab766fc2",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/vchatApps.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "52e51925ba8ee7e45349ff7279a31197679b5de4",
+          "size": 33470,
+          "sha256": "d19e9a2d9aed17f547df52c2d8abdde2ec77e57dc21de20ced49c9eca85c9782",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/weatherWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e548e4a8a887517461ea3f9f18b162dc89a4168e",
+          "size": 10252,
+          "sha256": "c3160b28481f25181d86e043c1e8b41d5c7cbb3dfa829be35899267f5137ec38",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/dragSystem.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bcfe782b995052aa1c1e4bcb238e6770c3185e8",
+          "size": 3211,
+          "sha256": "1d033a17c62fa354f56f3ebb9edcfba7296891cacad74feb1ec99bcc4182a2db",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/performanceManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c665d2f01f162e835c42776b5c79e6dffe6e0bee",
+          "size": 4649,
+          "sha256": "39f3906cc1f6642a8818d03d26ccda69e94991af39213e7fda0f107cd8709d0a",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/state.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18d6d02a95f38a0e77f697b5a1b9c767e929e132",
+          "size": 4744,
+          "sha256": "ccd651e133ba97920c7fcd9c3cc44e3829a81700b20f776b38349f55911665bc",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/statusIndicator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6f0b50740f767c89db16fc58ef4df08c4707f2d7",
+          "size": 1666,
+          "sha256": "2a48127a7613ca82ec4611d15ba704fe350f381e82aca5356cfbd96d09bee8d0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/styleAutomation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac7db7be215cba8bc6ae236a6a9d2125f05df36b",
+          "size": 17414,
+          "sha256": "7798be4e4571092222f7d57bb8ca5f699a52a87785c105c19a583c548b6ade46",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/theme.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76f5061f1984f545b23962a0d793e1203b7b3e71",
+          "size": 1777,
+          "sha256": "c5993ca068c7698805b8efd219e79c6f81c4dc5830b44d47253185b759e07841",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/visibilityFreezer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "865c5ce9d6093e9c84b487a94af15393e8de505f",
+          "size": 14119,
+          "sha256": "7a8c546a33d1648b91937eb82be983cb7d32ffd133b70115874aaee21bcfc9e9",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/wallpaperManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0d3a9b492f2b0f2ef35cd609c33ff055f977f123",
+          "size": 12426,
+          "sha256": "fe0ee59bb42419acdf44e7587c0b9f68f1c8db2e4a247fd296e352877e3ec27f",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/widgetManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5b2d7eeae64f03f856da06bc26a2ef52f4f91721",
+          "size": 38465,
+          "sha256": "684bf144ea4cda2a74ef275ebee59c00abe66558795b7bda969ae5556b530b3f",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/zIndexManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "057e3dfd5ba41a63e12fb5d1f425c852094b6717",
+          "size": 4971,
+          "sha256": "a45fd27a1a20e80575cc9ce73465bb4e35b0772a8606db5aaa5931f992bdb882",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/base.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a22e914aed63571898cbe03ac959cc2f554a3d6",
+          "size": 5077,
+          "sha256": "a21a21c5e6ffe063bc08ff21d1cd289d6fa27459d467a9b29e4482c0c750a32d",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/dock.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5a11585aa350312726db529c90ffbc08525cc582",
+          "size": 12260,
+          "sha256": "86bc4eda633f66c7fc8448685d7e0c19dbff3cfa530016b2afa6635c44c51e49",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/icon-picker.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "009ebea5e72bd934daed78250615f4dd4d852d73",
+          "size": 6805,
+          "sha256": "0b660e29f910f932be2696b584b2f08017a9784f70fc9648a010ecaef5bc7d93",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/living-icons.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "40f540076e4465cbe08d3e830ce7c763e0a3af3b",
+          "size": 400,
+          "sha256": "b4fad4de3f2aceb11d8351e9b51cad5d36029d05d7b39301b0ed300ff444389a",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/settings.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3b42a37515986de84795846f8f60db07f5c10090",
+          "size": 11218,
+          "sha256": "99b09447c7f83d215cda70d7ee8bf8257aba4ed775e634ef6bb013db59328cfe",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/shortcuts.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a1c6ec2ac62eab0326ee4e38ce2ba263b9b249f6",
+          "size": 3221,
+          "sha256": "15effb2b89552b8764e35a7efa0c041b90ba866217987e100bede1dc5d940723",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/sidebar.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aacd975e96638f6be4ec42cb2809cb62f826b1be",
+          "size": 13017,
+          "sha256": "16edfba201b49646def8ed385f89493546ec71df9a237e7c79e611aa5fe7325b",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/theme-overrides.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85cdaf66f15a0383275c1accbd1b97ac4dc6a2d8",
+          "size": 12951,
+          "sha256": "ba5c929b6216529cd4516689bb5e6e9da8247bd827669cc638846f3fc413187d",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/ui-components.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e07f317d61c698be4e1d1ea465260e6d1e92d2d7",
+          "size": 5682,
+          "sha256": "c925afbe573dad619bb45129df041fa05dd19841ff93eacefba1f976635275e3",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/widgets.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a4528178950b351986d8578e7655c691fb1c94bb",
+          "size": 5151,
+          "sha256": "e25d9e0a78363d2582fd3d1e9dfff4171328a0981fb3e28e89500ae16723c853",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/debug/debugTools.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3399ffa394118678788891a67108c8e08fb1e52c",
+          "size": 5722,
+          "sha256": "f33b59a560f91665af2bf8d2c32c6c6d9f25a26a87cc652a49d1d30eb4b7388d",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/desktop.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "38d3532508e1aa23a96c8b29d1e7be72f8082a3f",
+          "size": 1309,
+          "sha256": "01a8502fcd94a66bdea970e561bc297040b5f47864ab7f0991fafcdb0d6e1553",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/desktop.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "929b29d1abc07b817c0ef43cf9376513af97d623",
+          "size": 26956,
+          "sha256": "7e2f145f11510183c38257b539e70c4ff5bb07145453798550bce8e9c11f35ed",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/desktop.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0ca16793406c4ae0cf4ada1ebd2a12e492516802",
+          "size": 5763,
+          "sha256": "e0d16857e0579d11c7bb86248048e26ca00209af0c993a069a16413cf7201ed4",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/favorites/favoritesManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "625ac833e74120a02bca4caf61b3161991c585ea",
+          "size": 8326,
+          "sha256": "f2cb3bbd6d5387211edc840c09718ab49e555d53357656923159c75d3f78907e",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/favorites/thumbnail.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2fde8baabfcdb672be722937ef929f0a7f6931a4",
+          "size": 4368,
+          "sha256": "740dca7e2f4e6600c7dbdb876893813dfe68e8a285199b904d3269624d926dcf",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/contextMenu.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6dbce2149da88bcbb37da283fb19a4cb92633ac1",
+          "size": 18428,
+          "sha256": "885bcfff9c85d57c2a20fe31647f61476de62b41b737a0c6a11f43910d3397c0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/dock.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c69cfb917ef9ab273d08465c4beccb940c96a51a",
+          "size": 78669,
+          "sha256": "1cd2c41691726a406a0b15c1b0179d25fce0e6304e991d53e4ccf858297a88d5",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/globalSettings.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "35ca730127c025094905c5d6ff4e1271e69f7921",
+          "size": 33525,
+          "sha256": "4fed2e4c944dfb47c3665ddefcb613e3967e7967dc62c242b7dd67b363d1a457",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/iconPicker.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b0887b4981a8d270a5bfb4007ce3a5181608c8db",
+          "size": 13451,
+          "sha256": "328fc9a05c0c7fe566a36694755689750af2bf5637dca2e252fdfecf6fb59042",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/livingIcons.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "275f4b31316c357264f04678e713ffedcdb8c10e",
+          "size": 3743,
+          "sha256": "d52bf8ae39005096c8b4bde415ff17294e6980fe0acdc97fbbe616e9e0e998c0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/saveModal.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8e83fdd8e8c7c0a4a14267640714e1e0642a1883",
+          "size": 2905,
+          "sha256": "6475bc5fb5ebc66f9930f6cc12a12f0daffeb4e794624121d8758ed0e1fc077c",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/sidebar.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ba551b727173f448896691ffaa141c70edb07d89",
+          "size": 43278,
+          "sha256": "841a9f9afc29514820c673f58c03e8248486c274e39cdf0caa40acb3a9e7f17c",
+          "kind": "source"
+        },
+        {
           "path": "Flowlockmodules/README.md",
           "mode": "100644",
           "type": "blob",
@@ -727,6 +1186,33 @@
           "blob": "f83cd0ae3f5621157b86b1c78428cffd10d4a6a7",
           "size": 30099,
           "sha256": "aed1afb9cf110c67d4871fc20f1122ad584d3a4466064ff7c4fc6ab35439de44",
+          "kind": "source"
+        },
+        {
+          "path": "Forummodules/forum.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c418b21e3df422360270c61056f4c048d8d29730",
+          "size": 31544,
+          "sha256": "4d547161d5596958dfff28d8eeb1d0633850711a6d20dc24644bd020c86d135b",
+          "kind": "source"
+        },
+        {
+          "path": "Forummodules/forum.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "68937b93e7ed11110317c506bf6f7fd05a3720d4",
+          "size": 11222,
+          "sha256": "c7bc9c779d433de918d386f96b7b3ccbcf6d84aaed98893735528514b02ff807",
+          "kind": "source"
+        },
+        {
+          "path": "Forummodules/forum.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bc04ce8e1066bdb85d62a860d849e4f4cb166668",
+          "size": 71217,
+          "sha256": "a7dfb1b7978a42432665e999c95aacd7da8ced02cdad38ae5941b975db7a217c",
           "kind": "source"
         },
         {
@@ -820,6 +1306,465 @@
           "kind": "source"
         },
         {
+          "path": "Logmodules/log.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ccc5ade925aa338d9ff5d0d02537fa98a0657705",
+          "size": 10181,
+          "sha256": "a0e45cd1380b5ec9573a6b4ebb332e1dd63053fcc597431d9ae51a94574b9001",
+          "kind": "source"
+        },
+        {
+          "path": "Logmodules/log.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8c4f83afe637bc4f08bdbcda1dd5d147f45ba6a4",
+          "size": 5157,
+          "sha256": "d04c1fe8c89aeaa27a58d17a13ecd64c4054d612f4c586b9984cad30db07e154",
+          "kind": "source"
+        },
+        {
+          "path": "Logmodules/log.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "54bb2ce6a0825b731d00d2c0e62fb91e0bc17345",
+          "size": 16698,
+          "sha256": "4a1e30a121e83f9c2812efde5416a27cf437177f7f141f0be09df1d49edc3197",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo-graph.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "09e81c0f7d922323ce8405fd4bb3e330b776383d",
+          "size": 27269,
+          "sha256": "f5180c28990a88e3e2dd6f366cb257077d58fa2b7609b8418255f840bd3385ec",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo-workbench.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "29239138e4d95a27678921b562b0253337b8f08b",
+          "size": 14085,
+          "sha256": "f6e0266fa07c8e6b6e9ccc8885c0ccadc425628b2337f150e4a9c926542f42a8",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6884c3fd14c83f13505afc60358306e520912713",
+          "size": 29362,
+          "sha256": "d1a2bdd6526b20fd8888a377cdaa83b162fbab60e0ee4efc7338452be40ed1f1",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2ea120c0649cbaa736c184683a42054f9188f511",
+          "size": 30841,
+          "sha256": "48837edc1e8d6b57abcd3bf2784087ea9d1f86db91f0c046b710bc6e83ab328a",
+          "kind": "source"
+        },
+        {
+          "path": "Memomodules/memo.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f4349ee43a37d663e9c5b74939a8c06281deb76b",
+          "size": 61754,
+          "sha256": "601b1efb3f25dd8f5964e5fea9f3c840f569cabcb738f59d9458b69ac0e1e94f",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-ambient-pixi.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1f26000246974177e4e99d482f7b5bcc1296de1f",
+          "size": 18189,
+          "sha256": "dbbb045fda1410fa23e11366ab19a58efca911d037d89abe3aa361de844fd500",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-effects.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e4583b0455e43076a994cfa3f773e9348b1b8e94",
+          "size": 8192,
+          "sha256": "44d34b5a8a6d9b196ec71a0c5e972ff93b28b88f709ca4a7fbf503a41ba19918",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-lyrics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8cbefbcb49ed713986e81ddc792c04d096b4b949",
+          "size": 24392,
+          "sha256": "015228c9fcb6ca97ed2246b228734898e4ea8a7c85585fc8cecb629ceb4a4493",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-output.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7352049826eaa04138a06459a10340112511bc5b",
+          "size": 3829,
+          "sha256": "9270344ef087d051f2f4b4a368eba3a70f33f4e937ba0fd66c1b3bf68c146755",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-player.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ce1fce6fde6d5979abd407271eb62bddbd2af031",
+          "size": 18079,
+          "sha256": "ec5ae9eacc7f709002d95a8c31c4b5427e9a6b77092e6a2c554155fc61bdc3ea",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-sidebar.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1a697129c3bf1c1f2cfee007f0956629b3168370",
+          "size": 10712,
+          "sha256": "3a8a6b83b96909f369efadf2a8362828fe395efc28369e451ac1a065eac255cb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/cadenza-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2dcdb4953e9c25c5bb3af70e2a53636ebbeab596",
+          "size": 9694,
+          "sha256": "61da5942ee26d2429824581bcd8ca40900e5b960a06cbfa90d06fedef80d3eb6",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-camera.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e70e820ec6e2025595d280ac0f503cbaf1310581",
+          "size": 12994,
+          "sha256": "f88ae35407108a5aab3e7a22635064384ff8e25000ee538d401cead5a22896cc",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-director.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4bd45f4e8d9955c3691018452b318620d831ddfd",
+          "size": 16315,
+          "sha256": "e40995a330a71f5a8a2873fb8a09b3745e712a28302ec5c63a1c97cc8b7488f5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-events.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5c4fc5bfe3b988f8a695447025c603009826426f",
+          "size": 53428,
+          "sha256": "88f6d49237e172e6ec4e2216632e0b278052de00b10eef426e91be289b48b504",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-lyrics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a5f5daa0ce3e7aed6d4178d742e33955bc1a3cba",
+          "size": 33972,
+          "sha256": "e942833472534502316ed3c7a14e31f3305461772cb0eaa695e16ca1b0fb020d",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "baf5a4463a3d3945e10b26dfc90a6a5c853c4099",
+          "size": 13341,
+          "sha256": "e886442561c4f955a5fb8b37942b2dea242637f8a5c97ea5c0a5fe01de460482",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-optics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b34d095e55e435c04edc19447fe1dc2de55e2400",
+          "size": 3976,
+          "sha256": "4c32e64478c9f7847296031a5fdfd3558074b2563301d61e421dd2c89d3ac981",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-stations.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ffad21cad018b81b68092072e8ce76408ebe15ea",
+          "size": 25832,
+          "sha256": "f2d8c641306dd81e250cadc787beee6a4c46ab0bd1f1a07aa219bfe460863719",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-world.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "248d8ba5ddb50ff8aaa3bbdf262144fc8b01ca22",
+          "size": 48170,
+          "sha256": "7418389d2ea942f903fb87b8649551277dd463522c0a81de94a047d2f62ef865",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/fume-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "82b80f3f4b58e6fd32408603eb6743bca2c601e0",
+          "size": 22092,
+          "sha256": "0cee9da912b47f1649ee059403ee19c300afdfa6d19ca954ecd84c19d33a94a5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/luminous-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5c98500b13ca5b686e03bdff575f6d5a0856407",
+          "size": 3231,
+          "sha256": "a252a4032604de25851eb7b56d8d86583daefeb79f039aa9055bb532f4ba2569",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/partita-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5c7976a0ffce06c9f082da879113a314807c4e3f",
+          "size": 3838,
+          "sha256": "adbc943750e390a3bb78e6cdf40e53832dce96fbf9efb910577a0ec7119920df",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/sonnet-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7602a87b1567fd67faf19fbb35d4ffe64d8032f0",
+          "size": 4583,
+          "sha256": "8ee8b1fa5d59572f7d6cdce81fe392c4c86e7d41c5e4b2cecff3afa862d84dab",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/sonnet-pixi-core.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "60ee43aacfe89d0b0f43e729f9e7f6f99e61551e",
+          "size": 21049,
+          "sha256": "ddfa06782d64529845c6f2d6cbbb234573bb27f13cb5aac194ea6fec05ab1de9",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-decor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ae8395b713a5e9ca59bb88020b2ad59a64340062",
+          "size": 9874,
+          "sha256": "74617488a3fde6eb4a9be317c007c6547cece42c413958a92ec65e0283b50070",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-layout.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3b4a3711d89e3156e954ef59cc9071dfbe11848d",
+          "size": 7771,
+          "sha256": "ae65b211526879e5005c5e2dab011dd089b7eec873baa28c7dfa2afbb6741470",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-performance.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "10550c9c352725653050e4a97d8c67e900795cb9",
+          "size": 7286,
+          "sha256": "a08e0bebb0d9141bae3c1a1be05768176b5eddb70f37500738a0f389d675accb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-performance.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "eada88bf003799e18017fcf59b251caab4e58543",
+          "size": 21258,
+          "sha256": "3f700ce0056b7b1badef620e007bf729cd8f79884c8be448efc18257ef22a4c3",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-mode-utils.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e9e1f851c6040dfa7f5c74164403b640b50cae6c",
+          "size": 6706,
+          "sha256": "e78f0cfba4a5913eacdbd8582ed27a2d4e77606299a5553844f551b8c2f73895",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-pixi-effects.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8ba361e674e39f0c9daa4ba9cb3cf8614921091b",
+          "size": 67144,
+          "sha256": "0cc0b0fd5e9f6fd41c9ea0e056c6ae45c81c40d17daa4aa462b7309646aa9fdb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/tempera-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93744312c7b6f8e013c6fd5ce289e29a995f5aab",
+          "size": 4843,
+          "sha256": "89ec1ecf126f372125c1be1f77f3f98501305b6d79efaedf05eb64050f928cc0",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/tempera-pixi-core.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "517941b040f4f29008eef088221bdb1cceabe385",
+          "size": 26381,
+          "sha256": "113986fa80b201040feaee4860f6bde60f78108a24418fc5698966e3c18cf0b2",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/tunnel-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1cd53dce928962ecc87411d906238a34e4dffb13",
+          "size": 82260,
+          "sha256": "696a67e06a13716b2059686873f9f1f8e75577d0bd0502fdaa069e1c6e434d9d",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-advanced-modes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "351f7bbf831da7e09864bb12ab3087f4d7d06cba",
+          "size": 1118,
+          "sha256": "401c6b157aafea4881e877b954ecd2e42cd293e7566f96c778121d78dccb087c",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b159dccadc9318e7e3576a5b18644d3b5ef7150e",
+          "size": 18922,
+          "sha256": "0007ee6e1b6c4beb48409d0e60e68cac1c6a228ef3886b36eee3721822611eb5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-host.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7f527ae6b2513fb7e51991f326f633eda248d7ea",
+          "size": 69084,
+          "sha256": "de0717a0d112a1693cf3df902e8c5b4d4493da89ca3ab54b0f6b772d28e0ffb6",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-modes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f638db9a7d7b58806f75a0e1bde28dd25bcf91bf",
+          "size": 12247,
+          "sha256": "2e7d46dca846ad9c0716651f35231f41a1b653a7e242c43e6718f669e5c883d5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2cfc2ebad092aaedf815dc18b7267090fce431ab",
+          "size": 25074,
+          "sha256": "7ac2955043636e3ff55108817c3fb89b0d368eee8fd94faec76fa6fba54c43af",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a52694c71af82ad0d5c31a25cae6b8b8564d65ef",
+          "size": 83674,
+          "sha256": "445046ef7fb53979de6f5abacedef8b24c9c0ca2a36f01c4bb2802f64c1560a4",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-ui.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ca42f915b2514023a3c8394274a6558649d2a7bd",
+          "size": 9437,
+          "sha256": "7e46c9900f1d077ca646d70c7279281a23f91a13b8295ce17d971fd4c7319f66",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-utils.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "11f126fbfd4846234fe2a9ed284825fac5d3499b",
+          "size": 10220,
+          "sha256": "dce014801fffa8826094ccf09d420326323dbda286af7dc602af8d861a0f0faf",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-visualizer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "136536a83796da4b6377388053ad7809eb7a5eb9",
+          "size": 17036,
+          "sha256": "2a9873e8a2eaaef114dcee1d97bd5e65db7f3c131c3bd4738052c776016afea4",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-webdav.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e90fc81771e2eb57b2f81346ec22542b6c339c95",
+          "size": 11924,
+          "sha256": "38ed039d483c3c552f726430f3641cd3b0d9843e2176abae6d0d6418ef2ccb5a",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c3a40f2047367f4af5c4a2e78536963eeaaf9f0f",
+          "size": 58905,
+          "sha256": "ef533a9f48e2ded3ff70fa343c3c1f7f328714fdcbd08b5f9f5cd6d9d439f08c",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ff9d3a5bc4a89b69603ed042b91dd747d24a6cdc",
+          "size": 51367,
+          "sha256": "b64608fe4e7d7ee5773fd4f9eb9ffe34d321c8fedb14bd37e4376c20725ddcbb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "80e1ed010d7ff1319f8ca9560114ca1d985ace1d",
+          "size": 61317,
+          "sha256": "434bd2c4c5d7aea3bb2b0142f020b2a61232af6a16fb39376e6960d76dee51fe",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/socket.io.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6b2d60110922529dec9eb8f31aa02a67df4dd68",
+          "size": 49993,
+          "sha256": "73eba16bc895fdfa454e27ecb80def31ede8d861f99e175ff93b110eabec044f",
+          "kind": "source"
+        },
+        {
           "path": "Notemodules/notemini.css",
           "mode": "100644",
           "type": "blob",
@@ -871,6 +1816,33 @@
           "blob": "b976ed97527c122640146516549d5b513e2e6b61",
           "size": 94936,
           "sha256": "7083de2288afcee28f60a1ac0208c485e096bcb3af3c7db0325cb9751640a70e",
+          "kind": "source"
+        },
+        {
+          "path": "PluginManagerModules/plugin-manager.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d2ec34216e375debba9e6b166cf172bd34a63b4b",
+          "size": 16541,
+          "sha256": "85b7fc37a640fce37d79727063859942c06ef6cef1ab00a475e80b0493ca1f68",
+          "kind": "source"
+        },
+        {
+          "path": "PluginManagerModules/plugin-manager.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7066e5189a4f5fd45aefff797945273bf2bbe7dc",
+          "size": 7245,
+          "sha256": "0df0197316b027bec1e95dfaa2d9dc306fbf4f961b81f13c086d2a57bdcf41ae",
+          "kind": "source"
+        },
+        {
+          "path": "PluginManagerModules/plugin-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bfaf75f3026b708cabad1d23ea89781e31edd473",
+          "size": 19930,
+          "sha256": "2ab2250065a7b9c86475e77698706eea2a68362fd405ffc8f7e459ca11d9f128",
           "kind": "source"
         },
         {
@@ -988,6 +1960,33 @@
           "blob": "c23598c7d81163daabc7ab0fcd33664d39bb1431",
           "size": 27906,
           "sha256": "faffd8ae7aee6ad8ba2a15dfff406f81c6a36a302c633fa316755b4ede095da4",
+          "kind": "source"
+        },
+        {
+          "path": "RAGmodules/RAG_Observer.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2829a66af0558941c8476bbc3d57fe6bc1c53723",
+          "size": 171674,
+          "sha256": "b09a0ec0b52c06c6e38325d5a52105a26e61a07e8765e66301927684387a4d47",
+          "kind": "source"
+        },
+        {
+          "path": "RAGmodules/RAG_Overlay.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f94b8a63b80f8137f5a76fa303be8d57804ba64a",
+          "size": 25032,
+          "sha256": "ef97141d204fdc87afc50268e8d5d77e33ee82ebd9f9b9ec69051c942c0e9142",
+          "kind": "source"
+        },
+        {
+          "path": "RAGmodules/rag-observer-config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e59faea9111868d56169d6d59571c6b1f7bdbe1d",
+          "size": 13560,
+          "sha256": "42475d6e93f422a7dd73ef8719c28703b084d0215b49288224efc13877be616a",
           "kind": "source"
         },
         {
@@ -1474,6 +2473,33 @@
           "blob": "3d9e8e97a7155adddc08e4d0f96c167d864867a9",
           "size": 12958,
           "sha256": "4b1a3d3bbef9829ccd40bb6460af398d7c97f84c08fbcc3d0ebf93ce0a6fd465",
+          "kind": "source"
+        },
+        {
+          "path": "Themesmodules/themes-module.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0ab4093b875fb9a42645a24ecd7d3b0ffef2dd1f",
+          "size": 17895,
+          "sha256": "fb203ac3c9bd12cf97a3fcc685b6a9b05555a198a18791e04214216f9247cbaf",
+          "kind": "source"
+        },
+        {
+          "path": "Themesmodules/themes.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "622da8680c6a53025679ced15caedf22e8d23755",
+          "size": 8409,
+          "sha256": "5bb3641d3e6d1c66d99620eee25f952e2c0d2f0971ef34ba1bcc12cea16ced53",
+          "kind": "source"
+        },
+        {
+          "path": "Themesmodules/themes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d8f2aaad2418de0fa71019262de256484fa91094",
+          "size": 20785,
+          "sha256": "696b31b8e0320b35a4f70fb497540dbec38b5d0e0a07cc6f161c0fb451be5aff",
           "kind": "source"
         },
         {
@@ -2087,6 +3113,60 @@
           "blob": "20ae5966568944e18a40e89614e93a34042b09c8",
           "size": 7412,
           "sha256": "a74b77edf6c947d47916b6c4a85a486c0570fc512aabaca905238a9bd91c405a",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/recognizer.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8252f15eb3992aac72fb9a91e8da96343c4cfbca",
+          "size": 7403,
+          "sha256": "f29aa482967ebb021818fb95de7f8a2dd01741eb858c5c44c99392cc7e7708f2",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93f789fc8da88276b8dd3ef3d522d997fb16a398",
+          "size": 1914,
+          "sha256": "9d2dccab6981ee659e9dba2353391a83aa81e65222bdb1717208d7422892a8c6",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "116aad02bc0a94f25e970712704ec211de4eb939",
+          "size": 4209,
+          "sha256": "20c44bbc025d22b5a34f6c3ee522d04c855bb130c55446a287ddb6f5093b2581",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "348b1fdf2cefb3dc9e944759727f122edcb39ca7",
+          "size": 6364,
+          "sha256": "27b2b1dd47f5429eb35b82593b44f9b1d426cbf444ca2e4d9ed8d1e98e025735",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c569b899e1077b6a6b362331fd6e0edf55fbebe0",
+          "size": 3239,
+          "sha256": "723a8323e5f64b40eee878a264841d362f5ccce5a70c50b8e7227f252a2ede8f",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d02b65a22fd4b4fc9d667e72367eaca529e6ea79",
+          "size": 31240,
+          "sha256": "e2fca74c7ce410ecc8dcc9d47fd253e0b1e3972a5260b3137fd9efc4fb9850aa",
           "kind": "source"
         },
         {
@@ -4370,9 +5450,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
-          "size": 95787,
-          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
+          "blob": "e345aa2079e369c1e1ea1e5003267867fb2d1984",
+          "size": 95949,
+          "sha256": "ed5fc84c40e38623582362e309045fbc0e850c39660a58db9d8719c0c2af058b",
           "kind": "source"
         },
         {
@@ -4460,9 +5540,9 @@
           "path": "modules/bootstrap/packed-runtime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "45bc61ade429ea8b7f40a64eead548b5aadc7be5",
-          "size": 1824,
-          "sha256": "bff33a3d387da1e4e45808f262f98e73a9f52e62d793f45bda3f110fb1a6f400",
+          "blob": "ba939403e9e88d5db6e7383340cc96a393303318",
+          "size": 1997,
+          "sha256": "0d78556f9c7e42bc5838d06f76cc04ce1fc7fd8f3c4199326422ffc60e141795",
           "kind": "source"
         },
         {
@@ -4766,9 +5846,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "383b9e06a067f4f79b3bc188e670ff35b6d2a9b4",
-          "size": 110447,
-          "sha256": "2dbce45694a20c6370db5259b907c90f6ea037b19adb5ba5cdec73b6b2af8743",
+          "blob": "d9ef46b880355ea299c9ca2e56f7d0a5badef6fb",
+          "size": 114520,
+          "sha256": "e2ffbca9782cf1da20cc2768e30c71ef2e64a63ce87632077d7c3d0ed09fb01b",
           "kind": "source"
         },
         {
@@ -4793,9 +5873,9 @@
           "path": "modules/event-listeners.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6dc8b14df4a7586b28eec67e0f14493babf876ea",
-          "size": 72033,
-          "sha256": "6b193797f273e12e8ed2f8ad8f63308efe40e0baa3191a1ef5952e4065ad58a2",
+          "blob": "619dcd02b8c321f272ba8ef540adb335d81a5b95",
+          "size": 72045,
+          "sha256": "0cd37ea3104e56fdf682991189dd7a309bd91a2e6776779dfe8e289acacd7541",
           "kind": "source"
         },
         {
@@ -5060,6 +6140,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/ipc/nativeConversationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "24667c1f6c794b852b39feba4337b4ca84b54fb5",
+          "size": 12650,
+          "sha256": "35593379ccb92a6711ccb7964efb5ea60b7a49921afb4b7d86f21c3ceed10c02",
+          "kind": "source"
+        },
+        {
           "path": "modules/ipc/notesHandlers.js",
           "mode": "100644",
           "type": "blob",
@@ -5138,6 +6227,15 @@
           "blob": "19498c85777f83e209d7d106a0db2ae7b14b5375",
           "size": 2661,
           "sha256": "3d26d82b295dbcd5a4133c3200a576523c37247b59f8da56f85213944223606b",
+          "kind": "source"
+        },
+        {
+          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
+          "size": 2806,
+          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
           "kind": "source"
         },
         {
@@ -5378,9 +6476,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "773c46c9f84210276512c67ff36e3e260cd234e2",
-          "size": 221992,
-          "sha256": "262ca3a7bda6b7a975ff5f7bade15f3ca6ca50b8944fc5c084bb9dcc831c727e",
+          "blob": "4cd59fbe8e29e640bdbd8fcaea1e5ff9c6ad737e",
+          "size": 223481,
+          "sha256": "a597f4e971d92fb6dfa4d6bb68c9a620253629468f2af48124dd18a52324e178",
           "kind": "source"
         },
         {
@@ -5654,6 +6752,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/renderer/nativeConversationPresentation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aab5a3122a9c4e802eaea0d014cd6dcc39f72dcc",
+          "size": 4461,
+          "sha256": "73751fac85290bc6ead9ea16c3b89ae204a3f58442f166b86819ab89f3596aca",
+          "kind": "source"
+        },
+        {
           "path": "modules/renderer/nonStreamingEventConsumer.js",
           "mode": "100644",
           "type": "blob",
@@ -5729,9 +6836,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cf294aeba2c47b367e5db6973c8121b733fb2710",
-          "size": 121575,
-          "sha256": "3db9e2a30464d44a9a29c16fefbdfdf719b3eb26c154dd0f1d0225bdda1122e7",
+          "blob": "fdf74325c3569326897f392ce916565da88d9206",
+          "size": 121938,
+          "sha256": "14bf60642694ae69861e0514aeb3e96a45d29b59fa35276eaaad6146c0b07127",
           "kind": "source"
         },
         {
@@ -6032,6 +7139,42 @@
           "sha256": "56c4eb0124d93d3828bce4a2f89a98be06b5ffd486c3bcaf57d7b725c197f0aa"
         },
         {
+          "path": "modules/services/suveiHumanAuthorizationService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
+          "size": 46413,
+          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/README.md",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9199b7d216ee55f6d39feb89e646a3efeed75250",
+          "size": 2533,
+          "sha256": "2d53f0707c673d84eb959e179dd32fd2d5788f5c6b5af71f6e3668a48315da3f",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/nativePort.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "244919411f4b731cb4e1d591214273e29d0ca921",
+          "size": 2113,
+          "sha256": "4b2d0d91de361e44cd10fc9ce97f5ca5ced9d0c7a85df9b078950380e9d2caf1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/transport.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d43e239af9b0caecf619ceef2524799338feda19",
+          "size": 3747,
+          "sha256": "d3ca4634dabb1dd6bb3bf76c7732e5a87ec77e893e33fa99a1cc796d7d115d92",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/windowAppIds.js",
           "mode": "100644",
           "type": "blob",
@@ -6152,9 +7295,9 @@
           "path": "modules/settings/schema/jev-service.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b3db55c5d6ef835fbf31ffea9c9715d19e0089e0",
-          "size": 4543,
-          "sha256": "109c560cee16f91a1d60204af13cb402f3baa59f10ccb432db93851d87df18b6",
+          "blob": "5a8d5a3dd8afb2d77083c1cd2aad7d818c7a1e64",
+          "size": 4542,
+          "sha256": "ec6d63fbb48f0d6ae544537e63b74d914629b4ac9d4bc141fa371827c1e7bcb2",
           "kind": "source"
         },
         {
@@ -7484,9 +8627,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
-          "size": 18553,
-          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
+          "blob": "f3a70802009a0fa1c1593dcc6dfab969a13b9219",
+          "size": 24143,
+          "sha256": "7b8d8788b32a1f6d7c8b30c16bdec8e767f6b4509d4fe142c458ae3d46e0ca1f",
           "kind": "source"
         },
         {
@@ -7652,6 +8795,15 @@
           "kind": "source"
         },
         {
+          "path": "preloads/api/nativeConversation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "30d0eea136721eef7f2891cbf769439befc3e3d6",
+          "size": 528,
+          "sha256": "c215eb50d5e6fbf58cb2027f29512d7fb8d9303e4db1d8a96b65a59aa7cf7431",
+          "kind": "source"
+        },
+        {
           "path": "preloads/api/notes.js",
           "mode": "100644",
           "type": "blob",
@@ -7703,6 +8855,15 @@
           "blob": "3c91f6c4a9ba70d1d53b0049e2d7341dce7321a0",
           "size": 1090,
           "sha256": "b8952c931364a2d58c9cb463bd222aa24492d88472f8966a44befb6a3135a650",
+          "kind": "source"
+        },
+        {
+          "path": "preloads/api/suveiHumanAuthorization.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
+          "size": 629,
+          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
           "kind": "source"
         },
         {
@@ -8219,12 +9380,48 @@
           "kind": "source"
         },
         {
+          "path": "scripts/check-design-system-boundary.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4846805e46a018809ef46e6215b490311be41ce0",
+          "size": 36460,
+          "sha256": "0125fdcd4ada73d5cbc44a55bec5e26ddaed4e4f83b0e87c30dd8fdba35ea088",
+          "kind": "source"
+        },
+        {
           "path": "scripts/electron-builder-bootstrap-hooks.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "6b3a35bd8c72f756df945ec6f2c8d06b09e5365c",
-          "size": 1754,
-          "sha256": "291be491841e06c5e74cc27cd1d13c0fc4ea43e80e20afe5df403330162d89be",
+          "blob": "20c7615861b4624b2cbc493ab681293304fcc4ed",
+          "size": 2311,
+          "sha256": "74687d5778cf8bbd42682738130494a4f54c5792980673a23ec99738d07cbdce",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/fixtures/window-package-resources.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0d455e79d044bc781988587bb09f09a16574cf22",
+          "size": 20842,
+          "sha256": "896d9390e7d389c8f1fd62db7862af4e4edbfe450b1bf3f34af6d0f5f26e1682",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/lib/window-package-contract.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a5bb5866d71494e3199f3908df788d6347792d89",
+          "size": 4060,
+          "sha256": "4094cc787f839baf236a0c0b215ace3c0211726a6a5a1a34b2a43a8e1417b696",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-packaged-window-renderers.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c0c0bbb57c45467a25195fec0eeea122e19326dc",
+          "size": 8332,
+          "sha256": "05daf57b559285e5fa96dc7cd196ccb7b88f96efe1f95fdab2c8271bdcd41994",
           "kind": "source"
         },
         {
@@ -8819,6 +10016,15 @@
           "blob": "cd21c0e5da77d66e5679300b4a7cd79b437c894c",
           "size": 1068,
           "sha256": "609a0522ddc91b47afd795efae8423dc0c0ad2a71be0b90692142606d749d8c5",
+          "kind": "source"
+        },
+        {
+          "path": "tests/window-package-contract.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d948d4a5378505850e4ff829525b799be76e4299",
+          "size": 3773,
+          "sha256": "8d1d1425da36f6b3a28119f07069f09d166f8ac7f20ad43e046661aace37ae3a",
           "kind": "source"
         },
         {
@@ -10233,33 +11439,6 @@
           "size": 16293,
           "sha256": "c0e4e7ca6636010df110cbdb8945daea0f97e26d84d039b7679353291aba88cd",
           "kind": "source"
-        },
-        {
-          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
-          "size": 2806,
-          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
-          "kind": "source"
-        },
-        {
-          "path": "modules/services/suveiHumanAuthorizationService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
-          "size": 46413,
-          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
-          "kind": "source"
-        },
-        {
-          "path": "preloads/api/suveiHumanAuthorization.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
-          "size": 629,
-          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
-          "kind": "source"
         }
       ],
       "static_native_assets": [
@@ -10593,6 +11772,402 @@
           "kind": "source"
         },
         {
+          "path": "Desktopmodules/api/desktopMetrics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "414deb4d22e3add4e7b38eed7b7d026276b857cc",
+          "size": 10683,
+          "sha256": "715c07ae1d801f1a6fa410e670472bafe540074e9ebcc71cd374f4ce5b8ab0b5",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/api/ipcBridge.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f429c458a32cb489f994825ea96f908c5860b743",
+          "size": 19277,
+          "sha256": "74e2509e6ce8739296c89a516cb435058d68e436ec8cc8ab7e49bfa55d8426e7",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/api/vcpProxy.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9c665002c44345b697a3853cc88ff55d956f0344",
+          "size": 7198,
+          "sha256": "b7c2f5858b3c5ffc0d023bfd31a6ccc737c51d14c1c4d16f270c31538e34eb42",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/appTrayWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2f79511fb2963489133dfc0d7f811d89bd70c3db",
+          "size": 12402,
+          "sha256": "2984d42bc337f9844c5346f27ef0495e0ab3d956c6bf1ecb209be34069d950d3",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/musicWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a08bd71066267df795c86ef5a8b135b5676b861a",
+          "size": 9083,
+          "sha256": "31e35bfe3d16a9353cb882d4514683f22a64650d42bcfbde08d8e377452ecbf0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/newsWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "712bef46c2a03f525000bfe43dc6967bd4a5b7ca",
+          "size": 14122,
+          "sha256": "626ede1d2413c3a15d8492246b368373123b7734f13dde48aefbde3f785f50a0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/performanceMonitorWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "01a396c38c5a885530e0f5fef76fafca0de37afa",
+          "size": 12886,
+          "sha256": "3a841f66ee6c614690396cc0b1f632eb00716c7268c8a1fe92297f2b3eec89ea",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/systemMonitorWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d59da5eadf09dc4a80bf25284fab164aeb4a47b5",
+          "size": 29834,
+          "sha256": "dec9d24819bba71fcfae08a4c573a1a0b64b41bbd9116927ee471d3c15d124f7",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/translateWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "195f3f14dcab08f60abae54b546308a7574af5bc",
+          "size": 18419,
+          "sha256": "ae5d5aa6d82ab04b2f8716942e00b1d7e0a6e0f2c464307de877f4b3ab766fc2",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/vchatApps.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "52e51925ba8ee7e45349ff7279a31197679b5de4",
+          "size": 33470,
+          "sha256": "d19e9a2d9aed17f547df52c2d8abdde2ec77e57dc21de20ced49c9eca85c9782",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/builtinWidgets/weatherWidget.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e548e4a8a887517461ea3f9f18b162dc89a4168e",
+          "size": 10252,
+          "sha256": "c3160b28481f25181d86e043c1e8b41d5c7cbb3dfa829be35899267f5137ec38",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/dragSystem.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bcfe782b995052aa1c1e4bcb238e6770c3185e8",
+          "size": 3211,
+          "sha256": "1d033a17c62fa354f56f3ebb9edcfba7296891cacad74feb1ec99bcc4182a2db",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/performanceManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c665d2f01f162e835c42776b5c79e6dffe6e0bee",
+          "size": 4649,
+          "sha256": "39f3906cc1f6642a8818d03d26ccda69e94991af39213e7fda0f107cd8709d0a",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/state.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18d6d02a95f38a0e77f697b5a1b9c767e929e132",
+          "size": 4744,
+          "sha256": "ccd651e133ba97920c7fcd9c3cc44e3829a81700b20f776b38349f55911665bc",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/statusIndicator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6f0b50740f767c89db16fc58ef4df08c4707f2d7",
+          "size": 1666,
+          "sha256": "2a48127a7613ca82ec4611d15ba704fe350f381e82aca5356cfbd96d09bee8d0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/styleAutomation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac7db7be215cba8bc6ae236a6a9d2125f05df36b",
+          "size": 17414,
+          "sha256": "7798be4e4571092222f7d57bb8ca5f699a52a87785c105c19a583c548b6ade46",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/theme.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76f5061f1984f545b23962a0d793e1203b7b3e71",
+          "size": 1777,
+          "sha256": "c5993ca068c7698805b8efd219e79c6f81c4dc5830b44d47253185b759e07841",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/visibilityFreezer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "865c5ce9d6093e9c84b487a94af15393e8de505f",
+          "size": 14119,
+          "sha256": "7a8c546a33d1648b91937eb82be983cb7d32ffd133b70115874aaee21bcfc9e9",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/wallpaperManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0d3a9b492f2b0f2ef35cd609c33ff055f977f123",
+          "size": 12426,
+          "sha256": "fe0ee59bb42419acdf44e7587c0b9f68f1c8db2e4a247fd296e352877e3ec27f",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/widgetManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5b2d7eeae64f03f856da06bc26a2ef52f4f91721",
+          "size": 38465,
+          "sha256": "684bf144ea4cda2a74ef275ebee59c00abe66558795b7bda969ae5556b530b3f",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/core/zIndexManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "057e3dfd5ba41a63e12fb5d1f425c852094b6717",
+          "size": 4971,
+          "sha256": "a45fd27a1a20e80575cc9ce73465bb4e35b0772a8606db5aaa5931f992bdb882",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/base.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a22e914aed63571898cbe03ac959cc2f554a3d6",
+          "size": 5077,
+          "sha256": "a21a21c5e6ffe063bc08ff21d1cd289d6fa27459d467a9b29e4482c0c750a32d",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/dock.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5a11585aa350312726db529c90ffbc08525cc582",
+          "size": 12260,
+          "sha256": "86bc4eda633f66c7fc8448685d7e0c19dbff3cfa530016b2afa6635c44c51e49",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/icon-picker.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "009ebea5e72bd934daed78250615f4dd4d852d73",
+          "size": 6805,
+          "sha256": "0b660e29f910f932be2696b584b2f08017a9784f70fc9648a010ecaef5bc7d93",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/living-icons.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "40f540076e4465cbe08d3e830ce7c763e0a3af3b",
+          "size": 400,
+          "sha256": "b4fad4de3f2aceb11d8351e9b51cad5d36029d05d7b39301b0ed300ff444389a",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/settings.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3b42a37515986de84795846f8f60db07f5c10090",
+          "size": 11218,
+          "sha256": "99b09447c7f83d215cda70d7ee8bf8257aba4ed775e634ef6bb013db59328cfe",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/shortcuts.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a1c6ec2ac62eab0326ee4e38ce2ba263b9b249f6",
+          "size": 3221,
+          "sha256": "15effb2b89552b8764e35a7efa0c041b90ba866217987e100bede1dc5d940723",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/sidebar.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aacd975e96638f6be4ec42cb2809cb62f826b1be",
+          "size": 13017,
+          "sha256": "16edfba201b49646def8ed385f89493546ec71df9a237e7c79e611aa5fe7325b",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/theme-overrides.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85cdaf66f15a0383275c1accbd1b97ac4dc6a2d8",
+          "size": 12951,
+          "sha256": "ba5c929b6216529cd4516689bb5e6e9da8247bd827669cc638846f3fc413187d",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/ui-components.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e07f317d61c698be4e1d1ea465260e6d1e92d2d7",
+          "size": 5682,
+          "sha256": "c925afbe573dad619bb45129df041fa05dd19841ff93eacefba1f976635275e3",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/css/widgets.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a4528178950b351986d8578e7655c691fb1c94bb",
+          "size": 5151,
+          "sha256": "e25d9e0a78363d2582fd3d1e9dfff4171328a0981fb3e28e89500ae16723c853",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/debug/debugTools.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3399ffa394118678788891a67108c8e08fb1e52c",
+          "size": 5722,
+          "sha256": "f33b59a560f91665af2bf8d2c32c6c6d9f25a26a87cc652a49d1d30eb4b7388d",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/desktop.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "38d3532508e1aa23a96c8b29d1e7be72f8082a3f",
+          "size": 1309,
+          "sha256": "01a8502fcd94a66bdea970e561bc297040b5f47864ab7f0991fafcdb0d6e1553",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/desktop.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "929b29d1abc07b817c0ef43cf9376513af97d623",
+          "size": 26956,
+          "sha256": "7e2f145f11510183c38257b539e70c4ff5bb07145453798550bce8e9c11f35ed",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/desktop.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0ca16793406c4ae0cf4ada1ebd2a12e492516802",
+          "size": 5763,
+          "sha256": "e0d16857e0579d11c7bb86248048e26ca00209af0c993a069a16413cf7201ed4",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/favorites/favoritesManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "625ac833e74120a02bca4caf61b3161991c585ea",
+          "size": 8326,
+          "sha256": "f2cb3bbd6d5387211edc840c09718ab49e555d53357656923159c75d3f78907e",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/favorites/thumbnail.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2fde8baabfcdb672be722937ef929f0a7f6931a4",
+          "size": 4368,
+          "sha256": "740dca7e2f4e6600c7dbdb876893813dfe68e8a285199b904d3269624d926dcf",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/contextMenu.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6dbce2149da88bcbb37da283fb19a4cb92633ac1",
+          "size": 18428,
+          "sha256": "885bcfff9c85d57c2a20fe31647f61476de62b41b737a0c6a11f43910d3397c0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/dock.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c69cfb917ef9ab273d08465c4beccb940c96a51a",
+          "size": 78669,
+          "sha256": "1cd2c41691726a406a0b15c1b0179d25fce0e6304e991d53e4ccf858297a88d5",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/globalSettings.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "35ca730127c025094905c5d6ff4e1271e69f7921",
+          "size": 33525,
+          "sha256": "4fed2e4c944dfb47c3665ddefcb613e3967e7967dc62c242b7dd67b363d1a457",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/iconPicker.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b0887b4981a8d270a5bfb4007ce3a5181608c8db",
+          "size": 13451,
+          "sha256": "328fc9a05c0c7fe566a36694755689750af2bf5637dca2e252fdfecf6fb59042",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/livingIcons.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "275f4b31316c357264f04678e713ffedcdb8c10e",
+          "size": 3743,
+          "sha256": "d52bf8ae39005096c8b4bde415ff17294e6980fe0acdc97fbbe616e9e0e998c0",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/saveModal.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8e83fdd8e8c7c0a4a14267640714e1e0642a1883",
+          "size": 2905,
+          "sha256": "6475bc5fb5ebc66f9930f6cc12a12f0daffeb4e794624121d8758ed0e1fc077c",
+          "kind": "source"
+        },
+        {
+          "path": "Desktopmodules/ui/sidebar.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ba551b727173f448896691ffaa141c70edb07d89",
+          "size": 43278,
+          "sha256": "841a9f9afc29514820c673f58c03e8248486c274e39cdf0caa40acb3a9e7f17c",
+          "kind": "source"
+        },
+        {
           "path": "Dicemodules/dice-soundscape.js",
           "mode": "100644",
           "type": "blob",
@@ -10764,6 +12339,393 @@
           "kind": "source"
         },
         {
+          "path": "Musicmodules/music-ambient-pixi.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1f26000246974177e4e99d482f7b5bcc1296de1f",
+          "size": 18189,
+          "sha256": "dbbb045fda1410fa23e11366ab19a58efca911d037d89abe3aa361de844fd500",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-effects.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e4583b0455e43076a994cfa3f773e9348b1b8e94",
+          "size": 8192,
+          "sha256": "44d34b5a8a6d9b196ec71a0c5e972ff93b28b88f709ca4a7fbf503a41ba19918",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-lyrics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8cbefbcb49ed713986e81ddc792c04d096b4b949",
+          "size": 24392,
+          "sha256": "015228c9fcb6ca97ed2246b228734898e4ea8a7c85585fc8cecb629ceb4a4493",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-output.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7352049826eaa04138a06459a10340112511bc5b",
+          "size": 3829,
+          "sha256": "9270344ef087d051f2f4b4a368eba3a70f33f4e937ba0fd66c1b3bf68c146755",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-player.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ce1fce6fde6d5979abd407271eb62bddbd2af031",
+          "size": 18079,
+          "sha256": "ec5ae9eacc7f709002d95a8c31c4b5427e9a6b77092e6a2c554155fc61bdc3ea",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-sidebar.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1a697129c3bf1c1f2cfee007f0956629b3168370",
+          "size": 10712,
+          "sha256": "3a8a6b83b96909f369efadf2a8362828fe395efc28369e451ac1a065eac255cb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/cadenza-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2dcdb4953e9c25c5bb3af70e2a53636ebbeab596",
+          "size": 9694,
+          "sha256": "61da5942ee26d2429824581bcd8ca40900e5b960a06cbfa90d06fedef80d3eb6",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-camera.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e70e820ec6e2025595d280ac0f503cbaf1310581",
+          "size": 12994,
+          "sha256": "f88ae35407108a5aab3e7a22635064384ff8e25000ee538d401cead5a22896cc",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-director.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4bd45f4e8d9955c3691018452b318620d831ddfd",
+          "size": 16315,
+          "sha256": "e40995a330a71f5a8a2873fb8a09b3745e712a28302ec5c63a1c97cc8b7488f5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-events.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5c4fc5bfe3b988f8a695447025c603009826426f",
+          "size": 53428,
+          "sha256": "88f6d49237e172e6ec4e2216632e0b278052de00b10eef426e91be289b48b504",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-lyrics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a5f5daa0ce3e7aed6d4178d742e33955bc1a3cba",
+          "size": 33972,
+          "sha256": "e942833472534502316ed3c7a14e31f3305461772cb0eaa695e16ca1b0fb020d",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "baf5a4463a3d3945e10b26dfc90a6a5c853c4099",
+          "size": 13341,
+          "sha256": "e886442561c4f955a5fb8b37942b2dea242637f8a5c97ea5c0a5fe01de460482",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-optics.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b34d095e55e435c04edc19447fe1dc2de55e2400",
+          "size": 3976,
+          "sha256": "4c32e64478c9f7847296031a5fdfd3558074b2563301d61e421dd2c89d3ac981",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-stations.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ffad21cad018b81b68092072e8ce76408ebe15ea",
+          "size": 25832,
+          "sha256": "f2d8c641306dd81e250cadc787beee6a4c46ab0bd1f1a07aa219bfe460863719",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/diorama-world.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "248d8ba5ddb50ff8aaa3bbdf262144fc8b01ca22",
+          "size": 48170,
+          "sha256": "7418389d2ea942f903fb87b8649551277dd463522c0a81de94a047d2f62ef865",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/fume-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "82b80f3f4b58e6fd32408603eb6743bca2c601e0",
+          "size": 22092,
+          "sha256": "0cee9da912b47f1649ee059403ee19c300afdfa6d19ca954ecd84c19d33a94a5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/luminous-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5c98500b13ca5b686e03bdff575f6d5a0856407",
+          "size": 3231,
+          "sha256": "a252a4032604de25851eb7b56d8d86583daefeb79f039aa9055bb532f4ba2569",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/partita-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5c7976a0ffce06c9f082da879113a314807c4e3f",
+          "size": 3838,
+          "sha256": "adbc943750e390a3bb78e6cdf40e53832dce96fbf9efb910577a0ec7119920df",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/sonnet-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7602a87b1567fd67faf19fbb35d4ffe64d8032f0",
+          "size": 4583,
+          "sha256": "8ee8b1fa5d59572f7d6cdce81fe392c4c86e7d41c5e4b2cecff3afa862d84dab",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/sonnet-pixi-core.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "60ee43aacfe89d0b0f43e729f9e7f6f99e61551e",
+          "size": 21049,
+          "sha256": "ddfa06782d64529845c6f2d6cbbb234573bb27f13cb5aac194ea6fec05ab1de9",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-decor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ae8395b713a5e9ca59bb88020b2ad59a64340062",
+          "size": 9874,
+          "sha256": "74617488a3fde6eb4a9be317c007c6547cece42c413958a92ec65e0283b50070",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-layout.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3b4a3711d89e3156e954ef59cc9071dfbe11848d",
+          "size": 7771,
+          "sha256": "ae65b211526879e5005c5e2dab011dd089b7eec873baa28c7dfa2afbb6741470",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-performance.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "10550c9c352725653050e4a97d8c67e900795cb9",
+          "size": 7286,
+          "sha256": "a08e0bebb0d9141bae3c1a1be05768176b5eddb70f37500738a0f389d675accb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-lyric-performance.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "eada88bf003799e18017fcf59b251caab4e58543",
+          "size": 21258,
+          "sha256": "3f700ce0056b7b1badef620e007bf729cd8f79884c8be448efc18257ef22a4c3",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-mode-utils.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e9e1f851c6040dfa7f5c74164403b640b50cae6c",
+          "size": 6706,
+          "sha256": "e78f0cfba4a5913eacdbd8582ed27a2d4e77606299a5553844f551b8c2f73895",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/stage-pixi-effects.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8ba361e674e39f0c9daa4ba9cb3cf8614921091b",
+          "size": 67144,
+          "sha256": "0cc0b0fd5e9f6fd41c9ea0e056c6ae45c81c40d17daa4aa462b7309646aa9fdb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/tempera-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93744312c7b6f8e013c6fd5ce289e29a995f5aab",
+          "size": 4843,
+          "sha256": "89ec1ecf126f372125c1be1f77f3f98501305b6d79efaedf05eb64050f928cc0",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/tempera-pixi-core.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "517941b040f4f29008eef088221bdb1cceabe385",
+          "size": 26381,
+          "sha256": "113986fa80b201040feaee4860f6bde60f78108a24418fc5698966e3c18cf0b2",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/modes/tunnel-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1cd53dce928962ecc87411d906238a34e4dffb13",
+          "size": 82260,
+          "sha256": "696a67e06a13716b2059686873f9f1f8e75577d0bd0502fdaa069e1c6e434d9d",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-advanced-modes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "351f7bbf831da7e09864bb12ab3087f4d7d06cba",
+          "size": 1118,
+          "sha256": "401c6b157aafea4881e877b954ecd2e42cd293e7566f96c778121d78dccb087c",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b159dccadc9318e7e3576a5b18644d3b5ef7150e",
+          "size": 18922,
+          "sha256": "0007ee6e1b6c4beb48409d0e60e68cac1c6a228ef3886b36eee3721822611eb5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-host.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7f527ae6b2513fb7e51991f326f633eda248d7ea",
+          "size": 69084,
+          "sha256": "de0717a0d112a1693cf3df902e8c5b4d4493da89ca3ab54b0f6b772d28e0ffb6",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-modes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f638db9a7d7b58806f75a0e1bde28dd25bcf91bf",
+          "size": 12247,
+          "sha256": "2e7d46dca846ad9c0716651f35231f41a1b653a7e242c43e6718f669e5c883d5",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2cfc2ebad092aaedf815dc18b7267090fce431ab",
+          "size": 25074,
+          "sha256": "7ac2955043636e3ff55108817c3fb89b0d368eee8fd94faec76fa6fba54c43af",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-stage/music-stage.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a52694c71af82ad0d5c31a25cae6b8b8564d65ef",
+          "size": 83674,
+          "sha256": "445046ef7fb53979de6f5abacedef8b24c9c0ca2a36f01c4bb2802f64c1560a4",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-ui.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ca42f915b2514023a3c8394274a6558649d2a7bd",
+          "size": 9437,
+          "sha256": "7e46c9900f1d077ca646d70c7279281a23f91a13b8295ce17d971fd4c7319f66",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-utils.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "11f126fbfd4846234fe2a9ed284825fac5d3499b",
+          "size": 10220,
+          "sha256": "dce014801fffa8826094ccf09d420326323dbda286af7dc602af8d861a0f0faf",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-visualizer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "136536a83796da4b6377388053ad7809eb7a5eb9",
+          "size": 17036,
+          "sha256": "2a9873e8a2eaaef114dcee1d97bd5e65db7f3c131c3bd4738052c776016afea4",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music-webdav.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e90fc81771e2eb57b2f81346ec22542b6c339c95",
+          "size": 11924,
+          "sha256": "38ed039d483c3c552f726430f3641cd3b0d9843e2176abae6d0d6418ef2ccb5a",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c3a40f2047367f4af5c4a2e78536963eeaaf9f0f",
+          "size": 58905,
+          "sha256": "ef533a9f48e2ded3ff70fa343c3c1f7f328714fdcbd08b5f9f5cd6d9d439f08c",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ff9d3a5bc4a89b69603ed042b91dd747d24a6cdc",
+          "size": 51367,
+          "sha256": "b64608fe4e7d7ee5773fd4f9eb9ffe34d321c8fedb14bd37e4376c20725ddcbb",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/music.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "80e1ed010d7ff1319f8ca9560114ca1d985ace1d",
+          "size": 61317,
+          "sha256": "434bd2c4c5d7aea3bb2b0142f020b2a61232af6a16fb39376e6960d76dee51fe",
+          "kind": "source"
+        },
+        {
+          "path": "Musicmodules/socket.io.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6b2d60110922529dec9eb8f31aa02a67df4dd68",
+          "size": 49993,
+          "sha256": "73eba16bc895fdfa454e27ecb80def31ede8d861f99e175ff93b110eabec044f",
+          "kind": "source"
+        },
+        {
           "path": "Notemodules/notemini.css",
           "mode": "100644",
           "type": "blob",
@@ -10923,6 +12885,33 @@
           "blob": "e59faea9111868d56169d6d59571c6b1f7bdbe1d",
           "size": 13560,
           "sha256": "42475d6e93f422a7dd73ef8719c28703b084d0215b49288224efc13877be616a",
+          "kind": "source"
+        },
+        {
+          "path": "Themesmodules/themes-module.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0ab4093b875fb9a42645a24ecd7d3b0ffef2dd1f",
+          "size": 17895,
+          "sha256": "fb203ac3c9bd12cf97a3fcc685b6a9b05555a198a18791e04214216f9247cbaf",
+          "kind": "source"
+        },
+        {
+          "path": "Themesmodules/themes.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "622da8680c6a53025679ced15caedf22e8d23755",
+          "size": 8409,
+          "sha256": "5bb3641d3e6d1c66d99620eee25f952e2c0d2f0971ef34ba1bcc12cea16ced53",
+          "kind": "source"
+        },
+        {
+          "path": "Themesmodules/themes.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d8f2aaad2418de0fa71019262de256484fa91094",
+          "size": 20785,
+          "sha256": "696b31b8e0320b35a4f70fb497540dbec38b5d0e0a07cc6f161c0fb451be5aff",
           "kind": "source"
         },
         {
@@ -12232,6 +14221,51 @@
           "kind": "source"
         },
         {
+          "path": "Voicechatmodules/recognizer.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8252f15eb3992aac72fb9a91e8da96343c4cfbca",
+          "size": 7403,
+          "sha256": "f29aa482967ebb021818fb95de7f8a2dd01741eb858c5c44c99392cc7e7708f2",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93f789fc8da88276b8dd3ef3d522d997fb16a398",
+          "size": 1914,
+          "sha256": "9d2dccab6981ee659e9dba2353391a83aa81e65222bdb1717208d7422892a8c6",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "116aad02bc0a94f25e970712704ec211de4eb939",
+          "size": 4209,
+          "sha256": "20c44bbc025d22b5a34f6c3ee522d04c855bb130c55446a287ddb6f5093b2581",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "348b1fdf2cefb3dc9e944759727f122edcb39ca7",
+          "size": 6364,
+          "sha256": "27b2b1dd47f5429eb35b82593b44f9b1d426cbf444ca2e4d9ed8d1e98e025735",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c569b899e1077b6a6b362331fd6e0edf55fbebe0",
+          "size": 3239,
+          "sha256": "723a8323e5f64b40eee878a264841d362f5ccce5a70c50b8e7227f252a2ede8f",
+          "kind": "source"
+        },
+        {
           "path": "Voicechatmodules/voicechat.js",
           "mode": "100644",
           "type": "blob",
@@ -12268,6 +14302,24 @@
           "kind": "source"
         },
         {
+          "path": "assets/musicdark.jpeg",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b15c33f2faad64a1a21ccdf388093208a01a736a",
+          "size": 101375,
+          "sha256": "3a09e58334f52810a9bc24b0b772592c564b3277bcf99bd2a597360218949f90",
+          "kind": "source"
+        },
+        {
+          "path": "assets/musiclight.jpeg",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3bc991792d3b618b3539fdcc7d161e4fc2b18655",
+          "size": 86784,
+          "sha256": "b8aca0f853b5fd6a4f993ca487771ce9ea677f3efd9b9be66fa564056bab1026",
+          "kind": "source"
+        },
+        {
           "path": "assets/nova_button.png",
           "mode": "100644",
           "type": "blob",
@@ -12292,6 +14344,24 @@
           "blob": "561377ca79c02698842d07dcddc9fab4bbe5045c",
           "size": 432,
           "sha256": "15412a63c0496e7e80bdb91b203b903c4a37e9d9a5c1ed54752f4744def3b9a2",
+          "kind": "source"
+        },
+        {
+          "path": "assets/wallpaper/vcp_editorial_ink_light.jpg",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "757f10915f6bb6ff688a7bf390cf558ff8169cea",
+          "size": 219689,
+          "sha256": "e63639788efbbea09b3e37c601138ce0e62d1c0477b22f711bebc868f69d80b4",
+          "kind": "source"
+        },
+        {
+          "path": "assets/wallpaper/vcp_industrial_core_dark.jpg",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "948e8f66cfa1ef19edbc64d6ab485c28732f8b02",
+          "size": 125676,
+          "sha256": "5ffe9211e8c43f4b69abdf6da62c686e520f4598f13770be84586c1f58798344",
           "kind": "source"
         },
         {
@@ -12334,9 +14404,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "4d4b33647115daccdfb0fc92d823a13ce5de7389",
-          "size": 247034,
-          "sha256": "171ee3b863467402cbee5f1c4ca45c739f9bd46ae8ba008c98a3fde44a13ca5f",
+          "blob": "d0d178124d3c7c998280cb0267b6f81508333f26",
+          "size": 249560,
+          "sha256": "263cd39837e744088081987876c9f2e83fe82cf296d2b81a64c4a0f7f7a4d0bb",
           "kind": "source"
         },
         {
@@ -12424,9 +14494,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3aa8e289e3560266f6dfbd5675cd6bf6885e5139",
-          "size": 95787,
-          "sha256": "94849f2b21c4572027a41ede3fb25063031afd34c5a849747d4cedbea79dcacf",
+          "blob": "e345aa2079e369c1e1ea1e5003267867fb2d1984",
+          "size": 95949,
+          "sha256": "ed5fc84c40e38623582362e309045fbc0e850c39660a58db9d8719c0c2af058b",
           "kind": "source"
         },
         {
@@ -12505,9 +14575,9 @@
           "path": "modules/bootstrap/packed-runtime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "45bc61ade429ea8b7f40a64eead548b5aadc7be5",
-          "size": 1824,
-          "sha256": "bff33a3d387da1e4e45808f262f98e73a9f52e62d793f45bda3f110fb1a6f400",
+          "blob": "ba939403e9e88d5db6e7383340cc96a393303318",
+          "size": 1997,
+          "sha256": "0d78556f9c7e42bc5838d06f76cc04ce1fc7fd8f3c4199326422ffc60e141795",
           "kind": "source"
         },
         {
@@ -12811,9 +14881,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "383b9e06a067f4f79b3bc188e670ff35b6d2a9b4",
-          "size": 110447,
-          "sha256": "2dbce45694a20c6370db5259b907c90f6ea037b19adb5ba5cdec73b6b2af8743",
+          "blob": "d9ef46b880355ea299c9ca2e56f7d0a5badef6fb",
+          "size": 114520,
+          "sha256": "e2ffbca9782cf1da20cc2768e30c71ef2e64a63ce87632077d7c3d0ed09fb01b",
           "kind": "source"
         },
         {
@@ -12838,9 +14908,9 @@
           "path": "modules/event-listeners.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6dc8b14df4a7586b28eec67e0f14493babf876ea",
-          "size": 72033,
-          "sha256": "6b193797f273e12e8ed2f8ad8f63308efe40e0baa3191a1ef5952e4065ad58a2",
+          "blob": "619dcd02b8c321f272ba8ef540adb335d81a5b95",
+          "size": 72045,
+          "sha256": "0cd37ea3104e56fdf682991189dd7a309bd91a2e6776779dfe8e289acacd7541",
           "kind": "source"
         },
         {
@@ -13096,6 +15166,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/ipc/nativeConversationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "24667c1f6c794b852b39feba4337b4ca84b54fb5",
+          "size": 12650,
+          "sha256": "35593379ccb92a6711ccb7964efb5ea60b7a49921afb4b7d86f21c3ceed10c02",
+          "kind": "source"
+        },
+        {
           "path": "modules/ipc/notesHandlers.js",
           "mode": "100644",
           "type": "blob",
@@ -13174,6 +15253,15 @@
           "blob": "19498c85777f83e209d7d106a0db2ae7b14b5375",
           "size": 2661,
           "sha256": "3d26d82b295dbcd5a4133c3200a576523c37247b59f8da56f85213944223606b",
+          "kind": "source"
+        },
+        {
+          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
+          "size": 2806,
+          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
           "kind": "source"
         },
         {
@@ -13414,9 +15502,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "773c46c9f84210276512c67ff36e3e260cd234e2",
-          "size": 221992,
-          "sha256": "262ca3a7bda6b7a975ff5f7bade15f3ca6ca50b8944fc5c084bb9dcc831c727e",
+          "blob": "4cd59fbe8e29e640bdbd8fcaea1e5ff9c6ad737e",
+          "size": 223481,
+          "sha256": "a597f4e971d92fb6dfa4d6bb68c9a620253629468f2af48124dd18a52324e178",
           "kind": "source"
         },
         {
@@ -13690,6 +15778,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/renderer/nativeConversationPresentation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aab5a3122a9c4e802eaea0d014cd6dcc39f72dcc",
+          "size": 4461,
+          "sha256": "73751fac85290bc6ead9ea16c3b89ae204a3f58442f166b86819ab89f3596aca",
+          "kind": "source"
+        },
+        {
           "path": "modules/renderer/nonStreamingEventConsumer.js",
           "mode": "100644",
           "type": "blob",
@@ -13765,9 +15862,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cf294aeba2c47b367e5db6973c8121b733fb2710",
-          "size": 121575,
-          "sha256": "3db9e2a30464d44a9a29c16fefbdfdf719b3eb26c154dd0f1d0225bdda1122e7",
+          "blob": "fdf74325c3569326897f392ce916565da88d9206",
+          "size": 121938,
+          "sha256": "14bf60642694ae69861e0514aeb3e96a45d29b59fa35276eaaad6146c0b07127",
           "kind": "source"
         },
         {
@@ -14050,6 +16147,33 @@
           "sha256": "56c4eb0124d93d3828bce4a2f89a98be06b5ffd486c3bcaf57d7b725c197f0aa"
         },
         {
+          "path": "modules/services/suveiHumanAuthorizationService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
+          "size": 46413,
+          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/nativePort.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "244919411f4b731cb4e1d591214273e29d0ca921",
+          "size": 2113,
+          "sha256": "4b2d0d91de361e44cd10fc9ce97f5ca5ced9d0c7a85df9b078950380e9d2caf1",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/transport.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d43e239af9b0caecf619ceef2524799338feda19",
+          "size": 3747,
+          "sha256": "d3ca4634dabb1dd6bb3bf76c7732e5a87ec77e893e33fa99a1cc796d7d115d92",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/windowAppIds.js",
           "mode": "100644",
           "type": "blob",
@@ -14170,9 +16294,9 @@
           "path": "modules/settings/schema/jev-service.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b3db55c5d6ef835fbf31ffea9c9715d19e0089e0",
-          "size": 4543,
-          "sha256": "109c560cee16f91a1d60204af13cb402f3baa59f10ccb432db93851d87df18b6",
+          "blob": "5a8d5a3dd8afb2d77083c1cd2aad7d818c7a1e64",
+          "size": 4542,
+          "sha256": "ec6d63fbb48f0d6ae544537e63b74d914629b4ac9d4bc141fa371827c1e7bcb2",
           "kind": "source"
         },
         {
@@ -15493,9 +17617,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
-          "size": 18553,
-          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
+          "blob": "f3a70802009a0fa1c1593dcc6dfab969a13b9219",
+          "size": 24143,
+          "sha256": "7b8d8788b32a1f6d7c8b30c16bdec8e767f6b4509d4fe142c458ae3d46e0ca1f",
           "kind": "source"
         },
         {
@@ -15643,6 +17767,15 @@
           "kind": "source"
         },
         {
+          "path": "preloads/api/nativeConversation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "30d0eea136721eef7f2891cbf769439befc3e3d6",
+          "size": 528,
+          "sha256": "c215eb50d5e6fbf58cb2027f29512d7fb8d9303e4db1d8a96b65a59aa7cf7431",
+          "kind": "source"
+        },
+        {
           "path": "preloads/api/notes.js",
           "mode": "100644",
           "type": "blob",
@@ -15694,6 +17827,15 @@
           "blob": "3c91f6c4a9ba70d1d53b0049e2d7341dce7321a0",
           "size": 1090,
           "sha256": "b8952c931364a2d58c9cb463bd222aa24492d88472f8966a44befb6a3135a650",
+          "kind": "source"
+        },
+        {
+          "path": "preloads/api/suveiHumanAuthorization.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
+          "size": 629,
+          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
           "kind": "source"
         },
         {
@@ -16132,9 +18274,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2bcb6563c7e1250602471b22d905a6256fcbda40",
-          "size": 35094,
-          "sha256": "8b7a690bb4b904217b8d86d0a329ef75bf8f2c6ea6c1c42fc103ff860186ae0b",
+          "blob": "4846805e46a018809ef46e6215b490311be41ce0",
+          "size": 36460,
+          "sha256": "0125fdcd4ada73d5cbc44a55bec5e26ddaed4e4f83b0e87c30dd8fdba35ea088",
           "kind": "source"
         },
         {
@@ -16255,6 +18397,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/electron-builder-bootstrap-hooks.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "20c7615861b4624b2cbc493ab681293304fcc4ed",
+          "size": 2311,
+          "sha256": "74687d5778cf8bbd42682738130494a4f54c5792980673a23ec99738d07cbdce",
+          "kind": "source"
+        },
+        {
           "path": "scripts/fixtures/chat-contract-invalid.mjs",
           "mode": "100644",
           "type": "blob",
@@ -16264,12 +18415,30 @@
           "kind": "source"
         },
         {
+          "path": "scripts/fixtures/window-package-resources.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0d455e79d044bc781988587bb09f09a16574cf22",
+          "size": 20842,
+          "sha256": "896d9390e7d389c8f1fd62db7862af4e4edbfe450b1bf3f34af6d0f5f26e1682",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/lib/window-package-contract.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a5bb5866d71494e3199f3908df788d6347792d89",
+          "size": 4060,
+          "sha256": "4094cc787f839baf236a0c0b215ace3c0211726a6a5a1a34b2a43a8e1417b696",
+          "kind": "source"
+        },
+        {
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "b0f5eb65fc16471eacd6b9c1fead2b1a191fac5f",
-          "size": 9429,
-          "sha256": "72bd44d11857c2c59d88752101214613447e553379adf60bf367a4a765289566",
+          "blob": "572c80a1b19570ab12322e9383d9dfbdeaee409d",
+          "size": 10125,
+          "sha256": "bbcd143e4b62f145c357bfafaa3c7e0c694a01d448cabac4fca963b4c0d42375",
           "kind": "source"
         },
         {
@@ -16375,18 +18544,18 @@
           "path": "scripts/test-electron-lifecycle-stress.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3ee4a348d7fa5cf59cbe5f9122c8dcd4c41f7cfb",
-          "size": 56497,
-          "sha256": "7a236ccb45ec2012241ce7e9bf6b50b0e1ddc4fd1d4fc890e7f6f9c3024f859d",
+          "blob": "856814c95f6b7cc357eb5a4951b9eb2bf1452011",
+          "size": 57282,
+          "sha256": "ba5f08976815c6c5516c28b692a6db784fd06a12fa911cf60a621966d7dafdf4",
           "kind": "source"
         },
         {
           "path": "scripts/test-electron-main-chat-sequences.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7f0f63ac43a0589dd77cca5b18f90c4b7a2d8bbf",
-          "size": 79998,
-          "sha256": "06cb690620f23b0c3007463fb7e31875544776253cd6a034e1bbc9fb619af93b",
+          "blob": "67136c4ef2c8f0259889940a1d6177353b35c03d",
+          "size": 81461,
+          "sha256": "e52a2fded84e1037fb4454e70a683e68a04b9822233b0dba3df49b2885494b47",
           "kind": "source"
         },
         {
@@ -16402,9 +18571,9 @@
           "path": "scripts/test-electron-ui-apps-smoke.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "803377ab6d63dd6ae6b2537b09dffc77ececb5e1",
-          "size": 112484,
-          "sha256": "71f9bce55e181a246e6ee99d23b376f0206ba0ce0bfa2b503ceef4d1064deac5",
+          "blob": "5599f80db8673e9686c3a77046fba7da10d71bf0",
+          "size": 114076,
+          "sha256": "5d70141d545b44481fc44299113b8f4905673c0db4b8795c3f8ce911ed4f5f10",
           "kind": "source"
         },
         {
@@ -16462,6 +18631,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/test-packaged-window-renderers.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c0c0bbb57c45467a25195fec0eeea122e19326dc",
+          "size": 8332,
+          "sha256": "05daf57b559285e5fa96dc7cd196ccb7b88f96efe1f95fdab2c8271bdcd41994",
+          "kind": "source"
+        },
+        {
           "path": "scripts/test-page-runtime.mjs",
           "mode": "100644",
           "type": "blob",
@@ -16483,9 +18661,9 @@
           "path": "scripts/test-settings-wa-electron.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8a979d90a5448556e0dc1cd99de717cc051ee2a4",
-          "size": 35109,
-          "sha256": "4b809e4c4fb2b176d1288eb468176410cbcf1f77659255a808f75a5e5af85dd6",
+          "blob": "04538e623f6eaa39328c42e79167ea0aa3520094",
+          "size": 35533,
+          "sha256": "8d1f9785dafdd783ef2d201f5edc3e7dfaed80088d82e504d0ec46f7d539e77e",
           "kind": "source"
         },
         {
@@ -17713,6 +19891,105 @@
           "kind": "source"
         },
         {
+          "path": "tests/native-config-startup.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b8e84719e411ced045371e6aa78ff8007dca0229",
+          "size": 4936,
+          "sha256": "b8a666095e91d54c52a2ffb474b9cb211b94270e0020bdade8863debe6ce9c9b",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-conversation-ipc.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "27dceb2e89734518dcc8724b39775266503e12a1",
+          "size": 32059,
+          "sha256": "b20b50549fae028e90e5a000252641f01f4137f292d33e2e199680929b675e96",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-history-batch.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cd7ca438d3e7be5f37b315456cf08c162d9819b9",
+          "size": 4225,
+          "sha256": "407ed420c1b6386007741c857aff6578fcfcf026afa68faaf1cbf0c70e98dc32",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-markdown-proposals.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "490133ca10eebc93526053541f20b017cc9ead51",
+          "size": 6393,
+          "sha256": "2a95df18527c1e6ae064f4e1324c7f57612bcc02dcef260dc69f11a1d80eae30",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-presentation-lifecycle.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "544b9aa58043370b6c36a22cd8fe3ef5ca7f1470",
+          "size": 9100,
+          "sha256": "dda4d1624a98fd72fdc4bdf4b069dc27c573906acbc4177ea611bedd102ecd17",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-projection-recovery.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cd80ff17b460d4b71de489e7db22308ce54a5400",
+          "size": 1542,
+          "sha256": "306d3729e08de88c5742c9050f4520d6e0f2071fdb440a7b54db56428e9aa7fb",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-result-delivery.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "469a6fc058944b01c52fb79051f0491bc90a95e4",
+          "size": 2756,
+          "sha256": "c3b30d5c493bf44832cf3dd8d83e771af40b99933a914d28474e35ad53b24712",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-send-preflight.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "660e279693a07ab800cdbedba45a5843fbf24fde",
+          "size": 1812,
+          "sha256": "7838d64c055b3ea974e4073447dd8488aab51e0d61c3e9b964180ddac5c8e725",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-startup.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "160451ef794a0e65619e6e38906ade103862004c",
+          "size": 4446,
+          "sha256": "c028542cd22962c751ece010fef7f19259029f8e16e03d5d6c901e1588023920",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-three-boundaries.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "25e5de4b9052e5631bf392573675b5e4aab69d26",
+          "size": 9694,
+          "sha256": "5b53fa1ee2ad5486b36d615af392557c9c55ec2edec1e8e0e8e456eaa8e4127a",
+          "kind": "source"
+        },
+        {
+          "path": "tests/native-voice-send.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e0486a80b2abe9e6bb895831f97403c5d65f353e",
+          "size": 5009,
+          "sha256": "3c889229ba06340c9408d45aabb113ff9290330c3f66caf3dd640ae693c1efb9",
+          "kind": "source"
+        },
+        {
           "path": "tests/next-ui-registries.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -17728,6 +20005,15 @@
           "blob": "a506f10cbb9d821a20355cf652b66d80c3cfda49",
           "size": 1434,
           "sha256": "18663311d015577109be2e411479e076261f832bf6ded1a790582cdfdf3f24fd",
+          "kind": "source"
+        },
+        {
+          "path": "tests/notification-change-audit.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4e2a6ef59ddbaffab17462c22c8cefb05e37aa59",
+          "size": 44780,
+          "sha256": "31540a3670204161ad2e49ce2ff829072c31a32fbdd154c4de9119d7960b95b6",
           "kind": "source"
         },
         {
@@ -17779,9 +20065,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "84cfa1fa980d54bd77eff010e299e74ac3ada424",
-          "size": 15933,
-          "sha256": "4e1d2d568f5896345697a22045cde45839740a093ac79a91c674f620f1bbd2a8",
+          "blob": "82a32408297bfca39e742c04f9da6242ad5e5390",
+          "size": 16679,
+          "sha256": "83b6ccf0313f6cf97081503e9c36e21e467b873284086c5533e211b53db25310",
           "kind": "source"
         },
         {
@@ -17929,6 +20215,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/suvei-human-authorization.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ae33e6db3cdf9fabaa7d8b7eab521b847a1a65a1",
+          "size": 52168,
+          "sha256": "6d47d68d7f87bc6abe0024eff0d8bb7ad1ca8d8f8ce50bcacaac29d4dc51b3b0",
+          "kind": "source"
+        },
+        {
           "path": "tests/task-handle.test.js",
           "mode": "100644",
           "type": "blob",
@@ -17974,6 +20269,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/trusted-conversation-native-port.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4bafb9eb3c70f9f58d661b0d27a0811777d288e9",
+          "size": 3416,
+          "sha256": "475d233783522c304d61f5f480c2789c73639c9aa65bbd0b0ceace5c3035842c",
+          "kind": "source"
+        },
+        {
           "path": "tests/tts-surface-owner.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -18013,9 +20317,9 @@
           "path": "tests/vcpchat-managed-bootstrap-m3-m8.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b59254c1f0749c52a16ec1f5989068ff5add5ae1",
-          "size": 18129,
-          "sha256": "07b736ecdadddc3d56f21f02ae113fa06d983849e7908b53bbf3666ea5de2a2a",
+          "blob": "ccd86d5d5c4f63ce0f72faf56afc29b40c10bc81",
+          "size": 19900,
+          "sha256": "ea0eb9b6e6266c7e3227c937832e6559c972ec264eda17345cd897fd36c8fffa",
           "kind": "source"
         },
         {
@@ -18037,12 +20341,300 @@
           "kind": "source"
         },
         {
+          "path": "tests/window-package-contract.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d948d4a5378505850e4ff829525b799be76e4299",
+          "size": 3773,
+          "sha256": "8d1d1425da36f6b3a28119f07069f09d166f8ac7f20ad43e046661aace37ae3a",
+          "kind": "source"
+        },
+        {
           "path": "tests/window-stream-runtime.test.mjs",
           "mode": "100644",
           "type": "blob",
           "blob": "15abccba2da6fd83877d9605047ce22c02b78f48",
           "size": 5603,
           "sha256": "bcfca6cb31b006471b187cff87a6fe1d98880463afddac8a3ad3fa01f73e7e64",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/anime.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5f19b3da70b72a90437a02913db28736833f3660",
+          "size": 17384,
+          "sha256": "bceef94f964481f7680d95e7fbbe5a8c20d3945a926a754874898a578db7c7ab",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/auto-render.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "74f07c2f99bc40c895f9e9bc353b9377962d0723",
+          "size": 3478,
+          "sha256": "9cb8dacfc086c2966c9ec4ba54f4a2dc43b7cbe2b33cec1a2743d886c7fb47a7",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_AMS-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0acaaff03d4bb7606de02a827aeee338e5a86910",
+          "size": 28076,
+          "sha256": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Caligraphic-Bold.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f390922eceffe1f6dfb81a3dc086a92d98171b02",
+          "size": 6912,
+          "sha256": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Caligraphic-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "75344a1f98e37e2c631e178065854c3a81fb842f",
+          "size": 6908,
+          "sha256": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Fraktur-Bold.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "395f28beac23c7b0f7f3a1e714bd8dac253dd3bc",
+          "size": 11348,
+          "sha256": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Fraktur-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "735f6948d63c8cc7f8233735bb9c8d843c83d804",
+          "size": 11316,
+          "sha256": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Main-Bold.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ab2ad21da6fbe6c171bb869240954d0ead8f68fd",
+          "size": 25324,
+          "sha256": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Main-BoldItalic.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5931794de4a2a485fa70099bf2659b145976d043",
+          "size": 16780,
+          "sha256": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Main-Italic.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b50920e138807f385d0b0359f4f0f09891f18406",
+          "size": 16988,
+          "sha256": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Main-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "eb24a7ba282b03d830fa6c63ee897d92a5188736",
+          "size": 26272,
+          "sha256": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Math-BoldItalic.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "29657023adc09956249f6295746c8ce4469b50d3",
+          "size": 16400,
+          "sha256": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Math-Italic.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "215c143fd7805a5c2b222bd7892a1a2b09610020",
+          "size": 16440,
+          "sha256": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_SansSerif-Bold.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cfaa3bda59246b49e94298478d6de3b3208066c8",
+          "size": 12216,
+          "sha256": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_SansSerif-Italic.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "349c06dc609f896392fd5bc8b364d3bc3efc9330",
+          "size": 12028,
+          "sha256": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_SansSerif-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a90eea85f6f7bded69ff5d40114447a6d8b48cfe",
+          "size": 10344,
+          "sha256": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Script-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b3048fc115681ee6c1bc86b0aa158cfbbf59daa3",
+          "size": 9644,
+          "sha256": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Size1-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c5a8462fbfe2c39a7c1857b9e296e62500a8a8a5",
+          "size": 5468,
+          "sha256": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Size2-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e1bccfe2403a4ed770c1697ae7c15b9e1cd9bc4e",
+          "size": 5208,
+          "sha256": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Size3-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "249a28662218a7a17ad8bd1fe072169ecb666a49",
+          "size": 3624,
+          "sha256": "73d591271b1604960cb10bb90fee021670af7297017e0e98480b332d11f51995",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Size4-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "680c13085076a2f6c5a7e695935ec3f21cddb65f",
+          "size": 4928,
+          "sha256": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fonts/KaTeX_Typewriter-Regular.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "771f1af705f5cef5f578b3a1e7d8eff66f9b76b0",
+          "size": 13568,
+          "sha256": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/highlight.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5d699ae6a4cfc9544a22a9ac394b01db2e5abd4f",
+          "size": 121727,
+          "sha256": "837a6fa5b0c736b52bbde2b2b6190f305da3fc9ed41681db5321507057b5c846",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/katex.min.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "73a8c0a2fc51ba349e34adc4108d9611311b5a3c",
+          "size": 23196,
+          "sha256": "505d5f829022bb7b4f24dfee0aa1141cd7bba67afe411d1240335f820960b5c3",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/katex.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18c62f7088a9c728fbefad69244ebf7189916b56",
+          "size": 277038,
+          "sha256": "dc84b296ec3e884de093158f760fd9d45b6c7abe58b5381557f4e138f46a58ae",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/marked.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0bb9de457a24c91320ad2cf97ca57d3d5cc8c027",
+          "size": 42836,
+          "sha256": "99dd36ca6ca5120ce725724bce217f24369a2820cb5cadcdd8ee4aa50ead2289",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/morphdom.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bc1a5e150823693af94d243d3adc9a2df172a6c7",
+          "size": 12396,
+          "sha256": "1bea1e3733860f75e851bf53e2cd97af8bd24d88e70f15cc643f4a737cd2fe2a",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/pixi-unsafe-eval.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "31af35e82d330f52585a3b8b99fb91aabf530806",
+          "size": 15745,
+          "sha256": "f21427afbf693c56a19a4314630de646f14ec09d5025a4d812b929a8de985c3d",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/pixi.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8d3e991c60af97873423c068c674ec7bccd0fdbd",
+          "size": 818871,
+          "sha256": "9948591083793305468d73915a3ea85032dcf8e32eee7a1328585050d7a14d53",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/three.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0c2f4ba351000d47f413873d8bb9c1a2f18cb37a",
+          "size": 669884,
+          "sha256": "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/three.module.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d33f9c318f76da39df843683fd7cee5ca2c1b1ff",
+          "size": 1292907,
+          "sha256": "7d8a8113afd346464aa1854c1f47aaa0aca4c9a07f0a709f8b417f16d0b6b5fd",
           "kind": "source"
         },
         {
@@ -18925,51 +21517,6 @@
           "blob": "3f74df291d21232542005ebea68c6e6d90121bcd",
           "size": 517,
           "sha256": "de250fabacb1702d6c5ae9a1a56bd73f9785f81b325a76e14b9b855b5fe31096",
-          "kind": "source"
-        },
-        {
-          "path": "modules/ipc/suveiHumanAuthorizationHandlers.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "48d3b53ad680d6b5ae08201e2da06b4efffc3786",
-          "size": 2806,
-          "sha256": "30337b6295d04a7cac5cc145247b7244a927623de663fac58f72792b07d90a39",
-          "kind": "source"
-        },
-        {
-          "path": "modules/services/suveiHumanAuthorizationService.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ac3bc98edad7a2b02468a0e2a317677f942aac95",
-          "size": 46413,
-          "sha256": "0394e84c210e2a68e5ae201258eaf4e064cb52169b261a30cb918b1121d191b1",
-          "kind": "source"
-        },
-        {
-          "path": "preloads/api/suveiHumanAuthorization.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "361073a165cf807660a2a1b54500f9f82a05bfbc",
-          "size": 629,
-          "sha256": "a23bdafcd46f84ccf0be2fda34e19085d5b3f50b334f326356034371ecf101e3",
-          "kind": "source"
-        },
-        {
-          "path": "tests/notification-change-audit.test.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "4e2a6ef59ddbaffab17462c22c8cefb05e37aa59",
-          "size": 44780,
-          "sha256": "31540a3670204161ad2e49ce2ff829072c31a32fbdd154c4de9119d7960b95b6",
-          "kind": "source"
-        },
-        {
-          "path": "tests/suvei-human-authorization.test.js",
-          "mode": "100644",
-          "type": "blob",
-          "blob": "ae33e6db3cdf9fabaa7d8b7eab521b847a1a65a1",
-          "size": 52168,
-          "sha256": "6d47d68d7f87bc6abe0024eff0d8bb7ad1ca8d8f8ce50bcacaac29d4dc51b3b0",
           "kind": "source"
         }
       ],

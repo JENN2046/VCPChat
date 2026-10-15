@@ -20,6 +20,31 @@ const { collectEvidence } = await import('../scripts/vcpchat-release-evidence.mj
 
 function tempDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'vcpchat-m3-m8-')); }
 
+test('M8 real ASAR accepts portable closure paths and rejects missing or changed bytes', async t => {
+    const asar = await import('@electron/asar');
+    const { readPackagedFile, verifyPackagedRuntime } = require('../modules/bootstrap/packed-runtime');
+    const { sha256Buffer } = require('../modules/bootstrap/runtime-closure');
+    const root = tempDir();
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const source = path.join(root, 'source');
+    const resourcesDirectory = path.join(root, 'resources');
+    fs.mkdirSync(path.join(source, 'modules', 'bootstrap'), { recursive: true });
+    fs.mkdirSync(resourcesDirectory);
+    const content = Buffer.from('isolated closure fixture\n');
+    const relativePath = 'modules/bootstrap/contracts.js';
+    fs.writeFileSync(path.join(source, relativePath), content);
+    await asar.createPackage(source, path.join(resourcesDirectory, 'app.asar'));
+    const manifest = { files: [{ path: relativePath, size: content.length, sha256: sha256Buffer(content) }] };
+    fs.writeFileSync(path.join(resourcesDirectory, 'vcp-runtime-closure.json'), JSON.stringify(manifest));
+    assert.deepEqual(readPackagedFile({ resourcesDirectory, relativePath }), content);
+    assert.equal(verifyPackagedRuntime({ resourcesDirectory, manifest }).ok, true);
+    assert.equal(readPackagedFile({ resourcesDirectory, relativePath: 'modules/bootstrap/missing.js' }), null);
+    const corrupt = { files: [{ ...manifest.files[0], sha256: '0'.repeat(64) }] };
+    assert.equal(verifyPackagedRuntime({ resourcesDirectory, manifest: corrupt }).ok, false);
+    fs.unlinkSync(path.join(resourcesDirectory, 'vcp-runtime-closure.json'));
+    assert.equal(verifyPackagedRuntime({ resourcesDirectory, manifest }).ok, false);
+});
+
 test('M3 repair manifest is deterministic and uses npm ci plus targeted rebuild', () => {
     const manifest = createRepairManifest({ projectRoot: '/tmp/project', platform: 'darwin' });
     assert.equal(manifest.schemaVersion, 1);

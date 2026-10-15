@@ -1,6 +1,5 @@
 {
   "schema": 1,
-  "sourceCommit": "110c26876c9c83e4b9c048868c955cc2adf2064b",
   "windows": [
     {
       "id": "themes",
@@ -141,8 +140,8 @@
     },
     {
       "path": "Desktopmodules/builtinWidgets/vchatApps.js",
-      "size": 33470,
-      "sha256": "d19e9a2d9aed17f547df52c2d8abdde2ec77e57dc21de20ced49c9eca85c9782"
+      "size": 33982,
+      "sha256": "bd6645f72b60dbf4af8dcbc2f8563fb79e64c6c176a6973ca903f707d89b13f9"
     },
     {
       "path": "Desktopmodules/builtinWidgets/weatherWidget.js",
@@ -301,8 +300,8 @@
     },
     {
       "path": "Desktopmodules/ui/livingIcons.js",
-      "size": 3743,
-      "sha256": "d52bf8ae39005096c8b4bde415ff17294e6980fe0acdc97fbbe616e9e0e998c0"
+      "size": 3779,
+      "sha256": "5c944ff1aba19160ed9e285ec89f3f00221fea25f5977813843a98f13ef3d713"
     },
     {
       "path": "Desktopmodules/ui/saveModal.js",
@@ -328,6 +327,126 @@
       "path": "Forummodules/forum.js",
       "size": 71217,
       "sha256": "a7dfb1b7978a42432665e999c95aacd7da8ced02cdad38ae5941b975db7a217c"
+    },
+    {
+      "path": "Gamemodules/doudizhu/index.html",
+      "size": 2158,
+      "sha256": "1b81488d21e09135f1608670e7c7ebf0ca10661c580a34db2e00f8646df9eb81"
+    },
+    {
+      "path": "Gamemodules/doudizhu/style.css",
+      "size": 1676,
+      "sha256": "f1ae9552c00345b44a7b218560b7903e3343147909b69cc9a08bcc1392d4d844"
+    },
+    {
+      "path": "Gamemodules/doudizhu/ui.js",
+      "size": 10175,
+      "sha256": "c57ee3043c0033ab002964a51b8e9852be55f360831f18e587baaca9a6d2c116"
+    },
+    {
+      "path": "Gamemodules/forge-tax/audio.js",
+      "size": 5764,
+      "sha256": "6add08a426d8fae96427219f3ecc93c67ad8d69f13912a049a70332b81ea05b6"
+    },
+    {
+      "path": "Gamemodules/forge-tax/engine.js",
+      "size": 22189,
+      "sha256": "9147f0141b9b5673a7336fd7df4f047f3109317ad19afd42798953728523bed1"
+    },
+    {
+      "path": "Gamemodules/forge-tax/index.html",
+      "size": 2573,
+      "sha256": "52d2e441d68809be551643223b5b843ded0a5f5859b0f33bf3ebf236362751c8"
+    },
+    {
+      "path": "Gamemodules/forge-tax/preload.cjs",
+      "size": 863,
+      "sha256": "170097d48c8dd1b78f4f9e9051a5c4a0f06d1292a27506764554661fe29a8c03"
+    },
+    {
+      "path": "Gamemodules/forge-tax/service.cjs",
+      "size": 4849,
+      "sha256": "b26f2b07d4ac6272de8aae465637d9e57e545a9773b3114744a7bc9562cba0a3"
+    },
+    {
+      "path": "Gamemodules/forge-tax/session-store.cjs",
+      "size": 7345,
+      "sha256": "e48eee2d36f79adf0cbd3333fecd9ea9260324c05249b3e3c8f9b4e93474a14d"
+    },
+    {
+      "path": "Gamemodules/forge-tax/style.css",
+      "size": 4958,
+      "sha256": "9e611afec212e2f3b27b0a186498c471ff63b82760cbb9eaff68e9e7f3e66ec2"
+    },
+    {
+      "path": "Gamemodules/forge-tax/tool-result.cjs",
+      "size": 3964,
+      "sha256": "455b5bd6933c386be498da2f938d2b63b44eb7feeb39f7752184552860f9ee17"
+    },
+    {
+      "path": "Gamemodules/forge-tax/ui.js",
+      "size": 19328,
+      "sha256": "7083ed93e3fab8af33a679359bbfa3142f0360be5d972075cf04aa8c7f99f87d"
+    },
+    {
+      "path": "Gamemodules/game.css",
+      "size": 3465,
+      "sha256": "0650ebd9b7913c766278be42cb942c434ab444749722d6942f480ad1f69ad8a3"
+    },
+    {
+      "path": "Gamemodules/game.html",
+      "size": 4291,
+      "sha256": "6f18767b82fcf292d18f9f0b5e9a2d70709d4028e308c971066bde9ddaab8c6b"
+    },
+    {
+      "path": "Gamemodules/game.js",
+      "size": 9532,
+      "sha256": "d04aefe30ccf2b5e1c5d0d5d9564802961ce409ce8790c5426b973da267fda46"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/index.html",
+      "size": 6945,
+      "sha256": "0dbcd1b72a953bbd21e9d88085d6a852f7d230e952156dade6efd9f6838ee95d"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/js/audio.js",
+      "size": 9078,
+      "sha256": "6008a81d3ca6656f35a099001d2b17399aa6dada0262f169352d0cb2b38474f9"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/js/config.js",
+      "size": 13845,
+      "sha256": "f71ca552b20572a6a32246d57bf994e4246ae2b5e952a8c444b329040a9004f7"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/js/entities.js",
+      "size": 21506,
+      "sha256": "20949aa650b1e89af69947ffda2c3fdaa41c9dd6b22093c10266e40cfc7a3bd7"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/js/game.js",
+      "size": 30923,
+      "sha256": "2a80f390795c6fbfb6330c6ec5749bed5d5331cdbff8323e70962ed1959f38db"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/js/main.js",
+      "size": 10233,
+      "sha256": "370346adc7b8d3b5ddaca2d44dcf2f687a587430d6617d153982c32db9263db2"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/js/utils.js",
+      "size": 2934,
+      "sha256": "76b2144ccb5070a56c8e9cac8096bec73ee4a32a52494a2faf3d90548550a5a3"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/js/weapons.js",
+      "size": 23957,
+      "sha256": "1cd9daaa87fb75e8436d5dce292f5ed123de7d02425ddee3faefd01116b15aa1"
+    },
+    {
+      "path": "Gamemodules/vcp-neon-game/styles.css",
+      "size": 17855,
+      "sha256": "8a1c21bcd336b8ab1b77e752b74650396ba45a6b9048b980e2d3df45c49c789c"
     },
     {
       "path": "Logmodules/log.css",
@@ -391,8 +510,8 @@
     },
     {
       "path": "Musicmodules/music-player.js",
-      "size": 18079,
-      "sha256": "ec5ae9eacc7f709002d95a8c31c4b5427e9a6b77092e6a2c554155fc61bdc3ea"
+      "size": 18964,
+      "sha256": "c14a5990a55d854eb52e6ca3b4ed4037d65a51db6bf7c222db77ccfb8f0f4ca9"
     },
     {
       "path": "Musicmodules/music-sidebar.js",
@@ -466,8 +585,8 @@
     },
     {
       "path": "Musicmodules/music-stage/modes/sonnet-pixi-core.js",
-      "size": 21049,
-      "sha256": "ddfa06782d64529845c6f2d6cbbb234573bb27f13cb5aac194ea6fec05ab1de9"
+      "size": 22339,
+      "sha256": "fde8528104c050cd1a282d820248272a078696d6e35e1ed57aa304d61d7d645f"
     },
     {
       "path": "Musicmodules/music-stage/modes/stage-lyric-decor.js",
@@ -496,8 +615,13 @@
     },
     {
       "path": "Musicmodules/music-stage/modes/stage-pixi-effects.js",
-      "size": 67144,
-      "sha256": "0cc0b0fd5e9f6fd41c9ea0e056c6ae45c81c40d17daa4aa462b7309646aa9fdb"
+      "size": 71475,
+      "sha256": "1b883676deb2242561f9f27b30b6a93681f5cbe7d717f6666f5c455034e37908"
+    },
+    {
+      "path": "Musicmodules/music-stage/modes/stage-starbloom.js",
+      "size": 35972,
+      "sha256": "70a0dbe56e4ccca1980bfe02e4554c33905180fb84a6912635a0c11b5a4b4533"
     },
     {
       "path": "Musicmodules/music-stage/modes/tempera-manager.js",
@@ -506,13 +630,13 @@
     },
     {
       "path": "Musicmodules/music-stage/modes/tempera-pixi-core.js",
-      "size": 26381,
-      "sha256": "113986fa80b201040feaee4860f6bde60f78108a24418fc5698966e3c18cf0b2"
+      "size": 27784,
+      "sha256": "878e17dccb7ad8b08fed6e8589ba54370480aeca3dc6fff662fceab72b40f1c3"
     },
     {
       "path": "Musicmodules/music-stage/modes/tunnel-manager.js",
-      "size": 82260,
-      "sha256": "696a67e06a13716b2059686873f9f1f8e75577d0bd0502fdaa069e1c6e434d9d"
+      "size": 113879,
+      "sha256": "c8d18dcd0ef71d2b2c2c7c5b9048607241bfcdd60f2b3ca8f23dc1027386d9cf"
     },
     {
       "path": "Musicmodules/music-stage/music-stage-advanced-modes.js",
@@ -521,13 +645,13 @@
     },
     {
       "path": "Musicmodules/music-stage/music-stage-config.js",
-      "size": 18922,
-      "sha256": "0007ee6e1b6c4beb48409d0e60e68cac1c6a228ef3886b36eee3721822611eb5"
+      "size": 18935,
+      "sha256": "2f3ce8ce418ca41b64ad1c7d4bffc8b3dfa63557dc003f5d85c3ff4974f3f28a"
     },
     {
       "path": "Musicmodules/music-stage/music-stage-host.js",
-      "size": 69084,
-      "sha256": "de0717a0d112a1693cf3df902e8c5b4d4493da89ca3ab54b0f6b772d28e0ffb6"
+      "size": 69115,
+      "sha256": "d5b459d869b83ccd9ed69c57073fd85b9f04eb251f1b60cf74e40c4039189b0d"
     },
     {
       "path": "Musicmodules/music-stage/music-stage-modes.js",
@@ -571,13 +695,13 @@
     },
     {
       "path": "Musicmodules/music.html",
-      "size": 51367,
-      "sha256": "b64608fe4e7d7ee5773fd4f9eb9ffe34d321c8fedb14bd37e4376c20725ddcbb"
+      "size": 51432,
+      "sha256": "cc32c403d8258f9e3d26467e02c8db8dad6dc5ea03fa3516010f83b341701c76"
     },
     {
       "path": "Musicmodules/music.js",
-      "size": 61317,
-      "sha256": "434bd2c4c5d7aea3bb2b0142f020b2a61232af6a16fb39376e6960d76dee51fe"
+      "size": 61379,
+      "sha256": "001be726ecbc6537553d45885270bcac49258b04ee31e36d5f3eebd5fdf80abb"
     },
     {
       "path": "Musicmodules/socket.io.min.js",
@@ -600,9 +724,19 @@
       "sha256": "2ab2250065a7b9c86475e77698706eea2a68362fd405ffc8f7e459ca11d9f128"
     },
     {
+      "path": "RAGmodules/RAG_Observer.css",
+      "size": 40868,
+      "sha256": "4c15d43d8d831c1cf8201c4df40336cb992baf09b48664f9d092f914417e14ea"
+    },
+    {
       "path": "RAGmodules/RAG_Observer.html",
-      "size": 171674,
-      "sha256": "b09a0ec0b52c06c6e38325d5a52105a26e61a07e8765e66301927684387a4d47"
+      "size": 15344,
+      "sha256": "2df32cc037276f4aecca4fc051ae5b9ebf0744ff61d089ee000081c53cfb23a7"
+    },
+    {
+      "path": "RAGmodules/RAG_Observer.js",
+      "size": 122630,
+      "sha256": "ceef5d3663c1ed639f52c17cc5ec23889a45713fbcdb9be5bc6bf3148cbaaa29"
     },
     {
       "path": "RAGmodules/RAG_Overlay.html",
@@ -626,8 +760,41 @@
     },
     {
       "path": "Themesmodules/themes.js",
-      "size": 20785,
-      "sha256": "696b31b8e0320b35a4f70fb497540dbec38b5d0e0a07cc6f161c0fb451be5aff"
+      "size": 21162,
+      "sha256": "b5141b0e7016fde417c2c4466e829ae28237b95c563f69cf10ddc099a967a9c7"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/BladeGame/blade-electron.css",
+      "size": 13748,
+      "sha256": "aa4dfd7fbcf0224a8b8b5cb2642cb9bb2f2fa0e0193c7919c6fbbcbeb87ba0b5"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/BladeGame/blade-electron.html",
+      "size": 4293,
+      "sha256": "a196ef6bbc6451372d84bbc5707834eb057147880083c2546dbee6ee32ef64c8"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/BladeGame/blade-electron.js",
+      "size": 44681,
+      "sha256": "0d9533d560fc72d76f6fc24412a103ff2600e3103f4326459e2a574496dc9a85"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/BladeGame/blade-preload.js",
+      "size": 1270,
+      "sha256": "49fdcecc3a11f285aef56d55f15f9938c22aba7ea151150851e7d39a9a57731a"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/BladeGame/blade-service.js",
+      "size": 13879,
+      "sha256": "6235c8ac2c415569182e35b86cfb0fde6de49d725ca28654344d4ed51c53ed0e"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/BladeGame/plugin-manifest.json",
+      "size": 4490,
+      "sha256": "0b9c6218c6dc9c5c14deb35e9d29a88ea593e4d23dfe99e84d388041dc2574cb"
     }
-  ]
+  ],
+  "sourceBaseline": "d68be6afb8d4b0d73041f3b60d84203baf28e74f",
+  "upstreamTarget": "3cde846645bab109dfb3b635a43287e63e2ed294",
+  "status": "candidate-identities-not-installation-acceptance"
 }

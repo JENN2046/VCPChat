@@ -171,6 +171,7 @@ function createContentPipeline(deps = {}) {
         getToolResultRegex = null,
         getToolRequestRegex = null,
         replaceToolRequestBlocks = null,
+        deferToolRequest = null,
         getCodeFenceRegex = null,
         getDesktopPushRegex = null,
         getDesktopPushPartialRegex = null,
@@ -357,12 +358,22 @@ function createContentPipeline(deps = {}) {
         if (!hasToolRequests) return text;
 
         ctx.state.toolRequestMap = new Map();
+        ctx.state.toolRequestSourceMap = new Map();
 
-        const protectMatch = (match) => {
+        const protectMatch = (match, content) => {
             // 「始/末」标记是 Tool Request 字段语法的一部分，只应在工具请求围栏内部生效。
             // 因此在保护工具请求时局部处理字段内容，后续全局流水线不再扫描裸「始/末」。
             const placeholder = `<!--VCP_TOOL_REQUEST_${ctx.state.toolRequestPlaceholderId}-->`;
-            ctx.state.toolRequestMap.set(placeholder, processStartEndMarkers(match));
+            const deferredHtml = deferToolRequest?.(match, content);
+            if (typeof deferredHtml === 'string') {
+                ctx.state.toolRequestMap.set(placeholder, deferredHtml);
+                ctx.state.toolRequestPlaceholderId += 1;
+                return placeholder;
+            }
+            const escapedMatch = processStartEndMarkers(match);
+            ctx.state.toolRequestMap.set(placeholder, escapedMatch);
+            // 工具气泡在输出处自己转义一次，需要字段转义之前的原文；按转义后的整块查回。
+            if (typeof content === 'string') ctx.state.toolRequestSourceMap.set(escapedMatch, content);
             ctx.state.toolRequestPlaceholderId += 1;
             return placeholder;
         };
@@ -382,7 +393,7 @@ function createContentPipeline(deps = {}) {
     }
 
     function protectCodeBlocks(text, ctx) {
-        if (typeof text !== 'string' || (!text.includes('```') && !text.includes('~~~'))) return text;
+        if (typeof text !== 'string' || (!text.includes('`') && !text.includes('~~~'))) return text;
 
         ctx.state.codeBlockMap = new Map();
         return replaceMarkdownCodeDomains(text, (match) => {
@@ -497,7 +508,8 @@ function createContentPipeline(deps = {}) {
         step(ctx, 'transform-special-blocks', (text) => transformSpecialBlocks(
             text,
             ctx.state.codeBlockMap,
-            ctx.state.thoughtChainMap
+            ctx.state.thoughtChainMap,
+            ctx.state.toolRequestSourceMap
         ));
         step(ctx, 'ensure-html-fenced', (text) => ensureHtmlFenced(text));
         step(ctx, 'apply-common-content-processors', (text) => applyContentProcessors(text));

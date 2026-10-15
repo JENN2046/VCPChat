@@ -47,6 +47,29 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Frozen 3cde8466 update: source-rebuilt native artifacts and the bounded
+    // CodeSearcher include-filter correction, not directory-wide exemptions.
+    'VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher-x86_64-pc-windows-msvc.exe',
+    'VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher.js',
+    'tests/code-searcher-packed-path.test.cjs',
+    'docs/native-build-3cde8466.json',
+    'VCPDistributedServer/Plugin/CodeSearcher/src/BUILD_PROVENANCE.md',
+    'VCPDistributedServer/Plugin/CodeSearcher/src/Cargo.toml',
+    'VCPDistributedServer/Plugin/CodeSearcher/src/Cargo.lock',
+    'VCPDistributedServer/Plugin/CodeSearcher/src/src/main.rs',
+    'modules/services/chatDataService/bin/win32-x64/vcp_chat_data_service.exe',
+    'rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe',
+    // Preserve Human Owner authorization after upstream's RAG script extraction.
+    'RAGmodules/RAG_Observer.js',
+    // Isolated dependencies, lazy popup ownership, POSIX terminal fixtures,
+    // and exact package closure assertions adapted to the accepted upstream.
+    'tests/main-chat-response-body.test.mjs',
+    'tests/side-chat-deleted-child.test.mjs',
+    'tests/side-pane-advanced-parity.test.mjs',
+    'tests/terminal-command-run-watch.test.js',
+    'tests/terminal-package-closure.test.js',
+    'tests/music-capsule.test.cjs',
+    'tests/music-capsule-layout.test.cjs',
     // Exact auxiliary-window package contract and isolated artifact acceptance.
     'scripts/fixtures/window-package-resources.json',
     'scripts/lib/window-package-contract.cjs',
@@ -555,12 +578,11 @@ for (const file of reviewedClassicSecurityExceptions) {
         failures.push(`${file}: reviewed Classic security exception must also be present in the source-difference allowlist`);
     }
 }
-
 function git(args) {
     return execFileSync('git', ['-c', 'core.quotepath=false', ...args], { cwd: root, encoding: 'utf8' }).trim();
 }
 
-const trackedFiles = sourceContext?.trackedFiles || git(['ls-files']).split('\n').filter(Boolean);
+const trackedFiles = sourceContext?.trackedFiles || git(['ls-files', '--cached', '--others', '--exclude-standard']).split('\n').filter(Boolean);
 for (const file of trackedFiles) {
     if (forbiddenPaths.some(pattern => pattern.test(file))) failures.push(`${file}: forbidden Build/Codex path remains`);
 }
@@ -648,10 +670,8 @@ for (const file of cssFiles) {
     }
 }
 
-// Inspect the committed theme, not an unrelated user-owned working-tree edit.
-const activeThemeSource = sourceContext
-    ? sourceContext.readCommitted('styles/themes.css')
-    : git(['show', 'HEAD:styles/themes.css']);
+// Validate the tree under test, including uncommitted theme changes.
+const activeThemeSource = fs.readFileSync(path.join(root, 'styles/themes.css'), 'utf8');
 if (!activeThemeSource.includes(':focus-visible:not(#messageInput):not(.chat-message-input)')) {
     failures.push('styles/themes.css: design theme must preserve the main composer focus contract');
 }
@@ -745,7 +765,6 @@ if (sourceContext) {
         console.warn(`[DesignBoundary] Upstream ref ${upstreamRef} is unavailable; skipped Classic parity audit.`);
     }
 }
-
 if (failures.length) {
     console.error(failures.join('\n'));
     process.exitCode = 1;

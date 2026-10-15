@@ -1,0 +1,268 @@
+{
+  "schema": "vcpchat-isolated-native-build/v1",
+  "upstreamTarget": "3cde846645bab109dfb3b635a43287e63e2ed294",
+  "sourceBaseline": "d68be6afb8d4b0d73041f3b60d84203baf28e74f",
+  "platform": "windows-x64",
+  "rustToolchain": "1.89.0",
+  "binaries": [
+    {
+      "component": "rust_projectforge_indexer",
+      "destination": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
+      "size": 17844736,
+      "sha256": "f1e08676b9309eca255dab631555ff29387c834b1f767fc0a466ab67516d6678",
+      "gitBlob": "565e8bc6d128245c9e84d26974e27e21cb588be4",
+      "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
+      "inputHashes": [
+        {
+          "sha256": "3e4ebd2c02a9fd0d0aa6579a1dac55ee192a64f3db0a9b4837216fed788c2dbd",
+          "path": "Cargo.lock"
+        },
+        {
+          "sha256": "ca78799163c147fd067460bd4bee7df2f33e667a8103bcfd404fc30f9180e584",
+          "path": "Cargo.toml"
+        },
+        {
+          "sha256": "bf37c1dfe7b5cd12390721128ef39fa4a0fe14d4abd4be1bea8d3742cde898ba",
+          "path": "examples/geo_probe.rs"
+        },
+        {
+          "sha256": "19111888fc0ce3bfc0ca30f06d5380fab464dbbc2521aa2cf9dad1e4b9438adc",
+          "path": "src/lang.rs"
+        },
+        {
+          "sha256": "4ffd6f6877f13040da25fbc021fb70ac0340379dc56a60791886da0d2a8c517f",
+          "path": "src/main.rs"
+        },
+        {
+          "sha256": "fac7e27aba5f33ec0ece5c12a7b2755e4ef1a7e79c5d1e9a2ff6d2012eb153d3",
+          "path": "src/scan.rs"
+        },
+        {
+          "sha256": "e8d670e8f9929847453d249e11864906f4bfc1f80595a63dfbf630cbe8ca0106",
+          "path": "src/symbols.rs"
+        },
+        {
+          "sha256": "d663e38c8ae5bb0220e84197402c973302a266179e913c8ec77c380d775386b8",
+          "path": "src/binary/demangle.rs"
+        },
+        {
+          "sha256": "78880ce31d5589427fe7d2c2a3f194aa801b3dd52f0bbe830cca8799dda319db",
+          "path": "src/binary/elf.rs"
+        },
+        {
+          "sha256": "cb4f6cb73b03deb37310af046f9938e649cf152d124d5e217d76fc5e8d4cb5b6",
+          "path": "src/binary/entropy.rs"
+        },
+        {
+          "sha256": "5bc13ff25e39a14dafec7ee6938dc7dd365273a193371619a830c8ccc14344b6",
+          "path": "src/binary/mod.rs"
+        },
+        {
+          "sha256": "61b3390240b0b68ef37a401730c168360a301ded4f7310968286c54ff035dae9",
+          "path": "src/binary/pe.rs"
+        },
+        {
+          "sha256": "62600d44f213e25b7c86f355f19e6afb52bea62c3abef50658a954aa4e698bee",
+          "path": "src/binary/wasm.rs"
+        },
+        {
+          "sha256": "f85cae07d8f4fee621a00aad5b6d757d64ba17dde97df11e0c117551cfa53fa5",
+          "path": "src/facts/c_cpp.rs"
+        },
+        {
+          "sha256": "f09fc372abcdb7fd77800262f4f975f7c40ef319f79edd9518cd999f5aae3a4b",
+          "path": "src/facts/csharp_lua.rs"
+        },
+        {
+          "sha256": "a247f26491f25089bdc2ed626a98e57008abcb88d9566523bf0a244ef558dfc0",
+          "path": "src/facts/go.rs"
+        },
+        {
+          "sha256": "ef2dd07ff41b43879a61c3640299f0f8bfe001f3143a81074ffb3c7e4768b823",
+          "path": "src/facts/java.rs"
+        },
+        {
+          "sha256": "054772e1563edfc23629441acbb052bd6af0420e7f29de59ed6ef2b906ec2849",
+          "path": "src/facts/js_html.rs"
+        },
+        {
+          "sha256": "5362f32b0c762a349d74aa87d6f77d92bfe6df54f7d06977495e9df6619354f7",
+          "path": "src/facts/mod.rs"
+        },
+        {
+          "sha256": "829a73d2b6362620441ea8c4a0222bd50a5a85166cc54aaca5bf5fa72c5e6b11",
+          "path": "src/facts/python.rs"
+        },
+        {
+          "sha256": "7d32c0ba71071a9a0426cb98a5d50a60cc816b9358ccd4baa347a92eb7a1529c",
+          "path": "src/facts/rust_lang.rs"
+        },
+        {
+          "sha256": "e1f2f689d809688d18e43f5f78c47d77a08b76a7a5ece66a0790d30ff26610d1",
+          "path": "src/facts/types.rs"
+        }
+      ],
+      "unitTests": {
+        "passed": 33,
+        "failed": 0
+      },
+      "commands": [
+        "cargo test --release --locked --jobs 2",
+        "cargo build --release --locked --jobs 2"
+      ]
+    },
+    {
+      "component": "rust_voice_input_engine",
+      "destination": "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe",
+      "size": 258560,
+      "sha256": "db57bd214dd0a5b34ff7522acabc9cfc7479fecde9e6a3d4d42409214de43223",
+      "gitBlob": "7a981c416b8fc7449469014e0e2f5551a36f35ab",
+      "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
+      "inputHashes": [
+        {
+          "path": "Cargo.lock",
+          "sha256": "7964d58be408bbad96871f04c9e493fc62262c64687e07eb88d8af66555b5c9f"
+        },
+        {
+          "path": "Cargo.toml",
+          "sha256": "49bd440b559d0d34b1e94fe13e9f05aa7ab2fcc4aa783e600d079551bcd62592"
+        },
+        {
+          "path": "src/main.rs",
+          "sha256": "425d7d879a885e38b47654cef6411dfba1f89bb1b0796468018c870d49b9d9ce"
+        }
+      ],
+      "unitTests": {
+        "passed": 4,
+        "failed": 0
+      },
+      "commands": [
+        "cargo test --release --locked --jobs 2",
+        "cargo build --release --locked --jobs 2"
+      ]
+    },
+    {
+      "component": "rust_chat_data_service",
+      "destination": "modules/services/chatDataService/bin/win32-x64/vcp_chat_data_service.exe",
+      "size": 15513600,
+      "sha256": "d9aa93100f20fb0e6ffeca867fa87d6a0d9b7621355eb985e4a9d963b67a3b03",
+      "gitBlob": "1b41bc40f32b717351c4284f70afb7454a30b86c",
+      "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
+      "inputHashes": [
+        {
+          "path": "Cargo.lock",
+          "sha256": "1ea6d1290b1e74df58f96365ab88638c996e449401cbddd4f07f289327ce48d4"
+        },
+        {
+          "path": "Cargo.toml",
+          "sha256": "d60bbce900df7248126a536ab66a248ea3a4907d6ffe5b51a0512ad2543870de"
+        },
+        {
+          "path": "src/config.rs",
+          "sha256": "afbee4d39842d5be17f5ef59ee53505c2509599290ea2ec3ea600e33293936df"
+        },
+        {
+          "path": "src/domain.rs",
+          "sha256": "ec7342e01a1cc80afb718d848a13a8fed23658c74fad219b0eed7ed6157aaba6"
+        },
+        {
+          "path": "src/error.rs",
+          "sha256": "7101d2b2cd08b92a067e457217b3f13bc87b11ae4453e5098f8f286bb86842bf"
+        },
+        {
+          "path": "src/identity.rs",
+          "sha256": "5b350974fb73a988b43e3b99a31e17df714c7129491f0b0f1d41a03cab3ce40a"
+        },
+        {
+          "path": "src/ingest.rs",
+          "sha256": "ed9956a0d440f38bffa30e8f7f4825205384867f8ed73c208692bdc3cb90d6d5"
+        },
+        {
+          "path": "src/main.rs",
+          "sha256": "62d9c2159ee980a2b0a1949e419f08c67091bb9013278e802b198f89d4e71ef4"
+        },
+        {
+          "path": "src/protocol.rs",
+          "sha256": "a3b836ac8a02bb230e47baa2d434740db39af41ffe4e0f844ae81b38d251de18"
+        },
+        {
+          "path": "src/search.rs",
+          "sha256": "9ca8b599bb393c7757eb799670410179d0f0a5a4cf3d51feb63b3f7ebe219fa2"
+        },
+        {
+          "path": "src/storage.rs",
+          "sha256": "47d9bb274538b4e1ba8b20d6518ac29dda28c03d27302777d831bdf29b043aea"
+        },
+        {
+          "path": "src/sync_wire.rs",
+          "sha256": "8d616a42a1325072ac8b77dd5814cff5081cee797f4aed6cf57df160a701af77"
+        },
+        {
+          "path": "src/sync.rs",
+          "sha256": "fc96efd77b63e785d285319a1499efd486ebd8acca82185cbdd66f6b9a5ac87e"
+        },
+        {
+          "path": "src/watcher.rs",
+          "sha256": "cba0721f3133de766e9a633cc08cba2d02331cfc950d0c6906492e038be8a3bd"
+        },
+        {
+          "path": "../VCPDistributedServer/Plugin/VCPMobileSync/fixtures/message_canonical_contract.json",
+          "sha256": "d7e7303371db5454fd27fe1acce0830d49db6d47c5230cdd29411c2263b144da"
+        },
+        {
+          "path": "../VCPDistributedServer/Plugin/VCPMobileSync/fixtures/message_diff_matrix.json",
+          "sha256": "d30089c1fcc252c88f8b87e462a349cd9ac68c6022405b56854904f7c24749b1"
+        }
+      ],
+      "unitTests": {
+        "passed": 67,
+        "failed": 0
+      },
+      "commands": [
+        "cargo test --release --locked --jobs 2",
+        "cargo build --release --locked --jobs 2"
+      ]
+    },
+    {
+      "component": "CodeSearcher",
+      "destination": "VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher-x86_64-pc-windows-msvc.exe",
+      "size": 2584576,
+      "sha256": "d94d56024a0d02c57b6107bc9c8123c0bee8d2772e6961ed2a7c2d644ab27704",
+      "gitBlob": "4225909f5c7eaa37447c316c7c4b1f23e0bd333f",
+      "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
+      "inputHashes": [
+        {
+          "path": "Cargo.lock",
+          "sha256": "ccea9fabf6d7b07da5cc4a423efb1e67ef5ccf12633b3ef7d92a1355efaa9f3e"
+        },
+        {
+          "path": "Cargo.toml",
+          "sha256": "fafa67f64e5f747c8461b263f0e21146f2b270c27fbe3b95deba67abe0bcdfeb"
+        },
+        {
+          "path": "src/main.rs",
+          "sha256": "3a876e78da564b9eb28223d697e99ed747d6cfd97ece6d5964dba1023e712294"
+        }
+      ],
+      "unitTests": {
+        "passed": 5,
+        "failed": 0
+      },
+      "commands": [
+        "cargo test --release --locked --jobs 2",
+        "cargo build --release --locked --jobs 2"
+      ]
+    }
+  ],
+  "codeSearcher": {
+    "officialSourceCommit": "17a220a4c39a415c0cde77b63c552886fafac8ca",
+    "localAdaptation": "negative-only include filtering",
+    "actualExecutableMockTests": 15,
+    "bridgeMockTests": 15
+  },
+  "limits": [
+    "Existing local MSVC toolchain; CI-toolchain and bit-for-bit reproducibility not established.",
+    "Mock and unit results do not certify live microphone, provider, service, installer or deployment behavior.",
+    "Candidate only; complete upstream acceptance and PR validation remain pending."
+  ]
+}

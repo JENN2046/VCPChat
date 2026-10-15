@@ -16,15 +16,22 @@ function getTarget() {
     return targets[`${process.platform}:${process.arch}`] || null;
 }
 
+function getPhysicalPluginRoot() {
+    return __dirname.replace(/([\\/])app\.asar([\\/]|$)/, '$1app.asar.unpacked$2');
+}
+
 function getCandidates(target) {
     const binaryName = `CodeSearcher${target.extension}`;
+    // spawn cannot execute a path inside ASAR. The exact native artifact is
+    // unpacked by the package definition; source checkouts keep their path.
+    const binaryRoot = getPhysicalPluginRoot();
     return [
-        path.join(__dirname, `CodeSearcher-${target.triple}${target.extension}`),
-        ...target.legacy.map(name => path.join(__dirname, name)),
-        path.join(__dirname, 'src', 'target', target.triple, 'release', binaryName),
-        path.join(__dirname, 'src', 'target', 'release', binaryName),
-        path.join(__dirname, 'src', 'target', target.triple, 'debug', binaryName),
-        path.join(__dirname, 'src', 'target', 'debug', binaryName)
+        path.join(binaryRoot, `CodeSearcher-${target.triple}${target.extension}`),
+        ...target.legacy.map(name => path.join(binaryRoot, name)),
+        path.join(binaryRoot, 'src', 'target', target.triple, 'release', binaryName),
+        path.join(binaryRoot, 'src', 'target', 'release', binaryName),
+        path.join(binaryRoot, 'src', 'target', target.triple, 'debug', binaryName),
+        path.join(binaryRoot, 'src', 'target', 'debug', binaryName)
     ];
 }
 
@@ -70,7 +77,8 @@ function main() {
     }
 
     const child = spawn(executable, [], {
-        cwd: path.resolve(__dirname, '..', '..'),
+        // The child working directory must also be a real directory, not ASAR.
+        cwd: path.resolve(getPhysicalPluginRoot(), '..', '..'),
         env: process.env,
         windowsHide: true,
         stdio: ['pipe', 'pipe', 'pipe']

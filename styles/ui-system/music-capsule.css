@@ -1,0 +1,87 @@
+html .vcp-ui-scope .music-capsule {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    height: 34px;
+    z-index: 5;
+    pointer-events: none;
+}
+html .vcp-ui-scope .music-capsule[hidden] { display: none; }
+html .vcp-ui-scope .music-capsule-surface {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    width: 34px;
+    height: 34px;
+    max-width: 100%;
+    pointer-events: auto;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--vcp-ui-music-capsule-bg);
+    backdrop-filter: blur(16px) saturate(135%);
+    -webkit-backdrop-filter: blur(16px) saturate(135%);
+    color: var(--primary-text);
+    box-sizing: border-box;
+    box-shadow: var(--vcp-ui-music-capsule-shadow);
+    transition: width 240ms cubic-bezier(.22, 1, .36, 1);
+}
+html .vcp-ui-scope .music-capsule.is-expanded .music-capsule-surface {
+    width: min(var(--music-capsule-expanded-width, 100%), 100%);
+}
+html .vcp-ui-scope .music-capsule button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+html .vcp-ui-scope .music-capsule button:hover { color: var(--highlight-text); background: var(--vcp-ui-music-capsule-hover); }
+html .vcp-ui-scope .music-capsule button:focus-visible { outline: 2px solid var(--highlight-text); outline-offset: -3px; }
+html .vcp-ui-scope .music-capsule .vcp-ui-icon { --vcp-ui-icon-size: 16px; }
+html .vcp-ui-scope .music-capsule.is-playing .music-capsule-trigger { color: var(--highlight-text); }
+html .vcp-ui-scope .music-capsule-details {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 160ms ease;
+}
+html .vcp-ui-scope .music-capsule.is-expanded .music-capsule-details { opacity: 1; visibility: visible; }
+html .vcp-ui-scope .music-capsule-title {
+    flex: 1;
+    min-width: 0;
+    padding-left: 9px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--vcp-ui-text-sm);
+    line-height: 18px;
+}
+@media (prefers-reduced-motion: reduce) {
+    html .vcp-ui-scope .music-capsule-surface, html .vcp-ui-scope .music-capsule-details { transition: none; }
+}
+html .vcp-ui-scope .music-capsule [hidden] { display: none; }
+/* 同字体测量单行自然宽度，不参与布局、命中或读屏。 */
+html .vcp-ui-scope .music-capsule-title.music-capsule-measure {
+    position: absolute;
+    width: max-content;
+    max-width: none;
+    padding: 0;
+    flex: none;
+    visibility: hidden;
+    pointer-events: none;
+}

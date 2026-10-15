@@ -38,6 +38,7 @@ const importantFiles = new Set([
     path.join(styleDir, 'settings-stream-animation.css'),
 ]);
 const literalColorFiles = new Set([
+    path.join(styleDir, 'side-pane-plan.css'), // Existing light/dark fallbacks for plan cards retain the original presentation.
     path.join(styleDir, 'appearance-studio.css'),
     path.join(styleDir, 'settings-primitives.css'),
     path.join(styleDir, 'settings-shell.css'),
@@ -129,7 +130,9 @@ const componentCss = fs.readFileSync(path.join(styleDir, 'components.css'), 'utf
 if (!componentCss.includes(':focus-visible')) report(path.join(styleDir, 'components.css'), 'missing focus-visible rules');
 
 const inlineStyleCompatibilityAllowlist = new Set([
+    path.join(moduleDir, 'settings', 'group-slots.js'), // Legacy group-order icons retain their fixed flex sizing until the settings migration.
     path.join(moduleDir, 'vcp-ui.js'), // Per-instance Range progress cannot be expressed as a static token.
+    path.join(moduleDir, 'lucide-adapter.js'), // A caller-requested icon size is carried as the --vcp-ui-icon-size token.
     path.join(moduleDir, 'next-shell', 'next-shell-controller.js'), // Measured native-view bounds require a runtime sidebar width token.
     path.join(moduleDir, 'settings', 'settings-sidebar-slots.js'), // Dynamic editor height follows measured content.
     path.join(moduleDir, 'settings', 'agent-model-picker.js'), // Model picker trigger retains canonical geometry and popup placement.
@@ -137,11 +140,27 @@ const inlineStyleCompatibilityAllowlist = new Set([
     path.join(moduleDir, 'settings', 'identity-controls.js'), // ColorPair preview mirrors the canonical color value.
     path.join(moduleDir, 'settings', 'render-visibility.js'), // Legacy custom typography row visibility is an owned projection.
     path.join(moduleDir, 'typed-field-owners.js'), // Settings snapshot projection updates canonical dependent rows.
+    path.join(moduleDir, 'conversation-turn-navigator.js'), // Rail bars magnify by pointer distance; rail and card follow the measured chat scroller.
+    path.join(moduleDir, 'chat-composer-inset.js'), // Publishes the measured composer height and scrollbar width as CSS variables.
+    path.join(moduleDir, 'side-pane', 'side-pane-visibility.js'), // Pane width ratio and the open/close animation are measured at runtime.
+    path.join(moduleDir, 'side-pane', 'side-pane-tab-strip.js'), // Tab title tooltips are placed at the measured tab position.
+    path.join(moduleDir, 'side-pane', 'side-pane-resizer-owner.js'), // Dragged pane width follows the pointer, same as the left sidebar resizer.
+    path.join(moduleDir, 'side-pane', 'side-pane-tab-dnd.js'), // Tab reorder offsets follow the pointer.
+    path.join(moduleDir, 'side-pane', 'menu-position.js'), // Pointer-anchored context menus are placed at measured coordinates.
+    path.join(moduleDir, 'side-pane', 'portrait-display.js'), // Each Agent's own portrait focus point and height are written as CSS variables.
+    path.join(moduleDir, 'conversation-status-panel.js'), // Overlay follows the measured chat header.
+    path.join(moduleDir, 'conversation-status-panel', 'floating.js'), // Popovers follow the measured anchor.
+    path.join(moduleDir, 'conversation-status-panel', 'git-graph.js'), // The commit graph is sized from its layout.
 ]);
 
 for (const file of filesIn(moduleDir, '.js')) {
     const source = fs.readFileSync(file, 'utf8');
-    if (/\bstyle\s*=|\.style\./.test(source) && !inlineStyleCompatibilityAllowlist.has(file)) {
+    // Only this measured geometry token is exempt, not other style writes in
+    // the new capsule module. Keep all general inline-mutation prohibitions.
+    const inspectedSource = file === path.join(moduleDir, 'music-capsule.js')
+        ? source.replace("root.style.setProperty('--music-capsule-expanded-width', `${width}px`);", '')
+        : source;
+    if (/\bstyle\s*=|\.style\./.test(inspectedSource) && !inlineStyleCompatibilityAllowlist.has(file)) {
         report(file, 'contains inline style mutation');
     }
 }

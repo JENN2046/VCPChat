@@ -359,17 +359,41 @@ class ManifestRefreshTests(unittest.TestCase):
                 "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe"
             )
             allowed_additions = {reviewed_forge} if name in {"package-smoke", "chat-kernel-ui"} else set()
+            reviewed_searcher = "VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher-x86_64-pc-windows-msvc.exe"
+            if name == "package-smoke":
+                allowed_additions.add(reviewed_searcher)
             self.assertEqual(set(native), set(old) | allowed_additions)
+            if reviewed_searcher in allowed_additions:
+                self.assertEqual(native[reviewed_searcher], {
+                    "path": reviewed_searcher, "mode": "100644", "type": "blob",
+                    "blob": "4225909f5c7eaa37447c316c7c4b1f23e0bd333f", "size": 2584576,
+                    "sha256": "d94d56024a0d02c57b6107bc9c8123c0bee8d2772e6961ed2a7c2d644ab27704",
+                    "kind": "static-native", "format": "PE",
+                })
+            reviewed_rebuilds = {
+                "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
+                    ("7a981c416b8fc7449469014e0e2f5551a36f35ab", 258560,
+                     "db57bd214dd0a5b34ff7522acabc9cfc7479fecde9e6a3d4d42409214de43223"),
+                "modules/services/chatDataService/bin/win32-x64/vcp_chat_data_service.exe":
+                    ("1b41bc40f32b717351c4284f70afb7454a30b86c", 15513600,
+                     "d9aa93100f20fb0e6ffeca867fa87d6a0d9b7621355eb985e4a9d963b67a3b03"),
+            }
             for path in old:
-                if path != "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
+                if path in reviewed_rebuilds:
+                    blob, size, sha256 = reviewed_rebuilds[path]
+                    self.assertEqual(native[path], {
+                        "path": path, "mode": "100644", "type": "blob", "blob": blob,
+                        "size": size, "sha256": sha256, "kind": "static-native", "format": "PE",
+                    })
+                else:
                     self.assertEqual(native[path], old[path])
             if reviewed_forge in allowed_additions:
                 self.assertEqual(native[reviewed_forge], {
                     "path": reviewed_forge,
                     "mode": "100644", "type": "blob",
-                    "blob": "5c8ce39418052313ee84abdc4972ebdbd2a361be",
-                    "size": 7389696,
-                    "sha256": "cbb84371a943e37a5071cba7bf229c1324874d3987130dcb3b59fdb2dbe192f9",
+                    "blob": "565e8bc6d128245c9e84d26974e27e21cb588be4",
+                    "size": 17844736,
+                    "sha256": "f1e08676b9309eca255dab631555ff29387c834b1f767fc0a466ab67516d6678",
                     "kind": "static-native", "format": "PE",
                 })
 

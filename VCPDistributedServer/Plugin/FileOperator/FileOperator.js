@@ -1,11 +1,10 @@
 const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
+const { AsyncLocalStorage } = require('async_hooks');
 const glob = require('glob');
 const { minimatch } = require('minimatch');
-const pdf = require('pdf-parse');
-const mammoth = require('mammoth');
-const ExcelJS = require('exceljs');
+// 文档解析库仅在对应格式首次读取时加载，后续复用 CommonJS 模块缓存。
 const axios = require('axios');
 const { validateCode } = require('./CodeValidator');
 const fileKit = require('../../shared/fileKit');
@@ -387,6 +386,116 @@ function getDestinationPathParameter(parameters) {
   return getParameterValue(parameters, 'destination', 'destinationPath');
 }
 
+/**
+ * 单文件异步可重入互斥队列 (Per-File Async Reentrant Mutex Queue)
+ * 彻底解决大模型或多 Agent 并发分发针对同一文件的操作导致的竞态条件 (Race Condition)。
+ */
+class KeyedLockQueue {
+  constructor() {
+    this.chains = new Map();
+    this.als = new AsyncLocalStorage();
+  }
+
+  normalizeKey(filePath) {
+    if (!filePath || typeof filePath !== 'string') return null;
+    try {
+      const resolved = resolveAndNormalizePath(filePath);
+      return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  async runExclusive(filePaths, task) {
+    const rawPaths = Array.isArray(filePaths) ? filePaths : [filePaths];
+    const keys = Array.from(new Set(rawPaths.map(p => this.normalizeKey(p)).filter(Boolean)));
+
+    if (keys.length === 0) {
+      return await task();
+    }
+
+    // 字典序排序，保证多路径加锁顺序一致，彻底杜绝 AB-BA 哲学家死锁
+    keys.sort();
+
+    const heldLocks = this.als.getStore() || new Set();
+
+    // 过滤出当前异步调用栈中尚未持有的锁
+    const neededKeys = keys.filter(k => !heldLocks.has(k));
+
+    if (neededKeys.length === 0) {
+      // 当前上下文已持有所有涉及的锁，安全重入
+      return await task();
+    }
+
+    // 递归获取所有需要的锁节点
+    const acquireChain = async (index, newHeld) => {
+      if (index >= neededKeys.length) {
+        return await this.als.run(newHeld, task);
+      }
+      const lockKey = neededKeys[index];
+      const prev = this.chains.get(lockKey);
+
+      let release;
+      const gate = new Promise(resolve => { release = resolve; });
+
+      const next = (prev ? prev : Promise.resolve())
+        .then(async () => {
+          newHeld.add(lockKey);
+          return await acquireChain(index + 1, newHeld);
+        })
+        .finally(() => {
+          release();
+        });
+
+      // 保证异常不打断等待链条
+      const safeTail = next.catch(() => {});
+      this.chains.set(lockKey, safeTail);
+
+      // 当队列全部执行完毕后自动从 Map 中清理，避免内存泄漏
+      safeTail.finally(() => {
+        if (this.chains.get(lockKey) === safeTail) {
+          this.chains.delete(lockKey);
+        }
+      });
+
+      return await next;
+    };
+
+    return await acquireChain(0, new Set(heldLocks));
+  }
+}
+
+const fileLockQueue = new KeyedLockQueue();
+
+function extractLockPaths(action, parameters) {
+  if (!parameters) return [];
+  switch (action) {
+    case 'ReadFile':
+    case 'WriteFile':
+    case 'AppendFile':
+    case 'EditFile':
+    case 'ApplyDiff':
+    case 'UpdateHistory':
+    case 'DeleteFile':
+    case 'FileInfo': {
+      const p = getPathParameter(parameters);
+      return p ? [p] : [];
+    }
+    case 'CopyFile':
+    case 'MoveFile':
+    case 'RenameFile': {
+      const s = getSourcePathParameter(parameters);
+      const d = getDestinationPathParameter(parameters);
+      const paths = [];
+      if (s) paths.push(s);
+      if (d) paths.push(d);
+      return paths;
+    }
+    default:
+      return [];
+  }
+}
+
 // Helper function to run validation and attach results
 async function runValidationAndAttachResults(result, filePath, fileContent) {
   if (result.success && fileContent) {
@@ -482,14 +591,17 @@ async function readFile(filePath, encoding = 'utf8', lines) {
     const videoExtensions = ['.mp4', '.webm', '.mov'];
 
     if (extension === '.pdf') {
+      const pdf = require('pdf-parse');
       const data = await pdf(fileBuffer);
       content = data.text;
       isExtracted = true;
     } else if (extension === '.docx') {
+      const mammoth = require('mammoth');
       const { value } = await mammoth.extractRawText({ buffer: fileBuffer });
       content = value;
       isExtracted = true;
     } else if (['.xlsx', '.xls', '.csv'].includes(extension)) {
+      const ExcelJS = require('exceljs');
       const workbook = new ExcelJS.Workbook();
       if (extension === '.csv') {
         const worksheet = await workbook.csv.read(new (require('stream').Readable)({
@@ -1673,9 +1785,12 @@ async function processRequest(request) {
   const { command, ...parameters } = request;
   const action = command;
 
-  debugLog('Processing request', { action, parameters });
+  const targetPaths = extractLockPaths(action, parameters);
 
-  switch (action) {
+  return await fileLockQueue.runExclusive(targetPaths, async () => {
+    debugLog('Processing request', { action, parameters });
+
+    switch (action) {
     case 'ListAllowedDirectories':
       return await listAllowedDirectories();
     case 'ReadFile':
@@ -1728,33 +1843,9 @@ async function processRequest(request) {
         success: false,
         error: `Unknown action: ${action}`,
       };
-  }
-}
-
-// Setup stdio communication
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', async data => {
-  try {
-    const lines = data.toString().trim().split('\n');
-
-    for (const line of lines) {
-      if (!line.trim()) continue;
-
-      const request = JSON.parse(line); // This is now the flat object from VCP
-      const response = await processRequest(request);
-
-      // Convert internal format to VCP protocol format
-      const vcpResponse = convertToVCPFormat(response);
-      console.log(JSON.stringify(vcpResponse));
     }
-  } catch (error) {
-    const errorResponse = {
-      status: 'error',
-      error: `Invalid request format: ${error.message}`,
-    };
-    console.log(JSON.stringify(errorResponse));
-  }
-});
+  });
+}
 
 // Convert internal response format to VCP protocol format
 function convertToVCPFormat(response) {
@@ -1841,15 +1932,107 @@ function convertToVCPFormat(response) {
   }
 }
 
-// Handle process termination
-process.on('SIGTERM', () => {
-  debugLog('Received SIGTERM, shutting down gracefully');
-  process.exit(0);
-});
+/**
+ * hybridservice direct 协议接口：服务初始化
+ */
+async function initialize(context = {}) {
+  debugLog('FileOperator hybridservice initialized', {
+    hasServices: Boolean(context.services),
+    projectBasePath: context.projectBasePath
+  });
+}
 
-process.on('SIGINT', () => {
-  debugLog('Received SIGINT, shutting down gracefully');
-  process.exit(0);
-});
+/**
+ * hybridservice direct 协议接口：直接处理工具调用，常驻内存无需 spawn
+ */
+async function processToolCall(toolArgs, executionContext = {}) {
+  let request = toolArgs;
+  if (typeof request === 'string') {
+    try {
+      request = JSON.parse(request);
+    } catch (e) {
+      throw new Error(`Invalid request format: ${e.message}`);
+    }
+  }
+  if (!request || typeof request !== 'object') {
+    throw new Error('Invalid request: expected an object or JSON string');
+  }
 
-debugLog('FileOperator plugin started and listening for requests');
+  const response = await processRequest(request);
+  const vcpResponse = convertToVCPFormat(response);
+
+  if (vcpResponse.status === 'success') {
+    const finalResult = vcpResponse.result || {};
+    if (vcpResponse._specialAction) {
+      finalResult._specialAction = vcpResponse._specialAction;
+      finalResult.payload = vcpResponse.payload;
+    }
+    return finalResult;
+  } else {
+    throw new Error(vcpResponse.error || response.error || 'Unknown error occurred in FileOperator');
+  }
+}
+
+// 仅在作为独立脚本直接执行时监听 stdio（保持 CLI 兼容性）
+if (require.main === module) {
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', async data => {
+    try {
+      const lines = data.toString().trim().split('\n');
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+
+        const request = JSON.parse(line);
+        const response = await processRequest(request);
+
+        const vcpResponse = convertToVCPFormat(response);
+        console.log(JSON.stringify(vcpResponse));
+      }
+    } catch (error) {
+      const errorResponse = {
+        status: 'error',
+        error: `Invalid request format: ${error.message}`,
+      };
+      console.log(JSON.stringify(errorResponse));
+    }
+  });
+
+  process.on('SIGTERM', () => {
+    debugLog('Received SIGTERM, shutting down gracefully');
+    process.exit(0);
+  });
+
+  process.on('SIGINT', () => {
+    debugLog('Received SIGINT, shutting down gracefully');
+    process.exit(0);
+  });
+
+  debugLog('FileOperator plugin started and listening for requests');
+}
+
+module.exports = {
+  initialize,
+  processToolCall,
+  processRequest,
+  convertToVCPFormat,
+  fileLockQueue,
+  readFile,
+  writeFile,
+  appendFile,
+  editFile,
+  listDirectory,
+  getFileInfo,
+  copyFile,
+  moveFile,
+  renameFile,
+  deleteFile,
+  createDirectory,
+  searchFiles,
+  downloadFile,
+  createCanvas,
+  editCanvas,
+  updateHistory,
+  applyDiff,
+  listAllowedDirectories,
+};

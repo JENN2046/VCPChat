@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),{createRequire}=require('node:module'),{EventEmitter}=require('node:events');
 const file=path.resolve(__dirname,'../modules/ipc/nativeConversationHandlers.js');
-function load(transport,{clock}={}){const handlers=new Map(),module={exports:{}},base=createRequire(file);const require=p=>p==='electron'?{ipcMain:{handle:(k,v)=>handlers.set(k,v),removeHandler:k=>handlers.delete(k)}}:p.endsWith('/transport.cjs')?{createNativeTransport:()=>transport}:p.includes('ChartControllerService')?{initialize(){}}:base(p);vm.runInNewContext(fs.readFileSync(file,'utf8'),{module,exports:module.exports,require,process,setInterval:clock?.setInterval||setInterval,clearInterval:clock?.clearInterval||clearInterval},{filename:file});return {handlers,initialize:async opts=>{const wc=opts.mainWindow.webContents,execute=wc.executeJavaScript;if(execute)wc.executeJavaScript=code=>code.includes("root.querySelectorAll('.message-item')")?Promise.resolve(true):execute(code);return module.exports.initialize(opts);}};}
+function load(transport,{clock,portClock}={}){const handlers=new Map(),module={exports:{}},base=createRequire(file);const require=p=>p==='electron'?{ipcMain:{handle:(k,v)=>handlers.set(k,v),removeHandler:k=>handlers.delete(k)}}:p.endsWith('/transport.cjs')?{createNativeTransport:()=>transport}:p.endsWith('/nativePort.cjs')&&portClock?{installNativeConversationPort:options=>base(p).installNativeConversationPort({...options,clock:portClock})}:p.includes('ChartControllerService')?{initialize(){}}:base(p);vm.runInNewContext(fs.readFileSync(file,'utf8'),{module,exports:module.exports,require,process,setInterval:clock?.setInterval||setInterval,clearInterval:clock?.clearInterval||clearInterval},{filename:file});return {handlers,initialize:async opts=>{const wc=opts.mainWindow.webContents,execute=wc.executeJavaScript;if(execute)wc.executeJavaScript=code=>code.includes("root.querySelectorAll('.message-item')")?Promise.resolve(true):execute(code);return module.exports.initialize(opts);}};}
 test('real generic IPC wiring rejects fabricated renderer source, binds one event and cleans up without UI',async()=>{
  let sequence=0,text='可以',calls=[];const transport={sequence:()=>sequence,request:async(action,payload)=>{calls.push({action,payload});if(action==='prepare')return {ok:true,handled:true,sourceId:payload.messageId};if(action==='execute')return {ok:true,committed:true};return {ok:true};},project:async r=>r};
  const {handlers,initialize}=load(transport);const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async()=>({eligible:true,text,conversationId:'C1'});const window={webContents:wc,isFocused:()=>true,isDestroyed:()=>false};await initialize({mainWindow:window,binding:{toolName:'Example'},chartService:{}});const event={sender:wc,senderFrame:wc.mainFrame};
@@ -116,12 +116,12 @@ test('unowned invalidation cannot install a barrier',async t=>{
  const f=isolatedHistory(t,async(action,p)=>action==='prepare'?{ok:true,sourceId:p.messageId}:{ok:true});await f.start();assert.equal((await f.handlers.get('native-conversation:invalidate')({sender:{},senderFrame:{}},{conversationId:'C'})).ok,false);assert.ok((await f.prepare()).sourceId);assert.equal(f.calls.filter(c=>c.action==='invalidate').length,0);
 });
 
-function rebuiltWindows(t,request,{acknowledgeColdStart=true}={}){
+function rebuiltWindows(t,request,{acknowledgeColdStart=true,portClock}={}){
  // Retry/rebuild cases inject message-level failures; cold-start failures are
  // exercised separately below with acknowledgeColdStart=false.
  const timers=new Set(),calls=[],windows=[];
  const clock={setInterval(fn){timers.add(fn);return fn;},clearInterval(fn){timers.delete(fn);}};
- const f=load({sequence:()=>0,request:async(action,p)=>{if(acknowledgeColdStart&&action==='invalidate'&&!p.messageId)return {ok:true};calls.push({action,p});return request(action,p);},project:async r=>r,retryProjections:async()=>{}},{clock});
+ const f=load({sequence:()=>0,request:async(action,p)=>{if(acknowledgeColdStart&&action==='invalidate'&&!p.messageId)return {ok:true};calls.push({action,p});return request(action,p);},project:async r=>r,retryProjections:async()=>{}},{clock,portClock});
  t.after(()=>windows.forEach(w=>w.destroy()));
  return {calls,async tick(){await Promise.all([...timers].map(fn=>fn()));},async open(binding={toolName:'T'}){
   let destroyed=false,conversationId='C';const wc=new EventEmitter();wc.mainFrame={};
@@ -208,4 +208,26 @@ test('cold-start proposal waits for acknowledgement and concurrent physical conf
  const w=await f.open(),pending=w.invoke('propose',{tool:'T',conversationId:'C',messageId:'M',payload:{}});
  assert.equal((await w.prepare()).code,'PRESENTATION_INVALIDATION_REQUIRED');assert.equal(proposes,0);
  release({ok:true});assert.equal((await pending).ok,true);assert.equal(proposes,1);
+});
+
+test('slow cold-start acknowledgement retains the real physical event without allowing early prepare or replay',async t=>{
+ let now=0,release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r);
+ const f=rebuiltWindows(t,async(action,p)=>{if(action==='invalidate'){entered();return gate;}return readyResponse(action,p);},{acknowledgeColdStart:false,portClock:()=>now});
+ const w=await f.open(),pending=w.prepare();await started;
+ now=4000;assert.equal(f.calls.filter(c=>c.action==='prepare').length,0);
+ release({ok:true});const ready=await pending;assert.ok(ready.sourceId);
+ assert.equal((await w.invoke('execute',{sourceId:ready.sourceId})).ok,true);
+ assert.equal((await w.invoke('execute',{sourceId:ready.sourceId})).code,'SOURCE_UNKNOWN');
+ assert.equal((await w.invoke('prepare',{conversationId:'C',text:'可以'})).code,'NATIVE_SOURCE_REQUIRED');
+ assert.equal(f.calls.filter(c=>c.action==='prepare').length,1);assert.equal(f.calls.filter(c=>c.action==='execute').length,1);
+});
+
+for(const outcome of ['denied','destroyed','newer-revoke'])test('retained physical context stays fail-closed after slow reconciliation: '+outcome,async t=>{
+ let now=0,release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r);
+ const f=rebuiltWindows(t,async(action,p)=>{if(action==='invalidate'&&!p.messageId){entered();return gate;}return readyResponse(action,p);},{acknowledgeColdStart:false,portClock:()=>now});
+ const w=await f.open(),pending=w.prepare();await started;now=4000;
+ if(outcome==='destroyed')w.destroy();
+ if(outcome==='newer-revoke')assert.equal((await w.invoke('invalidate',{conversationId:'C',messageId:'newer'})).ok,true);
+ release({ok:outcome!=='denied'});assert.equal((await pending).code,'PRESENTATION_INVALIDATION_REQUIRED');
+ assert.equal(f.calls.filter(c=>['prepare','execute'].includes(c.action)).length,0);
 });

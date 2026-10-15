@@ -59,16 +59,22 @@ async function initialize({mainWindow,chartService,binding}){
  async function synchronizeConversation(conversationId){
   if(typeof conversationId!=='string'||!conversationId)return invalidationRequired();
   if(blocked(conversationId))return invalidationRequired();
-  if(synchronized.has(conversationId))return {ok:true};
-  return queueInvalidation({conversationId},true);
+  if(synchronized.has(conversationId))return {ok:true,version:invalidationVersions.get(conversationId)};
+  const attempt=queueInvalidation({conversationId},true),version=invalidationVersions.get(conversationId);
+  return {...await attempt,version};
  }
  const port=installNativeConversationPort({window:mainWindow,observedSequence:transport.sequence,isSessionCurrent:async()=>!mainWindow.isDestroyed(),snapshot:async(kind,input)=>wc.executeJavaScript(`(()=>{const input=document.getElementById('messageInput'),button=document.getElementById('sendMessageBtn'),c=window.__nativeConversationContext,hit=${kind==='mouse'?`document.elementFromPoint(${Number(input.x)||0},${Number(input.y)||0})`:'null'};return {text:input?.value??'',conversationId:c?.conversationId,eligible:!!c&&(${kind==='keyboard'?`!!button&&!button.disabled&&button.dataset.mode!=='interrupt'&&(document.activeElement===button||(${JSON.stringify(input.key)}==='Enter'&&document.activeElement===input))`:"!!button&&!button.disabled&&(hit===button||button.contains(hit))&&button.dataset.mode!=='interrupt'"})};})()`)});
- ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};if(!(await synchronizeConversation(p.conversationId))?.ok||!owned(e))return invalidationRequired();const version=invalidationVersions.get(p.conversationId);let context;try{context=await port.consume(p);}catch{
+ ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};if(blocked(p.conversationId))return invalidationRequired();const arrivalVersion=invalidationVersions.get(p.conversationId);let context;try{context=await port.consume(p);}catch{
    // Denial-only recognition: never mint a trusted source from renderer/voice text.
    const text=typeof p.text==='string'?p.text.trim():'',hasPlan=[...plans.values()].some(plan=>plan.conversationId===p.conversationId);
    const nativeIntent=/^把.+(?:延后|推迟|提前)[1-9][0-9]{0,3}分钟[。！!]?$/u.test(text)||/^再(?:延后|推迟|提前)/u.test(text)||(hasPlan&&/^(可以|同意|执行吧|取消|不要|不用了|不同意|改成|改为)/u.test(text));
    return {handled:nativeIntent,ok:false,code:'NATIVE_SOURCE_REQUIRED',...(nativeIntent?{preserveInput:true,message:'此排期指令需要手动发送，请物理点击发送按钮或按 Enter。待发送文本已保留。'}:{})};
   }
+  // Consume the short-lived physical event before any network await. The retained
+  // trusted context is single-use, but cannot prepare until reconciliation succeeds.
+  if(!owned(e)||blocked(p.conversationId)||invalidationVersions.get(p.conversationId)!==arrivalVersion)return invalidationRequired();
+  const sync=await synchronizeConversation(p.conversationId),version=sync.version;
+  if(!sync.ok||!owned(e)||blocked(p.conversationId)||invalidationVersions.get(p.conversationId)!==version)return invalidationRequired();
   // A removed/failed display cannot remain confirmable even if renderer cleanup lost its IPC.
   for(const [id,plan] of plans){
    const visible=await wc.executeJavaScript(`(()=>{const e=[...(document.getElementById('chatMessages')?.querySelectorAll('[data-native-plan-id]')||[])].find(e=>e.dataset.nativePlanId===${JSON.stringify(id)});return !!e?.isConnected&&e.textContent===${JSON.stringify(plan.presentation)}&&window.__nativeConversationContext?.conversationId===${JSON.stringify(plan.conversationId)};})()`);
@@ -79,7 +85,8 @@ async function initialize({mainWindow,chartService,binding}){
  ipcMain.handle(channels[1],async(e,p={})=>{const event=pending.get(p.sourceId);if(!owned(e)||!event)return {ok:false,code:'SOURCE_UNKNOWN'};pending.delete(p.sourceId);if(blocked(event.conversationId))return invalidationRequired();return transport.project(await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId}));});
  ipcMain.handle(channels[2],async(e,p={})=>{
   if(!owned(e)||p.tool!==binding.toolName)return {ok:false};
-  if(!(await synchronizeConversation(p.conversationId))?.ok||!owned(e))return invalidationRequired();
+  const sync=await synchronizeConversation(p.conversationId);
+  if(!sync.ok||!owned(e)||blocked(p.conversationId)||invalidationVersions.get(p.conversationId)!==sync.version)return invalidationRequired();
   // Register before DOM or transport awaits: request order, never response order, owns this message.
   const key=JSON.stringify([p.conversationId,p.messageId]),request={conversationId:p.conversationId,messageId:p.messageId};proposalRequests.set(key,request);
   const current=()=>owned(e)&&proposalRequests.get(key)===request&&!blocked(p.conversationId);

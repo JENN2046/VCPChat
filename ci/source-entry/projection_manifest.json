@@ -6143,9 +6143,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7d9418188bf6cfac38a507d1047b1d4dee8a42e7",
-          "size": 11916,
-          "sha256": "c128ea31a24949912c6336d64f8fcaf3ecc06bcd1c058e3b72ceb3ef53839714",
+          "blob": "24667c1f6c794b852b39feba4337b4ca84b54fb5",
+          "size": 12650,
+          "sha256": "35593379ccb92a6711ccb7964efb5ea60b7a49921afb4b7d86f21c3ceed10c02",
           "kind": "source"
         },
         {
@@ -15169,9 +15169,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7d9418188bf6cfac38a507d1047b1d4dee8a42e7",
-          "size": 11916,
-          "sha256": "c128ea31a24949912c6336d64f8fcaf3ecc06bcd1c058e3b72ceb3ef53839714",
+          "blob": "24667c1f6c794b852b39feba4337b4ca84b54fb5",
+          "size": 12650,
+          "sha256": "35593379ccb92a6711ccb7964efb5ea60b7a49921afb4b7d86f21c3ceed10c02",
           "kind": "source"
         },
         {
@@ -19903,9 +19903,9 @@
           "path": "tests/native-conversation-ipc.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "da02a3afd29b542365faedaf20659c8e1bb51f00",
-          "size": 29993,
-          "sha256": "1f503e94d3f0d2a629567484d3805cf0d4d7a1cbc7e0d2ffa9e3a2d4c238474e",
+          "blob": "27dceb2e89734518dcc8724b39775266503e12a1",
+          "size": 32059,
+          "sha256": "b20b50549fae028e90e5a000252641f01f4137f292d33e2e199680929b675e96",
           "kind": "source"
         },
         {

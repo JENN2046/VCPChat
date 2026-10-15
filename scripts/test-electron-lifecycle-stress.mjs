@@ -514,15 +514,23 @@ async function cycleAgentSettings(page, label, { expectEnhanced = true } = {}) {
         settingsSelects: document.querySelectorAll('#agentSettingsForm select').length,
         controlledSettingsSelects: [...document.querySelectorAll('#agentSettingsForm select')]
             .filter(select => Boolean(window.VCPUI?.getController?.(select))).length,
-        nativeSettingsSelects: [...document.querySelectorAll('#agentSettingsForm select')]
-            .filter(select => window.VCPUI?.getController?.(select)?.kernel === 'native').length,
+        schemaSettingsSelects: [...document.querySelectorAll('#agentSettingsForm select')]
+            .filter(select => select.id && select.closest('[data-schema-field]')?.dataset.schemaField === select.id
+                && select.form?.id === 'agentSettingsForm').length,
+        agentSurfaceOwned: window.VCPSettingsSidebar?.has?.('agent') === true,
         settingsSelectProxies: document.querySelectorAll('#agentSettingsForm .vcp-ui-select-proxy').length,
     }));
     assert.ok(state.promptNodes > 0, `${label}: agent settings prompt editor disappeared: ${JSON.stringify(state)}`);
     if (expectEnhanced) {
         assert.ok(state.enhanced > 0, `${label}: agent settings adapters disappeared: ${JSON.stringify(state)}`);
-        assert.equal(state.nativeSettingsSelects, state.settingsSelects,
-            `${label}: document-wide Select observer captured a settings control: ${JSON.stringify(state)}`);
+        // Schema-owned native business controls replaced the retired VCPUI
+        // controller registrations. Preserve ownership and no-proxy guards.
+        assert.equal(state.agentSurfaceOwned, true, `${label}: agent schema surface owner missing`);
+        assert.ok(state.settingsSelects > 0, `${label}: agent settings selects disappeared`);
+        assert.equal(state.schemaSettingsSelects, state.settingsSelects,
+            `${label}: select escaped its schema business field: ${JSON.stringify(state)}`);
+        assert.equal(state.controlledSettingsSelects, 0,
+            `${label}: document-wide Select observer captured a schema control: ${JSON.stringify(state)}`);
         assert.equal(state.settingsSelectProxies, 0,
             `${label}: settings form retained Web Awesome Select proxies: ${JSON.stringify(state)}`);
     } else {
@@ -826,6 +834,8 @@ const appData = await fs.mkdtemp(path.join(os.tmpdir(), 'vcpchat-lifecycle-stres
 await fs.writeFile(path.join(appData, 'settings.json'), JSON.stringify({
     uiMode: 'next',
     enableDistributedServer: false,
+    voiceMode: 'local',
+    voiceLocalSettings: { sovitsUrl: process.env.VCPCHAT_TEST_SOVITS_URL || 'http://127.0.0.1:1' },
     vcpServerUrl: 'http://127.0.0.1:1',
     vcpApiKey: 'lifecycle-stress-key',
 }), 'utf8');

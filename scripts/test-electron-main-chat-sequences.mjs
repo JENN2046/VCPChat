@@ -349,6 +349,7 @@ await Promise.all(identities.map(id => writeAgent(appData, id, topics[id])));
 await fs.writeFile(path.join(appData, 'settings.json'), JSON.stringify({
     uiMode: requestedUiMode, enableDistributedServer: false, vcpServerUrl: fixture.url, vcpApiKey: 'sequence-key',
     assistantAgent: identities[0], assistantEnabled: false,
+    voiceMode: 'local', voiceLocalSettings: { sovitsUrl: fixture.url },
 }), 'utf8');
 const debugPort = await freePort();
 const stderr = { value: '' };
@@ -509,8 +510,9 @@ try {
     const waitForStreamQuiescence = async () => {
         await page.waitForFunction(() => {
             const streams = window.VCPLifecycleInspector?.snapshot?.().streams;
-            return !streams
-                || (
+            return Boolean(streams)
+                && !document.querySelector('.message-item.streaming')
+                && (
                     streams.activeMessageId === null
                     && streams.activeInitializations === 0
                     && streams.prebuffered === 0
@@ -935,7 +937,16 @@ try {
             const candidate = (await browser.pages()).find(entry => entry !== exclude && !entry.isClosed() && entry.url().includes(fragment));
             if (candidate) {
                 trackPage(candidate);
-                try { await candidate.waitForSelector('#messageInput:not([disabled])', { timeout: 1_500 }); return candidate; } catch { /* stale/crashed candidate */ }
+                try {
+                    // The initial HTML composer is enabled before async IPC
+                    // delivers its agent. Wait for that real initialization,
+                    // not merely for the static input element to exist.
+                    await candidate.waitForFunction(expectedAgent => (
+                        document.querySelector('#messageInput:not([disabled])')
+                        && document.querySelector('#currentChatAgentName')?.textContent?.includes(expectedAgent)
+                    ), { timeout: 1_500 }, identities[0]);
+                    return candidate;
+                } catch { /* stale/crashed/uninitialized candidate */ }
             }
             await sleep(50);
         }
@@ -951,11 +962,22 @@ try {
         let auxiliaryPage = await waitForAuxiliaryPage(fragment);
         await auxiliaryPage.type('#messageInput', `${label}-success`);
         await auxiliaryPage.click('#sendMessageBtn');
-        await auxiliaryPage.waitForFunction(() => (
-            !document.querySelector('#messageInput')?.disabled
-            && [...document.querySelectorAll('.message-item.assistant .md-content')]
-                .some(node => /fixture\s+stream\s+complete/.test(node.textContent || ''))
-        ), { timeout });
+        try {
+            await auxiliaryPage.waitForFunction(() => (
+                !document.querySelector('#messageInput')?.disabled
+                && [...document.querySelectorAll('.message-item.assistant .md-content')]
+                    .some(node => /fixture\s+stream\s+complete/.test(node.textContent || ''))
+            ), { timeout });
+        } catch (error) {
+            const state = await auxiliaryPage.evaluate(() => ({
+                disabled: document.querySelector('#messageInput')?.disabled,
+                messages: [...document.querySelectorAll('.message-item')].map(node => ({
+                    className: node.className, text: node.textContent?.slice(0, 300),
+                })),
+            }));
+            error.message += `\n${label} controlled-fixture state: ${JSON.stringify(state)}; renderer errors: ${JSON.stringify(errors)}`;
+            throw error;
+        }
         await auxiliaryPage.click(closeSelector);
         await waitForAuxiliaryClose(auxiliaryPage);
 
@@ -1289,6 +1311,9 @@ try {
                 trace, catalog, driver, observe, coverage: sequenceCoverage,
                 assertInvariant: async ({ model, snapshot, index }) => {
                     const settledStreams = await waitForStreamQuiescence();
+                    // runTrace captured its snapshot before this async settle.
+                    // Assert the post-settlement state, not a stale active frame.
+                    snapshot = await observe();
                     assert.equal(snapshot.rendererReady, 'true', `run ${runIndex + 1}, step ${index}: renderer lost readiness`);
                     assert.equal(snapshot.mode, requestedUiMode, `run ${runIndex + 1}, step ${index}: mode changed`);
                     assert.equal(snapshot.settingsActive, false, `run ${runIndex + 1}, step ${index}: modal retained`);

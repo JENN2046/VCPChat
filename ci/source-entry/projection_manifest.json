@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
-          "size": 18553,
-          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
+          "blob": "76168210a4af5601111c419c21b67dd4a754eff9",
+          "size": 18815,
+          "sha256": "247b631398a2b66e36e30f837c5ce323954eb8be07c67f5c668448db84fab996",
           "kind": "source"
         },
         {
@@ -2087,6 +2087,60 @@
           "blob": "20ae5966568944e18a40e89614e93a34042b09c8",
           "size": 7412,
           "sha256": "a74b77edf6c947d47916b6c4a85a486c0570fc512aabaca905238a9bd91c405a",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/recognizer.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8252f15eb3992aac72fb9a91e8da96343c4cfbca",
+          "size": 7403,
+          "sha256": "f29aa482967ebb021818fb95de7f8a2dd01741eb858c5c44c99392cc7e7708f2",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93f789fc8da88276b8dd3ef3d522d997fb16a398",
+          "size": 1914,
+          "sha256": "9d2dccab6981ee659e9dba2353391a83aa81e65222bdb1717208d7422892a8c6",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "116aad02bc0a94f25e970712704ec211de4eb939",
+          "size": 4209,
+          "sha256": "20c44bbc025d22b5a34f6c3ee522d04c855bb130c55446a287ddb6f5093b2581",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "348b1fdf2cefb3dc9e944759727f122edcb39ca7",
+          "size": 6364,
+          "sha256": "27b2b1dd47f5429eb35b82593b44f9b1d426cbf444ca2e4d9ed8d1e98e025735",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c569b899e1077b6a6b362331fd6e0edf55fbebe0",
+          "size": 3239,
+          "sha256": "723a8323e5f64b40eee878a264841d362f5ccce5a70c50b8e7227f252a2ede8f",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d02b65a22fd4b4fc9d667e72367eaca529e6ea79",
+          "size": 31240,
+          "sha256": "e2fca74c7ce410ecc8dcc9d47fd253e0b1e3972a5260b3137fd9efc4fb9850aa",
           "kind": "source"
         },
         {
@@ -4460,9 +4514,9 @@
           "path": "modules/bootstrap/packed-runtime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "45bc61ade429ea8b7f40a64eead548b5aadc7be5",
-          "size": 1824,
-          "sha256": "bff33a3d387da1e4e45808f262f98e73a9f52e62d793f45bda3f110fb1a6f400",
+          "blob": "ba939403e9e88d5db6e7383340cc96a393303318",
+          "size": 1997,
+          "sha256": "0d78556f9c7e42bc5838d06f76cc04ce1fc7fd8f3c4199326422ffc60e141795",
           "kind": "source"
         },
         {
@@ -6215,9 +6269,9 @@
           "path": "modules/settings/schema/jev-service.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b3db55c5d6ef835fbf31ffea9c9715d19e0089e0",
-          "size": 4543,
-          "sha256": "109c560cee16f91a1d60204af13cb402f3baa59f10ccb432db93851d87df18b6",
+          "blob": "5a8d5a3dd8afb2d77083c1cd2aad7d818c7a1e64",
+          "size": 4542,
+          "sha256": "ec6d63fbb48f0d6ae544537e63b74d914629b4ac9d4bc141fa371827c1e7bcb2",
           "kind": "source"
         },
         {
@@ -7547,9 +7601,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
-          "size": 18553,
-          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
+          "blob": "76168210a4af5601111c419c21b67dd4a754eff9",
+          "size": 18815,
+          "sha256": "247b631398a2b66e36e30f837c5ce323954eb8be07c67f5c668448db84fab996",
           "kind": "source"
         },
         {
@@ -12286,6 +12340,51 @@
           "kind": "source"
         },
         {
+          "path": "Voicechatmodules/recognizer.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8252f15eb3992aac72fb9a91e8da96343c4cfbca",
+          "size": 7403,
+          "sha256": "f29aa482967ebb021818fb95de7f8a2dd01741eb858c5c44c99392cc7e7708f2",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93f789fc8da88276b8dd3ef3d522d997fb16a398",
+          "size": 1914,
+          "sha256": "9d2dccab6981ee659e9dba2353391a83aa81e65222bdb1717208d7422892a8c6",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voice-input-capture.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "116aad02bc0a94f25e970712704ec211de4eb939",
+          "size": 4209,
+          "sha256": "20c44bbc025d22b5a34f6c3ee522d04c855bb130c55446a287ddb6f5093b2581",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "348b1fdf2cefb3dc9e944759727f122edcb39ca7",
+          "size": 6364,
+          "sha256": "27b2b1dd47f5429eb35b82593b44f9b1d426cbf444ca2e4d9ed8d1e98e025735",
+          "kind": "source"
+        },
+        {
+          "path": "Voicechatmodules/voicechat.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c569b899e1077b6a6b362331fd6e0edf55fbebe0",
+          "size": 3239,
+          "sha256": "723a8323e5f64b40eee878a264841d362f5ccce5a70c50b8e7227f252a2ede8f",
+          "kind": "source"
+        },
+        {
           "path": "Voicechatmodules/voicechat.js",
           "mode": "100644",
           "type": "blob",
@@ -12559,9 +12658,9 @@
           "path": "modules/bootstrap/packed-runtime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "45bc61ade429ea8b7f40a64eead548b5aadc7be5",
-          "size": 1824,
-          "sha256": "bff33a3d387da1e4e45808f262f98e73a9f52e62d793f45bda3f110fb1a6f400",
+          "blob": "ba939403e9e88d5db6e7383340cc96a393303318",
+          "size": 1997,
+          "sha256": "0d78556f9c7e42bc5838d06f76cc04ce1fc7fd8f3c4199326422ffc60e141795",
           "kind": "source"
         },
         {
@@ -14278,9 +14377,9 @@
           "path": "modules/settings/schema/jev-service.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b3db55c5d6ef835fbf31ffea9c9715d19e0089e0",
-          "size": 4543,
-          "sha256": "109c560cee16f91a1d60204af13cb402f3baa59f10ccb432db93851d87df18b6",
+          "blob": "5a8d5a3dd8afb2d77083c1cd2aad7d818c7a1e64",
+          "size": 4542,
+          "sha256": "ec6d63fbb48f0d6ae544537e63b74d914629b4ac9d4bc141fa371827c1e7bcb2",
           "kind": "source"
         },
         {
@@ -15601,9 +15700,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0dc32cd94747e2cc7d44777a978c437bbbb69f1",
-          "size": 18553,
-          "sha256": "b62543575d93b9fb812d411c7afd187ca0f8be4b3df5eeb908c47f5f806540e0",
+          "blob": "76168210a4af5601111c419c21b67dd4a754eff9",
+          "size": 18815,
+          "sha256": "247b631398a2b66e36e30f837c5ce323954eb8be07c67f5c668448db84fab996",
           "kind": "source"
         },
         {
@@ -16501,18 +16600,18 @@
           "path": "scripts/test-electron-lifecycle-stress.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3ee4a348d7fa5cf59cbe5f9122c8dcd4c41f7cfb",
-          "size": 56497,
-          "sha256": "7a236ccb45ec2012241ce7e9bf6b50b0e1ddc4fd1d4fc890e7f6f9c3024f859d",
+          "blob": "856814c95f6b7cc357eb5a4951b9eb2bf1452011",
+          "size": 57282,
+          "sha256": "ba5f08976815c6c5516c28b692a6db784fd06a12fa911cf60a621966d7dafdf4",
           "kind": "source"
         },
         {
           "path": "scripts/test-electron-main-chat-sequences.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7f0f63ac43a0589dd77cca5b18f90c4b7a2d8bbf",
-          "size": 79998,
-          "sha256": "06cb690620f23b0c3007463fb7e31875544776253cd6a034e1bbc9fb619af93b",
+          "blob": "67136c4ef2c8f0259889940a1d6177353b35c03d",
+          "size": 81461,
+          "sha256": "e52a2fded84e1037fb4454e70a683e68a04b9822233b0dba3df49b2885494b47",
           "kind": "source"
         },
         {
@@ -16528,9 +16627,9 @@
           "path": "scripts/test-electron-ui-apps-smoke.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "803377ab6d63dd6ae6b2537b09dffc77ececb5e1",
-          "size": 112484,
-          "sha256": "71f9bce55e181a246e6ee99d23b376f0206ba0ce0bfa2b503ceef4d1064deac5",
+          "blob": "5599f80db8673e9686c3a77046fba7da10d71bf0",
+          "size": 114076,
+          "sha256": "5d70141d545b44481fc44299113b8f4905673c0db4b8795c3f8ce911ed4f5f10",
           "kind": "source"
         },
         {
@@ -16609,9 +16708,9 @@
           "path": "scripts/test-settings-wa-electron.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8a979d90a5448556e0dc1cd99de717cc051ee2a4",
-          "size": 35109,
-          "sha256": "4b809e4c4fb2b176d1288eb468176410cbcf1f77659255a808f75a5e5af85dd6",
+          "blob": "04538e623f6eaa39328c42e79167ea0aa3520094",
+          "size": 35533,
+          "sha256": "8d1f9785dafdd783ef2d201f5edc3e7dfaed80088d82e504d0ec46f7d539e77e",
           "kind": "source"
         },
         {
@@ -18265,9 +18364,9 @@
           "path": "tests/vcpchat-managed-bootstrap-m3-m8.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b59254c1f0749c52a16ec1f5989068ff5add5ae1",
-          "size": 18129,
-          "sha256": "07b736ecdadddc3d56f21f02ae113fa06d983849e7908b53bbf3666ea5de2a2a",
+          "blob": "ccd86d5d5c4f63ce0f72faf56afc29b40c10bc81",
+          "size": 19900,
+          "sha256": "ea0eb9b6e6266c7e3227c937832e6559c972ec264eda17345cd897fd36c8fffa",
           "kind": "source"
         },
         {

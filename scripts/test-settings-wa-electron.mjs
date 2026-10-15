@@ -64,6 +64,8 @@ await fs.copyFile(path.join(root, 'assets', 'default_user_avatar.png'), path.joi
 await fs.writeFile(path.join(appData, 'settings.json'), JSON.stringify({
     uiMode: 'next',
     enableDistributedServer: false,
+    voiceMode: 'local',
+    voiceLocalSettings: { sovitsUrl: process.env.VCPCHAT_TEST_SOVITS_URL || 'http://127.0.0.1:1' },
     vcpServerUrl: 'http://127.0.0.1:1',
     vcpApiKey: 'smoke-test-key',
     continueWritingPrompt: '请继续',
@@ -170,7 +172,7 @@ try {
 
     // Appearance home-visual switches stay on the far-right control column,
     // rather than dropping below their title and helper copy.
-    await page.evaluate(() => document.querySelectorAll('#globalSettingsModal .vcp-uiux-settings-nav-cell')[2]?.click());
+    await page.evaluate(() => document.querySelector('#vcpSettingsTab-appearance-settings')?.click());
     await page.waitForFunction(() => document.querySelector('#globalSettingsModal .settings-section.active')?.id === 'section-appearance-settings', { timeout: timeoutMs });
     const homeVisualSwitches = await page.evaluate(() => [...document.querySelectorAll('#globalSettingsModal .appearance-home-visual-setting')].map(row => {
         const copy = row.querySelector('.appearance-home-visual-copy')?.getBoundingClientRect();
@@ -288,7 +290,7 @@ try {
     assert.ok(contentWidthGeometry.choiceTop < contentWidthGeometry.copyBottom && contentWidthGeometry.choiceBottom > contentWidthGeometry.copyTop, `content-width choice shares the title row: ${JSON.stringify(contentWidthGeometry)}`);
     assert.equal(contentWidthGeometry.optionHeight, '24px', `content-width choice uses compact 24px pills: ${JSON.stringify(contentWidthGeometry)}`);
     assert.equal(contentWidthGeometry.optionRadius, '12px', `content-width choice uses compact 12px radius: ${JSON.stringify(contentWidthGeometry)}`);
-    assert.equal(contentWidthGeometry.optionBorder, '0px', `content-width choice has no resting border: ${JSON.stringify(contentWidthGeometry)}`);
+    assert.equal(contentWidthGeometry.optionBorder, '1px', `content-width choice retains the current 1px selection border: ${JSON.stringify(contentWidthGeometry)}`);
     assert.equal(contentWidthGeometry.optionFontSize, '12px', `content-width choice uses compact 12px text: ${JSON.stringify(contentWidthGeometry)}`);
     await page.evaluate(() => document.querySelector('#chatLayoutModeWide')?.closest('label')?.click());
     await sleep(250);
@@ -313,7 +315,7 @@ try {
     await page.evaluate(() => document.querySelector('#chatLayoutModeNormal')?.closest('label')?.click());
     await sleep(120);
     console.log('  [PASS] content-width choice stays on the right');
-    await page.evaluate(() => document.querySelectorAll('#globalSettingsModal .vcp-uiux-settings-nav-cell')[0]?.click());
+    await page.evaluate(() => document.querySelector('#vcpSettingsTab-user-identity')?.click());
     await page.waitForFunction(() => document.querySelector('#globalSettingsModal .settings-section.active')?.id === 'section-user-identity', { timeout: timeoutMs });
 
     // ---- 2. Category switching keeps unsaved values ----
@@ -322,13 +324,13 @@ try {
         input.value = '未保存测试';
         input.dispatchEvent(new Event('input', { bubbles: true }));
     });
-    await page.evaluate(() => document.querySelectorAll('#globalSettingsModal .vcp-uiux-settings-nav-cell')[1].click());
+    await page.evaluate(() => document.querySelector('#vcpSettingsTab-server-connection').click());
     await new Promise(resolve => setTimeout(resolve, 80));
     const switchState = await page.evaluate(() => ({
         active: document.querySelector('#globalSettingsModal .settings-section.active')?.id,
     }));
     assert.equal(switchState.active, 'section-server-connection', 'nav switched to server connection');
-    await page.evaluate(() => document.querySelectorAll('#globalSettingsModal .vcp-uiux-settings-nav-cell')[0].click());
+    await page.evaluate(() => document.querySelector('#vcpSettingsTab-user-identity').click());
     await new Promise(resolve => setTimeout(resolve, 80));
     const backState = await page.evaluate(() => ({
         active: document.querySelector('#globalSettingsModal .settings-section.active')?.id,
@@ -361,7 +363,7 @@ try {
         search.dispatchEvent(new Event('input', { bubbles: true }));
     });
     await new Promise(resolve => setTimeout(resolve, 80));
-    assert.equal(await page.evaluate(() => document.querySelectorAll('#globalSettingsModal .vcp-uiux-settings-nav-cell').length), 8, 'unified nav retains all categories');
+    assert.equal(await page.evaluate(() => document.querySelectorAll('#globalSettingsModal .vcp-uiux-settings-nav-cell').length), shellState.navCount, 'unified nav retains all categories');
     console.log('  [PASS] 3. search locates and activates the matching category');
 
     // ---- 4. Dark screenshot (700×500) ----
@@ -371,7 +373,7 @@ try {
     await page.evaluate(() => window.uiHelperFunctions.openModal('globalSettingsModal'));
     await page.waitForFunction(() => document.querySelector('#globalSettingsModal .vcp-uiux-settings-panel'), { timeout: timeoutMs });
     await page.evaluate(() => {
-        document.querySelectorAll('#globalSettingsModal .vcp-uiux-settings-nav-cell')[2]?.click();
+        document.querySelector('#vcpSettingsTab-appearance-settings')?.click();
         document.querySelector('#globalSettingsModal .chat-presentation-mode-selector')?.scrollIntoView({ block: 'center' });
     });
     await new Promise(resolve => setTimeout(resolve, 250));
@@ -480,6 +482,10 @@ try {
             };
         }, { once: true });
     });
+    const invalidFields = await page.evaluate(() => [...document.getElementById('globalSettingsForm').elements]
+        .filter(field => field.willValidate && !field.validity.valid)
+        .map(field => ({ name: field.name, stepMismatch: field.validity.stepMismatch })));
+    assert.deepEqual(invalidFields, [], 'default settings must not block native form submission');
     await page.evaluate(() => document.getElementById('globalSettingsForm')?.requestSubmit());
     // Poll for the modal to close; collect diagnostics so a hang is debuggable.
     let saveDiagnostics = null;

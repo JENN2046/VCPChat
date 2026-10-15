@@ -20,6 +20,7 @@ function installNativeConversationPort({window,snapshot,isSessionCurrent,observe
    const context=Object.freeze({});events.set(context,value);return context;
   },
   read:context=>events.get(context)||null,
+  invalidate:clear,
   dispose(){clear();wc.removeListener('before-input-event',key);wc.removeListener('before-mouse-event',mouse);wc.removeListener('blur',clear);wc.removeListener('did-start-navigation',clear);}
  };
 }

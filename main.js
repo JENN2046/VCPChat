@@ -1593,7 +1593,7 @@ if (!gotTheLock) {
             logger: console,
         });
         const nativeConversation = require('./modules/ipc/nativeConversationHandlers');
-        await nativeConversation.initialize({mainWindow,chartService});
+        await nativeConversation.initialize({mainWindow,chartService,nativeEpoch:()=>distributedServer?.nativeConversationClient?.epoch()??0,nativeRequest:request=>{const client=distributedServer?.nativeConversationClient;if(!client)throw Error('NATIVE_TRANSPORT_UNAVAILABLE');return client.request(request);}});
         configureDocxHandlers({
             mainWindow,
             openChildWindows,

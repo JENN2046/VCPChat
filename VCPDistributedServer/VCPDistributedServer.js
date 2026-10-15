@@ -277,6 +277,9 @@ class DistributedServer {
 
         // this.ws 现在是一个纯粹的客户端实例
         this.ws = new WebSocket(connectionUrl);
+        this.nativeConversationClient ??= require('../modules/services/trustedConversation/webSocket.cjs').createNativeWebSocketClient();
+        const nativeSocket = this.ws;
+        this.nativeConversationClient.bind(nativeSocket);
 
         this.ws.on('open', async () => {
             console.log(`[${this.serverName}] Successfully connected to main server.`);
@@ -290,7 +293,7 @@ class DistributedServer {
         });
 
         this.ws.on('message', (message) => {
-            this.handleMainServerMessage(message);
+            this.handleMainServerMessage(message, nativeSocket);
         });
         
         this.ws.on('close', () => {
@@ -597,16 +600,18 @@ class DistributedServer {
         }
     }
 
-    async handleMainServerMessage(message) {
+    async handleMainServerMessage(message, nativeSocket = this.ws) {
         try {
             const parsedMessage = JSON.parse(message);
+            // Private native results never enter generic tool dispatch or diagnostics.
+            if (this.nativeConversationClient?.receive(nativeSocket, parsedMessage)) return;
             if (this.debugMode) console.log(`[${this.serverName}] Received message from main server:`, parsedMessage.type);
 
             if (parsedMessage.type === 'execute_tool') {
                 await this.handleToolExecutionRequest(parsedMessage.data);
             }
         } catch (e) {
-            console.error(`[${this.serverName}] Error parsing message from main server:`, e);
+            console.error('[DistributedServer] MAIN_SERVER_MESSAGE_INVALID');
         }
     }
 

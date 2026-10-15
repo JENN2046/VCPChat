@@ -12388,9 +12388,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "4d4b33647115daccdfb0fc92d823a13ce5de7389",
-          "size": 247034,
-          "sha256": "171ee3b863467402cbee5f1c4ca45c739f9bd46ae8ba008c98a3fde44a13ca5f",
+          "blob": "d0d178124d3c7c998280cb0267b6f81508333f26",
+          "size": 249560,
+          "sha256": "263cd39837e744088081987876c9f2e83fe82cf296d2b81a64c4a0f7f7a4d0bb",
           "kind": "source"
         },
         {
@@ -16258,9 +16258,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2bcb6563c7e1250602471b22d905a6256fcbda40",
-          "size": 35094,
-          "sha256": "8b7a690bb4b904217b8d86d0a329ef75bf8f2c6ea6c1c42fc103ff860186ae0b",
+          "blob": "435f4c8cdeb110fb249636a98b0ffec57b52447e",
+          "size": 36182,
+          "sha256": "baf9b3f483f8e10545584de7b7abe4730fafc67b66d774a38ba8ffd370e977b1",
           "kind": "source"
         },
         {
@@ -16393,9 +16393,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "b0f5eb65fc16471eacd6b9c1fead2b1a191fac5f",
-          "size": 9429,
-          "sha256": "72bd44d11857c2c59d88752101214613447e553379adf60bf367a4a765289566",
+          "blob": "572c80a1b19570ab12322e9383d9dfbdeaee409d",
+          "size": 10125,
+          "sha256": "bbcd143e4b62f145c357bfafaa3c7e0c694a01d448cabac4fca963b4c0d42375",
           "kind": "source"
         },
         {
@@ -18013,9 +18013,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "84cfa1fa980d54bd77eff010e299e74ac3ada424",
-          "size": 15933,
-          "sha256": "4e1d2d568f5896345697a22045cde45839740a093ac79a91c674f620f1bbd2a8",
+          "blob": "82a32408297bfca39e742c04f9da6242ad5e5390",
+          "size": 16679,
+          "sha256": "83b6ccf0313f6cf97081503e9c36e21e467b873284086c5533e211b53db25310",
           "kind": "source"
         },
         {

@@ -55,24 +55,39 @@ async function lifecycle(t,options={}){
  vm.runInNewContext(source,{require:req,module:m,exports:m.exports,process:{env:{}},setInterval(fn){timers.add(fn);return {unref(){}};},clearInterval(){timers.clear();}});
  const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async()=>({eligible:true,text:'把合成排期延后1分钟',conversationId:'A:T'});
  const event={sender:wc,senderFrame:wc.mainFrame},invoke=(action,p={})=>handlers.get('native-conversation:'+action)(event,p);
- await m.exports.initialize({mainWindow:{webContents:wc,isDestroyed:()=>disposed,isFocused:()=>true},binding:{transport:'vcp-websocket',toolName:'Fixture',clientInstanceId,applicationAuthorizationEnv:'SYNTHETIC'},nativeEpoch:()=>distributed?.nativeConversationClient?.epoch()??0,nativeRequest:r=>{if(!distributed?.nativeConversationClient)throw Error('NATIVE_TRANSPORT_UNAVAILABLE');return distributed.nativeConversationClient.request(r);}});
+ const binding={transport:'vcp-websocket',toolName:'Fixture',clientInstanceId,applicationAuthorizationEnv:'SYNTHETIC'};
+ await m.exports.initialize({mainWindow:{webContents:wc,isDestroyed:()=>disposed,isFocused:()=>true},binding,nativeEpoch:()=>distributed?.nativeConversationClient?.epoch()??0,nativeRequest:r=>{if(!distributed?.nativeConversationClient)throw Error('NATIVE_TRANSPORT_UNAVAILABLE');return distributed.nativeConversationClient.request(r);}});
  const code=fs.readFileSync(path.join(root,'VCPDistributedServer/VCPDistributedServer.js'),'utf8');
  const connectSource=code.slice(code.indexOf('    connect() {'),code.indexOf('    scheduleReconnect()',code.indexOf('    connect() {')));
  class Wire extends EventEmitter{
   constructor(url){super();this.url=url;this.readyState=0;sockets.push(this);}
-  send(text){const frame=JSON.parse(text);frames.push(frame);const reply=result=>distributed.nativeConversationClient.receive(this,{type:'native_conversation_response',requestId:frame.requestId,result});
-   if(options.onFrame?.(frame,{reply,wire:this})===true)return;
+  send(text,callback){const frame=JSON.parse(text);frames.push(frame);const reply=result=>distributed.nativeConversationClient.receive(this,{type:'native_conversation_response',requestId:frame.requestId,result});
+   if(options.onFrame?.(frame,{reply,wire:this,callback})===true)return;
    reply(frame.body.action==='prepare'?{ok:true,handled:true,sourceId:frame.body.payload.messageId}:frame.body.action==='execute'?{ok:true,committed:true,operationId:'synthetic-operation'}:frame.body.action==='recover'?{ok:true,results:[{ok:true,committed:true,operationId:'synthetic-operation'}]}:{ok:true});
   }
  }
- const connect=new Function('console','WebSocket','require',`return ({${connectSource.trim()}}).connect;`)({log(){},warn(){},error(){}},Wire,p=>p.endsWith('/webSocket.cjs')?{createNativeWebSocketClient,isSecureNativeWebSocketUrl:()=>true}:base(p));
+ const connect=new Function('console','WebSocket','require',`return ({${connectSource.trim()}}).connect;`)({log(){},warn(){},error(){}},Wire,p=>p.endsWith('/webSocket.cjs')?{createNativeWebSocketClient:()=>createNativeWebSocketClient({timeoutMs:options.timeoutMs??25000}),isSecureNativeWebSocketUrl:()=>true}:base(p));
  distributed={mainServerUrl:'http://127.0.0.1:12345',vcpKey:'synthetic',nativeConversationWebSocket:true,registerTools(){},async reportIPAddress(){},async pushMusicPlaylistUpdate(){},setupStaticPlaceholderUpdates(){},clearStaticPlaceholderUpdates(){},scheduleReconnect(){}};
  const bind=()=>{connect.call(distributed);return distributed.ws;},open=()=>{distributed.ws.readyState=1;distributed.ws.emit('open');};
  const close=()=>{distributed.ws.readyState=3;distributed.ws.emit('close');};
  const capture=()=>wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});
  t.after(()=>{disposed=true;wc.emit('destroyed');distributed.nativeConversationClient?.close(distributed.ws);});
- return {frames,invoke,bind,open,close,capture,epoch:()=>distributed.nativeConversationClient?.epoch()??0,reconnect(){close();bind();open();},async tick(){for(const fn of timers)await fn();},async prepare(){capture();return invoke('prepare',{text:'把合成排期延后1分钟',conversationId:'A:T'});}};
+ return {binding,request:body=>distributed.nativeConversationClient.request({clientInstanceId,toolName:'Fixture',authorization:'Bearer '+'x'.repeat(40),body}),frames,invoke,bind,open,close,capture,epoch:()=>distributed.nativeConversationClient?.epoch()??0,reconnect(){close();bind();open();},async tick(){for(const fn of timers)await fn();},async prepare(){capture();return invoke('prepare',{text:'把合成排期延后1分钟',conversationId:'A:T'});}};
 }
+for(const mode of ['connecting','closing','closed-before-event','busy','invalid-client','insecure-url'])test('real pre-send '+mode+' keeps draft and consumes source without a frame',async t=>{
+ let hold=false;const inflight=[];const f=await lifecycle(t,{onFrame(frame){return hold&&frame.body.action==='status';}});const wire=f.bind();f.open();
+ const r=await renderer(()=>f.prepare(),{afterSave(){if(mode==='busy'){hold=true;for(let i=0;i<16;i++)inflight.push(f.request({action:'status',payload:{}}).catch(()=>{}));}else if(mode==='invalid-client')f.binding.clientInstanceId='invalid';else if(mode==='insecure-url')wire.url='ws://example.invalid';else wire.readyState={connecting:0,closing:2,'closed-before-event':3}[mode];},execute:p=>f.invoke('execute',p)});
+ assert.equal(r.returned.dispatched,false);assert.equal(r.returned.preserveInput,true);assert.equal(r.input,'把合成排期延后1分钟');assert.match(r.history.at(-1).content,/本次未派发/);assert.equal(r.listeners,0);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,0);
+ const id=f.frames.find(x=>x.body.action==='prepare').body.payload.messageId;assert.equal((await f.invoke('execute',{sourceId:id})).code,'SOURCE_UNKNOWN');f.close();await Promise.all(inflight);
+});
+for(const mode of ['throw','callback','timeout','invalid-response'])test('send begun '+mode+' stays unknown and never restores original command',async t=>{
+ const f=await lifecycle(t,{timeoutMs:20,onFrame(frame,{reply,callback}){if(frame.body.action!=='execute')return false;if(mode==='throw')throw Object.assign(Error('NATIVE_REQUEST_BUSY'),{dispatched:false,preserveInput:true});if(mode==='callback'){assert.equal(typeof callback,'function');callback(Object.assign(Error('NATIVE_REQUEST_BUSY'),{dispatched:false}));}if(mode==='invalid-response')reply({dispatched:false,preserveInput:true});return true;}});f.bind();f.open();
+ const r=await renderer(()=>f.prepare(),{execute:p=>f.invoke('execute',p)});assert.equal(r.returned.code,'RESULT_UNKNOWN');assert.equal(r.input,'');assert.equal(r.listeners,0);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,1);await f.tick();assert.equal(f.frames.filter(x=>x.body.action==='execute').length,1);
+});
+for(const change of ['new-text','same-text','topic-return','attachment'])test('pre-send denial does not overwrite replacement '+change,async t=>{
+ const f=await lifecycle(t);const wire=f.bind();f.open();const r=await renderer(()=>f.prepare(),{afterSave(controls){wire.readyState=2;if(change==='new-text')controls.edit('new draft');if(change==='same-text'){controls.edit('changed');controls.edit('把合成排期延后1分钟');}if(change==='topic-return'){controls.switchTopic();controls.returnTopic();}if(change==='attachment')controls.attach();},execute:p=>f.invoke('execute',p)});
+ assert.equal(r.returned.dispatched,false);assert.equal(r.input,change==='new-text'?'new draft':'把合成排期延后1分钟');assert.equal(r.listeners,0);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,0);
+});
 test('real distributed startup binds after IPC: first open and first physical send succeed',async t=>{
  const f=await lifecycle(t);assert.equal(f.epoch(),0);f.bind();assert.equal(f.epoch(),1);f.open();assert.equal(f.epoch(),1);
  const r=await renderer(()=>f.prepare(),{execute:p=>f.invoke('execute',p)});assert.equal(r.returned.committed,true);assert.equal(r.input,'');assert.equal(f.frames.filter(x=>x.body.action==='execute').length,1);assert.equal(r.listeners,0);
@@ -172,4 +187,34 @@ test('WS transport still rejects absent runtime request dependency',()=>assert.t
 
 for(const value of ['-'.repeat(36),'a'.repeat(36),'0000000-00000-4000-8000-000000000001',undefined,[clientInstanceId]])test('WS client rejects malformed UUID without sending: '+JSON.stringify(value),async()=>{
  const c=createNativeWebSocketClient(),s=socket();c.bind(s);try{await assert.rejects(c.request({clientInstanceId:value,body:{action:'status',payload:{}}}),/NATIVE_CLIENT_BINDING_REQUIRED/);assert.equal(s.frames.length,0);}finally{c.close(s);}
+});
+
+// A private local error identity is required; host-supplied codes/flags never suffice.
+const {isNativeRequestNotSent}=require('../modules/services/trustedConversation/webSocket.cjs');
+async function rejected(promise){try{await promise;assert.fail('expected rejection');}catch(error){return error;}}
+for(const input of [undefined,null,{}, {clientInstanceId:'invalid'}])test('invalid request input is proven pre-send: '+JSON.stringify(input),async()=>{
+ const c=createNativeWebSocketClient(),s=socket();c.bind(s);try{const error=await rejected(c.request(input));assert.equal(isNativeRequestNotSent(error),true);assert.equal(s.frames.length,0);}finally{c.close(s);}
+});
+test('missing socket is proven pre-send; matching error text and fields cannot forge proof',async()=>{
+ const c=createNativeWebSocketClient();const error=await rejected(c.request({clientInstanceId,body:{action:'execute',payload:{}}}));assert.equal(isNativeRequestNotSent(error),true);
+ for(const fake of [undefined,null,{message:error.message,dispatched:false,preserveInput:true},Object.assign(Error(error.message),{dispatched:false,preserveInput:true})])assert.equal(isNativeRequestNotSent(fake),false);
+});
+for(const kind of ['cycle','bigint'])test('serialization '+kind+' rejects before pending allocation and send',async()=>{
+ const c=createNativeWebSocketClient(),s=socket();c.bind(s);const body=kind==='bigint'?{value:1n}:{};if(kind==='cycle')body.self=body;
+ try{for(let i=0;i<20;i++){const error=await rejected(c.request({clientInstanceId,body}));assert.equal(isNativeRequestNotSent(error),true);assert.equal(error.message,'NATIVE_REQUEST_INVALID');}assert.equal(s.frames.length,0);
+ const p=c.request({clientInstanceId,body:{action:'status',payload:{}}});assert.equal(s.frames.length,1);c.receive(s,{type:'native_conversation_response',requestId:s.frames[0].requestId,result:{ok:true}});await p;
+ }finally{c.close(s);}
+});
+for(const mode of ['throw','callback'])test('send '+mode+' cannot reuse an earlier local pre-send proof',async()=>{
+ const c=createNativeWebSocketClient(),s=socket();c.bind(s);const proof=await rejected(c.request({clientInstanceId:'invalid'}));assert.equal(isNativeRequestNotSent(proof),true);let sends=0;
+ s.send=(_text,callback)=>{sends++;if(mode==='throw')throw proof;queueMicrotask(()=>callback(proof));};
+ try{const error=await rejected(c.request({clientInstanceId,body:{action:'execute',payload:{}}}));assert.equal(error.message,'NATIVE_RESULT_UNKNOWN');assert.equal(isNativeRequestNotSent(error),false);assert.equal(sends,1);}finally{c.close(s);}
+});
+test('send callback success still awaits host response and callback failure releases one pending slot',async()=>{
+ const c=createNativeWebSocketClient(),s=socket();c.bind(s);const callbacks=[];s.send=(text,callback)=>{s.frames.push(JSON.parse(text));callbacks.push(callback);};
+ const requests=Array.from({length:16},()=>c.request({clientInstanceId,body:{action:'status',payload:{}}}).catch(error=>error));
+ const busy=await rejected(c.request({clientInstanceId,body:{action:'execute',payload:{}}}));assert.equal(busy.message,'NATIVE_REQUEST_BUSY');assert.equal(isNativeRequestNotSent(busy),true);assert.equal(s.frames.length,16);
+ callbacks[0]();const stillBusy=await rejected(c.request({clientInstanceId,body:{action:'execute',payload:{}}}));assert.equal(isNativeRequestNotSent(stillBusy),true);assert.equal(s.frames.length,16);
+ callbacks[0](Error('synthetic asynchronous failure'));assert.equal(isNativeRequestNotSent(await requests[0]),false);
+ const next=c.request({clientInstanceId,body:{action:'recover',payload:{}}}).catch(error=>error);assert.equal(s.frames.length,17);c.close(s);await Promise.all([...requests,next]);
 });

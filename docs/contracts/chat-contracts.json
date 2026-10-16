@@ -1535,37 +1535,37 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 13,
+        "line": 14,
         "kind": "event-listener",
         "match": "ipcMain.handle(c"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 84,
+        "line": 85,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[0]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 109,
+        "line": 110,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[1]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 122,
+        "line": 129,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[2]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 138,
+        "line": 145,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[3]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 139,
+        "line": 146,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[4]"
       }

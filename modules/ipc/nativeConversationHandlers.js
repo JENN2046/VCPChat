@@ -2,6 +2,7 @@
 const fs=require('node:fs'),{ipcMain}=require('electron');
 const {installNativeConversationPort}=require('../services/trustedConversation/nativePort.cjs');
 const {createNativeTransport}=require('../services/trustedConversation/transport.cjs');
+const {isNativeRequestNotSent}=require('../services/trustedConversation/webSocket.cjs');
 function bindingFromEnvironment(){const file=process.env.VCPCHAT_NATIVE_TOOL_BINDING_FILE;if(!file)return null;const binding=JSON.parse(fs.readFileSync(file,'utf8'));if(!binding||typeof binding!=='object'||Array.isArray(binding))throw Error('NATIVE_CONFIGURATION_INVALID');return binding;}
 const initializedWindows=new WeakSet();
 // Main-process ownership: destroying a renderer must not forget a failed revoke.
@@ -115,7 +116,13 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
   pending.delete(p.sourceId);const {event}=record;
   if(record.epoch!==readEpoch())return {...connectionChanged(),dispatched:false,message:'连接已变化，本次未派发。请重新提出调整并确认新方案。'};
   if(record.invalidated||blocked(event.conversationId))return {...invalidationRequired(),preserveInput:true,dispatched:false,message:'旧方案已失效，本次未派发。请重新提出调整并确认新方案。'};
-  const result=await transport.project(await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId}));
+  let response;
+  try{response=await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId});}
+  catch(error){
+   if(binding.transport==='vcp-websocket'&&isNativeRequestNotSent(error))return {handled:true,ok:false,code:error.message,dispatched:false,preserveInput:true,message:'本次未派发，待发送文本已保留。请重新提出调整并确认新方案。'};
+   throw error;
+  }
+  const result=await transport.project(response);
   // A host result must never turn a dispatched operation into a retryable draft.
   return {...result,dispatched:true,preserveInput:false};
  });

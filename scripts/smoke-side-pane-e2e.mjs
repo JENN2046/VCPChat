@@ -296,9 +296,48 @@ function kinds(pageUrl) {
             use: async page => {
                 const marker = 'SMOKE_TERM_' + Date.now();
                 await waitIn(page, () => !!document.querySelector('.side-pane-view.active .xterm-helper-textarea'), null, 'terminal mounted');
-                await page.evaluate(() => document.querySelector('.side-pane-view.active .xterm-helper-textarea')?.focus());
-                await page.keyboard.type(`echo ${marker}\n`);
-                await waitIn(page, m => (document.querySelector('.side-pane-view.active .xterm-rows, .side-pane-view.active .xterm-accessibility-tree')?.textContent || '').split(m).length > 2, marker, 'terminal echo');
+                const diagnostic = { phase, marker, startedAt: Date.now(), samples: [] };
+                // Synthetic marker counts only: never retain shell text, paths or configuration.
+                await page.evaluate(m => {
+                    const api = window.chatAPI || window.electronAPI;
+                    const d = { startedAt: Date.now(), outputEvents: 0, outputChars: 0, markerHits: 0, exits: 0, samples: [] };
+                    let tail = '';
+                    const stops = [api.onTerminalData?.(event => {
+                        const text = String(event?.data || '');
+                        d.outputEvents++; d.outputChars += text.length;
+                        const joined = tail + text;
+                        d.markerHits += joined.split(m).length - 1;
+                        tail = joined.slice(-(m.length - 1));
+                    }), api.onTerminalExit?.(() => { d.exits++; })];
+                    const sample = () => {
+                        const view = document.querySelector('.side-pane-view.active');
+                        const rows = view?.querySelector('.xterm-rows');
+                        const a11y = view?.querySelector('.xterm-accessibility-tree');
+                        const count = el => (el?.textContent || '').split(m).length - 1;
+                        const focus = document.activeElement;
+                        const item = { elapsedMs: Date.now() - d.startedAt,
+                            focusedTerminal: focus === view?.querySelector('.xterm-helper-textarea'),
+                            activeTabIsTerminal: !!document.querySelector('.side-pane-tab.active[data-tab-id^="terminal:"]'),
+                            status: view?.querySelector('.side-terminal-status')?.dataset.state || null,
+                            rowsPresent: !!rows, a11yPresent: !!a11y,
+                            rowsMarkers: count(rows), a11yMarkers: count(a11y),
+                            selectedMarkers: count(view?.querySelector('.xterm-rows, .xterm-accessibility-tree')),
+                            outputEvents: d.outputEvents, outputChars: d.outputChars, markerHits: d.markerHits, exits: d.exits };
+                        d.samples.push(item);
+                    };
+                    sample();
+                    const timer = setInterval(sample, 500);
+                    window.__sidePaneTerminalDiagnostic = { finish() { clearInterval(timer); sample(); for (const stop of stops) stop?.(); delete window.__sidePaneTerminalDiagnostic; return d; } };
+                }, marker);
+                try {
+                    await page.evaluate(() => document.querySelector('.side-pane-view.active .xterm-helper-textarea')?.focus());
+                    await page.keyboard.type(`echo ${marker}\n`);
+                    await waitIn(page, m => (document.querySelector('.side-pane-view.active .xterm-rows, .side-pane-view.active .xterm-accessibility-tree')?.textContent || '').split(m).length > 2, marker, 'terminal echo');
+                    diagnostic.ok = true;
+                } finally {
+                    diagnostic.observation = await page.evaluate(() => window.__sidePaneTerminalDiagnostic?.finish());
+                    (report.terminalDiagnostics ||= []).push(diagnostic);
+                }
             },
         },
         browser: {

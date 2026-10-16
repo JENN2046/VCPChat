@@ -37,6 +37,71 @@ test('addresses open as before', () => {
     assert.equal(resolveBrowserAddress('   '), null);
 });
 
+for (const oldOutcome of ['resolved', 'late-success', 'late-failure']) {
+    test(`replacement guest owns readiness and isolates ${oldOutcome} acknowledgements`, async () => {
+        const { JSDOM } = await import('jsdom');
+        const { createBrowserSideProvider } = await import('../modules/ui-system/side-pane/browserSideProvider.js');
+        const dom = new JSDOM('<div id="view"></div>');
+        const requests = [], unregistered = [];
+        let handle;
+        const tab = { id: 'browser:replacement', kind: 'browser', payload: {} };
+        const provider = createBrowserSideProvider({ document: dom.window.document,
+            api: {
+                browserRegisterTarget: (_tab, id) => new Promise((resolve, reject) => requests.push({ id, resolve, reject })),
+                browserUnregisterTarget: async (_tab, id) => { unregistered.push(id); },
+            },
+            sidePaneController: { updateTab() {}, setVisible() {}, getSnapshot: () => ({ tabs: [tab] }), openTab: async () => handle },
+            notify() {} });
+        handle = await provider.mountTab(tab, dom.window.document.getElementById('view'));
+        const readyGuest = id => {
+            const guest = dom.window.document.querySelector('webview');
+            guest.getWebContentsId = () => id;
+            guest.dispatchEvent(new dom.window.Event('dom-ready'));
+            return guest;
+        };
+        const tick = () => new Promise(resolve => setImmediate(resolve));
+        try {
+            handle.navigate('https://example.test/');
+            const oldGuest = readyGuest(101);
+            const oldReady = handle.whenRegistered();
+            const oldRejected = oldOutcome === 'resolved' ? null : assert.rejects(oldReady, /替换/);
+            if (oldOutcome === 'resolved') {
+                requests[0].resolve({ success: true, data: { generation: 1 } });
+                await oldReady;
+            }
+            oldGuest.dispatchEvent(new dom.window.Event('render-process-gone'));
+            dom.window.document.querySelector('.side-browser-notice-retry').click();
+            const replacementReady = handle.whenRegistered();
+            assert.notEqual(replacementReady, oldReady);
+            if (oldRejected) await oldRejected;
+            let activated = false, assisted = false;
+            const activation = provider.handleAgentRequest({ action: 'activate', params: { targetId: tab.id } }).then(() => { activated = true; });
+            const assistance = provider.handleAgentRequest({ action: 'assist', params: { targetId: tab.id, assistance: { message: 'fixture' } } }).then(() => { assisted = true; });
+            await tick();
+            assert.equal(requests.length, 1, 'replacement waits for DOM-ready');
+            assert.equal(activated, false);
+            readyGuest(202);
+            if (oldOutcome === 'late-success') requests[0].resolve({ success: true, data: { generation: 1 } });
+            if (oldOutcome === 'late-failure') requests[0].reject(new Error('old generation failed'));
+            await tick();
+            assert.equal(activated, false);
+            assert.equal(assisted, false);
+            requests[1].resolve({ success: true, data: { generation: 2 } });
+            assert.deepEqual(await replacementReady, { generation: 2 });
+            await Promise.all([activation, assistance]);
+            assert.equal(activated, true);
+            assert.equal(assisted, true);
+            assert.ok(unregistered.includes(101));
+            // A second replacement's pending waiter must settle when its tab is disposed.
+            dom.window.document.querySelector('webview').dispatchEvent(new dom.window.Event('render-process-gone'));
+            dom.window.document.querySelector('.side-browser-notice-retry').click();
+            const disposedReady = assert.rejects(handle.whenRegistered(), /释放/);
+            await handle.dispose();
+            await disposedReady;
+        } finally { await handle.dispose(); dom.window.close(); }
+    });
+}
+
 test('plain text becomes a web search instead of an error', () => {
     assert.ok(normalizeBrowserInput('vcp 工具').error);
     assert.deepEqual(resolveBrowserAddress('vcp 工具'), { url: 'https://www.bing.com/search?q=vcp%20%E5%B7%A5%E5%85%B7' });

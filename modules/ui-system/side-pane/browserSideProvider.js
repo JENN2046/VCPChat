@@ -171,26 +171,31 @@ export function createBrowserSideProvider({
             let currentUrl = '';
             let registeredGuestId = null;
             let registration = null;
-            let resolveRegistration;
-            let rejectRegistration;
-            const registered = new Promise((resolve, reject) => {
-                resolveRegistration = resolve; rejectRegistration = reject;
-            });
-            registered.catch(() => {});
+            const createRegistrationReadiness = () => {
+                const state = {};
+                state.promise = new Promise((resolve, reject) => {
+                    state.resolve = resolve; state.reject = reject;
+                });
+                state.promise.catch(() => {});
+                return state;
+            };
+            let readiness = createRegistrationReadiness();
             const registerGuest = () => {
                 // did-attach alone does not make Electron's guest methods safe.
                 // Registration belongs to this live, DOM-ready view only.
                 if (disposed() || !domReady || registration || !api?.browserRegisterTarget || !webview?.getWebContentsId) return;
                 const guestId = webview.getWebContentsId();
+                const guest = webview;
+                const currentReadiness = readiness;
                 registeredGuestId = guestId;
                 registration = api.browserRegisterTarget(tab.id, guestId).then(res => {
                     if (!res?.success) throw new Error(res?.error || '浏览器目标注册失败。');
-                    if (disposed()) {
+                    if (disposed() || guest !== webview || currentReadiness !== readiness) {
                         void api.browserUnregisterTarget?.(tab.id, guestId);
                         return;
                     }
-                    resolveRegistration(res.data);
-                }).catch(error => rejectRegistration(error));
+                    currentReadiness.resolve(res.data);
+                }).catch(error => currentReadiness.reject(error));
             };
             let loading = false;
             // 静音的视频、摄像头预览也算在播：isCurrentlyAudible 只认出声的
@@ -430,6 +435,8 @@ export function createBrowserSideProvider({
             }
 
             function resetWebview() {
+                readiness.reject(new Error('浏览器页面已替换，请重试。'));
+                readiness = createRegistrationReadiness();
                 if (registeredGuestId !== null) void api?.browserUnregisterTarget?.(tab.id, registeredGuestId);
                 registeredGuestId = null;
                 registration = null;
@@ -594,7 +601,7 @@ export function createBrowserSideProvider({
             }, 'browser-tab-entry', 'subscription');
             // 网页视图最先拆：后登记的先释放，监听和登记在它之后
             own.own(() => {
-                rejectRegistration(new Error('浏览器标签已释放。'));
+                readiness.reject(new Error('浏览器标签已释放。'));
                 if (registeredGuestId !== null) void api?.browserUnregisterTarget?.(tab.id, registeredGuestId);
                 if (webview) {
                     webview.remove();
@@ -604,7 +611,7 @@ export function createBrowserSideProvider({
 
             return {
                 getTargetId() { return tab.id; },
-                whenRegistered() { return registered; },
+                whenRegistered() { return readiness.promise; },
                 showAssistance(value) {
                     assistance = value;
                     assistanceText.textContent = `AI 请求协助：${value.message}`;

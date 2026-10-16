@@ -31627,14 +31627,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 140,
+          "line": 144,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 140,
+          "line": 144,
           "kind": "event-listener",
           "match": "handle('vcp-game:agents'"
         },
@@ -31658,14 +31658,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 168,
+          "line": 172,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 168,
+          "line": 172,
           "kind": "event-listener",
           "match": "handle('vcp-game:continue'"
         },
@@ -31689,14 +31689,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 141,
+          "line": 145,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 141,
+          "line": 145,
           "kind": "event-listener",
           "match": "handle('vcp-game:create'"
         },
@@ -31720,14 +31720,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 181,
+          "line": 185,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 181,
+          "line": 185,
           "kind": "event-listener",
           "match": "ipcMain.handle('vcp-game:launch'"
         },
@@ -31751,14 +31751,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 146,
+          "line": 150,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 146,
+          "line": 150,
           "kind": "event-listener",
           "match": "handle('vcp-game:next'"
         },
@@ -31782,14 +31782,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 151,
+          "line": 155,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 151,
+          "line": 155,
           "kind": "event-listener",
           "match": "handle('vcp-game:observe'"
         },
@@ -31889,14 +31889,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 173,
+          "line": 177,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 173,
+          "line": 177,
           "kind": "event-listener",
           "match": "handle('vcp-game:stop'"
         },
@@ -31920,14 +31920,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 163,
+          "line": 167,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 163,
+          "line": 167,
           "kind": "event-listener",
           "match": "handle('vcp-game:submit'"
         },
@@ -34557,7 +34557,7 @@
     },
     {
       "file": "modules/ipc/gameHandlers.js",
-      "line": 134,
+      "line": 138,
       "reason": "dynamic event listener name: channel",
       "kind": "event-listener",
       "match": "ipcMain.handle(channel",
@@ -34565,7 +34565,7 @@
     },
     {
       "file": "modules/ipc/gameHandlers.js",
-      "line": 192,
+      "line": 196,
       "reason": "dynamic event listener name: channel",
       "kind": "event-listener",
       "match": "ipcMain.handle(channel",
@@ -35021,7 +35021,7 @@
     },
     {
       "file": "modules/ui-system/side-pane/browserSideProvider.js",
-      "line": 346,
+      "line": 351,
       "reason": "dynamic listener name: name",
       "kind": "custom-event-listener",
       "match": "guest.addEventListener(name",

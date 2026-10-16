@@ -8,6 +8,44 @@ const { pathToFileURL } = require('node:url');
 const { EventEmitter } = require('node:events');
 const handlers = new Map();
 const windows = [];
+test('runtime configuration registers every game IPC once without launching games', async () => {
+    const vm = require('node:vm');
+    const registered = new Map();
+    let constructions = 0;
+    const exported = { exports: {} };
+    const fakeService = { listRecords: async () => ({ records: ['synthetic'] }) };
+    const source = fs.readFileSync(path.join(__dirname, '../modules/ipc/gameHandlers.js'), 'utf8');
+    vm.runInNewContext(source, {
+        module: exported, URL, __dirname: path.join(__dirname, '../modules/ipc'),
+        require(name) {
+            if (name === 'electron') return {
+                BrowserWindow: class { constructor() { throw new Error('must not open a window'); } },
+                ipcMain: { handle(channel, fn) {
+                    assert.equal(registered.has(channel), false, 'duplicate handler');
+                    registered.set(channel, fn);
+                } },
+            };
+            if (name === '../game/gameRuntime') return { GameRuntime: class {
+                constructor(options) { constructions++; this.gameService = options.gameService; }
+            } };
+            if (name === 'path' || name === 'url') return require(name);
+            throw new Error(`Unexpected runtime load: ${name}`);
+        },
+    });
+    const runtimeApi = exported.exports;
+    const options = { gameService: fakeService, groupChat: {}, loadAgent() {}, listAgents: async () => [] };
+    const first = runtimeApi.configureRuntime(options);
+    assert.equal(runtimeApi.configureRuntime(options), first);
+    assert.equal(constructions, 1);
+    const channels = ['launch', 'resources', 'remove-resources', 'records', 'record',
+        'agents', 'create', 'next', 'observe', 'submit', 'continue', 'stop'];
+    assert.deepEqual([...registered.keys()].sort(), channels.map(name => `vcp-game:${name}`).sort());
+    const records = registered.get('vcp-game:records');
+    assert.deepEqual((await records(sender())).records, ['synthetic']);
+    for (const channel of channels) {
+        assert.equal((await registered.get(`vcp-game:${channel}`)(sender('main.html'), {})).success, false);
+    }
+});
 let bladeOpened = 0;
 class Window extends EventEmitter {
     constructor(options) {

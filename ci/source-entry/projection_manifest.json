@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "57d16293a4078057d7990e4a5f9c714601710bc2",
-          "size": 29415,
-          "sha256": "a64e8b73603dd7251857e8516bd0d608d5b690f85d47e37a9f0ef8587dfbf519",
+          "blob": "00bd5075877edf3b591526cd37a458ef30247296",
+          "size": 29757,
+          "sha256": "3cb836b864fc22ca4a5c35200d6830d39c1cfa46d1cff5e00ca59b95a5abedc5",
           "kind": "source"
         },
         {
@@ -2924,6 +2924,42 @@
           "blob": "b305cdc9953c4f9c7992c37fadef9aa03dcd2478",
           "size": 4472,
           "sha256": "3d9e88c053b552083d051a7b9822b251ccd0e0881ca832c0ccc76297ae6e9444",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/ForgeTax/forge-tax-service.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6ef8b8c5fb1b914c712dd02385bb817d18bb62db",
+          "size": 285,
+          "sha256": "da7f7a4ac994acafae4aae03670f4dfac6943249d0b8991e31573fd2a8ffcc1f",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/ForgeTax/plugin-manifest.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "199015af39024b16494bae6724f64df072f7adcc",
+          "size": 3131,
+          "sha256": "679d37cb5ec39a969ed0d126e3fd9b13c032888467933fb4b73bfc1b42018e8b",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/GameController/GameControllerService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3ae1db55a4ba85eb0bcd5ab79a0236b673c8ed94",
+          "size": 759,
+          "sha256": "a579d5fcccc7d8320531aacb6ff8e07221ea54ca0984ec5318c13b652003aa47",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/GameController/plugin-manifest.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3765c92c7bd8b178576f1214612a53161fa329b5",
+          "size": 2287,
+          "sha256": "51dab9067c10c2f2770d7e924aa8686d6438c705d0ad5689d390ae7906e6b605",
           "kind": "source"
         },
         {
@@ -7103,9 +7139,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b586a8e3596e1d5521d0f6b9a7466fde68cd2aa0",
-          "size": 8865,
-          "sha256": "aa57362e7dde1fa1c64db73c5c2646ea08c9a9e10bc50ce09e79b54a125e24be",
+          "blob": "290d9810934e88da21d0491682203a763860ab1d",
+          "size": 8922,
+          "sha256": "89e47fcd728f2ed68c8df7e041a555355eef74e8a103e40b2832e1550486db1c",
           "kind": "source"
         },
         {
@@ -9669,9 +9705,9 @@
           "path": "modules/ui-system/side-pane/browserSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "086134c9897bbead1eac96a5c9286f962408b6de",
-          "size": 32139,
-          "sha256": "c01267e5a055ef726255c3ed96a0a78c256a8f483c928418bff03cd5a9731b55",
+          "blob": "06bcaa753f745ad140a6c4719518e72fde5a6fae",
+          "size": 32572,
+          "sha256": "732b8a35866f108ee5203c89941c6bfc723302fb65737f95749f5f55c949d8fb",
           "kind": "source"
         },
         {
@@ -10911,9 +10947,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "57d16293a4078057d7990e4a5f9c714601710bc2",
-          "size": 29415,
-          "sha256": "a64e8b73603dd7251857e8516bd0d608d5b690f85d47e37a9f0ef8587dfbf519",
+          "blob": "00bd5075877edf3b591526cd37a458ef30247296",
+          "size": 29757,
+          "sha256": "3cb836b864fc22ca4a5c35200d6830d39c1cfa46d1cff5e00ca59b95a5abedc5",
           "kind": "source"
         },
         {
@@ -12013,9 +12049,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "57a59c57976bb41e1ef9431f6ca7e37cc8a7a3d2",
-          "size": 26620,
-          "sha256": "6f5725761ed47397395b9becc26faeb7d8c4b94991a5d52f2c926cfbe6792194",
+          "blob": "ba1a256aac0cad150247d24ca18a6718fd6d13a3",
+          "size": 27398,
+          "sha256": "46791d91922e1d641ed986ed5dca85d3559a2e6f47913f0d2556d0a85abb9f3b",
           "kind": "source"
         },
         {
@@ -13759,9 +13795,9 @@
           "path": "tests/side-browser-address.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "1a99a98b21941a8dd62f9eb58221fe85ddccf3e8",
-          "size": 17064,
-          "sha256": "e5698c452dd6f7c8211944847207b8fb45682b2b4fd705004353b41f233add23",
+          "blob": "4a1825d30ad2ab8a2d4456dbbbb16f935a4362e2",
+          "size": 21066,
+          "sha256": "a362457aac5dd694653a3ac31c8af18185a27ef2d5cb4f46eb50b97c996635df",
           "kind": "source"
         },
         {
@@ -14011,9 +14047,9 @@
           "path": "tests/window-package-contract.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d948d4a5378505850e4ff829525b799be76e4299",
-          "size": 3773,
-          "sha256": "8d1d1425da36f6b3a28119f07069f09d166f8ac7f20ad43e046661aace37ae3a",
+          "blob": "9155fbf09f49b174911c24d3d8edfe3d55c9fa49",
+          "size": 4846,
+          "sha256": "2d66441f8bfc3242e29bac4a3f68adfa82fcfa92899980ef31757d9868215a57",
           "kind": "source"
         },
         {
@@ -15907,6 +15943,10 @@
             "VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher-x86_64-pc-windows-msvc.exe",
             "VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher.js",
             "VCPDistributedServer/Plugin/CodeSearcher/plugin-manifest.json",
+            "VCPDistributedServer/Plugin/ForgeTax/forge-tax-service.js",
+            "VCPDistributedServer/Plugin/ForgeTax/plugin-manifest.json",
+            "VCPDistributedServer/Plugin/GameController/GameControllerService.js",
+            "VCPDistributedServer/Plugin/GameController/plugin-manifest.json",
             "VCPDistributedServer/Plugin/PTYShellExecutor/AdminConfirm.js",
             "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.impl.js",
             "VCPDistributedServer/Plugin/PTYShellExecutor/PTYShellExecutor.js",
@@ -17727,12 +17767,30 @@
           "kind": "source"
         },
         {
+          "path": "VCPDistributedServer/Plugin/ForgeTax/plugin-manifest.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "199015af39024b16494bae6724f64df072f7adcc",
+          "size": 3131,
+          "sha256": "679d37cb5ec39a969ed0d126e3fd9b13c032888467933fb4b73bfc1b42018e8b",
+          "kind": "source"
+        },
+        {
           "path": "VCPDistributedServer/Plugin/GameController/GameControllerService.js",
           "mode": "100644",
           "type": "blob",
           "blob": "3ae1db55a4ba85eb0bcd5ab79a0236b673c8ed94",
           "size": 759,
           "sha256": "a579d5fcccc7d8320531aacb6ff8e07221ea54ca0984ec5318c13b652003aa47",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/GameController/plugin-manifest.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3765c92c7bd8b178576f1214612a53161fa329b5",
+          "size": 2287,
+          "sha256": "51dab9067c10c2f2770d7e924aa8686d6438c705d0ad5689d390ae7906e6b605",
           "kind": "source"
         },
         {
@@ -19342,18 +19400,18 @@
           "path": "docs/contracts/chat-contracts.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8defab8fda4fa7339c2897b6deb77f9fc0674c5c",
+          "blob": "4fc590da338da10809f86842e6c1783c0dfb3313",
           "size": 63239,
-          "sha256": "f9a3642eb43bee8cb670ad639ed5063983e733da5e1d0a78eb99efcc603d5b66",
+          "sha256": "3382e0622b8ac78e24fcca775dbd8683f85df5ea6373524d8aa678606649d69e",
           "kind": "source"
         },
         {
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "9d6ce9a2dd3551837b76c6e96d3a6b45375e14ff",
+          "blob": "744065d51e8edbb5565e47fd70a243ada773e80d",
           "size": 979983,
-          "sha256": "056dc66cc9064f3742a3bfcdb747433550d8ffac903ec02a828f590b1ee9f4c6",
+          "sha256": "d509ee337a26b5beab1e91777e1a83b961057e9b72516dfba616f84512816a59",
           "kind": "source"
         },
         {
@@ -20413,9 +20471,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b586a8e3596e1d5521d0f6b9a7466fde68cd2aa0",
-          "size": 8865,
-          "sha256": "aa57362e7dde1fa1c64db73c5c2646ea08c9a9e10bc50ce09e79b54a125e24be",
+          "blob": "290d9810934e88da21d0491682203a763860ab1d",
+          "size": 8922,
+          "sha256": "89e47fcd728f2ed68c8df7e041a555355eef74e8a103e40b2832e1550486db1c",
           "kind": "source"
         },
         {
@@ -22951,9 +23009,9 @@
           "path": "modules/ui-system/side-pane/browserSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "086134c9897bbead1eac96a5c9286f962408b6de",
-          "size": 32139,
-          "sha256": "c01267e5a055ef726255c3ed96a0a78c256a8f483c928418bff03cd5a9731b55",
+          "blob": "06bcaa753f745ad140a6c4719518e72fde5a6fae",
+          "size": 32572,
+          "sha256": "732b8a35866f108ee5203c89941c6bfc723302fb65737f95749f5f55c949d8fb",
           "kind": "source"
         },
         {
@@ -24193,9 +24251,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "57d16293a4078057d7990e4a5f9c714601710bc2",
-          "size": 29415,
-          "sha256": "a64e8b73603dd7251857e8516bd0d608d5b690f85d47e37a9f0ef8587dfbf519",
+          "blob": "00bd5075877edf3b591526cd37a458ef30247296",
+          "size": 29757,
+          "sha256": "3cb836b864fc22ca4a5c35200d6830d39c1cfa46d1cff5e00ca59b95a5abedc5",
           "kind": "source"
         },
         {
@@ -25075,9 +25133,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "57a59c57976bb41e1ef9431f6ca7e37cc8a7a3d2",
-          "size": 26620,
-          "sha256": "6f5725761ed47397395b9becc26faeb7d8c4b94991a5d52f2c926cfbe6792194",
+          "blob": "ba1a256aac0cad150247d24ca18a6718fd6d13a3",
+          "size": 27398,
+          "sha256": "46791d91922e1d641ed986ed5dca85d3559a2e6f47913f0d2556d0a85abb9f3b",
           "kind": "source"
         },
         {
@@ -26890,6 +26948,24 @@
           "kind": "source"
         },
         {
+          "path": "tests/game-controller.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "655df2a17683f6dbd662d2c86986ec9385c47ba3",
+          "size": 2916,
+          "sha256": "affc159604a3a45a4f9e6785dfe055e21a6137e1e32d433f143a319e07dc670c",
+          "kind": "source"
+        },
+        {
+          "path": "tests/game-launcher.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a392256dfe59b3bbe7a0e7554a415ca16626c867",
+          "size": 9377,
+          "sha256": "60bccfdba5f031fa43db4417e6b722ce56665143ddb75af953f289232d7609d3",
+          "kind": "source"
+        },
+        {
           "path": "tests/git-changes-source.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -27685,9 +27761,9 @@
           "path": "tests/side-browser-address.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "1a99a98b21941a8dd62f9eb58221fe85ddccf3e8",
-          "size": 17064,
-          "sha256": "e5698c452dd6f7c8211944847207b8fb45682b2b4fd705004353b41f233add23",
+          "blob": "4a1825d30ad2ab8a2d4456dbbbb16f935a4362e2",
+          "size": 21066,
+          "sha256": "a362457aac5dd694653a3ac31c8af18185a27ef2d5cb4f46eb50b97c996635df",
           "kind": "source"
         },
         {
@@ -28819,9 +28895,9 @@
           "path": "tests/window-package-contract.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d948d4a5378505850e4ff829525b799be76e4299",
-          "size": 3773,
-          "sha256": "8d1d1425da36f6b3a28119f07069f09d166f8ac7f20ad43e046661aace37ae3a",
+          "blob": "9155fbf09f49b174911c24d3d8edfe3d55c9fa49",
+          "size": 4846,
+          "sha256": "2d66441f8bfc3242e29bac4a3f68adfa82fcfa92899980ef31757d9868215a57",
           "kind": "source"
         },
         {
@@ -30422,6 +30498,10 @@
             "VCPDistributedServer/Plugin/BladeGame/blade-preload.js",
             "VCPDistributedServer/Plugin/BladeGame/blade-service.js",
             "VCPDistributedServer/Plugin/BladeGame/plugin-manifest.json",
+            "VCPDistributedServer/Plugin/ForgeTax/forge-tax-service.js",
+            "VCPDistributedServer/Plugin/ForgeTax/plugin-manifest.json",
+            "VCPDistributedServer/Plugin/GameController/GameControllerService.js",
+            "VCPDistributedServer/Plugin/GameController/plugin-manifest.json",
             "VCPDistributedServer/Plugin/PowerShellExecutor/AdminConfirm.py",
             "VCPDistributedServer/Plugin/PowerShellExecutor/plugin-manifest.json",
             "assets/default_group_avatar.png",
@@ -30483,6 +30563,8 @@
             "tests/embedded-app-controller.test.js",
             "tests/embedded-app-security.test.js",
             "tests/escape-dispatcher.test.js",
+            "tests/game-controller.test.js",
+            "tests/game-launcher.test.js",
             "tests/git-changes-source.test.mjs",
             "tests/git-file-diff.test.mjs",
             "tests/git-mutation-outcome.test.js",

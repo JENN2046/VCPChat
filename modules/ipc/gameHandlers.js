@@ -93,7 +93,10 @@ async function openGame(gameId) {
 
 function configureRuntime({ gameService, groupChat, loadAgent, listAgents }) {
     listGameAgents = listAgents;
-    if (gameRuntime) return gameRuntime;
+    if (gameRuntime) {
+        initialize();
+        return gameRuntime;
+    }
     const { GameRuntime } = require('../game/gameRuntime');
     gameRuntime = new GameRuntime({
         gameService, groupChat, loadAgent,
@@ -113,6 +116,7 @@ function configureRuntime({ gameService, groupChat, loadAgent, listAgents }) {
             if (requestError) throw requestError;
         },
     });
+    initialize();
     return gameRuntime;
 }
 function isTableSender(event) {

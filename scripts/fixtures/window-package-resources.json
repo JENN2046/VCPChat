@@ -792,6 +792,26 @@
       "path": "VCPDistributedServer/Plugin/BladeGame/plugin-manifest.json",
       "size": 4490,
       "sha256": "0b9c6218c6dc9c5c14deb35e9d29a88ea593e4d23dfe99e84d388041dc2574cb"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/ForgeTax/forge-tax-service.js",
+      "size": 285,
+      "sha256": "da7f7a4ac994acafae4aae03670f4dfac6943249d0b8991e31573fd2a8ffcc1f"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/ForgeTax/plugin-manifest.json",
+      "size": 3131,
+      "sha256": "679d37cb5ec39a969ed0d126e3fd9b13c032888467933fb4b73bfc1b42018e8b"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/GameController/GameControllerService.js",
+      "size": 759,
+      "sha256": "a579d5fcccc7d8320531aacb6ff8e07221ea54ca0984ec5318c13b652003aa47"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/GameController/plugin-manifest.json",
+      "size": 2287,
+      "sha256": "51dab9067c10c2f2770d7e924aa8686d6438c705d0ad5689d390ae7906e6b605"
     }
   ],
   "sourceBaseline": "d68be6afb8d4b0d73041f3b60d84203baf28e74f",

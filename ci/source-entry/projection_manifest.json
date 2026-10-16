@@ -289,9 +289,9 @@
           "path": "VCPDistributedServer/VCPDistributedServer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "4d747dc2f91e839b945f938e5312d195b217acad",
-          "size": 43677,
-          "sha256": "25774e3af856c551f8db6448e33496afd65a6de9d37ce8f7000ab360d99480c8",
+          "blob": "fdf87a4c208908e504280a9a3fd0316f82e4c194",
+          "size": 44194,
+          "sha256": "b32666e9b36c6cc23ac0334a8b4761fc3b4992a8e4dd23b706cf299b58de4d51",
           "kind": "source"
         },
         {
@@ -3669,9 +3669,9 @@
           "path": "VCPDistributedServer/VCPDistributedServer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "4d747dc2f91e839b945f938e5312d195b217acad",
-          "size": 43677,
-          "sha256": "25774e3af856c551f8db6448e33496afd65a6de9d37ce8f7000ab360d99480c8",
+          "blob": "fdf87a4c208908e504280a9a3fd0316f82e4c194",
+          "size": 44194,
+          "sha256": "b32666e9b36c6cc23ac0334a8b4761fc3b4992a8e4dd23b706cf299b58de4d51",
           "kind": "source"
         },
         {
@@ -18635,9 +18635,9 @@
           "path": "VCPDistributedServer/VCPDistributedServer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "4d747dc2f91e839b945f938e5312d195b217acad",
-          "size": 43677,
-          "sha256": "25774e3af856c551f8db6448e33496afd65a6de9d37ce8f7000ab360d99480c8",
+          "blob": "fdf87a4c208908e504280a9a3fd0316f82e4c194",
+          "size": 44194,
+          "sha256": "b32666e9b36c6cc23ac0334a8b4761fc3b4992a8e4dd23b706cf299b58de4d51",
           "kind": "source"
         },
         {
@@ -19427,9 +19427,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4d9771a5f8dfcc8ced21196c26a0d5e7ca02489",
+          "blob": "899f760dae3fe59b5ad644c8cd5b909238612c6e",
           "size": 980698,
-          "sha256": "e27377a1c76407439506ff162c1e37ea10ce66d3cc058cf03700e08e08a030ea",
+          "sha256": "006077234d6d8d9a8663205b9c53140cd908fdb946df9a2d9d0eac4ee66c145a",
           "kind": "source"
         },
         {

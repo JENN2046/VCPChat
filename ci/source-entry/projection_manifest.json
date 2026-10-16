@@ -8670,9 +8670,9 @@
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e8777a48b7002199ce6f76b1cb572b01796922ec",
-          "size": 4579,
-          "sha256": "96efcb26e35f751ccc55d53103dc25473e36b3929c52a93256900ec9f3359c78",
+          "blob": "0d1f0e05b3fd1d9f2574643f30f2d619119d0b3c",
+          "size": 4596,
+          "sha256": "37d99d5e9c60ed44ba61cb810fbfc90a2d8797689022abce809ea8bb0f29393c",
           "kind": "source"
         },
         {
@@ -8680,9 +8680,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "3c3741c105b3c214b87e0721a6b81cd6041c96c0",
-          "size": 2029,
-          "sha256": "326a293accb939d04119e874ec163b59825fdb3cb1e22b6131c3d7269e7841a8"
+          "blob": "4eddccf064e098dd22a60f492b9aea9827b4607d",
+          "size": 2204,
+          "sha256": "b4a9bf92e952036c41405a096edcb54ba3b64c6cf44e32624ded5ac9560ef1df"
         },
         {
           "path": "modules/services/windowAppIds.js",
@@ -19427,9 +19427,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "2072d5690a7ab7b6395abccee8b316546ad4cbce",
+          "blob": "319c631d3e8b952d1774eca5db877a60e69fbe99",
           "size": 980379,
-          "sha256": "8df5ef9e57ab278d44ade36d0e72ad5080e5888026f8255315870dc37f80d108",
+          "sha256": "e281cb97e7460a32c0908970acd02d187501cf5bea6f5b667a1ca1a95bb92bb3",
           "kind": "source"
         },
         {
@@ -21992,9 +21992,9 @@
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e8777a48b7002199ce6f76b1cb572b01796922ec",
-          "size": 4579,
-          "sha256": "96efcb26e35f751ccc55d53103dc25473e36b3929c52a93256900ec9f3359c78",
+          "blob": "0d1f0e05b3fd1d9f2574643f30f2d619119d0b3c",
+          "size": 4596,
+          "sha256": "37d99d5e9c60ed44ba61cb810fbfc90a2d8797689022abce809ea8bb0f29393c",
           "kind": "source"
         },
         {
@@ -22002,9 +22002,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "3c3741c105b3c214b87e0721a6b81cd6041c96c0",
-          "size": 2029,
-          "sha256": "326a293accb939d04119e874ec163b59825fdb3cb1e22b6131c3d7269e7841a8"
+          "blob": "4eddccf064e098dd22a60f492b9aea9827b4607d",
+          "size": 2204,
+          "sha256": "b4a9bf92e952036c41405a096edcb54ba3b64c6cf44e32624ded5ac9560ef1df"
         },
         {
           "path": "modules/services/windowAppIds.js",
@@ -27555,9 +27555,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "0bcf32e99a5e4568b6c9d57ac20996a409acd23e",
-          "size": 15749,
-          "sha256": "e537deb9d83cdead0d291b039802e403da6a6e7d538a33e513357fc3e5f781f3"
+          "blob": "10579afc9b3d55dabcd25691a85126ddcfa4ea89",
+          "size": 16387,
+          "sha256": "ba1a8381d5614098c11f53f74ecbb5bfd636a24fcb55d4d8fc2725247356d68b"
         },
         {
           "path": "tests/next-ui-registries.test.mjs",

@@ -7051,7 +7051,7 @@
         },
         {
           "file": "modules/services/trustedConversation/webSocket.cjs",
-          "line": 7,
+          "line": 8,
           "kind": "event-listener"
         },
         {
@@ -7207,7 +7207,7 @@
         },
         {
           "file": "modules/services/trustedConversation/webSocket.cjs",
-          "line": 7,
+          "line": 8,
           "kind": "event-listener",
           "match": "ws.once('close'"
         },

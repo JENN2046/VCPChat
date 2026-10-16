@@ -78,6 +78,7 @@ const validEnv={OWNER:'Bearer '+'x'.repeat(40)};
 const invalidCases=[
  ['missing file','missing',{}],['bad JSON','{',{}],['null','null',{}],['array','[]',{}],['false','false',{}],
  ...['clientInstanceId','toolName'].flatMap(key=>[[`missing ${key}`,JSON.stringify({...validBinding,[key]:undefined}),validEnv],[`invalid ${key}`,JSON.stringify({...validBinding,[key]:'bad/value'}),validEnv]]),
+ ...['-'.repeat(36),'a'.repeat(36),'0000000-00000-4000-8000-000000000001'].map((value,i)=>['malformed UUID '+i,JSON.stringify({...validBinding,clientInstanceId:value}),validEnv]),
  ['non-string client',JSON.stringify({...validBinding,clientInstanceId:[clientInstanceId]}),validEnv],
  ['non-string tool',JSON.stringify({...validBinding,toolName:123}),validEnv],
  ['missing bearer reference',JSON.stringify({...validBinding,applicationAuthorizationEnv:undefined}),validEnv],
@@ -99,3 +100,7 @@ test('validated HTTP binding does not enable native WS gate',async()=>{
 });
 test('WS transport still rejects absent runtime request dependency',()=>assert.throws(()=>createNativeTransport({binding:validBinding,env:validEnv}),/NATIVE_CREDENTIAL_REFERENCE_REQUIRED/));
 }
+
+for(const value of ['-'.repeat(36),'a'.repeat(36),'0000000-00000-4000-8000-000000000001',undefined,[clientInstanceId]])test('WS client rejects malformed UUID without sending: '+JSON.stringify(value),async()=>{
+ const c=createNativeWebSocketClient(),s=socket();c.bind(s);try{await assert.rejects(c.request({clientInstanceId:value,body:{action:'status',payload:{}}}),/NATIVE_CLIENT_BINDING_REQUIRED/);assert.equal(s.frames.length,0);}finally{c.close(s);}
+});

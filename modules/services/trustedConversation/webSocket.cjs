@@ -1,5 +1,6 @@
 'use strict';
 const {randomUUID}=require('node:crypto');
+function isNativeClientInstanceId(value){return typeof value==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(value);}
 function isSecureNativeWebSocketUrl(value){try{const u=new URL(value);return !u.username&&!u.password&&!u.hash&&(u.protocol==='wss:'||(u.protocol==='ws:'&&['127.0.0.1','[::1]'].includes(u.hostname)));}catch{return false;}}
 function createNativeWebSocketClient({timeoutMs=25000}={}){
  const pending=new Map();let socket=null,epoch=0;
@@ -13,7 +14,7 @@ function createNativeWebSocketClient({timeoutMs=25000}={}){
   p.resolve(message.result);return true;
  }
  function request({toolName,authorization,body,clientInstanceId}){
-  if(!/^[a-f0-9-]{36}$/.test(clientInstanceId||''))return Promise.reject(Error('NATIVE_CLIENT_BINDING_REQUIRED'));
+  if(!isNativeClientInstanceId(clientInstanceId))return Promise.reject(Error('NATIVE_CLIENT_BINDING_REQUIRED'));
   const ws=socket;if(!ws||ws.readyState!==1)return Promise.reject(Error('NATIVE_TRANSPORT_UNAVAILABLE'));
   if(!isSecureNativeWebSocketUrl(ws.url))return Promise.reject(Error('NATIVE_SECURE_CHANNEL_REQUIRED'));
   if(pending.size>=16)return Promise.reject(Error('NATIVE_REQUEST_BUSY'));
@@ -27,4 +28,4 @@ function createNativeWebSocketClient({timeoutMs=25000}={}){
  }
  return {bind,receive,request,close,epoch:()=>epoch};
 }
-module.exports={createNativeWebSocketClient,isSecureNativeWebSocketUrl};
+module.exports={createNativeWebSocketClient,isSecureNativeWebSocketUrl,isNativeClientInstanceId};

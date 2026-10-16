@@ -7,6 +7,7 @@ const fs = require('fs').promises;
 const fsSync = require('fs');
 const dotenv = require('dotenv');
 const os = require('os');
+const { isIP } = require('node:net');
 const mime = require('mime-types');
 const chokidar = require('chokidar');
  // const { ipcMain } = require('electron'); // This was incorrect. ipcMain should be injected.
@@ -48,6 +49,7 @@ class DistributedServer {
         this.nativeConversationWebSocket = config.nativeConversationWebSocket === true;
         this.vcpKey = config.vcpKey;
         this.serverName = config.serverName || 'Unnamed-Distributed-Server';
+        this.bindAddress = '0.0.0.0';
         this.port = config.port || 0; // 0 表示随机选择一个可用端口
         this.debugMode = config.debugMode || false;
         this.rendererProcess = config.rendererProcess; // To communicate with the renderer
@@ -93,6 +95,34 @@ class DistributedServer {
         this.lastMusicPlaylistSignature = null;
     }
 
+    loadServerConfig() {
+        let configuredBindAddress;
+        // Load server-specific config
+        const serverConfigPath = path.join(__dirname, 'config.env');
+        try {
+            {
+                const serverEnv = dotenv.parse(fsSync.readFileSync(serverConfigPath));
+                configuredBindAddress = serverEnv.DIST_SERVER_BIND_ADDRESS;
+                if (serverEnv.DIST_SERVER_PORT) {
+                    const newPort = parseInt(serverEnv.DIST_SERVER_PORT, 10);
+                    if (!isNaN(newPort)) {
+                        this.port = newPort;
+                        console.log(`[${this.serverName}] Port loaded from config.env: ${this.port}`);
+                    }
+                }
+            }
+        } catch (e) {
+            if (e.code !== 'ENOENT') throw new Error('DIST_SERVER_CONFIG_READ_FAILED');
+        }
+
+        if (configuredBindAddress !== undefined) {
+            if (!isIP(configuredBindAddress)) {
+                throw new Error('DIST_SERVER_BIND_ADDRESS must be an IPv4 or IPv6 literal');
+            }
+            this.bindAddress = configuredBindAddress;
+        }
+    }
+
     async bindHttpServer(preferredPort) {
         const tryListen = (port) => new Promise((resolve, reject) => {
             const onError = (error) => {
@@ -106,7 +136,7 @@ class DistributedServer {
 
             this.server.once('error', onError);
             this.server.once('listening', onListening);
-            this.server.listen(port, '0.0.0.0');
+            this.server.listen(port, this.bindAddress);
         });
 
         try {
@@ -131,22 +161,7 @@ class DistributedServer {
         if (this.stopped) return;
         console.log(`[${this.serverName}] Initializing...`);
 
-        // Load server-specific config
-        const serverConfigPath = path.join(__dirname, 'config.env');
-        try {
-            if (fsSync.existsSync(serverConfigPath)) {
-                const serverEnv = dotenv.parse(fsSync.readFileSync(serverConfigPath));
-                if (serverEnv.DIST_SERVER_PORT) {
-                    const newPort = parseInt(serverEnv.DIST_SERVER_PORT, 10);
-                    if (!isNaN(newPort)) {
-                        this.port = newPort;
-                        console.log(`[${this.serverName}] Port loaded from config.env: ${this.port}`);
-                    }
-                }
-            }
-        } catch (e) {
-            console.error(`[${this.serverName}] Error reading server config.env:`, e);
-        }
+        this.loadServerConfig();
 
         // The base path should be relative to this file's location.
         const basePath = path.dirname(require.resolve('./VCPDistributedServer.js'));
@@ -171,7 +186,7 @@ class DistributedServer {
         await this.bindHttpServer(this.port);
         if (this.stopped) return;
             this.port = this.server.address().port; // 获取实际监听的端口
-            console.log(`[${this.serverName}] HTTP server listening on 0.0.0.0:${this.port}`);
+            console.log(`[${this.serverName}] HTTP server listening on ${this.bindAddress}:${this.port}`);
 
             // 注入端口到插件管理器，用于构造回调 URL
             pluginManager.setServerPort(this.port);

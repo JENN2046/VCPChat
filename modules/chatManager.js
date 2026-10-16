@@ -1462,6 +1462,7 @@ export const chatManager = (() => {
             return;
         }
         pendingSendContexts.add(sendSignature);
+        let stopNativeDraftObservation;
         try {
         let nativeResult = null;
         if (!request && !attachedFiles.length && currentSelectedItem.type !== 'group' && typeof electronAPI.prepareNativeConversation === 'function') {
@@ -1494,6 +1495,17 @@ export const chatManager = (() => {
                     _fileManagerData: fileManagerData
                 });
             }
+        }
+
+        // Track draft ownership before render, persistence and unread-state awaits.
+        // Reuse selection generations so switching away and back cannot consume it.
+        let nativeDraftEdited = false;
+        const nativeDraftItemGeneration = itemSelectionGeneration;
+        const nativeDraftTopicGeneration = topicSelectionGeneration;
+        if (nativeResult?.sourceId) {
+            const markDraftEdited = () => { nativeDraftEdited = true; };
+            input.addEventListener?.('input', markDraftEdited);
+            stopNativeDraftObservation = () => input.removeEventListener?.('input', markDraftEdited);
         }
 
         const userMessage = {
@@ -1544,6 +1556,7 @@ export const chatManager = (() => {
         // Consume only the exact draft transaction that was durably saved.
         // Both the text and attachment-array identity must still match, so an
         // attachment added while the save was pending cannot be discarded.
+        const consumeDraft = () => {
         if (
             isSendContextCurrent()
             && input.value === content
@@ -1557,6 +1570,9 @@ export const chatManager = (() => {
                 uiHelper.autoResizeTextarea(messageInput);
             }
         }
+
+        };
+        if (!nativeResult?.handled || !nativeResult.sourceId) consumeDraft();
 
         // 用户已参与该话题：同步清除 TopicSponsor/手动设置的持久化未读标记。
         // 之前这里只刷新徽章，并未真正修改 topic.unread，导致无数字“未读”长期残留。
@@ -1585,7 +1601,13 @@ export const chatManager = (() => {
         }
 
         if (nativeResult?.handled) {
-            try { if (nativeResult.sourceId) nativeResult = await electronAPI.executeNativeConversation({sourceId:nativeResult.sourceId}); } catch { nativeResult={code:'RESULT_UNKNOWN',message:'结果暂未确认，请查原操作回执，不要重复提交。'}; }
+            const hadSource = !!nativeResult.sourceId;
+            try { if (hadSource) nativeResult = await electronAPI.executeNativeConversation({sourceId:nativeResult.sourceId}); }
+            catch { nativeResult={code:'RESULT_UNKNOWN',message:'结果暂未确认，请查原操作回执，不要重复提交。'}; }
+            if (hadSource && !nativeDraftEdited
+                && nativeDraftItemGeneration === itemSelectionGeneration
+                && nativeDraftTopicGeneration === topicSelectionGeneration
+                && !(nativeResult.dispatched === false && nativeResult.preserveInput === true)) consumeDraft();
             const content = nativeResult.committed
                 ? `已完成操作，并已读回确认。操作编号：${nativeResult.operationId || '请查询原回执'}。${nativeResult.chart?.ok ? '图表已更新。' : nativeResult.chart?.retryPending===true ? '图表刷新暂未完成，正在恢复。' : nativeResult.chart ? '图表刷新未完成。' : ''}`
                 : (nativeResult.reconciliation?.length
@@ -2018,6 +2040,7 @@ export const chatManager = (() => {
             if (request?.propagateError) throw error;
         }
         } finally {
+            stopNativeDraftObservation?.();
             pendingSendContexts.delete(sendSignature);
         }
     }

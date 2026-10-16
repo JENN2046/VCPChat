@@ -10599,7 +10599,7 @@
         },
         {
           "file": "modules/ipc/nativeConversationHandlers.js",
-          "line": 131,
+          "line": 148,
           "kind": "event-listener"
         },
         {
@@ -10682,7 +10682,7 @@
         },
         {
           "file": "modules/ipc/nativeConversationHandlers.js",
-          "line": 131,
+          "line": 148,
           "kind": "event-listener",
           "match": "wc.once('destroyed'"
         },
@@ -15500,6 +15500,11 @@
           "kind": "custom-event-listener"
         },
         {
+          "file": "modules/chatManager.js",
+          "line": 1507,
+          "kind": "custom-event-listener"
+        },
+        {
           "file": "modules/event-listeners.js",
           "line": 690,
           "kind": "custom-event-listener"
@@ -15654,6 +15659,12 @@
           "line": 368,
           "kind": "custom-event-listener",
           "match": "volumeSlider.addEventListener('input'"
+        },
+        {
+          "file": "modules/chatManager.js",
+          "line": 1507,
+          "kind": "custom-event-listener",
+          "match": "input.addEventListener?.('input'"
         },
         {
           "file": "modules/event-listeners.js",
@@ -34609,7 +34620,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 79,
+      "line": 84,
       "reason": "dynamic event listener name: channels[0]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[0]",
@@ -34617,7 +34628,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 104,
+      "line": 109,
       "reason": "dynamic event listener name: channels[1]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[1]",
@@ -34625,7 +34636,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 105,
+      "line": 122,
       "reason": "dynamic event listener name: channels[2]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[2]",
@@ -34633,7 +34644,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 121,
+      "line": 138,
       "reason": "dynamic event listener name: channels[3]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[3]",
@@ -34641,7 +34652,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 122,
+      "line": 139,
       "reason": "dynamic event listener name: channels[4]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[4]",

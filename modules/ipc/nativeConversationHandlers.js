@@ -25,9 +25,14 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
  const {invalidations,invalidationVersions,synchronized}=invalidationScopes.get(scopeKey);
  let disposed=false;
  const wc=mainWindow.webContents,pending=new Map(),plans=new Map(),proposalRequests=new Map();const owned=e=>!disposed&&e.sender===wc&&e.senderFrame===wc.mainFrame&&!mainWindow.isDestroyed();
+ // main initializes IPC before DistributedServer.connect creates the client. Its first
+ // bind advances 0 to 1 while CONNECTING; open leaves it unchanged. Close/rebind
+ // advance beyond 1, so failed initial connections cannot use this adoption path.
+ function adoptInitialConnection(){if(connectionEpoch===0&&readEpoch()===1)connectionEpoch=1;}
  function refreshConnection(){
+  adoptInitialConnection();
   if(connectionEpoch===readEpoch())return false;
-  connectionEpoch=readEpoch();port.invalidate();pending.clear();plans.clear();proposalRequests.clear();synchronized.clear();
+  connectionEpoch=readEpoch();port.invalidate();plans.clear();proposalRequests.clear();synchronized.clear();
   // Retain failed invalidations, but prevent old replies from acknowledging new work.
   for(const [key,request] of invalidations)invalidations.set(key,{...request,inFlight:null});
   for(const key of invalidationVersions.keys())invalidationVersions.set(key,{});
@@ -56,7 +61,7 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
   const payload={conversationId:p.conversationId,...(p.messageId?{messageId:p.messageId}:{})};
   const key=JSON.stringify([payload.conversationId,payload.messageId||null]),request={conversationId:payload.conversationId,payload,inFlight:null,coldStart};
   invalidations.set(key,request);invalidationVersions.set(payload.conversationId,{});
-  for(const [id,event] of pending)if(event.conversationId===payload.conversationId)pending.delete(id);
+  for(const record of pending.values())if(record.event.conversationId===payload.conversationId)record.invalidated=true;
   retireRequests(payload);
   return sendInvalidation(key,request);
  }
@@ -75,7 +80,7 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
   const attempt=queueInvalidation({conversationId},true),version=invalidationVersions.get(conversationId);
   return {...await attempt,version};
  }
- const port=installNativeConversationPort({window:mainWindow,observedSequence:transport.sequence,isSessionCurrent:async()=>!mainWindow.isDestroyed()&&connectionEpoch===readEpoch(),snapshot:async(kind,input)=>wc.executeJavaScript(`(()=>{const input=document.getElementById('messageInput'),button=document.getElementById('sendMessageBtn'),c=window.__nativeConversationContext,hit=${kind==='mouse'?`document.elementFromPoint(${Number(input.x)||0},${Number(input.y)||0})`:'null'};return {text:input?.value??'',conversationId:c?.conversationId,eligible:!!c&&(${kind==='keyboard'?`!!button&&!button.disabled&&button.dataset.mode!=='interrupt'&&(document.activeElement===button||(${JSON.stringify(input.key)}==='Enter'&&document.activeElement===input))`:"!!button&&!button.disabled&&(hit===button||button.contains(hit))&&button.dataset.mode!=='interrupt'"})};})()`)});
+ const port=installNativeConversationPort({window:mainWindow,observedSequence:transport.sequence,isSessionCurrent:async()=>{adoptInitialConnection();return !mainWindow.isDestroyed()&&connectionEpoch===readEpoch();},snapshot:async(kind,input)=>wc.executeJavaScript(`(()=>{const input=document.getElementById('messageInput'),button=document.getElementById('sendMessageBtn'),c=window.__nativeConversationContext,hit=${kind==='mouse'?`document.elementFromPoint(${Number(input.x)||0},${Number(input.y)||0})`:'null'};return {text:input?.value??'',conversationId:c?.conversationId,eligible:!!c&&(${kind==='keyboard'?`!!button&&!button.disabled&&button.dataset.mode!=='interrupt'&&(document.activeElement===button||(${JSON.stringify(input.key)}==='Enter'&&document.activeElement===input))`:"!!button&&!button.disabled&&(hit===button||button.contains(hit))&&button.dataset.mode!=='interrupt'"})};})()`)});
  ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};if(refreshConnection())return connectionChanged();const epoch=readEpoch();if(blocked(p.conversationId))return invalidationRequired();const arrivalVersion=invalidationVersions.get(p.conversationId);let context;try{context=await port.consume(p);}catch{
    // Denial-only recognition: never mint a trusted source from renderer/voice text.
    const text=typeof p.text==='string'?p.text.trim():'',hasPlan=[...plans.values()].some(plan=>plan.conversationId===p.conversationId);
@@ -100,8 +105,20 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
   const before=prepareRejection();if(before)return before;
   let r;try{r=await transport.request('prepare',event);}catch{return prepareRejection()||{handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'};}
   const after=prepareRejection();if(after)return after;
-  if(r.sourceId)pending.set(r.sourceId,event);return r.ok===false&&!(r.code==='READ_ONLY_POLICY'&&r.handled===false)?{...r,handled:true}:r;});
- ipcMain.handle(channels[1],async(e,p={})=>{if(refreshConnection())return connectionChanged();const event=pending.get(p.sourceId);if(!owned(e)||!event)return {ok:false,code:'SOURCE_UNKNOWN'};pending.delete(p.sourceId);if(blocked(event.conversationId))return invalidationRequired();return transport.project(await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId}));});
+  if(r.sourceId)pending.set(r.sourceId,{event,epoch,invalidated:false});return r.ok===false&&!(r.code==='READ_ONLY_POLICY'&&r.handled===false)?{...r,handled:true}:r;});
+ ipcMain.handle(channels[1],async(e,p={})=>{
+  if(!owned(e))return {ok:false,code:'SOURCE_UNKNOWN'};
+  refreshConnection();const record=pending.get(p.sourceId);
+  if(!record)return {ok:false,code:'SOURCE_UNKNOWN'};
+  // Consume exactly once. A retained, unused source proves this attempt never dispatched,
+  // even if the recovery timer already observed the reconnect or a revoke was acknowledged.
+  pending.delete(p.sourceId);const {event}=record;
+  if(record.epoch!==readEpoch())return {...connectionChanged(),dispatched:false,message:'连接已变化，本次未派发。请重新提出调整并确认新方案。'};
+  if(record.invalidated||blocked(event.conversationId))return {...invalidationRequired(),preserveInput:true,dispatched:false,message:'旧方案已失效，本次未派发。请重新提出调整并确认新方案。'};
+  const result=await transport.project(await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId}));
+  // A host result must never turn a dispatched operation into a retryable draft.
+  return {...result,dispatched:true,preserveInput:false};
+ });
  ipcMain.handle(channels[2],async(e,p={})=>{
   if(!owned(e)||p.tool!==binding.toolName)return {ok:false};
   refreshConnection();const epoch=readEpoch();

@@ -26,11 +26,12 @@ test('disconnect immediately retires the epoch; a late old close cannot retire a
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),{createRequire}=require('node:module');
 const root=path.resolve(__dirname,'..'),file=path.join(root,'modules/ipc/nativeConversationHandlers.js'),base=createRequire(file),source=fs.readFileSync(file,'utf8');
 const AF=Object.getPrototypeOf(async()=>{}).constructor;
-async function renderer(result){
- const s=fs.readFileSync(path.join(root,'modules/chatManager.js'),'utf8');
- const chunk=s.slice(s.indexOf('        let nativeResult = null;'),s.indexOf('        const thinkingMessageId',s.indexOf('        let nativeResult = null;')));
- const run=new AF('result',`const history=[],toasts=[],rendered=[];let current=[];const request=null,attachedFiles=[],content='把合成排期延后1分钟',currentSelectedItem={id:'A',type:'agent',name:'fixture'},currentTopicId='T',globalSettings={vcpServerUrl:'http://unused.invalid'},sendContext={topicId:'T'},messageInput={value:content},input=messageInput,attachedFilesRef={get:()=>attachedFiles,set(){}},mainRendererFunctions={},isCanvasWindowOpen=false,itemListManager=null;const uiHelper={showToastNotification:m=>toasts.push(m),autoResizeTextarea(){}},setNextUiEmptyStateActive=()=>{},isSendContextCurrent=()=>true,sendHistoryRef={get:()=>current,set:v=>current=v},renderTarget={renderMessage:async m=>{rendered.push(m);return {remove(){}}}},persistOutgoingUserMessage=async(c,m)=>{history.push(m);return history},electronAPI={prepareNativeConversation:async()=>result,setTopicUnread:async()=>({success:true}),executeNativeConversation:async()=>{throw Error('unexpected execute')}};async function send(){${chunk}}const returned=await send();return {returned,input:input.value,history:history.map(m=>({role:m.role,content:m.content})),toasts};`);
- return run(result);
+async function renderer(result,options={}){
+ const s=fs.readFileSync(path.join(root,'modules/chatManager.js'),'utf8').replaceAll('\r\n','\n');
+ const chunk=s.slice(s.indexOf('        let stopNativeDraftObservation;'),s.indexOf('        const thinkingMessageId',s.indexOf('        let nativeResult = null;')));
+ const cleanup=s.slice(s.indexOf('        } finally {\n            stopNativeDraftObservation?.();'),s.indexOf('    async function createNewTopicForItem')).trim().replace(/}$/, '');
+ const run=new AF('result','options',`const history=[...(options.history||[])],toasts=[],rendered=[],listeners=new Set();let current=[],active=true,executes=0,itemSelectionGeneration=0,topicSelectionGeneration=0;const pendingSendContexts=new Set(),sendSignature='A:T',request=null,attachedFiles=[],content='把合成排期延后1分钟',currentSelectedItem={id:'A',type:'agent',name:'fixture'},currentTopicId='T',globalSettings={vcpServerUrl:'http://unused.invalid'},sendContext={topicId:'T'},messageInput={value:content,addEventListener:(_k,f)=>listeners.add(f),removeEventListener:(_k,f)=>listeners.delete(f)},input=messageInput;let attachments=attachedFiles;const attachedFilesRef={get:()=>attachments,set:v=>attachments=v},mainRendererFunctions={},isCanvasWindowOpen=false,itemListManager=null;const controls={input,edit(value){input.value=value;for(const f of listeners)f();},switchTopic(){active=false;topicSelectionGeneration++;},returnTopic(){active=true;topicSelectionGeneration++;},attach(){attachments=[{synthetic:true}];}},uiHelper={showToastNotification:m=>toasts.push(m),autoResizeTextarea(){}},notifySendState=()=>{},setNextUiEmptyStateActive=()=>{},isSendContextCurrent=()=>active,sendHistoryRef={get:()=>current,set:v=>current=v},renderTarget={renderMessage:async m=>{rendered.push(m);return {remove(){}}}},persistOutgoingUserMessage=async(c,m)=>{if(m.role==='user')await options.beforeSave?.(controls);history.push({...m,topic:c.topicId});if(m.role==='user')await options.afterSave?.(controls);return history},electronAPI={prepareNativeConversation:async()=>typeof result==='function'?result():result,setTopicUnread:async()=>{await options.unread?.(controls);return {success:true};},executeNativeConversation:async p=>{executes++;if(!options.execute)throw Error('unexpected execute');return options.execute(p,controls);}};async function send(){${chunk}${cleanup}}const returned=await send();return {returned,input:input.value,history:history.map(m=>({role:m.role,content:m.content,topic:m.topic})),toasts,executes,listeners:listeners.size};`);
+ return run(result,options);
 }
 async function ipc(mode){
  const handlers=new Map(),m={exports:{}},client=createNativeWebSocketClient();let prepareSent;
@@ -46,6 +47,69 @@ async function ipc(mode){
  if(mode==='inflight'){await entered;socket.emit('close');}
  const result=await pending;wc.emit('destroyed');client.close(socket);return {ipc:result,renderer:await renderer(result)};
 }
+// Exercise the actual startup connect method: IPC exists before the distributed
+// client, bind occurs while CONNECTING, and open does not advance its epoch.
+async function lifecycle(t,options={}){
+ const handlers=new Map(),m={exports:{}},frames=[],sockets=[],timers=new Set();let distributed=null,disposed=false;
+ const req=p=>p==='electron'?{ipcMain:{handle:(k,v)=>handlers.set(k,v),removeHandler:k=>handlers.delete(k)}}:p.endsWith('/transport.cjs')?{createNativeTransport:o=>createNativeTransport({...o,env:{SYNTHETIC:'Bearer '+'x'.repeat(40)}})}:p.includes('ChartControllerService')?{initialize(){}}:base(p);
+ vm.runInNewContext(source,{require:req,module:m,exports:m.exports,process:{env:{}},setInterval(fn){timers.add(fn);return {unref(){}};},clearInterval(){timers.clear();}});
+ const wc=new EventEmitter();wc.mainFrame={};wc.executeJavaScript=async()=>({eligible:true,text:'把合成排期延后1分钟',conversationId:'A:T'});
+ const event={sender:wc,senderFrame:wc.mainFrame},invoke=(action,p={})=>handlers.get('native-conversation:'+action)(event,p);
+ await m.exports.initialize({mainWindow:{webContents:wc,isDestroyed:()=>disposed,isFocused:()=>true},binding:{transport:'vcp-websocket',toolName:'Fixture',clientInstanceId,applicationAuthorizationEnv:'SYNTHETIC'},nativeEpoch:()=>distributed?.nativeConversationClient?.epoch()??0,nativeRequest:r=>{if(!distributed?.nativeConversationClient)throw Error('NATIVE_TRANSPORT_UNAVAILABLE');return distributed.nativeConversationClient.request(r);}});
+ const code=fs.readFileSync(path.join(root,'VCPDistributedServer/VCPDistributedServer.js'),'utf8');
+ const connectSource=code.slice(code.indexOf('    connect() {'),code.indexOf('    scheduleReconnect()',code.indexOf('    connect() {')));
+ class Wire extends EventEmitter{
+  constructor(url){super();this.url=url;this.readyState=0;sockets.push(this);}
+  send(text){const frame=JSON.parse(text);frames.push(frame);const reply=result=>distributed.nativeConversationClient.receive(this,{type:'native_conversation_response',requestId:frame.requestId,result});
+   if(options.onFrame?.(frame,{reply,wire:this})===true)return;
+   reply(frame.body.action==='prepare'?{ok:true,handled:true,sourceId:frame.body.payload.messageId}:frame.body.action==='execute'?{ok:true,committed:true,operationId:'synthetic-operation'}:frame.body.action==='recover'?{ok:true,results:[{ok:true,committed:true,operationId:'synthetic-operation'}]}:{ok:true});
+  }
+ }
+ const connect=new Function('console','WebSocket','require',`return ({${connectSource.trim()}}).connect;`)({log(){},warn(){},error(){}},Wire,p=>p.endsWith('/webSocket.cjs')?{createNativeWebSocketClient,isSecureNativeWebSocketUrl:()=>true}:base(p));
+ distributed={mainServerUrl:'http://127.0.0.1:12345',vcpKey:'synthetic',nativeConversationWebSocket:true,registerTools(){},async reportIPAddress(){},async pushMusicPlaylistUpdate(){},setupStaticPlaceholderUpdates(){},clearStaticPlaceholderUpdates(){},scheduleReconnect(){}};
+ const bind=()=>{connect.call(distributed);return distributed.ws;},open=()=>{distributed.ws.readyState=1;distributed.ws.emit('open');};
+ const close=()=>{distributed.ws.readyState=3;distributed.ws.emit('close');};
+ const capture=()=>wc.emit('before-input-event',{}, {type:'keyDown',key:'Enter'});
+ t.after(()=>{disposed=true;wc.emit('destroyed');distributed.nativeConversationClient?.close(distributed.ws);});
+ return {frames,invoke,bind,open,close,capture,epoch:()=>distributed.nativeConversationClient?.epoch()??0,reconnect(){close();bind();open();},async tick(){for(const fn of timers)await fn();},async prepare(){capture();return invoke('prepare',{text:'把合成排期延后1分钟',conversationId:'A:T'});}};
+}
+test('real distributed startup binds after IPC: first open and first physical send succeed',async t=>{
+ const f=await lifecycle(t);assert.equal(f.epoch(),0);f.bind();assert.equal(f.epoch(),1);f.open();assert.equal(f.epoch(),1);
+ const r=await renderer(()=>f.prepare(),{execute:p=>f.invoke('execute',p)});assert.equal(r.returned.committed,true);assert.equal(r.input,'');assert.equal(f.frames.filter(x=>x.body.action==='execute').length,1);assert.equal(r.listeners,0);
+});
+test('failed first connect followed by replacement is not treated as initial bind',async t=>{
+ const f=await lifecycle(t);f.bind();f.close();f.bind();f.open();assert.ok(f.epoch()>1);
+ const r=await renderer(()=>f.prepare());assert.equal(r.returned.code,'NATIVE_CONNECTION_CHANGED');assert.equal(r.input,'把合成排期延后1分钟');assert.equal(r.history.length,0);assert.equal(f.frames.filter(x=>['prepare','execute'].includes(x.body.action)).length,0);
+});
+for(const boundary of ['direct','timer','invalidation'])test('prepare to execute '+boundary+' retains exact draft and unrelated history with zero dispatch',async t=>{
+ const f=await lifecycle(t);f.bind();f.open();const history=[{role:'assistant',content:'unrelated history',topic:'other'}];
+ const r=await renderer(()=>f.prepare(),{history,async afterSave(){if(boundary==='invalidation')await f.invoke('invalidate',{conversationId:'A:T'});else{f.reconnect();if(boundary==='timer')await f.tick();}},execute:p=>f.invoke('execute',p)});
+ assert.equal(r.returned.dispatched,false);assert.equal(r.returned.preserveInput,true);assert.equal(r.input,'把合成排期延后1分钟');assert.equal(r.history.length,3);assert.deepEqual(r.history[0],history[0]);assert.deepEqual(r.history.slice(1).map(x=>x.topic),['T','T']);assert.match(r.history[2].content,/本次未派发/);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,0);assert.equal(r.listeners,0);
+ const source=f.frames.find(x=>x.body.action==='prepare').body.payload.messageId;assert.equal((await f.invoke('execute',{sourceId:source})).code,'SOURCE_UNKNOWN');
+});
+test('failed durable user save leaves draft, prior history and zero execute',async t=>{
+ const f=await lifecycle(t);f.bind();f.open();const r=await renderer(()=>f.prepare(),{history:[{role:'assistant',content:'other',topic:'other'}],beforeSave(){throw Error('synthetic disk full');},execute:p=>f.invoke('execute',p)});
+ assert.equal(r.input,'把合成排期延后1分钟');assert.equal(r.history.length,1);assert.equal(r.executes,0);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,0);assert.equal(r.listeners,0);
+});
+for(const stage of ['beforeSave','afterSave','unread'])test('edit then restore identical text during '+stage+' is a new draft',async t=>{
+ const f=await lifecycle(t);f.bind();f.open();const r=await renderer(()=>f.prepare(),{[stage](controls){controls.edit('new draft');controls.edit('把合成排期延后1分钟');},execute:p=>f.invoke('execute',p)});
+ assert.equal(r.returned.committed,true);assert.equal(r.input,'把合成排期延后1分钟');assert.equal(r.listeners,0);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,1);
+});
+test('after-dispatch disconnect consumes original draft; recover and replay never execute again',async t=>{
+ const f=await lifecycle(t,{onFrame(frame,{wire}){if(frame.body.action==='execute'){wire.readyState=3;wire.emit('close');return true;}}});f.bind();f.open();
+ const r=await renderer(()=>f.prepare(),{execute:p=>f.invoke('execute',p)});assert.equal(r.returned.code,'RESULT_UNKNOWN');assert.equal(r.input,'');assert.match(r.history.at(-1).content,/不要重复提交/);assert.equal(r.listeners,0);
+ f.bind();f.open();await f.tick();await f.tick();const source=f.frames.find(x=>x.body.action==='prepare').body.payload.messageId;const replay=await f.invoke('execute',{sourceId:source});assert.equal(replay.code,'SOURCE_UNKNOWN');assert.equal(replay.dispatched,undefined);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,1);assert.equal(f.frames.filter(x=>x.body.action==='recover').length,2);
+});
+test('host cannot label a dispatched reply as a retryable original draft',async t=>{
+ const f=await lifecycle(t,{onFrame(frame,{reply}){if(frame.body.action==='execute'){reply({ok:false,preserveInput:true,dispatched:false,code:'SYNTHETIC_HOST_ERROR'});return true;}}});f.bind();f.open();
+ const r=await renderer(()=>f.prepare(),{execute:p=>f.invoke('execute',p)});assert.equal(r.returned.dispatched,true);assert.equal(r.returned.preserveInput,false);assert.equal(r.input,'');assert.equal(r.listeners,0);
+});
+for(const change of ['new-text','same-text','attachment','topic','topic-return'])test('pending execute preserves user '+change+' and saves reply only in original topic',async t=>{
+ let deliver;const f=await lifecycle(t,{onFrame(frame,{reply}){if(frame.body.action==='execute'){deliver=()=>reply({ok:true,committed:true,operationId:'synthetic-operation'});return true;}}});f.bind();f.open();
+ const r=await renderer(()=>f.prepare(),{history:[{role:'assistant',content:'other history',topic:'other'}],async execute(p,controls){const pending=f.invoke('execute',p);if(change.startsWith('topic')){controls.switchTopic();if(change==='topic-return')controls.returnTopic();}else if(change==='attachment')controls.attach();else controls.edit(change==='same-text'?'把合成排期延后1分钟':'new user draft');deliver();return pending;}});
+ assert.equal(r.input,change==='new-text'?'new user draft':'把合成排期延后1分钟');assert.equal(r.history[0].content,'other history');assert.deepEqual(r.history.slice(1).map(x=>x.topic),['T','T']);assert.equal(f.frames.filter(x=>x.body.action==='execute').length,1);assert.equal(r.listeners,0);
+});
+
 async function startup(config, env={}, mainServerUrl='http://example.invalid') {
  const main=fs.readFileSync(path.join(root,'main.js'),'utf8');
  const chunk=main.slice(main.indexOf('function startDistributedServerAfterRenderer()'),main.indexOf('function toggleDevToolsForWindow',main.indexOf('function startDistributedServerAfterRenderer()')));

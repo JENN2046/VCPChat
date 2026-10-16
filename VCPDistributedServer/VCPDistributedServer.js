@@ -45,6 +45,7 @@ function isLoopbackAddress(address) {
 class DistributedServer {
     constructor(config = {}) {
         this.mainServerUrl = config.mainServerUrl;
+        this.nativeConversationWebSocket = config.nativeConversationWebSocket === true;
         this.vcpKey = config.vcpKey;
         this.serverName = config.serverName || 'Unnamed-Distributed-Server';
         this.port = config.port || 0; // 0 表示随机选择一个可用端口
@@ -287,11 +288,18 @@ class DistributedServer {
             return;
         }
 
+        if (this.nativeConversationWebSocket && !require('../modules/services/trustedConversation/webSocket.cjs').isSecureNativeWebSocketUrl(this.mainServerUrl.replace(/^http/, 'ws'))) {
+            console.error('[DistributedServer] NATIVE_SECURE_CHANNEL_REQUIRED');
+            return;
+        }
         const connectionUrl = `${this.mainServerUrl.replace(/^http/, 'ws')}/vcp-distributed-server/VCP_Key=${this.vcpKey}`;
-        console.log(`[${this.serverName}] Attempting to connect to main server at ${connectionUrl}`);
+        console.log('[DistributedServer] Connecting to configured main server.');
 
         // this.ws 现在是一个纯粹的客户端实例
         this.ws = new WebSocket(connectionUrl);
+        this.nativeConversationClient ??= require('../modules/services/trustedConversation/webSocket.cjs').createNativeWebSocketClient();
+        const nativeSocket = this.ws;
+        this.nativeConversationClient.bind(nativeSocket);
 
         this.ws.on('open', async () => {
             console.log(`[${this.serverName}] Successfully connected to main server.`);
@@ -305,7 +313,7 @@ class DistributedServer {
         });
 
         this.ws.on('message', (message) => {
-            this.handleMainServerMessage(message);
+            this.handleMainServerMessage(message, nativeSocket);
         });
         
         this.ws.on('close', () => {
@@ -316,7 +324,7 @@ class DistributedServer {
         });
 
         this.ws.on('error', (error) => {
-            console.error(`[${this.serverName}] WebSocket client error:`, error.message);
+            console.error('[DistributedServer] WEBSOCKET_CLIENT_ERROR');
             // 'close' 事件会自动被触发，所以这里不需要额外的处理
         });
     }
@@ -612,16 +620,18 @@ class DistributedServer {
         }
     }
 
-    async handleMainServerMessage(message) {
+    async handleMainServerMessage(message, nativeSocket = this.ws) {
         try {
             const parsedMessage = JSON.parse(message);
+            // Private native results never enter generic tool dispatch or diagnostics.
+            if (this.nativeConversationClient?.receive(nativeSocket, parsedMessage)) return;
             if (this.debugMode) console.log(`[${this.serverName}] Received message from main server:`, parsedMessage.type);
 
             if (parsedMessage.type === 'execute_tool') {
                 await this.handleToolExecutionRequest(parsedMessage.data);
             }
         } catch (e) {
-            console.error(`[${this.serverName}] Error parsing message from main server:`, e);
+            console.error('[DistributedServer] MAIN_SERVER_MESSAGE_INVALID');
         }
     }
 

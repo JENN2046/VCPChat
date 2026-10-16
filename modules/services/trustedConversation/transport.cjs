@@ -1,9 +1,22 @@
 'use strict';
-function createNativeTransport({binding,env=process.env,fetchImpl=fetch,chartService,controller}){
- const url=new URL(binding.toolboxUrl);if(url.protocol!=='http:'||!['127.0.0.1','[::1]'].includes(url.hostname)||url.username||url.password||url.search||url.hash||!/^\/?$/.test(url.pathname)||!/^[A-Za-z0-9_-]{1,100}$/.test(binding.toolName))throw Error('NATIVE_LOCAL_BINDING_INVALID');
- const key=env[binding.transportTokenEnv],application=env[binding.applicationAuthorizationEnv];if(!key||!/^Bearer [\x21-\x7e]{32,4096}$/.test(application||''))throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
+const {isNativeClientInstanceId}=require('./webSocket.cjs');
+function validateNativeBinding({binding,env=process.env}){
+ const websocket=binding.transport==='vcp-websocket';
+ if(websocket&&!isNativeClientInstanceId(binding.clientInstanceId))throw Error('NATIVE_CLIENT_BINDING_REQUIRED');
+ if(typeof binding.toolName!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(binding.toolName))throw Error('NATIVE_LOCAL_BINDING_INVALID');
+ const url=websocket?null:new URL(binding.toolboxUrl);
+ if(!websocket&&(url.protocol!=='http:'||!['127.0.0.1','[::1]'].includes(url.hostname)||url.username||url.password||url.search||url.hash||!/^\/?$/.test(url.pathname)))throw Error('NATIVE_LOCAL_BINDING_INVALID');
+ const key=env[binding.transportTokenEnv],application=env[binding.applicationAuthorizationEnv];if((!websocket&&!key)||!/^Bearer [\x21-\x7e]{32,4096}$/.test(application||''))throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
+ return {websocket,url,key,application};
+}
+function createNativeTransport({binding,env=process.env,fetchImpl=fetch,chartService,controller,nativeRequest}){
+ const {websocket,url,key,application}=validateNativeBinding({binding,env});
+ if(websocket&&typeof nativeRequest!=='function')throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
  let sequence=0,chartQueue=Promise.resolve();const projections=new Map();
- async function request(action,payload={}){const r=await fetchImpl(new URL('/v1/native-conversation/'+binding.toolName,url),{method:'POST',redirect:'error',signal:AbortSignal.timeout(25000),headers:{authorization:'Bearer '+key,'x-vcp-application-authorization':application,'content-type':'application/json'},body:JSON.stringify({action,payload})});if(!Number.isInteger(r.status)||r.status<200||r.status>=300)throw Error('NATIVE_HTTP_FAILURE');const value=await r.json();if(!value||typeof value!=='object'||Array.isArray(value)||typeof value.ok!=='boolean'||('handled'in value&&typeof value.handled!=='boolean')||('sequence'in value&&(!Number.isSafeInteger(value.sequence)||value.sequence<0))||(action==='prepare'&&value.ok&&(typeof value.handled!=='boolean'||(value.handled&&(typeof value.sourceId!=='string'||!value.sourceId)))))throw Error('NATIVE_RESPONSE_INVALID');if(Number.isSafeInteger(value.sequence))sequence=Math.max(sequence,value.sequence);return value;}
+ async function request(action,payload={}){let value;
+ if(websocket)value=await nativeRequest({clientInstanceId:binding.clientInstanceId,toolName:binding.toolName,authorization:application,body:{action,payload}});
+ else{const r=await fetchImpl(new URL('/v1/native-conversation/'+binding.toolName,url),{method:'POST',redirect:'error',signal:AbortSignal.timeout(25000),headers:{authorization:'Bearer '+key,'x-vcp-application-authorization':application,'content-type':'application/json'},body:JSON.stringify({action,payload})});if(!Number.isInteger(r.status)||r.status<200||r.status>=300)throw Error('NATIVE_HTTP_FAILURE');value=await r.json();}
+ if(!value||typeof value!=='object'||Array.isArray(value)||typeof value.ok!=='boolean'||('handled'in value&&typeof value.handled!=='boolean')||('sequence'in value&&(!Number.isSafeInteger(value.sequence)||value.sequence<0))||(action==='prepare'&&value.ok&&(typeof value.handled!=='boolean'||(value.handled&&(typeof value.sourceId!=='string'||!value.sourceId)))))throw Error('NATIVE_RESPONSE_INVALID');if(Number.isSafeInteger(value.sequence))sequence=Math.max(sequence,value.sequence);return value;}
  async function project(result){const p=result?.chart?.projection;if(!p)return result?.chart?{...result,chart:{...result.chart,retryPending:false}}:result;
   const id=p.create?.manifest?.id;if(typeof id!=='string'||!Array.isArray(p.version)||p.version.length!==2||p.version.some(v=>!Number.isSafeInteger(v)||v<0))return {...result,chart:{ok:false,code:'CHART_PROJECTION_INVALID'}};
   const queued=projections.get(id);if(queued&&p.version.some((v,i)=>v<queued.chart.projection.version[i]))return {...result,chart:{ok:true,discarded:'older-response'}};
@@ -19,4 +32,4 @@ function createNativeTransport({binding,env=process.env,fetchImpl=fetch,chartSer
  async function retryProjections(){for(const result of [...projections.values()])await project(result);}
  return {request,project,retryProjections,sequence:()=>sequence,toolName:binding.toolName};
 }
-module.exports={createNativeTransport};
+module.exports={createNativeTransport,validateNativeBinding};

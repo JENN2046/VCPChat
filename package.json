@@ -4,7 +4,7 @@
   "description": "一个为VCP服务器打造的AI聊天桌面客户端",
   "main": "main.js",
   "scripts": {
-    "test:chat-kernel": "node --test tests/chat-*.test.mjs tests/content-*.test.mjs tests/stream-*.test.mjs tests/main-chat-*.test.mjs tests/topic-selection-readiness.test.mjs tests/owned-preload-subscription.test.mjs tests/non-streaming-event-consumer.test.mjs tests/stream-transient-history.test.mjs tests/lifecycle-scope.test.js tests/lifecycle-inspector.test.js tests/chat-manager-selection-race.test.js tests/history-watcher-lease-manager.test.js tests/message-edit-watcher-failure.test.js tests/stream-manager-terminal-cleanup.test.js tests/ui-helper-chat-scroll-follow.test.js tests/suvei-human-authorization.test.js tests/notification-change-audit.test.js",
+    "test:chat-kernel": "node --test tests/native-websocket*.test.cjs tests/chat-*.test.mjs tests/content-*.test.mjs tests/stream-*.test.mjs tests/main-chat-*.test.mjs tests/topic-selection-readiness.test.mjs tests/owned-preload-subscription.test.mjs tests/non-streaming-event-consumer.test.mjs tests/stream-transient-history.test.mjs tests/lifecycle-scope.test.js tests/lifecycle-inspector.test.js tests/chat-manager-selection-race.test.js tests/history-watcher-lease-manager.test.js tests/message-edit-watcher-failure.test.js tests/stream-manager-terminal-cleanup.test.js tests/ui-helper-chat-scroll-follow.test.js tests/suvei-human-authorization.test.js tests/notification-change-audit.test.js",
     "guard:ui-interaction": "node scripts/check-ui-interaction-inventory.mjs",
     "guard:ui-async-state": "node scripts/check-ui-async-state-matrix.mjs",
     "guard:ui-task-journeys": "node scripts/check-ui-task-journeys.mjs",

@@ -1,0 +1,6 @@
+{
+  "transport": "vcp-websocket",
+  "toolName": "JennShootingOperations",
+  "clientInstanceId": "00000000-0000-4000-8000-000000000001",
+  "applicationAuthorizationEnv": "EXISTING_JSO_ADMIN_BEARER"
+}

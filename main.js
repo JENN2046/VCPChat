@@ -526,8 +526,17 @@ function startDistributedServerAfterRenderer() {
 
             console.log('[Main] Renderer is ready. Initializing distributed server in the background...');
             const DistributedServer = require('./VCPDistributedServer/VCPDistributedServer.js');
+            let nativeConversationWebSocket = false;
+            try {
+                const binding = require('./modules/ipc/nativeConversationHandlers').bindingFromEnvironment();
+                nativeConversationWebSocket = !!binding && require('./modules/services/trustedConversation/transport.cjs').validateNativeBinding({binding}).websocket;
+            } catch {
+                // Optional native configuration must not block ordinary distributed tools.
+                console.warn('[Main] Native conversation configuration unavailable; native WS disabled.');
+            }
             server = new DistributedServer({
                 mainServerUrl: settings.vcpLogUrl,
+                nativeConversationWebSocket,
                 vcpKey: settings.vcpLogKey,
                 serverName: 'VCPChat-Desktop-Client-Distributed-Server',
                 debugMode: true,
@@ -1715,7 +1724,7 @@ if (!gotTheLock) {
             logger: console,
         });
         const nativeConversation = require('./modules/ipc/nativeConversationHandlers');
-        await nativeConversation.initialize({mainWindow,chartService});
+        await nativeConversation.initialize({mainWindow,chartService,nativeEpoch:()=>distributedServer?.nativeConversationClient?.epoch()??0,nativeRequest:request=>{const client=distributedServer?.nativeConversationClient;if(!client)throw Error('NATIVE_TRANSPORT_UNAVAILABLE');return client.request(request);}});
         configureDocxHandlers({
             mainWindow,
             openChildWindows,

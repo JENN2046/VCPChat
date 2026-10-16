@@ -81,6 +81,13 @@ const allowedSourceDifferences = new Set([
     'scripts/lib/window-package-contract.cjs',
     'scripts/test-packaged-window-renderers.cjs',
     'tests/window-package-contract.test.mjs',
+    // PR #60 reviewed opt-in native WS transport, fixture and focused regressions.
+    // Exact paths only; forbidden/runtime and upstream Classic checks remain active.
+    'VCPDistributedServer/VCPDistributedServer.js',
+    'docs/native-conversation-websocket.example.json',
+    'modules/services/trustedConversation/webSocket.cjs',
+    'tests/native-websocket-redaction.test.cjs',
+    'tests/native-websocket.test.cjs',
     // Merged PR #58 native-conversation bridge and PR #59 fail-closed repair.
     // Exact source differences only; all forbidden-path/runtime checks remain active.
     'docs/native-conversation-binding.example.json',

@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const source=fs.readFileSync(path.join(__dirname,'../modules/chatManager.js'),'utf8');
 const start=source.indexOf('        if (nativeResult?.handled) {'),end=source.indexOf('        const thinkingMessageId',start);
 const AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-const run=new AsyncFunction('electronAPI','persistOutgoingUserMessage','renderTarget','uiHelper','isSendContextCurrent',`let nativeResult={handled:true,sourceId:'native-fixture'};const sendContext={topicId:'original-topic'},currentSelectedItem={name:'fake'};${source.slice(start,end)}`);
+const run=new AsyncFunction('electronAPI','persistOutgoingUserMessage','renderTarget','uiHelper','isSendContextCurrent',`const nativeDraftEdited=false,nativeDraftItemGeneration=0,nativeDraftTopicGeneration=0,itemSelectionGeneration=0,topicSelectionGeneration=0,input={},consumeDraft=()=>{};let nativeResult={handled:true,sourceId:'native-fixture'};const sendContext={topicId:'original-topic'},currentSelectedItem={name:'fake'};${source.slice(start,end)}`);
 for(const active of [true,false])test(`committed receipt survives failed history save (original topic active=${active})`,async()=>{
  let executes=0;const rendered=[],toasts=[];
  const result=await run({executeNativeConversation:async()=>{executes++;return {committed:true,operationId:'op-original',chart:{ok:true}}}},async()=>{throw Error('synthetic disk full')},{renderMessage:async r=>rendered.push(r)},{showToastNotification:s=>toasts.push(s)},()=>active);

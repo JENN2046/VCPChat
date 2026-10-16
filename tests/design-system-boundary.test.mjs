@@ -15,7 +15,14 @@ test('integrated boundary allows product work and rejects retained runtime, asse
         fs.mkdirSync(path.dirname(target), { recursive: true });
         fs.writeFileSync(target, source);
     };
-    const run = () => spawnSync(process.execPath, [guard], { cwd: root, encoding: 'utf8', windowsHide: true });
+    // This synthetic Git fixture has its own tree. The outer CI projection
+    // describes the real checkout and must not be applied to the fixture.
+    // Keep the real guard unchanged and remove only its two context bindings
+    // from child processes (never from the parent CI environment).
+    const fixtureEnv = { ...process.env };
+    delete fixtureEnv.VCPCHAT_CI_SOURCE_CONTEXT;
+    delete fixtureEnv.VCPCHAT_CI_SOURCE_CONTEXT_SHA256;
+    const run = () => spawnSync(process.execPath, [guard], { cwd: root, env: fixtureEnv, encoding: 'utf8', windowsHide: true });
     const reject = (file, source, expected) => {
         const existed = fs.existsSync(path.join(root, file));
         const previous = existed ? fs.readFileSync(path.join(root, file)) : null;

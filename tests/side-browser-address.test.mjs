@@ -3,6 +3,33 @@ import assert from 'node:assert/strict';
 
 import { normalizeBrowserInput, resolveBrowserAddress } from '../modules/ui-system/side-pane/browserSideProvider.js';
 
+test('guest registration waits for DOM readiness and ignores released views', async () => {
+    const { JSDOM } = await import('jsdom');
+    const { createBrowserSideProvider } = await import('../modules/ui-system/side-pane/browserSideProvider.js');
+    const dom = new JSDOM('<div id="view"></div>');
+    let reads = 0, registrations = 0, ready = false;
+    const provider = createBrowserSideProvider({ document: dom.window.document,
+        api: { browserRegisterTarget: async () => { registrations++; return {success:true,data:{}}; }, browserUnregisterTarget: async () => {} },
+        sidePaneController: { updateTab() {} }, notify() {} });
+    const handle = await provider.mountTab({id:'browser:ready-test',kind:'browser',payload:{}}, dom.window.document.getElementById('view'));
+    try {
+        handle.navigate('https://example.test/');
+        const guest = dom.window.document.querySelector('webview');
+        guest.getWebContentsId = () => { reads++; assert.ok(ready, 'guest method called before dom-ready'); return 123; };
+        guest.dispatchEvent(new dom.window.Event('did-attach'));
+        assert.equal(reads,0); assert.equal(registrations,0);
+        ready = true;
+        guest.dispatchEvent(new dom.window.Event('dom-ready'));
+        await handle.whenRegistered();
+        assert.equal(reads,1); assert.equal(registrations,1);
+        guest.dispatchEvent(new dom.window.Event('dom-ready'));
+        assert.equal(registrations,1,'duplicate readiness cannot register twice');
+        await handle.dispose();
+        guest.dispatchEvent(new dom.window.Event('dom-ready'));
+        assert.equal(reads,1,'late guest events after disposal are ignored');
+    } finally { await handle.dispose(); dom.window.close(); }
+});
+
 test('addresses open as before', () => {
     assert.deepEqual(resolveBrowserAddress('example.com'), { url: 'https://example.com/' });
     assert.deepEqual(resolveBrowserAddress('localhost:3000'), { url: 'http://localhost:3000/' });

@@ -3,6 +3,25 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const { JSDOM } = require('jsdom');
 
+test('main terminal diagnostics observe either platform executor without loading it', () => {
+    const path = require('node:path');
+    const vm = require('node:vm');
+    const source = fs.readFileSync('main.js', 'utf8');
+    const declaration = source.match(/const TERMINAL_EXECUTOR_PATHS = [\s\S]*?;\r?\n/)[0];
+    const expression = source.match(/loaded: (TERMINAL_EXECUTOR_PATHS\.some\([^\n]+\)),/)[1];
+    const cache = {};
+    const root = path.resolve('/synthetic-vcp');
+    const inspect = () => vm.runInNewContext(declaration + '\n' + expression, { path, PROJECT_ROOT: root, originalRequire: { cache } });
+    assert.equal(inspect(), false);
+    for (const name of ['PowerShellExecutor', 'PTYShellExecutor']) {
+        const file = path.join(root, 'VCPDistributedServer', 'Plugin', name, name + '.js');
+        cache[file] = {};
+        assert.equal(inspect(), true, name);
+        delete cache[file];
+        assert.equal(inspect(), false);
+    }
+});
+
 test('lifecycle inspector reports ownership metadata without payload content', async () => {
     const dom = new JSDOM('<!doctype html><html data-ui-mode="next"><body></body></html>', { runScripts: 'outside-only' });
     const { window } = dom;

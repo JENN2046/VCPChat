@@ -178,7 +178,9 @@ export function createBrowserSideProvider({
             });
             registered.catch(() => {});
             const registerGuest = () => {
-                if (registration || !api?.browserRegisterTarget || !webview?.getWebContentsId) return;
+                // did-attach alone does not make Electron's guest methods safe.
+                // Registration belongs to this live, DOM-ready view only.
+                if (disposed() || !domReady || registration || !api?.browserRegisterTarget || !webview?.getWebContentsId) return;
                 const guestId = webview.getWebContentsId();
                 registeredGuestId = guestId;
                 registration = api.browserRegisterTarget(tab.id, guestId).then(res => {

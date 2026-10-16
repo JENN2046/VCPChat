@@ -23,3 +23,4 @@ for (const [label,file] of [['source','rust_projectforge_indexer/src/main.rs'],[
 }
 test('reject omitted source inventory entries',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/src/extra.rs','new');assert.throws(()=>verify(root),/inventory/);});
 test('reject new Cargo build scripts',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/build.rs','new');assert.throws(()=>verify(root),/build script/);});
+test('source byte checking never normalizes line endings to hide changes',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/src/main.rs','fixture src/main.rs\r\n');assert.throws(()=>verify(root),/source identity/);});

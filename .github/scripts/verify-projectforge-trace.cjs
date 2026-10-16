@@ -63,6 +63,7 @@ function smoke(executable) {
   return { ready: true, ping: true, javascriptOutline: true, invalidInputRejected: true };
 }
 if (require.main === module) {
+  try {
   const root = path.resolve(process.argv[2] || '.');
   const result = verify(root);
   if (process.argv[3]) {
@@ -79,5 +80,11 @@ if (require.main === module) {
   }
   if (process.argv[4]) fs.writeFileSync(process.argv[4], JSON.stringify(result, null, 2) + '\n', { flag: 'wx' });
   console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    // Structured, bounded diagnostics; do not need raw job or runtime logs.
+    const message=String(error.message).split('\n')[0].replace(/[%\r\n]/g, ' ').slice(0,240);
+    console.error('::error::ProjectForge trace: '+message);
+    process.exitCode=1;
+  }
 }
 module.exports = { verify, smoke, sha, DESTINATION, RECIPE };

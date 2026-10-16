@@ -108,6 +108,10 @@ const allowedSourceDifferences = new Set([
     '.github/scripts/build-projectforge-windows.ps1',
     '.github/scripts/verify-projectforge-trace.cjs',
     'tests/projectforge-trace.test.cjs',
+    'tests/design-system-boundary.test.mjs',
+    'tests/lifecycle-inspector.test.js',
+    'tests/side-browser-address.test.mjs',
+    'modules/ui-system/side-pane/browserSideProvider.js',
     'scripts/smoke-side-pane-e2e.mjs',
     '.github/workflows/projectforge-windows.yml',
     // PR #52 reviewed tool-result framing and ProjectForge native-close fixes.

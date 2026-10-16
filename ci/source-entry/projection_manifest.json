@@ -625,9 +625,9 @@
           "path": ".github/scripts/verify-projectforge-trace.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "afde73656a5b8c3ea7c3e6507167c371a826cb32",
-          "size": 5059,
-          "sha256": "4c6dd1d0f2ab411f0cdd7846be2dbc60cd629b08d35a021aaa11f8a7302622a3",
+          "blob": "756204f2010313621326e4a6dd17f1dcae3d64ae",
+          "size": 5346,
+          "sha256": "fba0811833f70ff2cd9f42bccb4b78dc470e047d27cec657202c688f10ee3a72",
           "kind": "source"
         },
         {
@@ -6374,9 +6374,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "67029c95b2640e5ced1be6601da7563cf5d0ff73",
-          "size": 104890,
-          "sha256": "b5329c426c6f21ab8a290c51c2f40f3b8e43c4eb5fb2f43d6f9017933874baad",
+          "blob": "2728ceaf00b809e1d5b89e5f81b76caec444c8e1",
+          "size": 104945,
+          "sha256": "6302c62969e7f439f9b741fbfa1489bf99c79377cb6cd6d9b876b6d664ad2bac",
           "kind": "source"
         },
         {
@@ -9669,9 +9669,9 @@
           "path": "modules/ui-system/side-pane/browserSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4457028c28b5708980e2c6006aaae48515a33c58",
-          "size": 31956,
-          "sha256": "ae54222e2250c58e05257c7027cccb82d42fccebb547d743018ffee5769846f0",
+          "blob": "086134c9897bbead1eac96a5c9286f962408b6de",
+          "size": 32139,
+          "sha256": "c01267e5a055ef726255c3ed96a0a78c256a8f483c928418bff03cd5a9731b55",
           "kind": "source"
         },
         {
@@ -11896,9 +11896,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b051dde24936c65c3056a9b2396fd3b12b2039cd",
-          "size": 38356,
-          "sha256": "493043cd7935685b37af057c9789136789445803cd627aa58de40905ab58c503",
+          "blob": "dcb1d0c05260bd240b7e88681df3355fb7da2864",
+          "size": 38543,
+          "sha256": "39161df22e99a5f326903561a17031901e4fee1546758ad6740c3084dc3e7959",
           "kind": "source"
         },
         {
@@ -13315,6 +13315,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/design-system-boundary.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cfb40fd6bf714a59e3fd927c5fe8ae3ead634a39",
+          "size": 4754,
+          "sha256": "43eec0c674a0925df93fb7c2cd93e614d6586a6bb3e7f814e964419bb4c161af",
+          "kind": "source"
+        },
+        {
           "path": "tests/desktop-push-consumer.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -13408,9 +13417,9 @@
           "path": "tests/lifecycle-inspector.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9519e8be7a6671e105cdad996b7dc00b71986e33",
-          "size": 4475,
-          "sha256": "1a1d752135719dadde71c6477a2955ebeacfa38a9a78238c49a88a295500ca83",
+          "blob": "af20bce23e2859750bcb353b9c845f5cd4aa21d8",
+          "size": 5438,
+          "sha256": "a92607381fad2ad13ef132299dad37e6697e9873e9b179ad2686bb6cccf54e15",
           "kind": "source"
         },
         {
@@ -13705,9 +13714,9 @@
           "path": "tests/projectforge-trace.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "998d4ac6ac6adaf37b9f62ba611809a5c7c484e5",
-          "size": 2228,
-          "sha256": "68e5c65d5d34311c98bed64f6af4afbc28283a17c21262d12847805900bd6df4",
+          "blob": "6e4dce5ae473cb64b4d18e0d771b172a2ec5b267",
+          "size": 2459,
+          "sha256": "5962ca981c4d5e274155aeb60ea68c6cababeef0fd911f4a8d52830ce2f7ce31",
           "kind": "source"
         },
         {
@@ -13744,6 +13753,15 @@
           "blob": "e142279885145484b3181acf95086b0ebd5abee5",
           "size": 1846,
           "sha256": "b9d3758b6fa5f025bf115e637f295e6db900ade5c8aeef9932f8de7bcd090b85",
+          "kind": "source"
+        },
+        {
+          "path": "tests/side-browser-address.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1a99a98b21941a8dd62f9eb58221fe85ddccf3e8",
+          "size": 17064,
+          "sha256": "e5698c452dd6f7c8211944847207b8fb45682b2b4fd705004353b41f233add23",
           "kind": "source"
         },
         {
@@ -15948,9 +15966,9 @@
           "path": ".github/scripts/verify-projectforge-trace.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "afde73656a5b8c3ea7c3e6507167c371a826cb32",
-          "size": 5059,
-          "sha256": "4c6dd1d0f2ab411f0cdd7846be2dbc60cd629b08d35a021aaa11f8a7302622a3",
+          "blob": "756204f2010313621326e4a6dd17f1dcae3d64ae",
+          "size": 5346,
+          "sha256": "fba0811833f70ff2cd9f42bccb4b78dc470e047d27cec657202c688f10ee3a72",
           "kind": "source"
         },
         {
@@ -19684,9 +19702,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "67029c95b2640e5ced1be6601da7563cf5d0ff73",
-          "size": 104890,
-          "sha256": "b5329c426c6f21ab8a290c51c2f40f3b8e43c4eb5fb2f43d6f9017933874baad",
+          "blob": "2728ceaf00b809e1d5b89e5f81b76caec444c8e1",
+          "size": 104945,
+          "sha256": "6302c62969e7f439f9b741fbfa1489bf99c79377cb6cd6d9b876b6d664ad2bac",
           "kind": "source"
         },
         {
@@ -22933,9 +22951,9 @@
           "path": "modules/ui-system/side-pane/browserSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4457028c28b5708980e2c6006aaae48515a33c58",
-          "size": 31956,
-          "sha256": "ae54222e2250c58e05257c7027cccb82d42fccebb547d743018ffee5769846f0",
+          "blob": "086134c9897bbead1eac96a5c9286f962408b6de",
+          "size": 32139,
+          "sha256": "c01267e5a055ef726255c3ed96a0a78c256a8f483c928418bff03cd5a9731b55",
           "kind": "source"
         },
         {
@@ -24904,9 +24922,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b051dde24936c65c3056a9b2396fd3b12b2039cd",
-          "size": 38356,
-          "sha256": "493043cd7935685b37af057c9789136789445803cd627aa58de40905ab58c503",
+          "blob": "dcb1d0c05260bd240b7e88681df3355fb7da2864",
+          "size": 38543,
+          "sha256": "39161df22e99a5f326903561a17031901e4fee1546758ad6740c3084dc3e7959",
           "kind": "source"
         },
         {
@@ -26758,9 +26776,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "c1422330311669bc94e3703e983cbbda5733cd03",
-          "size": 4292,
-          "sha256": "1caaf0623a22af5713936b3292b7d5f696e3b196904fe6625279e56f9134a05c",
+          "blob": "cfb40fd6bf714a59e3fd927c5fe8ae3ead634a39",
+          "size": 4754,
+          "sha256": "43eec0c674a0925df93fb7c2cd93e614d6586a6bb3e7f814e964419bb4c161af",
           "kind": "source"
         },
         {
@@ -27028,9 +27046,9 @@
           "path": "tests/lifecycle-inspector.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9519e8be7a6671e105cdad996b7dc00b71986e33",
-          "size": 4475,
-          "sha256": "1a1d752135719dadde71c6477a2955ebeacfa38a9a78238c49a88a295500ca83",
+          "blob": "af20bce23e2859750bcb353b9c845f5cd4aa21d8",
+          "size": 5438,
+          "sha256": "a92607381fad2ad13ef132299dad37e6697e9873e9b179ad2686bb6cccf54e15",
           "kind": "source"
         },
         {
@@ -27514,9 +27532,9 @@
           "path": "tests/projectforge-trace.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "998d4ac6ac6adaf37b9f62ba611809a5c7c484e5",
-          "size": 2228,
-          "sha256": "68e5c65d5d34311c98bed64f6af4afbc28283a17c21262d12847805900bd6df4",
+          "blob": "6e4dce5ae473cb64b4d18e0d771b172a2ec5b267",
+          "size": 2459,
+          "sha256": "5962ca981c4d5e274155aeb60ea68c6cababeef0fd911f4a8d52830ce2f7ce31",
           "kind": "source"
         },
         {
@@ -27631,9 +27649,9 @@
           "path": "tests/side-browser-address.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2f259ed24fa897c34a4ba461ce9117813a81f477",
-          "size": 15325,
-          "sha256": "2c7aa5cd1ee4c8fca90477a3e7ec23a19480dbc4dd0f96fc70dd38c2400c6b28",
+          "blob": "1a99a98b21941a8dd62f9eb58221fe85ddccf3e8",
+          "size": 17064,
+          "sha256": "e5698c452dd6f7c8211944847207b8fb45682b2b4fd705004353b41f233add23",
           "kind": "source"
         },
         {

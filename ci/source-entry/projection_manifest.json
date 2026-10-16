@@ -10,9 +10,9 @@
           "path": "VCPDistributedServer/Plugin.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "b77c462a7fe19dce4e24138350510e005ebbde77",
-          "size": 32212,
-          "sha256": "3232d80400f50056a85dfb77ba368860bc2571cd83ca2a3b1c4650780601b17b",
+          "blob": "3304584b56c92fa3de2a413738939616901fc013",
+          "size": 32454,
+          "sha256": "abfcc0805609cb2e7b3c8445980774771ecaa0d568b30b0eb61d3debbd50aa07",
           "kind": "source"
         },
         {
@@ -289,9 +289,9 @@
           "path": "VCPDistributedServer/VCPDistributedServer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "4d747dc2f91e839b945f938e5312d195b217acad",
-          "size": 43677,
-          "sha256": "25774e3af856c551f8db6448e33496afd65a6de9d37ce8f7000ab360d99480c8",
+          "blob": "2a0cd6cabf217db67c180502f6632c8271d1f165",
+          "size": 44329,
+          "sha256": "05c23bb3999acbdbd8c771cd40b83c9c99ae3b851272d52122e8be8db22ee912",
           "kind": "source"
         },
         {
@@ -2821,9 +2821,9 @@
           "path": "VCPDistributedServer/Plugin.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "b77c462a7fe19dce4e24138350510e005ebbde77",
-          "size": 32212,
-          "sha256": "3232d80400f50056a85dfb77ba368860bc2571cd83ca2a3b1c4650780601b17b",
+          "blob": "3304584b56c92fa3de2a413738939616901fc013",
+          "size": 32454,
+          "sha256": "abfcc0805609cb2e7b3c8445980774771ecaa0d568b30b0eb61d3debbd50aa07",
           "kind": "source"
         },
         {
@@ -3669,9 +3669,9 @@
           "path": "VCPDistributedServer/VCPDistributedServer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "4d747dc2f91e839b945f938e5312d195b217acad",
-          "size": 43677,
-          "sha256": "25774e3af856c551f8db6448e33496afd65a6de9d37ce8f7000ab360d99480c8",
+          "blob": "2a0cd6cabf217db67c180502f6632c8271d1f165",
+          "size": 44329,
+          "sha256": "05c23bb3999acbdbd8c771cd40b83c9c99ae3b851272d52122e8be8db22ee912",
           "kind": "source"
         },
         {
@@ -6410,9 +6410,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a7fb221031b130d5213ffba117e473edeb78f8aa",
-          "size": 105823,
-          "sha256": "e329bb78ab13bc23b918acccfb018e82b648c7b344f226913f28bf00cea5e8fb",
+          "blob": "e9819e8f0a2fa8259b7448470f48ffd6738d2bc7",
+          "size": 105955,
+          "sha256": "35c48ba3b21843b97b0690da650389750daf3494c972008b31077034e0f5f7e5",
           "kind": "source"
         },
         {
@@ -11941,9 +11941,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "33dbdd8008ffbc30949500de4b6362990f715294",
-          "size": 39112,
-          "sha256": "b2d3107473ab81427b911c1aeb7978ead9dfe6f1d9b9dd1e072656354d3811f7",
+          "blob": "6298022bb08aa7493a2dbdfdfba147cd6f062b91",
+          "size": 39317,
+          "sha256": "c52b47caffeac6b04ecf42409f347f6619dd9f8ea4a214fac905cf405611518d",
           "kind": "source"
         },
         {
@@ -17635,9 +17635,9 @@
           "path": "VCPDistributedServer/Plugin.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "b77c462a7fe19dce4e24138350510e005ebbde77",
-          "size": 32212,
-          "sha256": "3232d80400f50056a85dfb77ba368860bc2571cd83ca2a3b1c4650780601b17b",
+          "blob": "3304584b56c92fa3de2a413738939616901fc013",
+          "size": 32454,
+          "sha256": "abfcc0805609cb2e7b3c8445980774771ecaa0d568b30b0eb61d3debbd50aa07",
           "kind": "source"
         },
         {
@@ -18635,9 +18635,9 @@
           "path": "VCPDistributedServer/VCPDistributedServer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "4d747dc2f91e839b945f938e5312d195b217acad",
-          "size": 43677,
-          "sha256": "25774e3af856c551f8db6448e33496afd65a6de9d37ce8f7000ab360d99480c8",
+          "blob": "2a0cd6cabf217db67c180502f6632c8271d1f165",
+          "size": 44329,
+          "sha256": "05c23bb3999acbdbd8c771cd40b83c9c99ae3b851272d52122e8be8db22ee912",
           "kind": "source"
         },
         {
@@ -19427,9 +19427,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "d4d9771a5f8dfcc8ced21196c26a0d5e7ca02489",
+          "blob": "6eb85958f9d7307bdfb0d0cf108230cc357dc857",
           "size": 980698,
-          "sha256": "e27377a1c76407439506ff162c1e37ea10ce66d3cc058cf03700e08e08a030ea",
+          "sha256": "305a11529fbff5abfc2e5b5a105f31e865027a622ed61589730f885157101cd4",
           "kind": "source"
         },
         {
@@ -19778,9 +19778,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a7fb221031b130d5213ffba117e473edeb78f8aa",
-          "size": 105823,
-          "sha256": "e329bb78ab13bc23b918acccfb018e82b648c7b344f226913f28bf00cea5e8fb",
+          "blob": "e9819e8f0a2fa8259b7448470f48ffd6738d2bc7",
+          "size": 105955,
+          "sha256": "35c48ba3b21843b97b0690da650389750daf3494c972008b31077034e0f5f7e5",
           "kind": "source"
         },
         {
@@ -25007,9 +25007,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "33dbdd8008ffbc30949500de4b6362990f715294",
-          "size": 39112,
-          "sha256": "b2d3107473ab81427b911c1aeb7978ead9dfe6f1d9b9dd1e072656354d3811f7",
+          "blob": "6298022bb08aa7493a2dbdfdfba147cd6f062b91",
+          "size": 39317,
+          "sha256": "c52b47caffeac6b04ecf42409f347f6619dd9f8ea4a214fac905cf405611518d",
           "kind": "source"
         },
         {

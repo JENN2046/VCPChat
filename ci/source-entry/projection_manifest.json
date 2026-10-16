@@ -6815,9 +6815,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "ba9c50ebf857246f654293d529d405ff1ac8e003",
-          "size": 126541,
-          "sha256": "07b77a81ef6320c99c42ebe6e7f56dfe80349cc6bcd5ece5863f445ece7cb7a2",
+          "blob": "dcf37b12df4c25a8f93f95dca42c86921f803960",
+          "size": 126575,
+          "sha256": "d2ee116fddaac8608768a2ce317f910656740ce9b9de12c0d74fec3351bc250b",
           "kind": "source"
         },
         {
@@ -12085,9 +12085,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "1268592811ee2b84d31355a0a630a95a18dc24d1",
-          "size": 12707,
-          "sha256": "c4479dd3af9890670a8044a22835f84fec075af1490a5499eee914ddce9b124b",
+          "blob": "43aec9b0424e2af4cf375eadb1d45694a523a44b",
+          "size": 12985,
+          "sha256": "8d7f96d622ec75fc287b917f3765de4a2b39123248baa945da3d29556b8d3b91",
           "kind": "source"
         },
         {
@@ -13588,9 +13588,9 @@
           "path": "tests/native-config-startup.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b8de59841b9f943452001343ed48700dff994835",
-          "size": 4968,
-          "sha256": "f46e7c22cd7ac1bf5b50c81da783e898f3a1b99e19c7478b678e916a17f9ed16",
+          "blob": "6f1c0d54d36311e2508a5398f842024d5785243b",
+          "size": 4994,
+          "sha256": "e00dc5b37770aef77de7b8aa2d5e1e8a24b8a1cd4ef60159964515dbad5c2f2b",
           "kind": "source"
         },
         {
@@ -13651,9 +13651,9 @@
           "path": "tests/native-send-preflight.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "660e279693a07ab800cdbedba45a5843fbf24fde",
-          "size": 1812,
-          "sha256": "7838d64c055b3ea974e4073447dd8488aab51e0d61c3e9b964180ddac5c8e725",
+          "blob": "f6f00d9d792e355ef7906da379ffd0081654de78",
+          "size": 1880,
+          "sha256": "7db1cb34167b74dae9a722287e908b3fc40947678bed8418fbc08ea112a6a2ea",
           "kind": "source"
         },
         {
@@ -13669,18 +13669,18 @@
           "path": "tests/native-three-boundaries.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "9fc521f8476e41d33d8daa539d2c408f83c8d2c5",
-          "size": 9857,
-          "sha256": "290d08e770f4fd9eb9f6ec140a9ce37dec3eab3348e7ae0bf764206d2833b7fa",
+          "blob": "70e336d38466e6ccd617c7c042d0cfa44d48685c",
+          "size": 9883,
+          "sha256": "0b6ca7ca8e28461f12a48e20bfcc49cfd541bc2381e7aa8b667f0f4054f100e9",
           "kind": "source"
         },
         {
           "path": "tests/native-voice-send.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0486a80b2abe9e6bb895831f97403c5d65f353e",
-          "size": 5009,
-          "sha256": "3c889229ba06340c9408d45aabb113ff9290330c3f66caf3dd640ae693c1efb9",
+          "blob": "93273fd0ca6c4adf329dbfe714adebf2b47095e9",
+          "size": 5035,
+          "sha256": "d8f18ea76efe0e3ea8acd8f3fb10c73a343766b6aded087f75764d36a1b35d65",
           "kind": "source"
         },
         {
@@ -19427,9 +19427,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8e89fc4cefeaa935ec8ce3887265ae5d5862a202",
+          "blob": "862b0498d1e89153e9ecb4cb2facd3e8f37788c8",
           "size": 980696,
-          "sha256": "f40f28dac675ac00eb131e4cf6e69fac4d68a87030fd21846795f893527c476b",
+          "sha256": "010a9a1f531e5eeeaef5b6679eb3c1d7824ffb8a1e107a44feb50f5584ed3779",
           "kind": "source"
         },
         {
@@ -20174,9 +20174,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "ba9c50ebf857246f654293d529d405ff1ac8e003",
-          "size": 126541,
-          "sha256": "07b77a81ef6320c99c42ebe6e7f56dfe80349cc6bcd5ece5863f445ece7cb7a2",
+          "blob": "dcf37b12df4c25a8f93f95dca42c86921f803960",
+          "size": 126575,
+          "sha256": "d2ee116fddaac8608768a2ce317f910656740ce9b9de12c0d74fec3351bc250b",
           "kind": "source"
         },
         {
@@ -25187,9 +25187,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "1268592811ee2b84d31355a0a630a95a18dc24d1",
-          "size": 12707,
-          "sha256": "c4479dd3af9890670a8044a22835f84fec075af1490a5499eee914ddce9b124b",
+          "blob": "43aec9b0424e2af4cf375eadb1d45694a523a44b",
+          "size": 12985,
+          "sha256": "8d7f96d622ec75fc287b917f3765de4a2b39123248baa945da3d29556b8d3b91",
           "kind": "source"
         },
         {
@@ -27446,9 +27446,9 @@
           "path": "tests/native-config-startup.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b8de59841b9f943452001343ed48700dff994835",
-          "size": 4968,
-          "sha256": "f46e7c22cd7ac1bf5b50c81da783e898f3a1b99e19c7478b678e916a17f9ed16",
+          "blob": "6f1c0d54d36311e2508a5398f842024d5785243b",
+          "size": 4994,
+          "sha256": "e00dc5b37770aef77de7b8aa2d5e1e8a24b8a1cd4ef60159964515dbad5c2f2b",
           "kind": "source"
         },
         {
@@ -27509,9 +27509,9 @@
           "path": "tests/native-send-preflight.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "660e279693a07ab800cdbedba45a5843fbf24fde",
-          "size": 1812,
-          "sha256": "7838d64c055b3ea974e4073447dd8488aab51e0d61c3e9b964180ddac5c8e725",
+          "blob": "f6f00d9d792e355ef7906da379ffd0081654de78",
+          "size": 1880,
+          "sha256": "7db1cb34167b74dae9a722287e908b3fc40947678bed8418fbc08ea112a6a2ea",
           "kind": "source"
         },
         {
@@ -27527,18 +27527,18 @@
           "path": "tests/native-three-boundaries.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "9fc521f8476e41d33d8daa539d2c408f83c8d2c5",
-          "size": 9857,
-          "sha256": "290d08e770f4fd9eb9f6ec140a9ce37dec3eab3348e7ae0bf764206d2833b7fa",
+          "blob": "70e336d38466e6ccd617c7c042d0cfa44d48685c",
+          "size": 9883,
+          "sha256": "0b6ca7ca8e28461f12a48e20bfcc49cfd541bc2381e7aa8b667f0f4054f100e9",
           "kind": "source"
         },
         {
           "path": "tests/native-voice-send.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e0486a80b2abe9e6bb895831f97403c5d65f353e",
-          "size": 5009,
-          "sha256": "3c889229ba06340c9408d45aabb113ff9290330c3f66caf3dd640ae693c1efb9",
+          "blob": "93273fd0ca6c4adf329dbfe714adebf2b47095e9",
+          "size": 5035,
+          "sha256": "d8f18ea76efe0e3ea8acd8f3fb10c73a343766b6aded087f75764d36a1b35d65",
           "kind": "source"
         },
         {
@@ -27555,9 +27555,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "dc69715677a5f392a226d9b8f480f6051dd4d2a7",
-          "size": 26922,
-          "sha256": "26d00ab5ea1a896ac13e50f678616683b928cc4b973a7493118ab3d203c51f73"
+          "blob": "ec40038620cccae8a05a3f8f716a31787d77fc7f",
+          "size": 27854,
+          "sha256": "4aa4b5b340476d24995e6518e1751342a464f1abe2efaf47c868a5d6ef148528"
         },
         {
           "path": "tests/next-ui-registries.test.mjs",

@@ -15501,7 +15501,7 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1507,
+          "line": 1474,
           "kind": "custom-event-listener"
         },
         {
@@ -15662,7 +15662,7 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1507,
+          "line": 1474,
           "kind": "custom-event-listener",
           "match": "input.addEventListener?.('input'"
         },

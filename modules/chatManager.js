@@ -1464,8 +1464,19 @@ export const chatManager = (() => {
         pendingSendContexts.add(sendSignature);
         let stopNativeDraftObservation;
         try {
+        // Capture ownership before prepare: that await can also outlive a draft
+        // edit or a switch away and back. All listeners leave in the send finally.
+        let nativeDraftEdited = false;
+        const nativeDraftItemGeneration = itemSelectionGeneration;
+        const nativeDraftTopicGeneration = topicSelectionGeneration;
+        const observeNativeDraft = () => {
+            const markDraftEdited = () => { nativeDraftEdited = true; };
+            input.addEventListener?.('input', markDraftEdited);
+            stopNativeDraftObservation = () => input.removeEventListener?.('input', markDraftEdited);
+        };
         let nativeResult = null;
         if (!request && !attachedFiles.length && currentSelectedItem.type !== 'group' && typeof electronAPI.prepareNativeConversation === 'function') {
+            observeNativeDraft();
             try { nativeResult = await electronAPI.prepareNativeConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
             catch { nativeResult={handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'}; }
         }
@@ -1495,17 +1506,6 @@ export const chatManager = (() => {
                     _fileManagerData: fileManagerData
                 });
             }
-        }
-
-        // Track draft ownership before render, persistence and unread-state awaits.
-        // Reuse selection generations so switching away and back cannot consume it.
-        let nativeDraftEdited = false;
-        const nativeDraftItemGeneration = itemSelectionGeneration;
-        const nativeDraftTopicGeneration = topicSelectionGeneration;
-        if (nativeResult?.sourceId) {
-            const markDraftEdited = () => { nativeDraftEdited = true; };
-            input.addEventListener?.('input', markDraftEdited);
-            stopNativeDraftObservation = () => input.removeEventListener?.('input', markDraftEdited);
         }
 
         const userMessage = {

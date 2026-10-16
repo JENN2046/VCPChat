@@ -12085,9 +12085,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "43aec9b0424e2af4cf375eadb1d45694a523a44b",
-          "size": 12985,
-          "sha256": "8d7f96d622ec75fc287b917f3765de4a2b39123248baa945da3d29556b8d3b91",
+          "blob": "baae5304158bec81a27848fd23c54337136d444a",
+          "size": 13649,
+          "sha256": "7ff02c0fdef03cccfcaf2baba4b1304ce74be8970d93f4f1fd38d5e6991a112b",
           "kind": "source"
         },
         {
@@ -25187,9 +25187,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "43aec9b0424e2af4cf375eadb1d45694a523a44b",
-          "size": 12985,
-          "sha256": "8d7f96d622ec75fc287b917f3765de4a2b39123248baa945da3d29556b8d3b91",
+          "blob": "baae5304158bec81a27848fd23c54337136d444a",
+          "size": 13649,
+          "sha256": "7ff02c0fdef03cccfcaf2baba4b1304ce74be8970d93f4f1fd38d5e6991a112b",
           "kind": "source"
         },
         {

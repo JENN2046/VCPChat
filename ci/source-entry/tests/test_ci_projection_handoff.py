@@ -90,18 +90,21 @@ class TransferTests(unittest.TestCase):
     def test_workflows_keep_verified_entry_and_failure_propagation(self):
         root=MODULE.parents[2]
         for name in ['side_pane_e2e.yml','side_pane_windows.yml']:
-            text=(root/'.github/workflows'/name).read_text()
+            text=(root/'.github/workflows'/name).read_text(encoding='utf-8')
             self.assertNotIn('actions/checkout',text)
             self.assertNotIn('continue-on-error',text)
             self.assertNotIn('contents: write',text)
             self.assertNotIn('    defaults:',text)
+            # setup-node's cache hashFiles cannot resolve private temp projections
+            # outside GITHUB_WORKSPACE. Installation remains locked and blocking.
+            self.assertNotIn('cache: npm',text)
             self.assertIn('no checkout or fallback',text)
             self.assertEqual(len(re.findall(r'^\s+PINS = ',text,re.M)),1)
             # Compile every inline control script, including literal backslashes.
             for match in re.finditer(r"          python(?:3)? -I -B - <<'PY'\n(.*?)          PY",text,re.S):
                 script='\n'.join(line[10:] for line in match[1].splitlines())
                 ast.parse(script)
-        windows=(root/'.github/workflows/side_pane_windows.yml').read_text()
+        windows=(root/'.github/workflows/side_pane_windows.yml').read_text(encoding='utf-8')
         self.assertIn("HELPER_SHA256 = '"+handoff.sha(MODULE.read_bytes())+"'",windows)
         self.assertIn('needs: source',windows)
         self.assertIn('name: side-pane-windows-source-${{ github.run_attempt }}',windows)

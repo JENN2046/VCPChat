@@ -11932,9 +11932,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "dcb1d0c05260bd240b7e88681df3355fb7da2864",
-          "size": 38543,
-          "sha256": "39161df22e99a5f326903561a17031901e4fee1546758ad6740c3084dc3e7959",
+          "blob": "f7be8883671134326f241dbb5a2a4dfdba9fa340",
+          "size": 38689,
+          "sha256": "b76698d176817f5843f7f7ce6022a146f5c25b5d73d3e9986f0b3a8b9f5dcb50",
           "kind": "source"
         },
         {
@@ -13402,6 +13402,15 @@
           "blob": "602a94cb7722fef680fb0cbb83d4fe9a18dc34b9",
           "size": 25329,
           "sha256": "5a50be0a37efcc47db28158c11f0b74eb5835713cd7dc6d9c84e90ac4c715771",
+          "kind": "source"
+        },
+        {
+          "path": "tests/game-launcher.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a392256dfe59b3bbe7a0e7554a415ca16626c867",
+          "size": 9377,
+          "sha256": "60bccfdba5f031fa43db4417e6b722ce56665143ddb75af953f289232d7609d3",
           "kind": "source"
         },
         {
@@ -24980,9 +24989,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "dcb1d0c05260bd240b7e88681df3355fb7da2864",
-          "size": 38543,
-          "sha256": "39161df22e99a5f326903561a17031901e4fee1546758ad6740c3084dc3e7959",
+          "blob": "f7be8883671134326f241dbb5a2a4dfdba9fa340",
+          "size": 38689,
+          "sha256": "b76698d176817f5843f7f7ce6022a146f5c25b5d73d3e9986f0b3a8b9f5dcb50",
           "kind": "source"
         },
         {

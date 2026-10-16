@@ -111,6 +111,9 @@ const allowedSourceDifferences = new Set([
     'tests/design-system-boundary.test.mjs',
     'tests/lifecycle-inspector.test.js',
     'tests/side-browser-address.test.mjs',
+    // PR #61: guarded game IPC startup wiring and its isolated regression.
+    'modules/ipc/gameHandlers.js',
+    'tests/game-launcher.test.js',
     'modules/ui-system/side-pane/browserSideProvider.js',
     'scripts/smoke-side-pane-e2e.mjs',
     '.github/workflows/projectforge-windows.yml',

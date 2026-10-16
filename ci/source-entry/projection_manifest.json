@@ -622,6 +622,15 @@
       "ready": true,
       "entries": [
         {
+          "path": ".github/scripts/verify-projectforge-trace.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "afde73656a5b8c3ea7c3e6507167c371a826cb32",
+          "size": 5059,
+          "sha256": "4c6dd1d0f2ab411f0cdd7846be2dbc60cd629b08d35a021aaa11f8a7302622a3",
+          "kind": "source"
+        },
+        {
           "path": "Agenttaskmodules/task.css",
           "mode": "100644",
           "type": "blob",
@@ -6158,9 +6167,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "1b7ee5c7315fc1a3f9a77a057c58b3cb29e906b3",
-          "size": 11263,
-          "sha256": "733b19662e63033af1ebd827fba99482256ae77e478d9398efebb47538e7c74a",
+          "blob": "3714eb6d529278ab009e83e960b4b6212416095d",
+          "size": 11929,
+          "sha256": "f85b08f6ca4993dda1d5a0c74b7377512a935f4ea126fa781d2cab2375a3b71f",
           "kind": "source"
         },
         {
@@ -11887,9 +11896,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7478a7fc662b4094b8a831283683bc4fdd620d71",
-          "size": 38223,
-          "sha256": "df76e5e7abb166d11125f1927585acb5aeccfb651d2185bf2f661162988b9ce4",
+          "blob": "b051dde24936c65c3056a9b2396fd3b12b2039cd",
+          "size": 38356,
+          "sha256": "493043cd7935685b37af057c9789136789445803cd627aa58de40905ab58c503",
           "kind": "source"
         },
         {
@@ -12058,9 +12067,9 @@
           "path": "scripts/smoke-side-pane-e2e.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "940914d67761150ebab687fedf9b552de9ac7e75",
-          "size": 31474,
-          "sha256": "0d20b22054579078f72435a78a77f02b4ad650a00db2d43da6b9cd992d3fc8fb",
+          "blob": "23d9aac3f396fe2c3af915e2f842c52d40a5a2c6",
+          "size": 31377,
+          "sha256": "0419c601c319141a5e14f665b6be323e08f215260f3ffcb22230f286ab27e64e",
           "kind": "source"
         },
         {
@@ -13690,6 +13699,15 @@
           "blob": "9c283cbfac896fd07a0443b143b029d33264e501",
           "size": 16756,
           "sha256": "3de7c8d7ea09325c97a18963235c34732b8f1b5120c493fa5658fb72b38062aa",
+          "kind": "source"
+        },
+        {
+          "path": "tests/projectforge-trace.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "998d4ac6ac6adaf37b9f62ba611809a5c7c484e5",
+          "size": 2228,
+          "sha256": "68e5c65d5d34311c98bed64f6af4afbc28283a17c21262d12847805900bd6df4",
           "kind": "source"
         },
         {
@@ -15927,6 +15945,15 @@
       "ready": true,
       "entries": [
         {
+          "path": ".github/scripts/verify-projectforge-trace.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "afde73656a5b8c3ea7c3e6507167c371a826cb32",
+          "size": 5059,
+          "sha256": "4c6dd1d0f2ab411f0cdd7846be2dbc60cd629b08d35a021aaa11f8a7302622a3",
+          "kind": "source"
+        },
+        {
           "path": "Agenttaskmodules/task.css",
           "mode": "100644",
           "type": "blob",
@@ -17853,6 +17880,15 @@
           "kind": "source"
         },
         {
+          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/AdminConfirm.py",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9e8c5fccd48dd6296f353d6fdfe221c4c54a75ee",
+          "size": 18788,
+          "sha256": "0d73537e124e5a815c8d7581d7bf3e57b2f8966f726da9da09caeae32f0acc42",
+          "kind": "source"
+        },
+        {
           "path": "VCPDistributedServer/Plugin/PowerShellExecutor/PowerShellExecutor.js",
           "mode": "100644",
           "type": "blob",
@@ -17913,6 +17949,15 @@
           "blob": "d4ff4374c5713f83b088c3bc3a720b9ef98542d9",
           "size": 580,
           "sha256": "05ec4e16117418eb1d3b2ce1612f48767364837e4f58e457f40e407ee40cbddc",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/PowerShellExecutor/plugin-manifest.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a07d5cf7e339228dcf43abdb2ef174f7a1789bba",
+          "size": 15315,
+          "sha256": "6f68c146889b22aff0d069703044e5bc1cb0bf7261b65f4463d3c8dac0c23840",
           "kind": "source"
         },
         {
@@ -19378,9 +19423,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "1b7ee5c7315fc1a3f9a77a057c58b3cb29e906b3",
-          "size": 11263,
-          "sha256": "733b19662e63033af1ebd827fba99482256ae77e478d9398efebb47538e7c74a",
+          "blob": "3714eb6d529278ab009e83e960b4b6212416095d",
+          "size": 11929,
+          "sha256": "f85b08f6ca4993dda1d5a0c74b7377512a935f4ea126fa781d2cab2375a3b71f",
           "kind": "source"
         },
         {
@@ -24859,9 +24904,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7478a7fc662b4094b8a831283683bc4fdd620d71",
-          "size": 38223,
-          "sha256": "df76e5e7abb166d11125f1927585acb5aeccfb651d2185bf2f661162988b9ce4",
+          "blob": "b051dde24936c65c3056a9b2396fd3b12b2039cd",
+          "size": 38356,
+          "sha256": "493043cd7935685b37af057c9789136789445803cd627aa58de40905ab58c503",
           "kind": "source"
         },
         {
@@ -25078,6 +25123,15 @@
           "blob": "35b42f7b43dd2653af4c638c27417a7efa53955a",
           "size": 871,
           "sha256": "d8fee34ae267bd89c806c7fb1a1915ea0e2360cabf711d499fec669847dfeaa4",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/smoke-side-pane-e2e.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "23d9aac3f396fe2c3af915e2f842c52d40a5a2c6",
+          "size": 31377,
+          "sha256": "0419c601c319141a5e14f665b6be323e08f215260f3ffcb22230f286ab27e64e",
           "kind": "source"
         },
         {
@@ -27454,6 +27508,15 @@
           "blob": "9c283cbfac896fd07a0443b143b029d33264e501",
           "size": 16756,
           "sha256": "3de7c8d7ea09325c97a18963235c34732b8f1b5120c493fa5658fb72b38062aa",
+          "kind": "source"
+        },
+        {
+          "path": "tests/projectforge-trace.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "998d4ac6ac6adaf37b9f62ba611809a5c7c484e5",
+          "size": 2228,
+          "sha256": "68e5c65d5d34311c98bed64f6af4afbc28283a17c21262d12847805900bd6df4",
           "kind": "source"
         },
         {
@@ -30305,6 +30368,8 @@
             "VCPDistributedServer/Plugin/BladeGame/blade-preload.js",
             "VCPDistributedServer/Plugin/BladeGame/blade-service.js",
             "VCPDistributedServer/Plugin/BladeGame/plugin-manifest.json",
+            "VCPDistributedServer/Plugin/PowerShellExecutor/AdminConfirm.py",
+            "VCPDistributedServer/Plugin/PowerShellExecutor/plugin-manifest.json",
             "assets/default_group_avatar.png",
             "assets/default_user_avatar.png",
             "assets/icon.png",
@@ -30400,6 +30465,7 @@
             "tests/popover-window-blur.test.mjs",
             "tests/powershell-output-boundaries.test.js",
             "tests/projectforge-changes-source.test.mjs",
+            "tests/projectforge-trace.test.cjs",
             "tests/selection-reference.test.mjs",
             "tests/sender-task-registry.test.js",
             "tests/settings-agent-draft-retention.test.mjs",

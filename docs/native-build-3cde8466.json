@@ -4,6 +4,12 @@
   "sourceBaseline": "d68be6afb8d4b0d73041f3b60d84203baf28e74f",
   "platform": "windows-x64",
   "rustToolchain": "1.89.0",
+  "acceptancePolicy": {
+    "mode": "traceable-build-artifact-identity-functional-acceptance",
+    "crossMachineByteEqualityRequired": false,
+    "requirements": ["reviewed source and locked dependencies", "recorded recipe and compiler", "exact packaged binary SHA256 matches the reviewed build receipt", "native source tests and actual binary functional checks"],
+    "limitation": "Hash identities bind reviewed inputs and delivered artifacts; they do not prove independent cross-machine reproducibility. Actual package acceptance is recorded separately."
+  },
   "binaries": [
     {
       "component": "rust_projectforge_indexer",
@@ -25,7 +31,7 @@
         "codeByteMutationRejected": true,
         "readyProtocol": 3,
         "pingPassed": true,
-        "hostedComparison": "PENDING"
+        "hostedComparison": "529e0767 comparison failed; retained as evidence, not a gate under the explicitly accepted traceability policy"
       },
       "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
       "inputHashes": [

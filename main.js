@@ -528,7 +528,8 @@ function startDistributedServerAfterRenderer() {
             const DistributedServer = require('./VCPDistributedServer/VCPDistributedServer.js');
             let nativeConversationWebSocket = false;
             try {
-                nativeConversationWebSocket = require('./modules/ipc/nativeConversationHandlers').bindingFromEnvironment()?.transport === 'vcp-websocket';
+                const binding = require('./modules/ipc/nativeConversationHandlers').bindingFromEnvironment();
+                nativeConversationWebSocket = !!binding && require('./modules/services/trustedConversation/transport.cjs').validateNativeBinding({binding}).websocket;
             } catch {
                 // Optional native configuration must not block ordinary distributed tools.
                 console.warn('[Main] Native conversation configuration unavailable; native WS disabled.');

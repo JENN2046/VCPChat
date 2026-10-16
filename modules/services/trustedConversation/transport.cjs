@@ -1,11 +1,16 @@
 'use strict';
-function createNativeTransport({binding,env=process.env,fetchImpl=fetch,chartService,controller,nativeRequest}){
+function validateNativeBinding({binding,env=process.env}){
  const websocket=binding.transport==='vcp-websocket';
- if(websocket&&!/^[a-f0-9-]{36}$/.test(binding.clientInstanceId||''))throw Error('NATIVE_CLIENT_BINDING_REQUIRED');
- if(!/^[A-Za-z0-9_-]{1,100}$/.test(binding.toolName))throw Error('NATIVE_LOCAL_BINDING_INVALID');
+ if(websocket&&(typeof binding.clientInstanceId!=='string'||!/^[a-f0-9-]{36}$/.test(binding.clientInstanceId)))throw Error('NATIVE_CLIENT_BINDING_REQUIRED');
+ if(typeof binding.toolName!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(binding.toolName))throw Error('NATIVE_LOCAL_BINDING_INVALID');
  const url=websocket?null:new URL(binding.toolboxUrl);
  if(!websocket&&(url.protocol!=='http:'||!['127.0.0.1','[::1]'].includes(url.hostname)||url.username||url.password||url.search||url.hash||!/^\/?$/.test(url.pathname)))throw Error('NATIVE_LOCAL_BINDING_INVALID');
- const key=env[binding.transportTokenEnv],application=env[binding.applicationAuthorizationEnv];if((!websocket&&!key)||!/^Bearer [\x21-\x7e]{32,4096}$/.test(application||'')||websocket&&typeof nativeRequest!=='function')throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
+ const key=env[binding.transportTokenEnv],application=env[binding.applicationAuthorizationEnv];if((!websocket&&!key)||!/^Bearer [\x21-\x7e]{32,4096}$/.test(application||''))throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
+ return {websocket,url,key,application};
+}
+function createNativeTransport({binding,env=process.env,fetchImpl=fetch,chartService,controller,nativeRequest}){
+ const {websocket,url,key,application}=validateNativeBinding({binding,env});
+ if(websocket&&typeof nativeRequest!=='function')throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
  let sequence=0,chartQueue=Promise.resolve();const projections=new Map();
  async function request(action,payload={}){let value;
  if(websocket)value=await nativeRequest({clientInstanceId:binding.clientInstanceId,toolName:binding.toolName,authorization:application,body:{action,payload}});
@@ -26,4 +31,4 @@ function createNativeTransport({binding,env=process.env,fetchImpl=fetch,chartSer
  async function retryProjections(){for(const result of [...projections.values()])await project(result);}
  return {request,project,retryProjections,sequence:()=>sequence,toolName:binding.toolName};
 }
-module.exports={createNativeTransport};
+module.exports={createNativeTransport,validateNativeBinding};

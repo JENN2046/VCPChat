@@ -46,21 +46,56 @@ async function ipc(mode){
  if(mode==='inflight'){await entered;socket.emit('close');}
  const result=await pending;wc.emit('destroyed');client.close(socket);return {ipc:result,renderer:await renderer(result)};
 }
-async function startup(config){
- const s=fs.readFileSync(path.join(root,'main.js'),'utf8');
- const chunk=s.slice(s.indexOf('function startDistributedServerAfterRenderer()'),s.indexOf('function toggleDevToolsForWindow',s.indexOf('function startDistributedServerAfterRenderer()')));
- let reads=0,constructed=0,initialized=0,errors=0,wsEnabled=null;
- const bindingModule={exports:{}};
- vm.runInNewContext(source,{module:bindingModule,exports:bindingModule.exports,require:p=>p==='node:fs'?{readFileSync(){reads++;if(config==='missing')throw Error('ENOENT');return config;}}:p==='electron'?{ipcMain:{}}:base(p),process:{env:config===undefined?{}:{VCPCHAT_NATIVE_TOOL_BINDING_FILE:'synthetic-binding'}}});
- const noop={},ctx={distributedServerStartPromise:null,distributedServer:null,isFinalizingQuit:false,app:{isQuitting:false},appSettingsManager:{readSettings:async()=>({enableDistributedServer:true})},mainWindow:{isDestroyed:()=>false,webContents:{}},console:{log(){},error(){errors++;},warn(){}},require:p=>p.endsWith('nativeConversationHandlers')?bindingModule.exports:class{constructor(options){constructed++;wsEnabled=options.nativeConversationWebSocket;}async initialize(){initialized++;}},musicHandlers:noop,diceHandlers:noop,desktopRemoteHandlers:noop,chatDataService:noop,loomManager:noop,scriptoriumAgentControl:noop,pluginAgentOperationService:noop,chartService:noop,gameService:noop,workspaceHandlers:noop};
- vm.createContext(ctx);vm.runInContext(chunk,ctx);await ctx.startDistributedServerAfterRenderer();await ctx.startDistributedServerAfterRenderer();return {reads,constructed,initialized,errors,wsEnabled,promiseRetained:!!ctx.distributedServerStartPromise};
+async function startup(config, env={}, mainServerUrl='http://example.invalid') {
+ const main=fs.readFileSync(path.join(root,'main.js'),'utf8');
+ const chunk=main.slice(main.indexOf('function startDistributedServerAfterRenderer()'),main.indexOf('function toggleDevToolsForWindow',main.indexOf('function startDistributedServerAfterRenderer()')));
+ const distributed=fs.readFileSync(path.join(root,'VCPDistributedServer/VCPDistributedServer.js'),'utf8');
+ const connectSource=distributed.slice(distributed.indexOf('    connect() {'),distributed.indexOf('    scheduleReconnect()',distributed.indexOf('    connect() {')));
+ let reads=0,constructed=0,initialized=0,errors=0,wsEnabled=null,sockets=0;
+ const logs=[],diagnostics={log(){},error:(...a)=>logs.push(a),warn:(...a)=>logs.push(a)};
+ const connect=new Function('console','WebSocket','require',`return ({${connectSource.trim()}}).connect;`)(diagnostics,function(){sockets++;return new EventEmitter();},require);
+ const realTransport=base('../services/trustedConversation/transport.cjs');
+ const transport={validateNativeBinding:options=>realTransport.validateNativeBinding({...options,env}),createNativeTransport:options=>realTransport.createNativeTransport({...options,env,fetchImpl:async()=>({status:200,json:async()=>({ok:true})})})};
+ const bindingModule={exports:{}},handlers=new Map();
+ const req=p=>p==='node:fs'?{readFileSync(){reads++;if(config==='missing')throw Error('ENOENT');return config;}}:p==='electron'?{ipcMain:{handle:(k,v)=>handlers.set(k,v),removeHandler:k=>handlers.delete(k)}}:p.endsWith('/transport.cjs')?transport:p.includes('ChartControllerService')?{initialize(){}}:base(p);
+ vm.runInNewContext(source,{module:bindingModule,exports:bindingModule.exports,require:req,process:{env:config===undefined?{}:{VCPCHAT_NATIVE_TOOL_BINDING_FILE:'synthetic-binding'}},setInterval:()=>({unref(){}}),clearInterval(){}});
+ const mainWindow={isDestroyed:()=>false,webContents:new EventEmitter()};
+ await bindingModule.exports.initialize({mainWindow,nativeRequest:async()=>({ok:true})});
+ const nativeCode=(await handlers.get('native-conversation:prepare')({},{})).code;
+ const noop={},ctx={distributedServerStartPromise:null,distributedServer:null,isFinalizingQuit:false,app:{isQuitting:false},appSettingsManager:{readSettings:async()=>({enableDistributedServer:true,vcpLogUrl:mainServerUrl,vcpLogKey:'SYNTHETIC_KEY'})},mainWindow,console:{...diagnostics,error(){errors++;}},require:p=>p.endsWith('nativeConversationHandlers')?bindingModule.exports:p.endsWith('/transport.cjs')?transport:class{constructor(options){constructed++;wsEnabled=options.nativeConversationWebSocket;Object.assign(this,options);}async initialize(){initialized++;connect.call(this);}},musicHandlers:noop,diceHandlers:noop,desktopRemoteHandlers:noop,chatDataService:noop,loomManager:noop,scriptoriumAgentControl:noop,pluginAgentOperationService:noop,chartService:noop,gameService:noop,workspaceHandlers:noop};
+ vm.createContext(ctx);vm.runInContext(chunk,ctx);await ctx.startDistributedServerAfterRenderer();await ctx.startDistributedServerAfterRenderer();
+ mainWindow.webContents.emit('destroyed');ctx.distributedServer?.nativeConversationClient?.close(ctx.distributedServer.ws);
+ assert.doesNotMatch(JSON.stringify(logs),/SYNTHETIC_KEY|Bearer |VCP_Key=/);
+ return {reads,constructed,initialized,errors,wsEnabled,sockets,nativeCode,logs};
 }
 
 for(const mode of ['before','inflight','late-success'])test('prepare connection change retains draft without history: '+mode,async()=>{
  const r=await ipc(mode);assert.equal(r.ipc.code,'NATIVE_CONNECTION_CHANGED');assert.equal(r.ipc.preserveInput,true);assert.equal(r.ipc.sourceId,undefined);assert.equal(r.renderer.input,'把合成排期延后1分钟');assert.equal(r.renderer.history.length,0);assert.equal(r.renderer.toasts.length,1);
 });
 test('unchanged epoch transport failure keeps existing history semantics',async()=>{const r=await ipc('same-epoch-error');assert.equal(r.ipc.code,'NATIVE_TRANSPORT_UNAVAILABLE');assert.equal(r.renderer.input,'');assert.equal(r.renderer.history.length,2);});
-for(const config of ['missing','{','null','[]',undefined,'{"transport":"http"}','{"transport":"vcp-websocket"}'])test('optional native binding does not abort distributed startup: '+String(config),async()=>{
- const r=await startup(config);assert.equal(r.constructed,1);assert.equal(r.initialized,1);assert.equal(r.errors,0);assert.equal(r.wsEnabled,config==='{"transport":"vcp-websocket"}');
+const validBinding={transport:'vcp-websocket',clientInstanceId,toolName:'Fixture',applicationAuthorizationEnv:'OWNER'};
+const validEnv={OWNER:'Bearer '+'x'.repeat(40)};
+const invalidCases=[
+ ['missing file','missing',{}],['bad JSON','{',{}],['null','null',{}],['array','[]',{}],['false','false',{}],
+ ...['clientInstanceId','toolName'].flatMap(key=>[[`missing ${key}`,JSON.stringify({...validBinding,[key]:undefined}),validEnv],[`invalid ${key}`,JSON.stringify({...validBinding,[key]:'bad/value'}),validEnv]]),
+ ['non-string client',JSON.stringify({...validBinding,clientInstanceId:[clientInstanceId]}),validEnv],
+ ['non-string tool',JSON.stringify({...validBinding,toolName:123}),validEnv],
+ ['missing bearer reference',JSON.stringify({...validBinding,applicationAuthorizationEnv:undefined}),validEnv],
+ ['missing bearer value',JSON.stringify(validBinding),{}],
+ ...['invalid','Bearer short','Bearer '+'x'.repeat(32)+'\n','Bearer '+'x'.repeat(4097)].map((value,i)=>['invalid bearer '+i,JSON.stringify(validBinding),{OWNER:value}]),
+ ['HTTP bad URL',JSON.stringify({toolName:'Fixture',toolboxUrl:'bad'}),{}],
+ ['HTTP remote URL',JSON.stringify({toolName:'Fixture',toolboxUrl:'http://example.invalid'}),{}],
+ ['HTTP missing key',JSON.stringify({toolName:'Fixture',toolboxUrl:'http://127.0.0.1:1',applicationAuthorizationEnv:'OWNER'}),validEnv]
+];
+for(const [name,config,env] of invalidCases)test('invalid optional native configuration leaves ordinary connection available: '+name,async()=>{
+ const r=await startup(config,env);assert.equal(r.constructed,1);assert.equal(r.initialized,1);assert.equal(r.errors,0);assert.equal(r.wsEnabled,false);assert.equal(r.sockets,1);assert.equal(r.nativeCode,'NATIVE_CONFIGURATION_UNAVAILABLE');
 });
+test('absent optional binding preserves ordinary distributed connection',async()=>{const r=await startup(undefined);assert.equal(r.wsEnabled,false);assert.equal(r.sockets,1);assert.equal(r.nativeCode,'NOT_CONFIGURED');});
+for(const [url,allowed] of [['http://example.invalid',false],['https://example.invalid',true],['http://127.0.0.1:12345',true]])test('validated native WS keeps secure-channel gate: '+url,async()=>{
+ const r=await startup(JSON.stringify(validBinding),validEnv,url);assert.equal(r.wsEnabled,true);assert.equal(r.nativeCode,'TRUSTED_CLIENT_REQUIRED');assert.equal(r.sockets,Number(allowed));if(!allowed)assert.ok(r.logs.some(args=>args[0]==='[DistributedServer] NATIVE_SECURE_CHANNEL_REQUIRED'));
+});
+test('validated HTTP binding does not enable native WS gate',async()=>{
+ const r=await startup(JSON.stringify({toolName:'Fixture',toolboxUrl:'http://127.0.0.1:1',transportTokenEnv:'KEY',applicationAuthorizationEnv:'OWNER'}),{...validEnv,KEY:'synthetic'});assert.equal(r.wsEnabled,false);assert.equal(r.sockets,1);assert.equal(r.nativeCode,'TRUSTED_CLIENT_REQUIRED');
+});
+test('WS transport still rejects absent runtime request dependency',()=>assert.throws(()=>createNativeTransport({binding:validBinding,env:validEnv}),/NATIVE_CREDENTIAL_REFERENCE_REQUIRED/));
 }

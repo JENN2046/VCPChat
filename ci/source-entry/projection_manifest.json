@@ -6410,9 +6410,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3e12d7619094f4fa9ace9682ee5f5269c8b0c47a",
-          "size": 105700,
-          "sha256": "5213bf6396a73e5f1e6a846017f6dc31c18316407e84c6dac0958bf32dcef833",
+          "blob": "a7fb221031b130d5213ffba117e473edeb78f8aa",
+          "size": 105823,
+          "sha256": "e329bb78ab13bc23b918acccfb018e82b648c7b344f226913f28bf00cea5e8fb",
           "kind": "source"
         },
         {
@@ -8670,9 +8670,9 @@
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5e6af29475bc89ba2fee0fe5fc3e38bcc2a3749f",
-          "size": 4244,
-          "sha256": "edf34007fed79b69cd56f888feb3988520b7d52b7b86c4e055bf5b91f8a5d877",
+          "blob": "e8777a48b7002199ce6f76b1cb572b01796922ec",
+          "size": 4579,
+          "sha256": "96efcb26e35f751ccc55d53103dc25473e36b3929c52a93256900ec9f3359c78",
           "kind": "source"
         },
         {
@@ -19427,9 +19427,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "4e90b97a1d767cc32f81afa8ec65f9b9df4c4122",
+          "blob": "2072d5690a7ab7b6395abccee8b316546ad4cbce",
           "size": 980379,
-          "sha256": "1e569fca4a8be499518df9d819c0bdad7502ace0d1f251598c7f6386cfd373e7",
+          "sha256": "8df5ef9e57ab278d44ade36d0e72ad5080e5888026f8255315870dc37f80d108",
           "kind": "source"
         },
         {
@@ -19778,9 +19778,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3e12d7619094f4fa9ace9682ee5f5269c8b0c47a",
-          "size": 105700,
-          "sha256": "5213bf6396a73e5f1e6a846017f6dc31c18316407e84c6dac0958bf32dcef833",
+          "blob": "a7fb221031b130d5213ffba117e473edeb78f8aa",
+          "size": 105823,
+          "sha256": "e329bb78ab13bc23b918acccfb018e82b648c7b344f226913f28bf00cea5e8fb",
           "kind": "source"
         },
         {
@@ -21992,9 +21992,9 @@
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5e6af29475bc89ba2fee0fe5fc3e38bcc2a3749f",
-          "size": 4244,
-          "sha256": "edf34007fed79b69cd56f888feb3988520b7d52b7b86c4e055bf5b91f8a5d877",
+          "blob": "e8777a48b7002199ce6f76b1cb572b01796922ec",
+          "size": 4579,
+          "sha256": "96efcb26e35f751ccc55d53103dc25473e36b3929c52a93256900ec9f3359c78",
           "kind": "source"
         },
         {
@@ -27555,9 +27555,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "68f8637529cff28a4fc5b8fffa8ae1bdb7fcd098",
-          "size": 11426,
-          "sha256": "f5b75dc153ce4555bfb9c27c39fc9186f98dd741e852efa6be23bf7a7feead87"
+          "blob": "0bcf32e99a5e4568b6c9d57ac20996a409acd23e",
+          "size": 15749,
+          "sha256": "e537deb9d83cdead0d291b039802e403da6a6e7d538a33e513357fc3e5f781f3"
         },
         {
           "path": "tests/next-ui-registries.test.mjs",

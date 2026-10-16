@@ -1468,7 +1468,7 @@ export const chatManager = (() => {
             try { nativeResult = await electronAPI.prepareNativeConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
             catch { nativeResult={handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'}; }
         }
-        if (nativeResult?.handled && ['NATIVE_SOURCE_REQUIRED', 'NATIVE_CONFIGURATION_UNAVAILABLE'].includes(nativeResult.code) && nativeResult.preserveInput) {
+        if (nativeResult?.handled && ['NATIVE_SOURCE_REQUIRED', 'NATIVE_CONFIGURATION_UNAVAILABLE', 'NATIVE_CONNECTION_CHANGED'].includes(nativeResult.code) && nativeResult.preserveInput) {
             uiHelper.showToastNotification(nativeResult.message, 'warning');
             return { handled: true, ok: false, code: nativeResult.code };
         }

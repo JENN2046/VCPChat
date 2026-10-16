@@ -526,9 +526,16 @@ function startDistributedServerAfterRenderer() {
 
             console.log('[Main] Renderer is ready. Initializing distributed server in the background...');
             const DistributedServer = require('./VCPDistributedServer/VCPDistributedServer.js');
+            let nativeConversationWebSocket = false;
+            try {
+                nativeConversationWebSocket = require('./modules/ipc/nativeConversationHandlers').bindingFromEnvironment()?.transport === 'vcp-websocket';
+            } catch {
+                // Optional native configuration must not block ordinary distributed tools.
+                console.warn('[Main] Native conversation configuration unavailable; native WS disabled.');
+            }
             server = new DistributedServer({
                 mainServerUrl: settings.vcpLogUrl,
-                nativeConversationWebSocket: require('./modules/ipc/nativeConversationHandlers').bindingFromEnvironment()?.transport === 'vcp-websocket',
+                nativeConversationWebSocket,
                 vcpKey: settings.vcpLogKey,
                 serverName: 'VCPChat-Desktop-Client-Distributed-Server',
                 debugMode: true,

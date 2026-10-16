@@ -1547,25 +1547,25 @@
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 99,
+        "line": 104,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[1]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 100,
+        "line": 105,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[2]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 116,
+        "line": 121,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[3]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 117,
+        "line": 122,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[4]"
       }

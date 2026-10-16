@@ -95,7 +95,12 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
    if(plans.get(id)!==plan)continue;
    if(!visible){const invalidated=await queueInvalidation({conversationId:plan.conversationId,messageId:plan.messageId});if(!invalidated?.ok)return invalidationRequired();}
   }
-  const event=port.read(context),invalidated=()=>epoch!==readEpoch()||blocked(event.conversationId)||invalidationVersions.get(event.conversationId)!==version;if(invalidated())return invalidationRequired();let r;try{r=await transport.request('prepare',event);}catch{return {handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'};}if(invalidated())return invalidationRequired();if(r.sourceId)pending.set(r.sourceId,event);return r.ok===false&&!(r.code==='READ_ONLY_POLICY'&&r.handled===false)?{...r,handled:true}:r;});
+  const event=port.read(context),invalidated=()=>blocked(event.conversationId)||invalidationVersions.get(event.conversationId)!==version;
+  const prepareRejection=()=>epoch!==readEpoch()?connectionChanged():invalidated()?invalidationRequired():null;
+  const before=prepareRejection();if(before)return before;
+  let r;try{r=await transport.request('prepare',event);}catch{return prepareRejection()||{handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'};}
+  const after=prepareRejection();if(after)return after;
+  if(r.sourceId)pending.set(r.sourceId,event);return r.ok===false&&!(r.code==='READ_ONLY_POLICY'&&r.handled===false)?{...r,handled:true}:r;});
  ipcMain.handle(channels[1],async(e,p={})=>{if(refreshConnection())return connectionChanged();const event=pending.get(p.sourceId);if(!owned(e)||!event)return {ok:false,code:'SOURCE_UNKNOWN'};pending.delete(p.sourceId);if(blocked(event.conversationId))return invalidationRequired();return transport.project(await transport.request('execute',{sourceId:p.sourceId,conversationId:event.conversationId}));});
  ipcMain.handle(channels[2],async(e,p={})=>{
   if(!owned(e)||p.tool!==binding.toolName)return {ok:false};

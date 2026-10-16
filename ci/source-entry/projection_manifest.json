@@ -6815,9 +6815,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "dcf37b12df4c25a8f93f95dca42c86921f803960",
-          "size": 126575,
-          "sha256": "d2ee116fddaac8608768a2ce317f910656740ce9b9de12c0d74fec3351bc250b",
+          "blob": "e9a86c405b6203c55b0a4a0373ac7ab141fbc743",
+          "size": 126829,
+          "sha256": "1a58a2e6b07b52f3e8be3f36e63630988f31a1500c592b2cc0a629ee6df496df",
           "kind": "source"
         },
         {
@@ -13669,9 +13669,9 @@
           "path": "tests/native-three-boundaries.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "70e336d38466e6ccd617c7c042d0cfa44d48685c",
-          "size": 9883,
-          "sha256": "0b6ca7ca8e28461f12a48e20bfcc49cfd541bc2381e7aa8b667f0f4054f100e9",
+          "blob": "1f1fd7cd45809db87db56f16d97296dbaca89070",
+          "size": 9991,
+          "sha256": "534c5c6fbd2ee96ac7073f01854949dd42a29be088d3a08b4f055b22c2e7ee90",
           "kind": "source"
         },
         {
@@ -20174,9 +20174,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "dcf37b12df4c25a8f93f95dca42c86921f803960",
-          "size": 126575,
-          "sha256": "d2ee116fddaac8608768a2ce317f910656740ce9b9de12c0d74fec3351bc250b",
+          "blob": "e9a86c405b6203c55b0a4a0373ac7ab141fbc743",
+          "size": 126829,
+          "sha256": "1a58a2e6b07b52f3e8be3f36e63630988f31a1500c592b2cc0a629ee6df496df",
           "kind": "source"
         },
         {
@@ -27527,9 +27527,9 @@
           "path": "tests/native-three-boundaries.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "70e336d38466e6ccd617c7c042d0cfa44d48685c",
-          "size": 9883,
-          "sha256": "0b6ca7ca8e28461f12a48e20bfcc49cfd541bc2381e7aa8b667f0f4054f100e9",
+          "blob": "1f1fd7cd45809db87db56f16d97296dbaca89070",
+          "size": 9991,
+          "sha256": "534c5c6fbd2ee96ac7073f01854949dd42a29be088d3a08b4f055b22c2e7ee90",
           "kind": "source"
         },
         {
@@ -27555,9 +27555,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "b926b963f42173adb13cc991b4cff5176f61c344",
-          "size": 34830,
-          "sha256": "1b53380b5704202bad6422d6f6a6e0c484db5229d55495ac6041b5732f669a29"
+          "blob": "533ae8451942e21cca1536e0fb4b80ab86a6e860",
+          "size": 36859,
+          "sha256": "24e00d83cc11e1ce03f8de8c7206f969cd0e7637503ef127f13995ac4913caf1"
         },
         {
           "path": "tests/next-ui-registries.test.mjs",

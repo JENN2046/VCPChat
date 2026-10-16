@@ -1,6 +1,8 @@
 import { presentNativeProposal, retireNativeProposal } from './renderer/nativeConversationPresentation.js';
+import { createProjectForgeTopicSurface } from './renderer/projectForgeTopicSurface.js';
 import { avatarColorCache, getDominantAvatarColor } from './renderer/colorUtils.js';
 import { createImageHandler } from './renderer/imageHandler.js';
+import { prepareChatMediaHtml, cleanupChatMedia } from './renderer/mediaLifecycle.js';
 import { processAnimationsInContent, cleanupAnimationsInContent } from './renderer/animation.js';
 import { createVisibilityOptimizer } from './renderer/visibilityOptimizer.js';
 import { createMessageSkeleton, fixVoiceChatAssetPath, formatMessageTimestamp } from './renderer/domBuilder.js';
@@ -15,14 +17,22 @@ import { createSurfaceTaskOwner } from './renderer/surfaceTaskOwner.js';
 import {
     findEarliestUnclosedToolBlock,
     findToolRequestEnd,
-    replaceToolRequestBlocks
+    replaceToolRequestBlocks,
+    readToolRequestField
 } from './renderer/toolRequestScanner.js';
 import { replaceMarkdownCodeDomains } from './renderer/markdownCodeDomainScanner.js';
 import {
     collectToolResultRanges,
     collectClosedToolResultRanges,
+    isToolResultHidden,
+    setToolResultHidden,
 } from './renderer/toolResultRegions.js';
+import { createToolPresentation } from './renderer/toolPresentation.js';
 import { parseJevToolUse } from './renderer/jevToolUse.js';
+import {
+    findMalformedToolFields,
+    describeToolRequestMarkerProblem
+} from './renderer/toolRequestMarkers.js';
 
 import { createContentProcessor } from './renderer/contentProcessor.js';
 import { createMessageContextMenu } from './renderer/messageContextMenu.js';
@@ -50,6 +60,7 @@ const middleClickHandler = options.middleClickHandler || createMiddleClickHandle
 const imageHandler = options.imageHandler || createImageHandler({ fixUrl: emoticonUrlFixer.fixEmoticonUrl });
 const colorExtractionPromises = new Map();
 const ownedStyleElements = new Set();
+const projectForgeTopicSurface = createProjectForgeTopicSurface();
 
 async function getDominantAvatarColorCached(url) {
     if (!colorExtractionPromises.has(url)) {
@@ -68,6 +79,78 @@ const TOOL_RESULT_TRUNCATE_THRESHOLD = 50000; // 50KB 以上触发截断
 const TOOL_RESULT_TRUNCATE_LINES = 80; // 截断后只显示前80行
 const toolResultFullContentMap = new Map(); // placeholderId -> { raw: string, fieldKey: string }
 let toolResultContentIdCounter = 0;
+const lazyToolContents = new Map();
+let lazyToolSequence = 0;
+
+function registerLazyTool(entry) {
+    const id = `${surfaceId}-${++lazyToolSequence}`;
+    lazyToolContents.set(id, entry);
+    return id;
+}
+
+function deferToolRequest(_block, source) {
+    const field = key => readToolRequestField(source, key);
+    const name = field('tool_name') || source.match(/<tool_name>([\s\S]*?)<\/tool_name>/i)?.[1]?.trim() || '';
+    if (name.toLowerCase() === 'dailynote') return null;
+    const jev = parseJevToolUse(field('JEV'));
+    const problem = describeToolRequestMarkerProblem({ toolName: name, malformedFields: findMalformedToolFields(source) });
+    const displayName = jev?.displayName || problem.displayName;
+    const summarySource = ['command', 'command1', 'path', 'filePath', 'powershell', 'text', 'keys', 'paths', 'file', 'glob', 'query', 'url', 'prompt']
+        .map(key => {
+            const value = field(key);
+            return value ? `${key}:「始」${value.slice(0, 240)}「末」` : '';
+        }).filter(Boolean).join('\n');
+    const id = registerLazyTool({ type: 'request', raw: source, meta: { summarySource, fingerprint: hashStringFNV1a(source) } });
+    const kind = jev ? 'jev-tool-use' : 'tool-use';
+    const hint = !jev && problem.hint ? `<span class="vcp-tool-malformed-hint">${escapeHtml(problem.hint)}</span>` : '';
+    return `<div class="vcp-tool-use-bubble${jev ? ' vcp-jev-tool-use-bubble' : problem.isMalformed ? ' is-malformed' : ''}" data-vcp-block-type="${kind}" data-vcp-preserve-children="true" data-vcp-lazy-tool-id="${id}"><div class="vcp-tool-summary"><span class="vcp-tool-label">${jev ? 'JEVToolUse:' : 'VCP-ToolUse:'}</span> <span class="vcp-tool-name-highlight">${escapeHtml(displayName)}</span>${hint}</div><div class="vcp-tool-details"></div></div>`;
+}
+
+function bindLazyTools(root) {
+    root?.querySelectorAll?.('[data-vcp-lazy-tool-id]').forEach(block => {
+        const entry = lazyToolContents.get(block.dataset.vcpLazyToolId);
+        if (!entry) return;
+        block._vcpLazyMeta = entry.meta;
+        block._vcpMountTool = expanded => mountLazyTool(block, expanded);
+    });
+}
+
+function mountLazyTool(block, expanded) {
+    const entry = lazyToolContents.get(block.dataset.vcpLazyToolId);
+    const body = block.querySelector(':scope > .vcp-tool-details, :scope > .vcp-tool-result-collapsible-content');
+    if (!entry || !body) return;
+    if (!expanded) {
+        imageHandler.cleanupContent?.(body);
+        cleanupToolResultFullContentForRoot(body);
+        cleanupChatMedia(body);
+        contentProcessor.cleanupPreviewsInContent(body);
+        body.replaceChildren();
+        delete body.dataset.vcpLazyMounted;
+        return;
+    }
+    if (body.dataset.vcpLazyMounted === 'true') return;
+    if (entry.type === 'request') {
+        const pre = body.ownerDocument.createElement('pre');
+        pre.textContent = entry.raw;
+        body.appendChild(pre);
+    } else {
+        const template = body.ownerDocument.createElement('template');
+        template.innerHTML = renderToolResultBlock(entry.raw, entry.ordinal, false);
+        const rendered = template.content.querySelector('.vcp-tool-result-collapsible-content');
+        imageHandler.setContentAndProcessImages(body, rendered?.innerHTML || '', block.closest('.message-item')?.dataset.messageId);
+        contentProcessor.processRenderedContent(body, mainRendererReferences.globalSettingsRef.get());
+    }
+    body.dataset.vcpLazyMounted = 'true';
+}
+
+function releaseLazyTools(root, incomingHtml = '') {
+    const keep = new Set();
+    for (const match of incomingHtml.matchAll(/data-vcp-lazy-tool-id="([^"]+)"/g)) keep.add(match[1]);
+    root?.querySelectorAll?.('[data-vcp-lazy-tool-id]').forEach(block => {
+        mountLazyTool(block, false);
+        if (!keep.has(block.dataset.vcpLazyToolId)) lazyToolContents.delete(block.dataset.vcpLazyToolId);
+    });
+}
 
 // 🟢 完整 Markdown → HTML 渲染缓存：只缓存 raw HTML 字符串，不缓存 DOM / 后处理结果 / message 对象。
 const RENDER_PIPELINE_VERSION = '2026-07-26-dollar-guard-v3';
@@ -859,7 +942,7 @@ function applyFrontendRegexRules(text, rules, role, depth) {
  * @param {Map} [codeBlockMap] Map of code block placeholders to their original content.
  * @returns {string} The processed text with special blocks as HTML.
  */
-function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null) {
+function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null, toolRequestSourceMap = null) {
     let processed = text;
 
     const restoreBlocks = (textStr) => {
@@ -1116,9 +1199,12 @@ function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null) {
 
     // Process Tool Requests
     processed = replaceToolRequestBlocks(processed, (match, content) => {
+        // 保护阶段已把「始」「末」字段值转义过一次（日记分支仍按这份交给 Markdown）。
+        // 工具气泡在输出处自己转义，必须用原文，否则引号等会显示成 &#039;。
+        const source = toolRequestSourceMap?.get(match) ?? content;
         const detectedToolName = extractMarkedField(content, /tool_name:\s*/i);
         const detectedCommand = extractMarkedField(content, /command:\s*/i);
-        const detectedJev = parseJevToolUse(extractMarkedField(content, /JEV:\s*/i));
+        const detectedJev = parseJevToolUse(extractMarkedField(source, /JEV:\s*/i));
         const normalizedToolName = (detectedToolName || '').trim().toLowerCase();
         const normalizedCommand = (detectedCommand || '').trim().toLowerCase();
 
@@ -1161,7 +1247,7 @@ function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null) {
         } else if (detectedJev) {
             // JEV 是自然语言工具入口的兼容展示分支，不替代既有 tool_name/XML 协议。
             // 显式单引号工具名优先；未显式指定时才展示能力名称。
-            const escapedFullContent = escapeHtml(restoreBlocks(content))
+            const escapedFullContent = escapeHtml(restoreBlocks(source))
                 .replace(/\r\n?|\n/g, '&#10;');
             const jevLabel = detectedJev.displayName ? 'JEVToolUse:' : 'JEVToolUse';
             const jevNameHtml = detectedJev.displayName
@@ -1177,10 +1263,10 @@ function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null) {
                 `</div>\n\n`;
         } else {
             // --- It's a regular tool call, render it normally ---
-            const xmlToolNameMatch = content.match(/<tool_name>([\s\S]*?)<\/tool_name>/i);
+            const xmlToolNameMatch = source.match(/<tool_name>([\s\S]*?)<\/tool_name>/i);
 
-            let toolName = 'Processing...';
-            let extractedName = (xmlToolNameMatch?.[1] || detectedToolName || '').trim();
+            let toolName = '';
+            let extractedName = (xmlToolNameMatch?.[1] || extractMarkedField(source, /tool_name:\s*/i) || '').trim();
             if (extractedName) {
                 extractedName = extractedName.replace(/[「{](?:始|末)(?:[Ee][Ss][Cc][Aa][Pp][Ee])?[」}]/gi, '').replace(/,$/, '').trim();
             }
@@ -1188,11 +1274,19 @@ function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null) {
                 toolName = extractedName;
             }
 
+            const malformedFields = findMalformedToolFields(source);
+            const markerProblem = describeToolRequestMarkerProblem({ toolName, malformedFields });
+            toolName = markerProblem.displayName;
+            const malformedClass = markerProblem.isMalformed ? ' is-malformed' : '';
+            const malformedHintHtml = markerProblem.hint
+                ? ` <span class="vcp-tool-malformed-hint">${escapeHtml(markerProblem.hint)}</span>`
+                : '';
+
             // 工具气泡会在外层继续经过 marked.parse()。如果把参数中的真实换行直接放进
             // <pre>，空行会终止 CommonMark raw HTML block，导致后续 Markdown 被浏览器
             // 收进尚未闭合的 <pre>，表现为“后续渲染被吞”。用字符实体保存换行，使整个
             // 气泡对 Markdown 解析器保持为单行、不可拆分 HTML；写入 DOM 后仍显示为换行。
-            const escapedFullContent = escapeHtml(restoreBlocks(content))
+            const escapedFullContent = escapeHtml(restoreBlocks(source))
                 .replace(/\r\n?|\n/g, '&#10;');
             /*
              * ToolUse 载荷可能包含超长单行 JSON / JavaScript。折叠时若仍把
@@ -1202,10 +1296,11 @@ function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null) {
              * <template> 的 DocumentFragment 不参与样式、布局、绘制与合成；
              * 点击展开时才将其克隆到 .vcp-tool-details，收起时再次释放。
              */
-            return `\n\n<div class="vcp-tool-use-bubble" data-vcp-block-type="tool-use" data-vcp-preserve-children="true">` +
+            return `\n\n<div class="vcp-tool-use-bubble${malformedClass}" data-vcp-block-type="tool-use" data-vcp-preserve-children="true">` +
                 `<div class="vcp-tool-summary">` +
                 `<span class="vcp-tool-label">VCP-ToolUse:</span> ` +
                 `<span class="vcp-tool-name-highlight">${escapeHtml(toolName)}</span>` +
+                malformedHintHtml +
                 `</div>` +
                 `<div class="vcp-tool-details"></div>` +
                 `<template class="vcp-tool-details-template"><pre>${escapedFullContent}</pre></template>` +
@@ -1489,6 +1584,11 @@ function removeOwnedMessageScopeStyle(scopeId) {
 }
 
 function processAssistantScopedHtmlContent(content, scopeId, messageItem = null, options = {}) {
+    // This path also receives authoritative visible stream source before CSS extraction.
+    if (options.injectStyles !== false && messageItem) {
+        const root = messageItem.closest('[data-vcp-projectforge-root]') || mainRendererReferences?.chatMessagesDiv;
+        projectForgeTopicSurface.observe(root, { id: messageItem.dataset.messageId, role: 'assistant', content });
+    }
     if (!scopeId || !containsAssistantHtmlNeedingScope(content)) {
         // 规范终稿可能移除了流式预览阶段出现过的 style；此时必须撤销旧消息级样式。
         if (options.injectStyles !== false && messageItem?.dataset?.vcpHtmlScopeCandidate === 'true') {
@@ -1813,7 +1913,7 @@ function shouldBypassRenderHtmlCache(text, options = {}) {
 
     // 大工具结果 HTML 含运行时 data-content-id，其完整文本由消息级 Map 持有，
     // 不能跨消息/内容 revision 复用缓存 HTML，否则按钮会引用已释放的条目。
-    if (text.includes('[[VCP调用结果信息汇总:')) return true;
+    if (text.includes('[[VCP调用结果信息汇总:') || text.includes('<<<[TOOL_REQUEST]>>>')) return true;
 
     // scoped CSS 有 scopeId 与 document.head 注入副作用，第一版保守跳过。
     // 同时用大小写无关的 HTML/CSS 风险识别覆盖 <STYLE>、结构化 HTML 与内联 style 场景。
@@ -2186,7 +2286,7 @@ function prepareFinalTextForRender(messageId, rawText, role = 'assistant', histo
  * @param {string} fullMatch - 完整的工具结果文本（含 [[VCP调用结果信息汇总: ... VCP调用结果结束]] 标记）
  * @returns {string} 渲染后的 HTML
  */
-function renderToolResultBlock(fullMatch, ordinal = -1) {
+function renderToolResultBlock(fullMatch, ordinal = -1, deferred = true) {
     const startMarker = '[[VCP调用结果信息汇总:';
     const endMarker = 'VCP调用结果结束]]';
     const markdownFieldKeys = new Set(['返回内容', '内容', 'Result', '返回结果', 'output']);
@@ -2239,16 +2339,29 @@ function renderToolResultBlock(fullMatch, ordinal = -1) {
 
     // 序号 + 原文哈希用于在消息原始内容中精确定位该工具结果块（删除功能使用）。
     const toolResultHash = hashStringFNV1a(fullMatch);
-    let html = `<div class="vcp-tool-result-bubble collapsible" data-vcp-block-type="tool-result" data-vcp-preserve-children="true" data-vcp-tool-result-index="${Number.isInteger(ordinal) ? ordinal : -1}" data-vcp-tool-result-hash="${toolResultHash}">`;
+    const isHidden = isToolResultHidden(fullMatch);
+    const previewSource = (details.find(item => markdownFieldKeys.has(item.key))?.value || otherContent.join('\n')).slice(0, 600);
+    const preview = previewSource.split('\n').map(line => line.trim()).find(line => line && !/^(```|~~~)/.test(line))?.replace(/^[#>*\s]+|[*`]/g, '').slice(0, 160) || '';
+    const rich = details.some(({ key, value }) =>
+        /^(?:可访问URL|返回内容|url|image)$/.test(key) && /^https?:\/\/[^\s]+$/i.test(value) && /\.(jpeg|jpg|png|gif|webp)([?&#]|$)/i.test(value)
+        || markdownFieldKeys.has(key) && /!\[[^\]]*\]\([^)\n]+\)/.test(value));
+    const lazyId = deferred ? registerLazyTool({ type: 'result', raw: fullMatch, ordinal, meta: { preview, rich } }) : null;
+    let html = `<div class="vcp-tool-result-bubble collapsible${isHidden ? ' vcp-tool-result-bubble--hidden' : ''}" data-vcp-block-type="tool-result" data-vcp-preserve-children="true"${lazyId ? ` data-vcp-lazy-tool-id="${lazyId}"` : ''} data-vcp-tool-result-index="${Number.isInteger(ordinal) ? ordinal : -1}" data-vcp-tool-result-hash="${toolResultHash}">`;
     html += `<div class="vcp-tool-result-header">`;
     html += `<span class="vcp-tool-result-label">VCP-ToolResult</span>`;
     html += `<span class="vcp-tool-result-name">${escapeHtml(toolName)}</span>`;
     html += `<span class="vcp-tool-result-status">${escapeHtml(status)}</span>`;
+    if (isHidden) {
+        html += `<span class="vcp-tool-result-hidden-badge" title="当前工具结果已排除，后续对话不会注入到AI上下文中">已隐藏</span>`;
+    }
     html += `<span class="vcp-result-toggle-icon"></span>`;
-    html += `<button type="button" class="vcp-tool-result-delete-btn" title="从上下文中删除此工具结果" aria-label="从上下文中删除此工具结果">${TOOL_RESULT_DELETE_ICON}</button>`;
+    const btnTitle = isHidden ? '当前已从上下文中隐藏（点击恢复注入）' : '当前已注入上下文（点击在上下文中隐藏）';
+    // 视觉语义：可见时为单纯睁眼图标；不可见时为带斜杠划掉的眼睛图标
+    const btnIcon = isHidden ? TOOL_RESULT_HIDE_ICON : TOOL_RESULT_SHOW_ICON;
+    html += `<button type="button" class="vcp-tool-result-delete-btn vcp-tool-result-toggle-btn${isHidden ? ' is-hidden' : ''}" data-vcp-hidden="${isHidden ? 'true' : 'false'}" title="${btnTitle}" aria-label="${btnTitle}">${btnIcon}</button>`;
     html += `</div>`;
-
     html += `<div class="vcp-tool-result-collapsible-content">`;
+    if (deferred) return html + `</div></div>`;
     html += `<div class="vcp-tool-result-details">`;
 
     details.forEach(({ key, value }) => {
@@ -2345,54 +2458,40 @@ function restoreRenderedToolResults(html, toolResultMap) {
     });
 }
 
-const TOOL_RESULT_DELETE_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>`;
-const TOOL_RESULT_DELETE_CONFIRM_MS = 3000;
+// 隐藏图标（Eye-Off：当前正常注入，点击后在上下文中隐藏）
+const TOOL_RESULT_HIDE_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
-function resetToolResultDeleteButton(button) {
-    if (!button) return;
-    const ownerWindow = button.ownerDocument?.defaultView;
-    if (button._vcpConfirmTimer) ownerWindow?.clearTimeout?.(button._vcpConfirmTimer);
-    delete button._vcpConfirmTimer;
-    delete button.dataset.confirming;
-    button.classList.remove('confirming');
-    button.innerHTML = TOOL_RESULT_DELETE_ICON;
-    button.title = '从上下文中删除此工具结果';
-    button.setAttribute('aria-label', '从上下文中删除此工具结果');
-}
+// 显示/恢复图标（Eye：当前已被隐藏，点击后恢复注入上下文）
+const TOOL_RESULT_SHOW_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+
+const TOOL_RESULT_DELETE_ICON = TOOL_RESULT_HIDE_ICON; // 兼容旧引用
 
 /**
- * 两段式确认：第一次点击进入确认态，3 秒内再次点击才真正删除，避免误触。
+ * 切换工具结果的显隐状态（从上下文中隐藏或恢复）。
  */
 function handleToolResultDeleteClick(button) {
     const bubble = button.closest('.vcp-tool-result-bubble');
     const messageItem = button.closest('.message-item');
     if (!bubble || !messageItem) return;
 
-    if (button.dataset.confirming !== 'true') {
-        button.dataset.confirming = 'true';
-        button.classList.add('confirming');
-        button.textContent = '确认删除?';
-        button.title = '再次点击确认从上下文中删除';
-        button.setAttribute('aria-label', '再次点击确认从上下文中删除此工具结果');
-        const ownerWindow = button.ownerDocument?.defaultView;
-        button._vcpConfirmTimer = ownerWindow?.setTimeout?.(() => resetToolResultDeleteButton(button), TOOL_RESULT_DELETE_CONFIRM_MS);
-        return;
-    }
-
-    resetToolResultDeleteButton(button);
     const ordinal = Number.parseInt(bubble.dataset.vcpToolResultIndex, 10);
-    removeToolResultFromMessage(
+    const isCurrentlyHidden = button.dataset.vcpHidden === 'true';
+    const targetHidden = !isCurrentlyHidden;
+
+    toggleToolResultVisibilityInMessage(
         messageItem,
         Number.isInteger(ordinal) ? ordinal : -1,
-        bubble.dataset.vcpToolResultHash || ''
+        bubble.dataset.vcpToolResultHash || '',
+        targetHidden
     );
 }
 
 /**
- * 从消息原始内容（上下文历史）中删除一个工具结果块，持久化并重新渲染该消息。
- * 定位策略：优先按原文哈希匹配（多个同哈希时取序号最接近者），否则回退到序号。
+ * 在消息原始内容中切换工具结果的隐藏状态并持久化。
+ * 隐藏后其效果与原先垃圾桶删除一致（在发给 AI 的上下文中完全剔除，节省 Token 且不干扰对话），
+ * 且具备完全无损性，用户随时可以再次点击恢复注入。
  */
-function removeToolResultFromMessage(messageItem, ordinal, hash) {
+function toggleToolResultVisibilityInMessage(messageItem, ordinal, hash, targetHidden) {
     const notify = (text, type = 'info') => mainRendererReferences.uiHelper?.showToastNotification?.(text, type);
     const messageId = messageItem?.dataset?.messageId;
     if (!messageId) return false;
@@ -2402,7 +2501,7 @@ function removeToolResultFromMessage(messageItem, ordinal, hash) {
         || messageItem.classList.contains('thinking')
         || streamManager.isMessageActive?.(messageId)
     ) {
-        notify('消息仍在生成中，暂时无法删除工具结果', 'warning');
+        notify('消息仍在生成中，暂时无法修改工具结果状态', 'warning');
         return false;
     }
 
@@ -2417,19 +2516,18 @@ function removeToolResultFromMessage(messageItem, ordinal, hash) {
     const isTextObject = !!message.content && typeof message.content === 'object' && typeof message.content.text === 'string';
     const content = typeof message.content === 'string' ? message.content : (isTextObject ? message.content.text : null);
     if (typeof content !== 'string') {
-        notify('消息内容格式异常，无法删除工具结果', 'error');
+        notify('消息内容格式异常，无法修改工具结果状态', 'error');
         return false;
     }
 
-    // 与渲染占位符（contentPipeline.protectToolResults）使用同一嵌套感知配对，
-    // 保证气泡上的序号/哈希能精确对应原文中的最外层工具结果块。
     const matches = collectClosedToolResultRanges(content).map((range, index) => {
         const raw = content.slice(range.start, range.end);
         return {
             start: range.start,
             end: range.end,
             ordinal: index,
-            hash: hashStringFNV1a(raw)
+            hash: hashStringFNV1a(raw),
+            raw
         };
     });
 
@@ -2447,10 +2545,8 @@ function removeToolResultFromMessage(messageItem, ordinal, hash) {
         return false;
     }
 
-    // 删除块本身，并收拢两侧多余空白，避免留下大段空行。
-    const before = content.slice(0, target.start).replace(/\s+$/, '');
-    const after = content.slice(target.end).replace(/^\s+/, '');
-    const newText = before && after ? `${before}\n\n${after}` : before + after;
+    const updatedRawBlock = setToolResultHidden(target.raw, targetHidden);
+    const newText = content.slice(0, target.start) + updatedRawBlock + content.slice(target.end);
 
     const updatedMessage = {
         ...message,
@@ -2467,16 +2563,25 @@ function removeToolResultFromMessage(messageItem, ordinal, hash) {
             itemId: selectedItem.id,
             itemType: selectedItem.type,
             topicId,
-            category: 'tool-result-remove',
+            category: targetHidden ? 'tool-result-hide' : 'tool-result-show',
         }, history).catch(error => {
-            console.error('[MessageRenderer] Failed to persist tool result removal:', error);
-            notify('工具结果已从界面移除，但保存历史失败', 'error');
+            console.error('[MessageRenderer] Failed to persist tool result visibility state:', error);
+            notify('工具结果状态已更新，但保存历史失败', 'error');
         });
     }
 
     updateMessageContent(messageId, updatedMessage.content);
-    notify('已从上下文中删除该工具结果', 'success');
+    if (targetHidden) {
+        notify('已在上下文中隐藏此工具结果（不会注入给后续AI）', 'success');
+    } else {
+        notify('已恢复此工具结果，后续对话将重新包含此上下文', 'success');
+    }
     return true;
+}
+
+// 保留旧函数名作为兼容别名
+function removeToolResultFromMessage(messageItem, ordinal, hash) {
+    return toggleToolResultVisibilityInMessage(messageItem, ordinal, hash, true);
 }
 
 /**
@@ -2546,11 +2651,17 @@ let mainRendererReferences = null;
 let contentPipeline = null;
 let contentRuntime = null;
 let rendererListenerDisposers = [];
+let toolPresentation = null;
 function disposeRendererListeners() {
+    toolPresentation?.dispose();
+    toolPresentation = null;
     rendererListenerDisposers.splice(0).reverse().forEach(dispose => { try { dispose(); } catch (error) { console.warn('[MessageRenderer] listener dispose failed:', error); } });
 }
 function disposeRendererResources() {
     disposeRendererListeners();
+    projectForgeTopicSurface.dispose();
+    if (mainRendererReferences?.chatMessagesDiv) releaseLazyTools(mainRendererReferences.chatMessagesDiv);
+    lazyToolContents.clear();
     contentProcessor.dispose?.();
     middleClickHandler.dispose?.();
     contextMenu.dispose?.();
@@ -2563,6 +2674,7 @@ function disposeRendererResources() {
 }
 async function disposeRootResources(root) {
     if (!root?.querySelectorAll) return;
+    projectForgeTopicSurface.clear(root);
     invalidateRenderSession(root);
     await renderTaskOwner.dispose(root);
     root.querySelectorAll('.message-item').forEach(item => cleanupMessageDomResources(item, item.dataset?.messageId || null));
@@ -2626,6 +2738,7 @@ function cleanupMessageDomResources(messageItem, messageId = null) {
     if (!messageItem) return;
     retireNativeProposal(messageItem);
 
+    releaseLazyTools(messageItem);
     cleanupToolResultFullContentForRoot(messageItem);
     const contentDiv = messageItem.querySelector('.md-content');
     if (contentDiv) {
@@ -2634,16 +2747,7 @@ function cleanupMessageDomResources(messageItem, messageId = null) {
             clearTimeout(contentDiv._vcpDeferredHighlightTimer);
             delete contentDiv._vcpDeferredHighlightTimer;
         }
-        if (contentDiv._vcpPretextIdleHandle) {
-            const { kind, id } = contentDiv._vcpPretextIdleHandle;
-            const ownerWindow = contentDiv.ownerDocument?.defaultView;
-            if (kind === 'idle' && typeof ownerWindow?.cancelIdleCallback === 'function') {
-                ownerWindow.cancelIdleCallback(id);
-            } else if (kind === 'timer') {
-                clearTimeout(id);
-            }
-            delete contentDiv._vcpPretextIdleHandle;
-        }
+        cancelPretextEstimate(contentDiv);
         cleanupMermaidViewers(contentDiv);
         contentProcessor.cleanupPreviewsInContent(contentDiv);
         cleanupAnimationsInContent(contentDiv);
@@ -2651,14 +2755,7 @@ function cleanupMessageDomResources(messageItem, messageId = null) {
             node._vcpAttachmentCleanup?.();
             delete node._vcpAttachmentCleanup;
         });
-        contentDiv.querySelectorAll('.vcp-audio-player').forEach(player => player._vcpAudioCleanup?.());
-        contentDiv.querySelectorAll('video, audio').forEach(media => {
-            if (media.closest('.vcp-audio-player')) return;
-            try { media.pause?.(); } catch { /* detached media may already be closed */ }
-            media.removeAttribute('src');
-            media.querySelectorAll?.('source').forEach(source => source.removeAttribute('src'));
-            try { media.load?.(); } catch { /* detached media may already be closed */ }
-        });
+        cleanupChatMedia(contentDiv);
     }
 
     cleanupScopedStylesForMessage(messageItem, messageId || messageItem.dataset?.messageId || null);
@@ -2670,6 +2767,7 @@ function cleanupMessageDomResources(messageItem, messageId = null) {
 }
 
 function removeMessageById(messageId, saveHistory = false, root = mainRendererReferences.chatMessagesDiv) {
+    projectForgeTopicSurface.remove(root, messageId);
     const item = root?.querySelector?.(`.message-item[data-message-id="${messageId}"]`);
     if (item) {
         // --- NEW: Cleanup dynamic content before removing from DOM ---
@@ -2705,6 +2803,7 @@ function removeMessageById(messageId, saveHistory = false, root = mainRendererRe
 }
 
 function clearChat(root = mainRendererReferences.chatMessagesDiv) {
+    projectForgeTopicSurface.clear(root);
     invalidateRenderSession(root);
     mainRendererReferences.uiHelper.resetChatScrollFollow?.();
 
@@ -2713,6 +2812,7 @@ function clearChat(root = mainRendererReferences.chatMessagesDiv) {
 
     // 只清理当前视图的 DOM/渲染相关内容，不触碰底层异步流状态
     // 这样可避免切换话题时误伤同窗口内其他 agent 的后台流式聊天
+    lazyToolContents.clear();
     toolResultFullContentMap.clear();
     toolResultContentIdCounter = 0;
 
@@ -2733,6 +2833,8 @@ function clearChat(root = mainRendererReferences.chatMessagesDiv) {
 function initializeMessageRenderer(refs) {
     disposeRendererListeners();
     mainRendererReferences = createRenderDependencies(refs);
+    mainRendererReferences.chatMessagesDiv.setAttribute('data-vcp-projectforge-root', '');
+    projectForgeTopicSurface.replaceHistory(mainRendererReferences.chatMessagesDiv, mainRendererReferences.currentChatHistoryRef.get());
 
     contentPipeline = createContentPipeline({
         escapeHtml,
@@ -2742,8 +2844,8 @@ function initializeMessageRenderer(refs) {
         deIndentHtml,
         deIndentToolRequestBlocks: contentProcessor.deIndentToolRequestBlocks,
         applyContentProcessors: contentProcessor.applyContentProcessors,
-        transformSpecialBlocks: (text, codeBlockMap, thoughtChainMap) =>
-            transformSpecialBlocks(text, codeBlockMap, thoughtChainMap),
+        transformSpecialBlocks: (text, codeBlockMap, thoughtChainMap, toolRequestSourceMap) =>
+            transformSpecialBlocks(text, codeBlockMap, thoughtChainMap, toolRequestSourceMap),
         ensureHtmlFenced,
         transformFlowlockBlocks: (text) => {
             if (!mainRendererReferences.flowlockProtocol || typeof mainRendererReferences.flowlockProtocol.transformForRender !== 'function') {
@@ -2755,6 +2857,7 @@ function initializeMessageRenderer(refs) {
         getToolResultRegex: () => TOOL_RESULT_REGEX,
         getToolRequestRegex: () => TOOL_REGEX,
         replaceToolRequestBlocks,
+        deferToolRequest,
         getCodeFenceRegex: () => CODE_FENCE_REGEX,
         getDesktopPushRegex: () => DESKTOP_PUSH_REGEX,
         getDesktopPushPartialRegex: () => DESKTOP_PUSH_PARTIAL_REGEX,
@@ -2785,6 +2888,19 @@ function initializeMessageRenderer(refs) {
     const scrollContainer = mainRendererReferences.chatMessagesDiv.closest('.chat-messages-container');
     visibilityOptimizer.initializeVisibilityOptimizer(scrollContainer || mainRendererReferences.chatMessagesDiv);
 
+    toolPresentation = createToolPresentation({
+        root: mainRendererReferences.chatMessagesDiv,
+        getLocalConfig: () => {
+            const item = mainRendererReferences.currentSelectedItemRef.get();
+            return item?.config || item;
+        },
+        getProfile: () => {
+            const appearance = mainRendererReferences.realm?.VCPAppearance;
+            return appearance?.getCurrent?.()
+                || appearance?.normalize?.(mainRendererReferences.globalSettingsRef.get().appearanceProfile, 'next');
+        }
+    });
+
     // --- Event Delegation ---
     ownRendererListener(mainRendererReferences.chatMessagesDiv, 'click', (e) => {
         // 0. 工具结果删除按钮（位于 header 内，必须先于折叠逻辑处理）
@@ -2801,6 +2917,12 @@ function initializeMessageRenderer(refs) {
         if (toolSummary) {
             const bubble = toolSummary.closest('.vcp-tool-use-bubble');
             if (bubble) {
+                if (bubble._vcpMountTool) {
+                    const expanded = !bubble.classList.contains('expanded');
+                    bubble.classList.toggle('expanded', expanded);
+                    bubble._vcpMountTool(expanded);
+                    return;
+                }
                 const details = bubble.querySelector(':scope > .vcp-tool-details');
                 const template = bubble.querySelector(':scope > .vcp-tool-details-template');
                 const willExpand = !bubble.classList.contains('expanded');
@@ -2825,6 +2947,7 @@ function initializeMessageRenderer(refs) {
             const bubble = toolHeader.closest('.vcp-tool-result-bubble.collapsible');
             if (bubble) {
                 bubble.classList.toggle('expanded');
+                bubble._vcpMountTool?.(bubble.classList.contains('expanded'));
             }
             return;
         }
@@ -3258,7 +3381,11 @@ function enhanceAudioPlayers(container) {
         let progressAnimationFrame = null;
         const stopSmoothProgress = () => {
             if (progressAnimationFrame !== null) {
-                ownerDocument.defaultView?.cancelAnimationFrame?.(progressAnimationFrame);
+                if (ownerDocument.defaultView?.cancelAnimationFrame) {
+                    ownerDocument.defaultView.cancelAnimationFrame(progressAnimationFrame);
+                } else {
+                    ownerDocument.defaultView?.clearTimeout?.(progressAnimationFrame);
+                }
                 progressAnimationFrame = null;
             }
         };
@@ -3479,7 +3606,21 @@ async function renderAttachments(message, contentDiv) {
                 iconSpan.innerHTML = fileVisual.iconMarkup;
                 const nameSpan = ownerDocument.createElement('span');
                 nameSpan.className = 'message-attachment-file-name';
-                nameSpan.textContent = att.name;
+                let displayName = att.name;
+                const pdfMeta = att.pdfMeta || att._fileManagerData?.pdfMeta;
+                const isPdf = fileVisual.kind === 'pdf' || /\.pdf$/i.test(att.name || '');
+                const hasImageFrames = (Array.isArray(att.imageFrames) && att.imageFrames.length > 0)
+                    || (Array.isArray(att._fileManagerData?.imageFrames) && att._fileManagerData.imageFrames.length > 0);
+                const isScannedPdf = isPdf && (pdfMeta?.isScanned === true || hasImageFrames);
+
+                if (isScannedPdf) {
+                    const pages = pdfMeta?.totalPages || att.imageFrames?.length || att._fileManagerData?.imageFrames?.length;
+                    displayName += pages ? ` [扫描件·${pages}页]` : ` [扫描件]`;
+                    attachmentElement.title = `点击打开文件: ${att.name} (扫描版·已提供多模态图像)`;
+                } else if (isPdf && pdfMeta?.totalPages) {
+                    displayName += ` [${pdfMeta.totalPages}页]`;
+                }
+                nameSpan.textContent = displayName;
                 attachmentElement.appendChild(iconSpan);
                 attachmentElement.appendChild(nameSpan);
             }
@@ -3539,8 +3680,11 @@ async function renderPostProcessedHtml(contentDiv, rawHtml, options = {}) {
     };
 
     if (typeof rawHtml === 'string') {
+        toolPresentation?.capture(contentDiv);
         // 替换 innerHTML 前必须释放旧子树上的预览 iframe、window message 监听器、
         // 动画/WebGL 资源及大工具结果完整文本。
+        releaseLazyTools(contentDiv, rawHtml);
+        cleanupChatMedia(contentDiv);
         cleanupToolResultFullContentForRoot(contentDiv);
         contentProcessor.cleanupPreviewsInContent(contentDiv);
         cleanupAnimationsInContent(contentDiv);
@@ -3551,7 +3695,14 @@ async function renderPostProcessedHtml(contentDiv, rawHtml, options = {}) {
 
     if (includeAttachments && message) {
         const existingAttachments = contentDiv.querySelector('.message-attachments');
-        if (existingAttachments) existingAttachments.remove();
+        if (existingAttachments) {
+            cleanupChatMedia(existingAttachments);
+            existingAttachments.querySelectorAll('*').forEach(node => {
+                node._vcpAttachmentCleanup?.();
+                delete node._vcpAttachmentCleanup;
+            });
+            existingAttachments.remove();
+        }
         await renderAttachments(message, contentDiv);
         // 不在旧任务中扫描删除附件：同一节点可能已被新 revision 重新挂载。
         // 新渲染开始时的统一 DOM 资源清理负责释放旧附件。
@@ -3559,6 +3710,9 @@ async function renderPostProcessedHtml(contentDiv, rawHtml, options = {}) {
     }
 
     if (!isStillValid()) return;
+
+    bindLazyTools(contentDiv);
+    toolPresentation?.apply(contentDiv);
 
     // 原生 audio 负责媒体播放，自定义控件层负责一致的主题与交互。
     // 放在附件渲染之后，可同时覆盖 Markdown HTML 音频和消息附件音频。
@@ -3623,6 +3777,8 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
     // console.debug('[MessageRenderer renderMessage] Received message:', JSON.parse(JSON.stringify(message)));
     const { chatMessagesDiv, electronAPI, markedInstance, uiHelper } = mainRendererReferences;
     const renderRoot = renderContext.root || chatMessagesDiv;
+    renderRoot.setAttribute('data-vcp-projectforge-root', '');
+    projectForgeTopicSurface.observe(renderRoot, message);
     const globalSettings = mainRendererReferences.globalSettingsRef.get();
     const currentSelectedItem = mainRendererReferences.currentSelectedItemRef.get();
     const currentChatHistory = mainRendererReferences.currentChatHistoryRef.get();
@@ -3845,8 +4001,9 @@ async function renderMessage(message, isInitialLoad = false, appendToDom = true,
         rawHtml = rawHtml.replace(/viewBox="0 "/g, 'viewBox="0 0 24 24"');
 
         // Synchronously set the base HTML content
-        const finalHtml = rawHtml;
+        const finalHtml = prepareChatMediaHtml(rawHtml, contentDiv.ownerDocument);
         contentDiv.innerHTML = finalHtml;
+        bindLazyTools(contentDiv);
 
         // [Pretext集成] 延后填充文本高度缓存，避免阻塞首屏与批量历史渲染。
         // 必须传入当前消息自己的内容节点；传聊天根会令 querySelector 始终命中
@@ -4249,24 +4406,53 @@ function scheduleMessagePretextEstimate(messageId, text, contentDiv) {
         }
     };
 
-    if (contentDiv?._vcpPretextIdleHandle) {
-        const previous = contentDiv._vcpPretextIdleHandle;
-        const ownerWindow = contentDiv.ownerDocument?.defaultView;
-        if (previous.kind === 'idle' && typeof ownerWindow?.cancelIdleCallback === 'function') ownerWindow.cancelIdleCallback(previous.id);
-        else if (previous.kind === 'timer') clearTimeout(previous.id);
-    }
-    const wrappedRun = () => {
-        if (contentDiv) delete contentDiv._vcpPretextIdleHandle;
-        run();
-    };
     const ownerWindow = contentDiv?.ownerDocument?.defaultView;
-    if (typeof ownerWindow?.requestIdleCallback === 'function') {
-        const id = ownerWindow.requestIdleCallback(wrappedRun, { timeout: 300 });
-        if (contentDiv) contentDiv._vcpPretextIdleHandle = { kind: 'idle', id };
-    } else {
-        const id = ownerWindow?.setTimeout?.(wrappedRun, 0) || setTimeout(wrappedRun, 0);
-        if (contentDiv) contentDiv._vcpPretextIdleHandle = { kind: 'timer', id };
+    enqueuePretextEstimate(ownerWindow, contentDiv || messageId, run);
+}
+
+/*
+ * 每条消息各占一个 requestIdleCallback 时，40 条历史就是 40 个排在前面的回调，
+ * 历史分批插入的 idle 回调只能等它们逐个跑完（每个还要读一次 clientWidth 触发布局），
+ * 大话题打开因此慢约 0.4s。这里每个窗口只挂一个 idle 回调，按 deadline 分片消费队列，
+ * 没做完就重新排队，让已经排着的分批插入先执行。同一节点重复渲染时覆盖旧任务。
+ */
+const pretextEstimateQueues = new WeakMap();
+
+function getPretextQueueOwner(ownerWindow) {
+    return typeof ownerWindow?.requestIdleCallback === 'function' ? ownerWindow : globalThis;
+}
+
+function enqueuePretextEstimate(ownerWindow, key, run) {
+    const queueOwner = getPretextQueueOwner(ownerWindow);
+    let state = pretextEstimateQueues.get(queueOwner);
+    if (!state) {
+        state = { jobs: new Map(), scheduled: false };
+        pretextEstimateQueues.set(queueOwner, state);
     }
+    state.jobs.delete(key);
+    state.jobs.set(key, run);
+    if (state.scheduled) return;
+
+    const schedule = () => {
+        state.scheduled = true;
+        if (queueOwner !== globalThis) queueOwner.requestIdleCallback(drain, { timeout: 300 });
+        else setTimeout(drain, 0);
+    };
+    const drain = (deadline) => {
+        state.scheduled = false;
+        for (const [jobKey, job] of state.jobs) {
+            state.jobs.delete(jobKey);
+            job();
+            if (!deadline || deadline.didTimeout || deadline.timeRemaining() <= 1) break;
+        }
+        if (state.jobs.size > 0) schedule();
+    };
+    schedule();
+}
+
+function cancelPretextEstimate(contentDiv) {
+    const queueOwner = getPretextQueueOwner(contentDiv?.ownerDocument?.defaultView);
+    pretextEstimateQueues.get(queueOwner)?.jobs.delete(contentDiv);
 }
 
 async function renderFullMessageProjection(messageId, fullContent, agentName, agentId, root = mainRendererReferences.chatMessagesDiv) {
@@ -4370,7 +4556,10 @@ function prepareUserMessageText(text) {
  * @param {number} options.batchDelay - Delay between batches in ms (default: 100)
  */
 async function renderHistory(history, options = {}) {
-    const renderSessionId = invalidateRenderSession(options.root || mainRendererReferences.chatMessagesDiv);
+    const renderRoot = options.root || mainRendererReferences.chatMessagesDiv;
+    renderRoot.setAttribute('data-vcp-projectforge-root', '');
+    projectForgeTopicSurface.replaceHistory(renderRoot, history || []);
+    const renderSessionId = invalidateRenderSession(renderRoot);
     mainRendererReferences.uiHelper.resetChatScrollFollow?.();
 
     const {
@@ -4682,6 +4871,7 @@ const messageRenderer = {
     disposeRendererResources,
     disposeRootResources,
     createDomRenderer: (root = mainRendererReferences.chatMessagesDiv) => createChatDomRenderer({ root, renderer: messageRenderer }),
+    getLazyToolStats: () => ({ entries: lazyToolContents.size }),
     getRenderHtmlCacheStats: () => ({
         entries: renderHtmlCache.size,
         bytes: renderHtmlCacheBytes,

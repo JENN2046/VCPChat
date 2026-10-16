@@ -50,8 +50,9 @@ test('Trace extracts the shipped preload metadata without requiring workspace mo
     const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');
     const result = await loadPreloadDecls(path.join(__dirname, '..'));
     assert.equal(result.status, 'ok', result.error);
-    // The merged native-conversation bridge adds five explicit chat-only APIs.
-    assert.equal(result.apis.length, 412);
+    // Frozen 3cde8466 declarations plus the retained native/SUVEI bridges.
+    // Independently checked against the shipped registry metadata in isolation.
+    assert.equal(result.apis.length, 490);
     for (const [name, channel] of [
         ['prepareNativeConversation', 'native-conversation:prepare'],
         ['executeNativeConversation', 'native-conversation:execute'],

@@ -53,3 +53,20 @@ test('all documented window resources have exact build entries and current ident
     // ProjectForge consumes the canvas vendor dependency even when canvas is not opened.
     assert.ok(contract.resources.some(entry=>entry.path==='Canvasmodules/vendor/diff_match_patch.js'));
 });
+
+test('game tools are exact package inputs with checked manifest and service bytes', () => {
+    const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
+    const paths = [
+        'VCPDistributedServer/Plugin/GameController/plugin-manifest.json',
+        'VCPDistributedServer/Plugin/GameController/GameControllerService.js',
+        'VCPDistributedServer/Plugin/ForgeTax/plugin-manifest.json',
+        'VCPDistributedServer/Plugin/ForgeTax/forge-tax-service.js',
+    ];
+    const read = relative => { const target = path.join(root, relative); return fs.existsSync(target) ? fs.readFileSync(target) : null; };
+    for (const file of paths) {
+        assert.ok(pkg.build.files.includes(file), `Missing exact game plugin input: ${file}`);
+        assert.ok(contract.resources.some(entry => entry.path === file), `Missing game plugin identity: ${file}`);
+        assert.throws(() => verifyWindowPackage({ readSource: read,
+            readPackaged: relative => relative === file ? null : read(relative) }), /Packaged window resource is missing/);
+    }
+});

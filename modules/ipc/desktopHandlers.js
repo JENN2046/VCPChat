@@ -37,6 +37,7 @@ let vchatThemesWindow = null;
 let vchatTaskWindow = null;
 let vchatPluginManagerWindow = null;
 let vchatProjectForgeWindow = null;
+let vchatGameWindow = null;
 
 // --- 收藏系统路径 - 使用项目根目录的 AppData ---
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -496,6 +497,7 @@ function createOrFocusChildWindow(existingWindow, options) {
         if (win === vchatTaskWindow) vchatTaskWindow = null;
         if (win === vchatPluginManagerWindow) vchatPluginManagerWindow = null;
         if (win === vchatProjectForgeWindow) vchatProjectForgeWindow = null;
+        if (win === vchatGameWindow) vchatGameWindow = null;
     });
 
     console.log(`[DesktopHandlers] Created child window: ${options.title}`);
@@ -775,6 +777,24 @@ function registerManagedWindows() {
         },
     });
 }
+function registerGameWindow() {
+    require('./gameHandlers').initialize();
+    windowService.register(WINDOW_APP_IDS.GAME, {
+        owner: 'desktopHandlers',
+        getWindow: () => vchatGameWindow,
+        open: async () => {
+            if (vchatGameWindow && !vchatGameWindow.isDestroyed() && vchatGameWindow.isMinimized()) {
+                vchatGameWindow.restore();
+            }
+            vchatGameWindow = createOrFocusChildWindow(vchatGameWindow, {
+                width: 1100, height: 760, minWidth: 640, minHeight: 480,
+                title: 'VCPgame 游戏大厅',
+                htmlPath: path.join(app.getAppPath(), 'Gamemodules', 'game.html'),
+            });
+            return vchatGameWindow;
+        },
+    });
+}
 
 function resolveAppActionToAppId(appAction) {
     switch (appAction) {
@@ -804,6 +824,8 @@ function resolveAppActionToAppId(appAction) {
             return WINDOW_APP_IDS.MUSIC;
         case 'open-themes-window':
             return WINDOW_APP_IDS.THEMES;
+        case 'open-game-window':
+            return WINDOW_APP_IDS.GAME;
         case 'open-task-window':
             return WINDOW_APP_IDS.TASK;
         case 'open-plugin-manager-window':
@@ -1003,6 +1025,7 @@ function initialize(params) {
     LAYOUT_CONFIG_PATH = path.join(DESKTOP_DATA_DIR, 'layout.json');
     CATALOG_PATH = path.join(DESKTOP_WIDGETS_DIR, 'CATALOG.md');
     registerManagedWindows();
+    registerGameWindow();
 
     if (!standaloneProcessCleanupRegistered) {
         app.once('will-quit', cleanupStandaloneAppProcesses);

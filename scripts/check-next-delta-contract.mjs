@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import { JSDOM } from 'jsdom';
 
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');

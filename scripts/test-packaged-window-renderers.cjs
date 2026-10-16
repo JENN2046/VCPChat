@@ -31,6 +31,9 @@ if(!process.versions.electron){
   'is-window-pinned':false,'get-emoticon-library':{},'load-forum-config':{},'load-agents-list':[],
   'desktop-set-always-on-bottom':{success:true},'desktop-save-dock':{success:true},'loom:list-apps':{success:true,apps:[]},
   'get-custom-playlists':[],'rag-overlay-get-state':{enabled:false,passThrough:true,notificationCategoryEnabled:false},'get-platform':'win32',
+  'vcp-game:records':{success:true,records:[],unavailable:[]},
+  'vcp-game:resources':{success:true,sessions:[],unavailable:[]},
+  'vcp-game:launch':{success:true},
  };
  const emptyArrays=['get-agents','get-agent-groups','music-load-custom-playlists'];
  for(const channel of emptyArrays)fixtures[channel]=[];
@@ -52,13 +55,31 @@ if(!process.versions.electron){
  }
  const waits=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  const results=[];
+ const windows=[...contract.windows,
+  {id:'game-hall',page:'Gamemodules/game.html',preload:'preloads/utility.js',api:'utilityAPI'},
+  {id:'neon',page:'Gamemodules/vcp-neon-game/index.html',sandbox:true,api:null},
+  {id:'blade',page:'VCPDistributedServer/Plugin/BladeGame/blade-electron.html',preload:'VCPDistributedServer/Plugin/BladeGame/blade-preload.js',sandbox:true,api:'bladeGame'},
+ ];
+ ipcMain.handle('blade-game:find-avatar',()=> 'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>'));
  app.whenReady().then(async()=>{
-  for(const spec of contract.windows){
+  for(const spec of windows){
    console.log('WINDOW_START '+spec.id);
    current={id:spec.id,calls:new Set(),commands:new Set(),unknown:new Set(),errors:[],missing:[],blocked:new Set()};
    const record=current;
    const ses=session.fromPartition('window-'+spec.id+'-'+Date.now());
    ses.setPermissionRequestHandler((_web,_permission,callback)=>callback(false));
+   if(['blade','neon'].includes(spec.id))ses.protocol.handle('file',request=>{
+    const local=path.resolve(fileURLToPath(new URL(request.url)));
+    if(!local.startsWith(asar+path.sep))return new Response('denied',{status:403});
+    const relative=path.relative(asar,local).replaceAll('\\','/');
+    // Runtime files are never opened: exact synthetic responses only.
+    const payload=relative==='AppData/settings.json'?{currentThemeMode:'dark'}:
+     relative==='AppData/emoticon_library.json'?{}:
+     relative==='VCPDistributedServer/Plugin/BladeGame/game_state.json'?{maid_name:'Fixture',user_hp:6,ai_hp:6,user_energy:1,ai_energy:1,turn:1,game_over:false,user_ready:false,events:[]}:null;
+    if(payload)return new Response(JSON.stringify(payload),{headers:{'content-type':'application/json'}});
+    if(relative.startsWith('AppData/'))return new Response('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>',{headers:{'content-type':'image/svg+xml'}});
+    return ses.fetch(request.url,{bypassCustomProtocolHandlers:true});
+   });
    ses.webRequest.onBeforeRequest((details,callback)=>{
     const u=new URL(details.url);
     const local=u.protocol==='file:'?path.resolve(fileURLToPath(u)):null;
@@ -68,14 +89,16 @@ if(!process.versions.electron){
     callback({cancel:!allowed});
    });
    ses.webRequest.onErrorOccurred(details=>{if(details.url.startsWith('file:'))record.missing.push({url:details.url,error:details.error});});
-   const win=new BrowserWindow({width:1200,height:800,show:false,webPreferences:{preload:path.join(asar,spec.preload),sandbox:false,contextIsolation:true,nodeIntegration:false,session:ses,backgroundThrottling:false}});
+   const win=new BrowserWindow({width:1200,height:800,show:false,webPreferences:{...(spec.preload?{preload:path.join(asar,spec.preload)}:{}),sandbox:spec.sandbox??false,contextIsolation:true,nodeIntegration:false,session:ses,backgroundThrottling:false}});
    win.webContents.on('console-message',(_event,details,message)=>{if(details?.level==='error'||details===3)record.errors.push(details?.message||message);});
    win.webContents.on('preload-error',(_e,_p,error)=>record.errors.push('preload: '+error.message));
    try{
     await win.loadFile(path.join(asar,spec.page));
     await waits(1800);
     const dom=await win.webContents.executeJavaScript(`({title:document.title,nodes:document.body.querySelectorAll('*').length,text:document.body.innerText.length,styles:document.styleSheets.length,api:typeof window.electronAPI,codeMirror:typeof window.CodeMirror})`);
-    assert.ok(dom.nodes>20&&dom.text>10&&dom.styles>0&&dom.api==='object','Blank/uninitialized window: '+JSON.stringify(dom));
+    assert.ok(dom.nodes>20&&dom.text>10&&dom.styles>0,'Blank/uninitialized window: '+JSON.stringify(dom));
+    const api=spec.api===undefined?'electronAPI':spec.api;
+    if(api)assert.equal(await win.webContents.executeJavaScript('typeof window['+JSON.stringify(api)+']'),'object','Missing real role preload API');
     if(spec.id==='themes'){
      const count=await win.webContents.executeJavaScript(`document.querySelectorAll('.theme-card').length`);assert.equal(count,2);
      const selected=await win.webContents.executeJavaScript(`document.querySelectorAll('.theme-card')[1].click();document.querySelector('#previewThemeName').textContent`);assert.equal(selected,'验收主题 Beta');
@@ -83,8 +106,14 @@ if(!process.versions.electron){
     }
     if(spec.id==='canvas')assert.equal(dom.codeMirror,'function');
     if(spec.id==='music')assert.ok(record.commands.has('music-renderer-ready'),'Music renderer did not finish initialization');
-    const landmarks={themes:'#themesGrid',canvas:'.CodeMirror',memo:'#search-memos',forum:'#search-posts',log:'#log-lines',tasks:'#agent-view',plugins:'#distributed-server-status',desktop:'#desktop-dock',music:'#playlist','rag-observer':'#connectionStatus','rag-overlay':'#overlayRoot'};
+    const landmarks={themes:'#themesGrid',canvas:'.CodeMirror',memo:'#search-memos',forum:'#search-posts',log:'#log-lines',tasks:'#agent-view',plugins:'#distributed-server-status',desktop:'#desktop-dock',music:'#playlist','rag-observer':'#connectionStatus','rag-overlay':'#overlayRoot','game-hall':'#game-resources',neon:'#game-canvas',blade:'#moveGrid'};
     assert.ok(await win.webContents.executeJavaScript('Boolean(document.querySelector('+JSON.stringify(landmarks[spec.id])+'))'),'Missing window-specific landmark');
+    if(spec.id==='game-hall'){
+     assert.ok(record.calls.has('vcp-game:records')&&record.calls.has('vcp-game:resources'));
+     await win.webContents.executeJavaScript(`document.querySelector('[data-game="neon"]').click()`);
+     await waits(100);assert.ok(record.calls.has('vcp-game:launch'));
+    }
+    if(spec.id==='blade')assert.equal(await win.webContents.executeJavaScript(`document.querySelector('#userHpText').textContent`),'6 / 6');
     await waits(250);
     const image=await win.webContents.capturePage();fs.writeFileSync(path.join(audit,spec.id+'.png'),image.toPNG());
     results.push({id:spec.id,dom,missing:record.missing,errors:record.errors,unknown:[...record.unknown],blocked:[...record.blocked],calls:[...record.calls],commands:[...record.commands],status:record.missing.length||record.unknown.size||record.errors.some(e=>/Uncaught|preload:/.test(e))?'FAIL':'PASS'});

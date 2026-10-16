@@ -253,7 +253,8 @@
 
     function parse(rawText, options = {}) {
         const text = typeof rawText === 'string' ? rawText : '';
-        const safeText = createSafeScanText(text);
+        const isUpstreamError = /^\s*\[ERROR\]/i.test(text);
+        const safeText = isUpstreamError ? '' : createSafeScanText(text);
         const commands = [];
         const ranges = [];
 
@@ -323,7 +324,8 @@
             ranges,
             hasCommands: commands.length > 0,
             terminalType,
-            shouldStart: !terminalType && commandTypes.has('start'),
+            isUpstreamError,
+            shouldStart: !isUpstreamError && !terminalType && commandTypes.has('start'),
             nextHeartbeatSeconds: commands
                 .filter(command => command.type === 'nextheartbeat')
                 .at(-1)?.delaySeconds ?? null,
@@ -381,7 +383,7 @@
 
     function transformForRender(rawText, options = {}) {
         const parsed = parse(rawText, options);
-        if (!parsed.hasCommands) return parsed.text;
+        if (parsed.isUpstreamError || !parsed.hasCommands) return parsed.text;
 
         const replacements = parsed.commands
             .map(command => ({

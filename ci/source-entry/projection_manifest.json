@@ -3155,9 +3155,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "565e8bc6d128245c9e84d26974e27e21cb588be4",
-          "size": 17844736,
-          "sha256": "f1e08676b9309eca255dab631555ff29387c834b1f767fc0a466ab67516d6678",
+          "blob": "0af0bf2f0b7744fa9f2e1d712c032e4c5a2729c4",
+          "size": 17836032,
+          "sha256": "e562b290e8431da0d8e2f28faa94968f0b4457001b886f2fff31ae325ef853da",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6158,9 +6158,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "dfd050d8656f1f49e76f3c3f7e306f1995cb1846",
-          "size": 10389,
-          "sha256": "8d49fc7ebb5764ac8892b8243350fef3d9c3b940882df010ed1efadd3be148f0",
+          "blob": "1b7ee5c7315fc1a3f9a77a057c58b3cb29e906b3",
+          "size": 11263,
+          "sha256": "733b19662e63033af1ebd827fba99482256ae77e478d9398efebb47538e7c74a",
           "kind": "source"
         },
         {
@@ -11887,9 +11887,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5b3699dc8e25766ef22e07fb5ba9d7f09faa6e95",
-          "size": 38169,
-          "sha256": "830b96ef2a70a04fff63c9e53633e3c8d314966ff1da8e2c67c3a2b87f37f214",
+          "blob": "7478a7fc662b4094b8a831283683bc4fdd620d71",
+          "size": 38223,
+          "sha256": "df76e5e7abb166d11125f1927585acb5aeccfb651d2185bf2f661162988b9ce4",
           "kind": "source"
         },
         {
@@ -15454,9 +15454,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "565e8bc6d128245c9e84d26974e27e21cb588be4",
-          "size": 17844736,
-          "sha256": "f1e08676b9309eca255dab631555ff29387c834b1f767fc0a466ab67516d6678",
+          "blob": "0af0bf2f0b7744fa9f2e1d712c032e4c5a2729c4",
+          "size": 17836032,
+          "sha256": "e562b290e8431da0d8e2f28faa94968f0b4457001b886f2fff31ae325ef853da",
           "kind": "static-native",
           "format": "PE"
         },
@@ -17973,9 +17973,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "565e8bc6d128245c9e84d26974e27e21cb588be4",
-          "size": 17844736,
-          "sha256": "f1e08676b9309eca255dab631555ff29387c834b1f767fc0a466ab67516d6678",
+          "blob": "0af0bf2f0b7744fa9f2e1d712c032e4c5a2729c4",
+          "size": 17836032,
+          "sha256": "e562b290e8431da0d8e2f28faa94968f0b4457001b886f2fff31ae325ef853da",
           "kind": "static-native",
           "format": "PE"
         },
@@ -19378,9 +19378,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "dfd050d8656f1f49e76f3c3f7e306f1995cb1846",
-          "size": 10389,
-          "sha256": "8d49fc7ebb5764ac8892b8243350fef3d9c3b940882df010ed1efadd3be148f0",
+          "blob": "1b7ee5c7315fc1a3f9a77a057c58b3cb29e906b3",
+          "size": 11263,
+          "sha256": "733b19662e63033af1ebd827fba99482256ae77e478d9398efebb47538e7c74a",
           "kind": "source"
         },
         {
@@ -24859,9 +24859,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5b3699dc8e25766ef22e07fb5ba9d7f09faa6e95",
-          "size": 38169,
-          "sha256": "830b96ef2a70a04fff63c9e53633e3c8d314966ff1da8e2c67c3a2b87f37f214",
+          "blob": "7478a7fc662b4094b8a831283683bc4fdd620d71",
+          "size": 38223,
+          "sha256": "df76e5e7abb166d11125f1927585acb5aeccfb651d2185bf2f661162988b9ce4",
           "kind": "source"
         },
         {
@@ -30000,9 +30000,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "565e8bc6d128245c9e84d26974e27e21cb588be4",
-          "size": 17844736,
-          "sha256": "f1e08676b9309eca255dab631555ff29387c834b1f767fc0a466ab67516d6678",
+          "blob": "0af0bf2f0b7744fa9f2e1d712c032e4c5a2729c4",
+          "size": 17836032,
+          "sha256": "e562b290e8431da0d8e2f28faa94968f0b4457001b886f2fff31ae325ef853da",
           "kind": "static-native",
           "format": "PE"
         }

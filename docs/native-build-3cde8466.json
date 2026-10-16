@@ -8,9 +8,25 @@
     {
       "component": "rust_projectforge_indexer",
       "destination": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
-      "size": 17844736,
-      "sha256": "f1e08676b9309eca255dab631555ff29387c834b1f767fc0a466ab67516d6678",
-      "gitBlob": "565e8bc6d128245c9e84d26974e27e21cb588be4",
+      "size": 17836032,
+      "sha256": "e562b290e8431da0d8e2f28faa94968f0b4457001b886f2fff31ae325ef853da",
+      "gitBlob": "0af0bf2f0b7744fa9f2e1d712c032e4c5a2729c4",
+      "buildConditions": {
+        "recipe": ".github/scripts/build-projectforge-windows.ps1",
+        "recipeSha256": "4f8654f1c21e675be43aaa0c18946e88b4bf7afdd1752cd06e759393ab7a8c72",
+        "canonicalCargoPath": "/vcp-build/cargo",
+        "canonicalSourcePath": "/vcp-build/projectforge",
+        "localMsvcLinkerVersion": "14.44.35229.0",
+        "freshBuilds": 2,
+        "differentSourceAndTargetDirectories": true,
+        "secondBuildSha256": "abe04804494fb4f94a8e6768c8a87796a9f840a873c0494a450b273df5180376",
+        "strictNormalizedSha256": "9b20481bfbc5b9574f8af3e945ab945791f77fd3f28d18d635586eda9569a434",
+        "unchangedComparatorSha256": "551b4a2a416ff4f1f2237dd40b1b6bb86130e32f534ea0ee41b2dc8e8beb5aef",
+        "codeByteMutationRejected": true,
+        "readyProtocol": 3,
+        "pingPassed": true,
+        "hostedComparison": "PENDING"
+      },
       "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
       "inputHashes": [
         {

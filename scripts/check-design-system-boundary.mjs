@@ -105,6 +105,7 @@ const allowedSourceDifferences = new Set([
     // Exact reviewed three-way source, voice-build and CI-entry changes.
     // This batch's native rebuild and its verification are not design-system UI.
     '.github/scripts/verify-windows-pe.cjs',
+    '.github/scripts/build-projectforge-windows.ps1',
     '.github/workflows/projectforge-windows.yml',
     // PR #52 reviewed tool-result framing and ProjectForge native-close fixes.
     'ProjectForgemodules/projectforge-source.js',

@@ -45,8 +45,10 @@ function createAuditDom() {
     return { dom, window, sentMessages };
 }
 
-test('main-window tool approval exposes change audit and submits modal reason', async () => {
+test('main-window tool approval exposes change audit and submits modal reason', async (t) => {
     const { dom, window, sentMessages } = createAuditDom();
+    // 断言失败时也要关窗口，否则 JSDOM 计时器会把测试进程挂住
+    t.after(() => dom.window.close());
     const longBefore = Array.from({ length: 420 }, (_, index) => `const before_${index} = ${index};`).join('\n');
     const longAfter = `${longBefore}\nconst acceptedChange = true;`;
     const request = {
@@ -103,12 +105,11 @@ test('main-window tool approval exposes change audit and submits modal reason', 
         }
     }]);
     assert.equal(modal.classList.contains('active'), false);
-
-    dom.window.close();
 });
 
-test('ordinary tool approval does not expose change audit', () => {
+test('ordinary tool approval does not expose change audit', (t) => {
     const { dom, window } = createAuditDom();
+    t.after(() => dom.window.close());
     const request = {
         type: 'tool_approval_request',
         data: {
@@ -669,7 +670,8 @@ test('SUVEI committed revocation recovery can only confirm approved=false to Too
 });
 
 test('RAG approval surfaces cannot emit generic approval for protected SUVEI execution', () => {
-    const observer = source('RAGmodules/RAG_Observer.html');
+    assert.match(source('RAGmodules/RAG_Observer.html'), /<script src="\.\/RAG_Observer\.js"><\/script>/);
+    const observer = source('RAGmodules/RAG_Observer.js');
     const overlay = source('RAGmodules/RAG_Overlay.html');
     const handlers = source('modules/ipc/ragHandlers.js');
 
@@ -936,7 +938,7 @@ test('mutation committed authorization recovery offers return or revoke without 
 test('mutation requests are protected in main review and RAG observer surfaces', () => {
     const { dom, window } = createAuditDom();
     assert.equal(window.notificationRenderer.isSuveiHumanAuthorizationRequest({ toolName: 'SUVEIStudio', args: { command: 'RequestMutationGrantAuthorization' } }), true);
-    assert.match(source('RAGmodules/RAG_Observer.html'), /"RequestMutationGrantAuthorization"/);
+    assert.match(source('RAGmodules/RAG_Observer.js'), /"RequestMutationGrantAuthorization"/);
     dom.window.close();
 });
 

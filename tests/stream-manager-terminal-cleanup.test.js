@@ -230,12 +230,15 @@ test('StreamProjection honors an owned view authority and history capability aft
     dom.window.close();
 });
 
-test('active stream waiting for tool result can reconcile after switching away and back', async () => {
+test('active stream waiting for tool result can reconcile after switching away and back', async t => {
     const createStreamProjection = await loadFactory();
     const dom = new JSDOM('<!doctype html><div id="chat"></div>', { url: 'https://vcpchat.local/' });
     let currentTopic = 'topic-a';
     let history = [];
     const projection = createStreamProjection();
+    t.after(async () => {
+        try { await projection.dispose(); } finally { dom.window.close(); }
+    });
     const dependencies = createDependencies(dom, {
         currentChatHistoryRef: { get: () => history, set: value => { history = [...value]; } },
         currentTopicIdRef: { get: () => currentTopic },
@@ -262,13 +265,16 @@ test('active stream waiting for tool result can reconcile after switching away a
     assert.equal(snapshot.length, 1);
     await projection.reconcileConversation({ itemType: 'agent', itemId: 'visible-agent', topicId: 'topic-a' });
     projection.appendStreamChunk('tool-wait', { content: 'after tool' }, { agentId: 'visible-agent', topicId: 'topic-a' });
-    await new Promise(resolve => setTimeout(resolve, 80));
+    // Observe the asynchronous render, not an 80 ms wall-clock scheduling guess.
+    // Keep the content assertion below and fail within a bounded interval.
+    const deadline = Date.now() + 2000;
+    while (!dom.window.document.querySelector('[data-message-id="tool-wait"] .md-content')?.textContent?.includes('after tool') && Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 20));
+    }
 
     assert.ok(history.some(message => message.id === 'tool-wait'), 'pending assistant must be restored to current history');
     assert.match(dom.window.document.querySelector('[data-message-id="tool-wait"] .md-content')?.textContent || '', /before tool/);
     assert.match(dom.window.document.querySelector('[data-message-id="tool-wait"] .md-content')?.textContent || '', /after tool/);
-    await projection.dispose();
-    dom.window.close();
 });
 
 test('StreamProjection rejects chunks and terminals from a different producer operation', async () => {
@@ -750,20 +756,28 @@ test('thinking and streaming messages opt out of content-visibility clipping', (
     );
 });
 
-test('scrolling chat surfaces do not create per-message or scroll-owner backdrop captures', () => {
+test('chat presentation surfaces retain frosted backdrops without nested card captures', () => {
     const chatCss = fs.readFileSync('styles/chat.css', 'utf8');
     const messageRendererCss = fs.readFileSync('styles/messageRenderer.css', 'utf8');
 
     assert.match(
         chatCss,
-        /\.message-item \.md-content\s*\{[\s\S]*?backdrop-filter:\s*none;[\s\S]*?-webkit-backdrop-filter:\s*none;[\s\S]*?\}/,
-        'ordinary bubbles must not allocate one backdrop capture per visible message'
+        /\.message-item \.md-content\s*\{[^}]*backdrop-filter:\s*blur\(12px\);[^}]*-webkit-backdrop-filter:\s*blur\(12px\);[^}]*\}/,
+        'ordinary bubbles must retain their frosted backdrop'
     );
     assert.match(
         chatCss,
-        /body\.chat-presentation-panel \.chat-messages-container,\s*body\.chat-presentation-immersive \.chat-messages-container\s*\{[\s\S]*?backdrop-filter:\s*none;[\s\S]*?-webkit-backdrop-filter:\s*none;[\s\S]*?\}/,
-        'the scrolling owner must not be a viewport-sized backdrop capture'
+        /body\.chat-presentation-panel \.chat-messages-container,\s*body\.chat-presentation-immersive \.chat-messages-container\s*\{[^}]*background:\s*var\(--chat-presentation-surface\);[^}]*backdrop-filter:\s*var\(--chat-presentation-surface-filter\);[^}]*-webkit-backdrop-filter:\s*var\(--chat-presentation-surface-filter\);[^}]*\}/,
+        'panel and immersive modes must retain a shared frosted message surface'
     );
+
+    for (const mode of ['panel', 'immersive']) {
+        assert.match(
+            chatCss,
+            new RegExp(`body\\.chat-presentation-${mode} \\.message-item \\.md-content,[^{}]*\\{[^}]*background:\\s*transparent !important;[^}]*backdrop-filter:\\s*none;[^}]*-webkit-backdrop-filter:\\s*none;[^}]*\\}`),
+            `${mode} message bodies must not stack blur over the shared surface`
+        );
+    }
 
     for (const selector of [
         '\\.vcp-tool-call-summary-bubble',

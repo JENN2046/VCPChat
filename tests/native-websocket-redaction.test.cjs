@@ -19,3 +19,11 @@ test('valid native response bypasses generic logs and evidence; ordinary tool di
  await receive.call(context,JSON.stringify({type:'native_conversation_response',result:{secret:'SYNTHETIC_PRIVATE_RESULT'}}));assert.equal(results,1);assert.equal(captures,0);assert.equal(logs.length,0);
  await receive.call(context,JSON.stringify({type:'execute_tool',data:{toolName:'synthetic'}}));assert.equal(captures,0);assert.equal(dispatches,1);assert.doesNotMatch(JSON.stringify(logs),/SYNTHETIC_PRIVATE/);
 });
+
+test('native-enabled remote plaintext refuses before constructing socket; connection diagnostics omit keys',()=>{
+ const begin=source.indexOf('    connect() {'),end=source.indexOf('    scheduleReconnect()',begin),logs=[],sockets=[];
+ const connect=new Function('console','WebSocket','require',`return ({${source.slice(begin,end).trim()}}).connect;`)({log:(...a)=>logs.push(a),error:(...a)=>logs.push(a)},function(url){sockets.push(url);return {on(){},once(){}};},require);
+ const context={mainServerUrl:'http://example.invalid',vcpKey:'SYNTHETIC_PRIVATE_KEY',nativeConversationWebSocket:true,serverName:'test'};
+ connect.call(context);assert.equal(sockets.length,0);assert.deepEqual(logs,[['[DistributedServer] NATIVE_SECURE_CHANNEL_REQUIRED']]);
+ context.mainServerUrl='http://127.0.0.1:12345';connect.call(context);assert.equal(sockets.length,1);assert.doesNotMatch(JSON.stringify(logs),/SYNTHETIC_PRIVATE_KEY|VCP_Key=/);
+});

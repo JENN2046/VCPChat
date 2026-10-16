@@ -1,69 +1,37 @@
 # HTML、JavaScript、CSS 与 EXE 文件分布
 
-> 自动生成于 2026年9月21日 02:46:32。
->
-> 扫描范围：项目根目录及最多 3 层子目录。
->
-> 文件类型：`.html`、`.js`、`.css`、`.exe`。
->
-> 已忽略依赖、版本控制、虚拟环境、缓存、测试覆盖率及常见构建产物目录。空目录不会显示。
+> 自动生成于：2026-09-30 11:39:55  
+
+> 项目根目录：`H:\VCP\VCPMain\VCPChat`  
+
+> 扫描最大深度：3 层  
+
+> 筛选文件类型：`.css`、`.exe`、`.html`、`.js`  
+
+> 扫描说明：已自动跳过版本控制、编译产物、依赖包、Python虚拟环境与运行时、构建与Web生成目录、AppData/用户数据等。
 
 ## 文件统计
 
-| 类型 | 数量 |
-| --- | ---: |
-| HTML | 44 |
-| JavaScript | 638 |
-| CSS | 113 |
-| EXE 运行时 | 9 |
-| **合计** | **804** |
+- **总目录数**：128
+- **总文件数**：899
+- **文件类型数**：4
 
-## 树状分布
+| 类型 | 扩展名 | 数量 |
+| :--- | :--- | ---: |
+| JavaScript | `.js` | 739 |
+| CSS | `.css` | 111 |
+| HTML | `.html` | 39 |
+| EXE 运行时/可执行程序 | `.exe` | 10 |
+| **合计** | - | **899** |
+
+## 目录结构树
 
 ```text
 VCPChat/
-├── 开发文档/
-│   └── folia-major-main/
-│       ├── api/
-│       │   ├── generate-theme_openai.js
-│       │   ├── generate-theme.js
-│       │   ├── lyric-proxy.js
-│       │   ├── qq.js
-│       │   └── segment-lyrics.js
-│       ├── public/
-│       │   ├── folia-cover-sw.js
-│       │   └── runtime-config.js
-│       ├── src/
-│       │   └── index.css
-│       ├── benchmark_chorus.js
-│       ├── dev-probe.html
-│       ├── index.html
-│       ├── mod-export.html
-│       ├── postcss.config.js
-│       ├── stage-client.html
-│       └── tailwind.config.js
 ├── Agenttaskmodules/
 │   ├── task.css
 │   ├── task.html
 │   └── task.js
-├── AppData/
-│   ├── DesktopWidgets/
-│   │   ├── fav_1774097780990_zmjekv/
-│   │   │   └── widget.html
-│   │   ├── fav_1774100012124_6i7gmw/
-│   │   │   └── widget.html
-│   │   └── fav_1774141828170_n6x2ed/
-│   │       └── widget.html
-│   └── LoomApps/
-│       ├── bing-mobile-native-clean/
-│       │   ├── inject.css
-│       │   └── inject.js
-│       ├── example-mobile/
-│       │   ├── inject.css
-│       │   └── inject.js
-│       └── taobao-mobile-clean/
-│           ├── inject.css
-│           └── inject.js
 ├── apps/
 │   └── bootstrap-installer/
 │       ├── src/
@@ -74,10 +42,10 @@ VCPChat/
 │       └── vcp-ui/
 │           └── noto-sans-sc.css
 ├── audio_engine/
-│   ├── audio_server_rubato.exe
-│   ├── audio_server_x86兼容版.exe
 │   ├── audio_server.exe
-│   └── audio_server.old.soxR.exe
+│   ├── audio_server.old.soxR.exe
+│   ├── audio_server_rubato.exe
+│   └── audio_server_x86兼容版.exe
 ├── bootstrap/
 │   ├── recovery-renderer.js
 │   ├── recovery.css
@@ -129,8 +97,6 @@ VCPChat/
 │   │   ├── theme-overrides.css
 │   │   ├── ui-components.css
 │   │   └── widgets.css
-│   ├── debug/
-│   │   └── debugTools.js
 │   ├── favorites/
 │   │   ├── favoritesManager.js
 │   │   └── thumbnail.js
@@ -250,22 +216,28 @@ VCPChat/
 │   │   ├── emoticonHandlers.js
 │   │   ├── fileDialogHandlers.js
 │   │   ├── forumHandlers.js
+│   │   ├── gitHandlers.js
 │   │   ├── groupChatHandlers.js
 │   │   ├── ipcContracts.js
 │   │   ├── libreHardwareMonitorBridge.js
+│   │   ├── localSttHandlers.js
+│   │   ├── mainChatVoiceCoordinator.js
 │   │   ├── memoHandlers.js
 │   │   ├── musicHandlers.js
 │   │   ├── notesHandlers.js
+│   │   ├── projectForgeHandlers.js
 │   │   ├── promptHandlers.js
 │   │   ├── ragHandlers.js
 │   │   ├── regexHandlers.js
 │   │   ├── settingsHandlers.js
+│   │   ├── sourceHandlers.js
 │   │   ├── sovitsHandlers.js
 │   │   ├── tavernHandlers.js
 │   │   ├── themeHandlers.js
 │   │   ├── translatorHandlers.js
 │   │   ├── voiceHandlers.js
-│   │   └── windowHandlers.js
+│   │   ├── windowHandlers.js
+│   │   └── workspaceHandlers.js
 │   ├── loom/
 │   │   ├── webcore/
 │   │   │   ├── adapter-contract.js
@@ -288,6 +260,7 @@ VCPChat/
 │   ├── renderer/
 │   │   ├── animation.js
 │   │   ├── colorUtils.js
+│   │   ├── composerModelSelect.js
 │   │   ├── contentPipeline.js
 │   │   ├── contentProcessor.js
 │   │   ├── desktopPushConsumer.js
@@ -297,6 +270,7 @@ VCPChat/
 │   │   ├── enhancedColorUtils.js
 │   │   ├── forwardMessageOwner.js
 │   │   ├── imageHandler.js
+│   │   ├── jevToolUse.js
 │   │   ├── mainChatAttachmentOwner.js
 │   │   ├── mainChatAuxiliaryEventOwner.js
 │   │   ├── mainChatComposition.js
@@ -323,6 +297,7 @@ VCPChat/
 │   │   ├── streamProjectionRuntime.js
 │   │   ├── surfaceTaskOwner.js
 │   │   ├── toolRequestScanner.js
+│   │   ├── toolResultRegions.js
 │   │   ├── topicSelectionReadiness.js
 │   │   ├── ttsSurfaceOwner.js
 │   │   ├── visibilityOptimizer.js
@@ -337,6 +312,7 @@ VCPChat/
 │   │   ├── chartService.js
 │   │   ├── deepWikiService.js
 │   │   ├── embeddedAppSessionManager.js
+│   │   ├── gitService.js
 │   │   ├── globalJevService.js
 │   │   ├── historyMutationQueue.js
 │   │   ├── historyWatcherLeaseManager.js
@@ -349,9 +325,13 @@ VCPChat/
 │   │   ├── scriptoriumImportService.js
 │   │   ├── scriptoriumPptxImportService.js
 │   │   ├── senderTaskRegistry.js
+│   │   ├── sourceService.js
 │   │   ├── windowAppIds.js
+│   │   ├── windowPinService.js
 │   │   ├── windowService.js
-│   │   └── windowStateService.js
+│   │   ├── windowStateService.js
+│   │   ├── workspaceIndex.js
+│   │   └── workspacePromptPlaceholders.js
 │   ├── settings/
 │   │   ├── render/
 │   │   │   ├── canonical-row.js
@@ -363,13 +343,15 @@ VCPChat/
 │   │   │   ├── appearance-settings.js
 │   │   │   ├── jev-service.js
 │   │   │   ├── kernel.js
+│   │   │   ├── local-stt-panel.js
 │   │   │   ├── quick-actions.js
 │   │   │   ├── render-settings.js
 │   │   │   ├── selection-assistant.js
 │   │   │   ├── server-connection.js
 │   │   │   ├── sidebar-surfaces.js
 │   │   │   ├── user-identity.js
-│   │   │   └── voice-settings.js
+│   │   │   ├── voice-settings.js
+│   │   │   └── workspace-management.js
 │   │   ├── schema-surface.js
 │   │   ├── store.js
 │   │   └── value-semantics.js
@@ -457,7 +439,18 @@ VCPChat/
 │   │   ├── agentConfigManager.js
 │   │   └── appSettingsManager.js
 │   ├── voice/
-│   │   └── voice-input-engine-adapter.js
+│   │   ├── localStt/
+│   │   │   ├── localSttService.js
+│   │   │   ├── modelManager.js
+│   │   │   └── sttWorker.js
+│   │   ├── audioRecorder.js
+│   │   ├── chatVoiceComposer.js
+│   │   ├── passiveVoiceSentinel.js
+│   │   ├── speechDirectiveMatcher.js
+│   │   ├── voice-input-engine-adapter.js
+│   │   ├── voiceComposerView.js
+│   │   ├── voiceWaveform.js
+│   │   └── wavAudioEncoder.js
 │   ├── chatManager.js
 │   ├── contextSanitizer.js
 │   ├── emoticonManager.js
@@ -496,8 +489,14 @@ VCPChat/
 │   ├── music-stage/
 │   │   ├── modes/
 │   │   │   ├── cadenza-manager.js
+│   │   │   ├── diorama-camera.js
+│   │   │   ├── diorama-director.js
+│   │   │   ├── diorama-events.js
+│   │   │   ├── diorama-lyrics.js
 │   │   │   ├── diorama-manager.js
+│   │   │   ├── diorama-optics.js
 │   │   │   ├── diorama-stations.js
+│   │   │   ├── diorama-world.js
 │   │   │   ├── fume-manager.js
 │   │   │   ├── luminous-manager.js
 │   │   │   ├── partita-manager.js
@@ -510,7 +509,8 @@ VCPChat/
 │   │   │   ├── stage-mode-utils.js
 │   │   │   ├── stage-pixi-effects.js
 │   │   │   ├── tempera-manager.js
-│   │   │   └── tempera-pixi-core.js
+│   │   │   ├── tempera-pixi-core.js
+│   │   │   └── tunnel-manager.js
 │   │   ├── music-stage-advanced-modes.js
 │   │   ├── music-stage-config.js
 │   │   ├── music-stage-host.js
@@ -543,10 +543,43 @@ VCPChat/
 │   ├── plugin-manager.html
 │   └── plugin-manager.js
 ├── preloads/
-│   ├── shared/
-│   │   ├── apiFactory.js
-│   │   ├── catalog.js
-│   │   └── roles.js
+│   ├── api/
+│   │   ├── agents.js
+│   │   ├── askNova.js
+│   │   ├── assistant.js
+│   │   ├── canvas.js
+│   │   ├── chat.js
+│   │   ├── desktop.js
+│   │   ├── dice.js
+│   │   ├── embeddedApps.js
+│   │   ├── emoticons.js
+│   │   ├── files.js
+│   │   ├── flowlock.js
+│   │   ├── forum.js
+│   │   ├── groupChat.js
+│   │   ├── localStt.js
+│   │   ├── loom.js
+│   │   ├── memo.js
+│   │   ├── music.js
+│   │   ├── notes.js
+│   │   ├── plugins.js
+│   │   ├── projectForge.js
+│   │   ├── prompts.js
+│   │   ├── rag.js
+│   │   ├── settings.js
+│   │   ├── tavern.js
+│   │   ├── theme.js
+│   │   ├── vcpLog.js
+│   │   ├── voice.js
+│   │   ├── window.js
+│   │   └── workspaces.js
+│   ├── behaviors/
+│   │   ├── embeddedSurface.js
+│   │   └── pinButton.js
+│   ├── core/
+│   │   ├── define.js
+│   │   ├── expose.js
+│   │   └── registry.js
 │   ├── chart.js
 │   ├── chat.js
 │   ├── desktop.js
@@ -555,6 +588,13 @@ VCPChat/
 │   ├── loom.js
 │   ├── utility.js
 │   └── voice-input-capture.js
+├── ProjectForgemodules/
+│   ├── projectforge-git.js
+│   ├── projectforge-sidetabs.js
+│   ├── projectforge-source.js
+│   ├── projectforge.css
+│   ├── projectforge.html
+│   └── projectforge.js
 ├── Promptmodules/
 │   ├── modular-prompt-module.js
 │   ├── original-prompt-module.js
@@ -562,9 +602,9 @@ VCPChat/
 │   ├── prompt-manager.js
 │   └── prompt-modules.css
 ├── RAGmodules/
+│   ├── rag-observer-config.js
 │   ├── RAG_Observer.html
-│   ├── RAG_Overlay.html
-│   └── rag-observer-config.js
+│   └── RAG_Overlay.html
 ├── rust_assistant_engine/
 │   ├── runtime/
 │   │   └── assistant_core_server-Windows-X64/
@@ -578,6 +618,9 @@ VCPChat/
 ├── rust_audio_engine/
 │   └── build-runtime.js
 ├── rust_chat_data_service/
+│   └── build-runtime.js
+├── rust_projectforge_indexer/
+│   ├── bench.js
 │   └── build-runtime.js
 ├── rust_voice_input_engine/
 │   ├── runtime/
@@ -646,27 +689,27 @@ VCPChat/
 │   │   ├── settings-sidebar-list.css
 │   │   └── settings-sidebar-tabs.css
 │   ├── themes/
+│   │   ├── themesCodeIDE.css
+│   │   ├── themesEva.css
 │   │   ├── themes冰火魔歌.css
-│   │   ├── themes赤与白昼.css
-│   │   ├── themes瓷与锦.css
-│   │   ├── themes第一适格者.css
-│   │   ├── themes绯红天穹.css
-│   │   ├── themes黑白简约.css
-│   │   ├── themes极简Aero.css
-│   │   ├── themes静谧森岭.css
 │   │   ├── themes卡提西亚.css
-│   │   ├── themes霓虹咖啡.css
-│   │   ├── themes酸性玄武.css
-│   │   ├── themes童趣梦境.css
+│   │   ├── themes夜樱猫语.css
 │   │   ├── themes星咏与狼嗥.css
 │   │   ├── themes星渊雪境.css
-│   │   ├── themes熊熊假日.css
-│   │   ├── themes雪境晨昏.css
-│   │   ├── themes夜樱猫语.css
 │   │   ├── themes月影春信.css
+│   │   ├── themes极简Aero.css
+│   │   ├── themes熊熊假日.css
+│   │   ├── themes瓷与锦.css
+│   │   ├── themes童趣梦境.css
+│   │   ├── themes第一适格者.css
 │   │   ├── themes纸墨与机芯.css
-│   │   ├── themesCodeIDE.css
-│   │   └── themesEva.css
+│   │   ├── themes绯红天穹.css
+│   │   ├── themes赤与白昼.css
+│   │   ├── themes酸性玄武.css
+│   │   ├── themes雪境晨昏.css
+│   │   ├── themes霓虹咖啡.css
+│   │   ├── themes静谧森岭.css
+│   │   └── themes黑白简约.css
 │   ├── ui-system/
 │   │   ├── uiux-theme/
 │   │   │   ├── semantic.css
@@ -726,12 +769,15 @@ VCPChat/
 │   ├── creation-controller.test.js
 │   ├── deepmemo-central-adapter.test.js
 │   ├── desktop-living-icons.test.js
+│   ├── diorama-director.test.js
+│   ├── diorama-events.test.js
 │   ├── embedded-app-controller.test.js
 │   ├── embedded-app-security.test.js
 │   ├── emoticon-url-fixer.test.js
 │   ├── escape-dispatcher.test.js
 │   ├── flowlock-timestamp-bindings.test.js
 │   ├── frontend-plugins.test.js
+│   ├── git-service.test.js
 │   ├── global-jev-service.test.js
 │   ├── group-chat-queue-interrupt.test.js
 │   ├── group-context-window.test.js
@@ -741,6 +787,9 @@ VCPChat/
 │   ├── group-sequential-mode.test.js
 │   ├── history-watcher-lease-manager.test.js
 │   ├── input-enhancer-note-keyboard.test.js
+│   ├── input-enhancer-workspace-mention.test.js
+│   ├── jev-client.test.js
+│   ├── jev-tool-use-rendering.test.js
 │   ├── launchpad-controller.test.js
 │   ├── launchpad-icons.test.js
 │   ├── lifecycle-inspector.test.js
@@ -755,6 +804,7 @@ VCPChat/
 │   ├── main-chat-attachment-owner.test.js
 │   ├── main-chat-sequence-model.test.js
 │   ├── main-chat-stream-consumer.test.js
+│   ├── main-chat-voice-composer.test.js
 │   ├── message-edit-watcher-failure.test.js
 │   ├── message-regeneration-stream-animation.test.js
 │   ├── mobile-sync-canonical.test.js
@@ -767,12 +817,20 @@ VCPChat/
 │   ├── mobile-sync-sqlite-delete.test.js
 │   ├── mobile-sync-streaming.test.js
 │   ├── music-lyrics-auto-candidate.test.js
+│   ├── music-lyrics-race-regression.test.js
 │   ├── music-stage-lifecycle.test.js
 │   ├── notification-change-audit.test.js
 │   ├── notification-menu-controller.test.js
 │   ├── overlay-coordinator.test.js
 │   ├── performance-recorder.test.js
+│   ├── pixi-stage-scenes.test.js
 │   ├── powershell-window-ipc-isolation.test.js
+│   ├── preload-registry.test.js
+│   ├── project-forge-ast.test.js
+│   ├── project-forge-event-ipc.test.js
+│   ├── project-forge-robustness.test.js
+│   ├── project-forge-trace.test.js
+│   ├── project-forge.test.js
 │   ├── scriptorium-async.test.js
 │   ├── scriptorium-cdn-localization-electron.test.js
 │   ├── scriptorium-collaborator.test.js
@@ -797,6 +855,7 @@ VCPChat/
 │   ├── sender-task-registry.test.js
 │   ├── settlement.test.js
 │   ├── single-chat-request-orchestrator.test.js
+│   ├── source-service.test.js
 │   ├── startup-theme-gate.test.js
 │   ├── state-authority.test.js
 │   ├── state-channel.test.js
@@ -806,11 +865,17 @@ VCPChat/
 │   ├── tavern-rules-engine.test.js
 │   ├── theme-handlers.test.js
 │   ├── tool-request-scanner.test.js
+│   ├── tool-result-regions.test.js
 │   ├── topic-list-mode-lifecycle.test.js
 │   ├── ui-helper-chat-scroll-follow.test.js
 │   ├── ui-helpers-settings-close.test.js
+│   ├── voice-composer-interaction.test.js
 │   ├── voice-input-engine.test.js
-│   └── window-state-service.test.js
+│   ├── window-pin-service.test.js
+│   ├── window-state-service.test.js
+│   ├── workspace-index.test.js
+│   ├── workspace-live-reference.test.js
+│   └── workspace-prompt-placeholders.test.js
 ├── Themesmodules/
 │   ├── themes-module.css
 │   ├── themes.html
@@ -828,15 +893,23 @@ VCPChat/
 │   └── style.css
 ├── VCPDistributedServer/
 │   ├── Plugin/
+│   │   ├── BladeGame/
+│   │   │   ├── blade-electron.css
+│   │   │   ├── blade-electron.html
+│   │   │   ├── blade-electron.js
+│   │   │   ├── blade-preload.js
+│   │   │   └── blade-service.js
 │   │   ├── ChartController/
 │   │   │   └── ChartControllerService.js
 │   │   ├── ChatRoomViewer/
 │   │   │   └── ChatRoomViewer.js
 │   │   ├── CodeSearcher/
-│   │   │   └── CodeSearcher.exe
+│   │   │   ├── CodeSearcher-x86_64-pc-windows-msvc.exe
+│   │   │   ├── CodeSearcher.exe
+│   │   │   └── CodeSearcher.js
 │   │   ├── DeepMemo/
-│   │   │   ├── deepmemo_rust.exe
 │   │   │   ├── DeepMemo.js
+│   │   │   ├── deepmemo_rust.exe
 │   │   │   └── DeepMemoService.js
 │   │   ├── DesktopRemote/
 │   │   │   └── desktop-remote.js
@@ -858,13 +931,27 @@ VCPChat/
 │   │   │   ├── PowerShellExecutor.js
 │   │   │   ├── test_interactive_sequence.js
 │   │   │   └── test_security_check.js
+│   │   ├── ProjectForge/
+│   │   │   ├── args.js
+│   │   │   ├── engine.js
+│   │   │   ├── indexerClient.js
+│   │   │   ├── linkGraph.js
+│   │   │   ├── ProjectForgeService.js
+│   │   │   ├── store.js
+│   │   │   ├── symbolResolver.js
+│   │   │   ├── tickets.js
+│   │   │   └── workspace.js
 │   │   ├── PromptSponsor/
 │   │   │   ├── prompt-sponsor-service.js
 │   │   │   └── prompt-sponsor.js
 │   │   ├── PTYShellExecutor/
 │   │   │   ├── PluginErrorReporter.js
 │   │   │   ├── PTYShellExecutor.impl.js
-│   │   │   └── PTYShellExecutor.js
+│   │   │   ├── PTYShellExecutor.js
+│   │   │   ├── ShellOutputPipeline.js
+│   │   │   └── ShellThemeBridge.js
+│   │   ├── ScreenPilot/
+│   │   │   └── ScreenPilotService.js
 │   │   ├── ScriptoriumCollaborator/
 │   │   │   └── ScriptoriumCollaboratorService.js
 │   │   ├── TopicMemo/
@@ -895,15 +982,24 @@ VCPChat/
 │   │   │   └── plugin.js
 │   │   └── WindowSensor/
 │   │       └── sensor-wrapper.js
+│   ├── shared/
+│   │   └── fileKit/
+│   │       ├── diff.js
+│   │       ├── index.js
+│   │       ├── output.js
+│   │       ├── paths.js
+│   │       ├── reader.js
+│   │       ├── text.js
+│   │       └── validator.js
 │   ├── frontend-plugin-loader.js
 │   ├── Plugin.js
 │   └── VCPDistributedServer.js
 ├── VCPHumanToolBox/
 │   ├── ComfyUImodules/
-│   │   ├── ComfyUI_StateManager.js
-│   │   ├── ComfyUI_UIManager.js
 │   │   ├── comfyui-ipc.js
 │   │   ├── comfyui.css
+│   │   ├── ComfyUI_StateManager.js
+│   │   ├── ComfyUI_UIManager.js
 │   │   ├── comfyUIConfig.js
 │   │   ├── ComfyUILoader.js
 │   │   └── PathResolver.js
@@ -924,19 +1020,19 @@ VCPChat/
 │   │   ├── WorkflowEditor_ApiConfigDialog.js
 │   │   ├── WorkflowEditor_CanvasManager_JSPlumb.js
 │   │   ├── WorkflowEditor_Config.js
-│   │   ├── WorkflowEditor_ConnectionManager_Simplified.js
 │   │   ├── WorkflowEditor_ConnectionManager.js
+│   │   ├── WorkflowEditor_ConnectionManager_Simplified.js
 │   │   ├── WorkflowEditor_ExecutionEngine.js
-│   │   ├── WorkflowEditor_NodeManager_URLExtractor_Integration.js
-│   │   ├── WorkflowEditor_NodeManager_URLExtractor.js
-│   │   ├── WorkflowEditor_NodeManager_URLRenderer_Patch.js
 │   │   ├── WorkflowEditor_NodeManager.js
+│   │   ├── WorkflowEditor_NodeManager_URLExtractor.js
+│   │   ├── WorkflowEditor_NodeManager_URLExtractor_Integration.js
+│   │   ├── WorkflowEditor_NodeManager_URLRenderer_Patch.js
 │   │   ├── WorkflowEditor_PluginDialog.js
 │   │   ├── WorkflowEditor_PluginManager.js
 │   │   ├── WorkflowEditor_StateManager.js
 │   │   ├── WorkflowEditor_UIManager.js
-│   │   ├── WorkflowEditorLoader_Simplified.js
-│   │   └── WorkflowEditorLoader.js
+│   │   ├── WorkflowEditorLoader.js
+│   │   └── WorkflowEditorLoader_Simplified.js
 │   ├── index.html
 │   ├── main.js
 │   ├── preload.js
@@ -961,6 +1057,14 @@ VCPChat/
 └── test.html
 ```
 
-## 排除目录
+## 排除规则列表
 
-`__pycache__`、`.cache`、`.git`、`.idea`、`.next`、`.nuxt`、`.parcel-cache`、`.turbo`、`.venv`、`.vscode`、`bower_components`、`build`、`coverage`、`dist`、`env`、`node_modules`、`target`、`vendor`、`venv`
+<details>
+<summary>点击展开查看已排除的目录与文件规则</summary>
+
+- **默认跳过目录名称**：
+  `.astro`, `.cache`, `.docusaurus`, `.git`, `.gradle`, `.hg`, `.hypothesis`, `.idea`, `.ipynb_checkpoints`, `.m2`, `.mypy_cache`, `.next`, `.nox`, `.nuxt`, `.output`, `.parcel-cache`, `.pnpm-store`, `.pyre`, `.pytest_cache`, `.ruff_cache`, `.svelte-kit`, `.svn`, `.temp`, `.tmp`, `.tox`, `.turbo`, `.venv`, `.virtualenv`, `.vite`, `.vs`, `.vscode`, `.webpack`, `.yarn`, `__pycache__`, `appdata`, `arm64`, `bin`, `bower_components`, `build`, `carthage`, `coverage`, `data_cache`, `debug`, `dist`, `env`, `htmlcov`, `indexeddb`, `jspm_packages`, `local_storage`, `logs`, `node_modules`, `obj`, `out`, `output`, `packages`, `pip-wheel-metadata`, `pkg`, `pods`, `release`, `sessions`, `storybook-static`, `target`, `temp`, `tmp`, `user_data`, `userdata`, `vendor`, `venv`, `wheelhouse`, `x64`, `x86`
+- **默认通配符排除**：
+  `cmake-build-*`, `*.egg-info`, `*.dist-info`, `*.tmp`, `.DS_Store`, `Thumbs.db`, `desktop.ini`, `*.pyc`, `*.pyo`, `*.pyd`, `*.o`, `*.obj`, `*.class`, `*.tsbuildinfo`, `*.log`, `*.tmp`, `*.temp`, `*.swp`, `*.swo`, `*.bak`, `*~`, `*.suo`, `*.user`
+- **.gitignore 生效规则**：共 54 条规则已并入跳过逻辑
+</details>

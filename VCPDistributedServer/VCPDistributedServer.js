@@ -45,6 +45,7 @@ function isLoopbackAddress(address) {
 class DistributedServer {
     constructor(config = {}) {
         this.mainServerUrl = config.mainServerUrl;
+        this.nativeConversationWebSocket = config.nativeConversationWebSocket === true;
         this.vcpKey = config.vcpKey;
         this.serverName = config.serverName || 'Unnamed-Distributed-Server';
         this.port = config.port || 0; // 0 表示随机选择一个可用端口
@@ -60,6 +61,7 @@ class DistributedServer {
         this.scriptoriumAgentControl = config.scriptoriumAgentControl || null;
         this.pluginAgentOperationService = config.pluginAgentOperationService || null;
         this.chartService = config.chartService || null;
+        this.gameService = config.gameService || null;
         this.workspaceService = config.workspaceService || null; // 工作区只读门面（白名单来源）
         this.ws = null;
         this.app = express(); // 创建 Express 应用
@@ -83,6 +85,7 @@ class DistributedServer {
         this.reconnectTimeoutId = null; // To keep track of the reconnect timeout
         this.stopped = false; // Flag to prevent reconnection when stopped manually
         this.stopPromise = null;
+        this.initializePromise = null;
         this.initialConnection = true; // Flag to handle one-time actions on first connect
         this.staticPlaceholderUpdateInterval = null; // 新增：静态占位符更新定时器
         this.musicPlaylistWatcher = null;
@@ -117,7 +120,15 @@ class DistributedServer {
         }
     }
 
-    async initialize() {
+    initialize() {
+        if (!this.initializePromise) {
+            this.initializePromise = this.initializeInBackground();
+        }
+        return this.initializePromise;
+    }
+
+    async initializeInBackground() {
+        if (this.stopped) return;
         console.log(`[${this.serverName}] Initializing...`);
 
         // Load server-specific config
@@ -140,7 +151,9 @@ class DistributedServer {
         // The base path should be relative to this file's location.
         const basePath = path.dirname(require.resolve('./VCPDistributedServer.js'));
         pluginManager.setProjectBasePath(basePath);
-        await pluginManager.loadPlugins();
+        const startupOptions = { shouldStop: () => this.stopped };
+        await pluginManager.loadPlugins(startupOptions);
+        if (this.stopped) return;
 
         // 初始化服务类插件，并将主进程持有的共享服务依赖注入 direct 模块。
         await pluginManager.initializeServices(this.app, null, basePath, {
@@ -149,11 +162,14 @@ class DistributedServer {
             scriptoriumAgentControl: this.scriptoriumAgentControl,
             pluginAgentOperationService: this.pluginAgentOperationService,
             chartService: this.chartService,
+            gameService: this.gameService,
             workspaceService: this.workspaceService,
-        });
+        }, startupOptions);
+        if (this.stopped) return;
         this.registerDiagnosticRoutes();
 
-        const address = await this.bindHttpServer(this.port);
+        await this.bindHttpServer(this.port);
+        if (this.stopped) return;
             this.port = this.server.address().port; // 获取实际监听的端口
             console.log(`[${this.serverName}] HTTP server listening on 0.0.0.0:${this.port}`);
 
@@ -272,8 +288,12 @@ class DistributedServer {
             return;
         }
 
+        if (this.nativeConversationWebSocket && !require('../modules/services/trustedConversation/webSocket.cjs').isSecureNativeWebSocketUrl(this.mainServerUrl.replace(/^http/, 'ws'))) {
+            console.error('[DistributedServer] NATIVE_SECURE_CHANNEL_REQUIRED');
+            return;
+        }
         const connectionUrl = `${this.mainServerUrl.replace(/^http/, 'ws')}/vcp-distributed-server/VCP_Key=${this.vcpKey}`;
-        console.log(`[${this.serverName}] Attempting to connect to main server at ${connectionUrl}`);
+        console.log('[DistributedServer] Connecting to configured main server.');
 
         // this.ws 现在是一个纯粹的客户端实例
         this.ws = new WebSocket(connectionUrl);
@@ -304,7 +324,7 @@ class DistributedServer {
         });
 
         this.ws.on('error', (error) => {
-            console.error(`[${this.serverName}] WebSocket client error:`, error.message);
+            console.error('[DistributedServer] WEBSOCKET_CLIENT_ERROR');
             // 'close' 事件会自动被触发，所以这里不需要额外的处理
         });
     }
@@ -886,8 +906,14 @@ class DistributedServer {
         }
 
         console.log(`[${this.serverName}] Stopping server...`);
-        this.stopPromise = Promise.resolve().then(async () => {
+        // 立即取消后续启动阶段；等待正在执行的初始化后再释放插件资源。
         this.stopped = true;
+        this.stopPromise = Promise.resolve().then(async () => {
+        if (this.initializePromise) {
+            await this.initializePromise.catch(error => {
+                console.warn(`[${this.serverName}] Initialization ended during shutdown:`, error.message);
+            });
+        }
         
         // 新增：清理静态占位符更新定时器
         this.clearStaticPlaceholderUpdates();
@@ -898,8 +924,8 @@ class DistributedServer {
             this.reconnectTimeoutId = null;
         }
         
-        // 新增：关闭插件管理器 - 使用异步方式，但不等待结果
-        pluginManager.shutdownAllPlugins().catch(err => {
+        // 等待服务资源释放，避免 Electron 退出时留下尚未完成的清理。
+        await pluginManager.shutdownAllPlugins().catch(err => {
             console.error(`[${this.serverName}] Error during plugin shutdown:`, err);
         });
         

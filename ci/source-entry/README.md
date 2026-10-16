@@ -142,3 +142,36 @@ locked ProjectForge Rust build inputs. Both package and Chat profiles admit
 the source-verified Windows indexer at its pinned identity; generated Linux
 binaries and config.env are excluded. Run manifest refresh tests after staging:
 the maintainer checks intentionally audit the Git index, not unstaged files.
+
+## October 16 Side Pane CI admission
+
+The frozen author frame for this candidate is
+`3cde846645bab109dfb3b635a43287e63e2ed294`. The workspace accepted-upstream
+anchor is separate and is not advanced by this source candidate. The existing
+four control modules, held paths, denied object identities and ordinary-alias
+rules remain unchanged. Current profile sizes and exact native identities are
+authoritative in `projection_manifest.json`, not the historical counts above.
+
+The Linux Side Pane Electron smoke reuses the package-smoke profile and the
+reviewed inline bootstrap. Its original command remains blocking on pull
+requests; a failed smoke is not converted into a successful warning-only job.
+
+The Windows Side Pane job first admits its chat-kernel-ui projection on Linux.
+The POSIX-only source writer is not ported, bypassed or weakened. A separate
+same-run CI handoff serializes only the already-admitted file bytes plus their
+source context. The receiving Windows job checks the producer's envelope
+SHA-256 and an independently pinned helper SHA-256 before executing the helper.
+The helper then verifies repository, event commit, run ID, run attempt, exact
+file set, sizes, SHA-256 and Git object identities before creating fresh scratch
+output. It refuses duplicate, extra, missing, traversing, case-colliding and
+Windows-special paths, and publishes source paths only after complete placement.
+It has no network, repository/archive checkout or failure fallback. The artifact
+is scoped to this workflow run and attempt; no cross-run download is accepted.
+This is CI source transfer, not installation or deployment.
+
+All six inline manifest pins (Chat, three Mobile, two Side Pane) must be refreshed
+together. Changes to `ci_projection_handoff.py` also require updating its exact
+SHA-256 in the Windows workflow. Controller tests and local Linux-to-Windows
+transfer checks do not substitute for the actual hosted Windows PTY tests or
+real Electron smoke result. Read-only workflow permissions and the existing
+deployment/release flow are unchanged.

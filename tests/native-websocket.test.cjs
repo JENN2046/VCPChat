@@ -17,3 +17,5 @@ test('WS failure never falls back to the separately configured HTTP path',async(
  let httpCalls=0;const t=createNativeTransport({binding:{transport:'vcp-websocket',clientInstanceId,toolboxUrl:'http://127.0.0.1:1',transportTokenEnv:'KEY',toolName:'Example',applicationAuthorizationEnv:'OWNER'},env:{OWNER:'Bearer '+'x'.repeat(40),KEY:'synthetic'},fetchImpl:async()=>{httpCalls++;throw Error('unexpected HTTP');},nativeRequest:async()=>{throw Error('NATIVE_RESULT_UNKNOWN');}});
  await assert.rejects(t.request('execute',{sourceId:'synthetic'}),/NATIVE_RESULT_UNKNOWN/);assert.equal(httpCalls,0);
 });
+
+test('disconnect immediately retires the epoch; a late old close cannot retire a replacement',()=>{const c=createNativeWebSocketClient(),old=socket(),next=socket();c.bind(old);const before=c.epoch();old.emit('close');assert.ok(c.epoch()>before);c.bind(next);const current=c.epoch();old.emit('close');assert.equal(c.epoch(),current);c.close(next);});

@@ -1,8 +1,9 @@
 'use strict';
 const {randomUUID}=require('node:crypto');
+function isSecureNativeWebSocketUrl(value){try{const u=new URL(value);return !u.username&&!u.password&&!u.hash&&(u.protocol==='wss:'||(u.protocol==='ws:'&&['127.0.0.1','[::1]'].includes(u.hostname)));}catch{return false;}}
 function createNativeWebSocketClient({timeoutMs=25000}={}){
  const pending=new Map();let socket=null,epoch=0;
- function close(ws){if(ws!==socket)return;socket=null;for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('NATIVE_TRANSPORT_UNAVAILABLE'));}pending.clear();}
+ function close(ws){if(ws!==socket)return;socket=null;epoch++;for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('NATIVE_TRANSPORT_UNAVAILABLE'));}pending.clear();}
  function bind(ws){if(socket)close(socket);socket=ws;epoch++;ws.once('close',()=>close(ws));}
  function receive(ws,message){
   if(message?.type!=='native_conversation_response')return false;
@@ -14,8 +15,7 @@ function createNativeWebSocketClient({timeoutMs=25000}={}){
  function request({toolName,authorization,body,clientInstanceId}){
   if(!/^[a-f0-9-]{36}$/.test(clientInstanceId||''))return Promise.reject(Error('NATIVE_CLIENT_BINDING_REQUIRED'));
   const ws=socket;if(!ws||ws.readyState!==1)return Promise.reject(Error('NATIVE_TRANSPORT_UNAVAILABLE'));
-  let target;try{target=new URL(ws.url);}catch{return Promise.reject(Error('NATIVE_SECURE_CHANNEL_REQUIRED'));}
-  if(target.protocol!=='wss:'&&!(target.protocol==='ws:'&&['127.0.0.1','[::1]'].includes(target.hostname)))return Promise.reject(Error('NATIVE_SECURE_CHANNEL_REQUIRED'));
+  if(!isSecureNativeWebSocketUrl(ws.url))return Promise.reject(Error('NATIVE_SECURE_CHANNEL_REQUIRED'));
   if(pending.size>=16)return Promise.reject(Error('NATIVE_REQUEST_BUSY'));
   const requestId=randomUUID();
   return new Promise((resolve,reject)=>{
@@ -27,4 +27,4 @@ function createNativeWebSocketClient({timeoutMs=25000}={}){
  }
  return {bind,receive,request,close,epoch:()=>epoch};
 }
-module.exports={createNativeWebSocketClient};
+module.exports={createNativeWebSocketClient,isSecureNativeWebSocketUrl};

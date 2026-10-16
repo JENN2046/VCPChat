@@ -1,6 +1,7 @@
 import { presentNativeProposal } from './nativeConversationPresentation.js';
 // modules/renderer/streamManager.js
 import { formatMessageTimestamp } from './domBuilder.js';
+import { prepareChatMediaHtml, cleanupChatMedia } from './mediaLifecycle.js';
 import { createContentPipeline, PIPELINE_MODES } from './contentPipeline.js';
 import { createContentRuntime } from '../chat/contentRuntime.js';
 import { createDesktopPushConsumer } from './desktopPushConsumer.js';
@@ -434,6 +435,7 @@ function ensureStreamingRoots(contentDiv) {
     let tailRoot = contentDiv.querySelector('.vcp-stream-tail-root');
 
     if (!stableRoot || !tailRoot) {
+        cleanupChatMedia(contentDiv);
         contentDiv.innerHTML = '';
         stableRoot = ownerDocument().createElement('div');
         stableRoot.className = 'vcp-stream-stable-root';
@@ -560,6 +562,7 @@ function appendNewStableRange(stableBlocksRoot, segmentState, textForRendering, 
 
     // 如果外部状态异常回退，宁可重置追加缓存，也不要产生重叠 block。
     if (segmentState.stableRenderedCutoff > nextStableCutoff) {
+        cleanupChatMedia(stableBlocksRoot);
         stableBlocksRoot.textContent = '';
         resetStableBlockState(segmentState);
     }
@@ -594,6 +597,7 @@ function restoreStableBlocksForRecreatedDom(stableBlocksRoot, segmentState, opti
     if (recordsAreMountedHere) return false;
 
     // 当前 root 属于新视图。先一次性清空，避免历史批量渲染与首个流式帧交错时留下半恢复结构。
+    cleanupChatMedia(stableBlocksRoot);
     stableBlocksRoot.replaceChildren();
 
     for (const record of segmentState.stableBlocks) {
@@ -738,9 +742,11 @@ function findParagraphStableCutoff(text, floorOffset) {
     let searchIndex = Math.max(0, floorOffset);
 
     while (searchIndex < text.length) {
-        const boundaryIndex = text.indexOf('\n\n', searchIndex);
-        if (boundaryIndex === -1) break;
-        const cutoff = boundaryIndex + 2;
+        const boundary = /\r?\n[ \t]*\r?\n/g;
+        boundary.lastIndex = searchIndex;
+        const match = boundary.exec(text);
+        if (!match) break;
+        const cutoff = match.index + match[0].length;
         if (cutoff > floorOffset) {
             recentBoundaries.push(cutoff);
             if (recentBoundaries.length > retainedBoundaryCount) recentBoundaries.shift();
@@ -973,6 +979,10 @@ function findBareDivIslandStableCutoff(text, startOffset = 0, codeDomains = []) 
             continue;
         }
 
+        if (!/^<(?:[a-zA-Z][a-zA-Z0-9:-]*(?:\s|\/?>|$)|\/[a-zA-Z]|!)/.test(text.slice(tagStart))) {
+            index = tagStart + 1;
+            continue;
+        }
         const token = parseHtmlTagToken(text, tagStart);
         if (token.type === 'incomplete') {
             return { cutoff, blocked: true };
@@ -1037,6 +1047,22 @@ function findRoleDividerSectionEnd(text, startIndex, toolResultRanges = null) {
 }
 
 function findExplicitStablePrefix(text, startOffset = 0) {
+    // 仅稳定区判定信任此独立行：VCP 用它宣布本轮工具回执已经结束。
+    // 必须先于工具结果/代码/HTML 扫描，载荷里的不配对字面量不能阻止封口。
+    // 这不是工具结果配对或安全隔离规则；完整渲染仍使用原来的数据域扫描器。
+    // 流式 EOF 尚不能证明独立行，等待 LF（兼容 CRLF）确认右边界。
+    const trustedEndLine = /^[ \t]*<<<\[END_ROLE_DIVIDE_USER\]>>>[ \t]*\r?\n/gm;
+    trustedEndLine.lastIndex = Math.max(0, startOffset);
+    let trustedCutoff = 0;
+    let trustedMatch;
+    while ((trustedMatch = trustedEndLine.exec(text)) !== null) {
+        trustedCutoff = trustedMatch.index + trustedMatch[0].length;
+    }
+    if (trustedCutoff > startOffset) {
+        // 已封口源码不再参与本次后续结构扫描；只检查封口之后的新 tail。
+        return trustedCutoff + findExplicitStablePrefix(text.slice(trustedCutoff), 0);
+    }
+
     let index = Math.max(0, startOffset);
     let stableCutoff = startOffset;
     let paragraphFloor = startOffset;
@@ -1061,6 +1087,18 @@ function findExplicitStablePrefix(text, startOffset = 0) {
         ) {
             codeDomainIndex += 1;
         }
+        // HTML islands own all inner delimiters, including Markdown-looking text.
+        if (text[index] === '<' && /^<div(?:\s|>)/i.test(text.slice(index)) && isBareDivIslandLineStart(text, index)) {
+            const island = scanBareDivIslandEnd(text, index);
+            if (island.end < 0) {
+                blockedByUnclosedExplicitBlock = true;
+                break;
+            }
+            stableCutoff = island.end;
+            paragraphFloor = island.end;
+            index = island.end;
+            continue;
+        }
         const codeDomain = codeDomains[codeDomainIndex];
         if (codeDomain && index >= codeDomain.start && index < codeDomain.end) {
             if (!codeDomain.closed) {
@@ -1070,6 +1108,10 @@ function findExplicitStablePrefix(text, startOffset = 0) {
                 break;
             }
             if (codeDomain.kind === 'fence') {
+                if (codeDomain.end === text.length && !text.endsWith('\n')) {
+                    blockedByUnclosedExplicitBlock = true;
+                    break;
+                }
                 stableCutoff = Math.max(stableCutoff, codeDomain.end);
                 paragraphFloor = Math.max(paragraphFloor, codeDomain.end);
             }
@@ -1092,7 +1134,7 @@ function findExplicitStablePrefix(text, startOffset = 0) {
 
         if (startsWithAt(text, index, '$$') && isLineOnlyToken(text, index, 2)) {
             const mathEnd = findDisplayMathBlockEnd(text, index, '$$');
-            if (mathEnd === -1) {
+            if (mathEnd === -1 || (mathEnd === text.length && !text.endsWith('\n'))) {
                 blockedByUnclosedExplicitBlock = true;
                 break;
             }
@@ -1104,7 +1146,7 @@ function findExplicitStablePrefix(text, startOffset = 0) {
 
         if (startsWithAt(text, index, '\\[') && isLineOnlyToken(text, index, 2)) {
             const mathEnd = findDisplayMathBlockEnd(text, index, '\\[', '\\]');
-            if (mathEnd === -1) {
+            if (mathEnd === -1 || (mathEnd === text.length && !text.endsWith('\n'))) {
                 blockedByUnclosedExplicitBlock = true;
                 break;
             }
@@ -1201,7 +1243,7 @@ function findExplicitStablePrefix(text, startOffset = 0) {
         }
 
         if (startsWithAt(text, index, MARKDOWN_SECTION_BREAK_TOKEN)) {
-            if (isLineOnlyToken(text, index, MARKDOWN_SECTION_BREAK_TOKEN.length)) {
+            if (isLineOnlyToken(text, index, MARKDOWN_SECTION_BREAK_TOKEN.length) && text.indexOf('\n', index) !== -1) {
                 // 独立行 Markdown 文档分段符 --- 可作为稳定切点；
                 // 目前只处理严格的 ---，暂不扩展到 ***/___ 或带空格变体。
                 stableCutoff = index + MARKDOWN_SECTION_BREAK_TOKEN.length;
@@ -1228,7 +1270,8 @@ function findExplicitStablePrefix(text, startOffset = 0) {
     }
 
     if (blockedByUnclosedExplicitBlock) {
-        return stableCutoff;
+        // The unfinished tail cannot revoke already complete paragraphs before it.
+        return Math.max(stableCutoff, findParagraphStableCutoff(text.slice(0, index), paragraphFloor));
     }
 
     const divIslandResult = findBareDivIslandStableCutoff(text, paragraphFloor, codeDomains);
@@ -1615,6 +1658,7 @@ function renderStreamFrame(messageId) {
     if (textForRendering.trim() === '') {
         let thinkingIndicator = contentDiv.querySelector('.thinking-indicator');
         if (!thinkingIndicator) {
+            cleanupChatMedia(contentDiv);
             contentDiv.replaceChildren();
             thinkingIndicator = ownerDocument().createElement('span');
             thinkingIndicator.className = 'thinking-indicator';
@@ -1682,7 +1726,7 @@ function renderStreamFrame(messageId) {
             { injectStyles: false }
         )
         : tailText;
-    const rawHtml = parseStreamTail(renderTailText);
+    const rawHtml = prepareChatMediaHtml(parseStreamTail(renderTailText), ownerDocument());
 
     if (refs.morphdom) {
         try {
@@ -1795,6 +1839,7 @@ function renderStreamFrame(messageId) {
                 if (node.classList?.contains('keep-alive')) {
                     return false;
                 }
+                cleanupChatMedia(node);
                 return true;
             },
 
@@ -1828,10 +1873,12 @@ function renderStreamFrame(messageId) {
             // 而工具请求后端可能长时间等待回执，不会继续产生可触发重绘的新文本。
             // 直接使用同一份已经过流式隔离/HTML 封印的 rawHtml 重建 tail，
             // 保证首块为 TOOL_REQUEST 时不会保持空白直到导航或终态。
+            cleanupChatMedia(tailRoot);
             tailRoot.innerHTML = rawHtml;
             console.debug('[StreamManager] morphdom rejected a stream frame; replaced the sealed tail directly.', error);
         }
     } else {
+        cleanupChatMedia(tailRoot);
         tailRoot.innerHTML = rawHtml;
     }
 
@@ -2595,7 +2642,8 @@ async function projectStreamTerminalInternal(messageId, finishReason, context, f
 
             const contentDiv = messageItem.querySelector('.md-content');
             if (contentDiv) {
-                contentDiv.querySelectorAll('.vcp-stream-stable-root, .vcp-stream-tail-root').forEach((el) => el.remove());
+                // Keep the old subtree reachable until the replacement's cleanup runs.
+                cleanupChatMedia(contentDiv);
 
                 const preparedFinal = typeof refs.prepareFinalTextForRender === 'function'
                     ? refs.prepareFinalTextForRender(messageId, finalFullText, message.role || 'assistant', historyForThisMessage)

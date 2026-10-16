@@ -1541,31 +1541,31 @@
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 67,
+        "line": 79,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[0]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 85,
+        "line": 99,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[1]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 86,
+        "line": 100,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[2]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 100,
+        "line": 116,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[3]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-        "line": 101,
+        "line": 117,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[4]"
       }

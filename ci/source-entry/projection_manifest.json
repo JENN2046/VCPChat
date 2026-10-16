@@ -25135,6 +25135,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/run-all-tests.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "827ac22eb58916fe3c9fbdd82b8d54361eb79cee",
+          "size": 3339,
+          "sha256": "dc1b621e28a5d0130fc88d09ed1aa5e4af450f58a88495c1c3f8cec5e2a74956",
+          "kind": "source"
+        },
+        {
           "path": "scripts/run-chat-contract-invariants.mjs",
           "mode": "100644",
           "type": "blob",
@@ -25240,6 +25249,15 @@
           "blob": "bf4abd010be153ffd593677ffa5e29c82dbba62a",
           "size": 2602,
           "sha256": "767d31167e7fbd36f25400e616c761064443863d80a3fed49f3c2f1b52e9ecfd",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-dedicated-preload-electron.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c872de464e1dc57f1a3604e47496f256f9129033",
+          "size": 2070,
+          "sha256": "2e056bc2abf7d8baa48bc82c4a6dc1cba3e5d16825143b17ef4fcb77bbf14d9b",
           "kind": "source"
         },
         {
@@ -26950,6 +26968,24 @@
           "blob": "367e4858df8ca50a429baa3c75c0fbe4bcf30efc",
           "size": 4768,
           "sha256": "5eeeea9353fe36781d0eb2352befdafffa5f8959fa9d8619215b84056d6593ba",
+          "kind": "source"
+        },
+        {
+          "path": "tests/helpers/dedicated-preload-electron.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aed21dd612df27fb786b51fa4ec0f149e04a69a7",
+          "size": 5235,
+          "sha256": "306c3eab172309729ca0208400cbc35245ec7fac56d0abca0922f531f19e0394",
+          "kind": "source"
+        },
+        {
+          "path": "tests/helpers/electron-test-main.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ae13729f56087b60318d50f9ee50d6feb13bf2ef",
+          "size": 669,
+          "sha256": "c81f074d4d38ebf47291459f689bfd11fedd379933b90842cffa8b43c4433c2f",
           "kind": "source"
         },
         {
@@ -30417,10 +30453,12 @@
             "scripts/check-ui-system.mjs",
             "scripts/check-ui-task-journeys.mjs",
             "scripts/check-vcpui-consumers.mjs",
+            "scripts/run-all-tests.mjs",
             "scripts/run-chat-contract-invariants.mjs",
             "scripts/test-appearance-engine.mjs",
             "scripts/test-appearance-studio.mjs",
             "scripts/test-chat-contract-invalid.mjs",
+            "scripts/test-dedicated-preload-electron.mjs",
             "scripts/test-next-ui-tab-lifecycle.mjs",
             "scripts/test-page-runtime.mjs",
             "scripts/test-ui-motion-contract.mjs",

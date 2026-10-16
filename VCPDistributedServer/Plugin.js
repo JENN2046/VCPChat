@@ -51,13 +51,16 @@ class PluginManager {
         this.staticPluginSkipLogAt = new Map(); // 限制跳过日志频率，避免唤醒风暴刷屏
         this.projectBasePath = null;
         this.serverPort = null; // 新增：用于构造回调 URL
+        this.callbackHost = '127.0.0.1';
         this.debugMode = (process.env.DebugMode || "False").toLowerCase() === "true";
         this.staticPluginMinIntervalMs = parseInt(process.env.STATIC_PLUGIN_MIN_INTERVAL_MS || '10000', 10);
         this.staticPluginMaxScheduleDelayMs = parseInt(process.env.STATIC_PLUGIN_MAX_SCHEDULE_DELAY_MS || '60000', 10);
     }
 
-    setServerPort(port) {
+    setServerPort(port, address = '127.0.0.1') {
         this.serverPort = port;
+        const host = address === '0.0.0.0' ? '127.0.0.1' : address === '::' ? '::1' : address;
+        this.callbackHost = host.includes(':') ? `[${host}]` : host;
     }
 
     setProjectBasePath(basePath) {
@@ -226,7 +229,7 @@ class PluginManager {
         const isAsyncPlugin = plugin.pluginType === 'asynchronous';
         if (isAsyncPlugin) {
             if (this.serverPort) {
-                envForProcess.CALLBACK_BASE_URL = `http://127.0.0.1:${this.serverPort}/plugin/callback`;
+                envForProcess.CALLBACK_BASE_URL = `http://${this.callbackHost}:${this.serverPort}/plugin/callback`;
             }
             envForProcess.PLUGIN_NAME_FOR_CALLBACK = pluginName;
         }

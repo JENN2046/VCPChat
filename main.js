@@ -535,6 +535,7 @@ function startDistributedServerAfterRenderer() {
                 console.warn('[Main] Native conversation configuration unavailable; native WS disabled.');
             }
             server = new DistributedServer({
+                configPath: app.isPackaged ? path.join(app.getPath('userData'), 'VCPDistributedServer', 'config.env') : undefined,
                 mainServerUrl: settings.vcpLogUrl,
                 nativeConversationWebSocket,
                 vcpKey: settings.vcpLogKey,

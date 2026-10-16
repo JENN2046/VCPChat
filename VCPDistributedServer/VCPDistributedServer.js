@@ -50,6 +50,7 @@ class DistributedServer {
         this.vcpKey = config.vcpKey;
         this.serverName = config.serverName || 'Unnamed-Distributed-Server';
         this.bindAddress = '0.0.0.0';
+        this.configPath = config.configPath || path.join(__dirname, 'config.env');
         this.port = config.port || 0; // 0 表示随机选择一个可用端口
         this.debugMode = config.debugMode || false;
         this.rendererProcess = config.rendererProcess; // To communicate with the renderer
@@ -98,7 +99,7 @@ class DistributedServer {
     loadServerConfig() {
         let configuredBindAddress;
         // Load server-specific config
-        const serverConfigPath = path.join(__dirname, 'config.env');
+        const serverConfigPath = this.configPath;
         try {
             {
                 const serverEnv = dotenv.parse(fsSync.readFileSync(serverConfigPath));
@@ -116,7 +117,7 @@ class DistributedServer {
         }
 
         if (configuredBindAddress !== undefined) {
-            if (!isIP(configuredBindAddress)) {
+            if (!isIP(configuredBindAddress) || configuredBindAddress.includes('%')) {
                 throw new Error('DIST_SERVER_BIND_ADDRESS must be an IPv4 or IPv6 literal');
             }
             this.bindAddress = configuredBindAddress;
@@ -189,7 +190,7 @@ class DistributedServer {
             console.log(`[${this.serverName}] HTTP server listening on ${this.bindAddress}:${this.port}`);
 
             // 注入端口到插件管理器，用于构造回调 URL
-            pluginManager.setServerPort(this.port);
+            pluginManager.setServerPort(this.port, this.server.address().address);
 
             // 注册异步插件回调接口
             this.app.post('/plugin/callback', (req, res) => {

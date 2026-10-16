@@ -81,7 +81,8 @@ const allowedSourceDifferences = new Set([
     'scripts/lib/window-package-contract.cjs',
     'scripts/test-packaged-window-renderers.cjs',
     'tests/window-package-contract.test.mjs',
-    // Reviewed optional distributed bind address documentation and regression.
+    // Reviewed optional distributed bind address and matching async callbacks.
+    'VCPDistributedServer/Plugin.js',
     'docs/distributed-bind-address.md',
     'tests/distributed-bind-address.test.cjs',
     // PR #60 reviewed opt-in native WS transport, fixture and focused regressions.

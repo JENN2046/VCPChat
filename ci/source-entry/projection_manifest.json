@@ -11887,9 +11887,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "bb002ad50174e37f58e88754769eb581508c717c",
-          "size": 37840,
-          "sha256": "ac4d6c8006c54c24fc118ac440c1380702f32f957af56f9dea4fd017a2d0c676",
+          "blob": "5b3699dc8e25766ef22e07fb5ba9d7f09faa6e95",
+          "size": 38169,
+          "sha256": "830b96ef2a70a04fff63c9e53633e3c8d314966ff1da8e2c67c3a2b87f37f214",
           "kind": "source"
         },
         {
@@ -12052,6 +12052,15 @@
           "blob": "cc1122c2a17368b2b019beaf10823643c2d2bbbe",
           "size": 1953,
           "sha256": "8579cacdb9b48e29fe215f789cdd51c1a1213f19b9301857f5980e48521e93d6",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/smoke-side-pane-e2e.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "940914d67761150ebab687fedf9b552de9ac7e75",
+          "size": 31474,
+          "sha256": "0d20b22054579078f72435a78a77f02b4ad650a00db2d43da6b9cd992d3fc8fb",
           "kind": "source"
         },
         {
@@ -13768,9 +13777,9 @@
           "path": "tests/stream-manager-terminal-cleanup.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0d67efecaa66dae715737983fcbed29b717b53a5",
-          "size": 38406,
-          "sha256": "cd0d6818254e54a2455237b83b000386d12ecc02add1838cad40efcb2f079f54",
+          "blob": "efe721078bfe8d5d1c8753b751c9f329d10341a9",
+          "size": 38823,
+          "sha256": "be1990b55e236c86be4e8398859a4f5879cf66561a3a66ea1529298777c7f764",
           "kind": "source"
         },
         {
@@ -15703,6 +15712,12 @@
           ]
         },
         {
+          "name": "reviewed-side-pane-e2e-inputs",
+          "files": [
+            "scripts/smoke-side-pane-e2e.mjs"
+          ]
+        },
+        {
           "name": "reviewed-exact-auxiliary-window-package-inputs",
           "files": [
             "Agenttaskmodules/task.css",
@@ -15896,7 +15911,17 @@
             "style.css"
           ]
         }
-      ]
+      ],
+      "source_context": {
+        "source": {
+          "commit": "b02741fc5198659855eb892f55c220371167352b",
+          "tree": "dccf74d99cf206a75d57695108bbd57e9d6d7dd9"
+        },
+        "upstream": {
+          "commit": "3cde846645bab109dfb3b635a43287e63e2ed294",
+          "tree": "66c4a2991ecffbc1cda4b3cb35753a9419743a23"
+        }
+      }
     },
     "chat-kernel-ui": {
       "ready": true,
@@ -18951,6 +18976,24 @@
           "blob": "ab5cbe956e3f6abc9ca5cca29af4e1a1364fc0cc",
           "size": 4637,
           "sha256": "6a278071a7c687fa03485ba04dfe23eee61b31d3cfa7e75545ca3c7dda046291",
+          "kind": "source"
+        },
+        {
+          "path": "ci/source-entry/ci_projection_handoff.py",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e567bacd0289453744a5c7db643137fddb02e17b",
+          "size": 8154,
+          "sha256": "f712fcdf24ae90aaa85d6dd21995226e86fd3d29c43775aaa33f7a4459eb55fa",
+          "kind": "source"
+        },
+        {
+          "path": "ci/source-entry/tests/test_ci_projection_handoff.py",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "15e2f343df3f2e9cc8f8cb22ca91da836acae33f",
+          "size": 6632,
+          "sha256": "83d0ddcd57d97b87177484cfb64d165a279283f10d41b0e017581fd40cdcd73e",
           "kind": "source"
         },
         {
@@ -24600,9 +24643,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "bb002ad50174e37f58e88754769eb581508c717c",
-          "size": 37840,
-          "sha256": "ac4d6c8006c54c24fc118ac440c1380702f32f957af56f9dea4fd017a2d0c676",
+          "blob": "5b3699dc8e25766ef22e07fb5ba9d7f09faa6e95",
+          "size": 38169,
+          "sha256": "830b96ef2a70a04fff63c9e53633e3c8d314966ff1da8e2c67c3a2b87f37f214",
           "kind": "source"
         },
         {
@@ -28128,9 +28171,9 @@
           "path": "tests/stream-manager-terminal-cleanup.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0d67efecaa66dae715737983fcbed29b717b53a5",
-          "size": 38406,
-          "sha256": "cd0d6818254e54a2455237b83b000386d12ecc02add1838cad40efcb2f079f54",
+          "blob": "efe721078bfe8d5d1c8753b751c9f329d10341a9",
+          "size": 38823,
+          "sha256": "be1990b55e236c86be4e8398859a4f5879cf66561a3a66ea1529298777c7f764",
           "kind": "source"
         },
         {
@@ -29902,6 +29945,8 @@
             "assets/default_group_avatar.png",
             "assets/default_user_avatar.png",
             "assets/iconset/VChatOfficial/vchat_main.png",
+            "ci/source-entry/ci_projection_handoff.py",
+            "ci/source-entry/tests/test_ci_projection_handoff.py",
             "scripts/check-chat-evidence.mjs",
             "scripts/check-classic-parity.mjs",
             "scripts/check-classic-retirement-boundary.mjs",

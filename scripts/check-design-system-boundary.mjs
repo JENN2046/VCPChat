@@ -47,6 +47,11 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Same-run CI projection transfer preserves the Linux-only source writer.
+    '.github/workflows/side_pane_e2e.yml',
+    '.github/workflows/side_pane_windows.yml',
+    'ci/source-entry/ci_projection_handoff.py',
+    'ci/source-entry/tests/test_ci_projection_handoff.py',
     // Frozen 3cde8466 update: source-rebuilt native artifacts and the bounded
     // CodeSearcher include-filter correction, not directory-wide exemptions.
     'VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher-x86_64-pc-windows-msvc.exe',
@@ -69,6 +74,7 @@ const allowedSourceDifferences = new Set([
     'tests/terminal-command-run-watch.test.js',
     'tests/terminal-package-closure.test.js',
     'tests/music-capsule.test.cjs',
+    'tests/stream-manager-terminal-cleanup.test.js',
     'tests/music-capsule-layout.test.cjs',
     // Exact auxiliary-window package contract and isolated artifact acceptance.
     'scripts/fixtures/window-package-resources.json',

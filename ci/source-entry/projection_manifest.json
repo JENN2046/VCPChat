@@ -11941,9 +11941,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "33dbdd8008ffbc30949500de4b6362990f715294",
-          "size": 39112,
-          "sha256": "b2d3107473ab81427b911c1aeb7978ead9dfe6f1d9b9dd1e072656354d3811f7",
+          "blob": "fe8a6161c91dcd9684bd389b28ad4a649b5e0286",
+          "size": 39279,
+          "sha256": "d46c669e1997f3579c2410c0d832e0bbf7583035fb9de0ee4e196323c2f8783e",
           "kind": "source"
         },
         {
@@ -25007,9 +25007,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "33dbdd8008ffbc30949500de4b6362990f715294",
-          "size": 39112,
-          "sha256": "b2d3107473ab81427b911c1aeb7978ead9dfe6f1d9b9dd1e072656354d3811f7",
+          "blob": "fe8a6161c91dcd9684bd389b28ad4a649b5e0286",
+          "size": 39279,
+          "sha256": "d46c669e1997f3579c2410c0d832e0bbf7583035fb9de0ee4e196323c2f8783e",
           "kind": "source"
         },
         {

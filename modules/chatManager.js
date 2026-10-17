@@ -1480,8 +1480,11 @@ export const chatManager = (() => {
             try { nativeResult = await electronAPI.prepareNativeConversation({text:content,conversationId:`${currentSelectedItem.id}:${currentTopicId}`}); }
             catch { nativeResult={handled:true,ok:false,code:'NATIVE_TRANSPORT_UNAVAILABLE'}; }
         }
-        if (nativeResult?.handled && ['NATIVE_SOURCE_REQUIRED', 'NATIVE_CONFIGURATION_UNAVAILABLE', 'NATIVE_CONNECTION_CHANGED'].includes(nativeResult.code) && nativeResult.preserveInput) {
-            uiHelper.showToastNotification(nativeResult.message, 'warning');
+        // Prepare cannot dispatch the business operation. Stop before history/draft
+        // consumption on rejection; leave the current input and attachments untouched.
+        // Execute failures below keep their existing unknown-result/recovery semantics.
+        if (nativeResult?.handled && nativeResult.ok === false) {
+            uiHelper.showToastNotification(nativeResult.message || `尚未发送：${nativeResult.code || '预检失败'}。草稿已保留，请检查连接后手动重试。`, 'warning');
             return { handled: true, ok: false, code: nativeResult.code };
         }
         if (!nativeResult?.handled && !globalSettings.vcpServerUrl) {

@@ -12,23 +12,32 @@ Workbench H0. The recovery evidence participates in the preview snapshot, and
 the decision rereads and verifies the complete terms digest. No credential,
 allowlist, Core authorization, or ToolBox approval bypass is introduced.
 
-Base: VCPChat 28a1c85ad5b8cdf28fc4ac9c80223122ab9e9617 (local runtime source).
-The separately fetched JENN2046/VCPChat main currently resolves to 39e074fb;
-therefore this patch has not been pushed as a main-target PR or deployed.
-The active runtime has unrelated changes and was not modified.
+Current base: JENN2046/VCPChat default branch `NuobaoVCPchat` at
+`5af217ad99091e673060c2540ebf8db5bda69223` (checked 2026-10-19).
+The fork default branch is not `main`; `main` is a historical branch.
+The original patch was prepared against local HEAD `28a1c85a`. The current
+remote default branch has 51 additional commits, while this authorization
+service and its existing authorization test are unchanged across those bases.
+The patch was carried into a separate clean worktree on the current base.
+The active runtime directory has extensive unrelated uncommitted updates and
+was not changed. This work has not been pushed, merged, or installed there.
 
-Validation:
-- node --test tests/suvei-human-authorization.test.js: 59 passed.
-- notification-change-audit.test.js: 18 passed, using the existing local
-  runtime node_modules through NODE_PATH (initial clean worktree lacked jsdom).
-- git diff --check passed.
-- A read-only comparison against the current C receipt confirmed that legacy
-  terms mismatch and the recovery-aware Core terms match. No receipt or secret
-  is included in this patch.
+Current-base validation:
+- node --test tests/suvei-human-authorization.test.js
+  tests/notification-change-audit.test.js: 77 passed, zero failures.
+- Existing local runtime node_modules was resolved through NODE_PATH for jsdom;
+  this is a source regression check, not a clean dependency-install check.
+- git diff --check against the current remote base passed.
+- The earlier read-only comparison against the October 8 C receipt confirmed
+  that legacy terms mismatch and recovery-aware Core terms match. That is
+  historical evidence; no fresh production receipt or execution was read or
+  performed during this October 19 compatibility check.
+- No receipt, credential, or secret is included in this patch.
 
 Deployment remains pending: verify the running desktop build/source, back up
 its existing service module, install this narrowly scoped module change only
 if the base matches, and restart VCPChat through the user's normal lifecycle.
 Rollback restores the previous service module and restarts the client. Do not
-resend until the client is updated; check C's canonical state and H0 expiry first.
+resend until the client is updated; check C's canonical state first. The October 8 H0 has expired, so any new
+execution requires a fresh applicable Owner H0.
 No provider execution or new H0 was performed as part of this fix.

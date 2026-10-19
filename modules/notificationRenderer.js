@@ -474,6 +474,20 @@ function formatSuveiAuthorityPacket(packet) {
             `修正指令: ${intent.editInstruction || '—'}`
         );
     }
+    if (intent.recoveryContext) {
+        lines.push(
+            '',
+            '已提交的 Workbench 双风险 H0（继续执行会沿用这些条款）',
+            `接受旧结果未决及潜在重复生成／计费风险: ${authorization.acceptUnresolvedPriorOutcome === true}`,
+            `接受 B 上游结果未核实及上游重试数量未知风险: ${authorization.acceptUnverifiedContinuationOutcome === true}`,
+            'A 结果未知，原预留和槽位保留。B 本地结算不证明上游未创建任务。',
+            'A/B/C 均可能重复生成或计费；C 是最后一次单图调用，无自动重试。',
+            'A+B+C 最多 3 次 Core 调用；上游内部重试数量未知，不能承诺最多 3 个上游任务。',
+            'B 的额外风险占用不会因 C 完成或超时自动释放。内部单位不是货币上限，真实货币报价未知。',
+            '完整恢复证据（与授权摘要绑定）:',
+            JSON.stringify(intent.recoveryContext, null, 2)
+        );
+    }
     lines.push(
         '',
         '授权上限（本次批准绑定以下 exact terms）',

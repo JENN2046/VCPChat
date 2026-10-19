@@ -1133,6 +1133,9 @@ test('Workbench dual-risk H0 reconciles without a second authorization POST', as
     const p = await h.service.prepare(recoveryApproval('risk-reconcile'));
     assert.equal(p.decisionMode, 'reconcile_authorized');
     assert.deepEqual(p.intent.recoveryContext, h.getIntent().recoveryContext);
+    assert.deepEqual(p.authorization.recoveryContext, h.getIntent().recoveryContext);
+    assert.equal(p.authorization.acceptUnresolvedPriorOutcome, true);
+    assert.equal(p.authorization.acceptUnverifiedContinuationOutcome, true);
     assert.equal(p.expectedAuthorizationTermsDigest, h.getIntent().authorizationTermsDigest);
     const result = await h.service.decide({ requestId: 'risk-reconcile', approved: true });
     assert.equal(result.proposalState, 'AUTHORIZED');

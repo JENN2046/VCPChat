@@ -20,11 +20,11 @@ remote default branch has 51 additional commits, while this authorization
 service and its existing authorization test are unchanged across those bases.
 The patch was carried into a separate clean worktree on the current base.
 The active runtime directory has extensive unrelated uncommitted updates and
-was not changed. This work has not been pushed, merged, or installed there.
+was not changed. Delivery is tracked in PR #64 against NuobaoVCPchat. It has not been installed there.
 
 Current-base validation:
 - node --test tests/suvei-human-authorization.test.js
-  tests/notification-change-audit.test.js: 77 passed, zero failures.
+  tests/notification-change-audit.test.js: 78 passed, zero failures.
 - Existing local runtime node_modules was resolved through NODE_PATH for jsdom;
   this is a source regression check, not a clean dependency-install check.
 - git diff --check against the current remote base passed.
@@ -33,6 +33,10 @@ Current-base validation:
   historical evidence; no fresh production receipt or execution was read or
   performed during this October 19 compatibility check.
 - No receipt, credential, or secret is included in this patch.
+- Review follow-up: expose both committed risk acceptance flags and the full
+  bound recovery snapshot in the authorization preview and review modal. The
+  modal explains duplicate generation/cost, unknown upstream retry count,
+  retained exposure, the final Core call, and the absence of a currency cap.
 
 Deployment remains pending: verify the running desktop build/source, back up
 its existing service module, install this narrowly scoped module change only

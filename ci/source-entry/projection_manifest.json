@@ -7661,9 +7661,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "aec1f1021b3fa1ae690209a20823ce62132af974",
-          "size": 93403,
-          "sha256": "305018dd844046e4d99efa3172680d3166592d24bc967c6d11e570fb4d0a78c6",
+          "blob": "d83b4c4563955cadd63461ab6119a87adcf27f42",
+          "size": 94447,
+          "sha256": "90746a54b24790f5c4785da811f663b523397da66545c00a9474b2deaa42828a",
           "kind": "source"
         },
         {
@@ -8634,9 +8634,9 @@
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ea08d48f0a3bcada53b238d67058a6d5dbcf6f00",
-          "size": 48376,
-          "sha256": "a6011f0fd38acf0e2e9359069e817fff8cf4f8838b90d9721b5d2792ce141d81",
+          "blob": "ae059411bf5090d905f95bf28e3c4161da872f10",
+          "size": 48547,
+          "sha256": "25f848781e09d561d4f6f7cf4f6dba9038987da02f803f55edb764d777406160",
           "kind": "source"
         },
         {
@@ -12085,9 +12085,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "baae5304158bec81a27848fd23c54337136d444a",
-          "size": 13649,
-          "sha256": "7ff02c0fdef03cccfcaf2baba4b1304ce74be8970d93f4f1fd38d5e6991a112b",
+          "blob": "6f6e1aa2c7d0d6ba7494c1d8f9b1d721605d0c02",
+          "size": 13806,
+          "sha256": "6c9635ccc3e362f1d6516d4cdc7f667f99309a3543c3d7d56a4525db18e3e382",
           "kind": "source"
         },
         {
@@ -13705,9 +13705,9 @@
           "path": "tests/notification-change-audit.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "40fa4609bee6aa83e745166b86b37d34e8377106",
-          "size": 45025,
-          "sha256": "48ab7650914985a52fa5d2cf87df57b6b96b99d9480ef615b1d1ff44270a9a4a",
+          "blob": "1cf5fd762b74fe68b401ad1c6676927f3e90565a",
+          "size": 49766,
+          "sha256": "99765bbe8b8b0ac6a1010bbd41a9dde430e191e4e9c6fac285eb2d67107c9fd0",
           "kind": "source"
         },
         {
@@ -13921,9 +13921,9 @@
           "path": "tests/suvei-human-authorization.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9248a4f2ce03ad1a00b03f2cc41205862caf4f28",
-          "size": 57024,
-          "sha256": "8811439adac6037c61776288e61eac255008eca36b2f75c1dfa0022df48e8e0c",
+          "blob": "14efe9d17add4ead4b9ea26b7ae5ff6dbce74573",
+          "size": 57257,
+          "sha256": "0fc03f4fa3a4f7929f69bf2aedde991ad78a7d1a680b67b18bbbd479a05a89ad",
           "kind": "source"
         },
         {
@@ -21011,9 +21011,9 @@
           "path": "modules/notificationRenderer.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "aec1f1021b3fa1ae690209a20823ce62132af974",
-          "size": 93403,
-          "sha256": "305018dd844046e4d99efa3172680d3166592d24bc967c6d11e570fb4d0a78c6",
+          "blob": "d83b4c4563955cadd63461ab6119a87adcf27f42",
+          "size": 94447,
+          "sha256": "90746a54b24790f5c4785da811f663b523397da66545c00a9474b2deaa42828a",
           "kind": "source"
         },
         {
@@ -21965,9 +21965,9 @@
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ea08d48f0a3bcada53b238d67058a6d5dbcf6f00",
-          "size": 48376,
-          "sha256": "a6011f0fd38acf0e2e9359069e817fff8cf4f8838b90d9721b5d2792ce141d81",
+          "blob": "ae059411bf5090d905f95bf28e3c4161da872f10",
+          "size": 48547,
+          "sha256": "25f848781e09d561d4f6f7cf4f6dba9038987da02f803f55edb764d777406160",
           "kind": "source"
         },
         {
@@ -25187,9 +25187,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "baae5304158bec81a27848fd23c54337136d444a",
-          "size": 13649,
-          "sha256": "7ff02c0fdef03cccfcaf2baba4b1304ce74be8970d93f4f1fd38d5e6991a112b",
+          "blob": "6f6e1aa2c7d0d6ba7494c1d8f9b1d721605d0c02",
+          "size": 13806,
+          "sha256": "6c9635ccc3e362f1d6516d4cdc7f667f99309a3543c3d7d56a4525db18e3e382",
           "kind": "source"
         },
         {
@@ -27590,9 +27590,9 @@
           "path": "tests/notification-change-audit.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "40fa4609bee6aa83e745166b86b37d34e8377106",
-          "size": 45025,
-          "sha256": "48ab7650914985a52fa5d2cf87df57b6b96b99d9480ef615b1d1ff44270a9a4a",
+          "blob": "1cf5fd762b74fe68b401ad1c6676927f3e90565a",
+          "size": 49766,
+          "sha256": "99765bbe8b8b0ac6a1010bbd41a9dde430e191e4e9c6fac285eb2d67107c9fd0",
           "kind": "source"
         },
         {
@@ -28697,9 +28697,9 @@
           "path": "tests/suvei-human-authorization.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9248a4f2ce03ad1a00b03f2cc41205862caf4f28",
-          "size": 57024,
-          "sha256": "8811439adac6037c61776288e61eac255008eca36b2f75c1dfa0022df48e8e0c",
+          "blob": "14efe9d17add4ead4b9ea26b7ae5ff6dbce74573",
+          "size": 57257,
+          "sha256": "0fc03f4fa3a4f7929f69bf2aedde991ad78a7d1a680b67b18bbbd479a05a89ad",
           "kind": "source"
         },
         {

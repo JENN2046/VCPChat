@@ -567,6 +567,9 @@ class SuveiHumanAuthorizationService {
             maxWallClockMs: MAX_WALL_CLOCK_MS,
             maxAdapterCallsPerAttempt: 1,
         });
+        if (committedAuthorization && intent.recoveryContext != null) {
+            Object.assign(authorization, committedRecoveryTerms(intent, authorization));
+        }
         const expectedAuthorizationTermsDigest = rejectionReconciliation
             ? null
             : authorizationTermsDigest(intent, this.identity.userId, authorization);

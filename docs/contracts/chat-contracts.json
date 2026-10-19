@@ -1584,7 +1584,7 @@
     "dynamicSites": [
       {
         "file": "modules/notificationRenderer.js",
-        "line": 1639,
+        "line": 1653,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }

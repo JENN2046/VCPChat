@@ -19418,18 +19418,18 @@
           "path": "docs/contracts/chat-contracts.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "ab5875ffbec0e185c326e2cee6c95442820b6c9c",
+          "blob": "ea1f7b3198bb7d954021df3e651db201f78a2099",
           "size": 63241,
-          "sha256": "09265cad25317a4919e530de926c9338b556fbbe1dd7bfceebbe2aedaf2b956c",
+          "sha256": "8a49dfa561f3a9ec9e9c67924b516f00b1009d38b1afa9b5c4f5dbbfeaa74507",
           "kind": "source"
         },
         {
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6eb85958f9d7307bdfb0d0cf108230cc357dc857",
+          "blob": "b9e35e04ff4cb89301ac15cb56449b7932d2a50c",
           "size": 980698,
-          "sha256": "305a11529fbff5abfc2e5b5a105f31e865027a622ed61589730f885157101cd4",
+          "sha256": "81c4d959d79f821f369f53ce8ec2ab866f3e855e884c7a3e0a1c9cf28751eab5",
           "kind": "source"
         },
         {

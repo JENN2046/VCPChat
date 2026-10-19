@@ -4102,7 +4102,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1282,
+          "line": 1296,
           "kind": "custom-event-listener"
         },
         {
@@ -5635,7 +5635,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1282,
+          "line": 1296,
           "kind": "custom-event-listener",
           "match": "reasonInput.addEventListener('click'"
         },
@@ -8022,7 +8022,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 911,
+          "line": 925,
           "kind": "custom-event-listener"
         },
         {
@@ -8166,7 +8166,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 911,
+          "line": 925,
           "kind": "custom-event-listener",
           "match": "element.addEventListener('contextmenu'"
         },
@@ -13258,7 +13258,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1699,
+          "line": 1713,
           "kind": "custom-event-listener"
         },
         {
@@ -13318,7 +13318,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1699,
+          "line": 1713,
           "kind": "custom-event-listener",
           "match": "window.addEventListener('focus'"
         },
@@ -16127,12 +16127,12 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 912,
+          "line": 926,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1283,
+          "line": 1297,
           "kind": "custom-event-listener"
         },
         {
@@ -16505,13 +16505,13 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 912,
+          "line": 926,
           "kind": "custom-event-listener",
           "match": "element.addEventListener('keydown'"
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1283,
+          "line": 1297,
           "kind": "custom-event-listener",
           "match": "reasonInput.addEventListener('keydown'"
         },
@@ -30854,7 +30854,7 @@
       "consumers": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1456,
+          "line": 1470,
           "kind": "custom-event-listener"
         },
         {
@@ -30876,7 +30876,7 @@
       "evidence": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1456,
+          "line": 1470,
           "kind": "custom-event-listener",
           "match": "toastElement.addEventListener('transitionend'"
         },
@@ -34788,7 +34788,7 @@
     },
     {
       "file": "modules/notificationRenderer.js",
-      "line": 1639,
+      "line": 1653,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",

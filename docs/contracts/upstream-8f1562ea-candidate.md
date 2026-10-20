@@ -48,7 +48,7 @@ equality is not claimed or required.
 
 ProjectForge: 39 source tests, protocol v3 readiness/ping, JavaScript outline,
 PowerShell geometry, malformed-Rust error reporting and invalid-input rejection.
-Audio: 428 source tests plus a passing doc test; actual rebuilt executable tested
+Audio: 429 source tests plus a passing doc test; actual rebuilt executable tested
 on a random loopback port with synthetic settings/database in a new temporary
 directory, including settings save, cold restart persistence and invalid bit
 depth rejection. No supplier calls, real configuration or hardware playback.
@@ -75,6 +75,18 @@ Regressions cover both transitions, no redundant FIR rebuild, enabled legacy FIR
 explicit disable, new-install defaults, invalid/duplicate controls and saved
 round trips. The delivered Windows audio aliases are rebuilt again after these
 source fixes, not repinned to the previous executable.
+
+A second exact-head review identified two additional reproducible P2s. Applying
+saved settings now unloads mounted FIR whenever EQ is disabled or IIR is
+selected, before applying the desired state. A source regression checks all
+four enabled/type combinations without opening devices or media; the actual
+loopback server also verifies that saving disabled FIR takes effect immediately,
+without a second `/set_eq` request or restart.
+
+Tool-marker diagnostics now trust only the caller's parsed top-level JEV flag.
+Raw request text cannot promote a missing-tool-name request to JEV. Regressions
+retain legitimate declared JEV and malformed-marker diagnostics while rejecting
+JEV literals nested inside regular or ESCAPE parameter values.
 
 ## Compatibility and limits
 

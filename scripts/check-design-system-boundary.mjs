@@ -57,6 +57,11 @@ const allowedSourceDifferences = new Set([
     // retain the old enabled-FIR meaning only for files without the new flag.
     'Musicmodules/music-effects.js',
     'rust_audio_engine/src/settings.rs',
+    // Save-time EQ state must unmount stale FIR; JEV identity comes only from
+    // the parsed declared field, never from an ordinary parameter's payload.
+    'rust_audio_engine/src/server.rs',
+    'modules/renderer/toolRequestMarkers.js',
+    'tests/tool-request-malformed-marker.test.mjs',
     'audio_engine/audio_server.exe',
     'audio_engine/audio_server_rubato_dsp.exe',
     // Same-run CI projection transfer preserves the Linux-only source writer.

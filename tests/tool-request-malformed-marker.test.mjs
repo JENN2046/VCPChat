@@ -4,6 +4,8 @@ import {
     findMalformedToolFields,
     describeToolRequestMarkerProblem,
 } from '../modules/renderer/toolRequestMarkers.js';
+import { readToolRequestField } from '../modules/renderer/toolRequestScanner.js';
+import { parseJevToolUse } from '../modules/renderer/jevToolUse.js';
 
 const S = '「' + '始」';
 const E = '「' + '末」';
@@ -137,7 +139,7 @@ test('does not treat normal JEV tool request as malformed (natural language call
     assert.equal(problem.hint, '');
 });
 
-test('auto-detects JEV tool request from content when isJev flag is omitted', () => {
+test('unparsed content cannot assert JEV identity when the parsed flag is omitted', () => {
     const content = [
         `maid:${S}Nova${E}`,
         `JEV:${S}联络[Grok]，告诉他【npm 上 animejs 最新版本是多少？】，并使用[临时通讯]。${E}`
@@ -152,6 +154,37 @@ test('auto-detects JEV tool request from content when isJev flag is omitted', ()
         content
     });
 
+    assert.equal(problem.isMalformed, true);
+    assert.equal(problem.displayName, '格式错误');
+    assert.match(problem.hint, /未识别 tool_name/);
+});
+
+test('JEV literals inside regular or ESCAPE parameter values do not hide a missing tool name', () => {
+    for (const [start, end] of [[S, E], [S_ESC, E_ESC]]) {
+        const content = `content:${start}Example JEV:${S}not a declared field${end}`;
+        const jev = parseJevToolUse(readToolRequestField(content, 'JEV'));
+        assert.equal(jev, null);
+        const problem = describeToolRequestMarkerProblem({
+            toolName: readToolRequestField(content, 'tool_name') || '',
+            malformedFields: findMalformedToolFields(content),
+            isJev: Boolean(jev),
+            content,
+        });
+        assert.equal(problem.isMalformed, true);
+        assert.equal(problem.displayName, '格式错误');
+        assert.match(problem.hint, /未识别 tool_name/);
+    }
+});
+
+test('a parsed top-level JEV field retains its valid presentation', () => {
+    const content = `content:${S_ESC}Example JEV:${S}data only${E_ESC}\nJEV:${S}联络[Grok]${E}`;
+    const jev = parseJevToolUse(readToolRequestField(content, 'JEV'));
+    assert.ok(jev);
+    const problem = describeToolRequestMarkerProblem({
+        isJev: Boolean(jev),
+        malformedFields: findMalformedToolFields(content),
+        content,
+    });
     assert.equal(problem.isMalformed, false);
     assert.equal(problem.displayName, '');
     assert.equal(problem.hint, '');

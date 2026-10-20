@@ -373,8 +373,8 @@ class ManifestRefreshTests(unittest.TestCase):
                 })
             reviewed_rebuilds = {
                 "audio_engine/audio_server.exe":
-                    ("21bad92865e3461a80bef061f9b06bdf0208e18f", 10052096,
-                     "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e"),
+                    ("65bb928faf39c3043e9357b3dfd0a744201c7f21", 10052096,
+                     "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72"),
                 "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
                     ("7a981c416b8fc7449469014e0e2f5551a36f35ab", 258560,
                      "db57bd214dd0a5b34ff7522acabc9cfc7479fecde9e6a3d4d42409214de43223"),

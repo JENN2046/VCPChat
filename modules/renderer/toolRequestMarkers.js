@@ -29,16 +29,14 @@ export function findMalformedToolFields(content) {
 
 /**
  * 根据解析出的工具名和损坏字段列表，描述工具调用标记的问题
- * @param {{ toolName?: string, malformedFields?: string[], isJev?: boolean, content?: string }} params
+ * @param {{ toolName?: string, malformedFields?: string[], isJev?: boolean }} params
  * @returns {{ isMalformed: boolean, displayName: string, hint: string }}
  */
-export function describeToolRequestMarkerProblem({ toolName = '', malformedFields = [], isJev = false, content = '' } = {}) {
+export function describeToolRequestMarkerProblem({ toolName = '', malformedFields = [], isJev = false } = {}) {
     const rawName = typeof toolName === 'string' ? toolName.trim() : '';
     const fields = Array.isArray(malformedFields) ? malformedFields : [];
-    const effectiveIsJev = Boolean(
-        isJev ||
-        (typeof content === 'string' && /(?:^|[\s,;])JEV\s*:\s*[「{]始/i.test(content))
-    );
+    // The caller parses declared fields. Payload examples are not JEV identity.
+    const effectiveIsJev = Boolean(isJev);
     const isMalformed = effectiveIsJev ? fields.length > 0 : (!rawName || fields.length > 0);
 
     let displayName = rawName;

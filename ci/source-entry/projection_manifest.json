@@ -6028,9 +6028,9 @@
           "path": "audio_engine/audio_server.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
           "size": 10052096,
-          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
+          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6058,9 +6058,9 @@
           "path": "audio_engine/audio_server_rubato_dsp.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
           "size": 10052096,
-          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
+          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6213,9 +6213,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "67349895cc5cc08e4bb1afb0fb3c4baf45ce8a75",
-          "size": 36089,
-          "sha256": "930ae32b5fd67cd0ecc9837a99c50d08569b0817721c170614569dc861c4c1f8",
+          "blob": "6884d4ae22e8e5ac133a3ec900a0db53cbf4b4f0",
+          "size": 36189,
+          "sha256": "0bc635a27fccc6f1e5bfc49dfefddba35e7f7c89d69da0e18de1b8e1920de727",
           "kind": "source"
         },
         {
@@ -8310,9 +8310,9 @@
           "path": "modules/renderer/toolRequestMarkers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "210c5569c22661376618bf0d92f6c449a6f0810f",
-          "size": 2946,
-          "sha256": "6f87aad6bc656a02b8e01e14ad3ce11da71ee95bf8bda7ba46e46e9cf7ff367e",
+          "blob": "cffb0d83252947985ad94b69336ccbec59038ac0",
+          "size": 2888,
+          "sha256": "c4d12f68b5a115914d55ffc48439c334cc159c895e6159046a7204db6a2b8b43",
           "kind": "source"
         },
         {
@@ -11987,9 +11987,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a9a473b03d4e0a9d053afd848cfcc5ea4e4e8559",
-          "size": 40025,
-          "sha256": "3eca4c94c3b706080123c2955058263cae5f4ca7661c00c0d93bd16c2c34d9f0",
+          "blob": "c511a342e35ff0aeb244d5628b2c6b99b2640630",
+          "size": 40319,
+          "sha256": "94f2121292a3aa53c4434e262a2cd597ca43866bd8cadbefa83d3da812725978",
           "kind": "source"
         },
         {
@@ -15610,9 +15610,9 @@
           "path": "audio_engine/audio_server.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
           "size": 10052096,
-          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
+          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
           "kind": "static-native",
           "format": "PE"
         },
@@ -15640,9 +15640,9 @@
           "path": "audio_engine/audio_server_rubato_dsp.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
           "size": 10052096,
-          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
+          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
           "kind": "static-native",
           "format": "PE"
         },
@@ -19581,9 +19581,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "67349895cc5cc08e4bb1afb0fb3c4baf45ce8a75",
-          "size": 36089,
-          "sha256": "930ae32b5fd67cd0ecc9837a99c50d08569b0817721c170614569dc861c4c1f8",
+          "blob": "6884d4ae22e8e5ac133a3ec900a0db53cbf4b4f0",
+          "size": 36189,
+          "sha256": "0bc635a27fccc6f1e5bfc49dfefddba35e7f7c89d69da0e18de1b8e1920de727",
           "kind": "source"
         },
         {
@@ -21714,9 +21714,9 @@
           "path": "modules/renderer/toolRequestMarkers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "210c5569c22661376618bf0d92f6c449a6f0810f",
-          "size": 2946,
-          "sha256": "6f87aad6bc656a02b8e01e14ad3ce11da71ee95bf8bda7ba46e46e9cf7ff367e",
+          "blob": "cffb0d83252947985ad94b69336ccbec59038ac0",
+          "size": 2888,
+          "sha256": "c4d12f68b5a115914d55ffc48439c334cc159c895e6159046a7204db6a2b8b43",
           "kind": "source"
         },
         {
@@ -25071,9 +25071,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a9a473b03d4e0a9d053afd848cfcc5ea4e4e8559",
-          "size": 40025,
-          "sha256": "3eca4c94c3b706080123c2955058263cae5f4ca7661c00c0d93bd16c2c34d9f0",
+          "blob": "c511a342e35ff0aeb244d5628b2c6b99b2640630",
+          "size": 40319,
+          "sha256": "94f2121292a3aa53c4434e262a2cd597ca43866bd8cadbefa83d3da812725978",
           "kind": "source"
         },
         {
@@ -28851,9 +28851,9 @@
           "path": "tests/tool-request-malformed-marker.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "33e156642627073abaf3a2475db18d8dcec5d609",
-          "size": 6783,
-          "sha256": "57f1c6a293cf539cbb47327d5031383b778c382c3e646f243aba8679b9bc65ef",
+          "blob": "19680cb5da7cce5fdf84f0def5bb7fac2aac91af",
+          "size": 8363,
+          "sha256": "94c82eced3db60095c8e330e13e59259e1e5d12bd1c651594a5c94ff0733d5b6",
           "kind": "source"
         },
         {

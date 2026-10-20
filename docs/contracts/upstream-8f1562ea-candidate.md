@@ -102,6 +102,15 @@ Regression coverage executes only that fixed synthetic builtin in a clean child
 environment and rejects non-synthetic input. No product terminal code, CI authority,
 timeouts, cleanup or other E2E assertions are relaxed.
 
+EQ submission is now serialized from a captured type/taps/bands/toggle snapshot.
+An in-flight FIR type change is not rebuilt by queued slider events, and older
+type completions cannot overwrite newer synchronization markers. Markers advance
+only after type success; both rejected requests and the actual IPC `status:error`
+response leave retries usable. A failed band update does not rebuild an already
+successful type or persist a false success. Four new mock regressions failed on
+the previous source before this bounded frontend correction; native source and
+artifacts are unchanged by it.
+
 ## Compatibility and limits
 
 Public backend source at `35ec1f7c` accepts the retained `memory_ab`, `k` and

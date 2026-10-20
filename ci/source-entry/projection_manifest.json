@@ -1651,9 +1651,9 @@
           "path": "Musicmodules/music-effects.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "50da1c5f8cd9e90b0cfd9d87307e7354065d7b7c",
-          "size": 9296,
-          "sha256": "326f74efc9b52516799af5aee35967c54084e8e267668409f89802028941a4f3",
+          "blob": "ea4f67d10a46bb05714cfd8a41ca8abf998540e3",
+          "size": 9743,
+          "sha256": "70b7d294dcd960b2addbbabf5ad2055193fb35b46414d6816bd89fcfa33b3a92",
           "kind": "source"
         },
         {
@@ -12104,9 +12104,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6d46b6b3c952b18abb88089204aba80a0f600685",
+          "blob": "2f3f24204d5934cf526d2bb69b5cb859be55aa8a",
           "size": 27398,
-          "sha256": "5d0fa32797a7d5126954d3eb7e16a12a9f43b96d46a7ff2694e1e56fd8c05f21",
+          "sha256": "2461b161d6a4007004952c98a3dfe1fc7303f529d6b5713db0750b4eea4125d8",
           "kind": "source"
         },
         {
@@ -13634,9 +13634,9 @@
           "path": "tests/music-capsule.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "6edad9a2c2b0743f2fe4f6719a7edebf17814bc0",
-          "size": 7952,
-          "sha256": "6e4c5c2cbae368c75bc3bfa360a1420c6d23837b0c124ea1624ed978be212180",
+          "blob": "d47b331237d9f90737a0607d5f7a1dc0ee53d66e",
+          "size": 11640,
+          "sha256": "cc7f540f0d2331ff78d5b0e8264af401c323fd0d9ff291e6898c534f15edcfe8",
           "kind": "source"
         },
         {
@@ -17084,9 +17084,9 @@
           "path": "Musicmodules/music-effects.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "50da1c5f8cd9e90b0cfd9d87307e7354065d7b7c",
-          "size": 9296,
-          "sha256": "326f74efc9b52516799af5aee35967c54084e8e267668409f89802028941a4f3",
+          "blob": "ea4f67d10a46bb05714cfd8a41ca8abf998540e3",
+          "size": 9743,
+          "sha256": "70b7d294dcd960b2addbbabf5ad2055193fb35b46414d6816bd89fcfa33b3a92",
           "kind": "source"
         },
         {
@@ -25239,9 +25239,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6d46b6b3c952b18abb88089204aba80a0f600685",
+          "blob": "2f3f24204d5934cf526d2bb69b5cb859be55aa8a",
           "size": 27398,
-          "sha256": "5d0fa32797a7d5126954d3eb7e16a12a9f43b96d46a7ff2694e1e56fd8c05f21",
+          "sha256": "2461b161d6a4007004952c98a3dfe1fc7303f529d6b5713db0750b4eea4125d8",
           "kind": "source"
         },
         {
@@ -27525,9 +27525,9 @@
           "path": "tests/music-capsule.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "6edad9a2c2b0743f2fe4f6719a7edebf17814bc0",
-          "size": 7952,
-          "sha256": "6e4c5c2cbae368c75bc3bfa360a1420c6d23837b0c124ea1624ed978be212180",
+          "blob": "d47b331237d9f90737a0607d5f7a1dc0ee53d66e",
+          "size": 11640,
+          "sha256": "cc7f540f0d2331ff78d5b0e8264af401c323fd0d9ff291e6898c534f15edcfe8",
           "kind": "source"
         },
         {

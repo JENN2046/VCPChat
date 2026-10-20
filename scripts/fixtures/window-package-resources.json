@@ -495,8 +495,8 @@
     },
     {
       "path": "Musicmodules/music-effects.js",
-      "size": 9296,
-      "sha256": "326f74efc9b52516799af5aee35967c54084e8e267668409f89802028941a4f3"
+      "size": 9743,
+      "sha256": "70b7d294dcd960b2addbbabf5ad2055193fb35b46414d6816bd89fcfa33b3a92"
     },
     {
       "path": "Musicmodules/music-lyrics.js",

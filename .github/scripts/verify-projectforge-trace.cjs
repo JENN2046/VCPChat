@@ -50,7 +50,7 @@ function verify(root) {
 function smoke(executable) {
   const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-component-smoke-'));
   const component = '<template><div class=card>{{ title }}</div></template>\n<script setup lang="ts">\n// fixture documentation\nfunction componentFixture(value: number) {\n  return value;\n}\n</script>\n<style>.card { color: red; }</style>\n';
-  const svelte = '<Widget {...props} />\n<div {active}></div>\n' + component;
+  const svelte = '<Widget {...props} /><button onclick={() => count++ / 2}></button>\n<div {active}></div>\n' + component;
   fs.writeFileSync(path.join(fixtureRoot, 'fixture.vue'), component);
   fs.writeFileSync(path.join(fixtureRoot, 'fixture.svelte'), svelte);
   try {
@@ -69,6 +69,9 @@ function smoke(executable) {
     { id: 12, method: 'outline', params: { lang: 'vue', text: '<style>.fake { color:red; }</style>\n' } },
     { id: 13, method: 'outline', params: { lang: 'svelte', text: '<script>function unsafeInline() {}</script>' } },
     { id: 14, method: 'outline', params: { lang: 'vue', text: '<div {active}></div>\n' + component } },
+    { id: 15, method: 'outline', params: { lang: 'svelte', text: '<button onclick={() => count-- / 2}></button>\n' + component } },
+    { id: 16, method: 'outline', params: { lang: 'svelte', text: '<button onclick={() => count++ + /unterminated}></button>\n' + component } },
+    { id: 17, method: 'outline', params: { lang: 'svelte', text: '<button onclick={() => { count-- / 2}></button>\n' + component } },
   ].map(v => JSON.stringify(v)).join('\n') + '\n';
   const child = spawnSync(executable, [], { input, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024, windowsHide: true });
   assert.ifError(child.error); assert.equal(child.status, 0, 'native exit');
@@ -113,10 +116,16 @@ function smoke(executable) {
   assert.equal(response(12).result.hasError, false); assert.deepEqual(response(12).result.symbols, []);
   assert.equal(response(13).result.hasError, true); assert.deepEqual(response(13).result.symbols, []);
   assert.equal(response(14).result.hasError, true); assert.deepEqual(response(14).result.symbols, []);
+  assert.equal(response(15).result.hasError, false);
+  assert.deepEqual(response(15).result.symbols.map(v => [v.name, v.start, v.end]), [['componentFixture', 5, 7]]);
+  for (const id of [16, 17]) {
+    assert.equal(response(id).result.hasError, true); assert.deepEqual(response(id).result.symbols, []);
+  }
   return { ready: true, ping: true, javascriptOutline: true, powershellGeometry: true,
     sameLineShellGeometry: true, controlContinuationsExcluded: true, powershellBackticks: true,
     componentScriptRanges: true, componentFindSymbols: true, lineRangeReplacement: true,
-    markupExcluded: true, inlineEditRejected: true, malformedRustReported: true, invalidInputRejected: true };
+    markupExcluded: true, inlineEditRejected: true, postfixDivision: true, brokenExpressionsRejected: true,
+    malformedRustReported: true, invalidInputRejected: true };
   } finally { fs.rmSync(fixtureRoot, { recursive: true, force: true }); }
 }
 if (require.main === module) {

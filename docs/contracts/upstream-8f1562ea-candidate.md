@@ -6,7 +6,8 @@ runtime state is part of this change.
 
 ## Bounded Vue/Svelte container correction
 
-PR #65 remains draft pending exact-head validation and review.
+PR #65 is ready for review; merge remains conditional on exact-head checks and
+no unresolved blocking feedback. Jenn authorized merge after the bounded fix.
 Actual program reproduction with synthetic template/script/style text produces
 non-script symbols and a range crossing the script/style boundary. Existing
 bare-JavaScript geometry tests do not establish correct component extraction.
@@ -27,7 +28,7 @@ flag: backticks escape/continue PowerShell text rather than opening JS templates
 and quoted escape rules preserve Windows paths and doubled single quotes.
 Source and actual-protocol regressions pass without executing fixture scripts.
 
-The reviewed container/PowerShell correction passes 55 native source tests.
+The reviewed container/PowerShell correction passes 57 native source tests.
 The rebuilt delivered program passes outline, synthetic findSymbols and an
 original-line replacement simulation that preserves script/style/container tags.
 Comments, quoted attributes, interpolation regexes and Svelte block scopes are
@@ -42,6 +43,11 @@ Svelte-only attributes, braced values and block directives are gated on the
 Svelte language. Vue rejects them as malformed markup rather than inheriting
 Svelte acceptance; both the source test and actual bundled-program negative
 regression verify the language boundary.
+Postfix `++`/`--` remain value-ending tokens before division; prefix updates
+still expect an operand. Synthetic dynamic attributes cover increment/decrement,
+member/group operands, division chains and a following binary-operator regex.
+Unterminated regexes and unbalanced expressions still stop extraction with an
+error rather than promoting later script text.
 
 ## Exact comparison
 

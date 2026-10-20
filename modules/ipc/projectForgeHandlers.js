@@ -130,4 +130,13 @@ function initialize({ workspaceService = null, subscriptions = null, ipcMain: in
     ipcMain.handle('project-forge:delete-project', wrap((projectId, signature) => forge().deleteProject(projectId, signature), true));
 }
 
-module.exports = { CHANGED_TOPIC, initialize };
+async function cleanupForQuit() {
+    if (!forgeModule) return; // Do not load or initialize PF merely to quit.
+    try { await forgeModule.cleanup(); }
+    catch (error) {
+        if (error.message === 'PROJECTFORGE_BUSY') error.shutdownUnchanged = true;
+        throw error;
+    }
+}
+
+module.exports = { CHANGED_TOPIC, initialize, cleanupForQuit };

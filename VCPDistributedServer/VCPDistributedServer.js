@@ -1,3 +1,4 @@
+const quitAdmission = require('../modules/services/quitAdmission.cjs');
 // VCPDistributedServer.js
 const WebSocket = require('ws');
 const express = require('express');
@@ -652,6 +653,16 @@ class DistributedServer {
     }
 
     async handleToolExecutionRequest(data) {
+        try {
+            return await quitAdmission.run(() => this.handleAdmittedToolExecutionRequest(data));
+        } catch (error) {
+            if (error.code !== 'APPLICATION_SHUTTING_DOWN') throw error;
+            this.sendMessage({ type: 'tool_result', data: { requestId: data?.requestId,
+                status: 'error', error: error.code } });
+        }
+    }
+
+    async handleAdmittedToolExecutionRequest(data) {
         const { requestId, toolName, toolArgs, _vcpContext } = data;
         if (!requestId || !toolName) {
             console.error(`[${this.serverName}] Invalid tool execution request received.`);
@@ -916,13 +927,16 @@ class DistributedServer {
         }
     }
 
-    async stop() {
+    async stop({ beforePluginCleanup } = {}) {
         if (this.stopPromise) {
             return this.stopPromise;
         }
 
         console.log(`[${this.serverName}] Stopping server...`);
-        // 立即取消后续启动阶段；等待正在执行的初始化后再释放插件资源。
+        // Refuse before any teardown when host work is in flight. New GUI/WS
+        // calls stay closed while initialization settles and cleanup is attempted.
+        const wasClosing = quitAdmission.begin();
+        const wasStopped = this.stopped;
         this.stopped = true;
         this.stopPromise = Promise.resolve().then(async () => {
         if (this.initializePromise) {
@@ -931,6 +945,10 @@ class DistributedServer {
             });
         }
         
+        if (beforePluginCleanup) await beforePluginCleanup();
+        await pluginManager.shutdownAllPlugins();
+        this.stopped = true;
+
         // 新增：清理静态占位符更新定时器
         this.clearStaticPlaceholderUpdates();
         await this.closeMusicPlaylistWatcher();
@@ -939,11 +957,6 @@ class DistributedServer {
             clearTimeout(this.reconnectTimeoutId);
             this.reconnectTimeoutId = null;
         }
-        
-        // 等待服务资源释放，避免 Electron 退出时留下尚未完成的清理。
-        await pluginManager.shutdownAllPlugins().catch(err => {
-            console.error(`[${this.serverName}] Error during plugin shutdown:`, err);
-        });
         
         if (this.ws) {
             // Remove listeners to prevent reconnection logic from firing on manual close
@@ -961,7 +974,18 @@ class DistributedServer {
         }
         console.log(`[${this.serverName}] Server stopped.`);
         });
-        return this.stopPromise;
+        try {
+            await this.stopPromise;
+            if (!wasClosing) quitAdmission.resume();
+        }
+        catch (error) {
+            this.stopPromise = null;
+            if (error.shutdownUnchanged) {
+                this.stopped = wasStopped;
+                if (!wasClosing) quitAdmission.resume();
+            }
+            throw error;
+        }
     }
 }
 

@@ -84,6 +84,6 @@ test('main.js puts every side pane domain behind the policy', () => {
     }
     for (const init of ['workspaceHandlers.initialize(', 'projectForgeHandlers.initialize(', 'sourceHandlers.initialize(']) {
         const line = source.slice(source.indexOf(init)).split('\n')[0];
-        assert.match(line, /ipcMain: guardIpcMain\(ipcMain, sidePaneGuard\(/, init);
+        assert.match(line, /ipcMain: (?:quitAdmission\.guardIpcMain\()?guardIpcMain\(ipcMain, sidePaneGuard\(/, init);
     }
 });

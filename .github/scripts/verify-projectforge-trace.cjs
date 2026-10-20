@@ -68,6 +68,7 @@ function smoke(executable) {
     { id: 11, method: 'findSymbols', params: { root: fixtureRoot, name: 'componentFixture', exact: true } },
     { id: 12, method: 'outline', params: { lang: 'vue', text: '<style>.fake { color:red; }</style>\n' } },
     { id: 13, method: 'outline', params: { lang: 'svelte', text: '<script>function unsafeInline() {}</script>' } },
+    { id: 14, method: 'outline', params: { lang: 'vue', text: '<div {active}></div>\n' + component } },
   ].map(v => JSON.stringify(v)).join('\n') + '\n';
   const child = spawnSync(executable, [], { input, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024, windowsHide: true });
   assert.ifError(child.error); assert.equal(child.status, 0, 'native exit');
@@ -111,6 +112,7 @@ function smoke(executable) {
   }));
   assert.equal(response(12).result.hasError, false); assert.deepEqual(response(12).result.symbols, []);
   assert.equal(response(13).result.hasError, true); assert.deepEqual(response(13).result.symbols, []);
+  assert.equal(response(14).result.hasError, true); assert.deepEqual(response(14).result.symbols, []);
   return { ready: true, ping: true, javascriptOutline: true, powershellGeometry: true,
     sameLineShellGeometry: true, controlContinuationsExcluded: true, powershellBackticks: true,
     componentScriptRanges: true, componentFindSymbols: true, lineRangeReplacement: true,

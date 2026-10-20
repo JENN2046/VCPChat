@@ -400,9 +400,9 @@ class ManifestRefreshTests(unittest.TestCase):
                 self.assertEqual(native[reviewed_forge], {
                     "path": reviewed_forge,
                     "mode": "100644", "type": "blob",
-                    "blob": "aa197fdf6267f41c40f505e8bf6328512884cbf5",
+                    "blob": "75c2fb598fde1255577b6db3e96edaf7681eb932",
                     "size": 17905152,
-                    "sha256": "cee12c7ff38eae8b61944034cc2d73c0db2b7d6b64624e372ef4784fd49a4ede",
+                    "sha256": "206f0542846288c7b5fd38cef3b53ecb1853ca37a064977857758bdff44c8dff",
                     "kind": "static-native", "format": "PE",
                 })
 

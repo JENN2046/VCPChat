@@ -175,3 +175,18 @@ SHA-256 in the Windows workflow. Controller tests and local Linux-to-Windows
 transfer checks do not substitute for the actual hosted Windows PTY tests or
 real Electron smoke result. Read-only workflow permissions and the existing
 deployment/release flow are unchanged.
+
+## October 20 frozen source refresh
+
+The fork base is `008542de728a702cbf35190273375b4990fbcdad`; the independent
+author frame is `8f1562ea8fb851d0e370449a66ba24700d93faf9`. This comparison
+does not activate the candidate or rewrite the separate accepted/runtime baseline.
+Required identities and all six manifest pins are refreshed together. The
+ProjectForge parser fixtures and the single new audio executable alias have
+exact admissions; the latter is the same source-rebuilt portable artifact as
+`audio_server.exe`. The native receipt records compiler, locked inputs and actual
+local conditions rather than asserting independent byte-for-byte reproduction.
+Held paths/blobs, ordinary aliases, source controllers, permissions, trigger
+conditions and product commands remain unchanged. See
+`docs/contracts/upstream-8f1562ea-candidate.md` for dispositions and compatibility
+limits; current sizes/identities remain authoritative in the manifest.

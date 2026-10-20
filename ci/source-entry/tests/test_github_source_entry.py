@@ -362,6 +362,7 @@ class ManifestRefreshTests(unittest.TestCase):
             reviewed_searcher = "VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher-x86_64-pc-windows-msvc.exe"
             if name == "package-smoke":
                 allowed_additions.add(reviewed_searcher)
+                allowed_additions.add("audio_engine/audio_server_rubato_dsp.exe")
             self.assertEqual(set(native), set(old) | allowed_additions)
             if reviewed_searcher in allowed_additions:
                 self.assertEqual(native[reviewed_searcher], {
@@ -371,6 +372,9 @@ class ManifestRefreshTests(unittest.TestCase):
                     "kind": "static-native", "format": "PE",
                 })
             reviewed_rebuilds = {
+                "audio_engine/audio_server.exe":
+                    ("39e24d9477523bd34d3a3cee22ee4edc37c698aa", 10052096,
+                     "2f4efd8e99416addb7cc1e0341c0adb8578d91aac054e0261378587687f46eeb"),
                 "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
                     ("7a981c416b8fc7449469014e0e2f5551a36f35ab", 258560,
                      "db57bd214dd0a5b34ff7522acabc9cfc7479fecde9e6a3d4d42409214de43223"),
@@ -387,13 +391,18 @@ class ManifestRefreshTests(unittest.TestCase):
                     })
                 else:
                     self.assertEqual(native[path], old[path])
+            if name == "package-smoke":
+                self.assertEqual(native["audio_engine/audio_server_rubato_dsp.exe"], {
+                    **native["audio_engine/audio_server.exe"],
+                    "path": "audio_engine/audio_server_rubato_dsp.exe",
+                })
             if reviewed_forge in allowed_additions:
                 self.assertEqual(native[reviewed_forge], {
                     "path": reviewed_forge,
                     "mode": "100644", "type": "blob",
-                    "blob": "0af0bf2f0b7744fa9f2e1d712c032e4c5a2729c4",
-                    "size": 17836032,
-                    "sha256": "e562b290e8431da0d8e2f28faa94968f0b4457001b886f2fff31ae325ef853da",
+                    "blob": "fc38126f7dfb1f1b57eab464631407bb7d71c0e1",
+                    "size": 17905664,
+                    "sha256": "9b049a2b05fe4a46593fb207cb7a7ac5b86d8385d0c1e915a72ee9832a87b794",
                     "kind": "static-native", "format": "PE",
                 })
 
@@ -405,6 +414,9 @@ class ManifestRefreshTests(unittest.TestCase):
         self.assertTrue(required)
         admitted = {row["path"] for row in self.manifest["profiles"]["chat-kernel-ui"]["entries"]}
         self.assertTrue(required <= admitted, sorted(required - admitted))
+        for profile_name in ["package-smoke", "chat-kernel-ui"]:
+            self.assertIn("scripts/lib/terminal-smoke-probe.mjs",
+                          {row["path"] for row in self.manifest["profiles"][profile_name]["entries"]})
         rules = self.manifest["profiles"]["chat-kernel-ui"]["required_scans"]
         kernel_rule = next(rule for rule in rules if rule["name"] == "reviewed-effective-kernel-test-inputs")
         self.assertEqual(set(kernel_rule["files"]), required)

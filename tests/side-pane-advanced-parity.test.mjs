@@ -1,6 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
+import { execFileSync } from 'node:child_process';
+import { terminalSmokeProbe } from '../scripts/lib/terminal-smoke-probe.mjs';
+
+test('terminal smoke requires executed output, never just the typed command or input echo', () => {
+    const marker = 'SMOKE_TERM_123456';
+    for (const platform of ['linux', 'win32']) {
+        const command = terminalSmokeProbe(platform, marker);
+        assert.ok(!command.includes(marker), 'input echo alone cannot satisfy the marker assertion');
+    }
+    assert.throws(() => terminalSmokeProbe('linux', "SMOKE_TERM_1'; exit 0"), TypeError);
+    const command = terminalSmokeProbe(process.platform, marker);
+    const env = Object.fromEntries(['PATH', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT']
+        .filter(key => process.env[key]).map(key => [key, process.env[key]]));
+    const output = process.platform === 'win32'
+        ? execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command], { env, encoding: 'utf8', windowsHide: true })
+        : execFileSync('/bin/sh', ['-c', command], { env, encoding: 'utf8' });
+    assert.equal(output.trim(), marker, 'actual shell output must contain exactly the complete marker');
+});
 
 import * as SidePaneState from '../modules/ui-system/side-pane/side-pane-state.js';
 import { sideChatTab } from '../modules/ui-system/side-pane/tab-types/chat.js';
@@ -956,18 +974,20 @@ test('Parity: Side Chat Model Picker closes on selection and window blur, and fo
     assert.ok(pickerBtn, 'Should have model picker button');
     assert.equal(doc.querySelector('.side-chat-model-popover'), null, 'closed popup is not mounted');
 
-    // Click button to toggle popover
+    // Click button to lazily mount and open popover
     pickerBtn.click();
     await tick();
     const popover = doc.querySelector('.side-chat-model-popover');
     assert.ok(popover, 'click mounts the model popover');
     assert.equal(pickerBtn.getAttribute('aria-expanded'), 'true');
+    assert.equal(popover.hidden, false);
 
-    // 选中后收起
+    // 选中后收起（从 DOM 移除）
     popover.querySelector('[data-model="claude-3-5-sonnet"]').click();
     assert.equal(handle.getModel(), 'claude-3-5-sonnet');
     assert.equal(popover.isConnected, false);
     assert.equal(pickerBtn.getAttribute('aria-expanded'), 'false');
+    assert.equal(doc.querySelector('.side-chat-model-popover'), null);
 
     // 点进侧栏浏览器的 webview 时主页面只会失焦，弹层也要收起
     pickerBtn.click();
@@ -975,10 +995,11 @@ test('Parity: Side Chat Model Picker closes on selection and window blur, and fo
     const reopened = doc.querySelector('.side-chat-model-popover');
     assert.ok(reopened, 'the menu can be reopened after selection');
     assert.notEqual(reopened, popover);
+    assert.equal(reopened.hidden, false);
     dom.window.dispatchEvent(new dom.window.Event('blur'));
     assert.equal(reopened.isConnected, false);
     assert.equal(pickerBtn.getAttribute('aria-expanded'), 'false');
-
+    assert.equal(doc.querySelector('.side-chat-model-popover'), null);
     // Direct setModel via handle
     handle.setModel('gemini-1.5-pro');
     assert.equal(handle.getModel(), 'gemini-1.5-pro');

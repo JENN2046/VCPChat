@@ -609,19 +609,19 @@
     "dynamicSites": [
       {
         "file": "modules/messageRenderer.js",
-        "line": 676,
+        "line": 686,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 2684,
+        "line": 2694,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 3433,
+        "line": 3443,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }

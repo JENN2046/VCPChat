@@ -4072,17 +4072,17 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3543,
+          "line": 3553,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3602,
+          "line": 3612,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3640,
+          "line": 3650,
           "kind": "custom-event-listener"
         },
         {
@@ -5599,19 +5599,19 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3543,
+          "line": 3553,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('click'"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3602,
+          "line": 3612,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('click'"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3640,
+          "line": 3650,
           "kind": "custom-event-listener",
           "match": "removeBtn.addEventListener('click'"
         },
@@ -8017,7 +8017,7 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3544,
+          "line": 3554,
           "kind": "custom-event-listener"
         },
         {
@@ -8160,7 +8160,7 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3544,
+          "line": 3554,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('contextmenu'"
         },
@@ -8688,7 +8688,7 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 195,
+          "line": 200,
           "kind": "event-listener"
         },
         {
@@ -8921,7 +8921,7 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 195,
+          "line": 200,
           "kind": "event-listener",
           "match": "child.stderr.on('data'"
         },
@@ -12327,12 +12327,12 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 199,
+          "line": 204,
           "kind": "event-listener"
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 200,
+          "line": 205,
           "kind": "event-listener"
         },
         {
@@ -12619,13 +12619,13 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 199,
+          "line": 204,
           "kind": "event-listener",
           "match": "child.stdin.on('error'"
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 200,
+          "line": 205,
           "kind": "event-listener",
           "match": "child.once('error'"
         },
@@ -12916,12 +12916,12 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 201,
+          "line": 206,
           "kind": "event-listener"
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 288,
+          "line": 293,
           "kind": "event-listener"
         },
         {
@@ -13002,13 +13002,13 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 201,
+          "line": 206,
           "kind": "event-listener",
           "match": "child.once('exit'"
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 288,
+          "line": 293,
           "kind": "event-listener",
           "match": "child.once('exit'"
         },
@@ -16933,7 +16933,7 @@
       "consumers": [
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 167,
+          "line": 172,
           "kind": "event-listener"
         },
         {
@@ -16955,7 +16955,7 @@
       "evidence": [
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
-          "line": 167,
+          "line": 172,
           "kind": "event-listener",
           "match": "rl.on('line'"
         },
@@ -34756,7 +34756,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 676,
+      "line": 686,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -34764,7 +34764,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 2684,
+      "line": 2694,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -34772,7 +34772,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 3433,
+      "line": 3443,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",

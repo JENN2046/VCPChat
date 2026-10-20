@@ -47,6 +47,32 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Frozen 8f1562ea: malformed parser input is data, never a Cargo test crate;
+    // runtime-only FTZ fixtures prevent constant folding, without DSP changes.
+    'rust_projectforge_indexer/src/geo.rs',
+    // Reviewed SFC script-only extraction and its two module declarations.
+    'rust_projectforge_indexer/src/component.rs',
+    'rust_projectforge_indexer/src/main.rs',
+    'rust_projectforge_indexer/examples/geo_probe.rs',
+    'rust_projectforge_indexer/tests/broken_syntax.rs',
+    'rust_projectforge_indexer/tests/fixtures/broken_syntax.rs',
+    'rust_audio_engine/src/processor/dynamic_loudness/tests.rs',
+    // PR #65 review: apply the selected EQ type before enable/bands, and
+    // retain the old enabled-FIR meaning only for files without the new flag.
+    'Musicmodules/music-effects.js',
+    'rust_audio_engine/src/settings.rs',
+    // Save-time EQ state must unmount stale FIR; JEV identity comes only from
+    // the parsed declared field, never from an ordinary parameter's payload.
+    'rust_audio_engine/src/server.rs',
+    'modules/renderer/toolRequestMarkers.js',
+    'tests/tool-request-malformed-marker.test.mjs',
+    // Verified backend-compatible experiment labels and real lazy-card regression.
+    'VCPHumanToolBox/renderer_modules/config.js',
+    'tests/message-renderer-tool-cards.test.mjs',
+    // Synthetic E2E output probe must prove execution without assuming input echo.
+    'scripts/lib/terminal-smoke-probe.mjs',
+    'audio_engine/audio_server.exe',
+    'audio_engine/audio_server_rubato_dsp.exe',
     // Same-run CI projection transfer preserves the Linux-only source writer.
     '.github/workflows/side_pane_e2e.yml',
     '.github/workflows/side_pane_windows.yml',
@@ -601,6 +627,16 @@ const reviewedClassicSecurityExceptions = new Set([
     'RAGmodules/RAG_Observer.html',
     'RAGmodules/RAG_Overlay.html',
 ]);
+// PR #65 P1: exact compatibility wording repair, not a Classic redesign or
+// a directory-wide exception. Keep authorization exemptions separate.
+const reviewedClassicCompatibilityExceptions = new Set([
+    'VCPHumanToolBox/renderer_modules/config.js',
+]);
+for (const file of reviewedClassicCompatibilityExceptions) {
+    if (!allowedSourceDifferences.has(file)) {
+        failures.push(`${file}: reviewed Classic compatibility exception requires a source-difference entry`);
+    }
+}
 for (const file of reviewedClassicSecurityExceptions) {
     if (!allowedSourceDifferences.has(file)) {
         failures.push(`${file}: reviewed Classic security exception must also be present in the source-difference allowlist`);
@@ -751,7 +787,8 @@ if (sourceContext) {
     }
     for (const file of sourceContext.changedPaths('upstream')) {
         if (upstreamClassicPatterns.some(pattern => pattern.test(file))
-            && !reviewedClassicSecurityExceptions.has(file)) {
+            && !reviewedClassicSecurityExceptions.has(file)
+            && !reviewedClassicCompatibilityExceptions.has(file)) {
             failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
         }
     }
@@ -785,7 +822,8 @@ if (sourceContext) {
             .split('\n')
             .filter(file => file
                 && upstreamClassicPatterns.some(pattern => pattern.test(file))
-                && !reviewedClassicSecurityExceptions.has(file));
+                && !reviewedClassicSecurityExceptions.has(file)
+                && !reviewedClassicCompatibilityExceptions.has(file));
         for (const file of classicDifferences) {
             failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
         }

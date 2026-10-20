@@ -1,6 +1,7 @@
 'use strict';
 // Traceability and artifact identity, NOT cross-machine build equivalence.
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
@@ -27,10 +28,11 @@ function verify(root) {
       assert.ok(!entry.isSymbolicLink(), 'source link forbidden');
       const name = dir + '/' + entry.name;
       if (entry.isDirectory()) walk(name);
-      else { assert.ok(entry.isFile() && name.endsWith('.rs'), 'unexpected Rust source input'); actual.push(name); }
+      else { assert.ok(entry.isFile() && (name.endsWith('.rs') || name === 'tests/sample_script.ps1'), 'unexpected Rust source input'); actual.push(name); }
     }
   }
   walk('src'); walk('examples');
+  if (fs.existsSync(path.join(source, 'tests'))) walk('tests');
   assert.ok(!fs.existsSync(path.join(source, 'build.rs')), 'new build script requires provenance review');
   assert.ok(!fs.existsSync(path.join(source, '.cargo')), 'local Cargo configuration not admitted');
   assert.deepEqual(record.inputHashes.map(x => x.path).sort(), actual.sort(), 'complete source inventory');
@@ -46,10 +48,30 @@ function verify(root) {
     bundledSha256: record.sha256, crossMachineEquivalenceClaimed: false };
 }
 function smoke(executable) {
+  const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-component-smoke-'));
+  const component = '<template><div class=card>{{ title }}</div></template>\n<script setup lang="ts">\n// fixture documentation\nfunction componentFixture(value: number) {\n  return value;\n}\n</script>\n<style>.card { color: red; }</style>\n';
+  const svelte = '<Widget {...props} /><button onclick={() => count++ / 2}></button>\n<div {active}></div>\n' + component;
+  fs.writeFileSync(path.join(fixtureRoot, 'fixture.vue'), component);
+  fs.writeFileSync(path.join(fixtureRoot, 'fixture.svelte'), svelte);
+  try {
   const input = [
     { id: 1, method: 'ping', params: {} },
     { id: 2, method: 'outline', params: { lang: 'javascript', text: 'export function traceFixture() { return 42; }\n' } },
     { id: 3, method: 'outline', params: { lang: 'javascript' } },
+    { id: 4, method: 'outline', params: { lang: 'ps1', text: 'function Trace-Geometry {\n    return 42\n}\n' } },
+    { id: 5, method: 'outline', params: { lang: 'rust', text: 'pub fn broken() {\n    if true {\n' } },
+    { id: 6, method: 'outline', params: { lang: 'sh', text: 'health_check() { curl localhost; }\n' } },
+    { id: 7, method: 'outline', params: { lang: 'vue', text: '<script>\nfunction outer() {\n  if (ready) {\n    call();\n  } else {\n    call();\n  }\n}\n</script>\n' } },
+    { id: 8, method: 'outline', params: { lang: 'ps1', text: 'function Invoke-Step {\n  Write-Output `\n    "hello"\n}\n' } },
+    { id: 9, method: 'outline', params: { lang: 'vue', text: component } },
+    { id: 10, method: 'outline', params: { lang: 'svelte', text: svelte } },
+    { id: 11, method: 'findSymbols', params: { root: fixtureRoot, name: 'componentFixture', exact: true } },
+    { id: 12, method: 'outline', params: { lang: 'vue', text: '<style>.fake { color:red; }</style>\n' } },
+    { id: 13, method: 'outline', params: { lang: 'svelte', text: '<script>function unsafeInline() {}</script>' } },
+    { id: 14, method: 'outline', params: { lang: 'vue', text: '<div {active}></div>\n' + component } },
+    { id: 15, method: 'outline', params: { lang: 'svelte', text: '<button onclick={() => count-- / 2}></button>\n' + component } },
+    { id: 16, method: 'outline', params: { lang: 'svelte', text: '<button onclick={() => count++ + /unterminated}></button>\n' + component } },
+    { id: 17, method: 'outline', params: { lang: 'svelte', text: '<button onclick={() => { count-- / 2}></button>\n' + component } },
   ].map(v => JSON.stringify(v)).join('\n') + '\n';
   const child = spawnSync(executable, [], { input, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024, windowsHide: true });
   assert.ifError(child.error); assert.equal(child.status, 0, 'native exit');
@@ -60,7 +82,51 @@ function smoke(executable) {
   assert.equal(response(2).ok, true);
   assert.ok(response(2).result.symbols.some(v => v.name === 'traceFixture' && v.kind === 'function'));
   assert.equal(response(3).ok, false); assert.equal(response(3).error.code, 'INVALID_PARAMS');
-  return { ready: true, ping: true, javascriptOutline: true, invalidInputRejected: true };
+  assert.equal(response(4).ok, true);
+  assert.ok(response(4).result.symbols.some(v => v.name === 'Trace-Geometry'));
+  assert.equal(response(5).ok, true); assert.equal(response(5).result.hasError, true);
+  assert.equal(response(6).ok, true);
+  assert.ok(response(6).result.symbols.some(v => v.name === 'health_check' && v.start === 1 && v.end === 1));
+  assert.equal(response(7).ok, true);
+  assert.deepEqual(response(7).result.symbols.map(v => v.name), ['outer']);
+  assert.equal(response(8).ok, true);
+  assert.equal(response(8).result.hasError, false);
+  assert.ok(response(8).result.symbols.some(v => v.name === 'Invoke-Step' && v.start === 1 && v.end === 4));
+  for (const [id, lang] of [[9, 'vue'], [10, 'svelte']]) {
+    const result = response(id).result;
+    assert.equal(response(id).ok, true); assert.equal(result.lang, lang);
+    const offset = lang === 'svelte' ? 2 : 0;
+    assert.equal(result.hasError, false); assert.equal(result.lineCount, 8 + offset);
+    assert.deepEqual(result.symbols.map(v => [v.name, v.start, v.end, v.fullStart]), [['componentFixture', 4 + offset, 6 + offset, 3 + offset]]);
+    const lines = (lang === 'svelte' ? svelte : component).trimEnd().split('\n');
+    for (const s of result.symbols) {
+      // Exercise the existing line-range replacement consumer on synthetic text.
+      lines.splice(s.fullStart - 1, s.end - s.fullStart + 1, 'function replacementFixture() {}');
+    }
+    assert.ok(lines.includes('<script setup lang="ts">'));
+    assert.ok(lines.includes('</script>'));
+    assert.ok(lines.includes('<style>.card { color: red; }</style>'));
+  }
+  assert.equal(response(11).ok, true);
+  assert.equal(response(11).result.hits.length, 2);
+  assert.ok(response(11).result.hits.every(v => {
+    const offset = v.path.endsWith('.svelte') ? 2 : 0;
+    return v.start === 4 + offset && v.end === 6 + offset && v.fullStart === 3 + offset;
+  }));
+  assert.equal(response(12).result.hasError, false); assert.deepEqual(response(12).result.symbols, []);
+  assert.equal(response(13).result.hasError, true); assert.deepEqual(response(13).result.symbols, []);
+  assert.equal(response(14).result.hasError, true); assert.deepEqual(response(14).result.symbols, []);
+  assert.equal(response(15).result.hasError, false);
+  assert.deepEqual(response(15).result.symbols.map(v => [v.name, v.start, v.end]), [['componentFixture', 5, 7]]);
+  for (const id of [16, 17]) {
+    assert.equal(response(id).result.hasError, true); assert.deepEqual(response(id).result.symbols, []);
+  }
+  return { ready: true, ping: true, javascriptOutline: true, powershellGeometry: true,
+    sameLineShellGeometry: true, controlContinuationsExcluded: true, powershellBackticks: true,
+    componentScriptRanges: true, componentFindSymbols: true, lineRangeReplacement: true,
+    markupExcluded: true, inlineEditRejected: true, postfixDivision: true, brokenExpressionsRejected: true,
+    malformedRustReported: true, invalidInputRejected: true };
+  } finally { fs.rmSync(fixtureRoot, { recursive: true, force: true }); }
 }
 if (require.main === module) {
   try {

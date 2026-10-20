@@ -9,6 +9,25 @@ const { installProjectForgeCloseGuard } = require('../modules/ipc/projectForgeCl
 const { minimatch } = require('minimatch');
 const build = require('../package.json').build;
 
+test('numbered edit normalization retains replacements and rejects ambiguous destructive input', () => {
+    const args = require('../VCPDistributedServer/Plugin/ProjectForge/args');
+    const parse = input => args.parseEditSteps(args.lowerKeys(input));
+    const folded = parse({ target: 'old', replace: 'new', target2: 'later', replace2: 'updated' });
+    assert.deepEqual(folded.map(({ step, target, replace }) => ({ step, target, replace })), [
+        { step: 1, target: 'old', replace: 'new' },
+        { step: 2, target: 'later', replace: 'updated' },
+    ]);
+    assert.equal(folded.notes.length, 1);
+    assert.equal(Object.prototype.propertyIsEnumerable.call(folded, 'notes'), false);
+    assert.throws(() => parse({ target1: 'old', replace: 'new' }), /编号串中混入/);
+    assert.throws(() => parse({ target: 'old', replacement: 'new', target2: 'later' }), /不认识参数/);
+    const explicit = parse({ target1: 'old', replace1: 'new', reason: 'batch reason', todo: '2,3' });
+    assert.equal(explicit.length, 1);
+    assert.equal(explicit[0].replace, 'new');
+    assert.equal(args.hasNumberedSteps(args.lowerKeys({ Target1: 'old' })), true);
+    assert.equal(args.hasNumberedSteps({ target: 'old' }), false);
+});
+
 test('Trace statically reads declarations without executing registry, helpers or API side effects', async t => {
     const os = require('node:os');
     const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');

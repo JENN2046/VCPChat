@@ -93,7 +93,14 @@ function deferToolRequest(_block, source) {
     const name = field('tool_name') || source.match(/<tool_name>([\s\S]*?)<\/tool_name>/i)?.[1]?.trim() || '';
     if (name.toLowerCase() === 'dailynote') return null;
     const jev = parseJevToolUse(field('JEV'));
-    const problem = describeToolRequestMarkerProblem({ toolName: name, malformedFields: findMalformedToolFields(source) });
+    const malformedFields = findMalformedToolFields(source);
+    const isJev = Boolean(jev) || (!name && malformedFields.some(key => key.toLowerCase() === 'jev'));
+    const problem = describeToolRequestMarkerProblem({
+        toolName: name,
+        malformedFields,
+        isJev,
+        content: source
+    });
     const displayName = jev?.displayName || problem.displayName;
     const summarySource = ['command', 'command1', 'path', 'filePath', 'powershell', 'text', 'keys', 'paths', 'file', 'glob', 'query', 'url', 'prompt']
         .map(key => {
@@ -101,9 +108,12 @@ function deferToolRequest(_block, source) {
             return value ? `${key}:「始」${value.slice(0, 240)}「末」` : '';
         }).filter(Boolean).join('\n');
     const id = registerLazyTool({ type: 'request', raw: source, meta: { summarySource, fingerprint: hashStringFNV1a(source) } });
-    const kind = jev ? 'jev-tool-use' : 'tool-use';
-    const hint = !jev && problem.hint ? `<span class="vcp-tool-malformed-hint">${escapeHtml(problem.hint)}</span>` : '';
-    return `<div class="vcp-tool-use-bubble${jev ? ' vcp-jev-tool-use-bubble' : problem.isMalformed ? ' is-malformed' : ''}" data-vcp-block-type="${kind}" data-vcp-preserve-children="true" data-vcp-lazy-tool-id="${id}"><div class="vcp-tool-summary"><span class="vcp-tool-label">${jev ? 'JEVToolUse:' : 'VCP-ToolUse:'}</span> <span class="vcp-tool-name-highlight">${escapeHtml(displayName)}</span>${hint}</div><div class="vcp-tool-details"></div></div>`;
+    const kind = isJev ? 'jev-tool-use' : 'tool-use';
+    const hint = problem.hint ? ` <span class="vcp-tool-malformed-hint">${escapeHtml(problem.hint)}</span>` : '';
+    const label = isJev ? (displayName ? 'JEVToolUse:' : 'JEVToolUse') : 'VCP-ToolUse:';
+    const nameHtml = displayName ? ` <span class="vcp-tool-name-highlight">${escapeHtml(displayName)}</span>` : '';
+    const bubbleClass = `vcp-tool-use-bubble${isJev ? ' vcp-jev-tool-use-bubble' : ''}${problem.isMalformed ? ' is-malformed' : ''}`;
+    return `<div class="${bubbleClass}" data-vcp-block-type="${kind}" data-vcp-preserve-children="true" data-vcp-lazy-tool-id="${id}"><div class="vcp-tool-summary"><span class="vcp-tool-label">${label}</span>${nameHtml}${hint}</div><div class="vcp-tool-details"></div></div>`;
 }
 
 function bindLazyTools(root) {
@@ -1275,7 +1285,7 @@ function transformSpecialBlocks(text, codeBlockMap, thoughtChainMap = null, tool
             }
 
             const malformedFields = findMalformedToolFields(source);
-            const markerProblem = describeToolRequestMarkerProblem({ toolName, malformedFields });
+            const markerProblem = describeToolRequestMarkerProblem({ toolName, malformedFields, content: source });
             toolName = markerProblem.displayName;
             const malformedClass = markerProblem.isMalformed ? ' is-malformed' : '';
             const malformedHintHtml = markerProblem.hint

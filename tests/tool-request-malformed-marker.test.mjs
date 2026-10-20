@@ -6,6 +6,18 @@ import {
 } from '../modules/renderer/toolRequestMarkers.js';
 import { readToolRequestField } from '../modules/renderer/toolRequestScanner.js';
 import { parseJevToolUse } from '../modules/renderer/jevToolUse.js';
+import { tools as toolDefinitions } from '../VCPHumanToolBox/renderer_modules/config.js';
+
+test('Memory A/B descriptions retain verified 2xK backend refinement semantics', () => {
+    const memory = toolDefinitions.LightMemo.commands.memory_ab;
+    for (const description of [toolDefinitions.LightMemo.description, memory.description,
+        ...memory.params.filter(field => ['candidate_k', 'compare_rerank'].includes(field.name)).map(field => field.description)]) {
+        assert.match(description, /2×K/);
+        assert.doesNotMatch(description, /使用完整(?:的有界)?共同候选池|而非共识 2×K/);
+    }
+    assert.equal(memory.params.find(field => field.name === 'compare_rerank').default, true);
+    assert.equal(memory.params.find(field => field.name === 'candidate_k').max, 100);
+});
 
 const S = '「' + '始」';
 const E = '「' + '末」';

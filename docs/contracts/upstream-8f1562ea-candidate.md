@@ -46,7 +46,7 @@ by same-batch retries after test-fixture corrections. Local source remaps and
 the independent CI recipe are distinguished explicitly. Cross-machine byte
 equality is not claimed or required.
 
-ProjectForge: 41 source tests, protocol v3 readiness/ping, JavaScript outline,
+ProjectForge: 42 source tests, protocol v3 readiness/ping, JavaScript outline,
 PowerShell geometry, malformed-Rust error reporting and invalid-input rejection.
 Audio: 430 source tests plus a passing doc test; actual rebuilt executable tested
 on a random loopback port with synthetic settings/database in a new temporary
@@ -114,12 +114,19 @@ artifacts are unchanged by it.
 ## Compatibility and limits
 
 Public backend source at `35ec1f7c` accepts the retained `memory_ab`, `k` and
-`candidate_k` fields; omitting `compare_jev` keeps its default disabled. However,
-that server's external refinement still documents a `2×K` pool, while the newer
-client description refers to the author's newer common-pool behavior. Do not
-claim a front/back-end VCP 2.0 rollout or identical experiment semantics from
-this client source PR. Deployment planning must pair the backend version or
-explicitly retain the old server semantics. No backend code/config is changed.
+`candidate_k` fields; omitting `compare_jev` keeps its default disabled. Its
+LightMemo implementation sets the refinement window to `2×K` and builds the
+consensus pool from KNN and RiverMemo. All A/B labels now describe that verified
+compatibility behavior, not the author's newer full-candidate/native-snapshot
+experiment claims. Query controls and bounded inputs are retained. A future
+paired backend/capability review may change these descriptions; this source PR
+does not establish such a rollout. No backend code or configuration is changed.
+
+Additional parser regressions exclude continuation heads after leading closing
+braces (`} else`, `} catch`) from geometry symbols. A real lazy-renderer regression
+checks malformed declared JEV, valid JEV and nested payload literals; malformed
+field identity is derived only from the scanned field list when no tool_name
+exists, never from raw payload matching. Typed tool_name presentation is retained.
 
 Local Linux regressions are network-disconnected after dependency installation.
 Windows-only skips remain skips; hosted Windows checks and PR review are

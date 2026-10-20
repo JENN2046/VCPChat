@@ -62,6 +62,9 @@ const allowedSourceDifferences = new Set([
     'rust_audio_engine/src/server.rs',
     'modules/renderer/toolRequestMarkers.js',
     'tests/tool-request-malformed-marker.test.mjs',
+    // Verified backend-compatible experiment labels and real lazy-card regression.
+    'VCPHumanToolBox/renderer_modules/config.js',
+    'tests/message-renderer-tool-cards.test.mjs',
     // Synthetic E2E output probe must prove execution without assuming input echo.
     'scripts/lib/terminal-smoke-probe.mjs',
     'audio_engine/audio_server.exe',
@@ -620,6 +623,16 @@ const reviewedClassicSecurityExceptions = new Set([
     'RAGmodules/RAG_Observer.html',
     'RAGmodules/RAG_Overlay.html',
 ]);
+// PR #65 P1: exact compatibility wording repair, not a Classic redesign or
+// a directory-wide exception. Keep authorization exemptions separate.
+const reviewedClassicCompatibilityExceptions = new Set([
+    'VCPHumanToolBox/renderer_modules/config.js',
+]);
+for (const file of reviewedClassicCompatibilityExceptions) {
+    if (!allowedSourceDifferences.has(file)) {
+        failures.push(`${file}: reviewed Classic compatibility exception requires a source-difference entry`);
+    }
+}
 for (const file of reviewedClassicSecurityExceptions) {
     if (!allowedSourceDifferences.has(file)) {
         failures.push(`${file}: reviewed Classic security exception must also be present in the source-difference allowlist`);
@@ -770,7 +783,8 @@ if (sourceContext) {
     }
     for (const file of sourceContext.changedPaths('upstream')) {
         if (upstreamClassicPatterns.some(pattern => pattern.test(file))
-            && !reviewedClassicSecurityExceptions.has(file)) {
+            && !reviewedClassicSecurityExceptions.has(file)
+            && !reviewedClassicCompatibilityExceptions.has(file)) {
             failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
         }
     }
@@ -804,7 +818,8 @@ if (sourceContext) {
             .split('\n')
             .filter(file => file
                 && upstreamClassicPatterns.some(pattern => pattern.test(file))
-                && !reviewedClassicSecurityExceptions.has(file));
+                && !reviewedClassicSecurityExceptions.has(file)
+                && !reviewedClassicCompatibilityExceptions.has(file));
         for (const file of classicDifferences) {
             failures.push(`${file}: excluded Next surface must remain byte-identical to ${upstreamRef}`);
         }

@@ -4072,17 +4072,17 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3551,
+          "line": 3553,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3610,
+          "line": 3612,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3648,
+          "line": 3650,
           "kind": "custom-event-listener"
         },
         {
@@ -5599,19 +5599,19 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3551,
+          "line": 3553,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('click'"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3610,
+          "line": 3612,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('click'"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3648,
+          "line": 3650,
           "kind": "custom-event-listener",
           "match": "removeBtn.addEventListener('click'"
         },
@@ -8017,7 +8017,7 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3552,
+          "line": 3554,
           "kind": "custom-event-listener"
         },
         {
@@ -8160,7 +8160,7 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3552,
+          "line": 3554,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('contextmenu'"
         },
@@ -34756,7 +34756,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 684,
+      "line": 686,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -34764,7 +34764,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 2692,
+      "line": 2694,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -34772,7 +34772,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 3441,
+      "line": 3443,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",

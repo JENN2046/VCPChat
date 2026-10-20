@@ -19,9 +19,9 @@
     {
       "component": "rust_projectforge_indexer",
       "destination": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
-      "size": 17881088,
-      "sha256": "e8d1781dd53d84686dc94d60801814097c0850efd00cc9f6fc83f1ee513b8ea1",
-      "gitBlob": "264be88a55b5b28e83b1befc03f5da0748b27fab",
+      "size": 17882112,
+      "sha256": "8a77e453d3d4057b02ce17138d752faf1019dbe0b10cc5fea4d7c022b46438ba",
+      "gitBlob": "9d7096ab6bbcef0fac12d36691bfc956e40c065b",
       "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
       "inputHashes": [
         {
@@ -37,7 +37,7 @@
           "path": "examples/geo_probe.rs"
         },
         {
-          "sha256": "89119c4674267a60abad36c136a4b760f8fa99cbaa20432fa0c34b83f8e63522",
+          "sha256": "f75d116b09a19cdcfc62843b358456229e949f4d925fcde1ddebf430257103a6",
           "path": "src/geo.rs"
         },
         {
@@ -138,7 +138,7 @@
         "portableCpu": true,
         "crossMachineByteEqualityRequired": false,
         "functionality": {
-          "sourceTests": 41
+          "sourceTests": 42
         },
         "recipe": ".github/scripts/build-projectforge-windows.ps1",
         "recipeSha256": "4f8654f1c21e675be43aaa0c18946e88b4bf7afdd1752cd06e759393ab7a8c72",

@@ -79,6 +79,12 @@ struct LineMetrics {
 /// 判断一行去掉前导空白后是否以控制流关键字开头（过滤 if/for/while/switch/match/catch/else 等非符号子拱）
 #[inline]
 fn is_control_flow_head(trimmed: &[u8]) -> bool {
+    // A continuation head can follow one or more blocks closed on this line.
+    let mut start = 0;
+    while let Some(&byte) = trimmed.get(start) {
+        if byte == b'}' || byte.is_ascii_whitespace() { start += 1; } else { break; }
+    }
+    let trimmed = &trimmed[start..];
     const CTRLS: &[&[u8]] = &[
         b"if", b"else", b"for", b"while", b"switch", b"case", b"default",
         b"try", b"catch", b"finally", b"match", b"loop", b"do", b"with",
@@ -1169,6 +1175,21 @@ function setup() {
         assert!(!outline.has_error);
         let symbols: Vec<_> = outline.symbols.iter().map(|s| (s.name.as_str(), s.start, s.end, s.depth, s.parent)).collect();
         assert_eq!(symbols, [("outer", 1, 5, 0, None), ("inner", 2, 2, 1, Some(0)), ("after", 6, 6, 0, None)]);
+    }
+
+    #[test]
+    fn continuations_after_closing_braces_remain_control_blocks() {
+        for ext in ["zig", "wgsl", "vue"] {
+            let source = "fn outer() {\n    if (ready) {\n        call();\n    } else if (other) {\n        call();\n    } else {\n        call();\n    }\n}\n";
+            let outline = profile_from_name(ext).unwrap().outline(source);
+            assert!(!outline.has_error, "{ext}");
+            assert_eq!(outline.symbols.len(), 1, "control continuations are not anonymous definitions: {ext}");
+            assert_eq!(outline.symbols[0].name, "outer");
+            assert_eq!((outline.symbols[0].start, outline.symbols[0].end), (1, 9));
+        }
+        assert!(is_control_flow_head(b"} } else {"));
+        assert!(is_control_flow_head(b"}\tcatch (error) {"));
+        assert!(!is_control_flow_head(b"} function after() {"));
     }
 }
 

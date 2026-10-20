@@ -54,6 +54,7 @@ function smoke(executable) {
     { id: 4, method: 'outline', params: { lang: 'ps1', text: 'function Trace-Geometry {\n    return 42\n}\n' } },
     { id: 5, method: 'outline', params: { lang: 'rust', text: 'pub fn broken() {\n    if true {\n' } },
     { id: 6, method: 'outline', params: { lang: 'sh', text: 'health_check() { curl localhost; }\n' } },
+    { id: 7, method: 'outline', params: { lang: 'vue', text: 'function outer() {\n  if (ready) {\n    call();\n  } else {\n    call();\n  }\n}\n' } },
   ].map(v => JSON.stringify(v)).join('\n') + '\n';
   const child = spawnSync(executable, [], { input, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024, windowsHide: true });
   assert.ifError(child.error); assert.equal(child.status, 0, 'native exit');
@@ -69,8 +70,10 @@ function smoke(executable) {
   assert.equal(response(5).ok, true); assert.equal(response(5).result.hasError, true);
   assert.equal(response(6).ok, true);
   assert.ok(response(6).result.symbols.some(v => v.name === 'health_check' && v.start === 1 && v.end === 1));
+  assert.equal(response(7).ok, true);
+  assert.deepEqual(response(7).result.symbols.map(v => v.name), ['outer']);
   return { ready: true, ping: true, javascriptOutline: true, powershellGeometry: true,
-    sameLineShellGeometry: true, malformedRustReported: true, invalidInputRejected: true };
+    sameLineShellGeometry: true, controlContinuationsExcluded: true, malformedRustReported: true, invalidInputRejected: true };
 }
 if (require.main === module) {
   try {

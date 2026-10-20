@@ -189,6 +189,31 @@ async function disposeFixture(fixture) {
     }
 }
 
+test('lazy renderer labels malformed declared JEV without promoting payload literals', async () => {
+    for (const [fields, isJev, malformed] of [
+        ['JEV:「始»联络[Grok]«末」', true, true],
+        [`JEV:${S}联络[Grok]${E}`, true, false],
+        ['content:「始ESCAPE」example JEV:「始»data«末」「末ESCAPE」', false, true],
+        [`tool_name:${S}Demo${E}\nJEV:「始»data«末」`, false, true],
+    ]) {
+        const fixture = await createRendererFixture(`<<<[TOOL_REQUEST]>>>\n${fields}\n<<<[END_TOOL_REQUEST]>>>`, {toolPresentation:'legacy', toolExpansion:'none'});
+        try {
+            const card = fixture.messageItem.querySelector('.vcp-tool-use-bubble');
+            assert.ok(card);
+            assert.equal(card.dataset.vcpBlockType, isJev ? 'jev-tool-use' : 'tool-use');
+            assert.equal(card.classList.contains('is-malformed'), malformed);
+            if (isJev && malformed) {
+                assert.match(card.textContent, /字段标记写法有误.*JEV/);
+                assert.doesNotMatch(card.textContent, /未识别 tool_name/);
+            } else if (!isJev && !fields.includes('tool_name')) assert.match(card.textContent, /未识别 tool_name/);
+            else if (!isJev) {
+                assert.match(card.textContent, /Demo/);
+                assert.doesNotMatch(card.textContent, /未识别 tool_name/);
+            }
+        } finally { await disposeFixture(fixture); }
+    }
+});
+
 
 async function renderTranscript(toolPresentation) {
     const fixture = await createRendererFixture(TRANSCRIPT, { toolPresentation, toolExpansion: 'none' });

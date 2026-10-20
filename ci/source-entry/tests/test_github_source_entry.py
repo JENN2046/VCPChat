@@ -373,8 +373,8 @@ class ManifestRefreshTests(unittest.TestCase):
                 })
             reviewed_rebuilds = {
                 "audio_engine/audio_server.exe":
-                    ("65bb928faf39c3043e9357b3dfd0a744201c7f21", 10052096,
-                     "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72"),
+                    ("39e24d9477523bd34d3a3cee22ee4edc37c698aa", 10052096,
+                     "2f4efd8e99416addb7cc1e0341c0adb8578d91aac054e0261378587687f46eeb"),
                 "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
                     ("7a981c416b8fc7449469014e0e2f5551a36f35ab", 258560,
                      "db57bd214dd0a5b34ff7522acabc9cfc7479fecde9e6a3d4d42409214de43223"),
@@ -400,9 +400,9 @@ class ManifestRefreshTests(unittest.TestCase):
                 self.assertEqual(native[reviewed_forge], {
                     "path": reviewed_forge,
                     "mode": "100644", "type": "blob",
-                    "blob": "8310d588e75a43d382ce6784e972b3dfe4339a92",
-                    "size": 17880576,
-                    "sha256": "feadce48a1424d43ac2ea529a3a49a115ee90c5260e3e9b541ed644c0dbe6c91",
+                    "blob": "264be88a55b5b28e83b1befc03f5da0748b27fab",
+                    "size": 17881088,
+                    "sha256": "e8d1781dd53d84686dc94d60801814097c0850efd00cc9f6fc83f1ee513b8ea1",
                     "kind": "static-native", "format": "PE",
                 })
 
@@ -414,6 +414,9 @@ class ManifestRefreshTests(unittest.TestCase):
         self.assertTrue(required)
         admitted = {row["path"] for row in self.manifest["profiles"]["chat-kernel-ui"]["entries"]}
         self.assertTrue(required <= admitted, sorted(required - admitted))
+        for profile_name in ["package-smoke", "chat-kernel-ui"]:
+            self.assertIn("scripts/lib/terminal-smoke-probe.mjs",
+                          {row["path"] for row in self.manifest["profiles"][profile_name]["entries"]})
         rules = self.manifest["profiles"]["chat-kernel-ui"]["required_scans"]
         kernel_rule = next(rule for rule in rules if rule["name"] == "reviewed-effective-kernel-test-inputs")
         self.assertEqual(set(kernel_rule["files"]), required)

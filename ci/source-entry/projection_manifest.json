@@ -625,9 +625,9 @@
           "path": ".github/scripts/verify-projectforge-trace.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a0ebe380bf2981b4b086167129f0b0e2da64a299",
-          "size": 5932,
-          "sha256": "f5dbd799fc83f3cdfc9d2526c0c906ed591a5f7c9c9d250e62c3df0ee48f59bb",
+          "blob": "ed35a4316fedd163b114c3e23521f9daa83953ee",
+          "size": 6213,
+          "sha256": "77f518a8d6e6e89a10a1ef342e22bae62c12cbec7f5191ac733cb97c5389d58d",
           "kind": "source"
         },
         {
@@ -3200,9 +3200,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "8310d588e75a43d382ce6784e972b3dfe4339a92",
-          "size": 17880576,
-          "sha256": "feadce48a1424d43ac2ea529a3a49a115ee90c5260e3e9b541ed644c0dbe6c91",
+          "blob": "264be88a55b5b28e83b1befc03f5da0748b27fab",
+          "size": 17881088,
+          "sha256": "e8d1781dd53d84686dc94d60801814097c0850efd00cc9f6fc83f1ee513b8ea1",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6028,9 +6028,9 @@
           "path": "audio_engine/audio_server.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
+          "blob": "39e24d9477523bd34d3a3cee22ee4edc37c698aa",
           "size": 10052096,
-          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
+          "sha256": "2f4efd8e99416addb7cc1e0341c0adb8578d91aac054e0261378587687f46eeb",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6058,9 +6058,9 @@
           "path": "audio_engine/audio_server_rubato_dsp.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
+          "blob": "39e24d9477523bd34d3a3cee22ee4edc37c698aa",
           "size": 10052096,
-          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
+          "sha256": "2f4efd8e99416addb7cc1e0341c0adb8578d91aac054e0261378587687f46eeb",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6213,9 +6213,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6884d4ae22e8e5ac133a3ec900a0db53cbf4b4f0",
-          "size": 36189,
-          "sha256": "0bc635a27fccc6f1e5bfc49dfefddba35e7f7c89d69da0e18de1b8e1920de727",
+          "blob": "4369492cc9eeff997a0f42c42bc820ba892e0697",
+          "size": 36216,
+          "sha256": "eefb03f904c4b3411705d63bfcbfbfde6ba463229c6d6941fd9bb06c37c50d4e",
           "kind": "source"
         },
         {
@@ -11842,9 +11842,9 @@
           "path": "rust_projectforge_indexer/src/geo.rs",
           "mode": "100644",
           "type": "blob",
-          "blob": "877334a2c1ed2dac81718073b68889912051d805",
-          "size": 43352,
-          "sha256": "053f8f11b5cf66d52e0949d294ab3d8e6a093e542e40823e1ef06ec9d669c5d7",
+          "blob": "e0a5457b292ab1f7d0cf7429c123de9f892f0ff6",
+          "size": 45886,
+          "sha256": "89119c4674267a60abad36c136a4b760f8fa99cbaa20432fa0c34b83f8e63522",
           "kind": "source"
         },
         {
@@ -11987,9 +11987,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "c511a342e35ff0aeb244d5628b2c6b99b2640630",
-          "size": 40319,
-          "sha256": "94f2121292a3aa53c4434e262a2cd597ca43866bd8cadbefa83d3da812725978",
+          "blob": "98a5d495811a599ccf03954013b41a22807b55da",
+          "size": 40447,
+          "sha256": "629981a4e5cbd5fc441d3d6da1a51fc629abb13bd74c4cc714b4689638b9ba79",
           "kind": "source"
         },
         {
@@ -12119,6 +12119,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/lib/terminal-smoke-probe.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "263a0d1b34ebdfd93218738fc2bb1e71800f7e69",
+          "size": 435,
+          "sha256": "19745538f02f215bf92b13ac12f503c8876fc4eebd045ed92c6a228e028667d3",
+          "kind": "source"
+        },
+        {
           "path": "scripts/lib/window-package-contract.cjs",
           "mode": "100644",
           "type": "blob",
@@ -12158,9 +12167,9 @@
           "path": "scripts/smoke-side-pane-e2e.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b2354bdb44d74943e5dc3b58b86eaf132c280022",
-          "size": 34240,
-          "sha256": "76a2033100e64a1a02e733070b548d7e7fffdda308fcc6411055ff26b8f40dc4",
+          "blob": "9622997b95ada39cab5214d6b87beba66e9f23ed",
+          "size": 34393,
+          "sha256": "48e1527c318e054a2f7dfb4835fadce0b1703163c9938edf0c74803bbf69c9e4",
           "kind": "source"
         },
         {
@@ -13877,9 +13886,9 @@
           "path": "tests/side-pane-advanced-parity.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "80baf199663c40c9db46aa51bb40a22c76bfc8d1",
-          "size": 51770,
-          "sha256": "53ddac1df6323cdec46cf54f089079b3e5549ef1f7d93097460fd25b96005491",
+          "blob": "8f2adbd0f07f4ad86fa38801182255ecd7e3c7f2",
+          "size": 52963,
+          "sha256": "d08b936250fa5f5e4cd2d246bdf42eb9b11ec102e65267a9e598228e93e253e6",
           "kind": "source"
         },
         {
@@ -15590,9 +15599,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "8310d588e75a43d382ce6784e972b3dfe4339a92",
-          "size": 17880576,
-          "sha256": "feadce48a1424d43ac2ea529a3a49a115ee90c5260e3e9b541ed644c0dbe6c91",
+          "blob": "264be88a55b5b28e83b1befc03f5da0748b27fab",
+          "size": 17881088,
+          "sha256": "e8d1781dd53d84686dc94d60801814097c0850efd00cc9f6fc83f1ee513b8ea1",
           "kind": "static-native",
           "format": "PE"
         },
@@ -15610,9 +15619,9 @@
           "path": "audio_engine/audio_server.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
+          "blob": "39e24d9477523bd34d3a3cee22ee4edc37c698aa",
           "size": 10052096,
-          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
+          "sha256": "2f4efd8e99416addb7cc1e0341c0adb8578d91aac054e0261378587687f46eeb",
           "kind": "static-native",
           "format": "PE"
         },
@@ -15640,9 +15649,9 @@
           "path": "audio_engine/audio_server_rubato_dsp.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "65bb928faf39c3043e9357b3dfd0a744201c7f21",
+          "blob": "39e24d9477523bd34d3a3cee22ee4edc37c698aa",
           "size": 10052096,
-          "sha256": "282348f1a5ef99be4d7d5f316026b7711da54eda36afe33161b41bac82dc6d72",
+          "sha256": "2f4efd8e99416addb7cc1e0341c0adb8578d91aac054e0261378587687f46eeb",
           "kind": "static-native",
           "format": "PE"
         },
@@ -16068,6 +16077,12 @@
             "rust_projectforge_indexer/tests/fixtures/broken_syntax.rs",
             "rust_projectforge_indexer/tests/sample_script.ps1"
           ]
+        },
+        {
+          "name": "reviewed-synthetic-terminal-output-probe",
+          "files": [
+            "scripts/lib/terminal-smoke-probe.mjs"
+          ]
         }
       ],
       "source_context": {
@@ -16088,9 +16103,9 @@
           "path": ".github/scripts/verify-projectforge-trace.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a0ebe380bf2981b4b086167129f0b0e2da64a299",
-          "size": 5932,
-          "sha256": "f5dbd799fc83f3cdfc9d2526c0c906ed591a5f7c9c9d250e62c3df0ee48f59bb",
+          "blob": "ed35a4316fedd163b114c3e23521f9daa83953ee",
+          "size": 6213,
+          "sha256": "77f518a8d6e6e89a10a1ef342e22bae62c12cbec7f5191ac733cb97c5389d58d",
           "kind": "source"
         },
         {
@@ -18176,9 +18191,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "8310d588e75a43d382ce6784e972b3dfe4339a92",
-          "size": 17880576,
-          "sha256": "feadce48a1424d43ac2ea529a3a49a115ee90c5260e3e9b541ed644c0dbe6c91",
+          "blob": "264be88a55b5b28e83b1befc03f5da0748b27fab",
+          "size": 17881088,
+          "sha256": "e8d1781dd53d84686dc94d60801814097c0850efd00cc9f6fc83f1ee513b8ea1",
           "kind": "static-native",
           "format": "PE"
         },
@@ -19581,9 +19596,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6884d4ae22e8e5ac133a3ec900a0db53cbf4b4f0",
-          "size": 36189,
-          "sha256": "0bc635a27fccc6f1e5bfc49dfefddba35e7f7c89d69da0e18de1b8e1920de727",
+          "blob": "4369492cc9eeff997a0f42c42bc820ba892e0697",
+          "size": 36216,
+          "sha256": "eefb03f904c4b3411705d63bfcbfbfde6ba463229c6d6941fd9bb06c37c50d4e",
           "kind": "source"
         },
         {
@@ -25071,9 +25086,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "c511a342e35ff0aeb244d5628b2c6b99b2640630",
-          "size": 40319,
-          "sha256": "94f2121292a3aa53c4434e262a2cd597ca43866bd8cadbefa83d3da812725978",
+          "blob": "98a5d495811a599ccf03954013b41a22807b55da",
+          "size": 40447,
+          "sha256": "629981a4e5cbd5fc441d3d6da1a51fc629abb13bd74c4cc714b4689638b9ba79",
           "kind": "source"
         },
         {
@@ -25239,6 +25254,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/lib/terminal-smoke-probe.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "263a0d1b34ebdfd93218738fc2bb1e71800f7e69",
+          "size": 435,
+          "sha256": "19745538f02f215bf92b13ac12f503c8876fc4eebd045ed92c6a228e028667d3",
+          "kind": "source"
+        },
+        {
           "path": "scripts/lib/window-package-contract.cjs",
           "mode": "100644",
           "type": "blob",
@@ -25305,9 +25329,9 @@
           "path": "scripts/smoke-side-pane-e2e.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b2354bdb44d74943e5dc3b58b86eaf132c280022",
-          "size": 34240,
-          "sha256": "76a2033100e64a1a02e733070b548d7e7fffdda308fcc6411055ff26b8f40dc4",
+          "blob": "9622997b95ada39cab5214d6b87beba66e9f23ed",
+          "size": 34393,
+          "sha256": "48e1527c318e054a2f7dfb4835fadce0b1703163c9938edf0c74803bbf69c9e4",
           "kind": "source"
         },
         {
@@ -28140,9 +28164,9 @@
           "path": "tests/side-pane-advanced-parity.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "80baf199663c40c9db46aa51bb40a22c76bfc8d1",
-          "size": 51770,
-          "sha256": "53ddac1df6323cdec46cf54f089079b3e5549ef1f7d93097460fd25b96005491",
+          "blob": "8f2adbd0f07f4ad86fa38801182255ecd7e3c7f2",
+          "size": 52963,
+          "sha256": "d08b936250fa5f5e4cd2d246bdf42eb9b11ec102e65267a9e598228e93e253e6",
           "kind": "source"
         },
         {
@@ -30302,9 +30326,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "8310d588e75a43d382ce6784e972b3dfe4339a92",
-          "size": 17880576,
-          "sha256": "feadce48a1424d43ac2ea529a3a49a115ee90c5260e3e9b541ed644c0dbe6c91",
+          "blob": "264be88a55b5b28e83b1befc03f5da0748b27fab",
+          "size": 17881088,
+          "sha256": "e8d1781dd53d84686dc94d60801814097c0850efd00cc9f6fc83f1ee513b8ea1",
           "kind": "static-native",
           "format": "PE"
         }
@@ -30864,6 +30888,12 @@
             "vendor/pyodide.asm.js",
             "vendor/three.min.js",
             "vendor/three.module.js"
+          ]
+        },
+        {
+          "name": "reviewed-synthetic-terminal-output-probe",
+          "files": [
+            "scripts/lib/terminal-smoke-probe.mjs"
           ]
         }
       ],

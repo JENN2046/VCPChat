@@ -66,6 +66,7 @@ struct LineMetrics {
     non_empty: bool,
     is_comment: bool,
     open_braces: u16,
+    same_line_block: bool,
     close_braces: u16,
     leading_close_braces: u16,
     net_parens: i16,
@@ -168,6 +169,7 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
         non_empty: false,
         is_comment: false,
         open_braces: 0,
+        same_line_block: false,
         close_braces: 0,
         leading_close_braces: 0,
         net_parens: 0,
@@ -267,6 +269,7 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
 
         // 2. 扫描行内括号与冒号（跳过字符串和注释）
         let mut open_braces: u16 = 0;
+        let mut same_line_block = false;
         let mut close_braces: u16 = 0;
         let mut leading_close_braces: u16 = 0;
         let mut seen_code_token = false;
@@ -421,6 +424,11 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
                         leading_close_braces += 1;
                     } else if open_braces > 0 {
                         open_braces -= 1;
+                        // Keep a completed outer same-line block in addition
+                        // to the net-open brace ledger.
+                        if open_braces == 0 {
+                            same_line_block = true;
+                        }
                     } else {
                         close_braces += 1;
                     }
@@ -454,6 +462,7 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
             non_empty: non_empty && (!is_comment || trimmed.starts_with(b"@") || trimmed.starts_with(b"#")),
             is_comment,
             open_braces,
+            same_line_block,
             close_braces,
             leading_close_braces,
             net_parens,
@@ -585,6 +594,20 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
                 } else {
                     healthy = false;
                 }
+            }
+
+            // Completed same-line blocks never enter the open-block stack.
+            // One line has one signature: nested pairs do not duplicate it,
+            // and a still-open outer block is handled by the existing stack.
+            if m.same_line_block && m.open_braces == 0 && m.has_decl_hint && !m.starts_with_ctrl {
+                let sig_start = backtrack_multiline_sig(&lines, ln);
+                arches.push(GeoArch {
+                    sig_start,
+                    foot_line: ln,
+                    end_line: ln,
+                    full_start: compute_full_start(&lines, sig_start),
+                    tier: if healthy { Tier::Green } else { Tier::Red },
+                });
             }
 
             // 2) 再压入本行未闭合的 `{`
@@ -1120,6 +1143,32 @@ function setup() {
         assert_eq!(names_of("ps1", PS), ["Get-Foo", "Set-Bar"]);
         assert_eq!(names_of("wgsl", WGSL), ["VertexInput", "vs_main"]);
         assert_eq!(names_of("vue", VUE), ["setup", "inc"]);
+    }
+
+    #[test]
+    fn same_line_geometry_definitions_are_complete_arches() {
+        for (ext, source, name) in [
+            ("sh", "health_check() { curl localhost; }\n", "health_check"),
+            ("ps1", "function Get-Health { return 42 }\n", "Get-Health"),
+            ("wgsl", "fn health_check() { return; }\n", "health_check"),
+            ("vue", "function health_check() { return 42; }\n", "health_check"),
+        ] {
+            let outline = profile_from_name(ext).unwrap().outline(source);
+            assert!(!outline.has_error);
+            assert_eq!(outline.symbols.len(), 1, "{ext}");
+            let symbol = &outline.symbols[0];
+            assert_eq!(symbol.name, name);
+            assert_eq!((symbol.start, symbol.end, symbol.depth, symbol.parent), (1, 1, 0, None));
+        }
+    }
+
+    #[test]
+    fn same_line_blocks_preserve_parents_without_duplicate_or_control_arches() {
+        let source = "outer() {\n    inner() { if true; then echo '{ }'; fi; }\n    if true; then { echo ok; }; fi\n    # fake() { ignored }\n}\nafter() { { echo done; }; }\n";
+        let outline = profile_from_name("sh").unwrap().outline(source);
+        assert!(!outline.has_error);
+        let symbols: Vec<_> = outline.symbols.iter().map(|s| (s.name.as_str(), s.start, s.end, s.depth, s.parent)).collect();
+        assert_eq!(symbols, [("outer", 1, 5, 0, None), ("inner", 2, 2, 1, Some(0)), ("after", 6, 6, 0, None)]);
     }
 }
 

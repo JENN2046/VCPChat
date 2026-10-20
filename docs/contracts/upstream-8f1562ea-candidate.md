@@ -46,9 +46,9 @@ by same-batch retries after test-fixture corrections. Local source remaps and
 the independent CI recipe are distinguished explicitly. Cross-machine byte
 equality is not claimed or required.
 
-ProjectForge: 39 source tests, protocol v3 readiness/ping, JavaScript outline,
+ProjectForge: 41 source tests, protocol v3 readiness/ping, JavaScript outline,
 PowerShell geometry, malformed-Rust error reporting and invalid-input rejection.
-Audio: 429 source tests plus a passing doc test; actual rebuilt executable tested
+Audio: 430 source tests plus a passing doc test; actual rebuilt executable tested
 on a random loopback port with synthetic settings/database in a new temporary
 directory, including settings save, cold restart persistence and invalid bit
 depth rejection. No supplier calls, real configuration or hardware playback.
@@ -87,6 +87,20 @@ Tool-marker diagnostics now trust only the caller's parsed top-level JEV flag.
 Raw request text cannot promote a missing-tool-name request to JEV. Regressions
 retain legitimate declared JEV and malformed-marker diagnostics while rejecting
 JEV literals nested inside regular or ESCAPE parameter values.
+
+The next review's two P2s also have reproducing source tests: completed single-line
+geometry definitions now retain an arch, without duplicate nested pairs or
+control/comment/string false symbols; saved dither now updates the real atomic
+DSP snapshot as well as its UI field. Test inputs are synthetic, never played or
+executed as user scripts. Both affected native programs were rebuilt again.
+
+A hosted real-Electron smoke failure retained only one synthetic terminal marker.
+Its old two-occurrence assertion depended on input echo. The probe now constructs
+the marker from separate constant parts, so it is absent from the typed command;
+one full output marker therefore proves execution, not merely echoed input.
+Regression coverage executes only that fixed synthetic builtin in a clean child
+environment and rejects non-synthetic input. No product terminal code, CI authority,
+timeouts, cleanup or other E2E assertions are relaxed.
 
 ## Compatibility and limits
 

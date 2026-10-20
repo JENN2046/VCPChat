@@ -62,6 +62,8 @@ const allowedSourceDifferences = new Set([
     'rust_audio_engine/src/server.rs',
     'modules/renderer/toolRequestMarkers.js',
     'tests/tool-request-malformed-marker.test.mjs',
+    // Synthetic E2E output probe must prove execution without assuming input echo.
+    'scripts/lib/terminal-smoke-probe.mjs',
     'audio_engine/audio_server.exe',
     'audio_engine/audio_server_rubato_dsp.exe',
     // Same-run CI projection transfer preserves the Linux-only source writer.

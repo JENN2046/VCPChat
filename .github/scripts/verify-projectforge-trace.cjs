@@ -53,6 +53,7 @@ function smoke(executable) {
     { id: 3, method: 'outline', params: { lang: 'javascript' } },
     { id: 4, method: 'outline', params: { lang: 'ps1', text: 'function Trace-Geometry {\n    return 42\n}\n' } },
     { id: 5, method: 'outline', params: { lang: 'rust', text: 'pub fn broken() {\n    if true {\n' } },
+    { id: 6, method: 'outline', params: { lang: 'sh', text: 'health_check() { curl localhost; }\n' } },
   ].map(v => JSON.stringify(v)).join('\n') + '\n';
   const child = spawnSync(executable, [], { input, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024, windowsHide: true });
   assert.ifError(child.error); assert.equal(child.status, 0, 'native exit');
@@ -66,8 +67,10 @@ function smoke(executable) {
   assert.equal(response(4).ok, true);
   assert.ok(response(4).result.symbols.some(v => v.name === 'Trace-Geometry'));
   assert.equal(response(5).ok, true); assert.equal(response(5).result.hasError, true);
+  assert.equal(response(6).ok, true);
+  assert.ok(response(6).result.symbols.some(v => v.name === 'health_check' && v.start === 1 && v.end === 1));
   return { ready: true, ping: true, javascriptOutline: true, powershellGeometry: true,
-    malformedRustReported: true, invalidInputRejected: true };
+    sameLineShellGeometry: true, malformedRustReported: true, invalidInputRejected: true };
 }
 if (require.main === module) {
   try {

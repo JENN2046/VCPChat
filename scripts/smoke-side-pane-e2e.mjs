@@ -16,6 +16,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
+import { terminalSmokeProbe } from './lib/terminal-smoke-probe.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
@@ -331,8 +332,9 @@ function kinds(pageUrl) {
                 }, marker);
                 try {
                     await page.evaluate(() => document.querySelector('.side-pane-view.active .xterm-helper-textarea')?.focus());
-                    await page.keyboard.type(`echo ${marker}\n`);
-                    await waitIn(page, m => (document.querySelector('.side-pane-view.active .xterm-rows, .side-pane-view.active .xterm-accessibility-tree')?.textContent || '').split(m).length > 2, marker, 'terminal echo');
+                    await page.keyboard.type(terminalSmokeProbe(process.platform, marker));
+                    await page.keyboard.press('Enter');
+                    await waitIn(page, m => (document.querySelector('.side-pane-view.active .xterm-rows, .side-pane-view.active .xterm-accessibility-tree')?.textContent || '').includes(m), marker, 'terminal command output');
                     diagnostic.ok = true;
                 } finally {
                     diagnostic.observation = await page.evaluate(() => window.__sidePaneTerminalDiagnostic?.finish());

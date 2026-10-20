@@ -433,6 +433,20 @@ mod settings_eq_tests {
     use super::*;
 
     #[test]
+    fn applying_saved_dither_updates_the_actual_dsp_snapshot() {
+        let mut player = AudioPlayer::new(crate::config::AppConfig::default());
+        for enabled in [false, true, false] {
+            let settings = PersistentSettings {
+                dither_enabled: enabled,
+                ..PersistentSettings::default()
+            };
+            apply_settings_to_player(&mut player, &settings);
+            assert_eq!(player.dither_enabled, enabled);
+            assert_eq!(player.lockfree_noise_shaper_params.read().enabled, enabled);
+        }
+    }
+
+    #[test]
     fn applying_eq_settings_unloads_fir_when_disabled_or_selecting_iir() {
         // Synthetic defaults only: do not load AppConfig from the environment,
         // open media/devices, create an HTTP server or persist any settings.
@@ -506,8 +520,9 @@ fn apply_settings_to_player(player: &mut AudioPlayer, settings: &PersistentSetti
         }
     }
     
-    // Dither (state only; lock-free audio path currently does not host NoiseShaper stage)
+    // Keep persisted/UI state and the output chain's atomic DSP snapshot aligned.
     player.dither_enabled = settings.dither_enabled;
+    player.lockfree_noise_shaper_params.set_enabled(settings.dither_enabled);
     player.set_output_bits(settings.output_bits);
 
     // Noise shaper curve (was persisted but never applied on startup)

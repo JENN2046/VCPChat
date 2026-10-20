@@ -58,6 +58,8 @@ pub struct ScanStyle {
     pub hash_comment: bool,
     /// 标识符允许连字符（PowerShell `Verb-Noun` 函数名）
     pub hyphen_ident: bool,
+    /// PowerShell uses backtick escapes, not JS template strings or regex literals.
+    pub powershell_escapes: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -318,6 +320,11 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
                 continue;
             }
 
+            if style.powershell_escapes && c == b'`' {
+                j += 2; // escaped character, or the end-of-line continuation
+                continue;
+            }
+
             // 行注释
             if c == b'/' && j + 1 < tlen && trimmed[j + 1] == b'/' {
                 break;
@@ -336,6 +343,7 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
 
             // JS 族正则字面量：`/` 跟在运算符/分隔符之后（或行首）视为正则，整体跳过（含字符类 [...] 与 flags）
             if matches!(family, Family::Js)
+                && !style.powershell_escapes
                 && c == b'/'
                 && matches!(
                     last_non_ws,
@@ -382,7 +390,7 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
                 j += 3;
                 continue;
             }
-            if c == b'"' || c == b'\'' || (matches!(family, Family::Js | Family::Go) && c == b'`') {
+            if c == b'"' || c == b'\'' || ((matches!(family, Family::Js) && !style.powershell_escapes || matches!(family, Family::Go)) && c == b'`') {
                 // Rust 生命周期 'a 不算字符串
                 if c == b'\'' && matches!(family, Family::Rust) {
                     if j + 2 < tlen && trimmed[j + 2] == b'\'' {
@@ -401,9 +409,14 @@ pub fn scan_geometry(style: ScanStyle, source: &str) -> GeoFileResult {
                     // 行内消费完单双引号
                     j += 1;
                     while j < tlen {
-                        if trimmed[j] == b'\\' {
+                        if (!style.powershell_escapes && trimmed[j] == b'\\')
+                            || (style.powershell_escapes && c == b'"' && trimmed[j] == b'`') {
                             j += 2;
                         } else if trimmed[j] == c {
+                            if style.powershell_escapes && c == b'\'' && trimmed.get(j + 1) == Some(&c) {
+                                j += 2; // PowerShell single quotes escape by doubling.
+                                continue;
+                            }
                             j += 1;
                             break;
                         } else {
@@ -946,6 +959,7 @@ impl GeoProfile {
             family: self.family,
             hash_comment: self.hash_comment,
             hyphen_ident: self.hyphen_ident,
+            powershell_escapes: self.name == "powershell",
         }
     }
 
@@ -968,7 +982,8 @@ pub fn profile_from_name(name: &str) -> Option<GeoProfile> {
         "ps1" | "psm1" | "psd1" => p(Family::Js, true, true, "powershell", "."),
         "wgsl" => p(Family::Rust, false, false, "wgsl", "."),
         "zig" => p(Family::Rust, false, false, "zig", "."),
-        "vue" | "svelte" => p(Family::Js, false, false, "vue", "."),
+        "vue" => p(Family::Js, false, false, "vue", "."),
+        "svelte" => p(Family::Js, false, false, "svelte", "."),
         _ => None,
     }
 }
@@ -1023,6 +1038,9 @@ fn classify_kind(sig: &str) -> &'static str {
 /// - `depth`/`parent` 由拱的区间包含关系建立（前序遍历）；
 /// - `has_error` 映射为几何账本不可信（!healthy）。
 pub fn geo_outline(raw: &str, profile: &GeoProfile) -> Outline {
+    if matches!(profile.name, "vue" | "svelte") {
+        return crate::component::outline(raw, profile.name);
+    }
     let source = normalize_source(raw);
     let g = scan_geometry(profile.scan_style(), &source);
     let lines: Vec<&str> = source.split('\n').collect();
@@ -1129,6 +1147,7 @@ fn vs_main(in: VertexInput) -> vec4<f32> {
 ";
 
     const VUE: &str = "\
+<script>\n\
 function setup() {
   const state = ref(0);
   function inc() {
@@ -1136,6 +1155,7 @@ function setup() {
   }
   return { state, inc };
 }
+</script>
 ";
 
     fn names_of(ext: &str, src: &str) -> Vec<String> {
@@ -1157,7 +1177,6 @@ function setup() {
             ("sh", "health_check() { curl localhost; }\n", "health_check"),
             ("ps1", "function Get-Health { return 42 }\n", "Get-Health"),
             ("wgsl", "fn health_check() { return; }\n", "health_check"),
-            ("vue", "function health_check() { return 42; }\n", "health_check"),
         ] {
             let outline = profile_from_name(ext).unwrap().outline(source);
             assert!(!outline.has_error);
@@ -1179,7 +1198,7 @@ function setup() {
 
     #[test]
     fn continuations_after_closing_braces_remain_control_blocks() {
-        for ext in ["zig", "wgsl", "vue"] {
+        for ext in ["zig", "wgsl"] {
             let source = "fn outer() {\n    if (ready) {\n        call();\n    } else if (other) {\n        call();\n    } else {\n        call();\n    }\n}\n";
             let outline = profile_from_name(ext).unwrap().outline(source);
             assert!(!outline.has_error, "{ext}");
@@ -1191,6 +1210,24 @@ function setup() {
         assert!(is_control_flow_head(b"}\tcatch (error) {"));
         assert!(!is_control_flow_head(b"} function after() {"));
     }
+
+    #[test]
+    fn powershell_backtick_continuations_do_not_open_template_strings() {
+        let source = "function Invoke-Step {\n    Write-Output `\n        'hello'\n}\nfunction Get-Next { return 42 }\n";
+        let outline = profile_from_name("ps1").unwrap().outline(source);
+        assert!(!outline.has_error);
+        let symbols: Vec<_> = outline.symbols.iter().map(|s| (s.name.as_str(), s.start, s.end)).collect();
+        assert_eq!(symbols, [("Invoke-Step", 1, 4), ("Get-Next", 5, 5)]);
+    }
+
+    #[test]
+    fn powershell_quoted_backticks_and_windows_paths_do_not_change_brace_depth() {
+        let source = "function Get-Text {\n    Write-Output \"literal `\" } still text\"\n    Write-Output 'literal '' } '' text'\n    Write-Output \"C:\\\"\n}\n";
+        let outline = profile_from_name("ps1").unwrap().outline(source);
+        assert!(!outline.has_error);
+        assert_eq!(outline.symbols.len(), 1);
+        assert_eq!((outline.symbols[0].start, outline.symbols[0].end), (1, 5));
+    }
 }
 
 impl ScanStyle {
@@ -1200,6 +1237,7 @@ impl ScanStyle {
             family: lang.family(),
             hash_comment: false,
             hyphen_ident: false,
+            powershell_escapes: false,
         }
     }
 }

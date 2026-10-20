@@ -1,6 +1,7 @@
 'use strict';
 // Traceability and artifact identity, NOT cross-machine build equivalence.
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
@@ -47,6 +48,11 @@ function verify(root) {
     bundledSha256: record.sha256, crossMachineEquivalenceClaimed: false };
 }
 function smoke(executable) {
+  const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-component-smoke-'));
+  const component = '<template><div class=card>{{ title }}</div></template>\n<script setup lang="ts">\n// fixture documentation\nfunction componentFixture(value: number) {\n  return value;\n}\n</script>\n<style>.card { color: red; }</style>\n';
+  fs.writeFileSync(path.join(fixtureRoot, 'fixture.vue'), component);
+  fs.writeFileSync(path.join(fixtureRoot, 'fixture.svelte'), component);
+  try {
   const input = [
     { id: 1, method: 'ping', params: {} },
     { id: 2, method: 'outline', params: { lang: 'javascript', text: 'export function traceFixture() { return 42; }\n' } },
@@ -54,7 +60,13 @@ function smoke(executable) {
     { id: 4, method: 'outline', params: { lang: 'ps1', text: 'function Trace-Geometry {\n    return 42\n}\n' } },
     { id: 5, method: 'outline', params: { lang: 'rust', text: 'pub fn broken() {\n    if true {\n' } },
     { id: 6, method: 'outline', params: { lang: 'sh', text: 'health_check() { curl localhost; }\n' } },
-    { id: 7, method: 'outline', params: { lang: 'vue', text: 'function outer() {\n  if (ready) {\n    call();\n  } else {\n    call();\n  }\n}\n' } },
+    { id: 7, method: 'outline', params: { lang: 'vue', text: '<script>\nfunction outer() {\n  if (ready) {\n    call();\n  } else {\n    call();\n  }\n}\n</script>\n' } },
+    { id: 8, method: 'outline', params: { lang: 'ps1', text: 'function Invoke-Step {\n  Write-Output `\n    "hello"\n}\n' } },
+    { id: 9, method: 'outline', params: { lang: 'vue', text: component } },
+    { id: 10, method: 'outline', params: { lang: 'svelte', text: component } },
+    { id: 11, method: 'findSymbols', params: { root: fixtureRoot, name: 'componentFixture', exact: true } },
+    { id: 12, method: 'outline', params: { lang: 'vue', text: '<style>.fake { color:red; }</style>\n' } },
+    { id: 13, method: 'outline', params: { lang: 'svelte', text: '<script>function unsafeInline() {}</script>' } },
   ].map(v => JSON.stringify(v)).join('\n') + '\n';
   const child = spawnSync(executable, [], { input, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024, windowsHide: true });
   assert.ifError(child.error); assert.equal(child.status, 0, 'native exit');
@@ -72,8 +84,33 @@ function smoke(executable) {
   assert.ok(response(6).result.symbols.some(v => v.name === 'health_check' && v.start === 1 && v.end === 1));
   assert.equal(response(7).ok, true);
   assert.deepEqual(response(7).result.symbols.map(v => v.name), ['outer']);
+  assert.equal(response(8).ok, true);
+  assert.equal(response(8).result.hasError, false);
+  assert.ok(response(8).result.symbols.some(v => v.name === 'Invoke-Step' && v.start === 1 && v.end === 4));
+  for (const [id, lang] of [[9, 'vue'], [10, 'svelte']]) {
+    const result = response(id).result;
+    assert.equal(response(id).ok, true); assert.equal(result.lang, lang);
+    assert.equal(result.hasError, false); assert.equal(result.lineCount, 8);
+    assert.deepEqual(result.symbols.map(v => [v.name, v.start, v.end, v.fullStart]), [['componentFixture', 4, 6, 3]]);
+    const lines = component.trimEnd().split('\n');
+    for (const s of result.symbols) {
+      // Exercise the existing line-range replacement consumer on synthetic text.
+      lines.splice(s.fullStart - 1, s.end - s.fullStart + 1, 'function replacementFixture() {}');
+    }
+    assert.ok(lines.includes('<script setup lang="ts">'));
+    assert.ok(lines.includes('</script>'));
+    assert.ok(lines.includes('<style>.card { color: red; }</style>'));
+  }
+  assert.equal(response(11).ok, true);
+  assert.equal(response(11).result.hits.length, 2);
+  assert.ok(response(11).result.hits.every(v => v.start === 4 && v.end === 6 && v.fullStart === 3));
+  assert.equal(response(12).result.hasError, false); assert.deepEqual(response(12).result.symbols, []);
+  assert.equal(response(13).result.hasError, true); assert.deepEqual(response(13).result.symbols, []);
   return { ready: true, ping: true, javascriptOutline: true, powershellGeometry: true,
-    sameLineShellGeometry: true, controlContinuationsExcluded: true, malformedRustReported: true, invalidInputRejected: true };
+    sameLineShellGeometry: true, controlContinuationsExcluded: true, powershellBackticks: true,
+    componentScriptRanges: true, componentFindSymbols: true, lineRangeReplacement: true,
+    markupExcluded: true, inlineEditRejected: true, malformedRustReported: true, invalidInputRejected: true };
+  } finally { fs.rmSync(fixtureRoot, { recursive: true, force: true }); }
 }
 if (require.main === module) {
   try {

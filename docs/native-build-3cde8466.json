@@ -19,9 +19,9 @@
     {
       "component": "rust_projectforge_indexer",
       "destination": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
-      "size": 17882112,
-      "sha256": "8a77e453d3d4057b02ce17138d752faf1019dbe0b10cc5fea4d7c022b46438ba",
-      "gitBlob": "9d7096ab6bbcef0fac12d36691bfc956e40c065b",
+      "size": 17904640,
+      "sha256": "87bb0062f8c2a35f5e7d2b1620d333971b57d1ef1ebbd6bf6b36c962d1babe15",
+      "gitBlob": "c3ab648244858b8330d10238542c5a128da4cd37",
       "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
       "inputHashes": [
         {
@@ -33,11 +33,15 @@
           "path": "Cargo.toml"
         },
         {
-          "sha256": "cd31990ac3ee20ad4864569bdd9ad8f47d98c40dbc166213f69f0248eafa8e58",
+          "sha256": "9ba475b4a27ca1acb1a24e312018d7bb83072d0464487a62507f32eecb555f5d",
           "path": "examples/geo_probe.rs"
         },
         {
-          "sha256": "f75d116b09a19cdcfc62843b358456229e949f4d925fcde1ddebf430257103a6",
+          "sha256": "cb80071e03e3c9e3ad557df72963da694a27720cbc258f9ec00ddfcc94277655",
+          "path": "src/component.rs"
+        },
+        {
+          "sha256": "f60757af1b6c3e24b6c3723c86bf93a99a4dded55096fba5d29fef1cc3fb35e9",
           "path": "src/geo.rs"
         },
         {
@@ -45,7 +49,7 @@
           "path": "src/lang.rs"
         },
         {
-          "sha256": "e3a7091950cfbd6bce921b1a8d79ea99eca80229722db2b02c26cfda4a0bfa93",
+          "sha256": "b8a1452d2e6a63bedd794360a31786a093d4aacb240a65c49b7cad4c4c896b7b",
           "path": "src/main.rs"
         },
         {
@@ -138,7 +142,7 @@
         "portableCpu": true,
         "crossMachineByteEqualityRequired": false,
         "functionality": {
-          "sourceTests": 42
+          "sourceTests": 53
         },
         "recipe": ".github/scripts/build-projectforge-windows.ps1",
         "recipeSha256": "4f8654f1c21e675be43aaa0c18946e88b4bf7afdd1752cd06e759393ab7a8c72",

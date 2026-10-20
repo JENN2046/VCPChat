@@ -4,6 +4,36 @@ This is source-review evidence, not merge approval, a release, installation or
 runtime activation. No configuration, authorization token, personal content or
 runtime state is part of this change.
 
+## Bounded Vue/Svelte container correction
+
+PR #65 remains draft pending exact-head validation and review.
+Actual program reproduction with synthetic template/script/style text produces
+non-script symbols and a range crossing the script/style boundary. Existing
+bare-JavaScript geometry tests do not establish correct component extraction.
+Do not merge or deploy this candidate on the strength of passing source gates.
+Jenn approved a bounded script-container correction. Vue/Svelte now index only
+top-level inline JS/TS script bodies, each with the existing parser. Markup,
+styles, comments and nested script literals cannot create code symbols. Parent
+indices and normalized original-file line ranges are preserved across blocks;
+no geometric healing may cross a script boundary. No scripts means no symbols;
+bare JS fragments use the JS/TS entry instead. External scripts, unsupported
+script languages and malformed containers are reported, never fetched/executed.
+Because the existing editing protocol is whole-line, a script block containing
+symbols on its opening/closing-tag line is rejected rather than returning an
+unsafe editable range. No new dependency, compiler, public field or configuration.
+
+The independent PowerShell backtick issue is fixed with an explicit scan-style
+flag: backticks escape/continue PowerShell text rather than opening JS templates,
+and quoted escape rules preserve Windows paths and doubled single quotes.
+Source and actual-protocol regressions pass without executing fixture scripts.
+
+The reviewed container/PowerShell correction passes 53 native source tests.
+The rebuilt delivered program passes outline, synthetic findSymbols and an
+original-line replacement simulation that preserves script/style/container tags.
+Comments, quoted attributes, interpolation regexes and Svelte block scopes are
+covered as non-script boundaries. Exact manifest identities are refreshed;
+forbidden rules, CI permissions and deployment behavior are unchanged.
+
 ## Exact comparison
 
 - Fork base: `008542de728a702cbf35190273375b4990fbcdad` on `NuobaoVCPchat`
@@ -46,7 +76,7 @@ by same-batch retries after test-fixture corrections. Local source remaps and
 the independent CI recipe are distinguished explicitly. Cross-machine byte
 equality is not claimed or required.
 
-ProjectForge: 42 source tests, protocol v3 readiness/ping, JavaScript outline,
+ProjectForge: 44 source tests, protocol v3 readiness/ping, JavaScript outline,
 PowerShell geometry, malformed-Rust error reporting and invalid-input rejection.
 Audio: 430 source tests plus a passing doc test; actual rebuilt executable tested
 on a random loopback port with synthetic settings/database in a new temporary

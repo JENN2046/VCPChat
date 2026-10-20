@@ -50,6 +50,10 @@ const allowedSourceDifferences = new Set([
     // Frozen 8f1562ea: malformed parser input is data, never a Cargo test crate;
     // runtime-only FTZ fixtures prevent constant folding, without DSP changes.
     'rust_projectforge_indexer/src/geo.rs',
+    // Reviewed SFC script-only extraction and its two module declarations.
+    'rust_projectforge_indexer/src/component.rs',
+    'rust_projectforge_indexer/src/main.rs',
+    'rust_projectforge_indexer/examples/geo_probe.rs',
     'rust_projectforge_indexer/tests/broken_syntax.rs',
     'rust_projectforge_indexer/tests/fixtures/broken_syntax.rs',
     'rust_audio_engine/src/processor/dynamic_loudness/tests.rs',

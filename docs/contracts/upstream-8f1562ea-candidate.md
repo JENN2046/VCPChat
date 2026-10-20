@@ -27,12 +27,17 @@ flag: backticks escape/continue PowerShell text rather than opening JS templates
 and quoted escape rules preserve Windows paths and doubled single quotes.
 Source and actual-protocol regressions pass without executing fixture scripts.
 
-The reviewed container/PowerShell correction passes 53 native source tests.
+The reviewed container/PowerShell correction passes 54 native source tests.
 The rebuilt delivered program passes outline, synthetic findSymbols and an
 original-line replacement simulation that preserves script/style/container tags.
 Comments, quoted attributes, interpolation regexes and Svelte block scopes are
 covered as non-script boundaries. Exact manifest identities are refreshed;
 forbidden rules, CI permissions and deployment behavior are unchanged.
+Follow-up review: valid Svelte shorthand/spread markup attributes are consumed
+as opaque balanced expressions without hiding later scripts. Dynamic attributes
+on the script element itself remain unsupported/error (unknown src/lang/type),
+and malformed spreads still fail closed. Actual outline/findSymbols and range
+replacement smoke includes preceding shorthand/spread markup.
 
 ## Exact comparison
 

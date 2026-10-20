@@ -4,6 +4,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const schedule = require('node-schedule');
 const dotenv = require('dotenv');
+const quitAdmission = require('../modules/services/quitAdmission.cjs');
 
 const PLUGIN_DIR = path.join(__dirname, 'Plugin');
 const manifestFileName = 'plugin-manifest.json';
@@ -184,6 +185,10 @@ class PluginManager {
     }
 
     async processToolCall(toolName, toolArgs, executionContext = {}) {
+        return quitAdmission.run(() => this.processAdmittedToolCall(toolName, toolArgs, executionContext));
+    }
+
+    async processAdmittedToolCall(toolName, toolArgs, executionContext = {}) {
         const plugin = this.plugins.get(toolName);
         if (!plugin) {
             throw new Error(`[DistPluginManager] Plugin "${toolName}" not found for tool call.`);
@@ -607,28 +612,30 @@ class PluginManager {
     // 关闭所有插件：停止定时任务，并释放 direct service / hybridservice 资源。
     async shutdownAllPlugins() {
         console.log('[DistPluginManager] Shutting down all plugins...');
-        for (const job of this.scheduledJobs.values()) {
-            job.cancel();
+        // PF can refuse synchronously before releasing anything. Do it before
+        // stopping timers or other services so a busy refusal leaves them intact.
+        const forge = this.serviceModules.get('ProjectForge')?.module;
+        if (typeof forge?.cleanup === 'function') {
+            try { await forge.cleanup(); }
+            catch (error) {
+                if (error.message === 'PROJECTFORGE_BUSY') error.shutdownUnchanged = true;
+                throw error;
+            }
         }
+        for (const job of this.scheduledJobs.values()) job.cancel();
         this.scheduledJobs.clear();
-
+        const errors = [];
         for (const [name, serviceData] of this.serviceModules) {
+            if (name === 'ProjectForge') continue;
             const cleanup = serviceData?.module?.cleanup;
-            if (typeof cleanup !== 'function') {
-                continue;
-            }
-            try {
-                await cleanup();
-                if (this.debugMode) {
-                    console.log(`[DistPluginManager] Cleaned up service plugin: ${name}`);
-                }
-            } catch (error) {
-                console.error(
-                    `[DistPluginManager] Error cleaning up service plugin ${name}:`,
-                    error
-                );
+            if (typeof cleanup !== 'function') continue;
+            try { await cleanup(); }
+            catch (error) {
+                console.error(`[DistPluginManager] Error cleaning up service plugin ${name}:`, error);
+                errors.push(error);
             }
         }
+        if (errors.length) throw new AggregateError(errors, 'PLUGIN_SHUTDOWN_FAILED');
 
         console.log('[DistPluginManager] Plugin shutdown completed.');
     }

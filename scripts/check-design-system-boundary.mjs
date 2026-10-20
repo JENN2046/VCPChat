@@ -47,6 +47,14 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Composer save queue from 994ef193 and scoped host quit lifecycle integration.
+    // Exact paths only; sender denials and all forbidden-path rules remain active.
+    'modules/renderer/composerModelSelect.js',
+    'modules/services/quitAdmission.cjs',
+    'tests/composer-model-select.test.mjs',
+    'tests/quit-lifecycle.test.cjs',
+    'tests/distributed-plugin-startup.test.js',
+    'tests/side-pane-ipc-sender.test.js',
     // Frozen 8f1562ea: malformed parser input is data, never a Cargo test crate;
     // runtime-only FTZ fixtures prevent constant folding, without DSP changes.
     'rust_projectforge_indexer/src/geo.rs',

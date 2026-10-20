@@ -100,22 +100,15 @@ function initialize(mainWindow, openChildWindows) {
                 console.warn('[WindowHandlers] Ignored close-window from non-window webContents.');
                 return;
             }
-            // If it's the main window, check if the desktop window is alive.
-            // If so, hide the main window to tray instead of quitting.
             if (win === mainWindow) {
                 const desktopHandlers = require('./desktopHandlers');
                 const desktopWindow = desktopHandlers.getDesktopWindow();
-                if (desktopWindow && !desktopWindow.isDestroyed()) {
-                    // 桌面窗口存在时，主窗口关闭 → 最小化到托盘
-                    console.log('[WindowHandlers] Desktop window is active. Hiding main window to tray instead of quitting.');
+                if (process.platform !== 'linux' && desktopWindow && !desktopWindow.isDestroyed()) {
                     win.hide();
                 } else {
-                    // 桌面窗口不存在时，正常退出
-                    // 优化：立即隐藏所有窗口提供即时反馈，因为主进程清理（如音频引擎、分布式服务器）可能耗时数秒
-                    BrowserWindow.getAllWindows().forEach(w => {
-                        if (!w.isDestroyed()) w.hide();
-                    });
-                    app.isQuitting = true; // 标记正在退出，允许窗口关闭事件通过
+                    // Keep windows visible while guarded cleanup decides whether
+                    // quitting is safe. Never hide them before a busy refusal.
+                    app.isQuitting = true;
                     app.quit();
                 }
             } else {
@@ -127,7 +120,8 @@ function initialize(mainWindow, openChildWindows) {
     ipcMain.on('hide-window', (event) => {
         const win = BrowserWindow.fromWebContents(event.sender);
         if (win) {
-            win.hide();
+            if (win === mainWindow && process.platform === 'linux') win.minimize();
+            else win.hide();
         }
     });
 

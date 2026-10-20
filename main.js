@@ -1,3 +1,5 @@
+const quitAdmission = require('./modules/services/quitAdmission.cjs');
+const { prepareProjectForgeQuit, cancelProjectForgeQuit } = require('./modules/ipc/projectForgeCloseGuard');
 // main.js - Electron 主窗口
 
 // Bootstrap-only fatal evidence. The monitor does not consume the exception,
@@ -354,6 +356,7 @@ let audioEngineStopPromise = null;
 let isAudioEngineStopping = false;
 let appQuitCleanupPromise = null;
 let isFinalizingQuit = false;
+let quitCleanupSettled = false;
 const MAIN_RENDERER_CRASH_WINDOW_MS = 60_000;
 const MAIN_RENDERER_STABLE_RESET_MS = 30_000;
 const MAIN_RENDERER_MAX_RECOVERIES = 3;
@@ -723,8 +726,15 @@ async function performQuitCleanup() {
     }
 
     appQuitCleanupPromise = (async () => {
+        quitAdmission.begin();
+        // Busy PF must refuse before history, voice, sockets or other services stop.
+        if (distributedServer) {
+            await distributedServer.stop({ beforePluginCleanup: () => projectForgeHandlers.cleanupForQuit() });
+            distributedServer = null;
+        } else {
+            await projectForgeHandlers.cleanupForQuit();
+        }
         await historyWatcherLeases.dispose();
-
         try {
             localSttHandlers.shutdown();
             await voiceHandlers.shutdownVoiceInputEngine();
@@ -732,31 +742,16 @@ async function performQuitCleanup() {
             console.warn('[Main] Failed to shut down native voice input engine:', error.message || error);
         }
 
-        if (distributedServer) {
-            console.log('[Main] Stopping distributed server...');
-            try {
-                await distributedServer.stop();
-            } finally {
-                distributedServer = null;
-            }
-        }
-
         if (chatDataService) {
             console.log('[Main] Stopping VCP-CDS...');
-            try {
-                await chatDataService.stop();
-            } finally {
-                chatDataService = null;
-            }
+            await chatDataService.stop();
+            chatDataService = null;
         }
 
         if (loomManager) {
             console.log('[Main] Stopping VCP Loom...');
-            try {
-                await loomManager.shutdown();
-            } finally {
-                loomManager = null;
-            }
+            await loomManager.shutdown();
+            loomManager = null;
         }
 
         workspaceHandlers.dispose();
@@ -764,16 +759,17 @@ async function performQuitCleanup() {
         historyMutationQueue = null;
         pluginAgentOperationService = null;
         if (chartService) {
-            try {
-                await chartHandlers.shutdown();
-            } finally {
-                chartService = null;
-            }
+            await chartHandlers.shutdown();
+            chartService = null;
         }
         await stopAudioEngine();
     })();
 
-    return appQuitCleanupPromise;
+    try { return await appQuitCleanupPromise; }
+    catch (error) {
+        appQuitCleanupPromise = null;
+        throw error;
+    }
 }
 
 
@@ -819,6 +815,15 @@ function createWindow({ deferLoad = false } = {}) {
     // 2. 当桌面窗口存在时，隐藏到托盘而非退出（偷天换日！）
     // 3. 其他情况正常退出
     mainWindow.on('close', (event) => {
+        if (quitCleanupSettled) return;
+        // Keep the Linux main window until the guarded application quit succeeds.
+        // Auxiliary windows must not turn a close request into an invisible app.
+        if (process.platform === 'linux') {
+            event.preventDefault();
+            app.isQuitting = true;
+            app.quit();
+            return;
+        }
         if (app.isQuitting) {
             // 应用正在退出，允许关闭
             return;
@@ -1537,18 +1542,18 @@ if (!gotTheLock) {
         const sidePaneGuard = domain => createSidePaneSenderGuard(domain, () => mainWindow);
         workspaceHandlers.initialize({ settingsManager: appSettingsManager, logger: console, ipcMain: guardIpcMain(ipcMain, sidePaneGuard('workspaces')) });
         stateSubscriptions.registerIpc(ipcMain, sidePaneGuard('state'));
-        projectForgeHandlers.initialize({ workspaceService: workspaceHandlers.workspaceService, subscriptions: stateSubscriptions, ipcMain: guardIpcMain(ipcMain, sidePaneGuard('projectForge')) });
+        projectForgeHandlers.initialize({ workspaceService: workspaceHandlers.workspaceService, subscriptions: stateSubscriptions, ipcMain: quitAdmission.guardIpcMain(guardIpcMain(ipcMain, sidePaneGuard('projectForge'))) });
         // Git 也进领域表，但登记时就激活：模块只有 execFile 调用，没什么可省的，
         // 而状态面板首帧就会读工作区列表；仓库监听仍然等到第一个窗口订阅才开始
         domainActivator.register('git', {
             allowSender: sidePaneGuard('projectForge'),
             channels: gitHandlers.CHANNELS,
             load: () => gitHandlers,
-            init: (mod, { ipcMain: domainIpc }) => mod.initialize({ ipcMain: domainIpc, workspaceService: workspaceHandlers.workspaceService, getMainWindow: () => mainWindow, subscriptions: stateSubscriptions }),
+            init: (mod, { ipcMain: domainIpc }) => mod.initialize({ ipcMain: quitAdmission.guardIpcMain(domainIpc), workspaceService: workspaceHandlers.workspaceService, getMainWindow: () => mainWindow, subscriptions: stateSubscriptions }),
             dispose: mod => mod.dispose(),
             eager: true,
         });
-        sourceHandlers.initialize({ workspaceService: workspaceHandlers.workspaceService, ipcMain: guardIpcMain(ipcMain, sidePaneGuard('projectForge')) });
+        sourceHandlers.initialize({ workspaceService: workspaceHandlers.workspaceService, ipcMain: quitAdmission.guardIpcMain(guardIpcMain(ipcMain, sidePaneGuard('projectForge'))) });
         const preloadApis = describeApis();
         // 侧栏几个领域启动时只登记通道，第一次调用才 require 并 initialize（状态见 lifecycle:get-main-snapshot 的 domains）
         domainActivator.register('terminal', {
@@ -1856,7 +1861,9 @@ if (!gotTheLock) {
 
         ipcMain.on('minimize-to-tray', () => {
             if (mainWindow) {
-                mainWindow.hide();
+                // A Tray object does not prove a visible Linux tray host exists.
+                if (process.platform === 'linux') mainWindow.minimize();
+                else mainWindow.hide();
             }
         });
 
@@ -1970,23 +1977,44 @@ if (!gotTheLock) {
     });
 
     app.on('before-quit', async (event) => {
-        if (isFinalizingQuit) {
+        if (quitCleanupSettled) {
             return;
         }
 
-        // 优化：立即隐藏所有窗口提供即时反馈，因为主进程清理（如音频引擎、分布式服务器）可能耗时数秒
-        BrowserWindow.getAllWindows().forEach(w => {
-            if (!w.isDestroyed()) w.hide();
-        });
-
+        // Every quit request must wait for the one shared cleanup attempt.
         event.preventDefault();
+        if (isFinalizingQuit) {
+            return;
+        }
         isFinalizingQuit = true;
+
+        let wasAlreadyClosing = false;
         try {
+            wasAlreadyClosing = quitAdmission.begin();
+            if (!await prepareProjectForgeQuit()) {
+                if (!wasAlreadyClosing) quitAdmission.resume();
+                app.isQuitting = false;
+                isFinalizingQuit = false;
+                return;
+            }
             await performQuitCleanup();
-        } catch (error) {
-            console.warn('[Main] Cleanup before quit encountered an issue:', error);
-        } finally {
+            quitCleanupSettled = true;
             app.quit();
+        } catch (error) {
+            // Keep every window and the original instance. A proven pre-teardown
+            // busy refusal reopens admission; partial cleanup failures remain closed.
+            isFinalizingQuit = false;
+            app.isQuitting = false;
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                if (mainWindow.isMinimized()) mainWindow.restore();
+                mainWindow.show();
+                mainWindow.focus();
+            }
+            if (error.shutdownUnchanged && !wasAlreadyClosing) {
+                await cancelProjectForgeQuit();
+                quitAdmission.resume();
+            }
+            console.warn('[Main] Quit cancelled because cleanup did not complete:', error);
         }
     });
 

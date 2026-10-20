@@ -35,6 +35,7 @@ function createManager(manifests, modules = {}) {
             if (id === 'path') return path;
             if (id === 'child_process') return { spawn() { throw new Error('Unexpected spawn'); } };
             if (id === 'node-schedule') return {};
+            if (id === '../modules/services/quitAdmission.cjs') return require('../modules/services/quitAdmission.cjs');
             if (id === 'dotenv') return { parse: () => ({}) };
             events.push(`require:${path.basename(id)}`);
             const result = modules[path.basename(id)];

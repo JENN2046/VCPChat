@@ -362,6 +362,7 @@ class ManifestRefreshTests(unittest.TestCase):
             reviewed_searcher = "VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher-x86_64-pc-windows-msvc.exe"
             if name == "package-smoke":
                 allowed_additions.add(reviewed_searcher)
+                allowed_additions.add("audio_engine/audio_server_rubato_dsp.exe")
             self.assertEqual(set(native), set(old) | allowed_additions)
             if reviewed_searcher in allowed_additions:
                 self.assertEqual(native[reviewed_searcher], {
@@ -371,6 +372,9 @@ class ManifestRefreshTests(unittest.TestCase):
                     "kind": "static-native", "format": "PE",
                 })
             reviewed_rebuilds = {
+                "audio_engine/audio_server.exe":
+                    ("591a4be689da46281b9cdecf3c5ead925e83618c", 10047488,
+                     "48adcb6a54e0a49ddef720fdbc7efdc73232107410c0f452cdd3ecdf51d35444"),
                 "rust_voice_input_engine/runtime/win32-x64/vcp_voice_input_engine.exe":
                     ("7a981c416b8fc7449469014e0e2f5551a36f35ab", 258560,
                      "db57bd214dd0a5b34ff7522acabc9cfc7479fecde9e6a3d4d42409214de43223"),
@@ -387,13 +391,18 @@ class ManifestRefreshTests(unittest.TestCase):
                     })
                 else:
                     self.assertEqual(native[path], old[path])
+            if name == "package-smoke":
+                self.assertEqual(native["audio_engine/audio_server_rubato_dsp.exe"], {
+                    **native["audio_engine/audio_server.exe"],
+                    "path": "audio_engine/audio_server_rubato_dsp.exe",
+                })
             if reviewed_forge in allowed_additions:
                 self.assertEqual(native[reviewed_forge], {
                     "path": reviewed_forge,
                     "mode": "100644", "type": "blob",
-                    "blob": "0af0bf2f0b7744fa9f2e1d712c032e4c5a2729c4",
-                    "size": 17836032,
-                    "sha256": "e562b290e8431da0d8e2f28faa94968f0b4457001b886f2fff31ae325ef853da",
+                    "blob": "8310d588e75a43d382ce6784e972b3dfe4339a92",
+                    "size": 17880576,
+                    "sha256": "feadce48a1424d43ac2ea529a3a49a115ee90c5260e3e9b541ed644c0dbe6c91",
                     "kind": "static-native", "format": "PE",
                 })
 

@@ -9,7 +9,7 @@ function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-trace-test-'));
   t.after(() => fs.rmSync(root, { recursive:true, force:true }));
   const put = (name, value) => { fs.mkdirSync(path.dirname(path.join(root,name)),{recursive:true}); fs.writeFileSync(path.join(root,name),value); };
-  const inputs = ['Cargo.toml','Cargo.lock','src/main.rs','examples/probe.rs'];
+  const inputs = ['Cargo.toml','Cargo.lock','src/main.rs','examples/probe.rs','tests/fixtures/broken_syntax.rs','tests/sample_script.ps1'];
   inputs.forEach(name => put('rust_projectforge_indexer/'+name, 'fixture '+name));
   const bin=Buffer.from('MZ synthetic identity fixture, never executed'); put(DESTINATION,bin); put(RECIPE,'fixture recipe');
   const receipt={upstreamTarget:'frozen',binaries:[{component:'rust_projectforge_indexer',destination:DESTINATION,size:bin.length,sha256:sha(bin),gitBlob:crypto.createHash('sha1').update(Buffer.from(`blob ${bin.length}\0`)).update(bin).digest('hex'),buildConditions:{recipe:RECIPE,recipeSha256:sha(Buffer.from('fixture recipe'))},inputHashes:inputs.map(name=>({path:name,sha256:sha(Buffer.from('fixture '+name))}))}]};
@@ -22,5 +22,9 @@ for (const [label,file] of [['source','rust_projectforge_indexer/src/main.rs'],[
   test('reject changed '+label,t=>{const {root,put}=fixture(t);put(file,'changed');assert.throws(()=>verify(root));});
 }
 test('reject omitted source inventory entries',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/src/extra.rs','new');assert.throws(()=>verify(root),/inventory/);});
+
+test('reject changed parser fixtures',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/tests/fixtures/broken_syntax.rs','changed');assert.throws(()=>verify(root),/source identity/);});
+
+test('reject unrelated executable script inputs',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/tests/extra.ps1','unexpected');assert.throws(()=>verify(root),/unexpected Rust source input/);});
 test('reject new Cargo build scripts',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/build.rs','new');assert.throws(()=>verify(root),/build script/);});
 test('source byte checking never normalizes line endings to hide changes',t=>{const {root,put}=fixture(t);put('rust_projectforge_indexer/src/main.rs','fixture src/main.rs\r\n');assert.throws(()=>verify(root),/source identity/);});

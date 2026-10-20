@@ -27,10 +27,11 @@ function verify(root) {
       assert.ok(!entry.isSymbolicLink(), 'source link forbidden');
       const name = dir + '/' + entry.name;
       if (entry.isDirectory()) walk(name);
-      else { assert.ok(entry.isFile() && name.endsWith('.rs'), 'unexpected Rust source input'); actual.push(name); }
+      else { assert.ok(entry.isFile() && (name.endsWith('.rs') || name === 'tests/sample_script.ps1'), 'unexpected Rust source input'); actual.push(name); }
     }
   }
   walk('src'); walk('examples');
+  if (fs.existsSync(path.join(source, 'tests'))) walk('tests');
   assert.ok(!fs.existsSync(path.join(source, 'build.rs')), 'new build script requires provenance review');
   assert.ok(!fs.existsSync(path.join(source, '.cargo')), 'local Cargo configuration not admitted');
   assert.deepEqual(record.inputHashes.map(x => x.path).sort(), actual.sort(), 'complete source inventory');
@@ -50,6 +51,8 @@ function smoke(executable) {
     { id: 1, method: 'ping', params: {} },
     { id: 2, method: 'outline', params: { lang: 'javascript', text: 'export function traceFixture() { return 42; }\n' } },
     { id: 3, method: 'outline', params: { lang: 'javascript' } },
+    { id: 4, method: 'outline', params: { lang: 'ps1', text: 'function Trace-Geometry {\n    return 42\n}\n' } },
+    { id: 5, method: 'outline', params: { lang: 'rust', text: 'pub fn broken() {\n    if true {\n' } },
   ].map(v => JSON.stringify(v)).join('\n') + '\n';
   const child = spawnSync(executable, [], { input, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024, windowsHide: true });
   assert.ifError(child.error); assert.equal(child.status, 0, 'native exit');
@@ -60,7 +63,11 @@ function smoke(executable) {
   assert.equal(response(2).ok, true);
   assert.ok(response(2).result.symbols.some(v => v.name === 'traceFixture' && v.kind === 'function'));
   assert.equal(response(3).ok, false); assert.equal(response(3).error.code, 'INVALID_PARAMS');
-  return { ready: true, ping: true, javascriptOutline: true, invalidInputRejected: true };
+  assert.equal(response(4).ok, true);
+  assert.ok(response(4).result.symbols.some(v => v.name === 'Trace-Geometry'));
+  assert.equal(response(5).ok, true); assert.equal(response(5).result.hasError, true);
+  return { ready: true, ping: true, javascriptOutline: true, powershellGeometry: true,
+    malformedRustReported: true, invalidInputRejected: true };
 }
 if (require.main === module) {
   try {

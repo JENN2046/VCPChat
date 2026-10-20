@@ -47,6 +47,14 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Frozen 8f1562ea: malformed parser input is data, never a Cargo test crate;
+    // runtime-only FTZ fixtures prevent constant folding, without DSP changes.
+    'rust_projectforge_indexer/src/geo.rs',
+    'rust_projectforge_indexer/tests/broken_syntax.rs',
+    'rust_projectforge_indexer/tests/fixtures/broken_syntax.rs',
+    'rust_audio_engine/src/processor/dynamic_loudness/tests.rs',
+    'audio_engine/audio_server.exe',
+    'audio_engine/audio_server_rubato_dsp.exe',
     // Same-run CI projection transfer preserves the Linux-only source writer.
     '.github/workflows/side_pane_e2e.yml',
     '.github/workflows/side_pane_windows.yml',

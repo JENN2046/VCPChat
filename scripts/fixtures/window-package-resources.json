@@ -495,8 +495,8 @@
     },
     {
       "path": "Musicmodules/music-effects.js",
-      "size": 8192,
-      "sha256": "44d34b5a8a6d9b196ec71a0c5e972ff93b28b88f709ca4a7fbf503a41ba19918"
+      "size": 9103,
+      "sha256": "6af911d1d3d5477773262f4359d4f86bb8c2311de6371723975fc96b278b2805"
     },
     {
       "path": "Musicmodules/music-lyrics.js",
@@ -700,8 +700,8 @@
     },
     {
       "path": "Musicmodules/music.js",
-      "size": 61379,
-      "sha256": "001be726ecbc6537553d45885270bcac49258b04ee31e36d5f3eebd5fdf80abb"
+      "size": 63351,
+      "sha256": "0dc6e9a8e287b9c53d13fc593746759c662248b12ddaba1d8f3d2de03c238ce4"
     },
     {
       "path": "Musicmodules/socket.io.min.js",
@@ -735,8 +735,8 @@
     },
     {
       "path": "RAGmodules/RAG_Observer.js",
-      "size": 122630,
-      "sha256": "ceef5d3663c1ed639f52c17cc5ec23889a45713fbcdb9be5bc6bf3148cbaaa29"
+      "size": 122984,
+      "sha256": "318803b64bac0902cd2ec44bcceeb1b655dc51959234492ad3a3e1ac788889b0"
     },
     {
       "path": "RAGmodules/RAG_Overlay.html",

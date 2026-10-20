@@ -63,7 +63,6 @@ function setupEffects(app) {
             newBands[band] = parseInt(slider.value, 10);
         }
         app.eqEnabled = app.eqSwitch.checked;
-        await app.api.setMusicEq({ bands: newBands, enabled: app.eqEnabled });
         // 同步下发 EQ 类型与 FIR taps，否则类型/阶数切换只改界面、引擎侧不生效
         // 仅在变化时下发：本函数也被频段滑块 input 复用，FIR 态下重复 enable_fir_eq 会反复重建滤波器
         if (app.api?.setMusicEqType && app.eqTypeSelect) {
@@ -75,6 +74,9 @@ function setupEffects(app) {
                 app._syncedFirTaps = firTaps;
             }
         }
+        // 类型切换会卸载/启用对应滤波器，必须最后应用开关和频段，避免
+        // FIR -> IIR 后 IIR 仍关闭，或关闭状态下切换到 FIR 意外启用它。
+        await app.api.setMusicEq({ bands: newBands, enabled: app.eqEnabled });
         // 持久化 EQ 类型/阶数，否则切完 FIR 不触碰其他控件时 eq_type 不落盘、重启回退 IIR
         app.saveSettings?.();
     };

@@ -53,6 +53,10 @@ const allowedSourceDifferences = new Set([
     'rust_projectforge_indexer/tests/broken_syntax.rs',
     'rust_projectforge_indexer/tests/fixtures/broken_syntax.rs',
     'rust_audio_engine/src/processor/dynamic_loudness/tests.rs',
+    // PR #65 review: apply the selected EQ type before enable/bands, and
+    // retain the old enabled-FIR meaning only for files without the new flag.
+    'Musicmodules/music-effects.js',
+    'rust_audio_engine/src/settings.rs',
     'audio_engine/audio_server.exe',
     'audio_engine/audio_server_rubato_dsp.exe',
     // Same-run CI projection transfer preserves the Linux-only source writer.

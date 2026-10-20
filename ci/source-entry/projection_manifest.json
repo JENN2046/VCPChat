@@ -1651,9 +1651,9 @@
           "path": "Musicmodules/music-effects.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aaf7630376eca66d76392879738c59b702bb5a86",
-          "size": 9103,
-          "sha256": "6af911d1d3d5477773262f4359d4f86bb8c2311de6371723975fc96b278b2805",
+          "blob": "50da1c5f8cd9e90b0cfd9d87307e7354065d7b7c",
+          "size": 9296,
+          "sha256": "326f74efc9b52516799af5aee35967c54084e8e267668409f89802028941a4f3",
           "kind": "source"
         },
         {
@@ -6028,9 +6028,9 @@
           "path": "audio_engine/audio_server.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "591a4be689da46281b9cdecf3c5ead925e83618c",
-          "size": 10047488,
-          "sha256": "48adcb6a54e0a49ddef720fdbc7efdc73232107410c0f452cdd3ecdf51d35444",
+          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "size": 10052096,
+          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6058,9 +6058,9 @@
           "path": "audio_engine/audio_server_rubato_dsp.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "591a4be689da46281b9cdecf3c5ead925e83618c",
-          "size": 10047488,
-          "sha256": "48adcb6a54e0a49ddef720fdbc7efdc73232107410c0f452cdd3ecdf51d35444",
+          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "size": 10052096,
+          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
           "kind": "static-native",
           "format": "PE"
         },
@@ -6213,9 +6213,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "890ef61f0b531d30a6f7c5603762b62f35b88979",
-          "size": 35537,
-          "sha256": "747f5f7de612dd6e166f76c78d03c506376f532da58505ea615700d796f110e9",
+          "blob": "67349895cc5cc08e4bb1afb0fb3c4baf45ce8a75",
+          "size": 36089,
+          "sha256": "930ae32b5fd67cd0ecc9837a99c50d08569b0817721c170614569dc861c4c1f8",
           "kind": "source"
         },
         {
@@ -11987,9 +11987,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7b8ed8b2e41e103c43e3824453ac947c1c4a227b",
-          "size": 39794,
-          "sha256": "c4710ab0243e7ce83daf7972b7e0301aed64066b3a69bd7761aab62c0cf30c2f",
+          "blob": "a9a473b03d4e0a9d053afd848cfcc5ea4e4e8559",
+          "size": 40025,
+          "sha256": "3eca4c94c3b706080123c2955058263cae5f4ca7661c00c0d93bd16c2c34d9f0",
           "kind": "source"
         },
         {
@@ -12104,9 +12104,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "4c37a07e80097442bf96c1d719cc8350ab0e865a",
+          "blob": "6d46b6b3c952b18abb88089204aba80a0f600685",
           "size": 27398,
-          "sha256": "78051a1391f8ddc91254c321239c9cf7fd0a973f40b1be771cc82b666573581e",
+          "sha256": "5d0fa32797a7d5126954d3eb7e16a12a9f43b96d46a7ff2694e1e56fd8c05f21",
           "kind": "source"
         },
         {
@@ -13625,9 +13625,9 @@
           "path": "tests/music-capsule.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2527be1a4a91d49d8912e2cc5f34d6af9e6d0e09",
-          "size": 5749,
-          "sha256": "ec8a34b7eda29c07c32ccc9e5b8cb263ccf3ffb58f3042234b70033565e3c607",
+          "blob": "6edad9a2c2b0743f2fe4f6719a7edebf17814bc0",
+          "size": 7952,
+          "sha256": "6e4c5c2cbae368c75bc3bfa360a1420c6d23837b0c124ea1624ed978be212180",
           "kind": "source"
         },
         {
@@ -15610,9 +15610,9 @@
           "path": "audio_engine/audio_server.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "591a4be689da46281b9cdecf3c5ead925e83618c",
-          "size": 10047488,
-          "sha256": "48adcb6a54e0a49ddef720fdbc7efdc73232107410c0f452cdd3ecdf51d35444",
+          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "size": 10052096,
+          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
           "kind": "static-native",
           "format": "PE"
         },
@@ -15640,9 +15640,9 @@
           "path": "audio_engine/audio_server_rubato_dsp.exe",
           "mode": "100644",
           "type": "blob",
-          "blob": "591a4be689da46281b9cdecf3c5ead925e83618c",
-          "size": 10047488,
-          "sha256": "48adcb6a54e0a49ddef720fdbc7efdc73232107410c0f452cdd3ecdf51d35444",
+          "blob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
+          "size": 10052096,
+          "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
           "kind": "static-native",
           "format": "PE"
         },
@@ -17069,9 +17069,9 @@
           "path": "Musicmodules/music-effects.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aaf7630376eca66d76392879738c59b702bb5a86",
-          "size": 9103,
-          "sha256": "6af911d1d3d5477773262f4359d4f86bb8c2311de6371723975fc96b278b2805",
+          "blob": "50da1c5f8cd9e90b0cfd9d87307e7354065d7b7c",
+          "size": 9296,
+          "sha256": "326f74efc9b52516799af5aee35967c54084e8e267668409f89802028941a4f3",
           "kind": "source"
         },
         {
@@ -19581,9 +19581,9 @@
           "path": "docs/native-build-3cde8466.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "890ef61f0b531d30a6f7c5603762b62f35b88979",
-          "size": 35537,
-          "sha256": "747f5f7de612dd6e166f76c78d03c506376f532da58505ea615700d796f110e9",
+          "blob": "67349895cc5cc08e4bb1afb0fb3c4baf45ce8a75",
+          "size": 36089,
+          "sha256": "930ae32b5fd67cd0ecc9837a99c50d08569b0817721c170614569dc861c4c1f8",
           "kind": "source"
         },
         {
@@ -25071,9 +25071,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7b8ed8b2e41e103c43e3824453ac947c1c4a227b",
-          "size": 39794,
-          "sha256": "c4710ab0243e7ce83daf7972b7e0301aed64066b3a69bd7761aab62c0cf30c2f",
+          "blob": "a9a473b03d4e0a9d053afd848cfcc5ea4e4e8559",
+          "size": 40025,
+          "sha256": "3eca4c94c3b706080123c2955058263cae5f4ca7661c00c0d93bd16c2c34d9f0",
           "kind": "source"
         },
         {
@@ -25224,9 +25224,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "4c37a07e80097442bf96c1d719cc8350ab0e865a",
+          "blob": "6d46b6b3c952b18abb88089204aba80a0f600685",
           "size": 27398,
-          "sha256": "78051a1391f8ddc91254c321239c9cf7fd0a973f40b1be771cc82b666573581e",
+          "sha256": "5d0fa32797a7d5126954d3eb7e16a12a9f43b96d46a7ff2694e1e56fd8c05f21",
           "kind": "source"
         },
         {
@@ -27501,9 +27501,9 @@
           "path": "tests/music-capsule.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2527be1a4a91d49d8912e2cc5f34d6af9e6d0e09",
-          "size": 5749,
-          "sha256": "ec8a34b7eda29c07c32ccc9e5b8cb263ccf3ffb58f3042234b70033565e3c607",
+          "blob": "6edad9a2c2b0743f2fe4f6719a7edebf17814bc0",
+          "size": 7952,
+          "sha256": "6e4c5c2cbae368c75bc3bfa360a1420c6d23837b0c124ea1624ed978be212180",
           "kind": "source"
         },
         {

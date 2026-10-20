@@ -290,9 +290,9 @@
     {
       "component": "rust_audio_engine",
       "destination": "audio_engine/audio_server.exe",
-      "size": 10047488,
-      "sha256": "48adcb6a54e0a49ddef720fdbc7efdc73232107410c0f452cdd3ecdf51d35444",
-      "gitBlob": "591a4be689da46281b9cdecf3c5ead925e83618c",
+      "size": 10052096,
+      "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
+      "gitBlob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
       "compiler": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.0\nLLVM version: 23.1.1",
       "inputHashes": [
         {
@@ -340,7 +340,7 @@
           "path": "src/server.rs"
         },
         {
-          "sha256": "c2707e143ea0fc6f3b286680b1908dc0909fb81f31dd8d5e7873361035626b2d",
+          "sha256": "b84f4757e65d5a5b642b93219e2bffff643f2b5510e980af06e21171b2dbacad",
           "path": "src/settings.rs"
         },
         {
@@ -564,13 +564,17 @@
         "platform": "windows-x64",
         "sourceRemap": "/vcp-build/rust_audio_engine",
         "cargoRemap": "/vcp-build/cargo",
-        "sameBatchRetryAfterFixtureFix": true,
-        "buildTarget": "fresh isolated target, reused only for this batch test corrections",
+        "sameBatchIncrementalRebuild": true,
+        "buildTarget": "isolated target retained within this frozen source batch; rebuilt after reviewed EQ corrections",
         "portableCpu": true,
         "crossMachineByteEqualityRequired": false,
         "functionality": {
           "result": "PASS",
           "loopbackOnly": true,
+          "legacyFirStateMigrated": true,
+          "enabledIirAfterTypeChange": true,
+          "disabledFirAfterTypeChange": true,
+          "explicitDisabledFirSurvivesRestart": true,
           "isolatedSettingsRoundTrip": true,
           "coldRestartRetainsSettings": true,
           "invalidBitDepthRejected": true,
@@ -582,9 +586,9 @@
     {
       "component": "rust_audio_engine",
       "destination": "audio_engine/audio_server_rubato_dsp.exe",
-      "size": 10047488,
-      "sha256": "48adcb6a54e0a49ddef720fdbc7efdc73232107410c0f452cdd3ecdf51d35444",
-      "gitBlob": "591a4be689da46281b9cdecf3c5ead925e83618c",
+      "size": 10052096,
+      "sha256": "b271ad9689903dc599694adcc86cb8775a5b8d501e2fc109df237b54195fe01e",
+      "gitBlob": "21bad92865e3461a80bef061f9b06bdf0208e18f",
       "compiler": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.0\nLLVM version: 23.1.1",
       "inputHashes": [
         {
@@ -632,7 +636,7 @@
           "path": "src/server.rs"
         },
         {
-          "sha256": "c2707e143ea0fc6f3b286680b1908dc0909fb81f31dd8d5e7873361035626b2d",
+          "sha256": "b84f4757e65d5a5b642b93219e2bffff643f2b5510e980af06e21171b2dbacad",
           "path": "src/settings.rs"
         },
         {
@@ -856,13 +860,17 @@
         "platform": "windows-x64",
         "sourceRemap": "/vcp-build/rust_audio_engine",
         "cargoRemap": "/vcp-build/cargo",
-        "sameBatchRetryAfterFixtureFix": true,
-        "buildTarget": "fresh isolated target, reused only for this batch test corrections",
+        "sameBatchIncrementalRebuild": true,
+        "buildTarget": "isolated target retained within this frozen source batch; rebuilt after reviewed EQ corrections",
         "portableCpu": true,
         "crossMachineByteEqualityRequired": false,
         "functionality": {
           "result": "PASS",
           "loopbackOnly": true,
+          "legacyFirStateMigrated": true,
+          "enabledIirAfterTypeChange": true,
+          "disabledFirAfterTypeChange": true,
+          "explicitDisabledFirSurvivesRestart": true,
           "isolatedSettingsRoundTrip": true,
           "coldRestartRetainsSettings": true,
           "invalidBitDepthRejected": true,
@@ -882,5 +890,6 @@
     "Existing local MSVC toolchain; CI-toolchain and bit-for-bit reproducibility not established.",
     "Mock and unit results do not certify live microphone, provider, service, installer or deployment behavior.",
     "Candidate only; complete upstream acceptance and PR validation remain pending."
-  ]
+  ],
+  "rustToolchainScope": "Default for the original components and ProjectForge; audio uses its per-binary compiler record."
 }

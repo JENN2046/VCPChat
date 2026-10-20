@@ -48,7 +48,7 @@ equality is not claimed or required.
 
 ProjectForge: 39 source tests, protocol v3 readiness/ping, JavaScript outline,
 PowerShell geometry, malformed-Rust error reporting and invalid-input rejection.
-Audio: 426 source tests plus a passing doc test; actual rebuilt executable tested
+Audio: 428 source tests plus a passing doc test; actual rebuilt executable tested
 on a random loopback port with synthetic settings/database in a new temporary
 directory, including settings save, cold restart persistence and invalid bit
 depth rejection. No supplier calls, real configuration or hardware playback.
@@ -56,6 +56,25 @@ depth rejection. No supplier calls, real configuration or hardware playback.
 Two pre-existing audio FTZ tests now use runtime `black_box` inputs so constant
 folding cannot bypass the thread's MXCSR mode. Their zero-output assertions and
 the DSP implementation remain unchanged.
+
+## PR #65 EQ review follow-up
+
+The enabled FIR-to-IIR transition and legacy FIR loading issues were reproduced
+before fixing them. The UI now selects the type before applying enable/bands;
+unchanged FIR slider updates still avoid rebuilding the filter. Switching type
+while disabled must not enable EQ.
+
+The settings-file loader preserves the old enabled-FIR interpretation only
+when `eq_enabled` is absent and `eq_type` is exactly `FIR`. Explicit `false`,
+explicit `true`, missing/default IIR settings and all unrelated preferences keep
+their meanings. Typed deserialization still rejects invalid types and duplicate
+known controls before the presence check; the new-install default stays off.
+No real settings file is migrated by this source task.
+
+Regressions cover both transitions, no redundant FIR rebuild, enabled legacy FIR,
+explicit disable, new-install defaults, invalid/duplicate controls and saved
+round trips. The delivered Windows audio aliases are rebuilt again after these
+source fixes, not repinned to the previous executable.
 
 ## Compatibility and limits
 

@@ -5,6 +5,59 @@ const vm = require('node:vm');
 const { JSDOM } = require('jsdom');
 const html = fs.readFileSync('main.html', 'utf8');
 const script = fs.readFileSync('modules/ui-system/music-capsule.js', 'utf8');
+
+function eqFixture({ from = 'FIR', to = 'IIR', enabled = true } = {}) {
+    const engine = { type: from, fir: from === 'FIR', iir: from === 'IIR' };
+    const calls = [];
+    const app = {
+        eqBands: { 31: 0 }, eqSwitch: { checked: enabled },
+        eqTypeSelect: { value: to }, firTapsSelect: { value: '1023' },
+        _syncedEqType: from, _syncedFirTaps: 1023,
+        api: {
+            async setMusicEqType({ type }) {
+                calls.push('type:' + type);
+                engine.type = type;
+                engine.fir = type === 'FIR';
+                if (type === 'FIR') engine.iir = false;
+            },
+            async setMusicEq({ enabled }) {
+                calls.push('enabled:' + enabled);
+                if (engine.type === 'FIR') engine.fir = enabled;
+                else engine.iir = enabled;
+            },
+        },
+        saveSettings() { calls.push('save'); },
+    };
+    const context = { app, document: { getElementById: () => ({ value: '3' }) } };
+    vm.runInNewContext(fs.readFileSync('Musicmodules/music-effects.js', 'utf8') + '\nsetupEffects(app);', context);
+    return { app, engine, calls };
+}
+
+test('changing FIR to IIR reapplies the enabled state after selecting the engine type', async () => {
+    const { app, engine, calls } = eqFixture();
+    await app.sendEqSettings();
+    assert.equal(engine.type, 'IIR');
+    assert.equal(engine.iir, true);
+    assert.equal(engine.fir, false);
+    assert.deepEqual(calls, ['type:IIR', 'enabled:true', 'save']);
+});
+
+test('type changes keep disabled EQ off, and unchanged FIR sliders do not rebuild its filter', async () => {
+    for (const from of ['IIR', 'FIR']) {
+        const to = from === 'IIR' ? 'FIR' : 'IIR';
+        const { app, engine } = eqFixture({ from, to, enabled: false });
+        await app.sendEqSettings();
+        assert.equal(engine.fir, false);
+        assert.equal(engine.iir, false);
+    }
+    const { app, engine, calls } = eqFixture({ from: 'IIR', to: 'FIR' });
+    await app.sendEqSettings();
+    assert.equal(engine.fir, true);
+    assert.equal(engine.iir, false);
+    calls.length = 0;
+    await app.sendEqSettings();
+    assert.deepEqual(calls, ['enabled:true', 'save']);
+});
 test('capsule stays scoped and uses tokens with only its measured width write', () => {
     const dom = new JSDOM(html);
     assert.ok(dom.window.document.querySelector('.music-capsule').closest('.vcp-ui-scope'));

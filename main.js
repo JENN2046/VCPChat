@@ -1247,6 +1247,14 @@ if (!gotTheLock) {
         nativeSyncRuntime = await require('./modules/services/nativeSync/runtime').createNativeSyncRuntime({
             queue: historyMutationQueue, appDataRoot: APP_DATA_ROOT_IN_PROJECT,
             args: process.argv, isolated: Boolean(isolatedAppDataRoot),
+            readSettings: () => appSettingsManager.readSettings(),
+            readAgentConfig: id => agentConfigManager.readAgentConfig(id),
+            thumbnail: async file => {
+                const image=require('electron').nativeImage.createFromPath(file);
+                if(image.isEmpty())return null;
+                const bytes=image.resize({width:64,height:64}).toPNG();
+                return bytes.length<=16000?'data:image/png;base64,'+bytes.toString('base64'):null;
+            },
             notify: change => {
                 let sent = false;
                 for (const window of BrowserWindow.getAllWindows()) {

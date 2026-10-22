@@ -9,7 +9,7 @@ async function dailyConnection({appDataRoot,readSettings}){
  try{const dir=await fs.lstat(path.dirname(file));if(dir.isSymbolicLink())throw fail('DAILY_CONNECTION_ALIAS');}catch(e){if(e.code==='ENOENT')return null;throw e;}
  let config;try{const s=await fs.lstat(file);if(s.isSymbolicLink()||s.nlink>1)throw fail('DAILY_CONNECTION_ALIAS');config=JSON.parse(await fs.readFile(file,'utf8'));}catch(e){if(e.code==='ENOENT')return null;throw e;}
  if(config.enabled!==true)return null;
- if(Object.keys(config).some(k=>!['version','enabled','historySelectionApproved','deviceId','topics','transportUrl','credentialSource','serverUrl','approvedHistory'].includes(k)))throw fail('UNEXPECTED_DAILY_CONNECTION_FIELD');
+ if(Object.keys(config).some(k=>!['version','enabled','historySelectionApproved','deviceId','topics','transportUrl','credentialSource','serverUrl','approvedHistory','ssh'].includes(k)))throw fail('UNEXPECTED_DAILY_CONNECTION_FIELD');
  if(config.version!==1||config.historySelectionApproved!==true||typeof config.deviceId!=='string'||!Array.isArray(config.topics)||!config.topics.length||config.topics.length>8)throw fail('INVALID_DAILY_CONNECTION');
  let endpoint;try{endpoint=new URL(config.transportUrl);}catch{throw fail('PROTECTED_DESKTOP_TRANSPORT_REQUIRED');}
  if(endpoint.protocol!=='http:'||endpoint.hostname!=='127.0.0.1'||!endpoint.port||endpoint.pathname!=='/'||endpoint.username||endpoint.password||endpoint.search||endpoint.hash)throw fail('PROTECTED_DESKTOP_TRANSPORT_REQUIRED');
@@ -20,6 +20,7 @@ async function dailyConnection({appDataRoot,readSettings}){
  if(typeof settings.vcpApiKey!=='string'||!settings.vcpApiKey)throw fail('EXISTING_DESKTOP_KEY_REQUIRED');
  const backend=new URL(config.serverUrl),configured=new URL(settings.vcpServerUrl);
  if(!['http:','https:'].includes(backend.protocol)||backend.username||backend.password||backend.search||backend.hash||backend.pathname!=='/'||configured.username||configured.password||configured.origin!==backend.origin)throw fail('DESKTOP_BACKEND_IDENTITY_MISMATCH');
- return {url:endpoint.origin,deviceId:config.deviceId,topics:config.topics,token:settings.vcpApiKey,approvedHistory:config.approvedHistory};
+ if(config.ssh&&(config.ssh.alias!=='wp08'||config.ssh.remotePort!==8888))throw fail('UNAPPROVED_SSH_TRANSPORT');
+ return {url:endpoint.origin,deviceId:config.deviceId,topics:config.topics,token:settings.vcpApiKey,approvedHistory:config.approvedHistory,ssh:config.ssh};
 }
 module.exports={dailyConnection};

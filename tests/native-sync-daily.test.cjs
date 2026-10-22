@@ -33,3 +33,22 @@ test('catalog projection retains old IDs and exposes no Agent prompt, provider c
  const f=await fixture();const result=await catalog({appDataRoot:f.root,topics:[topic],readAgentConfig:async()=>({name:'Existing Agent',topics:[{id:topic.topicId,name:'Existing history'}],systemPrompt:'PRIVATE_PROMPT_MARKER',apiKey:'PRIVATE_KEY_MARKER',providerUrl:'PRIVATE_PROVIDER_MARKER'})});
  assert.equal(result.topics[0].ownerId,topic.itemId);assert.equal(result.topics[0].topicId,topic.topicId);const text=JSON.stringify(result);for(const value of ['PRIVATE_PROMPT','PRIVATE_KEY','PRIVATE_PROVIDER',f.root])assert.equal(text.includes(value),false);
 });
+test('automatic desktop tunnel refuses another SSH host or public target before launching a process',async()=>{
+ const {openSshTransport}=require('../modules/services/nativeSync/sshTransport');
+ await assert.rejects(openSshTransport({url:'http://127.0.0.1:28888',ssh:{alias:'another-host',remotePort:8888}}),e=>e.code==='UNAPPROVED_SSH_TRANSPORT');
+ await assert.rejects(openSshTransport({url:'http://public.invalid:28888',ssh:{alias:'wp08',remotePort:8888}}),e=>e.code==='UNAPPROVED_SSH_TRANSPORT');
+});
+
+test('desktop SSH requests use verified TLS with the public hostname and never fall back to HTTP',async t=>{
+ const {requestOverTls}=require('../modules/services/nativeSync/sshTransport');
+ await assert.rejects(requestOverTls({port:1,token:'synthetic',route:'http://other.invalid'}),e=>e.code==='UNAPPROVED_SYNC_ROUTE');
+ const cp=require('node:child_process'),https=require('node:https'),util=require('node:util');
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'vcp-r10-tls-client-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const cert=path.join(root,'cert.crt'),key=path.join(root,'private.key');
+ cp.execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=wp10.unicorn.org.cn','-addext','subjectAltName=DNS:wp10.unicorn.org.cn','-keyout',key,'-out',cert],{stdio:'ignore'});
+ let accepted=0;const server=https.createServer({key:await fs.readFile(key),cert:await fs.readFile(cert)},(q,r)=>{accepted++;assert.equal(q.headers.host,'wp10.unicorn.org.cn:13848');assert.equal(q.headers.authorization,'Bearer synthetic-tls-client-key');r.setHeader('Content-Type','application/json');r.end('{"ok":true}');});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));const port=server.address().port;
+ await assert.rejects(requestOverTls({port,token:'synthetic-tls-client-key',route:'/api/v1/sync/status'}),e=>e.code==='NETWORK_UNAVAILABLE');assert.equal(accepted,0);
+ const script="require(process.argv[1]).requestOverTls({port:Number(process.argv[2]),token:'synthetic-tls-client-key',route:'/api/v1/sync/status'}).then(x=>process.stdout.write(JSON.stringify(x))).catch(()=>process.exit(1))";
+ const result=await util.promisify(cp.execFile)(process.execPath,['-e',script,require.resolve('../modules/services/nativeSync/sshTransport'),String(port)],{env:{...process.env,NODE_EXTRA_CA_CERTS:cert},timeout:10000});assert.deepEqual(JSON.parse(result.stdout),{ok:true});assert.equal(accepted,1);
+});

@@ -2,10 +2,10 @@
 const path = require('node:path');
 const { NativeSyncAdapter } = require('./adapter');
 const { fail } = require('./protocol');
-async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, thumbnail }) {
+async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, thumbnail, readSyncCredential }) {
     const poc=args.includes('--native-sync-poc');
     if (poc && !isolated) throw fail('ISOLATED_APP_DATA_REQUIRED');
-    const daily=poc?null:await require('./dailyConnection').dailyConnection({appDataRoot,readSettings});
+    const daily=poc?null:await require('./dailyConnection').dailyConnection({appDataRoot,readSettings,readSyncCredential:readSyncCredential||((options)=>require('./desktopCredential').desktopCredential({...options,safeStorage:require('electron').safeStorage}))});
     if(!poc&&!daily)return null;
     let transport;
     try{

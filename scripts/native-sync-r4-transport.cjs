@@ -103,7 +103,7 @@ class RealHostTransport {
         child.stderr.resume(); child.on('exit', (code, signal) => { record.exitCode = code; record.signal = signal; record.exited = true; });
         await this.awaitCondition(async () => {
             if (child.exitCode !== null || child.signalCode !== null) throw new Error(`R4 SSH tunnel exited ${child.exitCode ?? child.signalCode}`);
-            try { const response = await fetch(this.url + '/api/v1/sync/status', { headers: { Authorization: 'Bearer isolated-poc-token' }, signal: AbortSignal.timeout(500) }); return response.ok; } catch { return false; }
+            try { const response = await fetch(this.url + '/api/v1/sync/status', { headers: { Authorization: 'Bearer isolated-poc-token' }, signal: AbortSignal.timeout(500) }); return response.status === (this.healthStatus || 200); } catch { return false; }
         }, 'SSH loopback forward');
     }
     async start() { await this.startServer(); await this.connect(); return this; }

@@ -10,9 +10,11 @@ const { canonicalMessage, messageHash, messageKey } = require('../modules/servic
 const root = path.resolve(__dirname, '..');
 const realHost = process.argv.includes('--real-host=wp08');
 const toolboxService = process.argv.includes('--toolbox-service');
+const fullToolbox = process.argv.includes('--full-toolbox');
+if (fullToolbox && !toolboxService) throw new Error('Full Toolbox acceptance requires the plugin transport');
 if (toolboxService && !realHost) throw new Error('Toolbox acceptance requires the authorized real-host transport');
 if (process.argv.some(arg => arg.startsWith('--real-host=') && arg !== '--real-host=wp08')) throw new Error('Only the authorized wp08 test host is supported');
-const artifacts = path.resolve(root, toolboxService ? '../../artifacts/native-sync-r5' : realHost ? '../../artifacts/native-sync-r4' : '../../artifacts/native-sync-r3');
+const artifacts = path.resolve(root, fullToolbox ? '../../artifacts/native-sync-r6' : toolboxService ? '../../artifacts/native-sync-r5' : realHost ? '../../artifacts/native-sync-r4' : '../../artifacts/native-sync-r3');
 const runRoot = path.join(artifacts, `run-${Date.now()}`);
 const electron = require('electron');
 const agent = 'R3Agent', topic = 'r3-topic', group = 'R3Group', groupTopic = 'r3-group-topic';
@@ -145,7 +147,7 @@ async function start(name, { enabled = true, fault = false } = {}) {
     if (enabled) args.push('--native-sync-poc', `--native-sync-url=${sync.url}`, `--native-sync-device=${name}`, `--native-sync-topics=${JSON.stringify(topics)}`);
     const env = {};
     for (const key of ['PATH', 'Path', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT']) if (process.env[key]) env[key] = process.env[key];
-    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_E2E_TEST: '1', VCPCHAT_R5_TOOLBOX: toolboxService ? '1' : '', VCPCHAT_R4_REAL_HOST: realHost ? 'wp08' : '', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.resolve(artifacts, '../native-sync-r3/deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
+    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_E2E_TEST: '1', VCPCHAT_R6_FULL_TOOLBOX: fullToolbox ? '1' : '', VCPCHAT_R5_TOOLBOX: toolboxService ? '1' : '', VCPCHAT_R4_REAL_HOST: realHost ? 'wp08' : '', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.resolve(artifacts, '../native-sync-r3/deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
     for (const folder of [env.TEMP, env.HOME, env.APPDATA, env.LOCALAPPDATA]) await fs.mkdir(folder, { recursive: true });
     const child = spawn(electron, args, { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
     const record = { name, pid: child.pid, args, appData, enabled, injectedFinalizeFailure: fault, exitCode: null, signal: null, mainUrl: null, rendererReady: false };
@@ -196,7 +198,9 @@ async function main() {
     await fs.mkdir(runRoot, { recursive: true });
     model = await startModel(); modelPort = model.address().port;
     if (realHost) {
-        remoteTransport = toolboxService
+        remoteTransport = fullToolbox
+            ? await require('./native-sync-r6-transport.cjs').prepare({ localRoot: runRoot })
+            : toolboxService
             ? await require('./native-sync-r5-transport.cjs').prepare({ localRoot: runRoot })
             : await require('./native-sync-r4-transport.cjs').RealHostTransport.prepare({ sourceRoot: root, localRoot: runRoot });
         sync = await remoteTransport.start();
@@ -275,16 +279,35 @@ async function main() {
     await assert.rejects(fs.access(path.join(runRoot, 'Sync-Off', '.native-sync', 'state.json')));
     checks.push('sync disabled: complete app opens and saves stream terminal locally without creating sync state or changing server journal');
 }
+async function verifyPluginDisabled() {
+    stage = 'complete-host-plugin-disabled';
+    await sync.disablePluginAndRestart();
+    for (const route of ['/api/v1/sync/push', '/api/v1/sync/pull', '/api/plugins/NativeSync/sync/push', '/api/plugins/NativeSync/sync/status']) {
+        const response = await fetch(sync.url + route, { method: route.endsWith('/push') ? 'POST' : 'GET', headers: { Authorization: 'Bearer isolated-poc-token', 'Content-Type': 'application/json' }, body: route.endsWith('/push') ? '{}' : undefined });
+        assert.equal(response.status, 503);
+    }
+    const before = await sync.snapshot('complete-server-plugin-disabled-no-data-or-writable-route');
+    assert.equal(before.ready, false); assert.equal(before.syncDataCreated, false); assert.equal(before.lifecycle.initialized, 0);
+    await seed('Plugin-Off'); const client = await start('Plugin-Off', { enabled: false });
+    await select(client); await send(client, 'R3_PLUGIN_OFF'); await visible(client, 'R3 synthetic response: R3_PLUGIN_OFF');
+    await screenshot(client, 'plugin-disabled-single-machine'); await stop(client);
+    assert.equal((await history('Plugin-Off')).length, 2);
+    await assert.rejects(fs.access(path.join(runRoot, 'Plugin-Off', '.native-sync', 'state.json')));
+    const after = await sync.snapshot('complete-server-plugin-disabled-after-single-machine-save');
+    assert.equal(after.syncDataCreated, false);
+    transportChecks.push({ check: 'real full server.js boot with plugin disabled creates no sync data and rejects write routes; complete VCPChat single-machine send unchanged', lifecycle: after.lifecycle, syncDataCreated: false, localHistoryMessages: 2 });
+}
 main().then(async () => {
     const persistence = process.argv.includes('--probe') ? null : await finalPersistence();
+    if (fullToolbox && !process.argv.includes('--probe')) await verifyPluginDisabled();
     const guardFiles = await fs.readdir(path.join(runRoot, 'guard'));
     const guards = await Promise.all(guardFiles.map(file => fs.readFile(path.join(runRoot, 'guard', file), 'utf8').then(JSON.parse)));
     assert.ok(guards.some(g => g.processType === 'browser'));
     assert.equal(guards.reduce((sum, g) => sum + g.blockedWrites.length + g.blockedReads, 0), 0, 'no runtime access outside isolation boundary');
     assert.equal(guards.filter(g => g.fatal).length, 0);
     if (realHost) { await remoteTransport.close(); sync = null; }
-    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : toolboxService ? 'R5_TOOLBOX_SERVICE_INTEGRATION_PASS' : realHost ? 'R4_REAL_HOST_TRANSPORT_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, persistence, transportChecks, remote: remoteTransport?.evidence ?? null, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, blockedReads: g.blockedReads, faultsInjected: g.faultsInjected })), model: 'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
-    const prefix = toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
+    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : fullToolbox ? 'R6_FULL_TOOLBOX_ISOLATED_BOOT_PASS' : toolboxService ? 'R5_TOOLBOX_SERVICE_INTEGRATION_PASS' : realHost ? 'R4_REAL_HOST_TRANSPORT_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, persistence, transportChecks, remote: remoteTransport?.evidence ?? null, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, blockedReads: g.blockedReads, faultsInjected: g.faultsInjected })), model: 'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
+    const prefix = fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
     await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt);
     console.log(JSON.stringify(receipt));
 }).catch(async error => {
@@ -295,7 +318,7 @@ main().then(async () => {
         try { uiStates.push({ name: client.record.name, state: await client.page?.evaluate("({selected:window.VCPMainChatState?.snapshot?.().selectedItem?.id, topic:window.VCPMainChatState?.snapshot?.().topicId, items:[...document.querySelectorAll('#agentList > [data-item-id]')].map(e=>({id:e.dataset.itemId,type:e.dataset.itemType})), activeModals:[...document.querySelectorAll('.modal.active')].map(e=>e.id), sendMode:document.getElementById('sendMessageBtn')?.dataset.mode})") }); await screenshot(client, 'failure-' + client.record.name); } catch {}
     }
     const receipt = { result: realHost ? 'BLOCKED' : checks.length ? 'FULL_APP_PARTIAL_PASS' : 'BLOCKED', stage, message: error.message, checks, launches, remote: remoteTransport?.evidence ?? null, guardEvidence: evidence, rendererErrors: [...active].flatMap(c => c.page?.exceptions || []), uiStates, runRoot };
-    const prefix = toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
+    const prefix = fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
     await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt); console.error(JSON.stringify(receipt)); process.exitCode = 1;
 }).finally(async () => {
     for (const client of active) { try { await client.browser?.send('Browser.close'); await waitFor(() => client.child.exitCode !== null, 'failure cleanup exit', 5000); } catch { client.child.kill(); } client.page?.close(); client.browser?.close(); }

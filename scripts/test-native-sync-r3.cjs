@@ -6,8 +6,11 @@ const net = require('node:net');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const { startSyncService } = require('../modules/services/nativeSync/httpService');
+const { canonicalMessage, messageHash, messageKey } = require('../modules/services/nativeSync/protocol');
 const root = path.resolve(__dirname, '..');
-const artifacts = path.resolve(root, '../../artifacts/native-sync-r3');
+const realHost = process.argv.includes('--real-host=wp08');
+if (process.argv.some(arg => arg.startsWith('--real-host=') && arg !== '--real-host=wp08')) throw new Error('Only the authorized wp08 test host is supported');
+const artifacts = path.resolve(root, realHost ? '../../artifacts/native-sync-r4' : '../../artifacts/native-sync-r3');
 const runRoot = path.join(artifacts, `run-${Date.now()}`);
 const electron = require('electron');
 const agent = 'R3Agent', topic = 'r3-topic', group = 'R3Group', groupTopic = 'r3-group-topic';
@@ -15,6 +18,41 @@ const topics = [{ itemId: agent, itemType: 'agent', topicId: topic }, { itemId: 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const checks = [], launches = [], active = new Set();
 let sync, model, modelPort, stage = 'setup';
+let remoteTransport = null;
+const transportChecks = [];
+async function centerRequest(route, body) {
+    const response = await fetch(sync.url + route, { method: body ? 'POST' : 'GET', headers: { Authorization: 'Bearer isolated-poc-token', 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(5000) });
+    assert.equal(response.status, 200); return response.json();
+}
+async function centerMetrics() { return centerRequest('/api/v1/sync/status'); }
+async function finalPersistence() {
+    const clients = [], canonical = {};
+    for (const name of ['Windows-A', 'Windows-B', 'Sync-Off']) {
+        const agentHistory = await history(name), groupHistory = await history(name, group, groupTopic);
+        let s = null;
+        try { s = await syncState(name); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+        const ids = [...agentHistory, ...groupHistory].map(m => m.id);
+        assert.equal(new Set(ids).size, ids.length);
+        canonical[name] = [agentHistory.map(m => canonicalMessage(m, topic)), groupHistory.map(m => canonicalMessage(m, groupTopic))];
+        clients.push({ name, agentMessages: agentHistory.length, groupMessages: groupHistory.length, cursor: s?.cursor ?? null, outbox: s?.outbox.length ?? null, pending: s ? Boolean(s.pending) : null });
+    }
+    assert.deepEqual(canonical['Windows-A'], canonical['Windows-B']);
+    const metrics = await centerMetrics();
+    for (const c of clients.slice(0, 2)) { assert.equal(c.cursor, metrics.headSeq); assert.equal(c.outbox, 0); assert.equal(c.pending, false); }
+    assert.equal(clients[2].cursor, null);
+    if (realHost) {
+        const remote = await sync.snapshot('final-remote-sqlite-consistency');
+        assert.deepEqual(remote.metrics, metrics);
+        const server = new Map(remote.entries.map(entry => [messageKey(entry), entry]));
+        let count = 0;
+        for (const [i, d] of topics.entries()) for (const m of canonical['Windows-A'][i]) {
+            const entry = server.get(messageKey({ ownerType: d.itemType, ownerId: d.itemId, topicId: d.topicId, msgId: m.id }));
+            assert.ok(entry); assert.equal(entry.hash, messageHash(m)); assert.equal(entry.deleted, 0); count++;
+        }
+        assert.equal(count, remote.entries.length);
+    }
+    return { clients, metrics, aAndBCanonicalHistoriesEqual: true, remoteSqliteHashIndexVerified: realHost };
+}
 
 async function json(file, value) { await fs.mkdir(path.dirname(file), { recursive: true }); await fs.writeFile(file, JSON.stringify(value, null, 2)); }
 async function freePort() {
@@ -88,7 +126,7 @@ async function start(name, { enabled = true, fault = false } = {}) {
     if (enabled) args.push('--native-sync-poc', `--native-sync-url=${sync.url}`, `--native-sync-device=${name}`, `--native-sync-topics=${JSON.stringify(topics)}`);
     const env = {};
     for (const key of ['PATH', 'Path', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT']) if (process.env[key]) env[key] = process.env[key];
-    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_E2E_TEST: '1', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.join(artifacts, 'deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
+    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_E2E_TEST: '1', VCPCHAT_R4_REAL_HOST: realHost ? 'wp08' : '', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.resolve(artifacts, '../native-sync-r3/deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
     for (const folder of [env.TEMP, env.HOME, env.APPDATA, env.LOCALAPPDATA]) await fs.mkdir(folder, { recursive: true });
     const child = spawn(electron, args, { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
     const record = { name, pid: child.pid, args, appData, enabled, injectedFinalizeFailure: fault, exitCode: null, signal: null, mainUrl: null, rendererReady: false };
@@ -138,7 +176,10 @@ async function stop(client) {
 async function main() {
     await fs.mkdir(runRoot, { recursive: true });
     model = await startModel(); modelPort = model.address().port;
-    sync = await startSyncService({ dbPath: path.join(runRoot, 'central.sqlite'), token: 'isolated-poc-token' });
+    if (realHost) {
+        remoteTransport = await require('./native-sync-r4-transport.cjs').RealHostTransport.prepare({ sourceRoot: root, localRoot: runRoot });
+        sync = await remoteTransport.start();
+    } else sync = await startSyncService({ dbPath: path.join(runRoot, 'central.sqlite'), token: 'isolated-poc-token' });
     await seed('Windows-A'); await seed('Windows-B'); await seed('Sync-Off');
     let a = await start('Windows-A');
     if (process.argv.includes('--probe')) { checks.push('full main.js / main.html cold-start ready'); await screenshot(a, 'probe-full-app'); await stop(a); return; }
@@ -157,14 +198,39 @@ async function main() {
     await waitFor(async () => { const s = await syncState('Windows-B'); return !s.pending && s.cursor >= 2 && s.outbox.length === 0; }, 'B remote application restart recovery');
     checks.push('B cold restart recovers pending apply/cursor and shows A messages in complete official UI');
     await screenshot(b, 'B-resumed-A');
-    await sync.close(); sync = null;
+    if (realHost) await sync.disconnect();
+    else { await sync.close(); sync = null; }
     await send(b, 'R3_B_OFFLINE');
-    assert.ok((await syncState('Windows-B')).outbox.length >= 2);
+    const offline = await syncState('Windows-B');
+    assert.ok(offline.outbox.length >= 2);
+    const replayOperation = offline.outbox[0];
+    if (realHost) {
+        const remote = await sync.snapshot('ssh-disconnected-remote-server-still-running');
+        assert.equal(remote.metrics.journalRows, 2);
+        transportChecks.push({ check: 'real SSH tunnel disconnect leaves Ubuntu running; native save durably queues Outbox', outbox: offline.outbox.length, cursor: offline.cursor, remoteMetrics: remote.metrics });
+    }
     await stop(b);
-    sync = await startSyncService({ dbPath: path.join(runRoot, 'central.sqlite'), token: 'isolated-poc-token' });
+    if (realHost) {
+        await sync.restartServerAndReconnect();
+        assert.equal((await centerMetrics()).journalRows, 2);
+    } else sync = await startSyncService({ dbPath: path.join(runRoot, 'central.sqlite'), token: 'isolated-poc-token' });
     b = await start('Windows-B'); await select(b); await visible(b, 'R3_B_OFFLINE');
     await waitFor(async () => (await syncState('Windows-B')).outbox.length === 0, 'restarted persisted Outbox flush');
     checks.push('offline native save + process shutdown + SQLite server restart + persisted Outbox continuation');
+    if (realHost) {
+        const before = await centerMetrics();
+        await sync.restartServerAndReconnect();
+        assert.deepEqual(await centerMetrics(), before);
+        const repeated = await centerRequest('/api/v1/sync/push', replayOperation);
+        assert.equal(repeated.hash, messageHash(replayOperation.message));
+        assert.deepEqual(await centerMetrics(), before);
+        const delta = await centerRequest('/api/v1/sync/pull?after_seq=2&limit=1');
+        assert.equal(delta.events.length, 1); assert.equal(delta.events[0].seq, 3); assert.equal(delta.nextSeq, 3); assert.equal(delta.hasMore, true);
+        const next = await centerRequest('/api/v1/sync/pull?after_seq=3&limit=1');
+        assert.equal(next.events.length, 1); assert.equal(next.events[0].seq, 4);
+        assert.equal((await centerRequest('/api/v1/sync/pull?after_seq=4&limit=1')).events.length, 0);
+        transportChecks.push({ check: 'Ubuntu process restart preserves applied operation IDs; same operation replay creates no duplicate journal; real incremental pull pages', metrics: before, replaySeq: repeated.seq, incrementalSeqs: [delta.events[0].seq, next.events[0].seq] });
+    }
     await stop(b);
 
     a = await start('Windows-A'); await select(a); await visible(a, 'R3_B_OFFLINE');
@@ -180,21 +246,24 @@ async function main() {
     checks.push('B full app receives group history and displays official group chat after restart');
     await screenshot(b, 'B-group'); await stop(b);
 
-    const before = sync.store.metrics().journalRows;
+    const before = (await centerMetrics()).journalRows;
     const c = await start('Sync-Off', { enabled: false }); await select(c); await send(c, 'R3_SINGLE_MACHINE'); await visible(c, 'R3_SINGLE_MACHINE');
     await screenshot(c, 'sync-off-single-machine'); await stop(c);
-    assert.equal(sync.store.metrics().journalRows, before);
+    assert.equal((await centerMetrics()).journalRows, before);
     await assert.rejects(fs.access(path.join(runRoot, 'Sync-Off', '.native-sync', 'state.json')));
     checks.push('sync disabled: complete app opens and saves stream terminal locally without creating sync state or changing server journal');
 }
 main().then(async () => {
+    const persistence = process.argv.includes('--probe') ? null : await finalPersistence();
     const guardFiles = await fs.readdir(path.join(runRoot, 'guard'));
     const guards = await Promise.all(guardFiles.map(file => fs.readFile(path.join(runRoot, 'guard', file), 'utf8').then(JSON.parse)));
     assert.ok(guards.some(g => g.processType === 'browser'));
     assert.equal(guards.reduce((sum, g) => sum + g.blockedWrites.length + g.blockedReads, 0), 0, 'no runtime access outside isolation boundary');
     assert.equal(guards.filter(g => g.fatal).length, 0);
-    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, faultsInjected: g.faultsInjected })), model: 'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
-    await json(path.join(runRoot, 'R3_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, 'LATEST_R3_RECEIPT.json'), receipt);
+    if (realHost) { await remoteTransport.close(); sync = null; }
+    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : realHost ? 'R4_REAL_HOST_TRANSPORT_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, persistence, transportChecks, remote: remoteTransport?.evidence ?? null, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, blockedReads: g.blockedReads, faultsInjected: g.faultsInjected })), model: 'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
+    const prefix = realHost ? 'R4' : 'R3';
+    await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt);
     console.log(JSON.stringify(receipt));
 }).catch(async error => {
     const guards = await fs.readdir(path.join(runRoot, 'guard')).catch(() => []);
@@ -203,9 +272,12 @@ main().then(async () => {
     for (const client of active) {
         try { uiStates.push({ name: client.record.name, state: await client.page?.evaluate("({selected:window.VCPMainChatState?.snapshot?.().selectedItem?.id, topic:window.VCPMainChatState?.snapshot?.().topicId, items:[...document.querySelectorAll('#agentList > [data-item-id]')].map(e=>({id:e.dataset.itemId,type:e.dataset.itemType})), activeModals:[...document.querySelectorAll('.modal.active')].map(e=>e.id), sendMode:document.getElementById('sendMessageBtn')?.dataset.mode})") }); await screenshot(client, 'failure-' + client.record.name); } catch {}
     }
-    const receipt = { result: checks.length ? 'FULL_APP_PARTIAL_PASS' : 'BLOCKED', stage, message: error.message, checks, launches, guardEvidence: evidence, rendererErrors: [...active].flatMap(c => c.page?.exceptions || []), uiStates, runRoot };
-    await json(path.join(runRoot, 'R3_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, 'LATEST_R3_RECEIPT.json'), receipt); console.error(JSON.stringify(receipt)); process.exitCode = 1;
+    const receipt = { result: realHost ? 'BLOCKED' : checks.length ? 'FULL_APP_PARTIAL_PASS' : 'BLOCKED', stage, message: error.message, checks, launches, remote: remoteTransport?.evidence ?? null, guardEvidence: evidence, rendererErrors: [...active].flatMap(c => c.page?.exceptions || []), uiStates, runRoot };
+    const prefix = realHost ? 'R4' : 'R3';
+    await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt); console.error(JSON.stringify(receipt)); process.exitCode = 1;
 }).finally(async () => {
     for (const client of active) { try { await client.browser?.send('Browser.close'); await waitFor(() => client.child.exitCode !== null, 'failure cleanup exit', 5000); } catch { client.child.kill(); } client.page?.close(); client.browser?.close(); }
-    if (sync) await sync.close(); if (model) await new Promise(resolve => model.close(resolve));
+    if (remoteTransport) await remoteTransport.close();
+    else if (sync) await sync.close();
+    if (model) await new Promise(resolve => model.close(resolve));
 });

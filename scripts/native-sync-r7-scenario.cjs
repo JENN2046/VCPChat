@@ -62,8 +62,9 @@ module.exports.run=async function run(h){
   await mobile.close();mobile=null;
   let b=await start('Windows-B');await select(b);await visible(b,'R7 server reply: R7_QUEUED_RESTART');await visible(b,'R7_MOBILE_DISCONNECT');
   await wait(async()=>{const s=await syncState('Windows-B');return s.cursor===7&&s.outbox.length===0&&!s.pending;},'B native cursor catches mobile conversation');
+  if(process.argv.includes('--coexist-services')) evidence.cdsPeers=[await require('./native-sync-r8-pwa-cds.cjs').verify(b,history,wait)];
   assert.equal((await history('Windows-B')).length,7);await screenshot(b,'windows-B-mobile-conversation');await stop(b);
-  a=await start('Windows-A');await select(a);await visible(a,'R7 server reply: R7_QUEUED_RESTART');await stop(a);
+  a=await start('Windows-A');await select(a);await visible(a,'R7 server reply: R7_QUEUED_RESTART');if(process.argv.includes('--coexist-services'))evidence.cdsPeers.push(await require('./native-sync-r8-pwa-cds.cjs').verify(a,history,wait));await stop(a);
   const c=await start('Sync-Off',{enabled:false});await select(c);await send(c,'R3_SINGLE_MACHINE');await visible(c,'R3 synthetic response: R3_SINGLE_MACHINE');await screenshot(c,'sync-off-single-machine');await stop(c);
   await assert.rejects(fs.access(path.join(runRoot,'Sync-Off','.native-sync/state.json')));assert.equal((await snapshot()).metrics.journalRows,7);
   evidence.checks.push('official Windows VCPChat Renderer displays the same mobile-origin conversation; sync-disabled original local save remains unchanged');

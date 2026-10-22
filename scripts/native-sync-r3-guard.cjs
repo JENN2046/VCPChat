@@ -7,7 +7,7 @@ const path = require('node:path');
 const net = require('node:net');
 const tls = require('node:tls');
 const { fileURLToPath } = require('node:url');
-const allowed = path.resolve(__dirname, process.env.VCPCHAT_R7_MOBILE_PWA === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
+const allowed = path.resolve(__dirname, process.env.VCPCHAT_R8_COEXIST === '1' ? '../../../artifacts/native-sync-r8' : process.env.VCPCHAT_R7_MOBILE_PWA === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
     ? '../../../artifacts/native-sync-r7' : process.env.VCPCHAT_R6_FULL_TOOLBOX === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
     ? '../../../artifacts/native-sync-r6' : process.env.VCPCHAT_R5_TOOLBOX === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
     ? '../../../artifacts/native-sync-r5' : process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
@@ -27,6 +27,7 @@ function writable(value) {
         const absolute = path.resolve(String(value));
         const project = path.resolve(__dirname, '..');
         evidence.blockedWrites.push(absolute.startsWith(project + path.sep) ? path.relative(project, absolute) : 'outside-test-root');
+        evidence.lastWriteFrames = new Error().stack.split('\n').slice(1,7);
         throw Object.assign(new Error('R3 isolated write boundary: ' + evidence.blockedWrites.at(-1)), { code: 'R3_WRITE_DENIED' });
     }
 }

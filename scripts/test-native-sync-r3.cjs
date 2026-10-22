@@ -12,10 +12,12 @@ const realHost = process.argv.includes('--real-host=wp08');
 const toolboxService = process.argv.includes('--toolbox-service');
 const fullToolbox = process.argv.includes('--full-toolbox');
 const mobilePwa=process.argv.includes('--mobile-pwa');
+const coexistence=process.argv.includes('--sync-coexistence');
+const coexistServices=coexistence||process.argv.includes('--coexist-services');
 if (fullToolbox && !toolboxService) throw new Error('Full Toolbox acceptance requires the plugin transport');
 if (toolboxService && !realHost) throw new Error('Toolbox acceptance requires the authorized real-host transport');
 if (process.argv.some(arg => arg.startsWith('--real-host=') && arg !== '--real-host=wp08')) throw new Error('Only the authorized wp08 test host is supported');
-const artifacts = path.resolve(root, mobilePwa ? '../../artifacts/native-sync-r7' : fullToolbox ? '../../artifacts/native-sync-r6' : toolboxService ? '../../artifacts/native-sync-r5' : realHost ? '../../artifacts/native-sync-r4' : '../../artifacts/native-sync-r3');
+const artifacts = path.resolve(root, coexistence ? '../../artifacts/native-sync-r8' : mobilePwa ? '../../artifacts/native-sync-r7' : fullToolbox ? '../../artifacts/native-sync-r6' : toolboxService ? '../../artifacts/native-sync-r5' : realHost ? '../../artifacts/native-sync-r4' : '../../artifacts/native-sync-r3');
 const runRoot = path.join(artifacts, `run-${Date.now()}`);
 const electron = require('electron');
 const agent = 'R3Agent', topic = 'r3-topic', group = 'R3Group', groupTopic = 'r3-group-topic';
@@ -123,6 +125,7 @@ async function startModel() {
         // Group requests append an invitation user prompt after the actual user
         // message. Echo the synthetic case marker, not that protocol prompt.
         const text = userTexts.find(value => /\bR3_[A-Z_]+\b/.test(value)) || userTexts[0] || '';
+        if (coexistence && JSON.stringify(body.messages || []).includes('R3_R8_GROUP_ERROR')) { response.writeHead(500, {'content-type':'application/json'}); response.end(JSON.stringify({message:'R8 synthetic group failure'})); return; }
         const result = 'R3 synthetic response: ' + text.slice(0, 180);
         if (body.stream) {
             response.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' });
@@ -134,7 +137,7 @@ async function startModel() {
 }
 async function seed(name) {
     const appData = path.join(runRoot, name);
-    await json(path.join(appData, 'settings.json'), { uiMode: 'next', userName: 'R3 Isolated User', enableDistributedServer: false, ChatDataServiceEnabled: false, assistantEnabled: false, assistantAgent: agent, vcpServerUrl: `http://127.0.0.1:${modelPort}/v1/chat/completions`, vcpApiKey: 'synthetic-r3-only', enableContextCompaction: false });
+    await json(path.join(appData, 'settings.json'), { uiMode: 'next', userName: 'R3 Isolated User', enableDistributedServer: false, ChatDataServiceEnabled: coexistServices, assistantEnabled: false, assistantAgent: agent, vcpServerUrl: `http://127.0.0.1:${modelPort}/v1/chat/completions`, vcpApiKey: 'synthetic-r3-only', enableContextCompaction: false });
     await json(path.join(appData, 'rust-assistant-config.json'), { version: 2, useRustAssistant: false });
     await json(path.join(appData, 'Agents', agent, 'config.json'), { name: agent, model: 'r3-synthetic', streamOutput: true, promptMode: 'original', originalSystemPrompt: 'Synthetic R3 fixture', systemPrompt: 'Synthetic R3 fixture', stripRegexes: [], topics: [{ id: topic, name: 'R3 Sync Topic', createdAt: 100, locked: true }, { id: 'r3-other', name: 'R3 Other Topic', createdAt: 101, locked: true }] });
     await json(path.join(appData, 'AgentGroups', group, 'config.json'), { id: group, name: group, mode: 'sequential', members: [agent], topics: [{ id: groupTopic, name: 'R3 Group Topic', createdAt: 102, locked: true }] });
@@ -145,10 +148,11 @@ async function start(name, { enabled = true, fault = false } = {}) {
     stage = `launch-${name}`;
     const appData = path.join(runRoot, name), port = await freePort();
     const args = ['.', `--remote-debugging-port=${port}`, '--remote-debugging-address=127.0.0.1'];
+    if (coexistServices) args.push('--native-sync-coexistence-poc');
     if (enabled) args.push('--native-sync-poc', `--native-sync-url=${sync.url}`, `--native-sync-device=${name}`, `--native-sync-topics=${JSON.stringify(topics)}`);
     const env = {};
     for (const key of ['PATH', 'Path', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT']) if (process.env[key]) env[key] = process.env[key];
-    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_E2E_TEST: '1', VCPCHAT_R7_MOBILE_PWA: mobilePwa?'1':'', VCPCHAT_R6_FULL_TOOLBOX: fullToolbox ? '1' : '', VCPCHAT_R5_TOOLBOX: toolboxService ? '1' : '', VCPCHAT_R4_REAL_HOST: realHost ? 'wp08' : '', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.resolve(artifacts, '../native-sync-r3/deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
+    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_R8_COEXIST: coexistence?'1':'', VCPCHAT_E2E_TEST: '1', VCPCHAT_R7_MOBILE_PWA: mobilePwa?'1':'', VCPCHAT_R6_FULL_TOOLBOX: fullToolbox ? '1' : '', VCPCHAT_R5_TOOLBOX: toolboxService ? '1' : '', VCPCHAT_R4_REAL_HOST: realHost ? 'wp08' : '', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.resolve(artifacts, '../native-sync-r3/deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
     for (const folder of [env.TEMP, env.HOME, env.APPDATA, env.LOCALAPPDATA]) await fs.mkdir(folder, { recursive: true });
     const child = spawn(electron, args, { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
     const record = { name, pid: child.pid, args, appData, enabled, injectedFinalizeFailure: fault, exitCode: null, signal: null, mainUrl: null, rendererReady: false };
@@ -163,6 +167,7 @@ async function start(name, { enabled = true, fault = false } = {}) {
     client.page = new CDP(target.webSocketDebuggerUrl); await client.page.send('Runtime.enable');
     await waitFor(() => client.page.evaluate("document.documentElement.dataset.vcpRendererReady === 'true'"), 'full renderer readiness', 25000);
     record.rendererReady = true;
+    if(coexistServices) record.coexistence=JSON.parse(await fs.readFile(path.join(appData,'R8_SERVICE_READY.json'),'utf8'));
     await waitFor(() => client.page.evaluate(`Boolean(document.querySelector('#agentList > [data-item-id="${agent}"][data-item-type="agent"]'))`), 'real Agent list');
     return client;
 }
@@ -210,6 +215,7 @@ async function main() {
         if (toolboxService) await verifyPluginGate();
     } else sync = await startSyncService({ dbPath: path.join(runRoot, 'central.sqlite'), token: 'isolated-poc-token' });
     await seed('Windows-A'); await seed('Windows-B'); await seed('Sync-Off');
+    if(coexistence)return require('./native-sync-r8-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest,getSync:()=>sync,setSync:value=>{sync=value;}});
     if(mobilePwa)return require('./native-sync-r7-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks});
     let a = await start('Windows-A');
     if (process.argv.includes('--probe')) { checks.push('full main.js / main.html cold-start ready'); await screenshot(a, 'probe-full-app'); await stop(a); return; }
@@ -310,8 +316,8 @@ main().then(async () => {
     assert.equal(guards.reduce((sum, g) => sum + g.blockedWrites.length + g.blockedReads, 0), 0, 'no runtime access outside isolation boundary');
     assert.equal(guards.filter(g => g.fatal).length, 0);
     if (realHost) { await remoteTransport.close(); sync = null; }
-    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : mobilePwa ? 'R7_MOBILE_PWA_CORE_PASS' : fullToolbox ? 'R6_FULL_TOOLBOX_ISOLATED_BOOT_PASS' : toolboxService ? 'R5_TOOLBOX_SERVICE_INTEGRATION_PASS' : realHost ? 'R4_REAL_HOST_TRANSPORT_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, persistence, transportChecks, remote: remoteTransport?.evidence ?? null, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, blockedReads: g.blockedReads, faultsInjected: g.faultsInjected })), model: 'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
-    const prefix = mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
+    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : coexistence ? 'R8_SYNC_COEXISTENCE_PASS' : mobilePwa ? 'R7_MOBILE_PWA_CORE_PASS' : fullToolbox ? 'R6_FULL_TOOLBOX_ISOLATED_BOOT_PASS' : toolboxService ? 'R5_TOOLBOX_SERVICE_INTEGRATION_PASS' : realHost ? 'R4_REAL_HOST_TRANSPORT_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, persistence, transportChecks, remote: remoteTransport?.evidence ?? null, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, blockedReads: g.blockedReads, faultsInjected: g.faultsInjected })), model: 'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
+    const prefix = coexistence ? 'R8' : mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
     await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt);
     console.log(JSON.stringify(receipt));
 }).catch(async error => {
@@ -321,8 +327,8 @@ main().then(async () => {
     for (const client of active) {
         try { uiStates.push({ name: client.record.name, state: await client.page?.evaluate("({selected:window.VCPMainChatState?.snapshot?.().selectedItem?.id, topic:window.VCPMainChatState?.snapshot?.().topicId, items:[...document.querySelectorAll('#agentList > [data-item-id]')].map(e=>({id:e.dataset.itemId,type:e.dataset.itemType})), activeModals:[...document.querySelectorAll('.modal.active')].map(e=>e.id), sendMode:document.getElementById('sendMessageBtn')?.dataset.mode})") }); await screenshot(client, 'failure-' + client.record.name); } catch {}
     }
-    const receipt = { result: realHost ? 'BLOCKED' : checks.length ? 'FULL_APP_PARTIAL_PASS' : 'BLOCKED', stage, message: error.message, checks, launches, remote: remoteTransport?.evidence ?? null, guardEvidence: evidence, rendererErrors: [...active].flatMap(c => c.page?.exceptions || []), uiStates, runRoot };
-    const prefix = mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
+    const receipt = { result: realHost ? 'BLOCKED' : checks.length ? 'FULL_APP_PARTIAL_PASS' : 'BLOCKED', stage, message: error.message, checks, launches, remote: remoteTransport?.evidence ?? null, startupDiagnostics:[...active].flatMap(c=>c.output.split('\n').filter(line=>/better-sqlite|R3 isolated|Cannot find module|NODE_MODULE_VERSION/.test(line))), guardEvidence: evidence, rendererErrors: [...active].flatMap(c => c.page?.exceptions || []), uiStates, runRoot };
+    const prefix = coexistence ? 'R8' : mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
     await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt); console.error(JSON.stringify(receipt)); process.exitCode = 1;
 }).finally(async () => {
     for (const client of active) { try { await client.browser?.send('Browser.close'); await waitFor(() => client.child.exitCode !== null, 'failure cleanup exit', 5000); } catch { client.child.kill(); } client.page?.close(); client.browser?.close(); }

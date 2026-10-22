@@ -342,6 +342,7 @@ let distributedServerStartPromise = null;
 let chatDataService = null; // Optional VCP-CDS shadow service.
 let historyMutationQueue = null;
 let nativeSyncRuntime = null;
+let syncCoexistencePoc = null;
 let pluginAgentOperationService = null;
 let chartService = null;
 let gameService = null;
@@ -542,6 +543,8 @@ function startDistributedServerAfterRenderer() {
                 handleFlowlockControl: desktopRemoteHandlers.handleFlowlockControl,
                 handleDesktopRemoteControl: desktopRemoteHandlers.handleDesktopRemoteControl,
                 chatDataService,
+                historyMutationQueue,
+                appDataRoot: APP_DATA_ROOT_IN_PROJECT,
                 loomManager,
                 scriptoriumAgentControl,
                 pluginAgentOperationService,
@@ -735,6 +738,8 @@ async function performQuitCleanup() {
             }
         }
 
+        await syncCoexistencePoc?.close();
+        syncCoexistencePoc = null;
         if (chatDataService) {
             console.log('[Main] Stopping VCP-CDS...');
             try {
@@ -1281,6 +1286,11 @@ if (!gotTheLock) {
         } catch (error) {
             chatDataService = null;
             console.error('[Main] VCP-CDS shadow initialization failed; continuing without it:', error);
+        }
+
+        if (process.argv.includes('--native-sync-coexistence-poc')) {
+            if (!isolatedAppDataRoot) throw new Error('ISOLATED_APP_DATA_REQUIRED');
+            syncCoexistencePoc = await require('./scripts/native-sync-r8-service.cjs').start({chatDataService, historyMutationQueue, appDataRoot:APP_DATA_ROOT_IN_PROJECT});
         }
 
         appSettingsManager.startCleanupTimer();

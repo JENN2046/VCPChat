@@ -45,8 +45,8 @@ test('desktop SSH requests use verified TLS with the public hostname and never f
  const cp=require('node:child_process'),https=require('node:https'),util=require('node:util');
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'vcp-r10-tls-client-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
  const cert=path.join(root,'cert.crt'),key=path.join(root,'private.key');
- cp.execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=wp10.unicorn.org.cn','-addext','subjectAltName=DNS:wp10.unicorn.org.cn','-keyout',key,'-out',cert],{stdio:'ignore'});
- let accepted=0;const server=https.createServer({key:await fs.readFile(key),cert:await fs.readFile(cert)},(q,r)=>{accepted++;assert.equal(q.headers.host,'wp10.unicorn.org.cn:13848');assert.equal(q.headers.authorization,'Bearer synthetic-tls-client-key');r.setHeader('Content-Type','application/json');r.end('{"ok":true}');});
+ cp.execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=dnvcp.skmt617.top','-addext','subjectAltName=DNS:dnvcp.skmt617.top','-keyout',key,'-out',cert],{stdio:'ignore'});
+ let accepted=0;const server=https.createServer({key:await fs.readFile(key),cert:await fs.readFile(cert)},(q,r)=>{accepted++;assert.equal(q.headers.host,'dnvcp.skmt617.top:13848');assert.equal(q.headers.authorization,'Bearer synthetic-tls-client-key');r.setHeader('Content-Type','application/json');r.end('{"ok":true}');});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));const port=server.address().port;
  await assert.rejects(requestOverTls({port,token:'synthetic-tls-client-key',route:'/api/v1/sync/status'}),e=>e.code==='NETWORK_UNAVAILABLE');assert.equal(accepted,0);
  const script="require(process.argv[1]).requestOverTls({port:Number(process.argv[2]),token:'synthetic-tls-client-key',route:'/api/v1/sync/status'}).then(x=>process.stdout.write(JSON.stringify(x))).catch(()=>process.exit(1))";

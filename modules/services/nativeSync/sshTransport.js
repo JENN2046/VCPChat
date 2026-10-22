@@ -5,7 +5,7 @@ const {fail}=require('./protocol');
 function requestOverTls({port,token,route,body}){
  if(!/^\/api\/(?:v1\/sync\/(?:pull|push|status)|plugins\/NativeSync\/mobile\/catalog)(?:\?|$)/.test(route)&&route!=='/healthz')return Promise.reject(fail('UNAPPROVED_SYNC_ROUTE'));
  return new Promise((resolve,reject)=>{
-  const q=https.request({hostname:'127.0.0.1',port,servername:'wp10.unicorn.org.cn',rejectUnauthorized:true,agent:false,path:route,method:body?'POST':'GET',headers:{Host:'wp10.unicorn.org.cn:13848','Content-Type':'application/json',...(route==='/healthz'?{}:{Authorization:`Bearer ${token}`})}},r=>{
+  const q=https.request({hostname:'127.0.0.1',port,servername:'dnvcp.skmt617.top',rejectUnauthorized:true,agent:false,path:route,method:body?'POST':'GET',headers:{Host:'dnvcp.skmt617.top:13848','Content-Type':'application/json',...(route==='/healthz'?{}:{Authorization:`Bearer ${token}`})}},r=>{
    let text='',bytes=0;r.setEncoding('utf8');
    r.on('data',b=>{bytes+=Buffer.byteLength(b);if(bytes>16*1024*1024)r.destroy();else text+=b;});
    r.on('error',()=>reject(fail('NETWORK_UNAVAILABLE')));r.on('end',()=>{let value;try{value=JSON.parse(text);}catch{return reject(fail('INVALID_SYNC_RESPONSE'));}if(r.statusCode<200||r.statusCode>=300)return reject(fail(value.error?.code||'SYNC_HTTP_ERROR'));resolve(value);});

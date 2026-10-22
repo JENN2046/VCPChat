@@ -23,6 +23,7 @@ const artifacts = path.resolve(root, r9Model ? '../../artifacts/native-sync-r9' 
 const resumeArg=process.argv.find(x=>x.startsWith('--r9-resume='));
 const runRoot = resumeArg ? path.resolve(resumeArg.slice(12)) : path.join(artifacts, `run-${Date.now()}`);
 if(resumeArg&&(!r9Model||path.dirname(runRoot)!==artifacts||!/^run-\d+$/.test(path.basename(runRoot))))throw Error('R9_RESUME_ROOT_DENIED');
+if(process.argv.some(x=>x.startsWith('--r9-attach-live='))&&!(r9Model&&r9Android&&resumeArg&&process.argv.includes('--r9-install-recovery')))throw Error('R9_LIVE_RECOVERY_SCOPE_REQUIRED');
 const electron = require('electron');
 const agent = 'R3Agent', topic = 'r3-topic', group = 'R3Group', groupTopic = 'r3-group-topic';
 const topics = [{ itemId: agent, itemType: 'agent', topicId: topic }, { itemId: group, itemType: 'group', topicId: groupTopic }];
@@ -62,7 +63,7 @@ async function finalPersistence() {
         try { s = await syncState(name); } catch (error) { if (error.code !== 'ENOENT') throw error; }
         const ids = [...agentHistory, ...groupHistory].map(m => m.id);
         assert.equal(new Set(ids).size, ids.length);
-        canonical[name] = [agentHistory.map(m => canonicalMessage(m, topic)), groupHistory.map(m => canonicalMessage(m, groupTopic))];
+        canonical[name] = await Promise.all(topics.map(async d => (await history(name,d.itemId,d.topicId)).map(m => canonicalMessage(m,d.topicId))));
         clients.push({ name, agentMessages: agentHistory.length, groupMessages: groupHistory.length, cursor: s?.cursor ?? null, outbox: s?.outbox.length ?? null, pending: s ? Boolean(s.pending) : null });
     }
     assert.deepEqual(canonical['Windows-A'], canonical['Windows-B']);
@@ -215,7 +216,10 @@ async function main() {
     await fs.mkdir(runRoot, { recursive: true });
     model = await startModel(); modelPort = model.address().port;
     if (realHost) {
-        remoteTransport = r9Model
+        const liveArg=process.argv.find(x=>x.startsWith('--r9-attach-live='));
+        remoteTransport = liveArg
+            ? await require('./native-sync-r9-live-transport.cjs').attach({localRoot:runRoot,url:liveArg.slice(17),origin:process.argv.find(x=>x.startsWith('--r9-live-origin='))?.slice(17)})
+            : r9Model
             ? await require('./native-sync-r9-model-transport.cjs')[resumeArg?'resume':'prepare']({localRoot:runRoot})
             : mobilePwa
             ? await require('./native-sync-r7-transport.cjs').prepare({localRoot:runRoot})
@@ -228,7 +232,24 @@ async function main() {
         if (toolboxService) await verifyPluginGate();
     } else sync = await startSyncService({ dbPath: path.join(runRoot, 'central.sqlite'), token: 'isolated-poc-token' });
     if(!resumeArg){await seed('Windows-A');await seed('Windows-B');}await seed('Sync-Off');
-    if(r9Android)return require('./native-sync-r9-android-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest});
+    if(r9Android){
+        const file=process.argv.includes('--r9-install-recovery')?'./native-sync-r9-install-recovery.cjs':'./native-sync-r9-android-scenario.cjs';
+        for(let attempt=0;;attempt++){
+            try{return await require(file).run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest});}
+            catch(error){
+                if(!process.argv.includes('--r9-install-recovery')||attempt>=2||(!['ERR_ASSERTION'].includes(error.code)&&!/timed out|CDP|SCREENSHOT_REQUIRES/.test(error.message)))throw error;
+                for(const client of [...active])await stop(client);
+                await json(path.join(runRoot,'INSTALL_RECOVERY_RETRY_REQUIRED.json'),{attempt:attempt+1,failureCode:error.code||'R9_INSTALL_STEP_FAILED',endpointKeptAlive:true,origin:sync.mobileOrigin});
+                console.log(JSON.stringify({event:'R9_INSTALL_RETRY_REQUIRED',runRoot,attempt:attempt+1,origin:sync.mobileOrigin}));
+                const controlFile=path.join(runRoot,'INSTALL_RECOVERY_CONTROL.json');
+                const control=await waitFor(async()=>{try{const value=JSON.parse(await fs.readFile(controlFile,'utf8'));assert.ok(['retry','stop'].includes(value.action));return value;}catch(e){if(e.code==='ENOENT')return false;throw e;}},'bounded isolated install-recovery retry control',300000);
+                await fs.rename(controlFile,path.join(runRoot,'INSTALL_RECOVERY_CONTROL_'+Date.now()+'.json'));
+                if(control.action==='stop')throw error;
+                delete require.cache[require.resolve(file)];
+                delete require.cache[require.resolve('./native-sync-r9-android.cjs')];
+            }
+        }
+    }
     if(r9Model)return require(resumeArg?'./native-sync-r9-model-resume.cjs':'./native-sync-r9-model-scenario.cjs').run({sync,runRoot,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest});
     if(coexistence)return require('./native-sync-r8-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest,getSync:()=>sync,setSync:value=>{sync=value;}});
     if(mobilePwa)return require('./native-sync-r7-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks});
@@ -315,6 +336,7 @@ async function verifyPluginDisabled() {
     assert.equal(before.ready, false); assert.equal(before.syncDataCreated, false); assert.equal(before.lifecycle.initialized, 0);
     await seed('Plugin-Off'); const client = await start('Plugin-Off', { enabled: false });
     await select(client); await send(client, 'R3_PLUGIN_OFF'); await visible(client, 'R3 synthetic response: R3_PLUGIN_OFF');
+    if(process.argv.includes('--r9-install-recovery'))transportChecks.push({check:'plugin-disabled original CDS index and MobileSync read projection converge',proof:await require('./native-sync-r8-pwa-cds.cjs').verify(client,history,waitFor,{expectedMessages:2,searchMarker:'R3_PLUGIN_OFF'})});
     await screenshot(client, 'plugin-disabled-single-machine'); await stop(client);
     assert.equal((await history('Plugin-Off')).length, 2);
     await assert.rejects(fs.access(path.join(runRoot, 'Plugin-Off', '.native-sync', 'state.json')));

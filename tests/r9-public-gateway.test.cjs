@@ -1,5 +1,9 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');const {allowed}=require('../scripts/native-sync-r9-public-gateway.cjs');
+test('Android WebAPK resolution refuses origins outside the owned temporary test scope before ADB',()=>{
+ const {resolveWebApk}=require('../scripts/native-sync-r9-android.cjs');
+ for(const origin of ['http://localhost','https://production.example','https://owned.trycloudflare.com/mobile/','https://owned.trycloudflare.com@elsewhere.test'])assert.throws(()=>resolveWebApk(origin),/R9_WEBAPK_SCOPE_REQUIRED/);
+});
 test('only mobile shell and bounded mobile session routes pass the public gateway',()=>{
  for(const p of ['/mobile/','/mobile/icon-192.png','/mobile/icon-512.png','/mobile/manifest.webmanifest','/mobile/sw.js','/mobile/assets/index-abc.js','/mobile/api/session','/mobile/api/conversations','/mobile/api/conversations/test-topic?after=0'])assert.equal(allowed('GET',p),true,p);
  for(const p of ['/mobile/api/pair','/mobile/api/conversations/test-topic/messages','/mobile/api/executions/job_123/cancel'])assert.equal(allowed('POST',p),true,p);

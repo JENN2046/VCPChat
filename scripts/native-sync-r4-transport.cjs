@@ -12,16 +12,16 @@ const sshArgs = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'Server
 const quote = value => "'" + String(value).replaceAll("'", "'\\''") + "'";
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sourceFiles = ['scripts/native-sync-r4-host.cjs', 'modules/services/nativeSync/httpService.js', 'modules/services/nativeSync/centralStore.js', 'modules/services/nativeSync/protocol.js', 'VCPDistributedServer/Plugin/VCPMobileSync/sync/canonical.js', 'VCPDistributedServer/Plugin/VCPMobileSync/core/hash.js'];
-const bootstrap = `import sys,json,pathlib,base64,hashlib,os
+function bootstrap(profile) { return `import sys,json,pathlib,base64,hashlib,os
 os.umask(0o077)
 data=json.load(sys.stdin)
-base=pathlib.Path('/home/admin/VCPKF/vcp/artifacts/native-sync-r4')
+base=pathlib.Path('/home/admin/VCPKF/vcp/artifacts/${profile.kind}')
 root=pathlib.Path(data['root'])
 assert root.parent==base and root.name.startswith('run-') and root.name[4:].isdigit()
 base.mkdir(mode=0o700,exist_ok=True)
 assert base.resolve()==base
 root.mkdir(mode=0o700,exist_ok=False)
-approved=set(${JSON.stringify(sourceFiles)})
+approved=set(${JSON.stringify(profile.files)})
 assert set(f['name'] for f in data['files'])==approved
 manifest={'sourceCommit':data['sourceCommit'],'files':[]}
 for item in data['files']:
@@ -34,7 +34,7 @@ for item in data['files']:
  manifest['files'].append({'name':item['name'],'sha256':item['sha256'],'bytes':len(raw)})
 (root/'source-manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
 print(json.dumps({'root':str(root),'sourceCommit':data['sourceCommit'],'files':manifest['files'],'exclusiveDirectory':True}))
-`;
+`; }
 async function limited(command, args, input) {
     const child = spawn(command, args, { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     let stdout = '', stderr = '';
@@ -46,20 +46,22 @@ async function limited(command, args, input) {
     finally { clearTimeout(timeout); }
 }
 class RealHostTransport {
-    static async prepare({ sourceRoot, localRoot }) {
-        const remote = new RealHostTransport(localRoot);
-        const files = await Promise.all(sourceFiles.map(async name => { const bytes = await fs.readFile(path.join(sourceRoot, name)); return { name, sha256: crypto.createHash('sha256').update(bytes).digest('hex'), base64: bytes.toString('base64') }; }));
+    static async prepare({ sourceRoot, localRoot, profile = { kind: 'native-sync-r4', files: sourceFiles, entry: 'scripts/native-sync-r4-host.cjs' } }) {
+        assert.ok(['native-sync-r4', 'native-sync-r5'].includes(profile.kind));
+        const remote = new RealHostTransport(localRoot, profile);
+        const files = await Promise.all(profile.files.map(async name => { const bytes = await fs.readFile(path.join(sourceRoot, name)); return { name, sha256: crypto.createHash('sha256').update(bytes).digest('hex'), base64: bytes.toString('base64') }; }));
         const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot, encoding: 'utf8', windowsHide: true }).trim();
-        remote.evidence.bootstrap = await limited('ssh', [...sshArgs, 'wp08', 'python3 -c ' + quote(bootstrap)], JSON.stringify({ root: remote.remoteRoot, files, sourceCommit }));
+        remote.evidence.bootstrap = await limited('ssh', [...sshArgs, 'wp08', 'python3 -c ' + quote(bootstrap(profile))], JSON.stringify({ root: remote.remoteRoot, files, sourceCommit }));
         await fs.writeFile(path.join(localRoot, 'remote-source-manifest.json'), JSON.stringify(remote.evidence.bootstrap, null, 2));
         const listener = net.createServer(); await new Promise(resolve => listener.listen(0, '127.0.0.1', resolve));
         remote.localPort = listener.address().port; await new Promise(resolve => listener.close(resolve));
         remote.url = `http://127.0.0.1:${remote.localPort}`;
         return remote;
     }
-    constructor(localRoot) {
+    constructor(localRoot, profile = { kind: 'native-sync-r4', entry: 'scripts/native-sync-r4-host.cjs' }) {
         assert.match(path.basename(localRoot), /^run-\d+$/);
-        this.remoteRoot = '/home/admin/VCPKF/vcp/artifacts/native-sync-r4/' + path.basename(localRoot);
+        this.profile = profile;
+        this.remoteRoot = '/home/admin/VCPKF/vcp/artifacts/' + profile.kind + '/' + path.basename(localRoot);
         this.localRoot = localRoot; this.server = null; this.tunnel = null;
         this.evidence = { hostAlias: 'wp08', remoteRoot: this.remoteRoot, servers: [], tunnels: [], snapshots: [] };
     }
@@ -69,7 +71,8 @@ class RealHostTransport {
         throw new Error(`${label} timed out`);
     }
     async startServer() {
-        const command = '/usr/bin/node --no-warnings ' + quote(this.remoteRoot + '/source/scripts/native-sync-r4-host.cjs') + ' ' + quote(this.remoteRoot);
+        const prefix = this.profile.kind === 'native-sync-r5' ? 'env -i PATH=/usr/bin:/bin HOME=' + quote(this.remoteRoot) + ' NODE_PATH=/home/admin/VCPKF/vcp/artifacts/native-sync-r5/deps/node_modules ' : '';
+        const command = prefix + '/usr/bin/node --no-warnings ' + quote(this.remoteRoot + '/source/' + this.profile.entry) + ' ' + quote(this.remoteRoot);
         const child = spawn('ssh', [...sshArgs, 'wp08', command], { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
         const record = { localSshPid: child.pid, command, exitCode: null, events: [] };
         this.evidence.servers.push(record); this.server = { child, record };
@@ -88,7 +91,8 @@ class RealHostTransport {
             if (child.exitCode !== null) throw new Error(`R4 remote startup exited ${child.exitCode}`);
             return record.events.find(event => event.event === 'ready');
         }, 'Ubuntu service startup');
-        assert.equal(ready.platform, 'linux'); assert.match(ready.dbPath, /^\/home\/admin\/VCPKF\/vcp\/artifacts\/native-sync-r4\/run-\d+\/data\/central.sqlite$/);
+        assert.equal(ready.platform, 'linux');
+        assert.equal(ready.dbPath, this.remoteRoot + (this.profile.kind === 'native-sync-r5' ? '/data/native-sync/central.sqlite' : '/data/central.sqlite'));
         this.remotePort = Number(new URL(ready.url).port);
     }
     async connect() {

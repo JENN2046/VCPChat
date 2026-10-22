@@ -7,8 +7,9 @@ const path = require('node:path');
 const net = require('node:net');
 const tls = require('node:tls');
 const { fileURLToPath } = require('node:url');
-const allowed = path.resolve(__dirname, process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
-    ? '../../../artifacts/native-sync-r4' : '../../../artifacts/native-sync-r3');
+const allowed = path.resolve(__dirname, process.env.VCPCHAT_R5_TOOLBOX === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
+    ? '../../../artifacts/native-sync-r5' : process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
+        ? '../../../artifacts/native-sync-r4' : '../../../artifacts/native-sync-r3');
 const runRoot = path.resolve(process.env.VCPCHAT_R3_RUN_ROOT || '');
 if (runRoot !== allowed && !runRoot.startsWith(allowed + path.sep)) throw new Error('Explicit R3 test root required');
 const originals = { mkdir: fs.mkdirSync, write: fs.writeFileSync, read: fs.readFileSync, asyncRead: fsp.readFile.bind(fsp), rename: fsp.rename.bind(fsp) };

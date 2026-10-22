@@ -312,7 +312,7 @@ if (isolatedAppDataRoot) app.setPath('userData', path.resolve(isolatedAppDataRoo
 const APP_DATA_ROOT_IN_PROJECT = isolatedAppDataRoot
     ? path.resolve(isolatedAppDataRoot)
     : path.join(PROJECT_ROOT, 'AppData');
-const NATIVE_SPLASH_READY_FILE = app.isPackaged
+const NATIVE_SPLASH_READY_FILE = (app.isPackaged || isolatedAppDataRoot)
     ? path.join(APP_DATA_ROOT_IN_PROJECT, '.vcp_ready')
     : path.join(__dirname, '.vcp_ready');
 
@@ -341,6 +341,7 @@ let distributedServer = null; // To hold the distributed server instance
 let distributedServerStartPromise = null;
 let chatDataService = null; // Optional VCP-CDS shadow service.
 let historyMutationQueue = null;
+let nativeSyncRuntime = null;
 let pluginAgentOperationService = null;
 let chartService = null;
 let gameService = null;
@@ -753,6 +754,8 @@ async function performQuitCleanup() {
         }
 
         workspaceHandlers.dispose();
+        await nativeSyncRuntime?.close();
+        nativeSyncRuntime = null;
         await historyMutationQueue?.dispose?.();
         historyMutationQueue = null;
         pluginAgentOperationService = null;
@@ -1234,6 +1237,18 @@ if (!gotTheLock) {
             userDataDir: USER_DATA_DIR,
             fileWatcher,
             logger: console
+        });
+        require('./modules/ipc/nativeHistoryHandlers').initialize({ ipcMain, historyMutationQueue });
+        nativeSyncRuntime = await require('./modules/services/nativeSync/runtime').createNativeSyncRuntime({
+            queue: historyMutationQueue, appDataRoot: APP_DATA_ROOT_IN_PROJECT,
+            args: process.argv, isolated: Boolean(isolatedAppDataRoot),
+            notify: change => {
+                let sent = false;
+                for (const window of BrowserWindow.getAllWindows()) {
+                    if (!window.isDestroyed()) { window.webContents.send('history-file-updated', change); sent = true; }
+                }
+                return sent;
+            },
         });
         pluginAgentOperationService = new PluginAgentOperationService({
             agentDir: AGENT_DIR,

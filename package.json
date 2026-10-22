@@ -4,6 +4,8 @@
   "description": "一个为VCP服务器打造的AI聊天桌面客户端",
   "main": "main.js",
   "scripts": {
+    "test:native-sync-r3": "node scripts/test-native-sync-r3.cjs",
+    "test:native-sync-r2": "node scripts/test-native-sync-r2.cjs",
     "start": "electron .",
     "doctor": "node scripts/vcpchat-doctor.mjs",
     "start:managed": "node scripts/vcpchat-dev-launcher.mjs",

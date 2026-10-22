@@ -1,0 +1,31 @@
+'use strict';
+const fs=require('node:fs/promises'),path=require('node:path'),https=require('node:https'),crypto=require('node:crypto'),assert=require('node:assert/strict');
+exports.run=async function(h){
+ const {sync,runRoot,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest}=h;
+ const cert=await fs.readFile(path.join(runRoot,'tls/server.crt'));let cookie=null;const evidence={model:'doubao-seed-2.0-mini',android:'NOT RUN in this server-core suite',jobs:[],checks:[]};
+ const request=(route,body,admin=false)=>new Promise((resolve,reject)=>{const req=https.request(sync.gateway.origin+route,{agent:false,method:body?'POST':'GET',ca:cert,headers:{Origin:sync.gateway.origin,...(body?{'Content-Type':'application/json'}:{}),...(cookie?{Cookie:cookie}:{}),...(admin?{Authorization:'Bearer isolated-poc-token'}:{})}},res=>{let text='';if(res.headers['set-cookie'])cookie=res.headers['set-cookie'][0].split(';')[0];res.on('data',b=>text+=b);res.on('end',()=>{const data=JSON.parse(text);if(res.statusCode>=400)reject(Error('R9_MOBILE_API_'+res.statusCode));else resolve(data);});});req.on('error',reject);req.end(body?JSON.stringify(body):undefined);});
+ const snapshot=()=>request('/mobile/api/conversations/test-topic');
+ const state=async id=>(await snapshot()).executions.find(x=>x.id===id);
+ async function submit(text,label){const accepted=await request('/mobile/api/conversations/test-topic/messages',{requestId:'r9-'+crypto.randomUUID(),text});assert.ok(['queued','running'].includes(accepted.state));evidence.jobs.push({label,id:accepted.id,persistedAcceptance:true});return accepted;}
+ async function completed(job){return waitFor(async()=>{const s=await state(job.id);if(s.state==='failed')throw Object.assign(Error('R9_REAL_MODEL_EXECUTION_FAILED'),{terminal:true});return s.state==='completed'&&s;},'real model final publication',120000);}
+ let a=await start('Windows-A');await select(a);
+ const grant=await request('/api/plugins/NativeSync/mobile/pairing',{},true);await request('/mobile/api/pair',{code:grant.pairingCode});
+ const first=await submit('R9_REAL_OK：请只回复这个测试标记 R9_REAL_OK，再用中文说一句问候。','real-dialogue');await completed(first);
+ const long=await submit('R9_REAL_LONG：请写约1500字的中文测试文章，讨论消息持久化、断线恢复和幂等，不使用工具，不查询个人信息。','long-reply');await completed(long);
+ const stored=await snapshot(),reply=stored.messages.find(x=>x.id==='reply_'+long.id)?.message?.content;assert.ok(reply?.length>=700,'real long reply must contain at least 700 characters');evidence.longReply={characters:reply.length,sha256:crypto.createHash('sha256').update(reply).digest('hex')};
+ const before=(await sync.providerSnapshot()).calls;await sync.failNext();const recover=await submit('R9_REAL_RECOVERY：请用中文简短解释一次网络失败后重新提交为什么应当防重。','controlled-failure-recovery');
+ const recovered=await waitFor(async()=>{const s=await state(recover.id);return ['completed','failed'].includes(s.state)&&s;},'bounded failure recovery',120000);
+ if(recovered.state==='failed'){const retry=await submit('R9_REAL_RECOVERY：网络已经恢复，请用中文简短解释防重。','new-request-after-recorded-failure');await completed(retry);}
+ const afterRecovery=await sync.providerSnapshot();assert.equal(afterRecovery.controlledFailures,1);assert.ok(afterRecovery.calls>before);evidence.recovery={failure:'one controlled relay outage; no fabricated provider response',initialState:recovered.state,realProviderRecovered:true};
+ const cancelled=await submit('R9_REAL_CANCEL：请写一篇不少于8000字的中文文章，主题为隔离测试环境的持久化，不要用工具。','active-cancel');
+ await waitFor(async()=>{const p=await sync.providerSnapshot();return p.active>0&&(await state(cancelled.id)).state==='running';},'real upstream request active before cancel',20000);
+ await request('/mobile/api/executions/'+cancelled.id+'/cancel',{});await waitFor(async()=>(await state(cancelled.id)).state==='cancelled','explicit cancellation');await waitFor(async()=>(await sync.providerSnapshot()).records.some(x=>x.aborted),'provider transport aborted');assert.ok(!(await snapshot()).messages.some(x=>x.id==='reply_'+cancelled.id));
+ const disconnected=await submit('R9_REAL_DISCONNECT：请写约1200字中文文章解释浏览器关闭后服务端继续完成任务的流程，不使用工具。','closed-client-connection');await stop(a);await completed(disconnected);evidence.clientDisconnect={httpConnectionClosedAfter202:true,desktopClosedBeforeCompletion:true,androidDeviceDisconnect:'NOT RUN in this suite'};
+ const beforeReplay=await sync.providerSnapshot();const m=await snapshot(),job=m.executions.find(x=>x.id===first.id),original=m.messages.find(x=>x.id===job.userMessageId).message;
+ await request('/mobile/api/conversations/test-topic/messages',{requestId:job.requestId,text:original.content});assert.equal((await sync.providerSnapshot()).calls,beforeReplay.calls);
+ await sync.restartServerAndReconnect();const restored=await snapshot();assert.ok(restored.messages.some(x=>x.id==='reply_'+disconnected.id));assert.equal(restored.executions.find(x=>x.id===first.id).state,'completed');
+ let b=await start('Windows-B');await select(b);await visible(b,'R9_REAL_OK');await waitFor(async()=>{const s=await syncState('Windows-B'),metrics=await centerRequest('/api/v1/sync/status');return s.cursor===metrics.headSeq&&!s.pending&&!s.outbox.length;},'Windows catches real-model history');await screenshot(b,'windows-real-model-conversation');await stop(b);
+ a=await start('Windows-A');await select(a);await visible(a,'R9_REAL_DISCONNECT');await stop(a);
+ const off=await start('Sync-Off',{enabled:false});await select(off);await send(off,'R3_SINGLE_MACHINE');await stop(off);
+ const p=await sync.providerSnapshot();assert.ok(p.calls<=12);evidence.provider=p;evidence.checks=['approved Ubuntu isolated config consumed only by loopback credential relay; original full ToolBox Agent/model pipeline unchanged','real dialogue and long final response published into NativeSync','controlled transport failure recovered using original execution path','active real-provider HTTP request cancelled, no assistant committed','202 client connection closes and desktop app exits before final publication; persisted final reply survives full host restart','retry does not call provider again; formal Windows Renderer receives same history'];checks.push(...evidence.checks);await fs.writeFile(path.join(runRoot,'REAL_MODEL_ACCEPTANCE.json'),JSON.stringify(evidence,null,2));
+};

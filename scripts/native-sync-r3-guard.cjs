@@ -7,7 +7,7 @@ const path = require('node:path');
 const net = require('node:net');
 const tls = require('node:tls');
 const { fileURLToPath } = require('node:url');
-const allowed = path.resolve(__dirname, process.env.VCPCHAT_R8_COEXIST === '1' ? '../../../artifacts/native-sync-r8' : process.env.VCPCHAT_R7_MOBILE_PWA === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
+const allowed = path.resolve(__dirname, process.env.VCPCHAT_R9_TEST === '1' ? '../../../artifacts/native-sync-r9' : process.env.VCPCHAT_R8_COEXIST === '1' ? '../../../artifacts/native-sync-r8' : process.env.VCPCHAT_R7_MOBILE_PWA === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
     ? '../../../artifacts/native-sync-r7' : process.env.VCPCHAT_R6_FULL_TOOLBOX === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
     ? '../../../artifacts/native-sync-r6' : process.env.VCPCHAT_R5_TOOLBOX === '1' && process.env.VCPCHAT_R4_REAL_HOST === 'wp08'
     ? '../../../artifacts/native-sync-r5' : process.env.VCPCHAT_R4_REAL_HOST === 'wp08'

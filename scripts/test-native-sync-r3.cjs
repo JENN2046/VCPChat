@@ -12,16 +12,21 @@ const realHost = process.argv.includes('--real-host=wp08');
 const toolboxService = process.argv.includes('--toolbox-service');
 const fullToolbox = process.argv.includes('--full-toolbox');
 const mobilePwa=process.argv.includes('--mobile-pwa');
+const r9Model=process.argv.includes('--r9-model');
+const r9Android=process.argv.includes('--r9-android');
 const coexistence=process.argv.includes('--sync-coexistence');
 const coexistServices=coexistence||process.argv.includes('--coexist-services');
 if (fullToolbox && !toolboxService) throw new Error('Full Toolbox acceptance requires the plugin transport');
 if (toolboxService && !realHost) throw new Error('Toolbox acceptance requires the authorized real-host transport');
 if (process.argv.some(arg => arg.startsWith('--real-host=') && arg !== '--real-host=wp08')) throw new Error('Only the authorized wp08 test host is supported');
-const artifacts = path.resolve(root, coexistence ? '../../artifacts/native-sync-r8' : mobilePwa ? '../../artifacts/native-sync-r7' : fullToolbox ? '../../artifacts/native-sync-r6' : toolboxService ? '../../artifacts/native-sync-r5' : realHost ? '../../artifacts/native-sync-r4' : '../../artifacts/native-sync-r3');
-const runRoot = path.join(artifacts, `run-${Date.now()}`);
+const artifacts = path.resolve(root, r9Model ? '../../artifacts/native-sync-r9' : coexistence ? '../../artifacts/native-sync-r8' : mobilePwa ? '../../artifacts/native-sync-r7' : fullToolbox ? '../../artifacts/native-sync-r6' : toolboxService ? '../../artifacts/native-sync-r5' : realHost ? '../../artifacts/native-sync-r4' : '../../artifacts/native-sync-r3');
+const resumeArg=process.argv.find(x=>x.startsWith('--r9-resume='));
+const runRoot = resumeArg ? path.resolve(resumeArg.slice(12)) : path.join(artifacts, `run-${Date.now()}`);
+if(resumeArg&&(!r9Model||path.dirname(runRoot)!==artifacts||!/^run-\d+$/.test(path.basename(runRoot))))throw Error('R9_RESUME_ROOT_DENIED');
 const electron = require('electron');
 const agent = 'R3Agent', topic = 'r3-topic', group = 'R3Group', groupTopic = 'r3-group-topic';
 const topics = [{ itemId: agent, itemType: 'agent', topicId: topic }, { itemId: group, itemType: 'group', topicId: groupTopic }];
+if(r9Android)topics.push({itemId:agent,itemType:'agent',topicId:'r3-other'});
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const checks = [], launches = [], active = new Set();
 let sync, model, modelPort, stage = 'setup';
@@ -94,11 +99,17 @@ async function waitFor(fn, label, ms = 20000) {
 }
 class CDP {
     constructor(url) {
-        this.socket = new WebSocket(url); this.pending = new Map(); this.serial = 0; this.exceptions = [];
-        this.ready = new Promise((resolve, reject) => { this.socket.addEventListener('open', resolve, { once: true }); this.socket.addEventListener('error', reject, { once: true }); });
+        this.socket = new WebSocket(url); this.pending = new Map(); this.serial = 0; this.exceptions = []; this.securityEvents=[];
+        this.ready = new Promise((resolve, reject) => {
+            const timer = setTimeout(() => { reject(new Error('CDP connection timeout')); this.socket.close(); }, 12000);
+            this.socket.addEventListener('open', () => { clearTimeout(timer); resolve(); }, { once: true });
+            this.socket.addEventListener('error', () => { clearTimeout(timer); reject(new Error('CDP connection failed')); }, { once: true });
+            this.socket.addEventListener('close', () => { clearTimeout(timer); reject(new Error('CDP connection closed')); }, { once: true });
+        });
         this.socket.addEventListener('message', ({ data }) => {
             const message = JSON.parse(data);
             if (message.id) { const callback = this.pending.get(message.id); if (!callback) return; this.pending.delete(message.id); clearTimeout(callback.timer); if (message.error) callback.reject(new Error(message.error.message)); else callback.resolve(message.result); }
+            if(message.method?.startsWith('Security.')&&message.params)this.securityEvents.push({method:message.method,params:message.params});
             if (message.method === 'Runtime.exceptionThrown') this.exceptions.push(message.params.exceptionDetails.text + ': ' + (message.params.exceptionDetails.exception?.description || ''));
         });
         this.socket.addEventListener('close', () => { for (const p of this.pending.values()) { clearTimeout(p.timer); p.reject(new Error('CDP connection closed')); } this.pending.clear(); });
@@ -152,7 +163,7 @@ async function start(name, { enabled = true, fault = false } = {}) {
     if (enabled) args.push('--native-sync-poc', `--native-sync-url=${sync.url}`, `--native-sync-device=${name}`, `--native-sync-topics=${JSON.stringify(topics)}`);
     const env = {};
     for (const key of ['PATH', 'Path', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT']) if (process.env[key]) env[key] = process.env[key];
-    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_R8_COEXIST: coexistence?'1':'', VCPCHAT_E2E_TEST: '1', VCPCHAT_R7_MOBILE_PWA: mobilePwa?'1':'', VCPCHAT_R6_FULL_TOOLBOX: fullToolbox ? '1' : '', VCPCHAT_R5_TOOLBOX: toolboxService ? '1' : '', VCPCHAT_R4_REAL_HOST: realHost ? 'wp08' : '', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.resolve(artifacts, '../native-sync-r3/deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
+    Object.assign(env, { VCPCHAT_APP_DATA_DIR: appData, VCPCHAT_R9_TEST: r9Model?'1':'', VCPCHAT_R8_COEXIST: coexistence?'1':'', VCPCHAT_E2E_TEST: '1', VCPCHAT_R7_MOBILE_PWA: mobilePwa?'1':'', VCPCHAT_R6_FULL_TOOLBOX: fullToolbox ? '1' : '', VCPCHAT_R5_TOOLBOX: toolboxService ? '1' : '', VCPCHAT_R4_REAL_HOST: realHost ? 'wp08' : '', VCPCHAT_R3_RUN_ROOT: runRoot, VCPCHAT_R3_FAIL_SYNC_FINALIZE: fault ? '1' : '0', NODE_OPTIONS: '--require=' + path.join(root, 'scripts/native-sync-r3-guard.cjs').replaceAll('\\', '/'), NODE_PATH: [path.resolve(artifacts, '../native-sync-r3/deps/node_modules'), path.resolve(artifacts, '../native-sync-r2/deps/node_modules')].join(path.delimiter), TEMP: path.join(runRoot, 'temp'), TMP: path.join(runRoot, 'temp'), HOME: path.join(appData, 'test-home'), USERPROFILE: path.join(appData, 'test-home'), APPDATA: path.join(appData, 'os-roaming'), LOCALAPPDATA: path.join(appData, 'os-local') });
     for (const folder of [env.TEMP, env.HOME, env.APPDATA, env.LOCALAPPDATA]) await fs.mkdir(folder, { recursive: true });
     const child = spawn(electron, args, { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
     const record = { name, pid: child.pid, args, appData, enabled, injectedFinalizeFailure: fault, exitCode: null, signal: null, mainUrl: null, rendererReady: false };
@@ -204,7 +215,9 @@ async function main() {
     await fs.mkdir(runRoot, { recursive: true });
     model = await startModel(); modelPort = model.address().port;
     if (realHost) {
-        remoteTransport = mobilePwa
+        remoteTransport = r9Model
+            ? await require('./native-sync-r9-model-transport.cjs')[resumeArg?'resume':'prepare']({localRoot:runRoot})
+            : mobilePwa
             ? await require('./native-sync-r7-transport.cjs').prepare({localRoot:runRoot})
             : fullToolbox
             ? await require('./native-sync-r6-transport.cjs').prepare({ localRoot: runRoot })
@@ -214,7 +227,9 @@ async function main() {
         sync = await remoteTransport.start();
         if (toolboxService) await verifyPluginGate();
     } else sync = await startSyncService({ dbPath: path.join(runRoot, 'central.sqlite'), token: 'isolated-poc-token' });
-    await seed('Windows-A'); await seed('Windows-B'); await seed('Sync-Off');
+    if(!resumeArg){await seed('Windows-A');await seed('Windows-B');}await seed('Sync-Off');
+    if(r9Android)return require('./native-sync-r9-android-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest});
+    if(r9Model)return require(resumeArg?'./native-sync-r9-model-resume.cjs':'./native-sync-r9-model-scenario.cjs').run({sync,runRoot,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest});
     if(coexistence)return require('./native-sync-r8-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks,waitFor,centerRequest,getSync:()=>sync,setSync:value=>{sync=value;}});
     if(mobilePwa)return require('./native-sync-r7-scenario.cjs').run({sync,runRoot,CDP,start,select,send,visible,screenshot,stop,history,syncState,checks});
     let a = await start('Windows-A');
@@ -316,8 +331,8 @@ main().then(async () => {
     assert.equal(guards.reduce((sum, g) => sum + g.blockedWrites.length + g.blockedReads, 0), 0, 'no runtime access outside isolation boundary');
     assert.equal(guards.filter(g => g.fatal).length, 0);
     if (realHost) { await remoteTransport.close(); sync = null; }
-    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : coexistence ? 'R8_SYNC_COEXISTENCE_PASS' : mobilePwa ? 'R7_MOBILE_PWA_CORE_PASS' : fullToolbox ? 'R6_FULL_TOOLBOX_ISOLATED_BOOT_PASS' : toolboxService ? 'R5_TOOLBOX_SERVICE_INTEGRATION_PASS' : realHost ? 'R4_REAL_HOST_TRANSPORT_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, persistence, transportChecks, remote: remoteTransport?.evidence ?? null, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, blockedReads: g.blockedReads, faultsInjected: g.faultsInjected })), model: 'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
-    const prefix = coexistence ? 'R8' : mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
+    const receipt = { result: process.argv.includes('--probe') ? 'PROBE_PASS' : r9Android ? 'R9_ANDROID_REAL_MODEL_PASS' : r9Model ? 'R9_REAL_MODEL_SERVER_CORE_PASS_ANDROID_UNVERIFIED' : coexistence ? 'R8_SYNC_COEXISTENCE_PASS' : mobilePwa ? 'R7_MOBILE_PWA_CORE_PASS' : fullToolbox ? 'R6_FULL_TOOLBOX_ISOLATED_BOOT_PASS' : toolboxService ? 'R5_TOOLBOX_SERVICE_INTEGRATION_PASS' : realHost ? 'R4_REAL_HOST_TRANSPORT_PASS' : 'FULL_APP_COLD_START_PASS', runRoot, checks, launches, persistence, transportChecks, remote: remoteTransport?.evidence ?? null, guardSummary: guards.map(g => ({ pid: g.pid, processType: g.processType, blockedNetwork: g.blockedNetwork.length, blockedWrites: g.blockedWrites.length, blockedReads: g.blockedReads, faultsInjected: g.faultsInjected })), model: r9Model?'approved Ubuntu doubao-seed-2.0-mini; Windows single-machine control uses synthetic loopback SSE':'synthetic loopback SSE only', fullEntry: 'electron . -> package.json main -> real main.js -> main.html -> renderer.js; no application modules replaced', singleInstance: 'unchanged; launches sequential; no allow-multiple-instances flag' };
+    const prefix = r9Android ? 'R9' : r9Model ? 'R9_MODEL' : coexistence ? 'R8' : mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
     await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt);
     console.log(JSON.stringify(receipt));
 }).catch(async error => {
@@ -328,7 +343,7 @@ main().then(async () => {
         try { uiStates.push({ name: client.record.name, state: await client.page?.evaluate("({selected:window.VCPMainChatState?.snapshot?.().selectedItem?.id, topic:window.VCPMainChatState?.snapshot?.().topicId, items:[...document.querySelectorAll('#agentList > [data-item-id]')].map(e=>({id:e.dataset.itemId,type:e.dataset.itemType})), activeModals:[...document.querySelectorAll('.modal.active')].map(e=>e.id), sendMode:document.getElementById('sendMessageBtn')?.dataset.mode})") }); await screenshot(client, 'failure-' + client.record.name); } catch {}
     }
     const receipt = { result: realHost ? 'BLOCKED' : checks.length ? 'FULL_APP_PARTIAL_PASS' : 'BLOCKED', stage, message: error.message, checks, launches, remote: remoteTransport?.evidence ?? null, startupDiagnostics:[...active].flatMap(c=>c.output.split('\n').filter(line=>/better-sqlite|R3 isolated|Cannot find module|NODE_MODULE_VERSION/.test(line))), guardEvidence: evidence, rendererErrors: [...active].flatMap(c => c.page?.exceptions || []), uiStates, runRoot };
-    const prefix = coexistence ? 'R8' : mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
+    const prefix = r9Android ? 'R9' : r9Model ? 'R9_MODEL' : coexistence ? 'R8' : mobilePwa ? 'R7' : fullToolbox ? 'R6' : toolboxService ? 'R5' : realHost ? 'R4' : 'R3';
     await json(path.join(runRoot, prefix + '_APP_RECEIPT.json'), receipt); await json(path.join(artifacts, `LATEST_${prefix}_RECEIPT.json`), receipt); console.error(JSON.stringify(receipt)); process.exitCode = 1;
 }).finally(async () => {
     for (const client of active) { try { await client.browser?.send('Browser.close'); await waitFor(() => client.child.exitCode !== null, 'failure cleanup exit', 5000); } catch { client.child.kill(); } client.page?.close(); client.browser?.close(); }

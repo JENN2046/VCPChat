@@ -22,6 +22,19 @@ root=Path(data['root'])
 assert root.parent==base and (root.name=='build-source' or root.name.startswith('run-') and root.name[4:].isdigit())
 base.mkdir(mode=0o700,exist_ok=True)
 assert base.resolve()==base
+if root.exists():
+ old=json.loads((root/'source-manifest.json').read_text())
+ incoming={}
+ for item in data['files']:
+  name=item['name'];p=Path(name)
+  if len(p.parts)>2 and p.parts[0]=='Plugin' and p.parts[1]!='NativeSync' and p.name=='plugin-manifest.json':name+='.block'
+  incoming[name]=item['sha256']
+ assert {x['name']:x['sha256'] for x in old['files']}==incoming
+ for name,digest in incoming.items():assert hashlib.sha256((root/'source'/name).read_bytes()).hexdigest()==digest
+ assert (root/'source/config.env').is_file() and (root/'source/.env').is_file() and (root/'source/node_modules').is_dir()
+ selected=json.loads((root/'r7-fixture-config.json').read_text())['port'] if data.get('r9Public') else None
+ print(json.dumps({'root':str(root),'sourceCommit':old['sourceCommit'],'sourceFileCount':len(old['files']),'disabledPluginManifests':len(old['disabledPluginManifests']),'nativeBinary':old.get('nativeBinary'),'manifestSha256':hashlib.sha256((root/'source-manifest.json').read_bytes()).hexdigest(),'fixedServerPort':selected,'verifiedReadOnlyBootstrapRecovery':True}))
+ sys.exit(0)
 root.mkdir(mode=0o700,exist_ok=False)
 source=root/'source';source.mkdir(mode=0o700)
 manifest={'sourceCommit':data['sourceCommit'],'files':[],'disabledPluginManifests':[]}
@@ -49,12 +62,15 @@ if root.name!='build-source':
  settings={'PORT':'0','SERVER_BIND_HOST':'127.0.0.1','Key':'isolated-poc-token','API_URL':'http://127.0.0.1:9','API_Key':'r6-synthetic-provider-unused','DebugMode':'false','CHAT_LOG_ENABLED':'false','TDB_KNOWLEDGE_ENABLED':'false','NativeSyncEnabled':'true','NativeSyncDataDir':str(root/'data/native-sync'),'KNOWLEDGEBASE_ROOT_PATH':str(root/'data/kb-empty'),'KNOWLEDGEBASE_STORE_PATH':str(root/'data/kb-store'),'KNOWLEDGEBASE_FULL_SCAN_ON_STARTUP':'false','VECTORDB_DIMENSION':'32','AGENT_DIR_PATH':str(root/'data/agents-empty'),'TVSTXT_DIR_PATH':str(root/'data/tvs-empty'),'DISTRIBUTED_MUSIC_PLAYLIST_SYNC_ENABLED':'false','WEBSOCKET_HEARTBEAT_ENABLED':'false'}
  for folder in ['kb-empty','agents-empty','tvs-empty']: (root/'data'/folder).mkdir(parents=True,exist_ok=True,mode=0o700)
  if kind=='native-sync-r7':
-  settings.update({'NativeMobileEnabled':'true','NativeMobileOrigin':data['mobileOrigin'],'NativeMobileTopics':json.dumps([{'key':'test-topic','ownerType':'agent','ownerId':'R3Agent','topicId':'r3-topic','agentAlias':'R3Agent','agentName':'R3Agent','topicName':'NativeSync test','model':'r7-synthetic'}]),'NativeMobilePwaDir':str(source/'Plugin/NativeSync/mobile-dist'),'NativeMobileStartDelayMs':'3000'})
+  settings.update({'NativeMobileEnabled':'true','NativeMobileOrigin':data['mobileOrigin'],'NativeMobileTopics':json.dumps([{'key':'test-topic','ownerType':'agent','ownerId':'R3Agent','topicId':'r3-topic','agentAlias':'R3Agent','agentName':'R3Agent','topicName':'NativeSync test','model':data.get('mobileModel','r7-synthetic')}]),'NativeMobilePwaDir':str(source/'Plugin/NativeSync/mobile-dist'),'NativeMobileStartDelayMs':'3000'})
   (source/'agent_map.json').write_text(json.dumps({'R3Agent':'r7-synthetic-agent.txt'}),encoding='utf-8')
   (root/'data/agents-empty/r7-synthetic-agent.txt').write_text('SYNTHETIC_R7_AGENT: respond as the configured synthetic Agent.',encoding='utf-8')
   import socket
   sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close()
   (root/'r7-fixture-config.json').write_text(json.dumps({'port':port}))
+  if data.get('r9Public'):
+   settings['PORT']=str(port)
+   topics=json.loads(settings['NativeMobileTopics']);topics.append(dict(topics[0],key='second-topic',topicId='r3-other',topicName='R9 Topic Switch'));settings['NativeMobileTopics']=json.dumps(topics)
  (source/'config.env').write_text('\\n'.join(k+'='+v for k,v in settings.items())+'\\n',encoding='utf-8')
  (source/'.env').write_text('# R6 synthetic empty sentinel; never search ancestor configuration.\\n',encoding='utf-8')
  (source/'ToolConfigs').mkdir(exist_ok=True)
@@ -63,7 +79,7 @@ if root.name!='build-source':
  (source/'TVStxt').mkdir(exist_ok=True)
  (source/'TVStxt/JevToolCallDecision.txt').write_text('## THIRD_PARTY_PROTOCOL\\nR6 synthetic empty decision fixture; no tools/providers enabled.\\n',encoding='utf-8')
  (source/'node_modules').symlink_to(Path('/home/admin/VCPKF/vcp/artifacts/native-sync-r6/deps/node_modules'),target_is_directory=True)
-print(json.dumps({'root':str(root),'sourceCommit':data['sourceCommit'],'sourceFileCount':len(manifest['files']),'disabledPluginManifests':len(manifest['disabledPluginManifests']),'nativeBinary':manifest.get('nativeBinary'),'manifestSha256':hashlib.sha256((root/'source-manifest.json').read_bytes()).hexdigest()}))
+print(json.dumps({'root':str(root),'sourceCommit':data['sourceCommit'],'sourceFileCount':len(manifest['files']),'disabledPluginManifests':len(manifest['disabledPluginManifests']),'nativeBinary':manifest.get('nativeBinary'),'manifestSha256':hashlib.sha256((root/'source-manifest.json').read_bytes()).hexdigest(),'fixedServerPort':int(settings['PORT']) if data.get('r9Public') else None}))
 `;
 async function exportSource(remoteRoot, profile = {}) {
     const selectedRoot=profile.sourceRoot||sourceRoot;
@@ -77,9 +93,10 @@ async function exportSource(remoteRoot, profile = {}) {
     const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: selectedRoot, encoding: 'utf8', windowsHide: true }).trim();
     const child = spawn('ssh', [...sshArgs, 'wp08', 'python3 -c ' + quote(extract)], { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     let stdout = '', stderr = '';
+    child.stdin.on('error',()=>{});
     child.stdout.on('data', b => { stdout += b; }); child.stderr.on('data', b => { stderr = (stderr + b).slice(-2000); });
     for(const file of profile.extraFiles||[])files.push(file);
-    child.stdin.end(JSON.stringify({ root: remoteRoot, sourceCommit, files,kind:profile.kind||'native-sync-r6',mobileOrigin:profile.mobileOrigin }));
+    child.stdin.end(JSON.stringify({ root: remoteRoot, sourceCommit, files,kind:profile.kind||'native-sync-r6',mobileOrigin:profile.mobileOrigin,mobileModel:profile.mobileModel,r9Public:profile.r9Public }));
     const [code] = await once(child, 'close');
     if (code !== 0) throw new Error(`R6 source export failed ${code}: ${stderr}`);
     return JSON.parse(stdout);
@@ -97,9 +114,10 @@ class FullToolboxTransport extends RealHostTransport {
     async startServer() {
         const dataDir = this.remoteRoot + (this.enabled ? '/data/native-sync' : '/data/native-sync-disabled');
         const isR7=this.profile.kind==='native-sync-r7';
-        const preload=isR7?'native-sync-r7-preload.cjs':'native-sync-r6-preload.cjs';
+        const preload=this.profile.preload || (isR7?'native-sync-r7-preload.cjs':'native-sync-r6-preload.cjs');
+        assert.match(preload,/^[a-z0-9-]+\.(?:cjs|mjs)$/);
         const runVariable=isR7?'VCP_R7_RUN_ROOT':'VCP_R6_RUN_ROOT';
-        const command = 'cd ' + quote(this.remoteRoot + '/source') + ' && env -i PATH=/usr/bin:/bin HOME=' + quote(this.remoteRoot) + ' NODE_PATH=' + base + '/deps/node_modules '+runVariable+'=' + quote(this.remoteRoot) + ' NativeSyncEnabled=' + (this.enabled ? 'true' : 'false') + ' NativeSyncDataDir=' + quote(dataDir) + ' /usr/bin/node --no-warnings --require ./scripts/'+preload+' server.js';
+        const command = 'cd ' + quote(this.remoteRoot + '/source') + ' && env -i PATH=/usr/bin:/bin HOME=' + quote(this.remoteRoot) + ' NODE_PATH=' + base + '/deps/node_modules '+runVariable+'=' + quote(this.remoteRoot) + ' NativeSyncEnabled=' + (this.enabled ? 'true' : 'false') + ' NativeSyncDataDir=' + quote(dataDir) + ' /usr/bin/node --no-warnings '+(preload.endsWith('.mjs')?'--import':'--require')+' ./scripts/'+preload+' server.js';
         const child = spawn('ssh', [...sshArgs, 'wp08', command], { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
         const record = { localSshPid: child.pid, command, exitCode: null, events: [], enabled: this.enabled, logFile: path.join(this.localRoot, `full-toolbox-${child.pid}.log`) };
         this.evidence.servers.push(record); this.server = { child, record };

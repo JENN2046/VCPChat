@@ -15,6 +15,27 @@ test('daily mode binds the approved server, selection and protected loopback; cr
  for(const url of ['http://remote.invalid:1234','https://127.0.0.1:1234','http://127.0.0.1:1234/?secret=x']){f.config.transportUrl=url;await f.write();await assert.rejects(dailyConnection({appDataRoot:f.root,readSettings:settings}),e=>e.code==='PROTECTED_DESKTOP_TRANSPORT_REQUIRED');}
  f.config.transportUrl='http://127.0.0.1:53218';f.config.serverUrl='http://other.invalid';await f.write();await assert.rejects(dailyConnection({appDataRoot:f.root,readSettings:settings}),e=>e.code==='DESKTOP_BACKEND_IDENTITY_MISMATCH');
 });
+
+test('dedicated sync session never reads or changes a different model backend, and still validates host/SSH scope',async()=>{
+ const f=await fixture();f.config.credentialSource='desktop-sync-session';f.config.ssh={alias:'wp08',remotePort:8888};await f.write();
+ let reads=0;const readSyncCredential=async({connection})=>{reads++;assert.equal(connection.deviceId,'existing-desktop');return 'vcp_sync_'+'a'.repeat(43);};
+ const result=await dailyConnection({appDataRoot:f.root,readSettings:()=>assert.fail('model settings must not be read'),readSyncCredential});assert.equal(result.token,'vcp_sync_'+'a'.repeat(43));assert.equal(reads,1);
+ for(const change of [{serverUrl:'http://different.invalid'},{ssh:{alias:'another-host',remotePort:8888}},{ssh:undefined}]){
+  const previous={...f.config};Object.assign(f.config,change);await f.write();await assert.rejects(dailyConnection({appDataRoot:f.root,readSettings:()=>assert.fail('model settings read'),readSyncCredential}),e=>['UNAPPROVED_SYNC_AUTHORITY','UNAPPROVED_SSH_TRANSPORT'].includes(e.code));assert.equal(reads,1);Object.assign(f.config,previous);
+ }
+});
+
+test('dedicated device credential is encrypted before SSH registration and survives a lost registration ACK',async()=>{
+ const {desktopCredential}=require('../modules/services/nativeSync/desktopCredential');
+ const f=await fixture();Object.assign(f.config,{credentialSource:'desktop-sync-session',ssh:{alias:'wp08',remotePort:8888}});
+ const master=crypto.randomBytes(32),safeStorage={isEncryptionAvailable:()=>true,encryptString:value=>{const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',master,iv);return Buffer.concat([iv,cipher.update(value),cipher.final(),cipher.getAuthTag()]);},decryptString:sealed=>{const decipher=crypto.createDecipheriv('aes-256-gcm',master,sealed.subarray(0,12));decipher.setAuthTag(sealed.subarray(-16));return Buffer.concat([decipher.update(sealed.subarray(12,-16)),decipher.final()]).toString();}};
+ let registered,attempts=0;const register=async grant=>{attempts++;if(registered)assert.equal(grant.token,registered);registered=grant.token;if(attempts===1)throw Object.assign(Error('synthetic ACK lost'),{code:'NETWORK_UNAVAILABLE'});return {registered:true};};
+ await assert.rejects(desktopCredential({appDataRoot:f.root,connection:f.config,safeStorage,register}),e=>e.code==='NETWORK_UNAVAILABLE');
+ const sealed=await fs.readFile(path.join(f.root,'.native-sync/device-session.sealed.json'),'utf8');assert.equal(sealed.includes(registered),false);
+ assert.equal(await desktopCredential({appDataRoot:f.root,connection:f.config,safeStorage,register}),registered);assert.equal(attempts,2);
+ const changed={...f.config,deviceId:'other-device'};await assert.rejects(desktopCredential({appDataRoot:f.root,connection:changed,safeStorage,register}),e=>e.code==='SYNC_CREDENTIAL_BINDING_CHANGED');
+ await assert.rejects(desktopCredential({appDataRoot:f.root,connection:f.config,safeStorage:{isEncryptionAvailable:()=>false},register}),e=>e.code==='OS_CREDENTIAL_ENCRYPTION_REQUIRED');assert.equal(attempts,2);
+});
 test('first import identifies identical history without mutating source or central state',async()=>{
  const f=await fixture(),before=await fs.readFile(f.historyFile);let requests=0;
  const proof=await initialImport({queue:f.queue,appDataRoot:f.root,connection:f.config,request:async route=>{requests++;assert.match(route,/^\/api\/v1\/sync\/pull\?/);return {events:[{...wire,msgId:'old-id',seq:1,action:'upsert',message:f.history[0],hash:messageHash(f.history[0])}],headSeq:1,hasMore:false};}});

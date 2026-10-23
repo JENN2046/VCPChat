@@ -194,7 +194,7 @@ class NativeSyncAdapter {
         if (this.requestOverride) return this.requestOverride(route, options);
         let response;
         try {
-            response = await fetch(this.url + route, { method: options.body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.token}`, 'Content-Type': 'application/json', 'X-NativeSync-Protocol':'2' }, body: options.body ? JSON.stringify(options.body) : undefined, redirect: 'error', signal: AbortSignal.timeout(2000) });
+            response = await fetch(this.url + route, { method: options.body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.token}`, 'Content-Type': 'application/json', 'X-NativeSync-Protocol':'2','X-NativeSync-Capabilities':'attachments-v1' }, body: options.body ? JSON.stringify(options.body) : undefined, redirect: 'error', signal: AbortSignal.timeout(2000) });
         } catch { throw fail('NETWORK_UNAVAILABLE'); }
         const result = await response.json();
         if (!response.ok) throw fail(result.error?.code || 'SYNC_HTTP_ERROR');

@@ -1249,6 +1249,7 @@ if (!gotTheLock) {
             readAgentConfig: id => agentConfigManager.readAgentConfig(id),
             readGroupConfig: id => groupChat.getAgentGroupConfig(id),
             readTavernRules: () => tavernHandlers.getActiveRules(),
+            storeAttachment: (...args) => fileManager.storeFile(...args),
             thumbnail: async file => {
                 const image=require('electron').nativeImage.createFromPath(file);
                 if(image.isEmpty())return null;

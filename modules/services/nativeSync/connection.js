@@ -18,9 +18,10 @@ async function readConnection({ appDataRoot, readSettings }) {
         config = JSON.parse(await fs.readFile(file, 'utf8'));
     } catch (error) { if (error.code === 'ENOENT') return null; throw error; }
     if (config.enabled !== true) return null;
-    const fields = ['version', 'enabled', 'historySelectionApproved', 'deviceId', 'topics', 'serverUrl', 'credentialSource', 'approvedHistory', 'publishCatalog', 'publishExecutionConfigs'];
+    const fields = ['version', 'enabled', 'historySelectionApproved', 'deviceId', 'topics', 'serverUrl', 'credentialSource', 'approvedHistory', 'publishCatalog', 'publishExecutionConfigs', 'syncAttachments'];
     if (Object.keys(config).some(key => !fields.includes(key))) throw fail('UNEXPECTED_SYNC_CONNECTION_FIELD');
-    if (config.version !== 1 || config.historySelectionApproved !== true || typeof config.deviceId !== 'string' || !config.deviceId || !Array.isArray(config.topics) || !config.topics.length || config.topics.length > 8 || (config.publishExecutionConfigs !== undefined && typeof config.publishExecutionConfigs !== 'boolean') || (config.publishCatalog !== undefined && typeof config.publishCatalog !== 'boolean')) throw fail('INVALID_SYNC_CONNECTION');
+    if (config.version !== 1 || config.historySelectionApproved !== true || typeof config.deviceId !== 'string' || !config.deviceId || !Array.isArray(config.topics) || !config.topics.length || config.topics.length > 8 || (config.syncAttachments !== undefined && typeof config.syncAttachments !== 'boolean') || (config.publishExecutionConfigs !== undefined && typeof config.publishExecutionConfigs !== 'boolean') || (config.publishCatalog !== undefined && typeof config.publishCatalog !== 'boolean')) throw fail('INVALID_SYNC_CONNECTION');
+    if(config.syncAttachments===true&&config.publishExecutionConfigs!==true)throw fail('ATTACHMENTS_REQUIRE_VERSIONED_CONFIG');
     for (const topic of config.topics) identity({ ownerType: topic.itemType || 'agent', ownerId: topic.itemId, topicId: topic.topicId, msgId: '_' });
     if (config.topics.some(topic => topic.itemType === 'group') && config.publishExecutionConfigs !== true) throw fail('GROUP_EXECUTION_CONFIG_REQUIRED');
     let endpoint;
@@ -32,6 +33,6 @@ async function readConnection({ appDataRoot, readSettings }) {
     try { backend = new URL(settings.vcpServerUrl); } catch { throw fail('DESKTOP_BACKEND_IDENTITY_MISMATCH'); }
     if (backend.origin !== endpoint.origin || backend.username || backend.password || backend.search || backend.hash) throw fail('DESKTOP_BACKEND_IDENTITY_MISMATCH');
     if (typeof settings.vcpApiKey !== 'string' || !settings.vcpApiKey) throw fail('EXISTING_DESKTOP_KEY_REQUIRED');
-    return { url: endpoint.origin, token: settings.vcpApiKey, deviceId: config.deviceId, topics: config.topics, approvedHistory: config.approvedHistory, publishExecutionConfigs: config.publishExecutionConfigs === true, publishCatalog: config.publishCatalog !== false };
+    return { syncAttachments:config.syncAttachments===true,url: endpoint.origin, token: settings.vcpApiKey, deviceId: config.deviceId, topics: config.topics, approvedHistory: config.approvedHistory, publishExecutionConfigs: config.publishExecutionConfigs === true, publishCatalog: config.publishCatalog !== false };
 }
 module.exports = { readConnection };

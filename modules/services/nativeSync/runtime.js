@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const { NativeSyncAdapter } = require('./adapter');
 const { fail } = require('./protocol');
 
-async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, readGroupConfig, readTavernRules, thumbnail, request }) {
+async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, readGroupConfig, readTavernRules, thumbnail, request, requestBinary, storeAttachment }) {
     const poc = args.includes('--native-sync-poc');
     if (poc && !isolated) throw fail('ISOLATED_APP_DATA_REQUIRED');
     if (!poc && !appDataRoot) return null;
@@ -22,7 +22,7 @@ async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated
     const send = request || (async (route, { body } = {}) => {
         let response;
         try {
-            response = await fetch(connection.url + route, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${connection.token}`, 'Content-Type': 'application/json', 'X-NativeSync-Protocol':'2' }, body: body ? JSON.stringify(body) : undefined, redirect: 'error', signal: AbortSignal.timeout(8000) });
+            response = await fetch(connection.url + route, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${connection.token}`, 'Content-Type': 'application/json', 'X-NativeSync-Protocol':'2','X-NativeSync-Capabilities':'attachments-v1' }, body: body ? JSON.stringify(body) : undefined, redirect: 'error', signal: AbortSignal.timeout(8000) });
         } catch { throw fail('NETWORK_UNAVAILABLE'); }
         if (!response.ok) throw fail('SYNC_SERVER_UNAVAILABLE');
         return response.json();
@@ -48,10 +48,16 @@ async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated
         if (endpoint.protocol !== 'http:' || endpoint.hostname !== '127.0.0.1') throw fail('ISOLATED_LOOPBACK_REQUIRED');
     }
     const adapter = await NativeSyncAdapter.open({ queue, statePath, ...(connection || { url: option('native-sync-url'), deviceId: option('native-sync-device'), topics: JSON.parse(option('native-sync-topics') || '[]'), token: 'isolated-poc-token' }), ...((connection || request) ? { request: send } : {}), notify });
-    let stopped = false, running = null, lastConfigCheck = Date.now();
+    const download=requestBinary||(async route=>{
+        let response;try{response=await fetch(connection.url+route,{headers:{Authorization:`Bearer ${connection.token}`,'X-NativeSync-Protocol':'2','X-NativeSync-Capabilities':'attachments-v1'},redirect:'error',signal:AbortSignal.timeout(30000)});}catch{throw fail('NETWORK_UNAVAILABLE');}
+        if(!response.ok){let code;try{code=(await response.json()).error?.code;}catch{}throw fail(/^ATTACHMENT_[A-Z_]+$/.test(code||'')?code:'ATTACHMENT_DOWNLOAD_FAILED');}
+        const chunks=[];let size=0;for await(const chunk of response.body){size+=chunk.length;if(size>20*1024*1024)throw fail('ATTACHMENT_FILE_TOO_LARGE');chunks.push(chunk);}return Buffer.concat(chunks);
+    });
+    const attachments=connection?.syncAttachments?new (require('./attachments').DesktopAttachments)({queue,appDataRoot,connection,send,download,storeAttachment}):null;
+    let stopped = false, running = null, lastConfigCheck = Date.now(), lastAttachmentCheck = 0;
     const timer = setInterval(() => {
         if (stopped || running) return;
-        running = (async () => { if (!prepared) await prepare(); if(connection?.publishExecutionConfigs && Date.now()-lastConfigCheck>=5000){await require('./executionConfigs').publishExecutionConfigs({topics:connection.topics,readAgentConfig,readGroupConfig,readTavernRules,send});lastConfigCheck=Date.now();} await adapter.synchronize(); })().catch(error => {
+        running = (async () => { if (!prepared) await prepare(); if(connection?.publishExecutionConfigs && Date.now()-lastConfigCheck>=5000){await require('./executionConfigs').publishExecutionConfigs({topics:connection.topics,readAgentConfig,readGroupConfig,readTavernRules,send});lastConfigCheck=Date.now();} const checkAttachments=attachments&&Date.now()-lastAttachmentCheck>=5000; if(checkAttachments)try{await attachments.uploadLocal();adapter.attachmentError=null;}catch(e){adapter.attachmentError=e.code||'ATTACHMENT_SYNC_FAILED';} await adapter.synchronize(); if(checkAttachments){try{await attachments.restoreRemote();}catch(e){adapter.attachmentError=e.code||'ATTACHMENT_SYNC_FAILED';}lastAttachmentCheck=Date.now();adapter.attachmentSkipped=attachments.skipped;} })().catch(error => {
             adapter.degraded = error.code || 'SYNC_FAILED';
         }).finally(() => { running = null; });
     }, intervalMs);

@@ -27,3 +27,12 @@ updated to the new central contract; product code does not import ToolBox code.
 
 The two-repository 90-test focused Linux run includes original NativeSync IPC,
 deletion, pagination and recovery regression, plus new metadata/authority tests.
+
+Enable `syncAttachments:true` only together with explicit private configuration
+publication. The desktop uploader reads the existing native attachment root,
+checks actual bytes and never uploads a client-provided arbitrary host path.
+Downloads verify SHA before calling native `fileManager.storeFile`; Queue adds
+device-local handles without changing shared content hashes. Missing source
+binary preserves the historical attachment reference. Large PDF image frames
+offload to CAS and return as local native frames through the same metadata
+contract. Both new client and server advertise/require `attachments-v1`.

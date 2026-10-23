@@ -15,3 +15,15 @@ so the first version contains active Tavern rules.
 
 Current isolated publisher tests: 2/2 on Ubuntu Node24. Full R1 desktop/mobile
 integration and final physical-device acceptance have not yet been performed.
+
+Metadata protocol2 preserves independently versioned Checkpoint/tool/thinking
+and attachment-content fields without changing the original message fingerprint.
+Queue capture detects same-hash metadata changes, persists their Outbox intent,
+and stores metadata versions in ACK/Pending state. Remote metadata still enters
+history through HistoryMutationQueue; restart does not create an echo event.
+Both the new desktop and new server are required for metadata-enabled topics.
+Legacy readers receive an explicit upgrade refusal. The desktop wire fixture is
+updated to the new central contract; product code does not import ToolBox code.
+
+The two-repository 90-test focused Linux run includes original NativeSync IPC,
+deletion, pagination and recovery regression, plus new metadata/authority tests.

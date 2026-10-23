@@ -28,7 +28,7 @@ async function startSyncService({ dbPath, token, port = 0 }) {
           if (raw.length > 1024 * 1024) throw new SyncError('BODY_TOO_LARGE', '1 MiB maximum', 413);
         }
         const op = JSON.parse(raw);
-        return send(res, 200, store.apply(op));
+        return send(res, 200, store.apply(op,{metadataPublisher:true}));
       }
       if (req.method === 'GET' && url.pathname === '/api/v1/sync/status') return send(res, 200, store.metrics());
       return send(res, 404, { error: { code: 'NOT_FOUND', message: 'Unknown route' } });

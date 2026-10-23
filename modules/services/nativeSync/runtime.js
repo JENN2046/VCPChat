@@ -22,7 +22,7 @@ async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated
     const send = request || (async (route, { body } = {}) => {
         let response;
         try {
-            response = await fetch(connection.url + route, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${connection.token}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined, redirect: 'error', signal: AbortSignal.timeout(8000) });
+            response = await fetch(connection.url + route, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${connection.token}`, 'Content-Type': 'application/json', 'X-NativeSync-Protocol':'2' }, body: body ? JSON.stringify(body) : undefined, redirect: 'error', signal: AbortSignal.timeout(8000) });
         } catch { throw fail('NETWORK_UNAVAILABLE'); }
         if (!response.ok) throw fail('SYNC_SERVER_UNAVAILABLE');
         return response.json();

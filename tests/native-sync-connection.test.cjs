@@ -49,7 +49,10 @@ test('connection rejects embedded keys, private transport hooks and unapproved s
     f.config.historySelectionApproved = false; await f.write();
     await assert.rejects(readConnection({ appDataRoot: f.root, readSettings: f.settings }), { code: 'INVALID_SYNC_CONNECTION' });
     f.config.historySelectionApproved = true; f.config.topics = [{ ...topic, itemType: 'group' }]; await f.write();
-    await assert.rejects(readConnection({ appDataRoot: f.root, readSettings: f.settings }), { code: 'MOBILE_AGENT_TOPICS_ONLY' });
+    await assert.rejects(readConnection({ appDataRoot: f.root, readSettings: f.settings }), { code: 'GROUP_EXECUTION_CONFIG_REQUIRED' });
+    f.config.publishExecutionConfigs = true; await f.write();
+    const groupConnection = await readConnection({ appDataRoot: f.root, readSettings: f.settings });
+    assert.equal(groupConnection.topics[0].itemType, 'group');
 });
 test('connection filesystem aliases are rejected before reading credentials', async t => {
     const f = await fixture(t); await f.write();
@@ -78,7 +81,9 @@ test('cached shared state starts offline, captures Outbox under exclusion and re
     assert.throws(() => require('../modules/services/syncWriterBoundary').createSyncWriterBoundary(queue).assertWrite({ ownerType: 'agent', ownerId: topic.itemId }), { code: 'SYNC_WRITER_EXCLUDED' });
     await queue.mutate(topic, history => [...history, { id: 'offline', role: 'user', content: 'saved offline', timestamp: 2 }]);
     assert.equal(JSON.parse(await fs.readFile(statePath, 'utf8')).outbox.length, 1);
-    await new Promise(resolve => setTimeout(resolve, 35)); assert.equal(pushes, 0); assert.equal(runtime.adapter.degraded, 'NETWORK_UNAVAILABLE');
+    const offlineDeadline = Date.now() + 3000;
+    while (runtime.adapter.degraded !== 'NETWORK_UNAVAILABLE' || runtime.adapter.busy) { assert.ok(Date.now() < offlineDeadline); await new Promise(resolve => setTimeout(resolve, 5)); }
+    assert.equal(pushes, 0); assert.equal(runtime.adapter.degraded, 'NETWORK_UNAVAILABLE');
     online = true;
     const deadline = Date.now() + 3000;
     while (runtime.adapter.state.outbox.length || runtime.adapter.state.cursor !== 2 || runtime.adapter.busy) { assert.ok(Date.now() < deadline); await new Promise(resolve => setTimeout(resolve, 10)); }

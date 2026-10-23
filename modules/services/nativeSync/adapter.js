@@ -3,6 +3,8 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const { durableJson } = require('./durableJson');
+const {envelopeFor,fieldsFrom,withFields,emptyHash}=require('./metadata');
+const {stable,sha256}=require('./protocol');
 const { identity, canonicalMessage, messageKey, messageHash, tombstoneHash, descriptor, wireTopic, fail } = require('./protocol');
 
 function validatePullPage(result, cursor, limit) {
@@ -125,7 +127,7 @@ class NativeSyncAdapter {
                 const event = d.syncEvent;
                 await this.transaction(next => {
                     const key = messageKey(event);
-                    if (!next.acked[key] || next.acked[key].seq < event.seq) next.acked[key] = { hash: event.hash, deleted: event.action === 'delete', seq: event.seq };
+                    if (!next.acked[key] || next.acked[key].seq < event.seq) next.acked[key] = { hash: event.hash, deleted: event.action === 'delete', seq: event.seq,metadataVersion:event.message?._nativeSyncMetadata?.version||0,metadataHash:event.message?._nativeSyncMetadata?.hash||emptyHash() };
                     next.cursor = Math.max(next.cursor, event.seq);
                     next.pending = null;
                 });
@@ -149,11 +151,11 @@ class NativeSyncAdapter {
         return this.transaction(next => {
             const actual = new Map();
             for (const raw of history) {
-                const msg = canonicalMessage(raw, d.topicId);
+                const msg = canonicalMessage({...raw,_nativeSyncMetadata:undefined}, d.topicId);
                 const id = identity({ ...wireTopic(d), msgId: msg.id });
                 const key = messageKey(id);
                 if (actual.has(key)) throw fail('DUPLICATE_MSG_ID');
-                actual.set(key, { id, message: msg, hash: messageHash(msg) });
+                actual.set(key, { id, message: msg, hash: messageHash(msg),metadataHash:sha256(stable(fieldsFrom(msg))) });
             }
             const belongs = key => { const [type, owner, topic] = JSON.parse(key); return type === d.itemType && owner === d.itemId && topic === d.topicId; };
             const latestOutbox = new Map();
@@ -162,11 +164,12 @@ class NativeSyncAdapter {
             for (const key of keys) {
                 const present = actual.get(key);
                 const pending = latestOutbox.get(key);
-                const base = pending ? { hash: pending.action === 'delete' ? tombstoneHash(pending) : messageHash(pending.message), deleted: pending.action === 'delete' } : next.acked[key];
-                if (present && base && !base.deleted && base.hash === present.hash) continue;
+                const base = pending ? { hash: pending.action === 'delete' ? tombstoneHash(pending) : messageHash(pending.message), deleted: pending.action === 'delete',metadataVersion:pending.metadata?.version??next.acked[key]?.metadataVersion??0,metadataHash:pending.metadata?.hash??next.acked[key]?.metadataHash??emptyHash() } : next.acked[key];
+                if (present && base && !base.deleted && base.hash === present.hash && (base.metadataHash||emptyHash()) === present.metadataHash) continue;
                 if (!present && (!base || base.deleted)) continue;
                 const [ownerType, ownerId, topicId, msgId] = JSON.parse(key);
-                const op = { ownerType, ownerId, topicId, msgId, deviceId: this.deviceId, opId: randomUUID(), action: present ? 'upsert' : 'delete', baseHash: base?.hash ?? null, message: present?.message ?? null };
+                const metadata=present&&(present.metadataHash!==emptyHash()||base?.metadataVersion)?envelopeFor(present.message,(base?.metadataVersion||0)+((base?.metadataHash||emptyHash())===present.metadataHash?0:1)):null;
+                const op = { ownerType, ownerId, topicId, msgId, deviceId: this.deviceId, opId: randomUUID(), action: present ? 'upsert' : 'delete', baseHash: base?.hash ?? null, message: present?.message ?? null, ...(metadata?{metadata}:{}) };
                 next.outbox.push(op); latestOutbox.set(key, op);
             }
         });
@@ -191,7 +194,7 @@ class NativeSyncAdapter {
         if (this.requestOverride) return this.requestOverride(route, options);
         let response;
         try {
-            response = await fetch(this.url + route, { method: options.body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.token}`, 'Content-Type': 'application/json' }, body: options.body ? JSON.stringify(options.body) : undefined, redirect: 'error', signal: AbortSignal.timeout(2000) });
+            response = await fetch(this.url + route, { method: options.body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.token}`, 'Content-Type': 'application/json', 'X-NativeSync-Protocol':'2' }, body: options.body ? JSON.stringify(options.body) : undefined, redirect: 'error', signal: AbortSignal.timeout(2000) });
         } catch { throw fail('NETWORK_UNAVAILABLE'); }
         const result = await response.json();
         if (!response.ok) throw fail(result.error?.code || 'SYNC_HTTP_ERROR');
@@ -205,10 +208,11 @@ class NativeSyncAdapter {
             while (this.state.outbox.length) {
                 const op = structuredClone(this.state.outbox[0]);
                 const result = await this.request('/api/v1/sync/push', { body: op });
+                if(op.metadata&&result.metadataHash!==op.metadata.hash)throw fail('CORRUPT_METADATA_ACK');
                 if (result.hash !== (op.action === 'delete' ? tombstoneHash(op) : messageHash(op.message)) || !Number.isSafeInteger(result.seq) || result.seq < 1 || result.deleted !== (op.action === 'delete')) throw fail('CORRUPT_ACK');
                 await this.transaction(next => {
                     if (next.outbox[0]?.opId !== op.opId) throw fail('OUTBOX_CHANGED');
-                    next.acked[messageKey(op)] = { hash: result.hash, deleted: result.deleted, seq: result.seq };
+                    next.acked[messageKey(op)] = { hash: result.hash, deleted: result.deleted, seq: result.seq,metadataVersion:result.metadataVersion||0,metadataHash:result.metadataHash||emptyHash() };
                     next.outbox.shift();
                 });
             }
@@ -231,7 +235,7 @@ class NativeSyncAdapter {
             if (actual !== expected && !alreadyApplied) throw fail('LOCAL_CONTENT_CONFLICT');
             if (recovering && this.state.pending && this.queue.revision(history) !== this.state.pending.beforeRevision && this.queue.revision(history) !== this.state.pending.afterRevision) throw fail('RECOVERY_HISTORY_CONFLICT');
             if (event.action === 'delete') { if (index >= 0) history.splice(index, 1); }
-            else if (index >= 0) history[index] = { ...history[index], ...canonicalMessage(event.message, d.topicId) };
+            else if (index >= 0) history[index] = event.message._nativeSyncMetadata?withFields({ ...history[index], ...canonicalMessage(event.message, d.topicId) },event.message._nativeSyncMetadata):{ ...history[index], ...canonicalMessage(event.message, d.topicId) };
             else history.push(canonicalMessage(event.message, d.topicId));
             const afterRevision = this.queue.revision(history);
             await this.transaction(next => {

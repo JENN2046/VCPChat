@@ -1,5 +1,7 @@
 # Seamless communication R1 desktop candidate
 
+> **NativeSync R2 产品定位：** 请先阅读 [NATIVE_SYNC_CONTINUITY_POSITIONING_R2.md](NATIVE_SYNC_CONTINUITY_POSITIONING_R2.md)。R1 文档记录已实现候选功能及其限定验收范围；R2 决定最终的跨终端连续性服务职责。R2 接入合同尚未实施和验收，不能将下述 R1 结果等同于 R2 通过。
+
 Separate feature branch from `ffed975c`; V1 `223cc38` and Draft PR #269 remain
 untouched. Opt into private execution configuration publication with
 `publishExecutionConfigs:true` in the existing non-secret NativeSync connection

@@ -49,5 +49,13 @@ Server lifecycle, backup and rollback details are in the matching ToolBox
 Daily use: launch `VCPChat R10 P1.lnk` under the manual-client directory; keep the
 existing SSH access available. Android uses its fixed R10 installed icon. Use
 only the selected shared topics; failed/interrupted tasks require review and are
-not automatically replayed. `IOS_NOT_RUN`; certificate renewal before2027-01-20
+not automatically replayed. Certificate renewal before2027-01-20
 and OS-reboot autostart are not completed by this task. No Push/Merge.
+
+Follow-up2026-10-23: Jenn confirms real iOS use works normally and iOS, Android
+and Windows all display the latest information. Latest iOS status is
+`IOS_USER_CONFIRMED_PASS` (user-run real-device evidence). The initial automated
+run did not exercise iOS; the original receipt remains available. This follow-up
+covers normal use and latest-message visibility; no iOS-specific background,
+reinstall or restart measurements were supplied. Earlier202-message totals remain
+the measured acceptance snapshot. No runtime code/configuration changed.

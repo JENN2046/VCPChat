@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const { NativeSyncAdapter } = require('./adapter');
 const { fail } = require('./protocol');
 
-async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, thumbnail, request }) {
+async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, readGroupConfig, readTavernRules, thumbnail, request }) {
     const poc = args.includes('--native-sync-poc');
     if (poc && !isolated) throw fail('ISOLATED_APP_DATA_REQUIRED');
     if (!poc && !appDataRoot) return null;
@@ -35,6 +35,7 @@ async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated
                 await send('/api/plugins/NativeSync/mobile/catalog', { body: metadata });
             }
         }
+        if (connection?.publishExecutionConfigs) await require('./executionConfigs').publishExecutionConfigs({topics:connection.topics,readAgentConfig,readGroupConfig,readTavernRules,send});
         prepared = true;
     };
     // Existing shared histories attach Queue policy locally before network work.
@@ -47,10 +48,10 @@ async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated
         if (endpoint.protocol !== 'http:' || endpoint.hostname !== '127.0.0.1') throw fail('ISOLATED_LOOPBACK_REQUIRED');
     }
     const adapter = await NativeSyncAdapter.open({ queue, statePath, ...(connection || { url: option('native-sync-url'), deviceId: option('native-sync-device'), topics: JSON.parse(option('native-sync-topics') || '[]'), token: 'isolated-poc-token' }), ...((connection || request) ? { request: send } : {}), notify });
-    let stopped = false, running = null;
+    let stopped = false, running = null, lastConfigCheck = Date.now();
     const timer = setInterval(() => {
         if (stopped || running) return;
-        running = (async () => { if (!prepared) await prepare(); await adapter.synchronize(); })().catch(error => {
+        running = (async () => { if (!prepared) await prepare(); if(connection?.publishExecutionConfigs && Date.now()-lastConfigCheck>=5000){await require('./executionConfigs').publishExecutionConfigs({topics:connection.topics,readAgentConfig,readGroupConfig,readTavernRules,send});lastConfigCheck=Date.now();} await adapter.synchronize(); })().catch(error => {
             adapter.degraded = error.code || 'SYNC_FAILED';
         }).finally(() => { running = null; });
     }, intervalMs);

@@ -1241,11 +1241,14 @@ if (!gotTheLock) {
             logger: console
         });
         require('./modules/ipc/nativeHistoryHandlers').initialize({ ipcMain, historyMutationQueue });
+        tavernHandlers.initialize({ APP_DATA_ROOT_IN_PROJECT });
         nativeSyncRuntime = await require('./modules/services/nativeSync/runtime').createNativeSyncRuntime({
             queue: historyMutationQueue, appDataRoot: APP_DATA_ROOT_IN_PROJECT,
             args: process.argv, isolated: Boolean(isolatedAppDataRoot),
             readSettings: () => appSettingsManager.readSettings(),
             readAgentConfig: id => agentConfigManager.readAgentConfig(id),
+            readGroupConfig: id => groupChat.getAgentGroupConfig(id),
+            readTavernRules: () => tavernHandlers.getActiveRules(),
             thumbnail: async file => {
                 const image=require('electron').nativeImage.createFromPath(file);
                 if(image.isEmpty())return null;
@@ -1957,7 +1960,7 @@ if (!gotTheLock) {
         desktopRemoteHandlers.initialize({ mainWindow });
         reportLauncherProgress('workspace-ready', 0.76, '工作空间与功能模块已连接');
         promptHandlers.initialize({ AGENT_DIR, APP_DATA_ROOT_IN_PROJECT });
-        tavernHandlers.initialize({ APP_DATA_ROOT_IN_PROJECT });
+        // Tavern authority is initialized before NativeSync configuration publication.
         voiceHandlers.initialize({ mainWindow, openChildWindows, settingsManager: appSettingsManager, projectRoot: PROJECT_ROOT });
         localSttHandlers.initialize({ appDataRoot: APP_DATA_ROOT_IN_PROJECT });
 

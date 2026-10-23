@@ -12,10 +12,10 @@ function requestOverTls({port,token,route,body}){
   });q.setTimeout(8000,()=>q.destroy());q.on('error',()=>reject(fail('NETWORK_UNAVAILABLE')));q.end(body?JSON.stringify(body):undefined);
  });
 }
-async function openSshTransport({url,ssh,token}){
+async function openSshTransport({url,ssh,token,background=false}){
  const endpoint=new URL(url);
  if(ssh?.alias!=='wp08'||ssh.remotePort!==8888||endpoint.protocol!=='http:'||endpoint.hostname!=='127.0.0.1'||!endpoint.port||endpoint.pathname!=='/'||endpoint.username||endpoint.password||endpoint.search||endpoint.hash)throw fail('UNAPPROVED_SSH_TRANSPORT');
- let stopped=false,child=null,retry=null,error=null;
+ let stopped=false,child=null,retry=null,error=null,verified=false;
  function launch(){
   if(stopped)return;
   // This host's SSH front end requires a session channel. A stdin-only cat
@@ -24,13 +24,22 @@ async function openSshTransport({url,ssh,token}){
   // clear SendEnv so unrelated desktop/provider environment is not forwarded.
   child=spawn('ssh',['-T','-o','BatchMode=yes','-o','StrictHostKeyChecking=yes','-o','SendEnv=-*','-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=15','-o','ServerAliveCountMax=3','-L',`127.0.0.1:${endpoint.port}:127.0.0.1:8888`,'wp08','cat'],{windowsHide:true,stdio:['pipe','ignore','ignore']});
   child.stdin.on('error',()=>{});
-  child.on('error',()=>{error=fail('SSH_TRANSPORT_UNAVAILABLE');});child.once('exit',()=>{child=null;if(!stopped)retry=setTimeout(launch,3000);});
+  child.on('error',()=>{error=fail('SSH_TRANSPORT_UNAVAILABLE');});child.once('exit',()=>{child=null;verified=false;if(!stopped)retry=setTimeout(launch,3000);});
  }
  const close=async()=>{stopped=true;clearTimeout(retry);const c=child;if(c&&!c.killed){await new Promise(resolve=>{const timer=setTimeout(()=>{c.kill('SIGTERM');resolve();},5000);timer.unref();c.once('exit',()=>{clearTimeout(timer);resolve();});c.stdin.end();});}};
  launch();try{
   const end=Date.now()+30000;
-  const request=(route,options={})=>requestOverTls({port:Number(endpoint.port),token,route,body:options.body});
-  while(Date.now()<end){if(error)throw error;try{const info=await request('/healthz');if(info.service==='VCPMobileGateway'&&info.port===8888&&info.httpsReady===true)return {close,request};}catch{}await new Promise(r=>setTimeout(r,250));}
+  const rawRequest=(route,options={})=>requestOverTls({port:Number(endpoint.port),token,route,body:options.body});
+  const request=async(route,options={})=>{
+   if(!verified&&route!=='/healthz'){
+    const info=await rawRequest('/healthz');
+    if(info.service!=='VCPMobileGateway'||info.port!==8888||info.httpsReady!==true)throw fail('SSH_TRANSPORT_UNAVAILABLE');
+    verified=true;
+   }
+   return rawRequest(route,options);
+  };
+  if(background)return {close,request};
+  while(Date.now()<end){if(error)throw error;try{const info=await request('/healthz');if(info.service==='VCPMobileGateway'&&info.port===8888&&info.httpsReady===true){verified=true;return {close,request};}}catch{}await new Promise(r=>setTimeout(r,250));}
   throw fail('SSH_TRANSPORT_UNAVAILABLE');
  }catch(e){await close();throw e;}
 }

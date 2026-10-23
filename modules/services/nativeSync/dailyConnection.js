@@ -21,9 +21,10 @@ async function dailyConnection({appDataRoot,readSettings,readSyncCredential}){
  if(config.credentialSource==='desktop-sync-session'){
   if(backend.origin!=='http://wp10.unicorn.org.cn:13546'||!config.ssh)throw fail('UNAPPROVED_SYNC_AUTHORITY');
   if(typeof readSyncCredential!=='function')throw fail('SYNC_CREDENTIAL_AUTHORITY_REQUIRED');
-  const token=await readSyncCredential({appDataRoot:root,connection:config});
+  const credential=await readSyncCredential({appDataRoot:root,connection:config,deferRegistration:true});
+  const token=typeof credential==='string'?credential:credential?.token;
   if(typeof token!=='string'||!/^vcp_sync_[a-zA-Z0-9_-]{43}$/.test(token))throw fail('SYNC_DEVICE_SESSION_REQUIRED');
-  return {url:endpoint.origin,deviceId:config.deviceId,topics:config.topics,token,approvedHistory:config.approvedHistory,ssh:config.ssh};
+  return {url:endpoint.origin,deviceId:config.deviceId,topics:config.topics,token,approvedHistory:config.approvedHistory,ssh:config.ssh,...(typeof credential?.register==='function'?{registerCredential:credential.register}:{})};
  }
  if(typeof readSettings!=='function')throw fail('DESKTOP_SETTINGS_AUTHORITY_REQUIRED');
  const settings=await readSettings();

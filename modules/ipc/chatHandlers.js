@@ -722,6 +722,8 @@ function initialize(mainWindow, context) {
 
     ipcMain.handle('delete-topic', async (event, agentId, topicIdToDelete) => {
         try {
+            require('../services/syncWriterBoundary').createSyncWriterBoundary(historyMutationQueue)
+                .assertWrite({ ownerType: 'agent', ownerId: agentId, topicId: topicIdToDelete });
             if (agentConfigManager) {
                 // 先读取当前配置进行验证
                 const currentConfig = await agentConfigManager.readAgentConfig(agentId);
@@ -787,7 +789,7 @@ function initialize(mainWindow, context) {
             }
         } catch (error) {
             console.error(`删除Agent ${agentId} 的话题 ${topicIdToDelete} 失败:`, error);
-            return { error: error.message };
+            return { error: error.message, ...(error.code ? { code: error.code } : {}) };
         }
     });
 

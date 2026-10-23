@@ -15,7 +15,7 @@ function registerOverSsh(grant){
   child.stdin.end(JSON.stringify(grant));
  });
 }
-async function desktopCredential({appDataRoot,connection,safeStorage,register=registerOverSsh}){
+async function desktopCredential({appDataRoot,connection,safeStorage,register=registerOverSsh,deferRegistration=false}){
  if(connection.credentialSource!=='desktop-sync-session'||connection.serverUrl!=='http://wp10.unicorn.org.cn:13546'||connection.ssh?.alias!=='wp08'||connection.ssh.remotePort!==8888)throw fail('UNAPPROVED_SYNC_AUTHORITY');
  if(!safeStorage?.isEncryptionAvailable()||safeStorage.getSelectedStorageBackend?.()==='basic_text')throw fail('OS_CREDENTIAL_ENCRYPTION_REQUIRED');
  const dir=path.join(appDataRoot,'.native-sync'),file=path.join(dir,'device-session.sealed.json');
@@ -33,7 +33,11 @@ async function desktopCredential({appDataRoot,connection,safeStorage,register=re
   await durableJson(file,{version:1,binding,sealed:safeStorage.encryptString(token).toString('base64')});
  }
  if(!/^vcp_sync_[a-zA-Z0-9_-]{43}$/.test(token))throw fail('SYNC_CREDENTIAL_UNAVAILABLE');
- await register({deviceId:connection.deviceId,topics:connection.topics.map(wireTopic),token});
+ const registerCredential=()=>register({deviceId:connection.deviceId,topics:connection.topics.map(wireTopic),token});
+ // Existing local state must remain usable before SSH is available. Registration
+ // stays mandatory before network synchronization, with the same sealed identity.
+ if(deferRegistration)return {token,register:registerCredential};
+ await registerCredential();
  return token;
 }
 module.exports={desktopCredential,registerOverSsh};

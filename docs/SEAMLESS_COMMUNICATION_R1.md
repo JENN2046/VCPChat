@@ -53,5 +53,8 @@ Current development validation is 125/125 focused tests on Ubuntu Node24 across
 both repositories, plus fixed author-rule output checks and a separate full
 ToolBox server.js synthetic acceptance. The cloud counterpart retains three
 native group modes, versioned plans, per-member Journal intents and original
-tool approval gates. Physical Electron/fileManager and real mobile acceptance
-remain required before an overall R1 PASS or production release declaration.
+tool approval gates. Additional real acceptance exercises original Windows
+Electron/fileManager, Nova/Kerr configurations, Checkpoint metadata, both CAS
+directions, three group modes and cloud execution while Windows is closed.
+The ToolBox candidate's `docs/R1_INTEGRATED_ACCEPTANCE.md` records device
+coverage and limits; `docs/R1_RELEASE_VERDICT.md` governs overall readiness.

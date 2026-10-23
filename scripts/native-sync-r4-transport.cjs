@@ -8,7 +8,7 @@ const net = require('node:net');
 const assert = require('node:assert/strict');
 const { spawn, execFileSync } = require('node:child_process');
 const { once } = require('node:events');
-const sshArgs = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2'];
+const sshArgs = [...(process.argv.includes('--p1-toolbox')?['-vv','-T','-o','StrictHostKeyChecking=yes','-o','SendEnv=-*']:[]),'-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2'];
 const quote = value => "'" + String(value).replaceAll("'", "'\\''") + "'";
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sourceFiles = ['scripts/native-sync-r4-host.cjs', 'modules/services/nativeSync/httpService.js', 'modules/services/nativeSync/centralStore.js', 'modules/services/nativeSync/protocol.js', 'VCPDistributedServer/Plugin/VCPMobileSync/sync/canonical.js', 'VCPDistributedServer/Plugin/VCPMobileSync/core/hash.js'];

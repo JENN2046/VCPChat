@@ -6,9 +6,9 @@ const { spawn, execFileSync } = require('node:child_process');
 const { once } = require('node:events');
 const assert = require('node:assert/strict');
 const { RealHostTransport } = require('./native-sync-r4-transport.cjs');
-const sourceRoot = path.resolve(__dirname, process.argv.includes('--regress-current-toolbox') ? '../../vcptoolbox-mobile-pwa-r7' : '../../vcptoolbox-native-sync-r6');
+const sourceRoot = path.resolve(__dirname, process.argv.includes('--p1-toolbox') ? '../../vcptoolbox-p1-remediation' : process.argv.includes('--regress-current-toolbox') ? '../../vcptoolbox-mobile-pwa-r7' : '../../vcptoolbox-native-sync-r6');
 const base = '/home/admin/VCPKF/vcp/artifacts/native-sync-r6';
-const sshArgs = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2'];
+const sshArgs = [...(process.argv.includes('--p1-toolbox')?['-vv','-T','-o','StrictHostKeyChecking=yes','-o','SendEnv=-*']:[]),'-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2'];
 const quote = value => "'" + String(value).replaceAll("'", "'\\''") + "'";
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const extract = `from pathlib import Path

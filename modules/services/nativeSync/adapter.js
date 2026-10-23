@@ -5,6 +5,20 @@ const { randomUUID } = require('node:crypto');
 const { durableJson } = require('./durableJson');
 const { identity, canonicalMessage, messageKey, messageHash, tombstoneHash, descriptor, wireTopic, fail } = require('./protocol');
 
+function validatePullPage(result, cursor, limit) {
+    if (!result || !Array.isArray(result.events) || result.events.length > limit ||
+        !Number.isSafeInteger(result.headSeq) || !Number.isSafeInteger(result.nextSeq) ||
+        result.headSeq < cursor || result.nextSeq < cursor || result.nextSeq > result.headSeq ||
+        typeof result.hasMore !== 'boolean' || result.hasMore !== (result.nextSeq < result.headSeq)) throw fail('INVALID_PULL_CURSOR');
+    if (result.hasMore && result.nextSeq === cursor) throw fail('PAGINATION_STALLED');
+    let previous = cursor;
+    for (const event of result.events) {
+        if (!Number.isSafeInteger(event?.seq) || event.seq <= previous) throw fail('CURSOR_REWIND');
+        if (event.seq > result.nextSeq) throw fail('INVALID_PULL_CURSOR');
+        previous = event.seq;
+    }
+}
+
 // State locks never wait for Queue or network. Queue -> short state transaction is
 // the only nested lock order; HTTP is always outside both locks.
 class NativeSyncAdapter {
@@ -142,15 +156,18 @@ class NativeSyncAdapter {
                 actual.set(key, { id, message: msg, hash: messageHash(msg) });
             }
             const belongs = key => { const [type, owner, topic] = JSON.parse(key); return type === d.itemType && owner === d.itemId && topic === d.topicId; };
-            const keys = new Set([...actual.keys(), ...Object.keys(next.acked).filter(belongs), ...next.outbox.map(messageKey).filter(belongs)]);
+            const latestOutbox = new Map();
+            for (const op of next.outbox) latestOutbox.set(messageKey(op), op);
+            const keys = new Set([...actual.keys(), ...Object.keys(next.acked).filter(belongs), ...[...latestOutbox.keys()].filter(belongs)]);
             for (const key of keys) {
                 const present = actual.get(key);
-                const pending = next.outbox.filter(op => messageKey(op) === key).at(-1);
+                const pending = latestOutbox.get(key);
                 const base = pending ? { hash: pending.action === 'delete' ? tombstoneHash(pending) : messageHash(pending.message), deleted: pending.action === 'delete' } : next.acked[key];
                 if (present && base && !base.deleted && base.hash === present.hash) continue;
                 if (!present && (!base || base.deleted)) continue;
                 const [ownerType, ownerId, topicId, msgId] = JSON.parse(key);
-                next.outbox.push({ ownerType, ownerId, topicId, msgId, deviceId: this.deviceId, opId: randomUUID(), action: present ? 'upsert' : 'delete', baseHash: base?.hash ?? null, message: present?.message ?? null });
+                const op = { ownerType, ownerId, topicId, msgId, deviceId: this.deviceId, opId: randomUUID(), action: present ? 'upsert' : 'delete', baseHash: base?.hash ?? null, message: present?.message ?? null };
+                next.outbox.push(op); latestOutbox.set(key, op);
             }
         });
     }
@@ -233,11 +250,16 @@ class NativeSyncAdapter {
             if (this.degraded || this.state.pending) await this.recover();
             for (let page = 0; page < 10000; page++) {
                 const result = await this.request(`/api/v1/sync/pull?after_seq=${this.state.cursor}&limit=${limit}`);
-                if (!Array.isArray(result.events) || (!result.events.length && result.hasMore)) throw fail('PAGINATION_STALLED');
+                validatePullPage(result, this.state.cursor, limit);
                 for (const event of result.events) {
                     if (event.seq <= this.state.cursor) throw fail('CURSOR_REWIND');
                     await this.applyRemote(event);
                 }
+                if (this.state.cursor < result.nextSeq) await this.transaction(next => {
+                    if (next.pending) throw fail('SYNC_STATE_NOT_DURABLE');
+                    if (next.cursor > result.nextSeq) throw fail('CURSOR_REWIND');
+                    next.cursor = result.nextSeq;
+                });
                 if (!result.hasMore) { this.retryNotifications(); return; }
             }
             throw fail('PAGINATION_STALLED');
@@ -247,4 +269,4 @@ class NativeSyncAdapter {
     diagnostics() { return { degraded: this.degraded, cursor: this.state.cursor, pending: Boolean(this.state.pending), outboxSize: this.state.outbox.length }; }
     async close() { await this.tail.catch(() => {}); this.queue.configureSync(); }
 }
-module.exports = { NativeSyncAdapter };
+module.exports = { NativeSyncAdapter, validatePullPage };

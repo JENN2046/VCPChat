@@ -1,6 +1,7 @@
 'use strict';
 const fs=require('node:fs/promises'),path=require('node:path'),crypto=require('node:crypto');
 const {messageHash,messageKey,wireTopic,identity,tombstoneHash,fail}=require('./protocol');
+const {validatePullPage}=require('./adapter');
 
 // First attachment must compare the complete selected source against the latest
 // central projection before capture can enqueue or publish any local message.
@@ -22,7 +23,7 @@ async function initialImport({queue,appDataRoot,connection,request}){
  for(let page=0;;page++){
   if(page>=10000)throw fail('INITIAL_IMPORT_PAGE_LIMIT');
   const r=await request(`/api/v1/sync/pull?after_seq=${cursor}&limit=500`);
-  if(!Array.isArray(r.events)||!Number.isSafeInteger(r.headSeq)||r.headSeq<cursor||(!r.events.length&&r.hasMore))throw fail('INVALID_IMPORT_PROJECTION');
+  validatePullPage(r,cursor,500);
   for(const event of r.events){
    const id=identity(event);if(!Number.isSafeInteger(event.seq)||event.seq<=cursor)throw fail('CURSOR_REWIND');cursor=event.seq;
    if(!['delete','upsert'].includes(event.action)||event.hash!==(event.action==='delete'?tombstoneHash(id):messageHash(event.message))||(event.action==='upsert'&&event.message.id!==id.msgId))throw fail('CORRUPT_EVENT');
@@ -31,6 +32,7 @@ async function initialImport({queue,appDataRoot,connection,request}){
    if(!selected.has(JSON.stringify([id.ownerType,id.ownerId,id.topicId])))throw fail('CENTRAL_CONTAINS_UNSELECTED_TOPICS');
    remote.set(messageKey(id),event);
   }
+  cursor=r.nextSeq;
   if(!r.hasMore)break;
  }
  let matched=0;

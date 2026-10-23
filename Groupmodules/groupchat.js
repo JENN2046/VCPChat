@@ -753,6 +753,8 @@ async function saveAgentGroupConfig(groupId, configData) {
  * @returns {Promise<object>} - 包含成功状态的对象
  */
 async function deleteAgentGroup(groupId) {
+    try { require('../modules/services/syncWriterBoundary').createSyncWriterBoundary(groupHistoryMutationQueue).assertWrite({ ownerType: 'group', ownerId: groupId }); }
+    catch (error) { return { success: false, error: error.message, code: error.code }; }
     if (!mainAppPaths.AGENT_GROUPS_DIR || !mainAppPaths.USER_DATA_DIR) {
         return { success: false, error: 'GroupChat module paths not initialized.' };
     }
@@ -2270,6 +2272,8 @@ async function createNewTopicForGroup(groupId, topicName) {
 }
 
 async function deleteGroupTopic(groupId, topicIdToDelete) {
+    try { require('../modules/services/syncWriterBoundary').createSyncWriterBoundary(groupHistoryMutationQueue).assertWrite({ ownerType: 'group', ownerId: groupId, topicId: topicIdToDelete }); }
+    catch (error) { return { success: false, error: error.message, code: error.code }; }
     let groupConfig = await getAgentGroupConfig(groupId);
     if (!groupConfig || !Array.isArray(groupConfig.topics)) {
         return { success: false, error: `Group ${groupId} or its topics not found.` };

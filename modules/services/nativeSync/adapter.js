@@ -270,7 +270,7 @@ class NativeSyncAdapter {
         } finally { this.busy = false; }
     }
     async synchronize() { await this.flush(); await this.pull(); }
-    diagnostics() { return { degraded: this.degraded, cursor: this.state.cursor, pending: Boolean(this.state.pending), outboxSize: this.state.outbox.length }; }
+    diagnostics() { return { degraded: this.degraded, configurationError:this.configurationError||null, attachmentError:this.attachmentError||null, cursor: this.state.cursor, pending: Boolean(this.state.pending), outboxSize: this.state.outbox.length }; }
     async close() { await this.tail.catch(() => {}); this.queue.configureSync(); }
 }
 module.exports = { NativeSyncAdapter, validatePullPage };

@@ -48,3 +48,14 @@ test('nonshared Topic delete and NativeSync-off Agent delete preserve original b
  f.queue.configureSync();assert.equal((await f.call('delete-agent',topic.itemId)).success,true);
  await assert.rejects(fs.stat(path.join(f.queue.userDataDir,topic.itemId)),e=>e.code==='ENOENT');
 });
+
+test('real Group module refuses shared owner/topic deletion before any config or history change',async t=>{
+ const f=await fixture(t),descriptor={itemId:'synthetic-group',itemType:'group',topicId:'shared'},appRoot=f.root;
+ const group=await load('Groupmodules/groupchat.js',new Map([['electron',{ipcMain:{on(){}}}],['../modules/fileManager',{}],['../modules/modelTrajectory',{}],['../modules/ipc/canvasHandlers',{}],['../modules/ipc/tavernHandlers',{}]]));
+ const groups=path.join(appRoot,'AgentGroups'),configPath=path.join(groups,descriptor.itemId,'config.json'),historyPath=f.queue.getHistoryPath(descriptor.itemId,descriptor.topicId),config={name:'Synthetic Group',topics:[{id:'shared'},{id:'other'}]};
+ await fs.mkdir(path.dirname(configPath),{recursive:true});await fs.writeFile(configPath,JSON.stringify(config));await fs.mkdir(path.dirname(historyPath),{recursive:true});await fs.writeFile(historyPath,JSON.stringify(f.history));
+ group.initializePaths({AGENT_GROUPS_DIR:groups,USER_DATA_DIR:f.queue.userDataDir,APP_DATA_ROOT_IN_PROJECT:appRoot});group.initializeRuntimeServices({historyMutationQueue:f.queue});f.queue.configureSync({topics:[descriptor]});
+ const beforeConfig=await fs.readFile(configPath),beforeHistory=await fs.readFile(historyPath);
+ for(const result of [await group.deleteGroupTopic(descriptor.itemId,'shared'),await group.deleteAgentGroup(descriptor.itemId)])assert.equal(result.code,'SYNC_WRITER_EXCLUDED');
+ assert.deepEqual(await fs.readFile(configPath),beforeConfig);assert.deepEqual(await fs.readFile(historyPath),beforeHistory);f.queue.configureSync();assert.equal((await group.deleteAgentGroup(descriptor.itemId)).success,true);await assert.rejects(fs.stat(path.dirname(configPath)),e=>e.code==='ENOENT');
+});

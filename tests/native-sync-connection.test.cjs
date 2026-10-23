@@ -97,3 +97,10 @@ test('failed first attachment cannot publish local messages or create sync state
     assert.equal(queue.syncPolicy, null);
     assert.deepEqual(await fs.readdir(path.join(f.root, '.native-sync')), ['connection.json']);
 });
+
+test('private configuration publication failure does not block authorized history catch-up or local Queue capture',async t=>{
+ const f=await fixture(t);f.config.publishExecutionConfigs=true;await f.write();const queue=new HistoryMutationQueue({userDataDir:path.join(f.root,'UserData'),logger:quiet});t.after(()=>queue.dispose());
+ const old={id:'old',role:'user',content:'synthetic old',timestamp:1},statePath=path.join(f.root,'.native-sync','state.json'),key=messageKey({ownerType:'agent',ownerId:topic.itemId,topicId:topic.topicId,msgId:old.id});await durableJson(queue.getHistoryPath(topic.itemId,topic.topicId),[old]);await durableJson(statePath,{version:1,deviceId:f.config.deviceId,topics:[topic],cursor:1,acked:{[key]:{hash:messageHash(old),deleted:false,seq:1}},outbox:[],pending:null});
+ let pulls=0,pushes=0;const runtime=await createNativeSyncRuntime({queue,appDataRoot:f.root,readSettings:f.settings,readAgentConfig:async()=>{throw Object.assign(Error('synthetic missing config'),{code:'CONFIG_UNAVAILABLE'});},intervalMs:10,request:async(route,{body}={})=>{if(route.endsWith('/push')){pushes++;return {seq:2,hash:messageHash(body.message),deleted:false};}pulls++;return {events:[],headSeq:2,nextSeq:2,hasMore:false};}});t.after(()=>runtime.close());
+ await queue.mutate(topic,history=>[...history,{id:'new',role:'user',content:'history still captures',timestamp:2}]);const end=Date.now()+3000;while(!pushes||!pulls||runtime.adapter.busy){assert.ok(Date.now()<end);await new Promise(r=>setTimeout(r,10));}assert.equal(pushes,1);assert.equal(runtime.adapter.diagnostics().configurationError,'CONFIG_UNAVAILABLE');assert.equal(runtime.adapter.state.outbox.length,0);
+});

@@ -1249,6 +1249,7 @@ if (!gotTheLock) {
             readAgentConfig: id => agentConfigManager.readAgentConfig(id),
             readGroupConfig: id => groupChat.getAgentGroupConfig(id),
             readTavernRules: () => tavernHandlers.getActiveRules(),
+            readExecutionPolicy: async () => { const s=await appSettingsManager.readSettings(); return {userName:s.userName||'用户',enableThoughtChainInjection:s.enableThoughtChainInjection===true,enableContextSanitizer:s.enableContextSanitizer===true,contextSanitizerDepth:s.contextSanitizerDepth===undefined?2:Number(s.contextSanitizerDepth),enableVcpToolInjection:s.enableVcpToolInjection===true}; },
             storeAttachment: (...args) => fileManager.storeFile(...args),
             thumbnail: async file => {
                 const image=require('electron').nativeImage.createFromPath(file);

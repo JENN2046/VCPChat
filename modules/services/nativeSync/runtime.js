@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const { NativeSyncAdapter } = require('./adapter');
 const { fail } = require('./protocol');
 
-async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, readGroupConfig, readTavernRules, thumbnail, request, requestBinary, storeAttachment }) {
+async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated = false, notify, intervalMs = 250, readSettings, readAgentConfig, readGroupConfig, readTavernRules, readExecutionPolicy, thumbnail, request, requestBinary, storeAttachment }) {
     const poc = args.includes('--native-sync-poc');
     if (poc && !isolated) throw fail('ISOLATED_APP_DATA_REQUIRED');
     if (!poc && !appDataRoot) return null;
@@ -27,15 +27,26 @@ async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated
         if (!response.ok) throw fail('SYNC_SERVER_UNAVAILABLE');
         return response.json();
     });
+    let publicationError = null;
+    const publishConfiguration = async () => {
+        if (!connection?.publishExecutionConfigs) return;
+        try {
+            await require('./executionConfigs').publishExecutionConfigs({topics:connection.topics,readAgentConfig,readGroupConfig,readTavernRules,readExecutionPolicy,send});
+            publicationError = null;
+        } catch (error) { publicationError = error.code || 'CONFIG_PUBLICATION_FAILED'; }
+    };
     const prepare = async () => {
         if (connection) {
             await require('./initialImport').initialImport({ queue, appDataRoot, connection, request: (route, body) => send(route, { body }) });
             if (connection.publishCatalog) {
-                const metadata = await require('./catalog').catalog({ appDataRoot, topics: connection.topics, readAgentConfig, thumbnail });
+                const metadata = await require('./catalog').catalog({ appDataRoot, topics: connection.topics, readAgentConfig, readGroupConfig, thumbnail });
                 await send('/api/plugins/NativeSync/mobile/catalog', { body: metadata });
             }
         }
-        if (connection?.publishExecutionConfigs) await require('./executionConfigs').publishExecutionConfigs({topics:connection.topics,readAgentConfig,readGroupConfig,readTavernRules,send});
+        // A private configuration failure cannot disable history catch-up. The
+        // host still refuses new execution without a verified snapshot; this
+        // catch only isolates publication from the existing history transport.
+        await publishConfiguration();
         prepared = true;
     };
     // Existing shared histories attach Queue policy locally before network work.
@@ -57,7 +68,7 @@ async function createNativeSyncRuntime({ queue, appDataRoot, args = [], isolated
     let stopped = false, running = null, lastConfigCheck = Date.now(), lastAttachmentCheck = 0;
     const timer = setInterval(() => {
         if (stopped || running) return;
-        running = (async () => { if (!prepared) await prepare(); if(connection?.publishExecutionConfigs && Date.now()-lastConfigCheck>=5000){await require('./executionConfigs').publishExecutionConfigs({topics:connection.topics,readAgentConfig,readGroupConfig,readTavernRules,send});lastConfigCheck=Date.now();} const checkAttachments=attachments&&Date.now()-lastAttachmentCheck>=5000; if(checkAttachments)try{await attachments.uploadLocal();adapter.attachmentError=null;}catch(e){adapter.attachmentError=e.code||'ATTACHMENT_SYNC_FAILED';} await adapter.synchronize(); if(checkAttachments){try{await attachments.restoreRemote();}catch(e){adapter.attachmentError=e.code||'ATTACHMENT_SYNC_FAILED';}lastAttachmentCheck=Date.now();adapter.attachmentSkipped=attachments.skipped;} })().catch(error => {
+        running = (async () => { if (!prepared) await prepare(); if(connection?.publishExecutionConfigs && Date.now()-lastConfigCheck>=5000){await publishConfiguration();lastConfigCheck=Date.now();} adapter.configurationError=publicationError; const checkAttachments=attachments&&Date.now()-lastAttachmentCheck>=5000; if(checkAttachments)try{await attachments.uploadLocal();adapter.attachmentError=null;}catch(e){adapter.attachmentError=e.code||'ATTACHMENT_SYNC_FAILED';} await adapter.synchronize(); if(checkAttachments){try{await attachments.restoreRemote();}catch(e){adapter.attachmentError=e.code||'ATTACHMENT_SYNC_FAILED';}lastAttachmentCheck=Date.now();adapter.attachmentSkipped=attachments.skipped;} })().catch(error => {
             adapter.degraded = error.code || 'SYNC_FAILED';
         }).finally(() => { running = null; });
     }, intervalMs);

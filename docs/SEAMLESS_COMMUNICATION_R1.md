@@ -36,3 +36,22 @@ device-local handles without changing shared content hashes. Missing source
 binary preserves the historical attachment reference. Large PDF image frames
 offload to CAS and return as local native frames through the same metadata
 contract. Both new client and server advertise/require `attachments-v1`.
+
+Group publication uses the original Group manager and native Agent DTOs with
+the host's explicit member alias mappings. The same publisher freezes native
+stream parameters and a small execution-policy whitelist; it does not copy all
+desktop settings or provider authority. A failed private config publication is
+visible in adapter diagnostics while authorized history capture/catch-up keeps
+working. The host independently rejects execution without verified config.
+
+Deleting a shared Group or Group Topic now refuses before modifying native
+config or history, using the same physical-history writer boundary as Agent
+deletion and CDS/MobileSync isolation. NativeSync-off behavior is retained.
+All local/remote attachment handle changes still pass through the shared Queue.
+
+Current development validation is 124/124 focused tests on Ubuntu Node24 across
+both repositories, plus fixed author-rule output checks and a separate full
+ToolBox server.js synthetic acceptance. The cloud counterpart retains three
+native group modes, versioned plans, per-member Journal intents and original
+tool approval gates. Physical Electron/fileManager and real mobile acceptance
+remain required before an overall R1 PASS or production release declaration.

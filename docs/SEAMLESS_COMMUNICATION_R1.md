@@ -49,7 +49,7 @@ config or history, using the same physical-history writer boundary as Agent
 deletion and CDS/MobileSync isolation. NativeSync-off behavior is retained.
 All local/remote attachment handle changes still pass through the shared Queue.
 
-Current development validation is 124/124 focused tests on Ubuntu Node24 across
+Current development validation is 125/125 focused tests on Ubuntu Node24 across
 both repositories, plus fixed author-rule output checks and a separate full
 ToolBox server.js synthetic acceptance. The cloud counterpart retains three
 native group modes, versioned plans, per-member Journal intents and original

@@ -48,6 +48,9 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // PR #72: serialize synchronization snapshots and preserve concurrent edits.
+    'modules/services/chartService.js',
+    'tests/chart-sync-races.test.cjs',
     // Reviewed local sidebar/save-field ownership changes.
     'modules/event-listeners.js',
     'modules/ipc/settingsHandlers.js',

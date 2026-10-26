@@ -3040,7 +3040,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 838,
+          "line": 846,
           "kind": "event-listener"
         },
         {
@@ -3214,7 +3214,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 838,
+          "line": 846,
           "kind": "event-listener",
           "match": "chartService.on('change'"
         },
@@ -3410,14 +3410,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 771,
+          "line": 779,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 771,
+          "line": 779,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:diagnostics'"
         },
@@ -3932,14 +3932,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 751,
+          "line": 759,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 751,
+          "line": 759,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:runtime-error'"
         },
@@ -3963,14 +3963,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 763,
+          "line": 771,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 763,
+          "line": 771,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:runtime-event'"
         },
@@ -3994,14 +3994,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 730,
+          "line": 738,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 730,
+          "line": 738,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:runtime-status'"
         },
@@ -13485,7 +13485,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 793,
+          "line": 801,
           "kind": "event-listener"
         },
         {
@@ -13581,7 +13581,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 793,
+          "line": 801,
           "kind": "event-listener",
           "match": "mainContents?.on('destroyed'"
         },
@@ -14037,7 +14037,7 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 794,
+          "line": 802,
           "kind": "event-listener"
         },
         {
@@ -14049,7 +14049,7 @@
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 794,
+          "line": 802,
           "kind": "event-listener",
           "match": "mainContents?.on('did-navigate'"
         },
@@ -26471,14 +26471,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 849,
+          "line": 857,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 849,
+          "line": 857,
           "kind": "event-listener",
           "match": "ipcMain.handle('open-chart-window'"
         }

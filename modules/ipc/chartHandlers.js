@@ -669,8 +669,7 @@ function registerIpcHandlers() {
         const action = String(request.action || 'status');
         if (action === 'status') return shootingPlannerSyncService.status();
 
-        const local = await chartService.readData(chartId);
-        const manifest = await chartService.readManifest(chartId);
+        const { data: local, manifest } = await chartService.readDataSnapshot(chartId);
         if (action === 'pull') {
             const remote = await shootingPlannerSyncService.pull();
             const next = {
@@ -705,15 +704,24 @@ function registerIpcHandlers() {
                 expectedRevision: local.cloudRevision,
                 operationId: request.operationId,
             });
-            const next = {
-                ...local,
-                cloudRevision: result.revision,
-                cloudUpdatedAt: result.updatedAt,
-            };
-            await chartService.replaceData(chartId, next, {
-                expectedDataRevision: manifest.dataRevision,
-            }, { vcpContext: { source: 'shooting-planner-cloud-push' } });
-            return { enabled: true, action, revision: result.revision };
+            let revision = result.revision;
+            try {
+                // Patch the latest queued data, preserving edits made during PUT.
+                await chartService.applyDataOperations(chartId, [
+                    { op: 'test', path: '/cloudRevision', value: local.cloudRevision },
+                    { op: 'set', path: '/cloudRevision', value: result.revision },
+                    { op: 'set', path: '/cloudUpdatedAt', value: result.updatedAt },
+                ], {
+                    operationId: `shooting-planner-push:${chartId}:${request.operationId}`,
+                }, { vcpContext: { source: 'shooting-planner-cloud-push' } });
+            } catch (error) {
+                if (error.code !== 'CHART_DATA_TEST_FAILED') throw error;
+                const latest = await chartService.readDataSnapshot(chartId);
+                if (!Number.isInteger(latest.data.cloudRevision) || latest.data.cloudRevision < result.revision) throw error;
+                // A newer pull or acknowledgement already reconciled this push.
+                revision = latest.data.cloudRevision;
+            }
+            return { enabled: true, action, revision };
         }
         const error = new Error('不支持的拍摄排班同步动作。');
         error.code = 'SHOOTING_SYNC_ACTION_UNSUPPORTED';

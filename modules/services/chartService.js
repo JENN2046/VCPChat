@@ -487,6 +487,15 @@ class ChartService extends EventEmitter {
         return JSON.parse(await fs.readFile(path.join(this.chartDir(chartId), SOURCE_FILES.data), 'utf8'));
     }
 
+    async readDataSnapshot(chartId) {
+        const id = normalizeChartId(chartId);
+        return this.enqueue(id, async () => {
+            const manifest = await this.readManifest(id);
+            const data = await this.readData(id);
+            return { manifest, data };
+        });
+    }
+
     async readSources(chartId) {
         const manifest = await this.readManifest(chartId);
         const dir = this.chartDir(chartId);

@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "9f3fb2c97e0c0d089692cc886476a63bf2b3e9ce",
-          "size": 30852,
-          "sha256": "bfe2b9aae3bc0e8609d8164edaee70f37bf65f904e17046251a29a5f825fa986",
+          "blob": "94cde7d99127cec73867d9fe4327d9ef6bf89fb4",
+          "size": 30912,
+          "sha256": "0fa6f214f85623fa33526df6f4e89beb1b39237ee4076d273ac299b5c5307c6c",
           "kind": "source"
         },
         {
@@ -9507,9 +9507,9 @@
           "path": "modules/ipc/chartHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b1f9d5981b101b6f8da481f69c5e581b5b4e049a",
-          "size": 35610,
-          "sha256": "68f4dd6e7ec6b73caa9811a5b434d4aa4dc018abdad033b0f02943c897d1eca7",
+          "blob": "6289f5b53bcc61bef967b62729e9f8ff0c81e980",
+          "size": 36307,
+          "sha256": "71cf8e3391d255bcf039474c62905bfb9caf7deb29309da6e28efce02ea58499",
           "kind": "source"
         },
         {
@@ -10965,9 +10965,9 @@
           "path": "modules/services/chartService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7b7d70b23923dbb2c214e11c5726d88b014c7232",
-          "size": 42611,
-          "sha256": "f6ad17a18086d1319398e5b1d1377382b1a8ddb06fbb1485c7d8792ecea76e26",
+          "blob": "80489771c4168f2ce706cd849cb443d315dc212b",
+          "size": 42908,
+          "sha256": "b64b7b297d13b7903a2b93848deb4e5dc96a95055f41facc0172a7464cb22cc4",
           "kind": "source"
         },
         {
@@ -13603,9 +13603,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "9f3fb2c97e0c0d089692cc886476a63bf2b3e9ce",
-          "size": 30852,
-          "sha256": "bfe2b9aae3bc0e8609d8164edaee70f37bf65f904e17046251a29a5f825fa986",
+          "blob": "94cde7d99127cec73867d9fe4327d9ef6bf89fb4",
+          "size": 30912,
+          "sha256": "0fa6f214f85623fa33526df6f4e89beb1b39237ee4076d273ac299b5c5307c6c",
           "kind": "source"
         },
         {
@@ -14768,9 +14768,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "daac4e51d98a43f69ab4ece625aacad30ff12257",
-          "size": 43635,
-          "sha256": "bb0c4a38a355e095247fa5303514c957c91d9ebc3ee0d68c3a75519514d4c971",
+          "blob": "aa435aa7f46624b1391a70a05fcebf6e88b8c907",
+          "size": 43796,
+          "sha256": "51ca794626cc71ff5ff4f9df32be3db0a4c27c533a0d477014bf9e00644c6be9",
           "kind": "source"
         },
         {
@@ -16733,6 +16733,24 @@
           "blob": "a18d426950db824cc6831a72737d687f4af90f86",
           "size": 1436,
           "sha256": "94bf581785c9f04da57ea1bb00f6e6e6b5246b082bb87e35b62a4e21afc78af3",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-service.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8c4ac5f23f68a2c3242633e2e0b0ba16729e3cd7",
+          "size": 8136,
+          "sha256": "2166bd9ceb4103a5f750687ba4e93d37da1a3a4c29bf9eb12c865a90a6e00ecc",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-sync-races.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bcd4afc2972a2210f9da39e92d88a2ff5347b85d",
+          "size": 6597,
+          "sha256": "0687b54cd9faeedf269466cc05f6de053243cbe91cf09a2eaec05d06511899de",
           "kind": "source"
         },
         {
@@ -20180,15 +20198,25 @@
             "modules/event-listeners.js",
             "modules/ipc/chartHandlers.js",
             "modules/ipc/settingsHandlers.js",
+            "modules/services/chartService.js",
             "modules/services/shootingPlannerSyncService.js",
             "preloads/chart.js",
             "styles/themes.css",
             "tests/chart-runtime-persistence-contract.test.mjs",
+            "tests/chart-service.test.js",
+            "tests/chart-sync-races.test.cjs",
             "tests/global-settings-save.test.mjs",
             "tests/settings-agent-draft-retention.test.mjs",
             "tests/settings-atomic-write.test.js",
             "tests/shooting-planner-sync-service.test.js",
             "tests/sidebar-avatar-only-navigation.test.js"
+          ]
+        },
+        {
+          "name": "reviewed-active-theme-wallpaper-inputs",
+          "files": [
+            "assets/wallpaper/relic_obsidian_dark.jpg",
+            "assets/wallpaper/relic_ivory_light.jpg"
           ]
         }
       ],
@@ -25527,6 +25555,24 @@
           "kind": "source"
         },
         {
+          "path": "assets/wallpaper/relic_ivory_light.jpg",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9d7d391d9260714528a3c617fc835b672dce7ae6",
+          "size": 302292,
+          "sha256": "02fbd1993bfbf49f51a4747fd02a95ad77251eb5c92bc791c4ad4b034e494b1b",
+          "kind": "static-asset"
+        },
+        {
+          "path": "assets/wallpaper/relic_obsidian_dark.jpg",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "48455db506f761392b07378e902b266e0b1db1c2",
+          "size": 318013,
+          "sha256": "a3eafa3fa2b569c6d87fc30f6b1a293f9b586e8ca5eee531286f8245fd6a43f1",
+          "kind": "static-asset"
+        },
+        {
           "path": "assets/wallpaper/vcp_editorial_ink_light.jpg",
           "mode": "100644",
           "type": "blob",
@@ -25683,9 +25729,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "bfe9a468531513fb40a973c85d9e17d17f6f5ac5",
+          "blob": "8c3b45d1b308a3a1b827e44bc8366741406c82b1",
           "size": 1077858,
-          "sha256": "2a49ddf79d449ef9b68d5e62434ab206780af78592054dfbb870400ad648653a",
+          "sha256": "2d642c247041508067ac14a188874a378fe1b2c11897ea1f3057067d4fc66194",
           "kind": "source"
         },
         {
@@ -27213,9 +27259,9 @@
           "path": "modules/ipc/chartHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b1f9d5981b101b6f8da481f69c5e581b5b4e049a",
-          "size": 35610,
-          "sha256": "68f4dd6e7ec6b73caa9811a5b434d4aa4dc018abdad033b0f02943c897d1eca7",
+          "blob": "6289f5b53bcc61bef967b62729e9f8ff0c81e980",
+          "size": 36307,
+          "sha256": "71cf8e3391d255bcf039474c62905bfb9caf7deb29309da6e28efce02ea58499",
           "kind": "source"
         },
         {
@@ -28662,9 +28708,9 @@
           "path": "modules/services/chartService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7b7d70b23923dbb2c214e11c5726d88b014c7232",
-          "size": 42611,
-          "sha256": "f6ad17a18086d1319398e5b1d1377382b1a8ddb06fbb1485c7d8792ecea76e26",
+          "blob": "80489771c4168f2ce706cd849cb443d315dc212b",
+          "size": 42908,
+          "sha256": "b64b7b297d13b7903a2b93848deb4e5dc96a95055f41facc0172a7464cb22cc4",
           "kind": "source"
         },
         {
@@ -31272,9 +31318,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "9f3fb2c97e0c0d089692cc886476a63bf2b3e9ce",
-          "size": 30852,
-          "sha256": "bfe2b9aae3bc0e8609d8164edaee70f37bf65f904e17046251a29a5f825fa986",
+          "blob": "94cde7d99127cec73867d9fe4327d9ef6bf89fb4",
+          "size": 30912,
+          "sha256": "0fa6f214f85623fa33526df6f4e89beb1b39237ee4076d273ac299b5c5307c6c",
           "kind": "source"
         },
         {
@@ -32127,9 +32173,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "daac4e51d98a43f69ab4ece625aacad30ff12257",
-          "size": 43635,
-          "sha256": "bb0c4a38a355e095247fa5303514c957c91d9ebc3ee0d68c3a75519514d4c971",
+          "blob": "aa435aa7f46624b1391a70a05fcebf6e88b8c907",
+          "size": 43796,
+          "sha256": "51ca794626cc71ff5ff4f9df32be3db0a4c27c533a0d477014bf9e00644c6be9",
           "kind": "source"
         },
         {
@@ -34110,6 +34156,24 @@
           "blob": "a18d426950db824cc6831a72737d687f4af90f86",
           "size": 1436,
           "sha256": "94bf581785c9f04da57ea1bb00f6e6e6b5246b082bb87e35b62a4e21afc78af3",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-service.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8c4ac5f23f68a2c3242633e2e0b0ba16729e3cd7",
+          "size": 8136,
+          "sha256": "2166bd9ceb4103a5f750687ba4e93d37da1a3a4c29bf9eb12c865a90a6e00ecc",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-sync-races.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bcd4afc2972a2210f9da39e92d88a2ff5347b85d",
+          "size": 6597,
+          "sha256": "0687b54cd9faeedf269466cc05f6de053243cbe91cf09a2eaec05d06511899de",
           "kind": "source"
         },
         {
@@ -39138,15 +39202,25 @@
             "modules/event-listeners.js",
             "modules/ipc/chartHandlers.js",
             "modules/ipc/settingsHandlers.js",
+            "modules/services/chartService.js",
             "modules/services/shootingPlannerSyncService.js",
             "preloads/chart.js",
             "styles/themes.css",
             "tests/chart-runtime-persistence-contract.test.mjs",
+            "tests/chart-service.test.js",
+            "tests/chart-sync-races.test.cjs",
             "tests/global-settings-save.test.mjs",
             "tests/settings-agent-draft-retention.test.mjs",
             "tests/settings-atomic-write.test.js",
             "tests/shooting-planner-sync-service.test.js",
             "tests/sidebar-avatar-only-navigation.test.js"
+          ]
+        },
+        {
+          "name": "reviewed-active-theme-wallpaper-inputs",
+          "files": [
+            "assets/wallpaper/relic_obsidian_dark.jpg",
+            "assets/wallpaper/relic_ivory_light.jpg"
           ]
         }
       ],

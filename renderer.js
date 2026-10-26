@@ -677,8 +677,18 @@ mainChatSettingsPresentationOwner.configureStartup({
     };
     syncConversationTurnNavigator();
     window.addEventListener('global-settings-updated', syncConversationTurnNavigator);
+    const handleTypedSettingsCommitted = event => {
+        const committedPatch = event?.detail?.patch;
+        if (!committedPatch || typeof committedPatch !== 'object' || Object.keys(committedPatch).length === 0) return;
+        mainChatSettingsOwner.merge(committedPatch);
+        if ('enableTurnNavigator' in committedPatch) {
+            syncConversationTurnNavigator();
+        }
+    };
+    window.addEventListener('vcp-typed-settings-committed', handleTypedSettingsCommitted);
     ownedRendererSubscriptions.add({ dispose: () => {
         window.removeEventListener('global-settings-updated', syncConversationTurnNavigator);
+        window.removeEventListener('vcp-typed-settings-committed', handleTypedSettingsCommitted);
         conversationTurnNavigator?.dispose();
         conversationTurnNavigator = null;
     } });
@@ -829,6 +839,8 @@ mainChatSettingsPresentationOwner.configureStartup({
         chatManager.init({
             chatContext,
             chatRepository,
+            historyMutationAuthority,
+            flowlockManager: window.flowlockManager,
             streamConsumerRegistry: mainChatAdapter?.streamRoutes,
             chatDomRenderer: mainChatDomRenderer,
             electronAPI: chatAPI,
@@ -863,6 +875,10 @@ mainChatSettingsPresentationOwner.configureStartup({
                 // This is no longer needed as chatManager will call messageRenderer's summarizer
             },
             notifySendStateChanged: mainChatSendOwner.update
+        });
+        messageRenderer.setContextMenuDependencies({
+            compactContext: () => chatManager.compactContext(),
+            isContextCompacting: () => chatManager.isContextCompacting(),
         });
         ownedRendererSubscriptions.add(chatManager);
         ownedRendererSubscriptions.add({ dispose: () => window.topicListManager.dispose?.() });
@@ -1085,6 +1101,8 @@ mainChatSettingsPresentationOwner.configureStartup({
         // diagnostics and isolated Electron smoke tests.
         document.documentElement.dataset.vcpRendererReady = 'true';
         window.dispatchEvent(new CustomEvent('vcp-renderer-ready'));
+        // 同一时刻通知主进程，作为启动标记里的 renderer-ready（lifecycle:get-main-snapshot.launch）
+        window.electronAPI?.markRendererReady?.();
 
         // Emoticon panel event listener
         if (attachFileBtn && emoticonTriggerBtn && window.emoticonManager) {

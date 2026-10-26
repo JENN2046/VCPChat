@@ -334,6 +334,25 @@
     ]
   },
   {
+    "id": "source.dynamic.modules.deskpet.pethandlers",
+    "kind": "source-review",
+    "owner": "modules/deskpet/petHandlers.js",
+    "status": "reviewed",
+    "dynamic": true,
+    "review": "Host listener adapter for the optional desk pet: event names come from the literal listenHost(...) calls in the same function (main window, screen, powerMonitor and app events); every listener is pushed onto hostEvents and removed by disposeHostEvents when the desk pet closes.",
+    "dynamicSites": [
+      {
+        "file": "modules/deskpet/petHandlers.js",
+        "line": 253,
+        "kind": "event-listener",
+        "match": "target?.on?.(event"
+      }
+    ],
+    "evidence": [
+      "Source review of the desk pet split; exact operation match below; new or changed dynamic sites still fail the contract gate."
+    ]
+  },
+  {
     "id": "source.dynamic.modules.event-listeners",
     "kind": "source-review",
     "owner": "modules/event-listeners.js",
@@ -343,7 +362,7 @@
     "dynamicSites": [
       {
         "file": "modules/event-listeners.js",
-        "line": 36,
+        "line": 39,
         "kind": "custom-event-listener",
         "match": "target?.addEventListener?.(type"
       }
@@ -381,7 +400,7 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/chartHandlers.js",
-        "line": 44,
+        "line": 50,
         "kind": "event-send",
         "match": "win.webContents.send(channel"
       }
@@ -450,7 +469,7 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/musicHandlers.js",
-        "line": 674,
+        "line": 724,
         "kind": "event-send",
         "match": "event.sender.send(channel"
       }
@@ -566,31 +585,31 @@
     "dynamicSites": [
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1367,
+        "line": 1375,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.addedEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1368,
+        "line": 1376,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.removedEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1385,
+        "line": 1393,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.selectEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1386,
+        "line": 1394,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.revokedEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 2335,
+        "line": 2344,
         "kind": "event-listener",
         "match": "ipcMain.handle(channel"
       }
@@ -609,19 +628,19 @@
     "dynamicSites": [
       {
         "file": "modules/messageRenderer.js",
-        "line": 686,
+        "line": 693,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 2694,
+        "line": 2740,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 3443,
+        "line": 3497,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
@@ -798,19 +817,19 @@
     "dynamicSites": [
       {
         "file": "modules/ui-system/appearance-studio.js",
-        "line": 524,
+        "line": 444,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/ui-system/appearance-studio.js",
-        "line": 815,
+        "line": 1153,
         "kind": "custom-event-listener",
         "match": "root.addEventListener(type"
       },
       {
         "file": "modules/ui-system/appearance-studio.js",
-        "line": 1579,
+        "line": 1351,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
@@ -1063,7 +1082,7 @@
       },
       {
         "file": "modules/ui-system/next-shell/next-shell-controller.js",
-        "line": 280,
+        "line": 283,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
@@ -1101,13 +1120,13 @@
     "dynamicSites": [
       {
         "file": "modules/ui-system/settings-bridge.js",
-        "line": 490,
+        "line": 491,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/ui-system/settings-bridge.js",
-        "line": 774,
+        "line": 783,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
@@ -1214,7 +1233,7 @@
     "dynamicSites": [
       {
         "file": "modules/ui-system/typed-field-owners.js",
-        "line": 441,
+        "line": 462,
         "kind": "custom-event-listener",
         "match": "form.addEventListener(type"
       }
@@ -1491,7 +1510,7 @@
     "dynamicSites": [
       {
         "file": "modules/loom/sideBrowserService.js",
-        "line": 106,
+        "line": 111,
         "kind": "event-listener",
         "match": "guest.on(event"
       }
@@ -1584,13 +1603,44 @@
     "dynamicSites": [
       {
         "file": "modules/notificationRenderer.js",
-        "line": 1653,
+        "line": 1717,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
     ],
     "evidence": [
       "Frozen 3cde8466 candidate: reviewed initializeFocusCleanup and its fixed call sites; SUVEI approval guards remain separate and unchanged."
+    ]
+  },
+  {
+    "id": "source.dynamic.deskpet.wake-coordinator",
+    "kind": "source-review",
+    "owner": "modules/deskpet/wake/coordinator.js",
+    "status": "reviewed",
+    "dynamic": true,
+    "review": "The local handle wrapper registers fixed deskpet-wake channels and checks ctx.fromMain before invoking work. Power-monitor event names come from fixed suspend/lock and resume/unlock lists; dispose removes both listener sets and stops the coordinator. This source registration does not activate microphones or authorize provider execution.",
+    "dynamicSites": [
+      {
+        "file": "modules/deskpet/wake/coordinator.js",
+        "line": 250,
+        "kind": "event-listener",
+        "match": "ipcMain.handle(channel"
+      },
+      {
+        "file": "modules/deskpet/wake/coordinator.js",
+        "line": 293,
+        "kind": "event-listener",
+        "match": "powerMonitor?.on?.(event"
+      },
+      {
+        "file": "modules/deskpet/wake/coordinator.js",
+        "line": 294,
+        "kind": "event-listener",
+        "match": "powerMonitor?.on?.(event"
+      }
+    ],
+    "evidence": [
+      "2026-10-26: reviewed the sender guard, fixed registration call sites and matching power-monitor disposal."
     ]
   }
 ]

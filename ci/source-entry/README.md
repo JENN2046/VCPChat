@@ -120,7 +120,7 @@ entries, update their exact identities and the workflow's manifest pin together,
 and rerun source-entry tests and the relevant original validation.
 
 The source entry itself does not execute dependency lifecycle scripts. The Chat
-workflow retains its original `npm ci --omit=optional`, Electron runtime check,
+workflow installs locked optional platform packages with `npm ci --include=optional` for the feature tests, and retains the Electron runtime check,
 kernel tests, evidence generation and complete UI gate. Their actual build,
 temporary database and runtime effects need their own results. The summary step
 uses a quoted Node heredoc so Markdown backticks are written literally and all
@@ -190,3 +190,14 @@ Held paths/blobs, ordinary aliases, source controllers, permissions, trigger
 conditions and product commands remain unchanged. See
 `docs/contracts/upstream-8f1562ea-candidate.md` for dispositions and compatibility
 limits; current sizes/identities remain authoritative in the manifest.
+
+
+## October 26 feature verification
+
+Feature tests use the hash-bound complete source context in Git-free CI projections.
+Their core dependency scan admits the exact reviewed code inputs; missing or changed
+inputs still fail before unreviewed bodies are consumed. Windows source tests verify
+a real Electron installation after the ignore-scripts dependency step. The static
+ProjectForge declaration reader inventories feature-owned preloadApi.js files as
+literal AST data, under the existing file/byte/symlink limits. It never requires or
+evaluates workspace declarations. Native recipe identities refer to Git blob bytes.

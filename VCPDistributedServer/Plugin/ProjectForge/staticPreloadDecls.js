@@ -79,16 +79,31 @@ function readStaticPreloadDecls(root) {
     const roleGlobals = Object.fromEntries([...object(globalNode)].map(([k, v]) => [k, string(v)]));
     const apiDir = path.join(base, 'preloads/api');
     if (fs.lstatSync(apiDir).isSymbolicLink()) throw new Error('声明目录不允许符号链接');
-    const files = fs.readdirSync(apiDir).filter(n => n.endsWith('.js')).sort();
+    const files = fs.readdirSync(apiDir).filter(n => n.endsWith('.js')).sort()
+        .map(name => ({ relative: `preloads/api/${name}`, domain: path.basename(name, '.js'), helper: '../core/define' }));
+    const modulesDir = path.join(base, 'modules');
+    let modulesStat;
+    try { modulesStat = fs.lstatSync(modulesDir); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+    if (modulesStat) {
+        if (modulesStat.isSymbolicLink() || !modulesStat.isDirectory()) throw new Error('功能声明目录不允许符号链接');
+        for (const item of fs.readdirSync(modulesDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, 'en'))) {
+            // The shipped registry ignores linked feature directories as well.
+            if (!item.isDirectory() || item.isSymbolicLink()) continue;
+            const relative = `modules/${item.name}/preloadApi.js`;
+            if (fs.existsSync(path.join(base, relative))) files.push({ relative, domain: item.name, helper: '../../preloads/core/define' });
+            if (files.length > MAX_FILES) throw new Error('声明文件数量超过限制');
+        }
+    }
     if (files.length > MAX_FILES) throw new Error('声明文件数量超过限制');
     const apis = [];
     const names = new Set();
     for (const file of files) {
-        const body = read(`preloads/api/${file}`);
+        const body = read(file.relative);
         const helpers = new Map();
         for (const n of body.flatMap(n => n.type === 'VariableDeclaration' ? n.declarations : [])) {
             if (n.id.type !== 'ObjectPattern' || n.init?.type !== 'CallExpression' || n.init.callee.name !== 'require' ||
-                n.init.arguments.length !== 1 || n.init.arguments[0].value !== '../core/define') continue;
+                n.init.arguments.length !== 1 || n.init.arguments[0].value !== file.helper) continue;
             for (const p of n.id.properties) if (p.type === 'ObjectProperty' && !p.computed && p.value.type === 'Identifier') helpers.set(p.value.name, p.key.name);
         }
         const exports = body.filter(n => n.type === 'ExpressionStatement' && n.expression.type === 'AssignmentExpression' &&
@@ -101,7 +116,7 @@ function readStaticPreloadDecls(root) {
             names.add(name);
             const value = entry(node, roles, helpers);
             if (!value.roles.length || value.roles.some(role => !Object.hasOwn(roleGlobals, role))) throw new Error('未知或空 API 角色');
-            apis.push({ name, domain: path.basename(file, '.js'), ...value });
+            apis.push({ name, domain: file.domain, ...value });
         }
     }
     return { status: 'ok', apis, roleGlobals, source: 'static' };

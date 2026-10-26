@@ -134,7 +134,7 @@ export function loadCiSourceContext(root, env = process.env) {
             const [current, baseline] = comparison(label, name);
             if (identical(current, baseline)) return false;
             if (!current || !baseline || current.mode !== baseline.mode || current.type !== baseline.type) return true;
-            fail('line-ending parity requires admitted historical content');
+            fail(`line-ending parity requires admitted historical content: ${label}:${name}`);
         },
     });
 }

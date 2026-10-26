@@ -40,6 +40,7 @@ test('integrated boundary allows product work and rejects retained runtime, asse
             'styles/ui-system/ask-nova.css', 'Notemodules/notes.html', 'Translatormodules/translator.html',
             'modules/event-listeners.js', 'modules/ui-system/appearance-studio.js']) write(file);
         write('styles/ui-next.css', '.shell { display: flex; }');
+        write('Notemodules/notes.js', fs.readFileSync(new URL('../Notemodules/notes.js', import.meta.url), 'utf8'));
         write('styles/themes.css', ':focus-visible:not(#messageInput):not(.chat-message-input) { outline: 1px solid; }');
         write('modules/shared/embeddedAppAllowlist.js', ['open-notes-window', 'open-note-mini-window', 'open-translator-window',
             'open-memo-window', 'open-forum-window', 'open-log-window', 'open-themes-window', 'open-task-window',
@@ -51,6 +52,7 @@ test('integrated boundary allows product work and rejects retained runtime, asse
         const valid = run();
         assert.equal(valid.status, 0, valid.stderr);
         reject('agent-runtime/new.js', '', /forbidden Build\/Codex path/);
+        reject('Notemodules/notes.js', fs.readFileSync(new URL('../Notemodules/notes.js', import.meta.url), 'utf8') + '\n// unreviewed fixture mutation\n', /unreviewed Notes compatibility change/);
         reject('modules/projectForgeBusiness.js', "const channel = 'agent-runtime:spawn';", /forbidden Build\/Codex runtime/);
         reject('modules/services/embeddedAppSessionManager.js', 'const vcpApiKey = "secret";', /credentials/);
         reject('modules/services/embeddedAppSessionManager.js', 'webContents.executeJavaScript(code);', /post-load injection/);

@@ -1,7 +1,7 @@
 {
   "schema": "vcpchat-isolated-native-build/v1",
-  "upstreamTarget": "8f1562ea8fb851d0e370449a66ba24700d93faf9",
-  "sourceBaseline": "008542de728a702cbf35190273375b4990fbcdad",
+  "upstreamTarget": "74d4a4919e953f8b85c9cec642500ea5ac99eed9",
+  "sourceBaseline": "ff064b8222789589c799751b24ba6bb4cec8e0f1",
   "platform": "windows-x64",
   "rustToolchain": "1.89.0",
   "acceptancePolicy": {
@@ -19,9 +19,9 @@
     {
       "component": "rust_projectforge_indexer",
       "destination": "VCPDistributedServer/Plugin/ProjectForge/bin/win32-x64/projectforge_indexer.exe",
-      "size": 17905664,
-      "sha256": "9b049a2b05fe4a46593fb207cb7a7ac5b86d8385d0c1e915a72ee9832a87b794",
-      "gitBlob": "fc38126f7dfb1f1b57eab464631407bb7d71c0e1",
+      "size": 17906688,
+      "sha256": "e0539fb72fedcc84d7750fa82b7d81040b279511956ead6352bccc4159373f11",
+      "gitBlob": "a0fd72ec0c0bf34275f2c03191dfa2fc65629a97",
       "compiler": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: x86_64-pc-windows-msvc\nrelease: 1.89.0\nLLVM version: 20.1.7",
       "inputHashes": [
         {
@@ -37,7 +37,7 @@
           "path": "examples/geo_probe.rs"
         },
         {
-          "sha256": "e2c82de4751afc2e7ecd41090691a0585fb3a7969b977afc181907afd65c950f",
+          "sha256": "ef99982ca8eaf77eb948c3cd3ca4ad53cd24e26fd958b25455fea95660682bfd",
           "path": "src/component.rs"
         },
         {
@@ -131,22 +131,20 @@
       ],
       "buildConditions": {
         "commands": [
-          "test --release --locked --jobs 2 --manifest-path Cargo.toml",
           "build --release --locked --jobs 2 --manifest-path Cargo.toml"
         ],
         "platform": "windows-x64",
         "sourceRemap": "/vcp-build/rust_projectforge_indexer",
         "cargoRemap": "/vcp-build/cargo",
-        "sameBatchIncrementalRebuild": true,
-        "buildTarget": "isolated target retained within this frozen source batch; rebuilt after reviewed EQ corrections",
         "portableCpu": true,
         "crossMachineByteEqualityRequired": false,
-        "functionality": {
-          "sourceTests": 57
-        },
         "recipe": ".github/scripts/build-projectforge-windows.ps1",
         "recipeSha256": "4f8654f1c21e675be43aaa0c18946e88b4bf7afdd1752cd06e759393ab7a8c72",
-        "recipeRelationship": "CI independently repeats locked test/build; local isolated wrapper uses the same commands but the recorded source remap differs. No byte-equivalence claim."
+        "recipeRelationship": "Same locked release build; unit tests execute separately on isolated Linux from the same source. No cross-machine byte-equivalence claim.",
+        "functionality": {
+          "linuxUnitTests": "61 passed in the isolated Linux source batch",
+          "windowsRuntimeSmoke": "NOT_RUN"
+        }
       }
     },
     {

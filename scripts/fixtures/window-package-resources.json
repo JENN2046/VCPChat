@@ -500,8 +500,8 @@
     },
     {
       "path": "Musicmodules/music-lyrics.js",
-      "size": 24392,
-      "sha256": "015228c9fcb6ca97ed2246b228734898e4ea8a7c85585fc8cecb629ceb4a4493"
+      "size": 25379,
+      "sha256": "66ed639276b9a6b4a1b9f9e6dba9f4ad0babd990166d3c381070321bf4de1f9c"
     },
     {
       "path": "Musicmodules/music-output.js",
@@ -650,8 +650,8 @@
     },
     {
       "path": "Musicmodules/music-stage/music-stage-host.js",
-      "size": 69115,
-      "sha256": "d5b459d869b83ccd9ed69c57073fd85b9f04eb251f1b60cf74e40c4039189b0d"
+      "size": 68917,
+      "sha256": "65a72af72a16720a62d52c260ec2a686cc71c139fd26e4b537a7efcf6447dcf1"
     },
     {
       "path": "Musicmodules/music-stage/music-stage-modes.js",
@@ -680,8 +680,8 @@
     },
     {
       "path": "Musicmodules/music-visualizer.js",
-      "size": 17036,
-      "sha256": "2a9873e8a2eaaef114dcee1d97bd5e65db7f3c131c3bd4738052c776016afea4"
+      "size": 17478,
+      "sha256": "0df2501e66438ed7664478a6e01c8950f8cae55e147364debbc1292b496172b7"
     },
     {
       "path": "Musicmodules/music-webdav.js",
@@ -700,8 +700,8 @@
     },
     {
       "path": "Musicmodules/music.js",
-      "size": 63351,
-      "sha256": "0dc6e9a8e287b9c53d13fc593746759c662248b12ddaba1d8f3d2de03c238ce4"
+      "size": 63309,
+      "sha256": "2e782df067dcfc1ce52e066aafc4b03d733da4c6cd830cbeb4e4fe5de95dc2e1"
     },
     {
       "path": "Musicmodules/socket.io.min.js",
@@ -710,18 +710,18 @@
     },
     {
       "path": "PluginManagerModules/plugin-manager.css",
-      "size": 16541,
-      "sha256": "85b7fc37a640fce37d79727063859942c06ef6cef1ab00a475e80b0493ca1f68"
+      "size": 24433,
+      "sha256": "35a48dd3474fadcc400118d655d0267d7ca9b95b8d3982f348ff88a8ac07035e"
     },
     {
       "path": "PluginManagerModules/plugin-manager.html",
-      "size": 7245,
-      "sha256": "0df0197316b027bec1e95dfaa2d9dc306fbf4f961b81f13c086d2a57bdcf41ae"
+      "size": 9869,
+      "sha256": "74644af16da989c0aca9927e779ad1275474fc9fe3fea0c78f1a1414926e0ef1"
     },
     {
       "path": "PluginManagerModules/plugin-manager.js",
-      "size": 19930,
-      "sha256": "2ab2250065a7b9c86475e77698706eea2a68362fd405ffc8f7e459ca11d9f128"
+      "size": 30898,
+      "sha256": "0499bdf2d371bec47d6609a332067669df45e10d9cb73add23503a218368b2fb"
     },
     {
       "path": "RAGmodules/RAG_Observer.css",

@@ -22,7 +22,7 @@ function main(gate,distributed,gui={cleanupForQuit:async()=>{}}){
  const s=fs.readFileSync(path.join(root,'main.js'),'utf8');const events=[];
  const context={quitAdmission:gate,prepareProjectForgeQuit:async()=>true,cancelProjectForgeQuit:async()=>{},appQuitCleanupPromise:null,distributedServer:distributed,projectForgeHandlers:gui,
  historyWatcherLeases:{dispose:async()=>events.push('history')},localSttHandlers:{shutdown:()=>events.push('voice')},voiceHandlers:{shutdownVoiceInputEngine:async()=>{}},
- chatDataService:null,loomManager:null,workspaceHandlers:{dispose:()=>events.push('workspace')},historyMutationQueue:null,pluginAgentOperationService:{},chartService:null,stopAudioEngine:async()=>events.push('audio'),
+ getAgentMoodStore:()=>null,appFeatures:{disposeAll:async()=>events.push('features')},chatDataService:null,loomManager:null,workspaceHandlers:{dispose:()=>events.push('workspace')},historyMutationQueue:null,pluginAgentOperationService:{},chartService:null,stopAudioEngine:async()=>events.push('audio'),
  mainWindow:null,console:{log(){},warn(){}},quitCleanupSettled:false,isFinalizingQuit:false,app:{on:(name,cb)=>context.beforeQuit=cb,quit:()=>events.push('quit')}};
  vm.createContext(context);vm.runInContext(s.slice(s.indexOf('async function performQuitCleanup()'),s.indexOf('// --- Main Window Creation ---')),context);
  vm.runInContext(s.slice(s.indexOf("    app.on('before-quit'"),s.indexOf("    app.on('will-quit'")),context);

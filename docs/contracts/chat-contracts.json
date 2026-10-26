@@ -400,7 +400,7 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/chartHandlers.js",
-        "line": 44,
+        "line": 50,
         "kind": "event-send",
         "match": "win.webContents.send(channel"
       }

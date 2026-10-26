@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f2e05419bd12d2bfaa4d5f0dac5e94adb4fce3cf",
-          "size": 30499,
-          "sha256": "e84a9db1ecd89b1f1bab79c0e0d44a1ed359ae6c3fc6f8df6da02be298ecf040",
+          "blob": "09bfe6d44c0aa811a5c2bad11de52a80c0c84775",
+          "size": 30535,
+          "sha256": "d371581319ad90b08c28c1f98d2e905452f70ee23017f7c1d47f383f4cd7abfe",
           "kind": "source"
         },
         {
@@ -9507,9 +9507,9 @@
           "path": "modules/ipc/chartHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5e1bdf13a834e51c0ed9ae8029f1288eb5946b7a",
-          "size": 27587,
-          "sha256": "fa8b839849254fe712ca2898b3f049e26e29c44a7e47897b4d712d88472b4702",
+          "blob": "62a80a059ab64e3fa46174892cb8ace8b3f0d876",
+          "size": 31209,
+          "sha256": "eddf9ab1671f037b493cea5810f43c0a20aa6ec135e2c36bac585670f0a5cf2b",
           "kind": "source"
         },
         {
@@ -13594,9 +13594,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f2e05419bd12d2bfaa4d5f0dac5e94adb4fce3cf",
-          "size": 30499,
-          "sha256": "e84a9db1ecd89b1f1bab79c0e0d44a1ed359ae6c3fc6f8df6da02be298ecf040",
+          "blob": "09bfe6d44c0aa811a5c2bad11de52a80c0c84775",
+          "size": 30535,
+          "sha256": "d371581319ad90b08c28c1f98d2e905452f70ee23017f7c1d47f383f4cd7abfe",
           "kind": "source"
         },
         {
@@ -16697,6 +16697,15 @@
           "blob": "e9de6735e47d3606d68c6e9e37ff532011452329",
           "size": 1586,
           "sha256": "9736355ef7ae814b9512b849d37a219a76a57c4342592e2c7e61bece4c690b90",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-embed-handlers.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "136fd1a0a92eba3709f666ccaf4fb3d2eb70cb81",
+          "size": 3950,
+          "sha256": "711c87b44536440a963113dafa76d56d2a541637a5cc55e7f93a54fdb0be6710",
           "kind": "source"
         },
         {
@@ -19936,6 +19945,13 @@
             "Notemodules/notes.js",
             "tests/notes-math-delimiters.test.mjs",
             "vendor/auto-render.min.js"
+          ]
+        },
+        {
+          "name": "reviewed-chart-embed-handler-regression",
+          "files": [
+            "tests/chart-embed-handlers.test.cjs",
+            "modules/ipc/chartHandlers.js"
           ]
         },
         {
@@ -25575,18 +25591,18 @@
           "path": "docs/contracts/chat-contracts.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "d546d43ed53e295d9a1f7db6f9b63dba60d340c3",
+          "blob": "fd4b0ad5f9aa5f1e1e5029abdff5a72b5f44e627",
           "size": 65293,
-          "sha256": "cf5a25f3a9ca0daec4ee65fcc0aaa17badd09a4c16981e4226ee30e8f0e82261",
+          "sha256": "218f3ae070ac2f2bbc87b3b1ac57fc9180266451db3f602971b570e804508e62",
           "kind": "source"
         },
         {
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8a164de92765e17f607cc3d08e0d4adcbd818668",
-          "size": 1074058,
-          "sha256": "f074c67578d16b638b3048954ac965dd2f0fdc5fe93d4fd5e83077fd54f2b2bc",
+          "blob": "c6e17acee1fdcbcd2cdd83089e65ba8bf334c4c1",
+          "size": 1076301,
+          "sha256": "a44bb3e07b952779a53b3ae89f9f022b9dc5d0edb30e716aa83cdfb7d20e2d82",
           "kind": "source"
         },
         {
@@ -27114,9 +27130,9 @@
           "path": "modules/ipc/chartHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5e1bdf13a834e51c0ed9ae8029f1288eb5946b7a",
-          "size": 27587,
-          "sha256": "fa8b839849254fe712ca2898b3f049e26e29c44a7e47897b4d712d88472b4702",
+          "blob": "62a80a059ab64e3fa46174892cb8ace8b3f0d876",
+          "size": 31209,
+          "sha256": "eddf9ab1671f037b493cea5810f43c0a20aa6ec135e2c36bac585670f0a5cf2b",
           "kind": "source"
         },
         {
@@ -31164,9 +31180,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f2e05419bd12d2bfaa4d5f0dac5e94adb4fce3cf",
-          "size": 30499,
-          "sha256": "e84a9db1ecd89b1f1bab79c0e0d44a1ed359ae6c3fc6f8df6da02be298ecf040",
+          "blob": "09bfe6d44c0aa811a5c2bad11de52a80c0c84775",
+          "size": 30535,
+          "sha256": "d371581319ad90b08c28c1f98d2e905452f70ee23017f7c1d47f383f4cd7abfe",
           "kind": "source"
         },
         {
@@ -33975,6 +33991,15 @@
           "blob": "99d182fcd6ad87e427a8405227a023706bf4ada0",
           "size": 14729,
           "sha256": "640d27efc829eac1fe4add6f4e2eaee9d8c53eab3caf0575b013f1330b6fb446",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-embed-handlers.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "136fd1a0a92eba3709f666ccaf4fb3d2eb70cb81",
+          "size": 3950,
+          "sha256": "711c87b44536440a963113dafa76d56d2a541637a5cc55e7f93a54fdb0be6710",
           "kind": "source"
         },
         {
@@ -38783,6 +38808,13 @@
             "Notemodules/notes.js",
             "tests/notes-math-delimiters.test.mjs",
             "vendor/auto-render.min.js"
+          ]
+        },
+        {
+          "name": "reviewed-chart-embed-handler-regression",
+          "files": [
+            "tests/chart-embed-handlers.test.cjs",
+            "modules/ipc/chartHandlers.js"
           ]
         },
         {

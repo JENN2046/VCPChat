@@ -51,6 +51,24 @@ module.exports={roles:['chat'],api:{save:invoke('save').mapResult(()=>{${attack}
         {name: 'local', kind: 'query', channel: null, roles: ['chat']},
     ]);
     assert.equal(fs.existsSync(sentinel), false);
+    const featureDir = path.join(root, 'modules/synthetic-feature');
+    fs.mkdirSync(featureDir, { recursive: true });
+    const feature = path.join(featureDir, 'preloadApi.js');
+    fs.writeFileSync(feature, `${attack}\nconst {invoke}=require('../../preloads/core/define');module.exports={roles:['chat'],api:{featureRead:invoke('feature:read')}};`);
+    const withFeature = await loadPreloadDecls(root);
+    assert.equal(withFeature.status, 'ok', withFeature.error);
+    assert.deepEqual(withFeature.apis.find(api => api.name === 'featureRead'), { name: 'featureRead', domain: 'synthetic-feature', kind: 'query', channel: 'feature:read', roles: ['chat'] });
+    assert.equal(fs.existsSync(sentinel), false, 'feature declaration side effects must never execute');
+    fs.writeFileSync(feature, `const {invoke}=require('../../preloads/core/define');module.exports={roles:['chat'],api:{featureRead:invoke(makeChannel())}};`);
+    const invalidFeature = await loadPreloadDecls(root);
+    assert.equal(invalidFeature.status, 'failed');
+    assert.deepEqual(invalidFeature.apis, []);
+    fs.unlinkSync(feature);
+    if (process.platform !== 'win32') {
+        fs.symlinkSync(api, feature);
+        assert.equal((await loadPreloadDecls(root)).status, 'failed', 'linked feature declarations are rejected before content reads');
+        fs.unlinkSync(feature);
+    }
     for (const source of [
         `${attack}\nmodule.exports = makeDeclaration();`,
         `const {invoke}=require('../core/define');module.exports={roles:['chat'],api:{save:invoke(getChannel())}};`,
@@ -69,9 +87,12 @@ test('Trace extracts the shipped preload metadata without requiring workspace mo
     const { loadPreloadDecls } = require('../VCPDistributedServer/Plugin/ProjectForge/linkGraph');
     const result = await loadPreloadDecls(path.join(__dirname, '..'));
     assert.equal(result.status, 'ok', result.error);
-    // Frozen 3cde8466 declarations plus the retained native/SUVEI bridges.
-    // Independently checked against the shipped registry metadata in isolation.
-    assert.equal(result.apis.length, 490);
+    // Compare static output with the reviewed shipped registry, including
+    // optional feature-owned declarations, rather than a stale API count.
+    const { describeApis } = require('../preloads/core/registry');
+    const normalized = rows => rows.map(({ name, domain, kind, channel, roles }) => ({ name, domain, kind, channel, roles }))
+        .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+    assert.deepEqual(normalized(result.apis), normalized(describeApis()));
     for (const [name, channel] of [
         ['prepareNativeConversation', 'native-conversation:prepare'],
         ['executeNativeConversation', 'native-conversation:execute'],

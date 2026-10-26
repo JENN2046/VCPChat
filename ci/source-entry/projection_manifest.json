@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6e81b91f7a02ee3dc42f5c6dd7b064e163a8c912",
-          "size": 30462,
-          "sha256": "b9ab2274444fcf6a3c4102020d9e01f438f0c66a05da031bb3af8e18c067c7ff",
+          "blob": "f2e05419bd12d2bfaa4d5f0dac5e94adb4fce3cf",
+          "size": 30499,
+          "sha256": "e84a9db1ecd89b1f1bab79c0e0d44a1ed359ae6c3fc6f8df6da02be298ecf040",
           "kind": "source"
         },
         {
@@ -628,6 +628,15 @@
           "blob": "856946c52e4fd0b9ceaa991cde9cc77a99342bb0",
           "size": 10638,
           "sha256": "bfb98072d79091ae248bab1805e8ed2b96a9092146747084780078c7db415b83",
+          "kind": "source"
+        },
+        {
+          "path": ".github/scripts/verify-windows-pe.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "884709ee2d7a7b676f95a873ce5785a47c847bf9",
+          "size": 3318,
+          "sha256": "551b4a2a416ff4f1f2237dd40b1b6bb86130e32f534ea0ee41b2dc8e8beb5aef",
           "kind": "source"
         },
         {
@@ -1012,9 +1021,9 @@
           "path": "DeskPetmodules/mainWindow/sendBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d654607b0f38cd908b80ca00b4824bc88bf0f22d",
-          "size": 4690,
-          "sha256": "3178d1d395125e67e129d734b973470b557d316b20f8bab84912f012830c7f1b",
+          "blob": "33dcee563f0526010e6db8f40e85191bbd5e44ff",
+          "size": 5369,
+          "sha256": "f0452d164be48d200c4f8bcc6b582ceca6994e32c1372559d12796f84684c53c",
           "kind": "source"
         },
         {
@@ -1819,6 +1828,42 @@
           "kind": "source"
         },
         {
+          "path": "Dicemodules/dice-soundscape.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "461a790befb2ad8bdada9814584e6f3e1db76b88",
+          "size": 12292,
+          "sha256": "1a9df1d9f3fc7ea86820c5971043c7174514232274d949ca850e70425a58947b",
+          "kind": "source"
+        },
+        {
+          "path": "Dicemodules/dice.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8f98d99ecbe67c9f3f4bbe7486f42864e8999e0f",
+          "size": 22132,
+          "sha256": "bb2de7b13c4141e27ac82ec073625f8f950b4b9208fcc7f3da072aecddaeb774",
+          "kind": "source"
+        },
+        {
+          "path": "Dicemodules/dice.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7f246fee2b12a36360cb518c97fb4dae865215f7",
+          "size": 7535,
+          "sha256": "792263d308c62e00e26d11a0706007b3c6dccf051bb6bca469dab56e19161523",
+          "kind": "source"
+        },
+        {
+          "path": "Dicemodules/dice.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f75191ca5860e086b1769fb05c82fc68c2a10a2b",
+          "size": 24178,
+          "sha256": "1fb1e88de4e5d9c56feb7d025c3edb2c6847599604dc57b4fa2b9185a6de3ada",
+          "kind": "source"
+        },
+        {
           "path": "Flowlockmodules/README.md",
           "mode": "100644",
           "type": "blob",
@@ -2257,6 +2302,33 @@
           "blob": "54bb2ce6a0825b731d00d2c0e62fb91e0bc17345",
           "size": 16698,
           "sha256": "4a1e30a121e83f9c2812efde5416a27cf437177f7f141f0be09df1d49edc3197",
+          "kind": "source"
+        },
+        {
+          "path": "Loommodules/device-menu.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8f91db992e8f0c306b546b47b92ff476880639f0",
+          "size": 8070,
+          "sha256": "b2dcc4ea4421822813528c8c1911ba22e2f6f21a82590adce8177527bea303b3",
+          "kind": "source"
+        },
+        {
+          "path": "Loommodules/manager.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7333d193341ce43017b75f7a6b082de0e5817000",
+          "size": 36038,
+          "sha256": "ed44593321f625e30f70dd286d4b4a7d9441ed5bc218fb742669c54e8ddc3923",
+          "kind": "source"
+        },
+        {
+          "path": "Loommodules/shell.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ddaf515dd5d16e159e2f7e62fae99b59390cdf89",
+          "size": 11808,
+          "sha256": "121e00d5c7fee843c021d062f2c5a4942e381d99c3fc6c29cbd5b1ebd5b3586e",
           "kind": "source"
         },
         {
@@ -2749,9 +2821,9 @@
           "path": "Notemodules/notes.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b602ebd2901ca4d673d714471082d97aeac3a694",
-          "size": 94001,
-          "sha256": "39a489713999c7a1e473110dca715c4b325260b20a801c2b665d7ecfeb265d19",
+          "blob": "607b6269a375bec9b86a46d604ec759a743b47d5",
+          "size": 94003,
+          "sha256": "313b2d89b4f094fb694bf71bedb4c652070578393996a8c23b34ec9eac7f27b8",
           "kind": "source"
         },
         {
@@ -3930,9 +4002,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/staticPreloadDecls.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "be22bbf7c60a97636c0ed0e2e1e081034dc09419",
-          "size": 6096,
-          "sha256": "4a60b26edba0f352f9150733b9525584fd8d9eeca0c5216bb2fd90704ca71ec5",
+          "blob": "4354e633f36902a48589930823329357e9f4f539",
+          "size": 7135,
+          "sha256": "387a4d3ea8b66d0e5e325cc7075f22fc8adccf35e1390d49e5676fa4280d798d",
           "kind": "source"
         },
         {
@@ -4350,6 +4422,15 @@
           "kind": "source"
         },
         {
+          "path": "VCPDistributedServer/normalize-plugin-examples.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5fe01ecfe7d213f8e80d925ba78deb2885447a1",
+          "size": 8269,
+          "sha256": "73882e88291ec2f62a57cb4fc06990e6027dc8e448f0e2f4f62b05c0c54d84c1",
+          "kind": "source"
+        },
+        {
           "path": "VCPDistributedServer/shared/fileKit/binaryReader.js",
           "mode": "100644",
           "type": "blob",
@@ -4422,6 +4503,402 @@
           "kind": "source"
         },
         {
+          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUILoader.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5dd5b9abeb49b138c7a8088705de095b2029445d",
+          "size": 5214,
+          "sha256": "4a80b1d3af485139f9dcd9b84a595065b1e6dc5b010bb70468a1ac5da875740d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUI_StateManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "11469d236aebfebf79e2fe97066d7c3edb211ea8",
+          "size": 4544,
+          "sha256": "b74c99ec327710282e7d64f33952af77b91420b78156bb8e92a1850236c366f7",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/ComfyUI_UIManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b2c765ab7705f2531524ec8801104636faebdf33",
+          "size": 32339,
+          "sha256": "45c933cf762716bc2ae9926c40e33bd426effd22a579bc4621e0690821039c68",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/PathResolver.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e34364aa63da3ae51cc6a2b8ce3e4337c8e0319",
+          "size": 7826,
+          "sha256": "a80db291ad067f83e387fca07e77ee2ed43cb5d36de49cb37fb8e9934157265e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/comfyUIConfig.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4f6812f073dfce5c6bbf30dc6cb0351f0c005fef",
+          "size": 16103,
+          "sha256": "645914d25c9fdeb9e57848dca20f8424a11c7a7f7681a905d6a9717fd5876896",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/comfyui-ipc.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a07d5f8a69dd31f525a041c3e96217c9371ab317",
+          "size": 15290,
+          "sha256": "a1cc84fc0a1468ff99f67dc2a15f90112d40d687241f6b90d555d99c8c811e09",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/ComfyUImodules/comfyui.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9fb7980310633fcbe953c8a847154798e9ab88f2",
+          "size": 19324,
+          "sha256": "215b45ed569520006047bb9f2fd534bfaccd99645032842e68d57ed5fe0aca8b",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditorLoader.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "437595b678eef3c624f020b791b4c9d56ef6c9bd",
+          "size": 10219,
+          "sha256": "0e195368efa6a66526a129288c44d7fb3274a19189210d53774cecec4b17d215",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditorLoader_Simplified.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5300fd35573b07f7aafa0fa734c12c7fc5890bf2",
+          "size": 9216,
+          "sha256": "24c244757c18b45ad60e10517711148d6359b5dbcfdd6681709170c77085facb",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ApiConfigDialog.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f582178038522cbd3d01af4afa5ad118540a4b5d",
+          "size": 6510,
+          "sha256": "f3eaf0878cea57db89a147ec5116a33093175d335ca5ee6ab1728ede20e48761",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ApiConfigDialog.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "43349fb825ff21f0612757f27040728983134245",
+          "size": 20400,
+          "sha256": "d0431edd9782a80539330622de9988a9fa879f8a28d5d5063507e24c276a0c66",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_CanvasManager_JSPlumb.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bcaa60239aebe49bb219b91ff7caebb369929477",
+          "size": 122382,
+          "sha256": "b8d34af6004082209a348e1aeabf1a9183fae2018c00bebdcf060995e1015692",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_Config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "877eeea13e9c2357cf0ae14e6052b84d0bed9baa",
+          "size": 13674,
+          "sha256": "6041d28b1ca06e7eb476b093e69976b2562736a3a6791c1092e77b5303d827bf",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ConnectionManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c79f0db9f2f39824ad9418c5d301b1eabda560bc",
+          "size": 21035,
+          "sha256": "555db53cf748acef272b89970e73e59dc9fd3f1188ea9004d2845710bbeb2672",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ConnectionManager_Simplified.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e1fc440ab4cd9dfb92b2672c6f85dbddd248400a",
+          "size": 7694,
+          "sha256": "51f4449c19f27c1493b518885e359f9d3ec99177692cc5cd449d69c0b5d046ae",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_ExecutionEngine.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2004f7cc5075bf32d2082aa2f4152ec704619465",
+          "size": 128800,
+          "sha256": "747488c714488d43479b97f0170064667f70f20fe5beaddab64e07b2e815d3fa",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8213dcb8748c2e44101cd381b6c557b0826358ea",
+          "size": 89958,
+          "sha256": "12a5b2d5e432be8f61151ee03babfc87e2ec0ea4cf58bbd4baf2b8a9b433c136",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLExtractor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3d770da9c61f5e5fd8dff0e70f9d26c84c4c4d2e",
+          "size": 21067,
+          "sha256": "9622d6c687a2db09dff4259d9d1c71ba439c6e2847b2312593cc2b8d12ac1717",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLExtractor_Integration.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c5dccda3b9bffdf93969d430dd31dc95fe18e129",
+          "size": 405,
+          "sha256": "0db4d9b15dcac09d1f878efe179727b88a699935cd1670c41572e4676b4bce28",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_NodeManager_URLRenderer_Patch.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8a90639bad5ff3eefe15a4bb6d19f2c07551fe91",
+          "size": 47866,
+          "sha256": "d740f17d5191c2bc1687b0d633074362fd53e3e8a2ad16df765d7e7a72bf3212",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_PluginDialog.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "570bae70f211462a637e35dbf17bfb3075911c04",
+          "size": 28026,
+          "sha256": "1c1b9bd5b65f96cdd6cbd6b35f87da3824477ca494ddeb45cf65e7c0453c4568",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_PluginManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "db484a9e224720b387153598844f2ed42848ce20",
+          "size": 34012,
+          "sha256": "4d5ec101b16a555ec12842ff6e070fbdaf2635c05e989c92339a5bc05495420e",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_StateManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6e1b3745bae363de9559d8ce65f0908ede0ef75e",
+          "size": 31253,
+          "sha256": "de2141468f4a7f074587c941c79a8402b105eacedf2359c714fd9de6293acce6",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/WorkflowEditor_UIManager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a8055462dd10879e980929b36b6c29e6824bcea6",
+          "size": 125167,
+          "sha256": "3fa70988c93d97506fa2181a028e7fc57706040c31bc5c67ded1fc609b6fc223",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/ai/AiClientFactory.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6aa6d5529dc70f8535535e9fff9bc69a29e74619",
+          "size": 1597,
+          "sha256": "2f99d7c2899fb8f1854bad6347d17217eb7a40e3af8979e08b8e6129357ec867",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/ai/HttpAiClient.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "877044e6194bb78037f6d6582ae210523c877402",
+          "size": 4119,
+          "sha256": "efc612108befa086ef858777bad732f535918403016adb735c64561192702e19",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/jsplumb.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f092c5050884f471f52b7b4e84c768485ad24d17",
+          "size": 215838,
+          "sha256": "c91a0c8c8172640a3ae12f933b5a0642412625486f256561e6437cae3c38fa64",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/WorkflowEditormodules/workflow-editor.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dd2de16fcaa3f1de23552c46e5845d9a1bb16a72",
+          "size": 33070,
+          "sha256": "43b6dcc773422961fc4e4bede2f115ebc7570b214904e3abbda5f1d675be66d2",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6e5126c0c771be3a01dd2afa56b2c7f3af0ab4f",
+          "size": 3519,
+          "sha256": "ed697f668cddd06e7ea74a24ddfeb7016a7ced49ecfca601abd3d10ae5cd5415",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/main.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ecc3ef1f03fcd7a29d7bbe17b8598b4fc66b38bf",
+          "size": 15048,
+          "sha256": "f35c449ecd46b71da3d14df422a6506667fd1b89e005e405f3d948fa686a6de6",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/preload.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0841a6f50b3cea5acff855da2f307864d4bc15cb",
+          "size": 3919,
+          "sha256": "c36163a68cf0065c6b87094a2e2f095aab20d729c4db5e8eaa18cda840784992",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "38ce3f209623d55d2925c4935e6d96ef33b57edd",
+          "size": 72186,
+          "sha256": "fc2255ffd1a8f28b07d5d91a18d13b005926c32e011d23463ed048dca01a55b1",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/config.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6e8aa1f907d21f6ff5414202eb617c6059f587da",
+          "size": 79908,
+          "sha256": "4c58700f489a06c13f88b98a1ebf273813aca28154f0ea2c527e753b4c904d34",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/tool-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2afbdfdf85d310bf34b165263d6f6204597d8cbb",
+          "size": 56333,
+          "sha256": "b7f6f765ca6a005cdf94732685f5f809c602cd2ec1efeb62279bb6d1477d25df",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/ui/canvas-editor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b3f57b34acd9c807cf64f0d84dd93eb8af3a5ebf",
+          "size": 54452,
+          "sha256": "1edabb3f7662a4c0921a658aafb737ccb39e5dbc3d2d32708303a954ea6b6442",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/ui/canvas-handler.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dd4b23215ae067337edceb6aea630833cd95b2eb",
+          "size": 17872,
+          "sha256": "bac7d13cf9f7799b8b6f810b4d5bbeadd20c613e60dac29bb7a184a2e2d7a58d",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/renderer_modules/ui/dynamic-image-handler.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4603df282076b47070be1ca03521e6fb451a4075",
+          "size": 19804,
+          "sha256": "e3be946df345e13b5d87ebf02078bb79730023572d0264ca33841586a6992496",
+          "kind": "source"
+        },
+        {
+          "path": "VCPHumanToolBox/style.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1bf482b133d8e9d39177870adcb5d3366004285b",
+          "size": 35779,
+          "sha256": "243aa2134fa5f8851de935b832e0f08e5ccfcc25f43ace40ba27bc0562aff0fb",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/consistency-checker.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1b5ab5ec9b8fdc827659a666e86095ca40c5e463",
+          "size": 22376,
+          "sha256": "17e714bb915e363efc9d7b015577364c6bf0b46912a95ccad4424833da7b850c",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7c18964aba496c7acf245731860a6c1fc1eba192",
+          "size": 4221,
+          "sha256": "052ec084e482a82a9ba7152102f25a0e7aa2a8c7f04b59e6053b78b95e8d641d",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/main.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "65f0a0ef62cdd87008ae9ad5aff68552f24be22f",
+          "size": 3621,
+          "sha256": "e0a753f4e093f94b3e7742a5b54773b517e33d35403ce7fccd3ba9560226c424",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/preload.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7b5f1e35e385ef6887f5a79cc194d17ba7d750f0",
+          "size": 718,
+          "sha256": "1b17f4f4ecf152d51ebbe12ed048f670dbd827a7536ae0f2312e554a910a2434",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/script.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d7d192c240f55c74ad7c414d9133397b62fa4d81",
+          "size": 38646,
+          "sha256": "8a083fbd8a23b1c3e660d8d7431f320eea75fe4b09a5afc1b8b82998847fbfe4",
+          "kind": "source"
+        },
+        {
+          "path": "VchatManager/style.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d06505664d03b3e7c248a976cc302b58998feb99",
+          "size": 12716,
+          "sha256": "c2ed173085f15fa71a03b9c8d9fe9281802e443003f486626983671e7ee5e9e4",
+          "kind": "source"
+        },
+        {
           "path": "Voicechatmodules/recognizer.html",
           "mode": "100644",
           "type": "blob",
@@ -4473,6 +4950,33 @@
           "blob": "65a9e655a2296f9a4b74e8c4c6ecc082911cfb26",
           "size": 36739,
           "sha256": "978dc96a8787b089e74ed08f1bff718112aedb6418258abb937042808295b831",
+          "kind": "source"
+        },
+        {
+          "path": "WebIndexTTS2/server.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5cbb404f126ee89b42cb6ed33d31020506c47ed",
+          "size": 10107,
+          "sha256": "d16dce947863c2fba66354548d31a6703a4bb1647a3ca7241e5aaf31d17b061a",
+          "kind": "source"
+        },
+        {
+          "path": "apps/bootstrap-installer/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0d7a5bd4f79ee9d7fe0ce2877ca1b24fa0312302",
+          "size": 351,
+          "sha256": "be1d491f2dbd952900ac02574aaa1b838875e5a529086f71dd925201dd70957e",
+          "kind": "source"
+        },
+        {
+          "path": "apps/bootstrap-installer/src/styles.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e4a9ec01039a959e1071698e0c1d1431ee9c04e",
+          "size": 9725,
+          "sha256": "03b317b5ad0f5b01394557891c9d1fc4a20d0d1b085e037eb69e74076209ed27",
           "kind": "source"
         },
         {
@@ -7803,6 +8307,15 @@
           "kind": "source"
         },
         {
+          "path": "examples/animated-launchpad/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "42d84816d4316b2a473494be26d2c744c7df2792",
+          "size": 17350,
+          "sha256": "eece9166021fa67f28d0728c116f870e2e56d912dbab544ac38ddee9918cdc55",
+          "kind": "source"
+        },
+        {
           "path": "main.html",
           "mode": "100644",
           "type": "blob",
@@ -7818,6 +8331,15 @@
           "blob": "b638eca617cee3add6dc2870496bfc50c4bdca58",
           "size": 114695,
           "sha256": "4b30d668507f768444e9bdcdb49244d13950fd4e2cb5fe5e1942b9d91537b8f9",
+          "kind": "source"
+        },
+        {
+          "path": "migration/migrateAvatars.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4cd53fefa3c2e685916b3bf8609b4cde6f7e8fd6",
+          "size": 3645,
+          "sha256": "90cdb8f48acde33806347ebc4bd13bc40e29a4ccf0ed362f53160c5b51216aaa",
           "kind": "source"
         },
         {
@@ -8292,9 +8814,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "0594f7ceb74de793c9c376988ce3952b7279034a",
-          "size": 137706,
-          "sha256": "9f0e5c0cbfc59e67dfbd20933ae21efdce5fbe695f35f2935368cb0965361dfd",
+          "blob": "73b2eb8f13751f25ea9d13edcf8f0e9493b9f756",
+          "size": 138358,
+          "sha256": "3da75dd36af35a83b37f97ab7795c4f5835efcbd21aa9119bd64e11aa86695f7",
           "kind": "source"
         },
         {
@@ -13072,9 +13594,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6e81b91f7a02ee3dc42f5c6dd7b064e163a8c912",
-          "size": 30462,
-          "sha256": "b9ab2274444fcf6a3c4102020d9e01f438f0c66a05da031bb3af8e18c067c7ff",
+          "blob": "f2e05419bd12d2bfaa4d5f0dac5e94adb4fce3cf",
+          "size": 30499,
+          "sha256": "e84a9db1ecd89b1f1bab79c0e0d44a1ed359ae6c3fc6f8df6da02be298ecf040",
           "kind": "source"
         },
         {
@@ -13648,6 +14170,15 @@
           "kind": "source"
         },
         {
+          "path": "rust_audio_engine/build-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6f95ad5ffb258ac5c4c818f4b903763455477a30",
+          "size": 2608,
+          "sha256": "d64e2ed11f0bd45b7d99daaa11944c803914f1c7755689c731bf6db30cb5e2bd",
+          "kind": "source"
+        },
+        {
           "path": "rust_chat_data_service/Cargo.lock",
           "mode": "100644",
           "type": "blob",
@@ -13807,6 +14338,15 @@
           "blob": "0f3a0216699cd34d268f954ac6647b160b67acd4",
           "size": 1093,
           "sha256": "10834db40fa39061bb7fce8c2d9b3d0fd8c09a3f7416e0a21f8bfcd48b3b7b32",
+          "kind": "source"
+        },
+        {
+          "path": "rust_projectforge_indexer/bench.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bdd9cd6df385aa2e292b4f1ee546d6f3db4e239d",
+          "size": 2323,
+          "sha256": "e0aded7a792f8d6377bd525cab8cb20714ee584b1a265cc2afe2b8d74ca388ac",
           "kind": "source"
         },
         {
@@ -14090,6 +14630,42 @@
           "kind": "source"
         },
         {
+          "path": "scripts/audit-settings-first-open.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a4303c4937d997bb16f615467e6697f6612ee560",
+          "size": 17449,
+          "sha256": "93e6d9351a6a1c0a885b5ac931a8c4c90c76f717ba25029dc9c6ee62d36b736d",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/audit-settings-layout.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "267cbbb5f137309229e74487b3f065d6aa8b5674",
+          "size": 12787,
+          "sha256": "e94c8ae29d4b929a67a1f1c2fc14d22f8901a98c2b6d258e05d4b41e73dac9d0",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/audit-settings-style-parity.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a651f040c53810a176367687b3a822722d412aa",
+          "size": 18569,
+          "sha256": "07393e3a744385edd26299dd816a4a703a6dfed1f8922669a5afb800b0d14137",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/build-chat-event-graph.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "621708bb2da0eab25a7f770361dc600661aa6d9e",
+          "size": 4101,
+          "sha256": "e74ab679fa05561f68df7048d0495324452ea37fa0258ee74fdb8468645d9467",
+          "kind": "source"
+        },
+        {
           "path": "scripts/build-webawesome-runtime.mjs",
           "mode": "100644",
           "type": "blob",
@@ -14099,12 +14675,66 @@
           "kind": "source"
         },
         {
+          "path": "scripts/chaos-probe-settings.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ffd1e9bc98e62e4e6ef68ff9389be966055d7b38",
+          "size": 9285,
+          "sha256": "96c7c86c173555db115d9229409a24499aa18a91505bfa4d5328c7f0a4e738db",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/chat-event-source.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bd7198cc31cdcc687a7975b0f934664297ffb9cb",
+          "size": 15120,
+          "sha256": "74b81dc397329ac2e0fbc5e39561c0a2b09126470091f11566384ff16ba43fe0",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/check-artifact-plane.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1d3b5903206994f29f6ec3ae10d4a9c203ab2499",
+          "size": 1858,
+          "sha256": "32e4e078aa537112adb402be0474657d232e7445c00d72781601c5855cb24e0a",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/check-chat-contracts.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7758681ee95377035220d85737d9052404d05fe4",
+          "size": 8575,
+          "sha256": "f49ac89a1c3a0e66d69be14b31d8abc7c8cda75e42bc9ba11d80dddc5e519f71",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/check-chat-evidence.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0e6184a565c78b257e686326b913da4f81cfde01",
+          "size": 1114,
+          "sha256": "4c2d7f012f01bc540168d351b292bcfcad6bc24b733311cfac3b157ec66b9e2d",
+          "kind": "source"
+        },
+        {
           "path": "scripts/check-chat-kernel-consumers.mjs",
           "mode": "100644",
           "type": "blob",
           "blob": "08aaa64751c3faafc7d129e7eda6d149757fd0fa",
           "size": 29226,
           "sha256": "a974cbe085ba73e7046c348b864f31fe655f0bb92615d08139116aeeba487c6b",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/check-chat-release-evidence.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "da69cbd0e3ad4c09ddccd7c6ce578b05198a284a",
+          "size": 1090,
+          "sha256": "77d8ca93f72a0c5d31e0cd1337618a21675ee56b96e58b5c3dccb6acb08fd819",
           "kind": "source"
         },
         {
@@ -14129,9 +14759,18 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "cc0efa2d1e90a892d72ddd69760cc29367d789cc",
-          "size": 42128,
-          "sha256": "840fe1756c6e045c8de501acd00bf4acede56d764bddeb3d968786802917e4ff",
+          "blob": "17cf2f3c8f8b0c68ada2c51e5e0e70bf69e5a5b4",
+          "size": 43042,
+          "sha256": "4f16f2922acb0a06a2b9294df40dd620e70c3692236ef91627765d04f36179af",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/check-global-settings-section-ownership.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0216747b1047979d13b195dcf9a7c12883e33cdc",
+          "size": 6315,
+          "sha256": "ab27a44302c4d169d8597b88379fe1ffb467e739e036280a71e05f4f713160d3",
           "kind": "source"
         },
         {
@@ -14141,6 +14780,15 @@
           "blob": "d8cc1715fdd90288b0538652f4b572799bdb1d0a",
           "size": 35662,
           "sha256": "bdf94d37934886bee134f37bb63a4827347ce888e699c29fa888a88924aaa81b",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/check-release-surface.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "508174948c9d09a988e05202d3dacac930c02644",
+          "size": 2989,
+          "sha256": "87e3da6e05979ca746facbba39fa26a6d5eec88c06889fb47bda5cee4b4de003",
           "kind": "source"
         },
         {
@@ -14207,6 +14855,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/check-uiux-artifacts.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2880e98842897e84f451d1d964cefde8102dfb7b",
+          "size": 802,
+          "sha256": "a75b8b9eac477b4ec699c74916d75e682048639a80c840e585386e715b38702c",
+          "kind": "source"
+        },
+        {
           "path": "scripts/check-vcpui-consumers.mjs",
           "mode": "100644",
           "type": "blob",
@@ -14231,6 +14888,33 @@
           "blob": "3aa17f3e3c9a26a8034a3e4515485b9577ba63d5",
           "size": 7544,
           "sha256": "06861aa6defd081ef6701de1cbcef09f1bafb02da27d857ff9cf49279690ad59",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/compare-dual-instance-parity.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dffa6abd5ef186b476645fc10b63c9f7c3fdc7e3",
+          "size": 12025,
+          "sha256": "bb3e720887dc09b39e7a4620ae49d08a87b622db2dbff405e1652e1a4754494c",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/compare-settings-schema-pixels.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4cf8e5c16bd008fd87a518a0ad32ff2596887d36",
+          "size": 3158,
+          "sha256": "7eee3109729acb6245e1d4ba0a2931805b90cfbfd2298af87bed242dda46c166",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/css-import-reader.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f67aca5d1aa6f14762562d97d74e48a51e29bce8",
+          "size": 645,
+          "sha256": "4e193efa5070668ebaabd8571b6c6b66649ea6324990eb3fa0592f9246276a54",
           "kind": "source"
         },
         {
@@ -14486,12 +15170,30 @@
           "kind": "source"
         },
         {
+          "path": "scripts/desktopremote-http-smoke.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "44a7b25981e7c1be0828afd010ea1a4d9605ad48",
+          "size": 5493,
+          "sha256": "de9abc8f45d81afcc3bf623f64909c92cd2205292e02f38010351e64de5bb0b5",
+          "kind": "source"
+        },
+        {
           "path": "scripts/electron-builder-bootstrap-hooks.cjs",
           "mode": "100644",
           "type": "blob",
           "blob": "20c7615861b4624b2cbc493ab681293304fcc4ed",
           "size": 2311,
           "sha256": "74687d5778cf8bbd42682738130494a4f54c5792980673a23ec99738d07cbdce",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/fixtures/chat-contract-invalid.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ec20d2e272385a331bbe7eb03d4a2a9ae9edceb3",
+          "size": 257,
+          "sha256": "855cb9d3cb27af4e872d149cd6841f0d9046c22aca3fe61b7e05251794e55019",
           "kind": "source"
         },
         {
@@ -14510,6 +15212,15 @@
           "blob": "d555345546d2e5a0c937a538fb28c4e2c60bf47c",
           "size": 2026,
           "sha256": "513d4454de91f8407b9b16c085479038c5fdb2827ea2d511b37fd8b82f7bfb06",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/inspect-sidebar-margins.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ecc1e5ca350fc36a8ffc2b9d078bff404254a836",
+          "size": 9358,
+          "sha256": "49348cc34aace1422e2b3a45703f75f730706c3325e6f014e6eec6627b390bf6",
           "kind": "source"
         },
         {
@@ -14534,9 +15245,27 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "9bea1eb8481a1968cc84e28a3e1f914e37d5c830",
-          "size": 15292,
-          "sha256": "2cc1a4c218d698617936e23c273ca953668f404cba775709be0f4d613dd1d3d0",
+          "blob": "2c04492359e820f4e2f3eb02bed1a2dd9c55c362",
+          "size": 15447,
+          "sha256": "fb4fa1d96d1518bf3ce856762ce57b35487ba5b59d8902f00ab1fe767acd1aea",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/package-portable-installer.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2c1bd6d6312b5f8cd53ad56f4365cf9b476bff46",
+          "size": 1034,
+          "sha256": "18112bbd81e06aeb987cf91624268f64914b58724bbfbfdfceb72e0911d41d38",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/probe-avatar-persistence-electron.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0f312a68008fc9197d6f27e9f999044d06c10d64",
+          "size": 17858,
+          "sha256": "0898d5ecc01021cf94e1e06310307a50f87638cd3a16caed8d95efcc68da02b3",
           "kind": "source"
         },
         {
@@ -14555,6 +15284,42 @@
           "blob": "cc1122c2a17368b2b019beaf10823643c2d2bbbe",
           "size": 1953,
           "sha256": "8579cacdb9b48e29fe215f789cdd51c1a1213f19b9301857f5980e48521e93d6",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/run-all-tests.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dee68757eda99648da6ef47ee13c559cd15e7c98",
+          "size": 3353,
+          "sha256": "cf89ad5243cb428d0e025421fe03e014143117a64423369f502b5daa08ed7aa3",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/run-chat-contract-invariants.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "35b42f7b43dd2653af4c638c27417a7efa53955a",
+          "size": 871,
+          "sha256": "d8fee34ae267bd89c806c7fb1a1915ea0e2360cabf711d499fec669847dfeaa4",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/run-electron-node.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "88eb9408fe653fa44c275a31306925ed023e7a7f",
+          "size": 1180,
+          "sha256": "3500de8437def7e546eee22f8f543c09272b7ce82994bd1c5f555defdf84bb01",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/scriptorium-line-break-diagnostic.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bad454746d169448dfd6cfd76d55b15ee63afa18",
+          "size": 4176,
+          "sha256": "ad5589ae19a3f251a477c6af3491d4403fb664f45592dcb9d4997c410db22e91",
           "kind": "source"
         },
         {
@@ -14594,12 +15359,75 @@
           "kind": "source"
         },
         {
+          "path": "scripts/test-artifact-plane-invalid.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "000c9058820e141278e2c3cc93c3d81e68c1cb4c",
+          "size": 835,
+          "sha256": "4435125790cbb51195991c1ae8608f730c8fb86ff3e249d6b0f06c3a31437dac",
+          "kind": "source"
+        },
+        {
           "path": "scripts/test-ask-nova-service.mjs",
           "mode": "100644",
           "type": "blob",
           "blob": "e3acabbfa6f5fc79849ca0fd6e9c7083766ba04c",
           "size": 6222,
           "sha256": "b3c0bb485e8be23742c3a2ef81b4d522ff49107cd2d51ac08b65e407ae2cc3db",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-built-artifact-smoke.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d41287f9d51d9c73317958ae3d70cd91b89ee630",
+          "size": 1856,
+          "sha256": "8e368e528eface1e755558da1b778086f539229bf9246b3e30d144ea3c27cedd",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-chat-contract-invalid.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "af4e7535c15e7467622ced3ec73fc51115387798",
+          "size": 2136,
+          "sha256": "978f92dbb1b950daff4335a7ac28ad46784a33af4ec8b7475ba7de48a727fcfc",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-chat-evidence-manifest.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0f5e29b4eeb75f36a00fcfe53b4e66045ff663da",
+          "size": 4633,
+          "sha256": "fb2e1ed2fd3f74d200e9dc3ad9b540d829acbbe1e4bc1ebd059e903516a2184b",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-chat-release-evidence-invalid.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "452e8bc23d5641418c5a213c6f631b90756eeb09",
+          "size": 1919,
+          "sha256": "03a30024dc4afb4a303848fd2056dfa55dd8409211ae2eef77856174c6bcd5f1",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-chat-transcript-snapshot.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bf4abd010be153ffd593677ffa5e29c82dbba62a",
+          "size": 2602,
+          "sha256": "767d31167e7fbd36f25400e616c761064443863d80a3fed49f3c2f1b52e9ecfd",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-dedicated-preload-electron.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c872de464e1dc57f1a3604e47496f256f9129033",
+          "size": 2070,
+          "sha256": "2e056bc2abf7d8baa48bc82c4a6dc1cba3e5d16825143b17ef4fcb77bbf14d9b",
           "kind": "source"
         },
         {
@@ -14621,6 +15449,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/test-electron-manual-soak.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fb080b33e368d7df8037945b5c5ba9e6f908ca3c",
+          "size": 9766,
+          "sha256": "f612a43c573f2fc40e653224eb62b5253c7db2155b603485f3c49a618c810cd9",
+          "kind": "source"
+        },
+        {
           "path": "scripts/test-electron-ui-apps-smoke.mjs",
           "mode": "100644",
           "type": "blob",
@@ -14636,6 +15473,15 @@
           "blob": "4ed68ded2af6a3920114c7ff3a979916a3e140e9",
           "size": 3936,
           "sha256": "a2dd7aca2cc58fc6581975445d08eefa2e2938133218c330a1e3603c2a537486",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-facade-registry-invalid.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4ea4d0b3769257d9f182b0d0be682a6d485fddc8",
+          "size": 2174,
+          "sha256": "0efb261cea91341c5801009a061281dadb0993749298b8ce4951f8521d98ca35",
           "kind": "source"
         },
         {
@@ -14657,6 +15503,24 @@
           "kind": "source"
         },
         {
+          "path": "scripts/test-packaged-artifact-invalid.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cf3c2e993ac4080d9b2edc1fd96d4e7b4ef3ce5b",
+          "size": 1157,
+          "sha256": "23992f353b35c4be1660713a6d1f21dae8ec2774e9474f28734e69b0474f20c8",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-packaged-artifact-smoke.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e8eb833cc47041f15eece23d0accf6c548bddb7d",
+          "size": 2473,
+          "sha256": "19622802cdeeca05e50f42b5a5a45a914de711243940628f753adaa48b3f3848",
+          "kind": "source"
+        },
+        {
           "path": "scripts/test-packaged-window-renderers.cjs",
           "mode": "100644",
           "type": "blob",
@@ -14675,6 +15539,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/test-settings-sidebar-parity-electron.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3b3286d21695429d8dcf72ec96dce3817d955a8d",
+          "size": 27550,
+          "sha256": "9a88ae4663697bc18d9f5c3349bc5891031679ea74222b36552bcaf6008734be",
+          "kind": "source"
+        },
+        {
           "path": "scripts/test-settings-wa-electron.mjs",
           "mode": "100644",
           "type": "blob",
@@ -14690,6 +15563,15 @@
           "blob": "120d186b3d7bc704e0348fef0b5b17e3d768aab2",
           "size": 23449,
           "sha256": "c15eda8dc290192ec822fb617a44d492bf433eaf1eb1cb5f58d659f1f461d6d2",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/test-top-tab-session.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "82576c64a81b46dc8a5701c5b4995c6a8aa8cd7b",
+          "size": 2340,
+          "sha256": "d32a6dfa9790ef8a43fa7e524fe3e9f38cb685febb834fcab68a2db0d4e62fef",
           "kind": "source"
         },
         {
@@ -14855,12 +15737,39 @@
           "kind": "source"
         },
         {
+          "path": "scripts/write-chat-evidence-manifest.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b26e404ac76b035f22cd0cd8798e274c051e7b96",
+          "size": 6971,
+          "sha256": "eee5fc04b9402f085b44af58f6fb8bb6adeeac4058f948cc7975f03e10899a11",
+          "kind": "source"
+        },
+        {
+          "path": "splash.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4749b91b39c228041b66fe25818fa45f1e2bf0ba",
+          "size": 3351,
+          "sha256": "4a8debdbffaa5e4e6f9767a5e4ce72d6c4ec92a9e0e4d689e343feb6808ad457",
+          "kind": "source"
+        },
+        {
           "path": "style.css",
           "mode": "100644",
           "type": "blob",
           "blob": "347cf0caa3ea765e764d4a7a1fe384f82a08680a",
           "size": 1456,
           "sha256": "3cfcfcf1cf2f986341cd6a2b290a7edddce78f74d4f2ee9cf30c46362e273e9b",
+          "kind": "source"
+        },
+        {
+          "path": "stylelint.ui-system.config.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d2121e1f0832ba72e539fa34e989f3150e87fa7e",
+          "size": 587,
+          "sha256": "12df835243df31508c4150b7b121a44076b44f9a8c64e9c7b501cd3aae5e3ce9",
           "kind": "source"
         },
         {
@@ -15746,6 +16655,15 @@
           "kind": "source"
         },
         {
+          "path": "test.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fcfa8cdf3ac3d6958b4312a2daee5f749f0f37a7",
+          "size": 77293,
+          "sha256": "b915ccc2d0256f272bcaaf1b04eaec3846b76f1a18cf564461ad06fd2ff65b6d",
+          "kind": "source"
+        },
+        {
           "path": "tests/account-menu-controller.test.js",
           "mode": "100644",
           "type": "blob",
@@ -15758,9 +16676,9 @@
           "path": "tests/app-features.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "867b46bed048d85a2771a611de7f22cbfea7fc4c",
-          "size": 12295,
-          "sha256": "11caaf689cff9e340e7a5af3d319a56268af794acc7a93309ea5355a66c64be6",
+          "blob": "2ba007b7261a2eadf4f260ada60b7a516bcc43ed",
+          "size": 13734,
+          "sha256": "70ef48387531d49bd26359d1438a101e01e4f84dd57ca37b4091dfbf523515cf",
           "kind": "source"
         },
         {
@@ -15830,9 +16748,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "cfb40fd6bf714a59e3fd927c5fe8ae3ead634a39",
-          "size": 4754,
-          "sha256": "43eec0c674a0925df93fb7c2cd93e614d6586a6bb3e7f814e964419bb4c161af",
+          "blob": "c3a3d2d63cb24b21ddc7efd79bb68f16cf7cc090",
+          "size": 5069,
+          "sha256": "a81b9b3b26c5ab54532bf372448f24e37d016e6109cf1d2630b8308f00b80114",
           "kind": "source"
         },
         {
@@ -16082,9 +17000,9 @@
           "path": "tests/deskpet-send-bridge.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a379828d881a6bdf96593dbb3dc72548932a0dca",
-          "size": 8456,
-          "sha256": "a0fda9d894b3e90865c71cb7845998fe36be7641425046fdf46a895a1804ad2e",
+          "blob": "39e973410b64be85a6ca470b985abb4324b32d2c",
+          "size": 12460,
+          "sha256": "e6bdac5f3e7ef7a4e4d35487e9f3408b4d9ff93ad6d6ed56a039ae0e9aed7940",
           "kind": "source"
         },
         {
@@ -16547,6 +17465,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/notes-math-delimiters.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "44ba184a6eecba59447d22b4f2581312579a76b1",
+          "size": 2167,
+          "sha256": "66c2f08f99c78c688915b4acba5febc76560854046baa94018bdbeb53da803dc",
+          "kind": "source"
+        },
+        {
           "path": "tests/notification-change-audit.test.js",
           "mode": "100644",
           "type": "blob",
@@ -16613,9 +17540,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa167f620e61d728db921b0304fcd0632751e5c9",
-          "size": 17990,
-          "sha256": "1c5d15bf68144da8978a3f880e8f8ad7939a37b740da5064f047eb3de3c40662",
+          "blob": "7336916dce81ed563bfa7d03ffa5e6ef5292ea7b",
+          "size": 19629,
+          "sha256": "cc4c121de895e6d8cbf5464fcccae7e68c25116db4816d2f678c44570f5cfc7f",
           "kind": "source"
         },
         {
@@ -19004,6 +19931,14 @@
           ]
         },
         {
+          "name": "reviewed-notes-math-regression-inputs",
+          "files": [
+            "Notemodules/notes.js",
+            "tests/notes-math-delimiters.test.mjs",
+            "vendor/auto-render.min.js"
+          ]
+        },
+        {
           "name": "reviewed-feature-owned-upstream-74d4a491-inputs",
           "roots": [
             "DeskPetmodules",
@@ -19067,6 +20002,95 @@
             "logs",
             "cache"
           ]
+        },
+        {
+          "name": "reviewed-feature-core-dependency-boundary",
+          "roots": [
+            ".github",
+            "Agenttaskmodules",
+            "Canvasmodules",
+            "Chartmodules",
+            "Desktopmodules",
+            "Dicemodules",
+            "Flowlockmodules",
+            "Forummodules",
+            "Gamemodules",
+            "Groupmodules",
+            "Logmodules",
+            "Loommodules",
+            "Memomodules",
+            "Musicmodules",
+            "Notemodules",
+            "PluginManagerModules",
+            "ProjectForgemodules",
+            "Promptmodules",
+            "RAGmodules",
+            "ScriptoriumModules",
+            "Tavernmodules",
+            "Themesmodules",
+            "Translatormodules",
+            "VCPDistributedServer",
+            "VCPHumanToolBox",
+            "VchatManager",
+            "Voicechatmodules",
+            "WebIndexTTS2",
+            "apps",
+            "assets",
+            "bootstrap",
+            "examples",
+            "migration",
+            "modules",
+            "preloads",
+            "rust_assistant_engine",
+            "rust_audio_engine",
+            "rust_chat_data_service",
+            "rust_projectforge_indexer",
+            "rust_voice_input_engine",
+            "scripts",
+            "styles"
+          ],
+          "files": [
+            "main.html",
+            "main.js",
+            "preload.js",
+            "renderer.js",
+            "splash.html",
+            "style.css",
+            "stylelint.ui-system.config.cjs",
+            "test.html"
+          ],
+          "suffixes": [
+            ".js",
+            ".mjs",
+            ".cjs",
+            ".html",
+            ".css"
+          ],
+          "exclude_roots": [
+            "modules/deskpet",
+            "DeskPetmodules",
+            "assets/deskpet",
+            "scripts/deskpet",
+            "tests",
+            "docs",
+            "vendor",
+            "VCPDistributedServer/Plugin",
+            "AppData",
+            "UserData",
+            "state-private",
+            "artifacts",
+            "node_modules"
+          ],
+          "ignore_components": [
+            "AppData",
+            "UserData",
+            "state-private",
+            "node_modules",
+            "logs",
+            "secrets",
+            "tokens",
+            "cookies"
+          ]
         }
       ],
       "source_context": {
@@ -19090,6 +20114,15 @@
           "blob": "856946c52e4fd0b9ceaa991cde9cc77a99342bb0",
           "size": 10638,
           "sha256": "bfb98072d79091ae248bab1805e8ed2b96a9092146747084780078c7db415b83",
+          "kind": "source"
+        },
+        {
+          "path": ".github/scripts/verify-windows-pe.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "884709ee2d7a7b676f95a873ce5785a47c847bf9",
+          "size": 3318,
+          "sha256": "551b4a2a416ff4f1f2237dd40b1b6bb86130e32f534ea0ee41b2dc8e8beb5aef",
           "kind": "source"
         },
         {
@@ -19153,6 +20186,60 @@
           "blob": "f5bd82ebe074125c9b0d7c5d26c156da8f819997",
           "size": 78068,
           "sha256": "945584f96cba95b7b82de5f67dc3d9cb224c3d37997a1d74b3ef4da303f58a95",
+          "kind": "source"
+        },
+        {
+          "path": "Chartmodules/chart-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4385eec7fada9d1ea338c33ea7568eb8fa57fd6d",
+          "size": 19874,
+          "sha256": "485f72b0e75bdbeb6f944529169371149e430db9e068af5687b2ad1238a79e9b",
+          "kind": "source"
+        },
+        {
+          "path": "Chartmodules/chart-sandbox.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fd8cbc34482df90544cf63cf4ca074b63d42e204",
+          "size": 943,
+          "sha256": "2a6be466d9b98d121d094dd8436946a67c26468dfe8602787459367cd9fcfc25",
+          "kind": "source"
+        },
+        {
+          "path": "Chartmodules/chart-sandbox.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c9692e7ee5a0ea66a29a63abc2e0656f2560db8e",
+          "size": 25175,
+          "sha256": "3adf3fc0a15bd2d5d50c25b7f6d49aaf23ddbed76398cac44bb362c7b41aadd3",
+          "kind": "source"
+        },
+        {
+          "path": "Chartmodules/chart.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1c0c8be7e4a74e97fb788f3b6dfe3677a58b2e25",
+          "size": 18131,
+          "sha256": "b841ecc7073a752c0b947abc1ed5d4b984421b442c23eea9da15aa72e6e31c61",
+          "kind": "source"
+        },
+        {
+          "path": "Chartmodules/chart.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a7d05ad6c0d02df3d73eb18430c141d5a9c5136",
+          "size": 8474,
+          "sha256": "da644c74b6649409d3bce41c66fe1727af84e3b0fa4571a8c1beaaf8e8f1ffd2",
+          "kind": "source"
+        },
+        {
+          "path": "Chartmodules/chart.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4a7b55bdec1bcb1210c599a9bd56dbae20846042",
+          "size": 25322,
+          "sha256": "33d32dd8d11b9c8abdf9cbbbe6f8d69e8cd35b73490437ee7bd0bdd8bae62338",
           "kind": "source"
         },
         {
@@ -19411,9 +20498,9 @@
           "path": "DeskPetmodules/mainWindow/sendBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d654607b0f38cd908b80ca00b4824bc88bf0f22d",
-          "size": 4690,
-          "sha256": "3178d1d395125e67e129d734b973470b557d316b20f8bab84912f012830c7f1b",
+          "blob": "33dcee563f0526010e6db8f40e85191bbd5e44ff",
+          "size": 5369,
+          "sha256": "f0452d164be48d200c4f8bcc6b582ceca6994e32c1372559d12796f84684c53c",
           "kind": "source"
         },
         {
@@ -20272,6 +21359,15 @@
           "kind": "source"
         },
         {
+          "path": "Flowlockmodules/flowlock.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6e44ad94777fe769728d0d9fe9a0d3e7aeec8128",
+          "size": 8435,
+          "sha256": "526040b4b6be98ac1a121dfce431848cbcff406b29f1061856b91e322e1ec563",
+          "kind": "source"
+        },
+        {
           "path": "Flowlockmodules/flowlock.js",
           "mode": "100644",
           "type": "blob",
@@ -20674,6 +21770,33 @@
           "blob": "54bb2ce6a0825b731d00d2c0e62fb91e0bc17345",
           "size": 16698,
           "sha256": "4a1e30a121e83f9c2812efde5416a27cf437177f7f141f0be09df1d49edc3197",
+          "kind": "source"
+        },
+        {
+          "path": "Loommodules/device-menu.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8f91db992e8f0c306b546b47b92ff476880639f0",
+          "size": 8070,
+          "sha256": "b2dcc4ea4421822813528c8c1911ba22e2f6f21a82590adce8177527bea303b3",
+          "kind": "source"
+        },
+        {
+          "path": "Loommodules/manager.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7333d193341ce43017b75f7a6b082de0e5817000",
+          "size": 36038,
+          "sha256": "ed44593321f625e30f70dd286d4b4a7d9441ed5bc218fb742669c54e8ddc3923",
+          "kind": "source"
+        },
+        {
+          "path": "Loommodules/shell.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ddaf515dd5d16e159e2f7e62fae99b59390cdf89",
+          "size": 11808,
+          "sha256": "121e00d5c7fee843c021d062f2c5a4942e381d99c3fc6c29cbd5b1ebd5b3586e",
           "kind": "source"
         },
         {
@@ -21166,9 +22289,9 @@
           "path": "Notemodules/notes.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b602ebd2901ca4d673d714471082d97aeac3a694",
-          "size": 94001,
-          "sha256": "39a489713999c7a1e473110dca715c4b325260b20a801c2b665d7ecfeb265d19",
+          "blob": "607b6269a375bec9b86a46d604ec759a743b47d5",
+          "size": 94003,
+          "sha256": "313b2d89b4f094fb694bf71bedb4c652070578393996a8c23b34ec9eac7f27b8",
           "kind": "source"
         },
         {
@@ -21253,6 +22376,51 @@
           "kind": "source"
         },
         {
+          "path": "Promptmodules/modular-prompt-module.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ecd27bcf9e8a90f60149cf514c3127f4ed991686",
+          "size": 59436,
+          "sha256": "5b982c55a162ca7767d79d28a7f18c26d6d9a906c310abab04c2b6dd56292b70",
+          "kind": "source"
+        },
+        {
+          "path": "Promptmodules/original-prompt-module.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "386d3c57994b68a35b86c47153a2d0a45e624f0d",
+          "size": 2588,
+          "sha256": "63bab9bd119f35c6e8776fd3922ad4562d2566ef08ff8e6bcde7d9830820a122",
+          "kind": "source"
+        },
+        {
+          "path": "Promptmodules/preset-prompt-module.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9eea7abd33624d852329cb88b9a35ad7bad68a1b",
+          "size": 14724,
+          "sha256": "5b246098abcd80b6f41d46ea6a5836b9e0aefbc527c496ad29e870b3af06888c",
+          "kind": "source"
+        },
+        {
+          "path": "Promptmodules/prompt-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e407f8c8c0e284b72e71e602343673f5f406fff2",
+          "size": 18420,
+          "sha256": "6748ce544362b44e1d5329e4b7dd68b06b914697f084b6dd3d9bada83671818a",
+          "kind": "source"
+        },
+        {
+          "path": "Promptmodules/prompt-modules.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b626fd38e1d80a29c41594cb7ebbd3ab9be70072",
+          "size": 28192,
+          "sha256": "7469c6d749d21065742e32fdf6115f5c7972917e681224a289bc662a05057547",
+          "kind": "source"
+        },
+        {
           "path": "RAGmodules/RAG_Observer.css",
           "mode": "100644",
           "type": "blob",
@@ -21304,6 +22472,474 @@
           "blob": "b5c6c7bf0c4e3788bf2f9c8392e6aa15e80d309f",
           "size": 31592,
           "sha256": "e2e0b142ddcda95a8f19015f5e8c740ea05fbeb92e570502dc36e4b8f93bdbeb",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/font-font-test.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "141627d04e5d7689b20e5bb0a19983acb8964ceb",
+          "size": 8346,
+          "sha256": "cc28a55e4f542289fc773f1aba8e2dd27e001b8bedc0d5599df746397c6351a8",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-agent-port.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "596e12c68d3e20bb6d72c31240ae3145516f01c9",
+          "size": 64805,
+          "sha256": "5a4a51d78f7a9cfdd72cc8ba1f93f510c44821baa7d8eba9d1de65bdda5dd795",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-async.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4ffcd3f123e6807a7733da3dc2f3f97d61db6a59",
+          "size": 3866,
+          "sha256": "f53ccbe94ef3b3c0e0bec55499ae206a6afa1d058aa5fc291465e36fee47481b",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-deck-adapter.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c2553049479ad53bdc3b8b34cfadb6648577257d",
+          "size": 13510,
+          "sha256": "994853a38b67a5516d97f19c2ee3995b8987ded810f72a43c9122c3ccae168fc",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-deck-editor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "be7f480e7d0a3258821e7bc1db5ace7e6dbe1f3a",
+          "size": 34616,
+          "sha256": "48a401a95c930adf017b984c7fe0761c2391a7800c932ad69c4604828311df88",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-deck-export.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "150192d51ecba3ed03c645eb005c4ecd47a3119f",
+          "size": 21003,
+          "sha256": "f06ba8f0650483dd4987dfbc5bf4e68ad15ff6523a997fdf11b961e1df94e5e6",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-deck-renderer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6337c1adb300bc4eff8cd6456e13dc499af8433",
+          "size": 9806,
+          "sha256": "6e9567a3f8e97bf63a14b176fce6768f614ed4663716a525d7d84c6ae054c8a0",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-document-store.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b7c5820936fd9f41475fdbc78c53878686816ec0",
+          "size": 11406,
+          "sha256": "3fa8bfd42c2ad3d1142a0fbd6bc2199423ee183eb28177ffc72dce1e00ce6f0f",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-dom-selection.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5e248046c578129a4d66d64aa5ebec7dba1089c2",
+          "size": 11725,
+          "sha256": "2bbbe7fc105fde686f4660ed0ec1f327cb969ab860820ac6ffb28845d9a26ffb",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-edit-history.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9e9177600a35e7ebc524998fdea1f7f7cd72d162",
+          "size": 9310,
+          "sha256": "7098b824bf2e710e45486b11a0284607fdefceb4fb4af19b65bbe8209e5d5a63",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-export-resources.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b6314be58d8c1140d726c4eb440e428e8bdad8cc",
+          "size": 8508,
+          "sha256": "b0a8c7d9b02f8b52696d8cc739d574cd1981d1d9557bb40f0f4f94217ff2c113",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-export.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "65eee1c0de64a0afba8f0bb4f265345f975298f7",
+          "size": 5943,
+          "sha256": "6d7a2b8864e649d8c68751cf2b248688883826a6defc2ec8e883b8cb1a0896c8",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-find.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f531dc6a9a90497d395c9f727be6676f9d4ab17f",
+          "size": 12139,
+          "sha256": "80873d8755e2265ae26b8701a89cf04145cd154948d07a1cc3a31898a6e05212",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-flow-adapter.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0ab86402acaa5e0d3d3cf904d667f1b87d7945b8",
+          "size": 10458,
+          "sha256": "aad423c26cb5b87dab5950af9f5339cad3db9c9cb21d9f706d0d8d2ce3de434d",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-flow-editor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ad88e595ee9e3f32f15b508d21c40836bfcb0e92",
+          "size": 158852,
+          "sha256": "23af21f75648f67ddf5776f2d7ebfca89337c6348fafdf5e3587a5ac6da6210e",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-flow-export.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "92f0a14f0807b9d11156b15db769177804d50bca",
+          "size": 7908,
+          "sha256": "f3dd6ec4ef30ab105aa7b1a3457d0e0207e3684e21c1352bfba659a75627da43",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-flow-renderer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "17cc0b6a827dc1246396d31b54d85ab20e73147e",
+          "size": 21831,
+          "sha256": "89789860fd7e42b43aa4a737084c85e35df59115023416f8c1a11ebb341305ea",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-formatting.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "414b7640064c778d1359b29ee10ce6446c64f32f",
+          "size": 15473,
+          "sha256": "ecbbf24f57e3b0cdb20e3012b49c1cb3c18a405754d2f3ed698663fd0fa9d319",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-input-sync.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8f17bb7b4f6bbc8b610aff28b665edf38cba617c",
+          "size": 6621,
+          "sha256": "b4faafbe9efa4d84167412fc50afc57b5b511f28427891f2c0a094cc57e0c1b8",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-library.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e4ee38483675c2c16015a97489cc8faf69c59c6c",
+          "size": 9628,
+          "sha256": "d9e9a3820180e2362e4bf537e74727e40d683f5d73bff144658a56d75980daca",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-lineage-store.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a97b9ff8bace1732a34aafb6598f8d6682be93a9",
+          "size": 7626,
+          "sha256": "c8ccaf47cdf763ff2a391fc944afcee15bf267dc68889827f114e9a1c651be63",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-lineage-ui.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2cf3e84a7d8f6c5d967732e56dca4820197bf436",
+          "size": 32476,
+          "sha256": "31b9259cfffa2fe17bb4e9f4286c319511df68e3c33633b1bfea5c75d14b8b4b",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-media.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e5fb4ba6f03936c3d2192fc71f65f675d6f1452",
+          "size": 16610,
+          "sha256": "a6d4af74c1eaaa27da4a2d75594fad889df79190b5ad66696d5a56c73cc3e1a0",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-navigation.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dfbc2b6002a0d056f1c475c44b88e6b2d8a81c7e",
+          "size": 12339,
+          "sha256": "02cab09207b1a9189e31eaf0f31a75f98a4467cc6e8ce4095cfcad8620f4b4fe",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-network-fonts.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5d1d2b1c20308c45caae5656bc16ceb7c4e6ae55",
+          "size": 11068,
+          "sha256": "c8b8c2923806b2d39a2848771f0d8e70beb96ff06d18eed1cee5975d76f947c9",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-objects.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3638929f9b2c846d7475e9257a7df3aad2a4574c",
+          "size": 61056,
+          "sha256": "f11cac6e965487eba3b932eb3e7e35fd1f34cf7c812d4ce1a1568e2ab3e59aa8",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-pagination.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6cf758be9c0f8b3d1a83768b52b9adaefc9fc998",
+          "size": 28078,
+          "sha256": "e988be9b762c4da0e7cfae83492c063df900c3db3c137e0fc83939e983828f68",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-pr-diff.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3c58216b9ac913052f901ca506a09247ae54fd13",
+          "size": 15792,
+          "sha256": "3dcc6c82988ca5ab957eae48fe817ae1ea65a46df51795d1c359d406de13ad00",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-pretext-bridge.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9778a977275ee96721f226c46bb45e5f62f0f272",
+          "size": 5303,
+          "sha256": "9c5c7861c4c6116420a438950d61c43f1db8421200f515f6670929dc738ce825",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-programmable-content.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fb01b995b82d3578f9b91f6e2378fa2ef8d1dd64",
+          "size": 16780,
+          "sha256": "60d0e144eff8bfffa486b203040e42bf3964b312cbd83fe2254f6295bc1a287d",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-render-coordinator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6e439ce81e46eecf6434796715ad695e844116d8",
+          "size": 11415,
+          "sha256": "dac0f6faee177e4e0b2ee65c0a89753e87b3a3e9b1ebea2b0691dcf290c70bcc",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-render-primitives.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6245bd222b713e27c7d5d70fe0023e1491810a7c",
+          "size": 20697,
+          "sha256": "45c0f256348570fb0896a5aa7d5691775ae778abefa5c6e07a55230ff935acb8",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-rendered-text.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "25392f112f6605de793fa47ed361e3aba58c3e9e",
+          "size": 35256,
+          "sha256": "ece6362a442bbbb567b06de62243b78ed7d8b6c02214ee9d0bf6db3c9af6b5cf",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7afd934d7a3313e346e376c8d0c6de711a6c9acc",
+          "size": 22238,
+          "sha256": "fb4f9078c0a3d3c699ab434131d1b4b92dc730d1685f0fbf02618039d4591f41",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-runtime.origin.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d320c4da0d5eaf54d4037f2a936167f8abd0dc95",
+          "size": 23455,
+          "sha256": "305bf2447b89a5a1d0dd7a98c4c6c604f8df6e01a80cc537cc8f1f4d17c607ae",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-session.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5b76391e0e59ee147675a2da13d9ce04ade6106c",
+          "size": 17922,
+          "sha256": "07f012ce543ab27b7f8261eae35f61d4843e179fd8b5dce11c90e144805cf295",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-settings.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7f5341472714d599b2646ca42d256823fe06f257",
+          "size": 3599,
+          "sha256": "5044b8e0cd7b649e4a8e01fcc89ef758b155b74f7343f1ce87625dc1fdf5fc51",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-shell.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac31c709c85f1715e06fef83f10c0e972eaf4152",
+          "size": 29561,
+          "sha256": "4ce59462315c683cdb8e9b34064a100c35e10b682cbbe40e47875dabc0d475b2",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-source-editor.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fe635f9460212357af018176e25dc3d965ce4b76",
+          "size": 21825,
+          "sha256": "599037ab04c58cebf3b10747171f918a7a85ff3f5e0041203fe5a1f8b54bd0dd",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-style-ui.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8eac09717ee5ee3179f5a093878bb149bb3a9583",
+          "size": 14611,
+          "sha256": "2a68ea09132338cd1000a27ea09678ae7024e769ff38e62e2a4377778d0e5f53",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-svg-assets.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3f4f41618608b3fb710e9346ad2a74c50c1a2a56",
+          "size": 27880,
+          "sha256": "d1cf5810d85ca765da924763737081bd9a6fb299274d9a96b990d637fa5ba7e2",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-visibility.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "682997fb0891f296f074dff3f1353799e5a3820b",
+          "size": 8708,
+          "sha256": "c6548113dc6ceae5f997c435e7ce90f5b6c2747709246ad3f1090e4c78dfe0ba",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "96e5875d8bb403dc4d5d53f83b0aacbf7cdbcd74",
+          "size": 137766,
+          "sha256": "97cc6c7e93364626a5c125c2ab54625ba97bd440654ff397b0b30a752e165672",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5166db30cc2f326f4b12c177013da55b0af59931",
+          "size": 68550,
+          "sha256": "93da9639f4f507c0067488bea7a6c8d601ea715418bf0ebff76b35e1fafebbd4",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7f8e921ab98cdb7c276d08b3df78a2d2517229fc",
+          "size": 36760,
+          "sha256": "56f3e2eedd6b9a99e1375b58389334e3738c8843c4adcc4d668a6cc199311a2b",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/vdoc-container.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ab393caba8bd6e872d09ee3e28dd04556feb2df6",
+          "size": 13650,
+          "sha256": "b1a4165dd096766107ef001faaa075ad42c8a3ac672ae561b07be6d18b1fa5bc",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/vdoc-core.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3c82d773aa5d7948eb5bc6042f14fa14dd1ec62b",
+          "size": 28574,
+          "sha256": "c1ca7a1f922f83d2795131ef9e7f9b1290bd512496540af2e837e442c3cd065d",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/vdoc-hybrid-compiler.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e58d43e1da977ae6f4b56d7fd49e85c0ac03ab81",
+          "size": 47645,
+          "sha256": "ae07d5d61a120c16f17bfdc5a054355dbdc098e7270dc32f8d06b0f83a2277ae",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/vdoc-style-library.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "db8dc871bb42a90e4deef2f74001e447a7196e9f",
+          "size": 21156,
+          "sha256": "b3986fc2ec4494525a5a7408bf305c74a41455c3786d5dcdbb70b02c662be767",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/vdoc-svg-asset-library.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dba735362a7bf7a0872255708af1f910ba0efb7b",
+          "size": 18114,
+          "sha256": "74d7a897e35392a27a2bcdb74258a5a678c18d34e7e0938b61c2e1ff3f407527",
+          "kind": "source"
+        },
+        {
+          "path": "Tavernmodules/tavern-manager.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7ef063920ee74128da5d9ec9918ffa1e9fd60e48",
+          "size": 36551,
+          "sha256": "5c08da83b3aedb9a1a06b09d3ebac03109ddc6d57790eb4aee0cef9d99dc9e4b",
+          "kind": "source"
+        },
+        {
+          "path": "Tavernmodules/tavern.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b8b6f3683180ebb8456ccc900bf942869a519f31",
+          "size": 20643,
+          "sha256": "19c34cf7d74ece176868b35963b686904cd58ff1b316e516afeb12f985ec4720",
           "kind": "source"
         },
         {
@@ -21905,9 +23541,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/staticPreloadDecls.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "be22bbf7c60a97636c0ed0e2e1e081034dc09419",
-          "size": 6096,
-          "sha256": "4a60b26edba0f352f9150733b9525584fd8d9eeca0c5216bb2fd90704ca71ec5",
+          "blob": "4354e633f36902a48589930823329357e9f4f539",
+          "size": 7135,
+          "sha256": "387a4d3ea8b66d0e5e325cc7075f22fc8adccf35e1390d49e5676fa4280d798d",
           "kind": "source"
         },
         {
@@ -22910,6 +24546,33 @@
           "kind": "source"
         },
         {
+          "path": "WebIndexTTS2/server.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5cbb404f126ee89b42cb6ed33d31020506c47ed",
+          "size": 10107,
+          "sha256": "d16dce947863c2fba66354548d31a6703a4bb1647a3ca7241e5aaf31d17b061a",
+          "kind": "source"
+        },
+        {
+          "path": "apps/bootstrap-installer/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0d7a5bd4f79ee9d7fe0ce2877ca1b24fa0312302",
+          "size": 351,
+          "sha256": "be1d491f2dbd952900ac02574aaa1b838875e5a529086f71dd925201dd70957e",
+          "kind": "source"
+        },
+        {
+          "path": "apps/bootstrap-installer/src/styles.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e4a9ec01039a959e1071698e0c1d1431ee9c04e",
+          "size": 9725,
+          "sha256": "03b317b5ad0f5b01394557891c9d1fc4a20d0d1b085e037eb69e74076209ed27",
+          "kind": "source"
+        },
+        {
           "path": "assets/default_avatar.png",
           "mode": "100644",
           "type": "blob",
@@ -23783,6 +25446,42 @@
           "kind": "source"
         },
         {
+          "path": "bootstrap/recovery-main.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85f608b2d7d808d9cd1d51ff07b6d7c396180997",
+          "size": 5788,
+          "sha256": "b2823de8ae7f8bd8765164ab2e7d39cf060065bf3ec328fd5698af58acb61740",
+          "kind": "source"
+        },
+        {
+          "path": "bootstrap/recovery-preload.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f431f4ccee903b682f86b859ed88c0e713c0928c",
+          "size": 882,
+          "sha256": "4c9c470dffe3ccffbdc06fe25d93e836099cb1a0c85b8842d14786a68af131bd",
+          "kind": "source"
+        },
+        {
+          "path": "bootstrap/recovery-renderer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c5dedb235b447bede74b8ed17291d058f79bea32",
+          "size": 10454,
+          "sha256": "3c9a67746ab539cd827ca7884231fa3f22975387839cd07b7046d3206a7335b1",
+          "kind": "source"
+        },
+        {
+          "path": "bootstrap/recovery.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "93cfdd0b1aee6501f3104128b3fec2ea24aa57af",
+          "size": 9605,
+          "sha256": "e308e144161efcd7fdfc4816324abaa899c390aa1ac5e6d12f6e3b81fac9d7cd",
+          "kind": "source"
+        },
+        {
           "path": "bootstrap/recovery.html",
           "mode": "100644",
           "type": "blob",
@@ -24188,6 +25887,15 @@
           "kind": "source"
         },
         {
+          "path": "examples/animated-launchpad/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "42d84816d4316b2a473494be26d2c744c7df2792",
+          "size": 17350,
+          "sha256": "eece9166021fa67f28d0728c116f870e2e56d912dbab544ac38ddee9918cdc55",
+          "kind": "source"
+        },
+        {
           "path": "launchers/VCPChat-Launcher.command",
           "mode": "100755",
           "type": "blob",
@@ -24239,6 +25947,15 @@
           "blob": "b638eca617cee3add6dc2870496bfc50c4bdca58",
           "size": 114695,
           "sha256": "4b30d668507f768444e9bdcdb49244d13950fd4e2cb5fe5e1942b9d91537b8f9",
+          "kind": "source"
+        },
+        {
+          "path": "migration/migrateAvatars.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4cd53fefa3c2e685916b3bf8609b4cde6f7e8fd6",
+          "size": 3645,
+          "sha256": "90cdb8f48acde33806347ebc4bd13bc40e29a4ccf0ed362f53160c5b51216aaa",
           "kind": "source"
         },
         {
@@ -24704,9 +26421,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "0594f7ceb74de793c9c376988ce3952b7279034a",
-          "size": 137706,
-          "sha256": "9f0e5c0cbfc59e67dfbd20933ae21efdce5fbe695f35f2935368cb0965361dfd",
+          "blob": "73b2eb8f13751f25ea9d13edcf8f0e9493b9f756",
+          "size": 138358,
+          "sha256": "3da75dd36af35a83b37f97ab7795c4f5835efcbd21aa9119bd64e11aa86695f7",
           "kind": "source"
         },
         {
@@ -29447,9 +31164,18 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "6e81b91f7a02ee3dc42f5c6dd7b064e163a8c912",
-          "size": 30462,
-          "sha256": "b9ab2274444fcf6a3c4102020d9e01f438f0c66a05da031bb3af8e18c067c7ff",
+          "blob": "f2e05419bd12d2bfaa4d5f0dac5e94adb4fce3cf",
+          "size": 30499,
+          "sha256": "e84a9db1ecd89b1f1bab79c0e0d44a1ed359ae6c3fc6f8df6da02be298ecf040",
+          "kind": "source"
+        },
+        {
+          "path": "preload.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e5a168661707de84c4ef2b9744dacc5b91a3f7a6",
+          "size": 126,
+          "sha256": "ae04dbfdaa974f66d8b590f60bd3e1bfe65751300575b0f32b15fd80721b87bb",
           "kind": "source"
         },
         {
@@ -29930,12 +31656,57 @@
           "kind": "source"
         },
         {
+          "path": "rust_assistant_engine/ui/assistant-bar.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "61912052a606e1fb64d58455c79017e844b0222e",
+          "size": 1679,
+          "sha256": "377d8434bf8e38aed1c35d134138aba48fc74a36e9ab40e33eab98a1005114e9",
+          "kind": "source"
+        },
+        {
+          "path": "rust_assistant_engine/ui/assistant-bar.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "205f8a34316528034f3b6a7351f6117318448a0c",
+          "size": 3113,
+          "sha256": "97a9329f817b510d9d482502c21181f29cd50a821ded27e5ad000f8ddd85664c",
+          "kind": "source"
+        },
+        {
+          "path": "rust_assistant_engine/ui/assistant.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2d8f560b66a8b125ee9cc9a69828531d2d992750",
+          "size": 9398,
+          "sha256": "385bcbcf754d401fb29e7e4421e1f09489c889458f0526e447b97da5076c358a",
+          "kind": "source"
+        },
+        {
+          "path": "rust_assistant_engine/ui/assistant.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "42fdc537d45a6fd0e3d34a86897adb7119220f27",
+          "size": 3413,
+          "sha256": "5c10f85d2eadb3231e40929f4e5981d30d8e5a960369c95bb82bc3a551070f01",
+          "kind": "source"
+        },
+        {
           "path": "rust_assistant_engine/ui/assistant.js",
           "mode": "100644",
           "type": "blob",
           "blob": "d2bedb1b66bb8713930c83e2d4975b7c707d898f",
           "size": 23720,
           "sha256": "982c85e8c1ba2e76e9c5485b2e858326cd86db3fe13c5339ba8ffbf1a60f4a0f",
+          "kind": "source"
+        },
+        {
+          "path": "rust_audio_engine/build-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6f95ad5ffb258ac5c4c818f4b903763455477a30",
+          "size": 2608,
+          "sha256": "d64e2ed11f0bd45b7d99daaa11944c803914f1c7755689c731bf6db30cb5e2bd",
           "kind": "source"
         },
         {
@@ -30083,12 +31854,30 @@
           "kind": "source"
         },
         {
+          "path": "rust_projectforge_indexer/bench.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bdd9cd6df385aa2e292b4f1ee546d6f3db4e239d",
+          "size": 2323,
+          "sha256": "e0aded7a792f8d6377bd525cab8cb20714ee584b1a265cc2afe2b8d74ca388ac",
+          "kind": "source"
+        },
+        {
           "path": "rust_projectforge_indexer/build-runtime.js",
           "mode": "100644",
           "type": "blob",
           "blob": "36b68938957723090a57197128014111e5105829",
           "size": 3592,
           "sha256": "9ca47bd74e9809b49ef53bb21ac7d670d38debf165903aab9b1faf57f9391271",
+          "kind": "source"
+        },
+        {
+          "path": "rust_voice_input_engine/build-runtime.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "11cf6d023b678153e510bf8adc727ed5a88a1d52",
+          "size": 2940,
+          "sha256": "106010be12a998466073bfd2131507af7882b940e06cd07ac1e881a858f4fb96",
           "kind": "source"
         },
         {
@@ -30101,12 +31890,30 @@
           "kind": "source"
         },
         {
+          "path": "scripts/audit-settings-first-open.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a4303c4937d997bb16f615467e6697f6612ee560",
+          "size": 17449,
+          "sha256": "93e6d9351a6a1c0a885b5ac931a8c4c90c76f717ba25029dc9c6ee62d36b736d",
+          "kind": "source"
+        },
+        {
           "path": "scripts/audit-settings-layout.mjs",
           "mode": "100644",
           "type": "blob",
           "blob": "267cbbb5f137309229e74487b3f065d6aa8b5674",
           "size": 12787,
           "sha256": "e94c8ae29d4b929a67a1f1c2fc14d22f8901a98c2b6d258e05d4b41e73dac9d0",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/audit-settings-style-parity.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a651f040c53810a176367687b3a822722d412aa",
+          "size": 18569,
+          "sha256": "07393e3a744385edd26299dd816a4a703a6dfed1f8922669a5afb800b0d14137",
           "kind": "source"
         },
         {
@@ -30125,6 +31932,15 @@
           "blob": "7d5c16f1288afa5f2785786605bbc2445674fb14",
           "size": 6210,
           "sha256": "4bf70275f34198089b46e155236769a8513938c4012954b23f92fde595347396",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/chaos-probe-settings.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ffd1e9bc98e62e4e6ef68ff9389be966055d7b38",
+          "size": 9285,
+          "sha256": "96c7c86c173555db115d9229409a24499aa18a91505bfa4d5328c7f0a4e738db",
           "kind": "source"
         },
         {
@@ -30203,9 +32019,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "cc0efa2d1e90a892d72ddd69760cc29367d789cc",
-          "size": 42128,
-          "sha256": "840fe1756c6e045c8de501acd00bf4acede56d764bddeb3d968786802917e4ff",
+          "blob": "17cf2f3c8f8b0c68ada2c51e5e0e70bf69e5a5b4",
+          "size": 43042,
+          "sha256": "4f16f2922acb0a06a2b9294df40dd620e70c3692236ef91627765d04f36179af",
           "kind": "source"
         },
         {
@@ -30332,6 +32148,33 @@
           "blob": "3aa17f3e3c9a26a8034a3e4515485b9577ba63d5",
           "size": 7544,
           "sha256": "06861aa6defd081ef6701de1cbcef09f1bafb02da27d857ff9cf49279690ad59",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/compare-dual-instance-parity.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dffa6abd5ef186b476645fc10b63c9f7c3fdc7e3",
+          "size": 12025,
+          "sha256": "bb3e720887dc09b39e7a4620ae49d08a87b622db2dbff405e1652e1a4754494c",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/compare-settings-schema-pixels.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4cf8e5c16bd008fd87a518a0ad32ff2596887d36",
+          "size": 3158,
+          "sha256": "7eee3109729acb6245e1d4ba0a2931805b90cfbfd2298af87bed242dda46c166",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/css-import-reader.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f67aca5d1aa6f14762562d97d74e48a51e29bce8",
+          "size": 645,
+          "sha256": "4e193efa5070668ebaabd8571b6c6b66649ea6324990eb3fa0592f9246276a54",
           "kind": "source"
         },
         {
@@ -30587,6 +32430,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/desktopremote-http-smoke.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "44a7b25981e7c1be0828afd010ea1a4d9605ad48",
+          "size": 5493,
+          "sha256": "de9abc8f45d81afcc3bf623f64909c92cd2205292e02f38010351e64de5bb0b5",
+          "kind": "source"
+        },
+        {
           "path": "scripts/electron-builder-bootstrap-hooks.cjs",
           "mode": "100644",
           "type": "blob",
@@ -30623,6 +32475,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/inspect-sidebar-margins.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ecc1e5ca350fc36a8ffc2b9d078bff404254a836",
+          "size": 9358,
+          "sha256": "49348cc34aace1422e2b3a45703f75f730706c3325e6f014e6eec6627b390bf6",
+          "kind": "source"
+        },
+        {
           "path": "scripts/lib/terminal-smoke-probe.mjs",
           "mode": "100644",
           "type": "blob",
@@ -30644,9 +32505,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "9bea1eb8481a1968cc84e28a3e1f914e37d5c830",
-          "size": 15292,
-          "sha256": "2cc1a4c218d698617936e23c273ca953668f404cba775709be0f4d613dd1d3d0",
+          "blob": "2c04492359e820f4e2f3eb02bed1a2dd9c55c362",
+          "size": 15447,
+          "sha256": "fb4fa1d96d1518bf3ce856762ce57b35487ba5b59d8902f00ab1fe767acd1aea",
           "kind": "source"
         },
         {
@@ -30656,6 +32517,15 @@
           "blob": "2c1bd6d6312b5f8cd53ad56f4365cf9b476bff46",
           "size": 1034,
           "sha256": "18112bbd81e06aeb987cf91624268f64914b58724bbfbfdfceb72e0911d41d38",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/probe-avatar-persistence-electron.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0f312a68008fc9197d6f27e9f999044d06c10d64",
+          "size": 17858,
+          "sha256": "0898d5ecc01021cf94e1e06310307a50f87638cd3a16caed8d95efcc68da02b3",
           "kind": "source"
         },
         {
@@ -30692,6 +32562,24 @@
           "blob": "35b42f7b43dd2653af4c638c27417a7efa53955a",
           "size": 871,
           "sha256": "d8fee34ae267bd89c806c7fb1a1915ea0e2360cabf711d499fec669847dfeaa4",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/run-electron-node.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "88eb9408fe653fa44c275a31306925ed023e7a7f",
+          "size": 1180,
+          "sha256": "3500de8437def7e546eee22f8f543c09272b7ce82994bd1c5f555defdf84bb01",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/scriptorium-line-break-diagnostic.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bad454746d169448dfd6cfd76d55b15ee63afa18",
+          "size": 4176,
+          "sha256": "ad5589ae19a3f251a477c6af3491d4403fb664f45592dcb9d4997c410db22e91",
           "kind": "source"
         },
         {
@@ -30938,6 +32826,15 @@
           "kind": "source"
         },
         {
+          "path": "scripts/test-top-tab-session.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "82576c64a81b46dc8a5701c5b4995c6a8aa8cd7b",
+          "size": 2340,
+          "sha256": "d32a6dfa9790ef8a43fa7e524fe3e9f38cb685febb834fcab68a2db0d4e62fef",
+          "kind": "source"
+        },
+        {
           "path": "scripts/test-ui-motion-contract.mjs",
           "mode": "100644",
           "type": "blob",
@@ -31106,6 +33003,15 @@
           "blob": "b26e404ac76b035f22cd0cd8798e274c051e7b96",
           "size": 6971,
           "sha256": "eee5fc04b9402f085b44af58f6fb8bb6adeeac4058f948cc7975f03e10899a11",
+          "kind": "source"
+        },
+        {
+          "path": "splash.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4749b91b39c228041b66fe25818fa45f1e2bf0ba",
+          "size": 3351,
+          "sha256": "4a8debdbffaa5e4e6f9767a5e4ce72d6c4ec92a9e0e4d689e343feb6808ad457",
           "kind": "source"
         },
         {
@@ -32018,6 +33924,15 @@
           "kind": "source"
         },
         {
+          "path": "test.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fcfa8cdf3ac3d6958b4312a2daee5f749f0f37a7",
+          "size": 77293,
+          "sha256": "b915ccc2d0256f272bcaaf1b04eaec3846b76f1a18cf564461ad06fd2ff65b6d",
+          "kind": "source"
+        },
+        {
           "path": "tests/account-menu-controller.test.js",
           "mode": "100644",
           "type": "blob",
@@ -32030,9 +33945,9 @@
           "path": "tests/app-features.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "867b46bed048d85a2771a611de7f22cbfea7fc4c",
-          "size": 12295,
-          "sha256": "11caaf689cff9e340e7a5af3d319a56268af794acc7a93309ea5355a66c64be6",
+          "blob": "2ba007b7261a2eadf4f260ada60b7a516bcc43ed",
+          "size": 13734,
+          "sha256": "70ef48387531d49bd26359d1438a101e01e4f84dd57ca37b4091dfbf523515cf",
           "kind": "source"
         },
         {
@@ -32216,6 +34131,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/chat-send-acceptance.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "800fe6970804026a47c4251869f878609e450276",
+          "size": 2311,
+          "sha256": "121396d655727976394523a5187153128af5248b86c672a17c302f3e260ea2c1",
+          "kind": "source"
+        },
+        {
           "path": "tests/chat-surface-slots.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -32363,9 +34287,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "cfb40fd6bf714a59e3fd927c5fe8ae3ead634a39",
-          "size": 4754,
-          "sha256": "43eec0c674a0925df93fb7c2cd93e614d6586a6bb3e7f814e964419bb4c161af",
+          "blob": "c3a3d2d63cb24b21ddc7efd79bb68f16cf7cc090",
+          "size": 5069,
+          "sha256": "a81b9b3b26c5ab54532bf372448f24e37d016e6109cf1d2630b8308f00b80114",
           "kind": "source"
         },
         {
@@ -32615,9 +34539,9 @@
           "path": "tests/deskpet-send-bridge.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a379828d881a6bdf96593dbb3dc72548932a0dca",
-          "size": 8456,
-          "sha256": "a0fda9d894b3e90865c71cb7845998fe36be7641425046fdf46a895a1804ad2e",
+          "blob": "39e973410b64be85a6ca470b985abb4324b32d2c",
+          "size": 12460,
+          "sha256": "e6bdac5f3e7ef7a4e4d35487e9f3408b4d9ff93ad6d6ed56a039ae0e9aed7940",
           "kind": "source"
         },
         {
@@ -33476,6 +35400,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/notes-math-delimiters.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "44ba184a6eecba59447d22b4f2581312579a76b1",
+          "size": 2167,
+          "sha256": "66c2f08f99c78c688915b4acba5febc76560854046baa94018bdbeb53da803dc",
+          "kind": "source"
+        },
+        {
           "path": "tests/notification-center.test.js",
           "mode": "100644",
           "type": "blob",
@@ -33587,9 +35520,9 @@
           "path": "tests/projectforge-delivery.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa167f620e61d728db921b0304fcd0632751e5c9",
-          "size": 17990,
-          "sha256": "1c5d15bf68144da8978a3f880e8f8ad7939a37b740da5064f047eb3de3c40662",
+          "blob": "7336916dce81ed563bfa7d03ffa5e6ef5292ea7b",
+          "size": 19629,
+          "sha256": "cc4c121de895e6d8cbf5464fcccae7e68c25116db4816d2f678c44570f5cfc7f",
           "kind": "source"
         },
         {
@@ -36303,6 +38236,7 @@
             "tests/chat-presentation-skin.test.mjs",
             "tests/chat-presentation-state.test.mjs",
             "tests/chat-repository.test.mjs",
+            "tests/chat-send-acceptance.test.mjs",
             "tests/chat-surface-slots.test.mjs",
             "tests/chat-surface.test.mjs",
             "tests/chat-theme-plugin.test.mjs",
@@ -36844,6 +38778,14 @@
           ]
         },
         {
+          "name": "reviewed-notes-math-regression-inputs",
+          "files": [
+            "Notemodules/notes.js",
+            "tests/notes-math-delimiters.test.mjs",
+            "vendor/auto-render.min.js"
+          ]
+        },
+        {
           "name": "reviewed-feature-owned-upstream-74d4a491-inputs",
           "roots": [
             "DeskPetmodules",
@@ -36906,6 +38848,95 @@
             "UserData",
             "logs",
             "cache"
+          ]
+        },
+        {
+          "name": "reviewed-feature-core-dependency-boundary",
+          "roots": [
+            ".github",
+            "Agenttaskmodules",
+            "Canvasmodules",
+            "Chartmodules",
+            "Desktopmodules",
+            "Dicemodules",
+            "Flowlockmodules",
+            "Forummodules",
+            "Gamemodules",
+            "Groupmodules",
+            "Logmodules",
+            "Loommodules",
+            "Memomodules",
+            "Musicmodules",
+            "Notemodules",
+            "PluginManagerModules",
+            "ProjectForgemodules",
+            "Promptmodules",
+            "RAGmodules",
+            "ScriptoriumModules",
+            "Tavernmodules",
+            "Themesmodules",
+            "Translatormodules",
+            "VCPDistributedServer",
+            "VCPHumanToolBox",
+            "VchatManager",
+            "Voicechatmodules",
+            "WebIndexTTS2",
+            "apps",
+            "assets",
+            "bootstrap",
+            "examples",
+            "migration",
+            "modules",
+            "preloads",
+            "rust_assistant_engine",
+            "rust_audio_engine",
+            "rust_chat_data_service",
+            "rust_projectforge_indexer",
+            "rust_voice_input_engine",
+            "scripts",
+            "styles"
+          ],
+          "files": [
+            "main.html",
+            "main.js",
+            "preload.js",
+            "renderer.js",
+            "splash.html",
+            "style.css",
+            "stylelint.ui-system.config.cjs",
+            "test.html"
+          ],
+          "suffixes": [
+            ".js",
+            ".mjs",
+            ".cjs",
+            ".html",
+            ".css"
+          ],
+          "exclude_roots": [
+            "modules/deskpet",
+            "DeskPetmodules",
+            "assets/deskpet",
+            "scripts/deskpet",
+            "tests",
+            "docs",
+            "vendor",
+            "VCPDistributedServer/Plugin",
+            "AppData",
+            "UserData",
+            "state-private",
+            "artifacts",
+            "node_modules"
+          ],
+          "ignore_components": [
+            "AppData",
+            "UserData",
+            "state-private",
+            "node_modules",
+            "logs",
+            "secrets",
+            "tokens",
+            "cookies"
           ]
         }
       ],

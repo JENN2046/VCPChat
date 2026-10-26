@@ -2,8 +2,6 @@
  * 桌宠上输入的话由主窗口按正常流程发送：切到那个 Agent，再用请求对象调用
  * handleSendMessage。不经过主输入框，用户还没发的草稿和已选附件都不会被带走或覆盖。
  */
-export const DESK_PET_SEND_ACCEPT_MS = 1500;
-
 export function createDeskPetSendBridge({
     getSelectedItem,
     getTopicId,
@@ -13,8 +11,6 @@ export function createDeskPetSendBridge({
     startTopic,
     isBusy,
     storeFiles = async () => [],
-    acceptMs = DESK_PET_SEND_ACCEPT_MS,
-    wait = (ms) => new Promise(resolve => setTimeout(resolve, ms)),
     now = () => Date.now(),
 }) {
     // 桌宠的发送一条一条来：两次快速发送不能同时等切换、同时通过「上一条还在回复中」的检查。
@@ -49,15 +45,18 @@ export function createDeskPetSendBridge({
         if (newTopic) {
             const before = getTopicId();
             await startTopic?.(selected);
-            if (!getTopicId() || getTopicId() === before || getSelectedItem()?.id !== agentId) {
+            if (!getTopicId() || getTopicId() === before || getSelectedItem()?.id !== agentId || getSelectedItem()?.type !== 'agent') {
                 return { success: false, error: '没能开新话题' };
             }
             if (expired()) return { success: false, error: '主窗口没有响应' };
         }
+        const targetTopicId = getTopicId();
+        const targetIsCurrent = () => getSelectedItem()?.id === agentId
+            && getSelectedItem()?.type === 'agent' && getTopicId() === targetTopicId;
         // 桌宠带来的文件按拖进输入框的流程存进这个话题（按了「+」就是刚开的那个），存好的才带上；一个都没存好就不发
         let attachments = [];
         if (dropped.length) {
-            const results = await storeFiles(agentId, getTopicId(), dropped).catch(error => [{ error: error?.message || String(error) }]);
+            const results = await storeFiles(agentId, targetTopicId, dropped).catch(error => [{ error: error?.message || String(error) }]);
             attachments = (Array.isArray(results) ? results : []).filter(r => r?.success && r.attachment).map(({ attachment: att }) => ({
                 file: { name: att.name, type: att.type, size: att.size },
                 localPath: att.internalPath,
@@ -71,14 +70,28 @@ export function createDeskPetSendBridge({
             }
             if (expired()) return { success: false, error: '主窗口没有响应' };
         }
-        const sending = Promise.resolve().then(() => sendMessage({ content: text, attachments, propagateError: true }));
-        // 发送要等回复开始流才返回；这里只等校验和落盘这一小段，之后的错误会显示在聊天里，桌宠也会收到出错事件。
-        const early = await Promise.race([
-            sending.then(() => null, error => error || new Error('发送失败')),
-            wait(acceptMs).then(() => null),
-        ]);
-        // shownInChat：话已经存进历史，只是回复失败（聊天里有报错）；不能让桌宠当成没发出去再发一遍。
-        if (early && !early.shownInChat) return { success: false, error: early.message || String(early) };
-        return { success: true };
+        let accepted = false, acknowledge;
+        const acceptance = new Promise(resolve => { acknowledge = resolve; });
+        const onAccepted = () => {
+            accepted = true;
+            acknowledge({ success: true });
+        };
+        const sending = Promise.resolve().then(() => {
+            // Recheck inside the send microtask: attachment storage and topic
+            // creation may have outlived the original main-window selection.
+            if (!targetIsCurrent()) throw new Error('目标会话已切换，消息未发送');
+            if (expired()) throw new Error('主窗口没有响应');
+            if (isBusy()) throw new Error('上一条还在回复中');
+            return sendMessage({ content: text, attachments, propagateError: true, onAccepted });
+        });
+        const settled = sending.then(
+            () => accepted ? { success: true } : { success: false, error: '消息尚未保存' },
+            error => accepted || error?.shownInChat
+                ? { success: true }
+                : { success: false, error: error?.message || String(error || '发送失败') },
+        );
+        // Only the send path's persistence acknowledgement permits clearing the
+        // pet draft. Keep a rejection handler attached after that early return.
+        return Promise.race([acceptance, settled]);
     }
 }

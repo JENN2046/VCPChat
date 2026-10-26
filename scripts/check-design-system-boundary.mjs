@@ -1,5 +1,6 @@
 import { loadCiSourceContext } from './ci-source-context.mjs';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import postcss from 'postcss';
@@ -47,6 +48,12 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Reviewed delivery regressions: conversation ownership/acceptance and
+    // the notes math delimiter repair; no feature-directory exemption.
+    'DeskPetmodules/mainWindow/sendBridge.js',
+    'tests/deskpet-send-bridge.test.mjs',
+    'Notemodules/notes.js',
+    'tests/notes-math-delimiters.test.mjs',
     // Scoped upstream integration regressions. No directory, sender or permission exemption.
     'tests/native-context-compaction-boundary.test.cjs',
     'tests/app-features.test.mjs',
@@ -643,7 +650,14 @@ const reviewedClassicSecurityExceptions = new Set([
 // a directory-wide exception. Keep authorization exemptions separate.
 const reviewedClassicCompatibilityExceptions = new Set([
     'VCPHumanToolBox/renderer_modules/config.js',
+    'Notemodules/notes.js',
 ]);
+// This exact source identity admits the display-math delimiter repair.
+// Other Notes changes still require review; retire when upstream fixes it.
+const reviewedNotesMathDigest = '313b2d89b4f094fb694bf71bedb4c652070578393996a8c23b34ec9eac7f27b8';
+const notesMathDigest = crypto.createHash('sha256')
+    .update(fs.readFileSync(path.join(root, 'Notemodules/notes.js'), 'utf8').replace(/\r\n/g, '\n')).digest('hex');
+if (notesMathDigest !== reviewedNotesMathDigest) failures.push('Notemodules/notes.js: unreviewed Notes compatibility change');
 for (const file of reviewedClassicCompatibilityExceptions) {
     if (!allowedSourceDifferences.has(file)) {
         failures.push(`${file}: reviewed Classic compatibility exception requires a source-difference entry`);

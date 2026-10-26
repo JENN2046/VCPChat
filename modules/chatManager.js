@@ -1779,6 +1779,19 @@ export const chatManager = (() => {
             return;
         }
 
+        // Notify local send owners only after their outgoing message was saved.
+        // Observer failures must not turn an accepted message into a retry.
+        if (typeof request?.onAccepted === 'function') {
+            try {
+                request.onAccepted(Object.freeze({
+                    messageId: userMessage.id,
+                    context: Object.freeze({ agentId: sendContext.agentId, itemType: sendContext.itemType, topicId: sendContext.topicId }),
+                }));
+            } catch (error) {
+                console.warn('[ChatManager] Send acceptance observer failed:', error?.message || error);
+            }
+        }
+
         // Consume only the exact draft transaction that was durably saved.
         // Both the text and attachment-array identity must still match, so an
         // attachment added while the save was pending cannot be discarded.

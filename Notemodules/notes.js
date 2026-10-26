@@ -581,7 +581,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (window.renderMathInElement) {
       renderMathInElement(previewContentDiv, {
         delimiters: [
-          { left: "$", right: "$", display: true },
+          { left: "$$", right: "$$", display: true },
           { left: "\\[", right: "\\]", display: true },
           { left: "\\(", right: "\\)", display: false },
           { left: "$", right: "$", display: false },

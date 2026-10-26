@@ -56,7 +56,7 @@ jobs:
           import urllib.parse
           import urllib.request
           
-          PINS = {'ci/source-entry/source_projection_policy.py': {'size': 4065, 'blob': 'afd8da3f36bee9199a983e44ac95364ce8b37341', 'sha256': '89d09d459596a8a1d784fa5261b3a7e2ef53b67e6975bd669311c876f21836ff'}, 'ci/source-entry/source_materializer.py': {'size': 8199, 'blob': 'a8e1108fba2df8f38c71e235d52b85c197c9da4f', 'sha256': '376b56b82caaf9df856a619bfb03f8886ed20c4a2fee9e1f444e1f575916b76e'}, 'ci/source-entry/source_writer.py': {'size': 10285, 'blob': '95a172ac42fcd0956647d14d3914df028d8a308c', 'sha256': '74d2d2469c92947d5d58e4784383f787c17bff8e22c0620228052bcc51b9d916'}, 'ci/source-entry/github_source_entry.py': {'size': 21538, 'blob': '786f537080c33dbb61af6321ee58a05e12ff6c04', 'sha256': 'ad71c3e120a3ae227651390f112beee1a51d21f4cd7118cb0f8ad6d205c8f2c5'}, 'ci/source-entry/projection_manifest.json': {'size': 1400800, 'blob': '5e96170a863b77a4d3c61a045b3b88dc61a6add4', 'sha256': 'be769615c7bfc777302f4455958353c018585fb1209021446b7fe3839da328b0'}}
+          PINS = {'ci/source-entry/source_projection_policy.py': {'size': 4065, 'blob': 'afd8da3f36bee9199a983e44ac95364ce8b37341', 'sha256': '89d09d459596a8a1d784fa5261b3a7e2ef53b67e6975bd669311c876f21836ff'}, 'ci/source-entry/source_materializer.py': {'size': 8199, 'blob': 'a8e1108fba2df8f38c71e235d52b85c197c9da4f', 'sha256': '376b56b82caaf9df856a619bfb03f8886ed20c4a2fee9e1f444e1f575916b76e'}, 'ci/source-entry/source_writer.py': {'size': 10285, 'blob': '95a172ac42fcd0956647d14d3914df028d8a308c', 'sha256': '74d2d2469c92947d5d58e4784383f787c17bff8e22c0620228052bcc51b9d916'}, 'ci/source-entry/github_source_entry.py': {'size': 21538, 'blob': '786f537080c33dbb61af6321ee58a05e12ff6c04', 'sha256': 'ad71c3e120a3ae227651390f112beee1a51d21f4cd7118cb0f8ad6d205c8f2c5'}, 'ci/source-entry/projection_manifest.json': {'size': 1475067, 'blob': '967a7160adb3ee0b2f061f1d873b2c8720ec9cdc', 'sha256': '538a07356761430fd5cb0d5efece96e8ddcdc58ef620b84775bbe75326bd01cb'}}
           PROFILE = 'chat-kernel-ui'
           REPOSITORY = "JENN2046/VCPChat"
           
@@ -241,6 +241,13 @@ jobs:
         run: npm run test:side-pane
 
       # 功能模块的主进程代码在 Windows 上会走不同的分支（光标轮询、窗口焦点），Linux 上测不到
+      - name: Verify Electron runtime for source tests
+        working-directory: ${{ steps.source.outputs.directory }}
+        run: node -e "const fs = require('node:fs'); const electron = require('electron'); if (typeof electron !== 'string' || !fs.existsSync(electron)) throw new Error('Electron runtime is unavailable');"
+
       - name: Run app feature tests
+        env:
+          VCPCHAT_CI_SOURCE_CONTEXT: ${{ steps.source.outputs.context_path }}
+          VCPCHAT_CI_SOURCE_CONTEXT_SHA256: ${{ steps.source.outputs.context_sha256 }}
         working-directory: ${{ steps.source.outputs.directory }}
         run: npm run test:features

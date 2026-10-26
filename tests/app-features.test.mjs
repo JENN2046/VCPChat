@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { parse } from '@babel/parser';
+import { loadCiSourceContext } from '../scripts/ci-source-context.mjs';
 
 const require = createRequire(import.meta.url);
 const { createAppFeatures, readFeatureManifests } = require('../modules/appFeatures.js');
@@ -171,13 +172,17 @@ function featurePathReferences(source, file) {
     }
     const ast = parse(source, { sourceType: 'unambiguous', allowReturnOutsideFunction: true, plugins: ['jsx'] });
     const references = [];
-    const visit = node => {
+    const auditInventories = new Set();
+    const visit = (node, parent = null) => {
         if (!node || typeof node !== 'object') return;
-        if (node.type === 'StringLiteral' && pathReference.test(node.value)) references.push(node.value);
+        if (file === 'scripts/check-design-system-boundary.mjs' && node.type === 'VariableDeclarator'
+            && node.id.name === 'allowedSourceDifferences' && node.init?.type === 'NewExpression'
+            && node.init.callee.name === 'Set' && node.init.arguments[0]?.type === 'ArrayExpression') auditInventories.add(node.init.arguments[0]);
+        if (node.type === 'StringLiteral' && pathReference.test(node.value) && !auditInventories.has(parent)) references.push(node.value);
         if (node.type === 'TemplateElement' && pathReference.test(node.value.raw)) references.push(node.value.raw);
         for (const value of Object.values(node)) {
-            if (Array.isArray(value)) value.forEach(visit);
-            else if (value && typeof value === 'object') visit(value);
+            if (Array.isArray(value)) value.forEach(child => visit(child, node));
+            else if (value && typeof value === 'object') visit(value, node);
         }
     };
     visit(ast);
@@ -188,19 +193,25 @@ test('feature dependency boundary rejects imports and paths but permits shared p
     assert.deepEqual(featurePathReferences("const x = require('./deskpet/petHandlers');", 'core.js'), ['./deskpet/petHandlers']);
     assert.deepEqual(featurePathReferences("import x from './DeskPetmodules/index.js';", 'core.mjs'), ['./DeskPetmodules/index.js']);
     assert.deepEqual(featurePathReferences("const channel = 'voice-chat:deskpet-send'; // 桌宠 peer", 'core.js'), []);
+    assert.deepEqual(featurePathReferences("const allowedSourceDifferences = new Set(['DeskPetmodules/index.js']);", 'scripts/check-design-system-boundary.mjs'), []);
+    assert.deepEqual(featurePathReferences("const allowedSourceDifferences = new Set([require('./DeskPetmodules/index.js')]);", 'scripts/check-design-system-boundary.mjs'), ['./DeskPetmodules/index.js']);
 });
 
 test('core code does not import the desk pet or bind feature paths outside its loader', () => {
-    const owned = ['modules/deskpet/', 'DeskPetmodules/', 'assets/deskpet/', 'scripts/deskpet', 'tests/', 'docs/', 'vendor/', 'VCPDistributedServer/Plugin/'];
-    let matches = '';
-    try {
-        matches = execFileSync('git', ['grep', '--untracked', '-I', '-l', '-i', '-E', 'deskpet|桌宠', '--', '*.js', '*.mjs', '*.cjs', '*.html', '*.css'], { cwd: projectRoot, encoding: 'utf8' });
-    } catch (error) {
-        if (error.status !== 1) throw error; // 1 = 没有匹配
-    }
-    const offenders = matches.split('\n').filter(Boolean)
+    const owned = ['modules/deskpet/', 'DeskPetmodules/', 'assets/deskpet/', 'scripts/deskpet/', 'tests/', 'docs/', 'vendor/', 'VCPDistributedServer/Plugin/',
+        'AppData/', 'UserData/', 'state-private/', 'artifacts/', 'node_modules/'];
+    const context = loadCiSourceContext(projectRoot);
+    const files = context?.trackedFiles || execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+        { cwd: projectRoot, encoding: 'utf8' }).split('\0').filter(Boolean);
+    const offenders = files.filter(file => /\.(?:js|mjs|cjs|html|css)$/.test(file))
         .filter(file => !owned.some(prefix => file.startsWith(prefix)))
-        .filter(file => featurePathReferences(fs.readFileSync(path.join(projectRoot, file), 'utf8'), file).length);
+        .filter(file => !file.split('/').some(part => ['appdata', 'userdata', 'state-private', 'node_modules', 'logs', 'secrets', 'tokens', 'cookies'].includes(part.toLowerCase())))
+        .filter(file => {
+            // CI must supply every inspected core body through its hash-bound
+            // projection. Never replace full Git metadata with a partial walk.
+            const source = context ? context.readCommitted(file) : fs.readFileSync(path.join(projectRoot, file), 'utf8');
+            return /deskpet|桌宠/i.test(source) && featurePathReferences(source, file).length;
+        });
     assert.deepEqual(offenders, []);
 
     // npm scripts 只经 scripts/app-features.cjs 走功能清单

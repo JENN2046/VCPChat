@@ -20,6 +20,7 @@ function fakeMainWindow({ selectDelayMs = 30 } = {}) {
         sendMessage: async (request) => {
             if (!state.topicId) throw new Error('请先选择一个项目和话题。');
             sent.push({ agentId: state.selected.id, topicId: state.topicId, request });
+            request.onAccepted({ messageId: 'synthetic-user' });
         },
         startTopic: async (item) => {
             if (state.failTopic) return;
@@ -44,7 +45,9 @@ test('a pet message for another agent waits until that agent has a topic', async
 test('a pet message never carries the main input draft or its attachments', async () => {
     const { bridge, sent } = fakeMainWindow();
     await bridge({ agentId: 'Bob', text: '桌宠说的话' });
-    assert.deepEqual(sent[0].request, { content: '桌宠说的话', attachments: [], propagateError: true });
+    const { onAccepted, ...payload } = sent[0].request;
+    assert.equal(typeof onAccepted, 'function');
+    assert.deepEqual(payload, { content: '桌宠说的话', attachments: [], propagateError: true });
 });
 
 test('a send that fails before it is saved is reported, not claimed as sent', async () => {
@@ -92,7 +95,7 @@ test('two quick sends from the pet run one after the other', async () => {
             original.topicId = `topic_${item.id}`;
             active -= 1;
         },
-        sendMessage: async () => { sent.push(original.selected.id); },
+        sendMessage: async request => { sent.push(original.selected.id); request.onAccepted({ messageId: 'synthetic-user' }); },
         isBusy: () => false,
         acceptMs: 20,
     });
@@ -121,7 +124,7 @@ test('files from the pet are stored in the target topic and sent with the messag
         getTopicId: () => state.topicId,
         findAgent: (id) => ({ id, type: 'agent', name: id }),
         selectItem: async (item) => { state.selected = { id: item.id, type: 'agent' }; state.topicId = `topic_${item.id}`; },
-        sendMessage: async (request) => sent.push(request),
+        sendMessage: async request => { sent.push(request); request.onAccepted({ messageId: 'synthetic-user' }); },
         isBusy: () => false,
         storeFiles: async (agentId, topicId, files) => {
             stored.push({ agentId, topicId, names: files.map((f) => f.name) });
@@ -161,4 +164,72 @@ test('when the new topic cannot be opened, nothing is sent into the old one', as
     const result = await bridge({ agentId: 'Bob', text: '换个话题', newTopic: true });
     assert.equal(result.success, false);
     assert.equal(sent.length, 0);
+});
+
+const deferred = () => {
+    let resolve, reject;
+    const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+    return { promise, resolve, reject };
+};
+const flush = () => new Promise(resolve => setImmediate(resolve));
+
+for (const switchKind of ['agent', 'topic']) test(`attachment storage refuses a changed target ${switchKind}`, async () => {
+    const gate = deferred(), entered = deferred(), sent = [];
+    const state = { selected: { id: 'Alice', type: 'agent' }, topic: 'topic_alice' };
+    const stored = [];
+    const bridge = createDeskPetSendBridge({
+        getSelectedItem: () => state.selected, getTopicId: () => state.topic,
+        findAgent: () => null, selectItem: async () => {}, isBusy: () => false,
+        storeFiles: async (agentId, topicId) => { stored.push({ agentId, topicId }); entered.resolve(); return gate.promise; },
+        sendMessage: async request => { sent.push(request); request.onAccepted?.(); },
+    });
+    const pending = bridge({ agentId: 'Alice', text: 'owned draft', files: [{ name: 'synthetic.png' }] });
+    await entered.promise;
+    if (switchKind === 'agent') state.selected = { id: 'Bob', type: 'agent' };
+    state.topic = switchKind === 'agent' ? 'topic_bob' : 'topic_alice_other';
+    gate.resolve([{ success: true, attachment: { name: 'synthetic.png', internalPath: 'file:///synthetic.png' } }]);
+    assert.equal((await pending).success, false);
+    assert.deepEqual(stored, [{ agentId: 'Alice', topicId: 'topic_alice' }]);
+    assert.equal(sent.length, 0, 'the old intent must not be sent into the newly selected conversation');
+});
+
+test('elapsed acceptance time cannot hide a delayed pre-persistence failure', async () => {
+    const gate = deferred();
+    let outcome = 'pending';
+    const bridge = createDeskPetSendBridge({
+        getSelectedItem: () => ({ id: 'Alice', type: 'agent' }), getTopicId: () => 'topic_alice',
+        findAgent: () => null, selectItem: async () => {}, isBusy: () => false,
+        sendMessage: () => gate.promise, acceptMs: 0, wait: () => Promise.resolve(),
+    });
+    const pending = bridge({ agentId: 'Alice', text: 'keep this draft' }).then(result => { outcome = result; return result; });
+    await flush();
+    assert.equal(outcome, 'pending', 'only explicit acceptance may clear the pet draft');
+    gate.reject(new Error('compaction cancelled before save'));
+    assert.deepEqual(await pending, { success: false, error: 'compaction cancelled before save' });
+});
+
+test('explicit durable acceptance returns before model completion and consumes later rejection', async () => {
+    const gate = deferred();
+    let accepted;
+    const bridge = createDeskPetSendBridge({
+        getSelectedItem: () => ({ id: 'Alice', type: 'agent' }), getTopicId: () => 'topic_alice',
+        findAgent: () => null, selectItem: async () => {}, isBusy: () => false,
+        sendMessage: request => { accepted = request.onAccepted; return gate.promise; },
+    });
+    const pending = bridge({ agentId: 'Alice', text: 'durably saved' });
+    await flush();
+    assert.equal(typeof accepted, 'function');
+    accepted({ messageId: 'synthetic-user' });
+    assert.deepEqual(await pending, { success: true });
+    gate.reject(new Error('later model failure'));
+    await flush();
+});
+
+test('a completed send without acceptance preserves the draft', async () => {
+    const bridge = createDeskPetSendBridge({
+        getSelectedItem: () => ({ id: 'Alice', type: 'agent' }), getTopicId: () => 'topic_alice',
+        findAgent: () => null, selectItem: async () => {}, isBusy: () => false,
+        sendMessage: async () => undefined,
+    });
+    assert.equal((await bridge({ agentId: 'Alice', text: 'not accepted' })).success, false);
 });

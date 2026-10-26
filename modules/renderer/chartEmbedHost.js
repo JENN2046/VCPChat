@@ -322,9 +322,9 @@ export function createChartEmbedHost({ root, api, maxInstances = 4 }) {
                 const result = await api.chartEmbedReadDataSource({
                     chartId: entry.id, token: entry.token, request: payload.request,
                 });
-                if (generation === entry.generation) send(entry, 'data-source-response', { requestId: payload.requestId, result });
+                send(entry, 'data-source-response', { generation, requestId: payload.requestId, result });
             } catch (error) {
-                if (generation === entry.generation) send(entry, 'data-source-response', { requestId: payload.requestId, error: error.message });
+                send(entry, 'data-source-response', { generation, requestId: payload.requestId, error: error.message });
             }
         }
     }

@@ -146,3 +146,40 @@ for (const visibility of ['offscreen', 'hidden']) test(`replacement chart replay
         assert.ok(sent.some(value => value.type === 'pause'), 'new sandbox runtime must receive pause even when cached visibility is unchanged');
     } finally { host.dispose(); dom.window.close(); }
 });
+
+for (const outcome of ['result', 'error']) test(`a replacement settles an already-authorized old-generation read: ${outcome}`, async () => {
+    const dom = new JSDOM('<body><div id="root"></div></body>', { url: 'https://example.test/', pretendToBeVisual: true });
+    const win = dom.window, root = win.document.getElementById('root');
+    win.Element.prototype.moveBefore = function(node, before) { this.insertBefore(node, before); };
+    let onChange, resolveRead, rejectRead, reads = 0;
+    const read = new Promise((resolve, reject) => { resolveRead = resolve; rejectRead = reject; });
+    const snapshot = revision => ({ manifest: { id: 'sales-trend', codeRevision: revision, dataRevision: 1 }, template: '', style: '', runtime: '', data: {} });
+    const host = createChartEmbedHost({ root, api: {
+        chartEmbedAcquire: async () => ({ token: 'synthetic-lease', snapshot: snapshot(1) }),
+        chartEmbedSnapshot: async () => snapshot(2), chartEmbedRelease: async () => {},
+        chartEmbedReadDataSource: async () => { reads++; return read; },
+        onChartEmbedChanged: callback => { onChange = callback; return () => {}; },
+    } });
+    try {
+        root.innerHTML = transformChartReferences(reference);
+        host.scan(root); await wait();
+        const frame = root.querySelector('iframe'), sent = [];
+        frame.contentWindow.postMessage = value => sent.push(value);
+        const message = data => win.dispatchEvent(new win.MessageEvent('message', { source: frame.contentWindow, data: { source: 'vcp-chart-sandbox', ...data } }));
+        message({ type: 'sandbox-ready' });
+        const initial = sent.find(value => value.type === 'initialize');
+        message({ type: 'data-source-request', chartId: initial.chartId, generation: initial.generation, requestId: 'original', request: { type: 'json', source: 'synthetic.json' } });
+        assert.equal(reads, 1);
+        onChange({ chartId: initial.chartId, type: 'code-replaced' }); await wait();
+        const latest = sent.filter(value => value.type === 'initialize').at(-1);
+        assert.notEqual(latest.generation, initial.generation);
+        message({ type: 'data-source-request', chartId: initial.chartId, generation: initial.generation, requestId: 'stale-new-request', request: { type: 'json', source: 'other.json' } });
+        assert.equal(reads, 1, 'generation change still rejects new requests from the old runtime');
+        if (outcome === 'result') resolveRead({ data: 42 }); else rejectRead(new Error('synthetic read failure'));
+        await wait();
+        const response = sent.find(value => value.type === 'data-source-response' && value.requestId === 'original');
+        assert.ok(response, 'the authorized read must settle so the old mount can leave the initialization queue');
+        assert.equal(response.generation, initial.generation);
+        if (outcome === 'result') assert.deepEqual(response.result, { data: 42 }); else assert.equal(response.error, 'synthetic read failure');
+    } finally { host.dispose(); dom.window.close(); }
+});

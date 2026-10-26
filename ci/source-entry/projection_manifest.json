@@ -10200,9 +10200,9 @@
           "path": "modules/renderer/chartEmbedHost.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "382d63850ebac5eaa9a4c7ff4e87a6d0498c8ff1",
-          "size": 15575,
-          "sha256": "6db44e6ef7724af6cacad58cc589181b61435220f02887c2ad76a7d6c86b57af",
+          "blob": "ec5de4fa268e529271b6ebb12dcad07cc730813c",
+          "size": 15525,
+          "sha256": "0dada04a39979a1308e61b77df8de9321f8c21e2fa241f27204b393ea1c3861d",
           "kind": "source"
         },
         {
@@ -16712,9 +16712,9 @@
           "path": "tests/chart-embed.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d6e623c259e83b130869d4babf45b4bb02d08dcf",
-          "size": 8076,
-          "sha256": "a88854d4518701555bba7a68f9f6478058098684edd1663b46bc4bae52cfd857",
+          "blob": "34a32e924edee605363f2a587122368bf44944e4",
+          "size": 11128,
+          "sha256": "b1edf8d0b1ab0f89666c1e19ae521c70bbeb6d4387da881f37864e3c915d62a7",
           "kind": "source"
         },
         {
@@ -27825,9 +27825,9 @@
           "path": "modules/renderer/chartEmbedHost.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "382d63850ebac5eaa9a4c7ff4e87a6d0498c8ff1",
-          "size": 15575,
-          "sha256": "6db44e6ef7724af6cacad58cc589181b61435220f02887c2ad76a7d6c86b57af",
+          "blob": "ec5de4fa268e529271b6ebb12dcad07cc730813c",
+          "size": 15525,
+          "sha256": "0dada04a39979a1308e61b77df8de9321f8c21e2fa241f27204b393ea1c3861d",
           "kind": "source"
         },
         {
@@ -34017,9 +34017,9 @@
           "path": "tests/chart-embed.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d6e623c259e83b130869d4babf45b4bb02d08dcf",
-          "size": 8076,
-          "sha256": "a88854d4518701555bba7a68f9f6478058098684edd1663b46bc4bae52cfd857",
+          "blob": "34a32e924edee605363f2a587122368bf44944e4",
+          "size": 11128,
+          "sha256": "b1edf8d0b1ab0f89666c1e19ae521c70bbeb6d4387da881f37864e3c915d62a7",
           "kind": "source"
         },
         {

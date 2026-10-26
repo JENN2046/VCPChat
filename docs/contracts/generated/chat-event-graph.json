@@ -18580,7 +18580,7 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1669,
+          "line": 1677,
           "kind": "custom-event-listener"
         },
         {
@@ -18741,7 +18741,7 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1669,
+          "line": 1677,
           "kind": "custom-event-listener",
           "match": "input.addEventListener?.('input'"
         },
@@ -25760,14 +25760,14 @@
       "consumers": [
         {
           "file": "modules/chatManager.js",
-          "line": 590,
+          "line": 597,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/chatManager.js",
-          "line": 590,
+          "line": 597,
           "kind": "preload-subscription",
           "match": "electronAPI.onCanvasContentUpdate("
         }
@@ -25779,14 +25779,14 @@
       "consumers": [
         {
           "file": "modules/chatManager.js",
-          "line": 591,
+          "line": 598,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/chatManager.js",
-          "line": 591,
+          "line": 598,
           "kind": "preload-subscription",
           "match": "electronAPI.onCanvasWindowClosed("
         }

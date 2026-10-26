@@ -58,6 +58,7 @@ export const chatManager = (() => {
     let contextCompactionService;
     let compactionFlowlock;
     const streamCompactionRequests = new Map();
+    const streamCompactionTerminalSignals = new Map();
 
     async function checkStreamContextBudget({ messageId, context, text, cancelStream }) {
         if (disposed || context?.isGroupMessage || context?.groupId
@@ -75,25 +76,31 @@ export const chatManager = (() => {
         if (!Number.isFinite(limit) || limit <= 0
             || estimateContextTokens([...effective, { role: 'assistant', content: text }], config.systemPrompt || '') < limit) return;
         streamCompactionRequests.set(messageId, scope);
+        const terminal = new Promise(resolve => streamCompactionTerminalSignals.set(messageId, resolve));
         compactionFlowlock?.suspendForContextCompaction?.(scope.itemId, scope.topicId);
         notifySendStateChanged();
         // Same interruption gateway and local fallback as the normal Stop reply action.
         try {
             const result = await interruptCapability?.interrupt?.(messageId);
-            if (!result?.success) await cancelStream?.(messageId, 'context-budget-exceeded');
+            if (result?.success && await settlesWithin(terminal, INTERRUPT_SETTLE_MS)) return;
+            if (streamCompactionRequests.has(messageId)) await cancelStream?.(messageId, 'context-budget-exceeded');
         } catch (error) {
-            await cancelStream?.(messageId, 'context-budget-exceeded');
+            if (streamCompactionRequests.has(messageId)) await cancelStream?.(messageId, 'context-budget-exceeded');
+        } finally {
+            streamCompactionTerminalSignals.delete(messageId);
         }
     }
 
     function abandonStreamContextCompaction({ messageId, event }) {
         if (!event?.outcome?.persistence?.error || !streamCompactionRequests.has(messageId)) return;
+        streamCompactionTerminalSignals.get(messageId)?.();
         streamCompactionRequests.delete(messageId);
         notifySendStateChanged();
         uiHelper?.showToastNotification?.('中止内容尚未保存，已取消自动压缩；心流保持挂起，请先处理保存失败。', 'error');
     }
 
     async function finishStreamContextCompaction({ messageId }) {
+        streamCompactionTerminalSignals.get(messageId)?.();
         const scope = streamCompactionRequests.get(messageId);
         if (!scope) return;
         if (scope.cancelled) {
@@ -1659,6 +1666,7 @@ export const chatManager = (() => {
         pendingSendContexts.add(sendSignature);
         let stopNativeDraftObservation;
         try {
+        if (Number.isFinite(request?.deadline) && Date.now() >= request.deadline) throw new Error('主窗口请求已过期，消息未发送');
         // Capture ownership before prepare: that await can also outlive a draft
         // edit or a switch away and back. All listeners leave in the send finally.
         let nativeDraftEdited = false;
@@ -1711,6 +1719,7 @@ export const chatManager = (() => {
                 return;
             }
         }
+        if (Number.isFinite(request?.deadline) && Date.now() >= request.deadline) throw new Error('主窗口请求已过期，消息未发送');
         const uiAttachments = [];
         if (attachedFiles.length > 0) {
             for (const af of attachedFiles) {
@@ -1759,6 +1768,7 @@ export const chatManager = (() => {
         // Save history with the user message before adding the thinking message or making API calls
         let sendHistory;
         try {
+            if (Number.isFinite(request?.deadline) && Date.now() >= request.deadline) throw new Error('主窗口请求已过期，消息未发送');
             sendHistory = existingCheckpoint
                 ? [...sendHistoryRef.get()]
                 : await persistOutgoingUserMessage(sendContext, userMessage);
@@ -2678,6 +2688,8 @@ export const chatManager = (() => {
         disposed = true;
         initialized = false;
         contextCompactionService?.dispose();
+        for (const resolve of streamCompactionTerminalSignals.values()) resolve();
+        streamCompactionTerminalSignals.clear();
         streamCompactionRequests.clear();
         itemSelectionGeneration += 1;
         topicSelectionGeneration += 1;

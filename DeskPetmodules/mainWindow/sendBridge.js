@@ -23,7 +23,7 @@ export function createDeskPetSendBridge({
 
     async function sendOne({ agentId, text, files, newTopic = false, deadline } = {}) {
         // 桌宠那边已经按超时报失败了（前面排着的一条切换太慢）：不再发，免得用户重试后发两遍
-        const expired = () => Number.isFinite(deadline) && now() > deadline;
+        const expired = () => Number.isFinite(deadline) && now() >= deadline;
         const dropped = Array.isArray(files) ? files : [];
         if (typeof text !== 'string') text = '';
         if (typeof agentId !== 'string' || !agentId || (!text.trim() && !dropped.length)) {
@@ -82,7 +82,8 @@ export function createDeskPetSendBridge({
             if (!targetIsCurrent()) throw new Error('目标会话已切换，消息未发送');
             if (expired()) throw new Error('主窗口没有响应');
             if (isBusy()) throw new Error('上一条还在回复中');
-            return sendMessage({ content: text, attachments, propagateError: true, onAccepted });
+            return sendMessage({ content: text, attachments, propagateError: true, onAccepted,
+                ...(Number.isFinite(deadline) ? { deadline } : {}) });
         });
         const settled = sending.then(
             () => accepted ? { success: true } : { success: false, error: '消息尚未保存' },

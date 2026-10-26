@@ -1021,9 +1021,9 @@
           "path": "DeskPetmodules/mainWindow/sendBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "33dcee563f0526010e6db8f40e85191bbd5e44ff",
-          "size": 5369,
-          "sha256": "f0452d164be48d200c4f8bcc6b582ceca6994e32c1372559d12796f84684c53c",
+          "blob": "da3263d047e0d993ada79241f1c34b7fea68cc60",
+          "size": 5438,
+          "sha256": "5ca57ba0269aadcd758d623120f736aa4d23b570bc14591fa1c7b19745f0ac9f",
           "kind": "source"
         },
         {
@@ -8814,9 +8814,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "73b2eb8f13751f25ea9d13edcf8f0e9493b9f756",
-          "size": 138358,
-          "sha256": "3da75dd36af35a83b37f97ab7795c4f5835efcbd21aa9119bd64e11aa86695f7",
+          "blob": "0b60a4b366d46cf76395f53925c33d6534861597",
+          "size": 139456,
+          "sha256": "562d1f56e726fb23ebcdf413d7bbeb4ca2c6f3dd284f9d4edac5f1a90c879e45",
           "kind": "source"
         },
         {
@@ -15245,9 +15245,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "2c04492359e820f4e2f3eb02bed1a2dd9c55c362",
-          "size": 15447,
-          "sha256": "fb4fa1d96d1518bf3ce856762ce57b35487ba5b59d8902f00ab1fe767acd1aea",
+          "blob": "853f4587bc07749d82fa485bd533352b4a92abec",
+          "size": 15618,
+          "sha256": "d00c1cb22b86370b3c4449a94ae9b0b23d6dbd6e5e85fe11e30fa13e9d15a61f",
           "kind": "source"
         },
         {
@@ -17009,9 +17009,9 @@
           "path": "tests/deskpet-send-bridge.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "39e973410b64be85a6ca470b985abb4324b32d2c",
-          "size": 12460,
-          "sha256": "e6bdac5f3e7ef7a4e4d35487e9f3408b4d9ff93ad6d6ed56a039ae0e9aed7940",
+          "blob": "3feda0906fa005419c6d28d2c239af1b909b8108",
+          "size": 13038,
+          "sha256": "44762c942e3445cadb16b4cd85efbd2b21b35c0133ab71da09dc31d43761891c",
           "kind": "source"
         },
         {
@@ -20514,9 +20514,9 @@
           "path": "DeskPetmodules/mainWindow/sendBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "33dcee563f0526010e6db8f40e85191bbd5e44ff",
-          "size": 5369,
-          "sha256": "f0452d164be48d200c4f8bcc6b582ceca6994e32c1372559d12796f84684c53c",
+          "blob": "da3263d047e0d993ada79241f1c34b7fea68cc60",
+          "size": 5438,
+          "sha256": "5ca57ba0269aadcd758d623120f736aa4d23b570bc14591fa1c7b19745f0ac9f",
           "kind": "source"
         },
         {
@@ -25600,9 +25600,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "c6e17acee1fdcbcd2cdd83089e65ba8bf334c4c1",
+          "blob": "59a140f2340f4089f8e2e13e8b44d2015da31b1e",
           "size": 1076301,
-          "sha256": "a44bb3e07b952779a53b3ae89f9f022b9dc5d0edb30e716aa83cdfb7d20e2d82",
+          "sha256": "b3f6344e3db5f7ae39571c6a13de8082fe6876bc9f314f66cf222549f48640b8",
           "kind": "source"
         },
         {
@@ -26437,9 +26437,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "73b2eb8f13751f25ea9d13edcf8f0e9493b9f756",
-          "size": 138358,
-          "sha256": "3da75dd36af35a83b37f97ab7795c4f5835efcbd21aa9119bd64e11aa86695f7",
+          "blob": "0b60a4b366d46cf76395f53925c33d6534861597",
+          "size": 139456,
+          "sha256": "562d1f56e726fb23ebcdf413d7bbeb4ca2c6f3dd284f9d4edac5f1a90c879e45",
           "kind": "source"
         },
         {
@@ -32521,9 +32521,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "2c04492359e820f4e2f3eb02bed1a2dd9c55c362",
-          "size": 15447,
-          "sha256": "fb4fa1d96d1518bf3ce856762ce57b35487ba5b59d8902f00ab1fe767acd1aea",
+          "blob": "853f4587bc07749d82fa485bd533352b4a92abec",
+          "size": 15618,
+          "sha256": "d00c1cb22b86370b3c4449a94ae9b0b23d6dbd6e5e85fe11e30fa13e9d15a61f",
           "kind": "source"
         },
         {
@@ -34021,6 +34021,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/chat-compaction-interrupt.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5c07a29cfde639e758952ae60b6a95eaff1f111e",
+          "size": 4492,
+          "sha256": "405633da4b783aa5f6d17a96e848986b2a25b11b7798ff2909e5cd32ccfb8880",
+          "kind": "source"
+        },
+        {
           "path": "tests/chat-composer-inset.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -34159,9 +34168,18 @@
           "path": "tests/chat-send-acceptance.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "800fe6970804026a47c4251869f878609e450276",
-          "size": 2311,
-          "sha256": "121396d655727976394523a5187153128af5248b86c672a17c302f3e260ea2c1",
+          "blob": "835fca7b179a4b7f89f02e2520ce66eb3fa12f4b",
+          "size": 2679,
+          "sha256": "2818343b66bc94823074d8cdeb1c6f955f9c5215a65fa0bd399cca1d6ee28d2f",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chat-send-deadline.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "034c920c0684e8816a52366dd7a797516d8bdb8c",
+          "size": 2108,
+          "sha256": "57cec87bfb3210031340af7f51409379688e2a60b7377a30dc94501470053a97",
           "kind": "source"
         },
         {
@@ -34564,9 +34582,9 @@
           "path": "tests/deskpet-send-bridge.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "39e973410b64be85a6ca470b985abb4324b32d2c",
-          "size": 12460,
-          "sha256": "e6bdac5f3e7ef7a4e4d35487e9f3408b4d9ff93ad6d6ed56a039ae0e9aed7940",
+          "blob": "3feda0906fa005419c6d28d2c239af1b909b8108",
+          "size": 13038,
+          "sha256": "44762c942e3445cadb16b4cd85efbd2b21b35c0133ab71da09dc31d43761891c",
           "kind": "source"
         },
         {
@@ -38246,6 +38264,7 @@
           "files": [
             "tests/chat-back-to-bottom.test.mjs",
             "tests/chat-bubble-backdrop.test.mjs",
+            "tests/chat-compaction-interrupt.test.mjs",
             "tests/chat-composer-inset.test.mjs",
             "tests/chat-context.test.mjs",
             "tests/chat-dom-renderer.test.mjs",
@@ -38262,6 +38281,7 @@
             "tests/chat-presentation-state.test.mjs",
             "tests/chat-repository.test.mjs",
             "tests/chat-send-acceptance.test.mjs",
+            "tests/chat-send-deadline.test.mjs",
             "tests/chat-surface-slots.test.mjs",
             "tests/chat-surface.test.mjs",
             "tests/chat-theme-plugin.test.mjs",

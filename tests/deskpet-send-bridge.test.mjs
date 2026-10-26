@@ -233,3 +233,14 @@ test('a completed send without acceptance preserves the draft', async () => {
     });
     assert.equal((await bridge({ agentId: 'Alice', text: 'not accepted' })).success, false);
 });
+
+test('the pet deadline is carried into pre-persistence sending', async () => {
+    let received;
+    const bridge = createDeskPetSendBridge({
+        getSelectedItem: () => ({ id: 'Alice', type: 'agent' }), getTopicId: () => 'topic_alice',
+        findAgent: () => null, selectItem: async () => {}, isBusy: () => false, now: () => 0,
+        sendMessage: async request => { received = request.deadline; request.onAccepted(); },
+    });
+    assert.equal((await bridge({ agentId: 'Alice', text: 'bounded', deadline: 1000 })).success, true);
+    assert.equal(received, 1000);
+});

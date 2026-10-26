@@ -112,6 +112,13 @@ export function createVcpStreamBridge({ createConsumer, reportError = console.er
     };
 
     return Object.freeze({
+        isOperationActive(messageId, operationId = null) {
+            const visibleId = String(messageId || '').trim();
+            const current = messageOperations.get(visibleId);
+            const sessionId = operationId == null ? current : String(operationId).trim();
+            return !disposed && Boolean(current) && current === sessionId
+                && operations.get(sessionId)?.accepting === true;
+        },
         accept(event) {
             if (!MANAGED_TYPES.has(event?.type) || !event?.messageId) return false;
             const operation = ensureOperation(event);

@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "09bfe6d44c0aa811a5c2bad11de52a80c0c84775",
-          "size": 30535,
-          "sha256": "d371581319ad90b08c28c1f98d2e905452f70ee23017f7c1d47f383f4cd7abfe",
+          "blob": "cec3e9c1f25a229d0c00e1c38beb539e80e5098b",
+          "size": 30568,
+          "sha256": "16d3bbd45c7ecae170982e3ab28e589b2b6cf23c2b30729708bdf86b507bbebf",
           "kind": "source"
         },
         {
@@ -8805,18 +8805,18 @@
           "path": "modules/chat/vcpStreamBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "209b5274dd5f68c5f963018126f98177dd4ed8f4",
-          "size": 7371,
-          "sha256": "0269ef4817298a81a4424da45d0f92f96b578ba121b1c5b27427be0ab55c41fe",
+          "blob": "2ffcfc25384bb8fbe5da427bb6cbe148bacb85ce",
+          "size": 7795,
+          "sha256": "fd7977c548e3f26d38665597bf604d5cdc6496d157497fa6070f33f4550f5689",
           "kind": "source"
         },
         {
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "0b60a4b366d46cf76395f53925c33d6534861597",
-          "size": 139456,
-          "sha256": "562d1f56e726fb23ebcdf413d7bbeb4ca2c6f3dd284f9d4edac5f1a90c879e45",
+          "blob": "cd5dafd8b46509a37d17631f4ddb0f5fe6d63f4e",
+          "size": 139610,
+          "sha256": "548c6823eb5e6c87fa7e898370e72ed4913d44029465adc73f11aab804ffb510",
           "kind": "source"
         },
         {
@@ -10425,18 +10425,18 @@
           "path": "modules/renderer/mainChatStreamConsumer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0733f3de2e3f82bb680af60a762dfd2485c9191d",
-          "size": 6663,
-          "sha256": "86aa5b11916622251ed30f56e4652e46276ec6a7a2253656e226bf89ad08621f",
+          "blob": "e987f5c04b859e1bcd2aefb875657ac02cc03040",
+          "size": 6695,
+          "sha256": "7e71057fb62d383af67949e11b65af4210214db64d40397b6a944a83bfdc2983",
           "kind": "source"
         },
         {
           "path": "modules/renderer/mainChatSurfaceAdapter.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "05147633781014a3c6bad9a50f22bef803e7ba4c",
-          "size": 9620,
-          "sha256": "2f4f2d582aae05660f8908405f966f71d2cf01ebc1ab57b667257aacea897342",
+          "blob": "871b8049426f2b50c516f38d6a56dfac613723b4",
+          "size": 9726,
+          "sha256": "ffa45a70e20fa21d536ea9811a751706ce02186e0718872f67498486f656147b",
           "kind": "source"
         },
         {
@@ -13594,9 +13594,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "09bfe6d44c0aa811a5c2bad11de52a80c0c84775",
-          "size": 30535,
-          "sha256": "d371581319ad90b08c28c1f98d2e905452f70ee23017f7c1d47f383f4cd7abfe",
+          "blob": "cec3e9c1f25a229d0c00e1c38beb539e80e5098b",
+          "size": 30568,
+          "sha256": "16d3bbd45c7ecae170982e3ab28e589b2b6cf23c2b30729708bdf86b507bbebf",
           "kind": "source"
         },
         {
@@ -15245,9 +15245,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "853f4587bc07749d82fa485bd533352b4a92abec",
-          "size": 15618,
-          "sha256": "d00c1cb22b86370b3c4449a94ae9b0b23d6dbd6e5e85fe11e30fa13e9d15a61f",
+          "blob": "2f82eee550bfe54113f43ecb66087df30436e4f9",
+          "size": 15740,
+          "sha256": "bc3d6b6a977eecef72b2a0163f7fee69c76a681863963d0382e096f850e48463",
           "kind": "source"
         },
         {
@@ -25600,9 +25600,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "59a140f2340f4089f8e2e13e8b44d2015da31b1e",
+          "blob": "bb11c14716c8cbdd218ee3b38e590cf3b53fc8c1",
           "size": 1076301,
-          "sha256": "b3f6344e3db5f7ae39571c6a13de8082fe6876bc9f314f66cf222549f48640b8",
+          "sha256": "e7f0e6226cefb9f4d2f04592829e28c491eddf4d44e609eea60c2c8427a3cd03",
           "kind": "source"
         },
         {
@@ -26428,18 +26428,18 @@
           "path": "modules/chat/vcpStreamBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "209b5274dd5f68c5f963018126f98177dd4ed8f4",
-          "size": 7371,
-          "sha256": "0269ef4817298a81a4424da45d0f92f96b578ba121b1c5b27427be0ab55c41fe",
+          "blob": "2ffcfc25384bb8fbe5da427bb6cbe148bacb85ce",
+          "size": 7795,
+          "sha256": "fd7977c548e3f26d38665597bf604d5cdc6496d157497fa6070f33f4550f5689",
           "kind": "source"
         },
         {
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "0b60a4b366d46cf76395f53925c33d6534861597",
-          "size": 139456,
-          "sha256": "562d1f56e726fb23ebcdf413d7bbeb4ca2c6f3dd284f9d4edac5f1a90c879e45",
+          "blob": "cd5dafd8b46509a37d17631f4ddb0f5fe6d63f4e",
+          "size": 139610,
+          "sha256": "548c6823eb5e6c87fa7e898370e72ed4913d44029465adc73f11aab804ffb510",
           "kind": "source"
         },
         {
@@ -28039,18 +28039,18 @@
           "path": "modules/renderer/mainChatStreamConsumer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0733f3de2e3f82bb680af60a762dfd2485c9191d",
-          "size": 6663,
-          "sha256": "86aa5b11916622251ed30f56e4652e46276ec6a7a2253656e226bf89ad08621f",
+          "blob": "e987f5c04b859e1bcd2aefb875657ac02cc03040",
+          "size": 6695,
+          "sha256": "7e71057fb62d383af67949e11b65af4210214db64d40397b6a944a83bfdc2983",
           "kind": "source"
         },
         {
           "path": "modules/renderer/mainChatSurfaceAdapter.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "05147633781014a3c6bad9a50f22bef803e7ba4c",
-          "size": 9620,
-          "sha256": "2f4f2d582aae05660f8908405f966f71d2cf01ebc1ab57b667257aacea897342",
+          "blob": "871b8049426f2b50c516f38d6a56dfac613723b4",
+          "size": 9726,
+          "sha256": "ffa45a70e20fa21d536ea9811a751706ce02186e0718872f67498486f656147b",
           "kind": "source"
         },
         {
@@ -31180,9 +31180,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "09bfe6d44c0aa811a5c2bad11de52a80c0c84775",
-          "size": 30535,
-          "sha256": "d371581319ad90b08c28c1f98d2e905452f70ee23017f7c1d47f383f4cd7abfe",
+          "blob": "cec3e9c1f25a229d0c00e1c38beb539e80e5098b",
+          "size": 30568,
+          "sha256": "16d3bbd45c7ecae170982e3ab28e589b2b6cf23c2b30729708bdf86b507bbebf",
           "kind": "source"
         },
         {
@@ -32521,9 +32521,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "853f4587bc07749d82fa485bd533352b4a92abec",
-          "size": 15618,
-          "sha256": "d00c1cb22b86370b3c4449a94ae9b0b23d6dbd6e5e85fe11e30fa13e9d15a61f",
+          "blob": "2f82eee550bfe54113f43ecb66087df30436e4f9",
+          "size": 15740,
+          "sha256": "bc3d6b6a977eecef72b2a0163f7fee69c76a681863963d0382e096f850e48463",
           "kind": "source"
         },
         {
@@ -34024,9 +34024,9 @@
           "path": "tests/chat-compaction-interrupt.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5c07a29cfde639e758952ae60b6a95eaff1f111e",
-          "size": 4492,
-          "sha256": "405633da4b783aa5f6d17a96e848986b2a25b11b7798ff2909e5cd32ccfb8880",
+          "blob": "a702178770760182bb19024987ef77ad097ad043",
+          "size": 5826,
+          "sha256": "418b763f5e1bb302829303ae70140241d1fad3d39b0e1ac07f60216781ed0542",
           "kind": "source"
         },
         {
@@ -36823,9 +36823,9 @@
           "path": "tests/vcp-stream-bridge.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "80e8c603533a8dcf67333b268656a6c4db034f8a",
-          "size": 13308,
-          "sha256": "7605a0bdf3e94cea4d844275a1d851ba9834f77a40eac80c658044ef57c6513d",
+          "blob": "ee76bc3e0b695e6fc03a71b755b2f672433dfc15",
+          "size": 14330,
+          "sha256": "789ac3e87804157ea9856723daf4da6155f202f2501a3a096a3092f3fd999863",
           "kind": "source"
         },
         {
@@ -38323,7 +38323,8 @@
             "tests/stream-transient-history.test.mjs",
             "tests/suvei-human-authorization.test.js",
             "tests/topic-selection-readiness.test.mjs",
-            "tests/ui-helper-chat-scroll-follow.test.js"
+            "tests/ui-helper-chat-scroll-follow.test.js",
+            "tests/vcp-stream-bridge.test.mjs"
           ]
         },
         {

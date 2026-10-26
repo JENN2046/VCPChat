@@ -56,7 +56,7 @@ export function createMainChatStreamConsumer(initialEvent, capabilities) {
                     if (boundaries.length > checkedBoundaryCount) {
                         checkedBoundaryCount = boundaries.length;
                         Promise.resolve(capabilities.onToolReturnBoundary?.({
-                            messageId, context, text: accumulatedText,
+                            messageId, streamOperationId: operationId, context, text: accumulatedText,
                         })).catch(error => capabilities.reportError?.('[ContextCompaction] Boundary check failed', error));
                     }
                 }

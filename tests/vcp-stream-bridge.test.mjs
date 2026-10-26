@@ -11,6 +11,23 @@ const waitUntil = async predicate => {
     assert.fail('stream bridge did not reach its real terminal promise');
 };
 
+test('stream liveness closes at producer termination while durable persistence is pending', async () => {
+    let release, persisting = false;
+    const gate = new Promise(resolve => { release = resolve; });
+    const bridge = createVcpStreamBridge({ createConsumer: () => ({
+        prepare() {}, consume() {}, persist: async () => { persisting = true; await gate; },
+    }) });
+    try {
+        assert.equal(bridge.isOperationActive('synthetic'), false);
+        bridge.accept({ type: 'start', messageId: 'synthetic', streamOperationId: 'attempt-1' });
+        assert.equal(bridge.isOperationActive('synthetic', 'attempt-1'), true);
+        assert.equal(bridge.isOperationActive('synthetic', 'attempt-other'), false);
+        bridge.accept({ type: 'end', messageId: 'synthetic', streamOperationId: 'attempt-1', finish_reason: 'stop' });
+        await waitUntil(() => persisting);
+        assert.equal(bridge.isOperationActive('synthetic', 'attempt-1'), false);
+    } finally { release(); await bridge.dispose(); }
+});
+
 test('VCP bridge drives one consumer from thinking through persisted terminal', async () => {
     const seen = [];
     const bridge = createVcpStreamBridge({

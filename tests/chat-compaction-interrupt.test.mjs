@@ -83,3 +83,24 @@ test('failed terminal persistence releases the waiter without resuming compactio
     assert.equal(f.requests.size, 0);
     assert.equal(f.signals.size, 0);
 });
+
+for (const stage of ['configuration', 'history']) test(`a background stream retired during ${stage} loading cannot suspend the conversation`, async () => {
+    const f = fixture();
+    let active = true, release;
+    const pending = new Promise(resolve => { release = resolve; });
+    f.context.currentSelectedItemRef = { get: () => ({ id: 'B', type: 'agent' }) };
+    f.context.electronAPI = { getAgentConfig: async () => stage === 'configuration' ? pending : { contextTokenLimit: 1 } };
+    f.context.getHistory = async () => stage === 'history' ? pending : [];
+    const checking = f.context.checkStreamContextBudget({ messageId: 'M', context: { agentId: 'A', topicId: 'T' }, text: 'synthetic',
+        isStreamActive: () => active, cancelStream: async () => { f.events.push('cancel'); await f.context.finishStreamContextCompaction({ messageId: 'M' }); } });
+    await flush();
+    active = false;
+    await f.context.finishStreamContextCompaction({ messageId: 'M' });
+    release(stage === 'configuration' ? { contextTokenLimit: 1 } : []);
+    await flush();
+    const observed = [...f.events];
+    for (const timer of f.timers.values()) timer.callback();
+    await checking;
+    assert.deepEqual(observed, [], 'a retired stream must not register a budget request or suspend Flowlock');
+    assert.equal(f.requests.size, 0);
+});

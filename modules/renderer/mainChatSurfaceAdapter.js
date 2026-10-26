@@ -136,6 +136,7 @@ export function createMainChatSurfaceAdapter({
             resolveProjection: messageId => streamRoutes.claim(messageId),
             onToolReturnBoundary: value => streamServices.chatManager?.checkStreamContextBudget?.({
                 ...value,
+                isStreamActive: () => bridge.isOperationActive(value.messageId, value.streamOperationId),
                 cancelStream: (messageId, reason) => bridge.cancelOperation(messageId, reason),
             }),
         }),

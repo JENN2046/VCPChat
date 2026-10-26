@@ -60,8 +60,9 @@ export const chatManager = (() => {
     const streamCompactionRequests = new Map();
     const streamCompactionTerminalSignals = new Map();
 
-    async function checkStreamContextBudget({ messageId, context, text, cancelStream }) {
+    async function checkStreamContextBudget({ messageId, context, text, cancelStream, isStreamActive }) {
         if (disposed || context?.isGroupMessage || context?.groupId
+            || isStreamActive?.() === false
             || !context?.agentId || !context?.topicId || streamCompactionRequests.has(messageId)
             || globalSettingsRef.get().enableContextCompaction !== true) return;
         const scope = { itemId: context.agentId, itemType: 'agent', topicId: context.topicId };
@@ -69,8 +70,9 @@ export const chatManager = (() => {
         const visible = selected?.id === scope.itemId && selected.type === 'agent'
             && currentTopicIdRef.get() === scope.topicId;
         const config = visible ? (selected.config || selected) : await electronAPI.getAgentConfig(scope.itemId);
+        if (disposed || isStreamActive?.() === false) return;
         const history = visible ? currentChatHistoryRef.get() : await getHistory(scope.itemId, 'agent', scope.topicId);
-        if (disposed || !Array.isArray(history) || streamCompactionRequests.has(messageId)) return;
+        if (disposed || isStreamActive?.() === false || !Array.isArray(history) || streamCompactionRequests.has(messageId)) return;
         const effective = effectiveContextHistory(history.filter(message => message.id !== messageId));
         const limit = Number(config?.contextTokenLimit);
         if (!Number.isFinite(limit) || limit <= 0

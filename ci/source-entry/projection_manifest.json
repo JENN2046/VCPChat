@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "a6e93af9fd4a12e37dc712f8eb7005f6bcb3a77d",
-          "size": 30595,
-          "sha256": "2c16ba72caef1c42014579c9bf3329cadcd645c1d23fea01114313bf448cce23",
+          "blob": "9f3fb2c97e0c0d089692cc886476a63bf2b3e9ce",
+          "size": 30852,
+          "sha256": "bfe2b9aae3bc0e8609d8164edaee70f37bf65f904e17046251a29a5f825fa986",
           "kind": "source"
         },
         {
@@ -715,9 +715,9 @@
           "path": "Chartmodules/chart-runtime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4385eec7fada9d1ea338c33ea7568eb8fa57fd6d",
-          "size": 19874,
-          "sha256": "485f72b0e75bdbeb6f944529169371149e430db9e068af5687b2ad1238a79e9b",
+          "blob": "b6d91303342156b85b19610d9031837d20ba7fe3",
+          "size": 21553,
+          "sha256": "05366443ca42217b613a94917bd50a3d39f49086dae3d2d91a5c317fdc91ce2a",
           "kind": "source"
         },
         {
@@ -9318,9 +9318,9 @@
           "path": "modules/event-listeners.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa00b9026fe559efedb1714c0a620110e40d3e86",
-          "size": 75111,
-          "sha256": "870038939ce78b73d1f84518f3b95be671a4b69e69bf213a5374ce01e0499d20",
+          "blob": "6acf5e842ba5a4fee490c59a44fbc76427cd207a",
+          "size": 75154,
+          "sha256": "e5367161b9d4c943dd015fb1dee727fe905ca1b45aec269abd4411e960783236",
           "kind": "source"
         },
         {
@@ -9507,9 +9507,9 @@
           "path": "modules/ipc/chartHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "62a80a059ab64e3fa46174892cb8ace8b3f0d876",
-          "size": 31209,
-          "sha256": "eddf9ab1671f037b493cea5810f43c0a20aa6ec135e2c36bac585670f0a5cf2b",
+          "blob": "b1f9d5981b101b6f8da481f69c5e581b5b4e049a",
+          "size": 35610,
+          "sha256": "68f4dd6e7ec6b73caa9811a5b434d4aa4dc018abdad033b0f02943c897d1eca7",
           "kind": "source"
         },
         {
@@ -9786,9 +9786,9 @@
           "path": "modules/ipc/settingsHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "28e5fce1557ff1e41589ceda61e5327ac79b18d5",
-          "size": 15174,
-          "sha256": "cec001787c68d8742e72e3898432f642c0a9597da3ac91c75afb134197600639",
+          "blob": "635674cb7f382c999680024b89ee8019dd5b890d",
+          "size": 15565,
+          "sha256": "b75b96827186c22eff548c83980fea5cd2739879754da9473eda7e9485cbae53",
           "kind": "source"
         },
         {
@@ -11203,6 +11203,15 @@
           "blob": "05bc550a2424f949ef60dacec13a5e5162790bf1",
           "size": 6494,
           "sha256": "d353a51d9b2cff7417db3b4618ba082b4ed771f206a8eaca77ae23480abf55f3",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/shootingPlannerSyncService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ed31bc4ef549b53a6bd35e2be624b8ee448dcf13",
+          "size": 4856,
+          "sha256": "2a8d06dc47cdb7b5102488227370c82f05875bc9f2fc9b3d28a36cecc4dd73b3",
           "kind": "source"
         },
         {
@@ -13594,9 +13603,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "a6e93af9fd4a12e37dc712f8eb7005f6bcb3a77d",
-          "size": 30595,
-          "sha256": "2c16ba72caef1c42014579c9bf3329cadcd645c1d23fea01114313bf448cce23",
+          "blob": "9f3fb2c97e0c0d089692cc886476a63bf2b3e9ce",
+          "size": 30852,
+          "sha256": "bfe2b9aae3bc0e8609d8164edaee70f37bf65f904e17046251a29a5f825fa986",
           "kind": "source"
         },
         {
@@ -13990,9 +13999,9 @@
           "path": "preloads/chart.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9ad7edcba2e062a2165e2da334ec87b4d361476b",
-          "size": 2434,
-          "sha256": "73850fc06eb0c5bd5c64e9bb7902db3783d8c031cf4ec5f58ee3d437db1d7ec3",
+          "blob": "558e8e4f89ad40f465f86f53800d1b4938c94c2a",
+          "size": 2610,
+          "sha256": "f54e0050e5f356bc932c6f56540089bbd1517c025e32637ce7b89e03a3412afb",
           "kind": "source"
         },
         {
@@ -14759,9 +14768,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "bc0ffd463668d0da3b1ff7837a22dd23cbc28d3f",
-          "size": 43162,
-          "sha256": "054958706e2bcd64ab96b93bb23edb340d044ab6f745280e652f9867c2b699b9",
+          "blob": "daac4e51d98a43f69ab4ece625aacad30ff12257",
+          "size": 43635,
+          "sha256": "bb0c4a38a355e095247fa5303514c957c91d9ebc3ee0d68c3a75519514d4c971",
           "kind": "source"
         },
         {
@@ -15947,9 +15956,9 @@
           "path": "styles/themes.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "c49004e55b0e228e9e0d94ae4e119f82ccfebc48",
-          "size": 10826,
-          "sha256": "4cbee2fd0ad48f1a3327991833c634e37c4588e27f027f822cca970389e96c0b",
+          "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
+          "size": 25410,
+          "sha256": "dae4d27a48cbbda4bfa92d997226c52509aa955f18eaa6ca34d3a0770e2f73e3",
           "kind": "source"
         },
         {
@@ -16136,9 +16145,9 @@
           "path": "styles/themes/themes黑曜与星火.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "d8049a4e12e76ecc3b27c6811d2f6398e90b4a9a",
-          "size": 25253,
-          "sha256": "00357f201f18299afefe70fedf477b0fc3798c343b1d7233bda1891608a56eec",
+          "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
+          "size": 25410,
+          "sha256": "dae4d27a48cbbda4bfa92d997226c52509aa955f18eaa6ca34d3a0770e2f73e3",
           "kind": "source"
         },
         {
@@ -16715,6 +16724,15 @@
           "blob": "34a32e924edee605363f2a587122368bf44944e4",
           "size": 11128,
           "sha256": "b1edf8d0b1ab0f89666c1e19ae521c70bbeb6d4387da881f37864e3c915d62a7",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-runtime-persistence-contract.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a18d426950db824cc6831a72737d687f4af90f86",
+          "size": 1436,
+          "sha256": "94bf581785c9f04da57ea1bb00f6e6e6b5246b082bb87e35b62a4e21afc78af3",
           "kind": "source"
         },
         {
@@ -17600,6 +17618,24 @@
           "kind": "source"
         },
         {
+          "path": "tests/settings-agent-draft-retention.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ae2c549a32af32bd962457d5007aef6f6db520a5",
+          "size": 9625,
+          "sha256": "22eaf30d6db6a045e611915f4e809ed48c6a9bc31b9246acbcbbdc4e0083fc45",
+          "kind": "source"
+        },
+        {
+          "path": "tests/settings-atomic-write.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d57818ad8b5e59fb3d1cc9aafeed41ca4604fb22",
+          "size": 5452,
+          "sha256": "9afa77b6f777af6eafec7559becaf499eeb4babaeeabdfd30a536940efa227d6",
+          "kind": "source"
+        },
+        {
           "path": "tests/settings-extension-hosts.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -17627,6 +17663,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/shooting-planner-sync-service.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b2b5d567f85fb592451b197db496b48c1862e25c",
+          "size": 2679,
+          "sha256": "a6dbe15bc31420d501e9ee82fbc8b95da6a81b6327dcacb7895496ec3d5b8afa",
+          "kind": "source"
+        },
+        {
           "path": "tests/side-browser-address.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -17651,6 +17696,15 @@
           "blob": "559d10a01d6d5a490ab6ba1e5515c82d45296543",
           "size": 56496,
           "sha256": "f578e1c5e5869bfb09ee73d710b536a69c509eb65405ba1ba68bea60a77a5553",
+          "kind": "source"
+        },
+        {
+          "path": "tests/sidebar-avatar-only-navigation.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "11a3fbd0559474623a7e99e192b7b52b0f78ff47",
+          "size": 1049,
+          "sha256": "74c0af2cd3f0f9a5013f4357e7a5cb7cd5d7f599b03cc5b20bc357a2f3f059eb",
           "kind": "source"
         },
         {
@@ -20118,6 +20172,24 @@
             "tokens",
             "cookies"
           ]
+        },
+        {
+          "name": "reviewed-retained-local-integrations",
+          "files": [
+            "Chartmodules/chart-runtime.js",
+            "modules/event-listeners.js",
+            "modules/ipc/chartHandlers.js",
+            "modules/ipc/settingsHandlers.js",
+            "modules/services/shootingPlannerSyncService.js",
+            "preloads/chart.js",
+            "styles/themes.css",
+            "tests/chart-runtime-persistence-contract.test.mjs",
+            "tests/global-settings-save.test.mjs",
+            "tests/settings-agent-draft-retention.test.mjs",
+            "tests/settings-atomic-write.test.js",
+            "tests/shooting-planner-sync-service.test.js",
+            "tests/sidebar-avatar-only-navigation.test.js"
+          ]
         }
       ],
       "source_context": {
@@ -20219,9 +20291,9 @@
           "path": "Chartmodules/chart-runtime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4385eec7fada9d1ea338c33ea7568eb8fa57fd6d",
-          "size": 19874,
-          "sha256": "485f72b0e75bdbeb6f944529169371149e430db9e068af5687b2ad1238a79e9b",
+          "blob": "b6d91303342156b85b19610d9031837d20ba7fe3",
+          "size": 21553,
+          "sha256": "05366443ca42217b613a94917bd50a3d39f49086dae3d2d91a5c317fdc91ce2a",
           "kind": "source"
         },
         {
@@ -25602,18 +25674,18 @@
           "path": "docs/contracts/chat-contracts.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "fd4b0ad5f9aa5f1e1e5029abdff5a72b5f44e627",
+          "blob": "16f514bad16a883f94ba0f9a1183d76bba18f279",
           "size": 65293,
-          "sha256": "218f3ae070ac2f2bbc87b3b1ac57fc9180266451db3f602971b570e804508e62",
+          "sha256": "7a3ed2e1ab85c10fcf1fcd9526138e437e39b9003d5af5670b5ceebc764d252d",
           "kind": "source"
         },
         {
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "716b3a98c145cb0c866ba5ca95278a58c336a3fd",
-          "size": 1076301,
-          "sha256": "da9e330d2a127841ae3a794ea7010a0799cb310b3b9f2818f434ccfcb92cc43a",
+          "blob": "bfe9a468531513fb40a973c85d9e17d17f6f5ac5",
+          "size": 1077858,
+          "sha256": "2a49ddf79d449ef9b68d5e62434ab206780af78592054dfbb870400ad648653a",
           "kind": "source"
         },
         {
@@ -26952,9 +27024,9 @@
           "path": "modules/event-listeners.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa00b9026fe559efedb1714c0a620110e40d3e86",
-          "size": 75111,
-          "sha256": "870038939ce78b73d1f84518f3b95be671a4b69e69bf213a5374ce01e0499d20",
+          "blob": "6acf5e842ba5a4fee490c59a44fbc76427cd207a",
+          "size": 75154,
+          "sha256": "e5367161b9d4c943dd015fb1dee727fe905ca1b45aec269abd4411e960783236",
           "kind": "source"
         },
         {
@@ -27141,9 +27213,9 @@
           "path": "modules/ipc/chartHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "62a80a059ab64e3fa46174892cb8ace8b3f0d876",
-          "size": 31209,
-          "sha256": "eddf9ab1671f037b493cea5810f43c0a20aa6ec135e2c36bac585670f0a5cf2b",
+          "blob": "b1f9d5981b101b6f8da481f69c5e581b5b4e049a",
+          "size": 35610,
+          "sha256": "68f4dd6e7ec6b73caa9811a5b434d4aa4dc018abdad033b0f02943c897d1eca7",
           "kind": "source"
         },
         {
@@ -27411,9 +27483,9 @@
           "path": "modules/ipc/settingsHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "28e5fce1557ff1e41589ceda61e5327ac79b18d5",
-          "size": 15174,
-          "sha256": "cec001787c68d8742e72e3898432f642c0a9597da3ac91c75afb134197600639",
+          "blob": "635674cb7f382c999680024b89ee8019dd5b890d",
+          "size": 15565,
+          "sha256": "b75b96827186c22eff548c83980fea5cd2739879754da9473eda7e9485cbae53",
           "kind": "source"
         },
         {
@@ -28809,6 +28881,15 @@
           "blob": "05bc550a2424f949ef60dacec13a5e5162790bf1",
           "size": 6494,
           "sha256": "d353a51d9b2cff7417db3b4618ba082b4ed771f206a8eaca77ae23480abf55f3",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/shootingPlannerSyncService.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ed31bc4ef549b53a6bd35e2be624b8ee448dcf13",
+          "size": 4856,
+          "sha256": "2a8d06dc47cdb7b5102488227370c82f05875bc9f2fc9b3d28a36cecc4dd73b3",
           "kind": "source"
         },
         {
@@ -31191,9 +31272,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "a6e93af9fd4a12e37dc712f8eb7005f6bcb3a77d",
-          "size": 30595,
-          "sha256": "2c16ba72caef1c42014579c9bf3329cadcd645c1d23fea01114313bf448cce23",
+          "blob": "9f3fb2c97e0c0d089692cc886476a63bf2b3e9ce",
+          "size": 30852,
+          "sha256": "bfe2b9aae3bc0e8609d8164edaee70f37bf65f904e17046251a29a5f825fa986",
           "kind": "source"
         },
         {
@@ -31578,9 +31659,9 @@
           "path": "preloads/chart.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9ad7edcba2e062a2165e2da334ec87b4d361476b",
-          "size": 2434,
-          "sha256": "73850fc06eb0c5bd5c64e9bb7902db3783d8c031cf4ec5f58ee3d437db1d7ec3",
+          "blob": "558e8e4f89ad40f465f86f53800d1b4938c94c2a",
+          "size": 2610,
+          "sha256": "f54e0050e5f356bc932c6f56540089bbd1517c025e32637ce7b89e03a3412afb",
           "kind": "source"
         },
         {
@@ -32046,9 +32127,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "bc0ffd463668d0da3b1ff7837a22dd23cbc28d3f",
-          "size": 43162,
-          "sha256": "054958706e2bcd64ab96b93bb23edb340d044ab6f745280e652f9867c2b699b9",
+          "blob": "daac4e51d98a43f69ab4ece625aacad30ff12257",
+          "size": 43635,
+          "sha256": "bb0c4a38a355e095247fa5303514c957c91d9ebc3ee0d68c3a75519514d4c971",
           "kind": "source"
         },
         {
@@ -33243,9 +33324,9 @@
           "path": "styles/themes.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "c49004e55b0e228e9e0d94ae4e119f82ccfebc48",
-          "size": 10826,
-          "sha256": "4cbee2fd0ad48f1a3327991833c634e37c4588e27f027f822cca970389e96c0b",
+          "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
+          "size": 25410,
+          "sha256": "dae4d27a48cbbda4bfa92d997226c52509aa955f18eaa6ca34d3a0770e2f73e3",
           "kind": "source"
         },
         {
@@ -33432,9 +33513,9 @@
           "path": "styles/themes/themes黑曜与星火.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "d8049a4e12e76ecc3b27c6811d2f6398e90b4a9a",
-          "size": 25253,
-          "sha256": "00357f201f18299afefe70fedf477b0fc3798c343b1d7233bda1891608a56eec",
+          "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
+          "size": 25410,
+          "sha256": "dae4d27a48cbbda4bfa92d997226c52509aa955f18eaa6ca34d3a0770e2f73e3",
           "kind": "source"
         },
         {
@@ -34020,6 +34101,15 @@
           "blob": "34a32e924edee605363f2a587122368bf44944e4",
           "size": 11128,
           "sha256": "b1edf8d0b1ab0f89666c1e19ae521c70bbeb6d4387da881f37864e3c915d62a7",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-runtime-persistence-contract.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a18d426950db824cc6831a72737d687f4af90f86",
+          "size": 1436,
+          "sha256": "94bf581785c9f04da57ea1bb00f6e6e6b5246b082bb87e35b62a4e21afc78af3",
           "kind": "source"
         },
         {
@@ -35661,6 +35751,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/settings-atomic-write.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d57818ad8b5e59fb3d1cc9aafeed41ca4604fb22",
+          "size": 5452,
+          "sha256": "9afa77b6f777af6eafec7559becaf499eeb4babaeeabdfd30a536940efa227d6",
+          "kind": "source"
+        },
+        {
           "path": "tests/settings-extension-hosts.test.mjs",
           "mode": "100644",
           "type": "blob",
@@ -35730,6 +35829,15 @@
           "blob": "4c824dac7b273a346b7263e7665a4064837b9342",
           "size": 10429,
           "sha256": "93cf1dba6e7bf3941a09d0b3531cd05c41cbd5c6b9bf444f572dd6940b1c8413",
+          "kind": "source"
+        },
+        {
+          "path": "tests/shooting-planner-sync-service.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b2b5d567f85fb592451b197db496b48c1862e25c",
+          "size": 2679,
+          "sha256": "a6dbe15bc31420d501e9ee82fbc8b95da6a81b6327dcacb7895496ec3d5b8afa",
           "kind": "source"
         },
         {
@@ -36468,6 +36576,15 @@
           "blob": "94aedfe3c4ca582a0ef68dc5a2860af0a00062ef",
           "size": 6046,
           "sha256": "bbfe7d4f2db013600d39a58986f2eb342dc9bf74c30963ede836270e13351497",
+          "kind": "source"
+        },
+        {
+          "path": "tests/sidebar-avatar-only-navigation.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "11a3fbd0559474623a7e99e192b7b52b0f78ff47",
+          "size": 1049,
+          "sha256": "74c0af2cd3f0f9a5013f4357e7a5cb7cd5d7f599b03cc5b20bc357a2f3f059eb",
           "kind": "source"
         },
         {
@@ -39012,6 +39129,24 @@
             "secrets",
             "tokens",
             "cookies"
+          ]
+        },
+        {
+          "name": "reviewed-retained-local-integrations",
+          "files": [
+            "Chartmodules/chart-runtime.js",
+            "modules/event-listeners.js",
+            "modules/ipc/chartHandlers.js",
+            "modules/ipc/settingsHandlers.js",
+            "modules/services/shootingPlannerSyncService.js",
+            "preloads/chart.js",
+            "styles/themes.css",
+            "tests/chart-runtime-persistence-contract.test.mjs",
+            "tests/global-settings-save.test.mjs",
+            "tests/settings-agent-draft-retention.test.mjs",
+            "tests/settings-atomic-write.test.js",
+            "tests/shooting-planner-sync-service.test.js",
+            "tests/sidebar-avatar-only-navigation.test.js"
           ]
         }
       ],

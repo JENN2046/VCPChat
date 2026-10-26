@@ -644,6 +644,11 @@ body[data-vcp-theme="light"] .message-item.streaming.assistant .md-content {
 }
 
 /* Accessibility */
+:focus-visible:not(#messageInput):not(.chat-message-input):not(.vcp-ui-scope *) {
+    outline: 2px solid var(--highlight-text);
+    outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .message-item.streaming.agent .md-content,
     .message-item.streaming.assistant .md-content,

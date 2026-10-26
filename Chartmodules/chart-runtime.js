@@ -292,6 +292,7 @@
         }
 
         createContext() {
+            const runtime = this;
             const dataSources = Object.freeze({
                 read: request => this.api.readDataSource({
                     chartId: this.snapshot.manifest.id,
@@ -325,6 +326,34 @@
                     params,
                 }),
             });
+            const persistence = Object.freeze({
+                replace: async (data, options = {}) => {
+                    const result = await runtime.api.replaceData({
+                        chartId: runtime.snapshot.manifest.id,
+                        data,
+                        expectedDataRevision: runtime.snapshot.manifest.dataRevision,
+                        operationId: options.operationId,
+                    });
+                    runtime.snapshot.manifest.dataRevision = result.dataRevision;
+                    runtime.snapshot.manifest.revision = result.revision;
+                    return result;
+                },
+            });
+            const cloudSync = Object.freeze({
+                status: () => runtime.api.syncShootingPlanner({
+                    chartId: runtime.snapshot.manifest.id,
+                    action: 'status',
+                }),
+                pull: () => runtime.api.syncShootingPlanner({
+                    chartId: runtime.snapshot.manifest.id,
+                    action: 'pull',
+                }),
+                push: options => runtime.api.syncShootingPlanner({
+                    chartId: runtime.snapshot.manifest.id,
+                    action: 'push',
+                    operationId: options?.operationId,
+                }),
+            });
             return Object.freeze({
                 root: this.host,
                 manifest: this.snapshot.manifest,
@@ -335,6 +364,8 @@
                 }),
                 resources: this.resources,
                 dataSources,
+                persistence,
+                cloudSync,
                 signal: this.controller.signal,
                 get data() { return this.dataHolder?.value; },
                 requestRender: reason => this.markBusy(reason || 'runtime-request'),
@@ -381,6 +412,12 @@
         }
 
         async update(change) {
+            if (change.dataRevision !== undefined) {
+                this.snapshot.manifest.dataRevision = change.dataRevision;
+            }
+            if (change.revision !== undefined) {
+                this.snapshot.manifest.revision = change.revision;
+            }
             if (change.type === 'data-replaced' && change.data !== undefined) {
                 this.dataHolder.value = clone(change.data);
             } else {

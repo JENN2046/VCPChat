@@ -1272,8 +1272,8 @@ export function setupEventListeners(deps) {
 
         const saveSidebarState = settings => {
             if (!chatAPI?.saveSettings) return;
-            const source = settings || refs.globalSettings.get();
-            const ops = Object.entries(source || {}).map(([key, value]) => ({ op: 'set', path: [key], value }));
+            const source = settings || refs.globalSettings.get() || {};
+            const ops = ['sidebarActive', 'sidebarAvatarOnly'].filter(k => k in source).map(key => ({ op: 'set', path: [key], value: source[key] }));
             chatAPI.saveSettings({ __vcpSettingsOps: ops }).then(result => {
                 if (!result.success) {
                     console.error('保存侧边栏状态失败:', result.error);

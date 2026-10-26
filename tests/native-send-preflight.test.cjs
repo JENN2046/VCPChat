@@ -4,7 +4,7 @@ const start=source.indexOf('        if (!content && attachedFiles.length === 0) 
 const end=source.indexOf('        const uiAttachments = [];',start);
 const AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
 const run=new AsyncFunction('handled','url','type',`
- const itemSelectionGeneration=0,topicSelectionGeneration=0,input={};const calls=[];const content='调整',attachedFiles=[],currentSelectedItem={id:'A',type},currentTopicId='T',globalSettings={vcpServerUrl:url},request=null,sendContext={agentId:'A',topicId:'T'},pendingSendContexts=new Set();
+ const itemSelectionGeneration=0,topicSelectionGeneration=0,input={};const calls=[];const content='调整',attachedFiles=[],currentSelectedItem={id:'A',type},currentTopicId='T',globalSettings={vcpServerUrl:url},request=null,sendContext={agentId:'A',topicId:'T'},pendingSendContexts=new Set(),isContextCompacting=()=>false;
  const uiHelper={showToastNotification:()=>calls.push('blocked'),openModal:()=>calls.push('settings')},setNextUiEmptyStateActive=()=>calls.push('hide-empty'),electronAPI={prepareNativeConversation:async()=>{calls.push('prepare');return {handled};}};
  async function preflight(){${source.slice(start,end)}return 'continue';}finally{pendingSendContexts.delete(sendSignature);}}
  const result=await preflight();return {result,calls};`);

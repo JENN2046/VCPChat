@@ -32,8 +32,12 @@ function route(fetchResponse, { settings = null, abortSignal = AbortSignal } = {
         ['../vcpClient', require('../modules/vcpClient.js')],
         // 真实的调用轨迹模块：没有配置记录目录时只返回空操作，不写盘
         ['../modelTrajectory', require('../modules/modelTrajectory.js')],
+        // 真实的心情模块：没有配置时 observe 是空操作
+        ['../agentMood', require('../modules/agentMood.js')],
         ['../services/attachmentDialogState', {}], ['../../Groupmodules/topicTitleManager', {}],
         ['../services/historyMutationQueue', {}], ['./workspaceHandlers', {}], ['./sideChatHandlers', {}],
+        // 桌宠没打开时这些钩子全是空操作，用真实模块。
+        ['../hostHooks', require('../modules/hostHooks.js')],
     ]);
     const load = name => { assert.ok(dependencies.has(name), 'unreviewed fixture dependency: ' + name); return dependencies.get(name); };
     vm.runInNewContext('(function(require,module,exports){' + source + '\n})', {
@@ -44,7 +48,7 @@ function route(fetchResponse, { settings = null, abortSignal = AbortSignal } = {
     const sender = Object.assign(new EventEmitter(), { id: 501, isDestroyed: () => false, send: (channel, event) => sent.push({ channel, event }) });
     const context = { agentId: 'fixture-agent', topicId: 'fixture-topic' };
     return { sent, warnings, sender, context, tasks: () => module.exports.getVcpStreamTaskSnapshot(),
-        start: (url = 'http://controlled.invalid/v1/chat/completions') => handlers.get('send-to-vcp')({ sender }, url, '', [], { stream: true }, 'same-message', false, context),
+        start: (url = 'http://controlled.invalid/v1/chat/completions', messages = []) => handlers.get('send-to-vcp')({ sender }, url, '', messages, { stream: true }, 'same-message', false, context),
         interrupt: (caller = sender) => handlers.get('interrupt-vcp-request')({ sender: caller }, { messageId: 'same-message' }),
         close: () => sender.emit('destroyed'),
     };
@@ -290,6 +294,28 @@ test('sender navigation aborts the real HTTP stream without delivering into the 
         await waitFor(() => !f.tasks().length && server.closed()); await tick();
         assert.deepEqual(f.sent.map(item => item.event.type), ['data'], 'aborted sender receives no later terminal/error event');
         assert.equal(f.sender.eventNames().length, 0);
+    } finally { f.close(); }
+});
+
+test('checkpoint text survives sanitizers and its private protection flag stays local', async () => {
+    let requestBody;
+    const text = '<context_checkpoint>src/core/kbm.rs</context_checkpoint>\n'
+        + '\n<think>\n日记原文\n</think>\n'
+        + '[[VCP调用结果信息汇总:[HIDDEN]\n日记里的示例\nVCP调用结果结束]]';
+    const f = route(async (_url, options) => {
+        requestBody = JSON.parse(options.body);
+        return { ok: true, body: new ReadableStream({ start(controller) {
+            controller.enqueue(encode('data: [DONE]\n\n')); controller.close();
+        } }) };
+    }, { settings: { enableContextSanitizer: true, contextSanitizerDepth: 0 } });
+    try {
+        await f.start(undefined, [
+            { role: 'user', content: text, __vcpContextCheckpoint: true },
+            { role: 'assistant', content: 'ordinary response' },
+        ]);
+        await waitFor(() => f.sent.length === 1 && !f.tasks().length);
+        assert.equal(requestBody.messages[0].content, text);
+        assert.equal('__vcpContextCheckpoint' in requestBody.messages[0], false);
     } finally { f.close(); }
 });
 

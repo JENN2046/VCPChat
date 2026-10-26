@@ -47,6 +47,10 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Scoped upstream integration regressions. No directory, sender or permission exemption.
+    'tests/native-context-compaction-boundary.test.cjs',
+    'tests/app-features.test.mjs',
+    'tests/deskpet-stream.test.mjs',
     // Composer save queue from 994ef193 and scoped host quit lifecycle integration.
     // Exact paths only; sender denials and all forbidden-path rules remain active.
     'modules/renderer/composerModelSelect.js',

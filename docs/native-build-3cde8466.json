@@ -139,7 +139,7 @@
         "portableCpu": true,
         "crossMachineByteEqualityRequired": false,
         "recipe": ".github/scripts/build-projectforge-windows.ps1",
-        "recipeSha256": "f2fcb84405a1ba015cbc70394588b512c981391256a4ea924b6fd9c854b50d26",
+        "recipeSha256": "4f8654f1c21e675be43aaa0c18946e88b4bf7afdd1752cd06e759393ab7a8c72",
         "recipeRelationship": "Same locked release build; unit tests execute separately on isolated Linux from the same source. No cross-machine byte-equivalence claim.",
         "functionality": {
           "linuxUnitTests": "61 passed in the isolated Linux source batch",

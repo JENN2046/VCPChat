@@ -111,3 +111,38 @@ test('streaming placeholders do not auto-acquire instances', async () => {
     host.dispose();
     dom.window.close();
 });
+
+for (const visibility of ['offscreen', 'hidden']) test(`replacement chart replays ${visibility} pause after mounting`, async () => {
+    const dom = new JSDOM('<body><div id="root"></div></body>', { url: 'https://example.test/', pretendToBeVisual: true });
+    const win = dom.window, root = win.document.getElementById('root');
+    win.Element.prototype.moveBefore = function(node, before) { this.insertBefore(node, before); };
+    if (visibility === 'hidden') Object.defineProperty(win.document, 'hidden', { configurable: true, get: () => true });
+    let onChange;
+    const snapshot = revision => ({ manifest: { id: 'sales-trend', codeRevision: revision, dataRevision: 1 }, template: '', style: '', runtime: '', data: {} });
+    const host = createChartEmbedHost({ root, api: {
+        chartEmbedAcquire: async () => ({ token: 'synthetic-lease', snapshot: snapshot(1) }),
+        chartEmbedSnapshot: async () => snapshot(2), chartEmbedRelease: async () => {},
+        onChartEmbedChanged: callback => { onChange = callback; return () => {}; },
+    } });
+    try {
+        root.innerHTML = transformChartReferences(reference);
+        const slot = root.querySelector('.vcp-chart-embed');
+        if (visibility === 'offscreen') slot.getBoundingClientRect = () => ({ top: 20000, bottom: 20360, width: 300, height: 360 });
+        host.scan(root);
+        await wait();
+        const frame = root.querySelector('iframe'), sent = [];
+        frame.contentWindow.postMessage = message => sent.push(message);
+        const message = data => win.dispatchEvent(new win.MessageEvent('message', { source: frame.contentWindow, data: { source: 'vcp-chart-sandbox', ...data } }));
+        message({ type: 'sandbox-ready' });
+        const first = sent.find(value => value.type === 'initialize');
+        message({ type: 'ready', chartId: first.chartId, generation: first.generation });
+        sent.length = 0;
+        onChange({ chartId: first.chartId, type: 'code-replaced' });
+        await wait();
+        const replacement = sent.find(value => value.type === 'initialize');
+        assert.ok(replacement);
+        sent.length = 0;
+        message({ type: 'ready', chartId: replacement.chartId, generation: replacement.generation });
+        assert.ok(sent.some(value => value.type === 'pause'), 'new sandbox runtime must receive pause even when cached visibility is unchanged');
+    } finally { host.dispose(); dom.window.close(); }
+});

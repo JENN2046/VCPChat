@@ -22180,7 +22180,7 @@
         },
         {
           "file": "modules/renderer/chartEmbedHost.js",
-          "line": 330,
+          "line": 331,
           "kind": "custom-event-listener"
         },
         {
@@ -22244,7 +22244,7 @@
         },
         {
           "file": "modules/renderer/chartEmbedHost.js",
-          "line": 330,
+          "line": 331,
           "kind": "custom-event-listener",
           "match": "win.addEventListener('message'"
         },
@@ -25798,14 +25798,14 @@
       "consumers": [
         {
           "file": "modules/renderer/chartEmbedHost.js",
-          "line": 337,
+          "line": 338,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/renderer/chartEmbedHost.js",
-          "line": 337,
+          "line": 338,
           "kind": "preload-subscription",
           "match": "api?.onChartEmbedChanged("
         }
@@ -36270,7 +36270,7 @@
         },
         {
           "file": "modules/renderer/chartEmbedHost.js",
-          "line": 332,
+          "line": 333,
           "kind": "custom-event-listener"
         },
         {
@@ -36298,7 +36298,7 @@
         },
         {
           "file": "modules/renderer/chartEmbedHost.js",
-          "line": 332,
+          "line": 333,
           "kind": "custom-event-listener",
           "match": "doc.addEventListener('visibilitychange'"
         },

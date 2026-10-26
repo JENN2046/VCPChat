@@ -310,6 +310,7 @@ export function createChartEmbedHost({ root, api, maxInstances = 4 }) {
         if (payload.type === 'ready') {
             clearTimeout(entry.timeout);
             status(entry, '实时图表');
+            entry.visible = undefined; // A replacement runtime resets its pause state.
             sync(entry);
         } else if (payload.type === 'error') {
             clearTimeout(entry.timeout);

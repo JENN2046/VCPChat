@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "cec3e9c1f25a229d0c00e1c38beb539e80e5098b",
-          "size": 30568,
-          "sha256": "16d3bbd45c7ecae170982e3ab28e589b2b6cf23c2b30729708bdf86b507bbebf",
+          "blob": "a6e93af9fd4a12e37dc712f8eb7005f6bcb3a77d",
+          "size": 30595,
+          "sha256": "2c16ba72caef1c42014579c9bf3329cadcd645c1d23fea01114313bf448cce23",
           "kind": "source"
         },
         {
@@ -10200,9 +10200,9 @@
           "path": "modules/renderer/chartEmbedHost.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "da5c3f7d85b6485c8013294c7f87de93d8a61a50",
-          "size": 15486,
-          "sha256": "3fca0490ca6a49dd2749ec9135d3bc27f92de8f3fe933de0dc1a140707a292fc",
+          "blob": "382d63850ebac5eaa9a4c7ff4e87a6d0498c8ff1",
+          "size": 15575,
+          "sha256": "6db44e6ef7724af6cacad58cc589181b61435220f02887c2ad76a7d6c86b57af",
           "kind": "source"
         },
         {
@@ -13594,9 +13594,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "cec3e9c1f25a229d0c00e1c38beb539e80e5098b",
-          "size": 30568,
-          "sha256": "16d3bbd45c7ecae170982e3ab28e589b2b6cf23c2b30729708bdf86b507bbebf",
+          "blob": "a6e93af9fd4a12e37dc712f8eb7005f6bcb3a77d",
+          "size": 30595,
+          "sha256": "2c16ba72caef1c42014579c9bf3329cadcd645c1d23fea01114313bf448cce23",
           "kind": "source"
         },
         {
@@ -14759,9 +14759,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "17cf2f3c8f8b0c68ada2c51e5e0e70bf69e5a5b4",
-          "size": 43042,
-          "sha256": "4f16f2922acb0a06a2b9294df40dd620e70c3692236ef91627765d04f36179af",
+          "blob": "bc0ffd463668d0da3b1ff7837a22dd23cbc28d3f",
+          "size": 43162,
+          "sha256": "054958706e2bcd64ab96b93bb23edb340d044ab6f745280e652f9867c2b699b9",
           "kind": "source"
         },
         {
@@ -16706,6 +16706,15 @@
           "blob": "136fd1a0a92eba3709f666ccaf4fb3d2eb70cb81",
           "size": 3950,
           "sha256": "711c87b44536440a963113dafa76d56d2a541637a5cc55e7f93a54fdb0be6710",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-embed.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6e623c259e83b130869d4babf45b4bb02d08dcf",
+          "size": 8076,
+          "sha256": "a88854d4518701555bba7a68f9f6478058098684edd1663b46bc4bae52cfd857",
           "kind": "source"
         },
         {
@@ -19951,7 +19960,9 @@
           "name": "reviewed-chart-embed-handler-regression",
           "files": [
             "tests/chart-embed-handlers.test.cjs",
-            "modules/ipc/chartHandlers.js"
+            "modules/ipc/chartHandlers.js",
+            "tests/chart-embed.test.mjs",
+            "modules/renderer/chartEmbedHost.js"
           ]
         },
         {
@@ -25600,9 +25611,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "bb11c14716c8cbdd218ee3b38e590cf3b53fc8c1",
+          "blob": "716b3a98c145cb0c866ba5ca95278a58c336a3fd",
           "size": 1076301,
-          "sha256": "e7f0e6226cefb9f4d2f04592829e28c491eddf4d44e609eea60c2c8427a3cd03",
+          "sha256": "da9e330d2a127841ae3a794ea7010a0799cb310b3b9f2818f434ccfcb92cc43a",
           "kind": "source"
         },
         {
@@ -27814,9 +27825,9 @@
           "path": "modules/renderer/chartEmbedHost.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "da5c3f7d85b6485c8013294c7f87de93d8a61a50",
-          "size": 15486,
-          "sha256": "3fca0490ca6a49dd2749ec9135d3bc27f92de8f3fe933de0dc1a140707a292fc",
+          "blob": "382d63850ebac5eaa9a4c7ff4e87a6d0498c8ff1",
+          "size": 15575,
+          "sha256": "6db44e6ef7724af6cacad58cc589181b61435220f02887c2ad76a7d6c86b57af",
           "kind": "source"
         },
         {
@@ -31180,9 +31191,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "cec3e9c1f25a229d0c00e1c38beb539e80e5098b",
-          "size": 30568,
-          "sha256": "16d3bbd45c7ecae170982e3ab28e589b2b6cf23c2b30729708bdf86b507bbebf",
+          "blob": "a6e93af9fd4a12e37dc712f8eb7005f6bcb3a77d",
+          "size": 30595,
+          "sha256": "2c16ba72caef1c42014579c9bf3329cadcd645c1d23fea01114313bf448cce23",
           "kind": "source"
         },
         {
@@ -32035,9 +32046,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "17cf2f3c8f8b0c68ada2c51e5e0e70bf69e5a5b4",
-          "size": 43042,
-          "sha256": "4f16f2922acb0a06a2b9294df40dd620e70c3692236ef91627765d04f36179af",
+          "blob": "bc0ffd463668d0da3b1ff7837a22dd23cbc28d3f",
+          "size": 43162,
+          "sha256": "054958706e2bcd64ab96b93bb23edb340d044ab6f745280e652f9867c2b699b9",
           "kind": "source"
         },
         {
@@ -34000,6 +34011,15 @@
           "blob": "136fd1a0a92eba3709f666ccaf4fb3d2eb70cb81",
           "size": 3950,
           "sha256": "711c87b44536440a963113dafa76d56d2a541637a5cc55e7f93a54fdb0be6710",
+          "kind": "source"
+        },
+        {
+          "path": "tests/chart-embed.test.mjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6e623c259e83b130869d4babf45b4bb02d08dcf",
+          "size": 8076,
+          "sha256": "a88854d4518701555bba7a68f9f6478058098684edd1663b46bc4bae52cfd857",
           "kind": "source"
         },
         {
@@ -38835,7 +38855,9 @@
           "name": "reviewed-chart-embed-handler-regression",
           "files": [
             "tests/chart-embed-handlers.test.cjs",
-            "modules/ipc/chartHandlers.js"
+            "modules/ipc/chartHandlers.js",
+            "tests/chart-embed.test.mjs",
+            "modules/renderer/chartEmbedHost.js"
           ]
         },
         {

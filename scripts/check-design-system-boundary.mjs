@@ -48,6 +48,8 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    'modules/renderer/chartEmbedHost.js', // Replay visibility after sandbox remount.
+    'tests/chart-embed.test.mjs',
     // Reviewed delivery regressions: conversation ownership/acceptance and
     // the notes math delimiter repair; no feature-directory exemption.
     'DeskPetmodules/mainWindow/sendBridge.js',

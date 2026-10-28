@@ -14759,9 +14759,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "58e1b871f4d4a0fcf0138f4cf47c9885011d431a",
-          "size": 44924,
-          "sha256": "caa6c3c27ac3b96f6f6f44c3df6696b9ec1f4b4bae60407b9189262dd09db75d",
+          "blob": "72e4fcb5f95058193b7067d60b7456c77aa789b2",
+          "size": 45032,
+          "sha256": "68f508fa9c6030a79e325b5eac7cf32df2438ea9673f123b384ef05111b7e19f",
           "kind": "source"
         },
         {
@@ -16973,9 +16973,9 @@
           "path": "tests/deskpet-lifecycle.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f681a2873bd4f87879ccee3d7a104873ad558dbf",
-          "size": 38076,
-          "sha256": "e28af331141412cec5d55bf64d8e4f60620d508ebde34f2fd029cca6a5f7aa92",
+          "blob": "0559511ca26b4e57be33f11064e1b413de81d07c",
+          "size": 38392,
+          "sha256": "bee7eac27c5ed83fad4ed4d6387f92327deea3716e97a3a78cf237da5439b264",
           "kind": "source"
         },
         {
@@ -32055,9 +32055,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "58e1b871f4d4a0fcf0138f4cf47c9885011d431a",
-          "size": 44924,
-          "sha256": "caa6c3c27ac3b96f6f6f44c3df6696b9ec1f4b4bae60407b9189262dd09db75d",
+          "blob": "72e4fcb5f95058193b7067d60b7456c77aa789b2",
+          "size": 45032,
+          "sha256": "68f508fa9c6030a79e325b5eac7cf32df2438ea9673f123b384ef05111b7e19f",
           "kind": "source"
         },
         {
@@ -34566,9 +34566,9 @@
           "path": "tests/deskpet-lifecycle.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f681a2873bd4f87879ccee3d7a104873ad558dbf",
-          "size": 38076,
-          "sha256": "e28af331141412cec5d55bf64d8e4f60620d508ebde34f2fd029cca6a5f7aa92",
+          "blob": "0559511ca26b4e57be33f11064e1b413de81d07c",
+          "size": 38392,
+          "sha256": "bee7eac27c5ed83fad4ed4d6387f92327deea3716e97a3a78cf237da5439b264",
           "kind": "source"
         },
         {

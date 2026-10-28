@@ -60,6 +60,7 @@ const allowedSourceDifferences = new Set([
     'tests/native-context-compaction-boundary.test.cjs',
     'tests/app-features.test.mjs',
     'tests/deskpet-stream.test.mjs',
+    'tests/deskpet-lifecycle.test.mjs', // Deterministic snap-test clock and unconditional fixture cleanup.
     // Composer save queue from 994ef193 and scoped host quit lifecycle integration.
     // Exact paths only; sender denials and all forbidden-path rules remain active.
     'modules/renderer/composerModelSelect.js',

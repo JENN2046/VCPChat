@@ -72,6 +72,19 @@ async function run() {
     const populated = { ...valid(), revision: Number.MAX_SAFE_INTEGER, products: [['SKU', 'Synthetic product']], tasks: [{ id: 'task' }], sessions: [{ id: 'session' }] };
     assert.deepStrictEqual(await pullBody({ ok: true, snapshot: populated }), populated);
 
+    const validAck = () => ({ ok: true, revision: 4, updatedAt: '2026-10-28T00:00:00.000Z' });
+    const pushBody = body => new ShootingPlannerSyncService({
+        baseUrl: 'https://synthetic.example.test', schedulerToken: 'synthetic-only-token-1234',
+        fetchImpl: async () => jsonResponse(200, body),
+    }).push({}, { expectedRevision: 3, operationId: 'synthetic-original-operation' });
+    for (const body of [null, [], {}, { ...validAck(), ok: false }, { ...validAck(), ok: undefined },
+        ...[undefined, null, '4', -1, 0, 3, 4.5, Number.MAX_SAFE_INTEGER + 1].map(revision => ({ ...validAck(), revision })),
+        ...[undefined, null, '', 'invalid'].map(updatedAt => ({ ...validAck(), updatedAt }))]) {
+        await assert.rejects(pushBody(body), { code: 'SHOOTING_SYNC_INVALID_RESPONSE' });
+    }
+    const replayed = { ...validAck(), replayed: true };
+    assert.deepStrictEqual(await pushBody(replayed), replayed);
+
     console.log('shooting-planner-sync-service.test.js: all assertions passed');
 }
 

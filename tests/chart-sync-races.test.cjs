@@ -175,3 +175,24 @@ test('a valid empty remote snapshot is applied while local-only fields remain in
     assert.deepEqual(data.products, []); assert.deepEqual(data.tasks, []); assert.deepEqual(data.sessions, []);
     assert.equal(data.cloudRevision, 4); assert.equal(data.note, 'before');
 });
+
+for (const [name, acknowledgement] of [
+    ['empty object', {}], ['null', null], ['failure envelope', { ok: false, revision: 4, updatedAt: '2026-10-28T00:00:00.000Z' }],
+    ['missing revision', { ok: true, updatedAt: '2026-10-28T00:00:00.000Z' }],
+    ['unsafe revision', { ok: true, revision: Number.MAX_SAFE_INTEGER + 1, updatedAt: '2026-10-28T00:00:00.000Z' }],
+    ['non-advancing revision', { ok: true, revision: 3, updatedAt: '2026-10-28T00:00:00.000Z' }],
+    ['missing timestamp', { ok: true, revision: 4 }], ['bad timestamp', { ok: true, revision: 4, updatedAt: 'invalid' }],
+]) test('malformed push acknowledgement ' + name + ' leaves local cloud metadata unchanged without retry', async t => {
+    let dispatches = 0;
+    const remote = new ShootingPlannerSyncService({ baseUrl: 'https://synthetic.example.test', schedulerToken: 'synthetic-only-token-1234',
+        fetchImpl: async (_url, options) => { dispatches++; assert.equal(options.headers['Idempotency-Key'], 'synthetic-operation-push-1');
+            return { ok: true, status: 200, headers: { get: () => null }, arrayBuffer: async () => Buffer.from(JSON.stringify(acknowledgement)) }; } });
+    const { service, call } = await fixture(t, { push: (data, options) => remote.push(data, options) });
+    const before = await service.readDataSnapshot(id);
+    let patches = 0; const apply = service.applyDataOperations.bind(service);
+    service.applyDataOperations = (...args) => { patches++; return apply(...args); };
+    await assert.rejects(call('push'), { code: 'SHOOTING_SYNC_INVALID_RESPONSE' });
+    assert.equal(dispatches, 1, 'an invalid reply must not dispatch again or invent an operation id');
+    assert.equal(patches, 0); assert.deepEqual(await service.readData(id), before.data);
+    assert.deepEqual(await service.readManifest(id), before.manifest);
+});

@@ -29,13 +29,16 @@ function normalizeBaseUrl(value) {
 
 // Validate the response envelope before it can replace the local collections.
 // Business-item semantics remain owned by the scheduling service.
-function isCompatibleSnapshot(value) {
+function hasValidRevisionMetadata(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value)
-        && value.schemaVersion === 1
         && Number.isSafeInteger(value.revision) && value.revision >= 0
         && typeof value.updatedAt === 'string'
         && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(value.updatedAt)
-        && Number.isFinite(Date.parse(value.updatedAt))
+        && Number.isFinite(Date.parse(value.updatedAt));
+}
+
+function isCompatibleSnapshot(value) {
+    return hasValidRevisionMetadata(value) && value.schemaVersion === 1
         && ['products', 'tasks', 'sessions'].every(key => Array.isArray(value[key]));
 }
 
@@ -62,13 +65,13 @@ class ShootingPlannerSyncService {
     }
 
     async push(snapshot, { expectedRevision, operationId }) {
-        if (!Number.isInteger(expectedRevision) || expectedRevision < 0) {
+        if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0) {
             throw createError('云端版本号缺失。', 'SHOOTING_SYNC_REVISION_REQUIRED');
         }
         if (typeof operationId !== 'string' || operationId.length < 8) {
             throw createError('同步操作号缺失。', 'SHOOTING_SYNC_OPERATION_ID_REQUIRED');
         }
-        return this.request('/api/v1/snapshot', {
+        const acknowledgement = await this.request('/api/v1/snapshot', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -77,6 +80,13 @@ class ShootingPlannerSyncService {
             },
             body: JSON.stringify(snapshot),
         });
+        // The server may have committed even when its reply is malformed. Keep
+        // local metadata and the caller's operation id intact; never retry here.
+        if (acknowledgement?.ok !== true || !hasValidRevisionMetadata(acknowledgement)
+            || acknowledgement.revision <= expectedRevision) {
+            throw createError('云端排班推送回执格式无效。', 'SHOOTING_SYNC_INVALID_RESPONSE');
+        }
+        return acknowledgement;
     }
 
     async request(pathname, options) {

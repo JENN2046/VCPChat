@@ -35439,9 +35439,9 @@
           "path": "tests/native-websocket.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "533ae8451942e21cca1536e0fb4b80ab86a6e860",
-          "size": 36859,
-          "sha256": "24e00d83cc11e1ce03f8de8c7206f969cd0e7637503ef127f13995ac4913caf1",
+          "blob": "47bbd66b550e52a6c2d0bfa57dea39cbfa51b3e3",
+          "size": 37022,
+          "sha256": "dd328645541b3842697baf6c042b7a48b6ee1cc06f1744c8878fba5f10652104",
           "kind": "source"
         },
         {

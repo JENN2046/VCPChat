@@ -14759,9 +14759,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5c8195c7b8ed24bb60ad4d01737346b71acb4607",
-          "size": 44812,
-          "sha256": "3594fc019e8d6f6d3f6d707912793b7fbf5396bc8fb430907ad407695bb4ee26",
+          "blob": "58e1b871f4d4a0fcf0138f4cf47c9885011d431a",
+          "size": 44924,
+          "sha256": "caa6c3c27ac3b96f6f6f44c3df6696b9ec1f4b4bae60407b9189262dd09db75d",
           "kind": "source"
         },
         {
@@ -16766,9 +16766,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8b82be6d47e3f1af6b4d55fb1e274cfdc0e2563f",
-          "size": 11111,
-          "sha256": "2acb42a93b2de9a9643c8651a8faa4935f094931e6aca36ffda2622ea3116662",
+          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
+          "size": 11427,
+          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
           "kind": "source"
         },
         {
@@ -17165,6 +17165,15 @@
           "blob": "db18ba30118e4cea3bc87eb909e136dce3e26420",
           "size": 840,
           "sha256": "c9e60b439c9059d7a059694d593224fd1084862ea2ce867f6b7551668a7df582",
+          "kind": "source"
+        },
+        {
+          "path": "tests/fixtures/reviewed-jso-consumer-sources.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f920fd1f40867165a0001dc254382b6332bf3162",
+          "size": 13837,
+          "sha256": "454a85f58424dae985620b1509a703fd33e4e156f22c1b58ff4da7c8303dd009",
           "kind": "source"
         },
         {
@@ -32046,9 +32055,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "5c8195c7b8ed24bb60ad4d01737346b71acb4607",
-          "size": 44812,
-          "sha256": "3594fc019e8d6f6d3f6d707912793b7fbf5396bc8fb430907ad407695bb4ee26",
+          "blob": "58e1b871f4d4a0fcf0138f4cf47c9885011d431a",
+          "size": 44924,
+          "sha256": "caa6c3c27ac3b96f6f6f44c3df6696b9ec1f4b4bae60407b9189262dd09db75d",
           "kind": "source"
         },
         {
@@ -34350,9 +34359,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8b82be6d47e3f1af6b4d55fb1e274cfdc0e2563f",
-          "size": 11111,
-          "sha256": "2acb42a93b2de9a9643c8651a8faa4935f094931e6aca36ffda2622ea3116662",
+          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
+          "size": 11427,
+          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
           "kind": "source"
         },
         {
@@ -34803,6 +34812,15 @@
           "blob": "d051020201b5d8d4cf0f0ad2302cb602dabb855e",
           "size": 1802,
           "sha256": "5e0b86735317c41286f4048953cc5ccc49b2bc0720622b0f20a14226ac4ba4d9",
+          "kind": "source"
+        },
+        {
+          "path": "tests/fixtures/reviewed-jso-consumer-sources.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f920fd1f40867165a0001dc254382b6332bf3162",
+          "size": 13837,
+          "sha256": "454a85f58424dae985620b1509a703fd33e4e156f22c1b58ff4da7c8303dd009",
           "kind": "source"
         },
         {

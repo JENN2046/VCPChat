@@ -67,9 +67,13 @@ test('integrated boundary allows product work and rejects retained runtime, asse
             ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
         ]);
         git(['config', 'core.autocrlf', 'false']);
+        const frozen = JSON.parse(fs.readFileSync(new URL('./fixtures/reviewed-jso-consumer-sources.json', import.meta.url), 'utf8'));
+        assert.equal(frozen.schema, 'reviewed-jso-consumer-test-data/v1');
+        assert.deepEqual(Object.keys(frozen.sources).sort(), [...reviewed.keys()].sort());
         const originals = new Map();
         for (const file of reviewed.keys()) {
-            const bytes = fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+            assert.equal(frozen.sources[file].gitBlob, reviewed.get(file));
+            const bytes = frozen.sources[file].text;
             originals.set(file, bytes); write(file, bytes); git(['add', '--', file]);
         }
         assert.equal(run().status, 0, 'only the reviewed declaration identities are admitted');

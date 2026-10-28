@@ -167,6 +167,7 @@ const allowedSourceDifferences = new Set([
     '.github/scripts/verify-projectforge-trace.cjs',
     'tests/projectforge-trace.test.cjs',
     'tests/design-system-boundary.test.mjs',
+    'tests/fixtures/reviewed-jso-consumer-sources.json', // Fixed synthetic Git-fixture data, not event bodies.
     'tests/lifecycle-inspector.test.js',
     'tests/side-browser-address.test.mjs',
     // PR #61: guarded game IPC startup wiring and its isolated regression.

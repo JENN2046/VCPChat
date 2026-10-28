@@ -489,23 +489,23 @@ test('SUVEI transport failure reparses committed Core state into recovery mode',
     dom.window.close();
 });
 
-test('SUVEI correction review displays exact source and mask content hashes', async () => {
+test('SUVEI shared-risk correction review displays source, mask, Owner basis and retained responsibility', async () => {
     const { dom, window } = createAuditDom();
     const packet = {
         schemaVersion: 'suvei_human_authorization_preview.v1',
         requestId: 'suvei-correction-hashes',
         projectId: '33333333-3333-4333-8333-333333333333',
         intentId: '44444444-4444-5444-8444-444444444444',
-        decisionMode: 'authorize',
-        authorizationCommitted: false,
+        decisionMode: 'reconcile_authorized',
+        authorizationCommitted: true,
         authorityTargetDigest: 'f'.repeat(64),
         toolApprovalExpiresAt: '2026-10-01T14:05:00.000Z',
         intent: {
             id: '44444444-4444-5444-8444-444444444444',
             projectId: '33333333-3333-4333-8333-333333333333',
-            proposalState: 'PENDING',
+            proposalState: 'AUTHORIZED',
             action: 'inpaint_candidate',
-            revision: 0,
+            revision: 1,
             requestFingerprint: 'e'.repeat(64),
             delegateUserId: '55555555-5555-4555-8555-555555555555',
             productionUnitId: '99999999-9999-4999-8999-999999999999',
@@ -520,10 +520,14 @@ test('SUVEI correction review displays exact source and mask content hashes', as
             sourceCandidateId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
             sourceCandidateRevision: 2,
             sourceCandidateSha256: '1'.repeat(64),
-            sourceCriticResultId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+            sourceCriticResultId: null,
+            sourceOwnerAssessmentId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
             maskMediaObjectId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
             maskContentSha256: '2'.repeat(64),
-            editInstruction: 'Repair only the masked edge'
+            editInstruction: 'Repair only the masked edge',
+            imageRiskContext: { unresolvedCount: 1, priorCoreCalls: 4, addedCoreCalls: 1, addedOutputs: 1,
+                reservedInternalUnits: '1', consumedInternalUnits: '3', occupiedSlots: 1, maximumLocalExposure: 2,
+                providerInternalRetries: 'UNKNOWN', targetDigest: '3'.repeat(64) }
         },
         authorization: {
             expectedRevision: 0,
@@ -534,7 +538,9 @@ test('SUVEI correction review displays exact source and mask content hashes', as
             maxTotalCredits: 1,
             maxConcurrentAttempts: 1,
             maxWallClockMs: 300000,
-            maxAdapterCallsPerAttempt: 1
+            maxAdapterCallsPerAttempt: 1,
+            acceptUnresolvedPriorOutcome: true,
+            acceptRetainedResponsibility: true
         }
     };
     window.chatAPI.prepareSuveiHumanAuthorization = async () => ({ success: true, packet });
@@ -561,13 +567,19 @@ test('SUVEI correction review displays exact source and mask content hashes', as
         JSON.stringify(request),
         window.document.getElementById('notificationsList')
     );
-    Array.from(window.document.querySelectorAll('.notification-actions button'))
-        .find(button => button.textContent === '审视 SUVEI 授权').click();
+    const reviewButton = Array.from(window.document.querySelectorAll('.notification-actions button'))
+        .find(button => button.textContent === '审视 SUVEI 授权');
+    assert.equal(reviewButton.disabled, false, 'a fresh main-window request must remain reviewable');
+    reviewButton.click();
     await new Promise(resolve => setImmediate(resolve));
 
     const text = window.document.getElementById('suveiHumanAuthorizationPacket').textContent;
     assert.match(text, /Source Candidate SHA256: 1{64}/);
     assert.match(text, /Mask SHA256: 2{64}/);
+    assert.match(text, /Owner correction assessment: dddddddd-dddd-4ddd-8ddd-dddddddddddd/);
+    assert.match(text, /确认保留旧责任: true/);
+    assert.match(text, /历史 Core 调用 4 次/);
+    assert.match(text, /内部单位不是货币上限/);
     dom.window.close();
 });
 

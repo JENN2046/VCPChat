@@ -110,6 +110,79 @@ function mutationApproval(requestId = "mutation-approval") {
     } };
 }
 
+function sharedRiskFixture(action = "inpaint_candidate", ownerDirected = false) {
+    const value = intent({ action, requestedOutputCount: 1, proposalState: "AUTHORIZED", revision: 1,
+        authorizedBy: OWNER, authorizedAt: "2026-10-01T14:00:00.000Z",
+        authorizationExpiresAt: "2026-10-01T14:30:00.000Z", executionGrantId: GRANT,
+        ...(action === "inpaint_candidate" ? { sourceCandidateId: SOURCE_CANDIDATE, sourceCandidateRevision: 1,
+            sourceCandidateSha256: "1".repeat(64), sourceCriticResultId: ownerDirected ? null : SOURCE_CRITIC,
+            ...(ownerDirected ? { sourceOwnerAssessmentId: SPEC_VERSION } : {}),
+            maskMediaObjectId: MASK_MEDIA, maskContentSha256: "2".repeat(64), editInstruction: "Repair the masked defect only" } : {}) });
+    value.imageRiskContext = { schemaVersion: "image_risk_context.v1", organizationId: ORG, projectId: PROJECT,
+        productionUnitId: UNIT, policyDigest: "3".repeat(64), targetDigest: "4".repeat(64),
+        inputs: { action, delegateUserId: DELEGATE, recipeId: RECIPE },
+        history: [{ id: RECIPE, state: "RECONCILIATION_REQUIRED", costObservation: { amount: "123", unit: "quota" } }],
+        unresolvedCount: 1, priorCoreCalls: 4, consumedInternalUnits: "3", reservedInternalUnits: "1",
+        occupiedSlots: 1, addedCoreCalls: 1, addedOutputs: 1, maximumLocalExposure: 2,
+        automaticRetry: false, providerInternalRetries: "UNKNOWN" };
+    // Independent Core terms fixture: do not obtain the expected digest from the client under test.
+    const terms = { schemaVersion: "agent_generation_authorization.v1", intentId: value.id,
+        requestFingerprint: value.requestFingerprint, delegateUserId: DELEGATE, authorizedBy: OWNER,
+        expiresAt: value.authorizationExpiresAt, maxAttempts: 1, maxOutputCount: 1, maxTotalCredits: 1,
+        maxConcurrentAttempts: 1, maxWallClockMs: 300000, maxAdapterCallsPerAttempt: 1,
+        imageRiskContext: value.imageRiskContext, acceptUnresolvedPriorOutcome: true, acceptRetainedResponsibility: true,
+        ...(action === "inpaint_candidate" ? { action, sourceCandidateId: SOURCE_CANDIDATE,
+            sourceCandidateSha256: value.sourceCandidateSha256, sourceCriticResultId: value.sourceCriticResultId,
+            ...(ownerDirected ? { sourceOwnerAssessmentId: SPEC_VERSION } : {}), maskContentSha256: value.maskContentSha256 } : {}) };
+    const sorted = input => Array.isArray(input) ? input.map(sorted) : input && typeof input === "object"
+        ? Object.fromEntries(Object.keys(input).sort().map(key => [key, sorted(input[key])])) : input;
+    value.authorizationTermsDigest = require("node:crypto").createHash("sha256").update(JSON.stringify(sorted(terms))).digest("hex");
+    return value;
+}
+
+test("shared-risk H0 is reviewed and reconciled without another Core authorization", async () => {
+    for (const [action, ownerDirected] of [["generate_candidate", false], ["inpaint_candidate", false], ["inpaint_candidate", true]]) {
+        const h = harness(); const current = sharedRiskFixture(action, ownerDirected); h.setIntent(current);
+        await h.service.login("exact owner password");
+        const packet = await h.service.prepare({ requestId: "shared-risk", toolName: "SUVEIStudio",
+            args: { command: action === "generate_candidate" ? "ExecuteAuthorizedGeneration" : "ExecuteAuthorizedCorrection",
+                projectId: PROJECT, intentId: INTENT } });
+        assert.equal(packet.decisionMode, "reconcile_authorized");
+        assert.equal(packet.expectedAuthorizationTermsDigest, current.authorizationTermsDigest);
+        assert.deepEqual(packet.intent.imageRiskContext, current.imageRiskContext);
+        if (ownerDirected) assert.equal(packet.intent.sourceOwnerAssessmentId, SPEC_VERSION);
+        const decision = await h.service.decide({ requestId: "shared-risk", approved: true });
+        assert.equal(decision.approved, true); assert.equal(decision.reconciled, true);
+        assert.equal(h.calls.filter(call => call.method === "POST" && !call.pathname.endsWith("/login")).length, 0);
+    }
+});
+
+test("pending risk H0 remains in Workbench and committed risk drift is rejected", async () => {
+    const h = harness(); const current = sharedRiskFixture(); h.setIntent({ ...current, proposalState: "PENDING", revision: 0 });
+    await h.service.login("exact owner password");
+    const request = { requestId: "shared-risk-drift", toolName: "SUVEIStudio",
+        args: { command: "ExecuteAuthorizedCorrection", projectId: PROJECT, intentId: INTENT } };
+    await assert.rejects(h.service.prepare(request), { code: "SUVEI_IMAGE_RISK_H0_REQUIRES_WORKBENCH" });
+    for (const patch of [{ sourceCriticResultId: null }, { sourceOwnerAssessmentId: SPEC_VERSION }]) {
+        h.setIntent({ ...current, ...patch });
+        await assert.rejects(h.service.prepare(request), { code: "SUVEI_CORRECTION_TARGET_INVALID" });
+    }
+    h.setIntent({ ...current, authorizationTermsDigest: "0".repeat(64) });
+    await assert.rejects(h.service.prepare(request), { code: "SUVEI_COMMITTED_AUTHORIZATION_MISMATCH" });
+    const wrongScope = structuredClone(current); wrongScope.imageRiskContext.productionUnitId = SPEC_VERSION;
+    h.setIntent(wrongScope);
+    await assert.rejects(h.service.prepare(request), { code: "SUVEI_IMAGE_RISK_AUTHORIZATION_UNSUPPORTED" });
+    h.setIntent(current); await h.service.prepare(request);
+    const drift = structuredClone(current); drift.imageRiskContext.history[0].costObservation.amount = "124"; h.setIntent(drift);
+    await assert.rejects(h.service.decide({ requestId: request.requestId, approved: true }));
+    h.setIntent(current); h.setNow(Date.parse(current.authorizationExpiresAt) + 1);
+    const expired = await h.service.prepare({ ...request, requestId: "expired-shared-risk" });
+    assert.equal(expired.decisionMode, "reconcile_authorized_expired_revoke_only");
+    await assert.rejects(h.service.decide({ requestId: "expired-shared-risk", approved: true }),
+        { code: "SUVEI_EXPIRED_AUTHORIZATION_CANNOT_RECOVER" });
+    assert.equal(h.calls.filter(call => call.method === "POST" && !call.pathname.endsWith("/login")).length, 0);
+});
+
 function harness({
     now = Date.parse("2026-10-01T14:00:00.000Z"),
     authorizeMode = "success",

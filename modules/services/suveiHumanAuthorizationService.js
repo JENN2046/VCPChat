@@ -175,6 +175,29 @@ function committedRecoveryTerms(intent, authorization) {
         acceptUnverifiedContinuationOutcome: true };
 }
 
+function committedImageRiskTerms(intent, authorization) {
+    const risk = intent.imageRiskContext;
+    if (risk == null) return {};
+    if (intent.proposalState === "PENDING") fail("SUVEI_IMAGE_RISK_H0_REQUIRES_WORKBENCH");
+    if (intent.recoveryContext != null || risk.schemaVersion !== "image_risk_context.v1"
+        || risk.organizationId !== intent.organizationId || risk.projectId !== intent.projectId
+        || risk.productionUnitId !== intent.productionUnitId
+        || risk.inputs?.action !== intent.action || risk.inputs?.delegateUserId !== intent.delegateUserId
+        || risk.inputs?.recipeId !== intent.recipeId
+        || !/^[0-9a-f]{64}$/.test(String(risk.policyDigest || ""))
+        || !/^[0-9a-f]{64}$/.test(String(risk.targetDigest || ""))
+        || !Array.isArray(risk.history) || risk.addedCoreCalls !== 1 || risk.addedOutputs !== 1
+        || risk.automaticRetry !== false || intent.requestedOutputCount !== 1
+        || ["maxAttempts", "maxOutputCount", "maxTotalCredits", "maxConcurrentAttempts",
+            "maxAdapterCallsPerAttempt"].some(key => authorization[key] !== 1)
+        || authorization.maxWallClockMs !== MAX_WALL_CLOCK_MS) {
+        fail("SUVEI_IMAGE_RISK_AUTHORIZATION_UNSUPPORTED");
+    }
+    // These flags are verified against Core's committed digest below, never submitted as new consent.
+    return { imageRiskContext: JSON.parse(canonicalJson(risk)),
+        acceptUnresolvedPriorOutcome: true, acceptRetainedResponsibility: true };
+}
+
 function authorizationTerms(intent, ownerUserId, authorization) {
     if (intent.action === MUTATION_ACTION) {
         return {
@@ -199,11 +222,13 @@ function authorizationTerms(intent, ownerUserId, authorization) {
         maxWallClockMs: authorization.maxWallClockMs,
         maxAdapterCallsPerAttempt: authorization.maxAdapterCallsPerAttempt,
         ...committedRecoveryTerms(intent, authorization),
+        ...committedImageRiskTerms(intent, authorization),
         ...(intent.action === "inpaint_candidate" ? {
             action: intent.action,
             sourceCandidateId: intent.sourceCandidateId,
             sourceCandidateSha256: intent.sourceCandidateSha256,
             sourceCriticResultId: intent.sourceCriticResultId,
+            ...(intent.sourceOwnerAssessmentId ? { sourceOwnerAssessmentId: intent.sourceOwnerAssessmentId } : {}),
             maskContentSha256: intent.maskContentSha256,
         } : {}),
     };
@@ -268,11 +293,15 @@ function canonicalIntentSnapshot(intent) {
         sourceCandidateRevision: intent.sourceCandidateRevision ?? null,
         sourceCandidateSha256: intent.sourceCandidateSha256 ?? null,
         sourceCriticResultId: intent.sourceCriticResultId ?? null,
+        ...(intent.sourceOwnerAssessmentId ? { sourceOwnerAssessmentId: intent.sourceOwnerAssessmentId } : {}),
         maskMediaObjectId: intent.maskMediaObjectId ?? null,
         maskContentSha256: intent.maskContentSha256 ?? null,
         editInstruction: intent.editInstruction ?? null,
         ...(intent.recoveryContext == null ? {} : {
             recoveryContext: JSON.parse(canonicalJson(intent.recoveryContext)),
+        }),
+        ...(intent.imageRiskContext == null ? {} : {
+            imageRiskContext: JSON.parse(canonicalJson(intent.imageRiskContext)),
         }),
     };
 }
@@ -299,7 +328,9 @@ function assertIntentShape(intent, binding, projectId, intentId, expectedAction,
         || !UUID_RE.test(String(intent.sourceCandidateId || ""))
         || !Number.isInteger(intent.sourceCandidateRevision) || intent.sourceCandidateRevision < 1
         || !/^[0-9a-f]{64}$/.test(String(intent.sourceCandidateSha256 || ""))
-        || !UUID_RE.test(String(intent.sourceCriticResultId || ""))
+        || ((intent.sourceCriticResultId != null) === (intent.sourceOwnerAssessmentId != null))
+        || (intent.sourceCriticResultId != null && !UUID_RE.test(String(intent.sourceCriticResultId)))
+        || (intent.sourceOwnerAssessmentId != null && !UUID_RE.test(String(intent.sourceOwnerAssessmentId)))
         || !UUID_RE.test(String(intent.maskMediaObjectId || ""))
         || !/^[0-9a-f]{64}$/.test(String(intent.maskContentSha256 || ""))
         || typeof intent.editInstruction !== "string" || !intent.editInstruction.trim())) {
@@ -533,6 +564,9 @@ class SuveiHumanAuthorizationService {
         if (intent.recoveryContext != null && intent.proposalState === "PENDING") {
             fail("SUVEI_RECOVERY_H0_REQUIRES_WORKBENCH");
         }
+        if (intent.imageRiskContext != null && intent.proposalState === "PENDING") {
+            fail("SUVEI_IMAGE_RISK_H0_REQUIRES_WORKBENCH");
+        }
         const requested = intent.requestedOutputCount;
         const reconciliation = intent.proposalState === "AUTHORIZED";
         const rejectionReconciliation = intent.proposalState === "REJECTED";
@@ -569,6 +603,9 @@ class SuveiHumanAuthorizationService {
         });
         if (committedAuthorization && intent.recoveryContext != null) {
             Object.assign(authorization, committedRecoveryTerms(intent, authorization));
+        }
+        if (committedAuthorization && intent.imageRiskContext != null) {
+            Object.assign(authorization, committedImageRiskTerms(intent, authorization));
         }
         const expectedAuthorizationTermsDigest = rejectionReconciliation
             ? null

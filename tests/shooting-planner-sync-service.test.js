@@ -54,6 +54,24 @@ async function run() {
         error => error.code === 'REVISION_CONFLICT' && error.revision === 9 && !error.message.includes('scheduler-token')
     );
 
+    const valid = () => ({ schemaVersion: 1, revision: 0, updatedAt: '2026-10-28T00:00:00.000Z', products: [], tasks: [], sessions: [] });
+    const pullBody = body => new ShootingPlannerSyncService({
+        baseUrl: 'https://synthetic.example.test', schedulerToken: 'synthetic-only-token-1234',
+        fetchImpl: async () => jsonResponse(200, body),
+    }).pull();
+    for (const snapshot of [null, [], {}, { ...valid(), schemaVersion: 2 }, { ...valid(), schemaVersion: '1' },
+        ...[-1, 0.5, Number.MAX_SAFE_INTEGER + 1, '0', null].map(revision => ({ ...valid(), revision })),
+        ...[undefined, null, '', 'not-a-date'].map(updatedAt => ({ ...valid(), updatedAt })),
+        ...['products', 'tasks', 'sessions'].flatMap(key => [undefined, null, {}, 'invalid'].map(value => ({ ...valid(), [key]: value })))]) {
+        await assert.rejects(pullBody({ ok: true, snapshot }), { code: 'SHOOTING_SYNC_INVALID_RESPONSE' });
+    }
+    for (const body of [null, [], {}, { ok: false, snapshot: valid() }, { snapshot: valid() }]) {
+        await assert.rejects(pullBody(body), { code: 'SHOOTING_SYNC_INVALID_RESPONSE' });
+    }
+    assert.deepStrictEqual(await pullBody({ ok: true, snapshot: valid() }), valid(), 'revision zero and intentionally empty collections remain valid');
+    const populated = { ...valid(), revision: Number.MAX_SAFE_INTEGER, products: [['SKU', 'Synthetic product']], tasks: [{ id: 'task' }], sessions: [{ id: 'session' }] };
+    assert.deepStrictEqual(await pullBody({ ok: true, snapshot: populated }), populated);
+
     console.log('shooting-planner-sync-service.test.js: all assertions passed');
 }
 

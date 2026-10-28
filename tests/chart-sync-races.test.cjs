@@ -8,6 +8,7 @@ const path = require('node:path');
 const Module = require('node:module');
 const { EventEmitter } = require('node:events');
 const { ChartService } = require('../modules/services/chartService');
+const { ShootingPlannerSyncService } = require('../modules/services/shootingPlannerSyncService');
 
 const ipc = new Map();
 const windows = [];
@@ -139,4 +140,38 @@ test('a late push acknowledgement cannot regress newer reconciled cloud metadata
     assert.equal(data.cloudRevision, 5);
     assert.equal(data.cloudUpdatedAt, 'newer');
     assert.deepEqual(data.products, [{ id: 'newer' }]);
+});
+
+const validRemote = () => ({ schemaVersion: 1, revision: 4, updatedAt: '2026-10-28T00:00:00.000Z', products: [], tasks: [], sessions: [] });
+function remoteClient(snapshot) {
+    return new ShootingPlannerSyncService({ baseUrl: 'https://synthetic.example.test', schedulerToken: 'synthetic-only-token-1234',
+        fetchImpl: async () => ({ ok: true, status: 200, headers: { get: () => null },
+            arrayBuffer: async () => Buffer.from(JSON.stringify({ ok: true, snapshot })) }) });
+}
+for (const [name, snapshot] of [
+    ['empty object', {}], ['array', []], ['unsupported schema', { ...validRemote(), schemaVersion: 2 }],
+    ['unsafe revision', { ...validRemote(), revision: Number.MAX_SAFE_INTEGER + 1 }],
+    ['missing timestamp', { ...validRemote(), updatedAt: undefined }],
+    ['products object', { ...validRemote(), products: {} }], ['tasks null', { ...validRemote(), tasks: null }],
+    ['missing sessions', { ...validRemote(), sessions: undefined }],
+]) test('malformed remote ' + name + ' cannot write or erase local planner data', async t => {
+    const remote = remoteClient(snapshot);
+    const { service, call } = await fixture(t, { pull: () => remote.pull() });
+    const before = await service.readDataSnapshot(id);
+    let writes = 0;
+    const replace = service.replaceData.bind(service);
+    service.replaceData = (...args) => { writes++; return replace(...args); };
+    await assert.rejects(call('pull'), { code: 'SHOOTING_SYNC_INVALID_RESPONSE' });
+    assert.equal(writes, 0, 'reject the response before any local replacement');
+    assert.deepEqual(await service.readData(id), before.data);
+    assert.deepEqual(await service.readManifest(id), before.manifest);
+});
+test('a valid empty remote snapshot is applied while local-only fields remain intact', async t => {
+    const remote = remoteClient(validRemote());
+    const { service, call } = await fixture(t, { pull: () => remote.pull() });
+    const result = await call('pull');
+    assert.equal(result.revision, 4);
+    const data = await service.readData(id);
+    assert.deepEqual(data.products, []); assert.deepEqual(data.tasks, []); assert.deepEqual(data.sessions, []);
+    assert.equal(data.cloudRevision, 4); assert.equal(data.note, 'before');
 });

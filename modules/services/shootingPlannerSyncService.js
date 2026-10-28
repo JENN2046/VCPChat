@@ -27,6 +27,18 @@ function normalizeBaseUrl(value) {
     return url;
 }
 
+// Validate the response envelope before it can replace the local collections.
+// Business-item semantics remain owned by the scheduling service.
+function isCompatibleSnapshot(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value)
+        && value.schemaVersion === 1
+        && Number.isSafeInteger(value.revision) && value.revision >= 0
+        && typeof value.updatedAt === 'string'
+        && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(value.updatedAt)
+        && Number.isFinite(Date.parse(value.updatedAt))
+        && ['products', 'tasks', 'sessions'].every(key => Array.isArray(value[key]));
+}
+
 class ShootingPlannerSyncService {
     constructor(options = {}) {
         this.fetch = options.fetchImpl || globalThis.fetch;
@@ -43,7 +55,7 @@ class ShootingPlannerSyncService {
 
     async pull() {
         const response = await this.request('/api/v1/snapshot', { method: 'GET' });
-        if (!response.snapshot || typeof response.snapshot !== 'object') {
+        if (response?.ok !== true || !isCompatibleSnapshot(response.snapshot)) {
             throw createError('云端排班快照格式无效。', 'SHOOTING_SYNC_INVALID_RESPONSE');
         }
         return response.snapshot;

@@ -1,0 +1,24 @@
+name: JSO Agent VCPChat candidate
+
+on:
+  pull_request:
+  push:
+    branches: [NuobaoVCPchat]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jso-agent-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  paired:
+    uses: JENN2046/VCPToolBox-JENN-Extensions/.github/workflows/jso-agent-paired.yml@a6c7d447ddaa29799c60aa109d5119b102d1eae4
+    with:
+      harness_sha: a6c7d447ddaa29799c60aa109d5119b102d1eae4
+      mode: candidate
+      candidate_component: vcpchat
+      candidate_repository: JENN2046/VCPChat
+      candidate_sha: ${{ github.event.pull_request.head.sha || github.sha }}

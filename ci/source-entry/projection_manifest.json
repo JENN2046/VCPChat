@@ -14768,9 +14768,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa435aa7f46624b1391a70a05fcebf6e88b8c907",
-          "size": 43796,
-          "sha256": "51ca794626cc71ff5ff4f9df32be3db0a4c27c533a0d477014bf9e00644c6be9",
+          "blob": "ab08b1a65530a8fdb5e0c13e85a2f3c392495b9d",
+          "size": 45666,
+          "sha256": "6de30068370a5657c1a586b197047263ae970041d3b4f2cb1a536681ac16e04b",
           "kind": "source"
         },
         {
@@ -14894,9 +14894,9 @@
           "path": "scripts/ci-source-context.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3aa17f3e3c9a26a8034a3e4515485b9577ba63d5",
-          "size": 7544,
-          "sha256": "06861aa6defd081ef6701de1cbcef09f1bafb02da27d857ff9cf49279690ad59",
+          "blob": "e9fb1d2961bfc386f8210c99430901b58617898b",
+          "size": 7970,
+          "sha256": "8356c6c26bacf7362e0790ad81e8f592d71ad7d829236b7829c669daba79c9f3",
           "kind": "source"
         },
         {
@@ -16766,9 +16766,9 @@
           "path": "tests/ci-source-context.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a58e845243700cf0c15a4041795df169b66248af",
-          "size": 8980,
-          "sha256": "e45ed1d46f5eb915fde7cd6226a1df503248108cda609cf0b86e19ff5bfde359",
+          "blob": "94d7a94970d6c2247be03ee6ff181972e93ee117",
+          "size": 10466,
+          "sha256": "bc99f0679e352875bc4bd08e6923710c2c039bce16d659c9b037e2d08ca79edd",
           "kind": "source"
         },
         {
@@ -16802,9 +16802,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "c3a3d2d63cb24b21ddc7efd79bb68f16cf7cc090",
-          "size": 5069,
-          "sha256": "a81b9b3b26c5ab54532bf372448f24e37d016e6109cf1d2630b8308f00b80114",
+          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
+          "size": 11427,
+          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
           "kind": "source"
         },
         {
@@ -17009,9 +17009,9 @@
           "path": "tests/deskpet-lifecycle.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f681a2873bd4f87879ccee3d7a104873ad558dbf",
-          "size": 38076,
-          "sha256": "e28af331141412cec5d55bf64d8e4f60620d508ebde34f2fd029cca6a5f7aa92",
+          "blob": "0559511ca26b4e57be33f11064e1b413de81d07c",
+          "size": 38392,
+          "sha256": "bee7eac27c5ed83fad4ed4d6387f92327deea3716e97a3a78cf237da5439b264",
           "kind": "source"
         },
         {
@@ -17201,6 +17201,15 @@
           "blob": "db18ba30118e4cea3bc87eb909e136dce3e26420",
           "size": 840,
           "sha256": "c9e60b439c9059d7a059694d593224fd1084862ea2ce867f6b7551668a7df582",
+          "kind": "source"
+        },
+        {
+          "path": "tests/fixtures/reviewed-jso-consumer-sources.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f920fd1f40867165a0001dc254382b6332bf3162",
+          "size": 13837,
+          "sha256": "454a85f58424dae985620b1509a703fd33e4e156f22c1b58ff4da7c8303dd009",
           "kind": "source"
         },
         {
@@ -32173,9 +32182,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa435aa7f46624b1391a70a05fcebf6e88b8c907",
-          "size": 43796,
-          "sha256": "51ca794626cc71ff5ff4f9df32be3db0a4c27c533a0d477014bf9e00644c6be9",
+          "blob": "ab08b1a65530a8fdb5e0c13e85a2f3c392495b9d",
+          "size": 45666,
+          "sha256": "6de30068370a5657c1a586b197047263ae970041d3b4f2cb1a536681ac16e04b",
           "kind": "source"
         },
         {
@@ -32299,9 +32308,9 @@
           "path": "scripts/ci-source-context.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3aa17f3e3c9a26a8034a3e4515485b9577ba63d5",
-          "size": 7544,
-          "sha256": "06861aa6defd081ef6701de1cbcef09f1bafb02da27d857ff9cf49279690ad59",
+          "blob": "e9fb1d2961bfc386f8210c99430901b58617898b",
+          "size": 7970,
+          "sha256": "8356c6c26bacf7362e0790ad81e8f592d71ad7d829236b7829c669daba79c9f3",
           "kind": "source"
         },
         {
@@ -34396,9 +34405,9 @@
           "path": "tests/ci-source-context.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "a58e845243700cf0c15a4041795df169b66248af",
-          "size": 8980,
-          "sha256": "e45ed1d46f5eb915fde7cd6226a1df503248108cda609cf0b86e19ff5bfde359",
+          "blob": "94d7a94970d6c2247be03ee6ff181972e93ee117",
+          "size": 10466,
+          "sha256": "bc99f0679e352875bc4bd08e6923710c2c039bce16d659c9b037e2d08ca79edd",
           "kind": "source"
         },
         {
@@ -34504,9 +34513,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "c3a3d2d63cb24b21ddc7efd79bb68f16cf7cc090",
-          "size": 5069,
-          "sha256": "a81b9b3b26c5ab54532bf372448f24e37d016e6109cf1d2630b8308f00b80114",
+          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
+          "size": 11427,
+          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
           "kind": "source"
         },
         {
@@ -34711,9 +34720,9 @@
           "path": "tests/deskpet-lifecycle.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f681a2873bd4f87879ccee3d7a104873ad558dbf",
-          "size": 38076,
-          "sha256": "e28af331141412cec5d55bf64d8e4f60620d508ebde34f2fd029cca6a5f7aa92",
+          "blob": "0559511ca26b4e57be33f11064e1b413de81d07c",
+          "size": 38392,
+          "sha256": "bee7eac27c5ed83fad4ed4d6387f92327deea3716e97a3a78cf237da5439b264",
           "kind": "source"
         },
         {
@@ -34957,6 +34966,15 @@
           "blob": "d051020201b5d8d4cf0f0ad2302cb602dabb855e",
           "size": 1802,
           "sha256": "5e0b86735317c41286f4048953cc5ccc49b2bc0720622b0f20a14226ac4ba4d9",
+          "kind": "source"
+        },
+        {
+          "path": "tests/fixtures/reviewed-jso-consumer-sources.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f920fd1f40867165a0001dc254382b6332bf3162",
+          "size": 13837,
+          "sha256": "454a85f58424dae985620b1509a703fd33e4e156f22c1b58ff4da7c8303dd009",
           "kind": "source"
         },
         {
@@ -35593,9 +35611,9 @@
           "path": "tests/native-websocket.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "533ae8451942e21cca1536e0fb4b80ab86a6e860",
-          "size": 36859,
-          "sha256": "24e00d83cc11e1ce03f8de8c7206f969cd0e7637503ef127f13995ac4913caf1",
+          "blob": "47bbd66b550e52a6c2d0bfa57dea39cbfa51b3e3",
+          "size": 37022,
+          "sha256": "dd328645541b3842697baf6c042b7a48b6ee1cc06f1744c8878fba5f10652104",
           "kind": "source"
         },
         {

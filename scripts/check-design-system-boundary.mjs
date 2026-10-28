@@ -863,7 +863,7 @@ if (sourceContext) {
             const restoredToUpstream = !filesDifferentFromUpstream.has(file);
             if (allowedSourceDifferences.has(file)
                 || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))
-            || isReviewedJsoConsumerDifference(file)
+                || isReviewedJsoConsumerDifference(file)
                 || forbiddenPaths.some(pattern => pattern.test(file))
                 || restoredToUpstream) continue;
             failures.push(`${file}: differs from ${sourceRef} outside the subtraction allowlist`);

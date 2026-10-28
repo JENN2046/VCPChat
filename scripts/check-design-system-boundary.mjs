@@ -60,6 +60,7 @@ const allowedSourceDifferences = new Set([
     'tests/native-context-compaction-boundary.test.cjs',
     'tests/app-features.test.mjs',
     'tests/deskpet-stream.test.mjs',
+    'tests/deskpet-lifecycle.test.mjs', // Deterministic snap-test clock and unconditional fixture cleanup.
     // Composer save queue from 994ef193 and scoped host quit lifecycle integration.
     // Exact paths only; sender denials and all forbidden-path rules remain active.
     'modules/renderer/composerModelSelect.js',
@@ -167,6 +168,7 @@ const allowedSourceDifferences = new Set([
     '.github/scripts/verify-projectforge-trace.cjs',
     'tests/projectforge-trace.test.cjs',
     'tests/design-system-boundary.test.mjs',
+    'tests/fixtures/reviewed-jso-consumer-sources.json', // Fixed synthetic Git-fixture data, not event bodies.
     'tests/lifecycle-inspector.test.js',
     'tests/side-browser-address.test.mjs',
     // PR #61: guarded game IPC startup wiring and its isolated regression.
@@ -578,6 +580,32 @@ const allowedSourceDifferences = new Set([
     'modules/event-listeners.js',
     'modules/renderer/middleClickHandler.js',
 ]);
+// Already-merged JSO consumer metadata, not a new UI/runtime authority surface.
+// Pin exact regular-file Git identities rather than exempting paths/directories.
+// Caller: merged PR #74. Consumer declaration: commit 42a285d3.
+const reviewedJsoConsumerBlobs = new Map([
+    ['.github/workflows/jso-agent-paired-candidate.yml', '38940cb06947455cc2a5f41b53a4cc314ae9c92c'],
+    ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
+]);
+function isReviewedJsoConsumerDifference(file) {
+    const reviewed = reviewedJsoConsumerBlobs.get(file);
+    if (!reviewed) return false;
+    if (sourceContext) return sourceContext.matchesEventBlob(file, '100644', reviewed);
+    try {
+        const parts = file.split('/');
+        let target = root, info;
+        for (const [index, part] of parts.entries()) {
+            target = path.join(target, part); info = fs.lstatSync(target);
+            if (info.isSymbolicLink() || (index < parts.length - 1 ? !info.isDirectory() : !info.isFile())) return false;
+        }
+        if (process.platform !== 'win32' && (info.mode & 0o111)) return false;
+        if (git(['ls-files', '--stage', '--', file]) !== `100644 ${reviewed} 0\t${file}`) return false;
+        // Git checkouts may use CRLF; the reviewed blob has canonical LF bytes.
+        const bytes = Buffer.from(fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n'));
+        return crypto.createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex') === reviewed;
+    } catch { return false; }
+}
+
 const allowedSourceDifferencePatterns = [
     // Settings schema/UIUX and its bridge are the active design-system surface
     // for this PR. Keep the subtraction audit scoped to these owned paths;
@@ -803,6 +831,7 @@ if (sourceContext) {
     for (const file of sourceContext.changedPaths('source')) {
         if (allowedSourceDifferences.has(file)
             || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))
+            || isReviewedJsoConsumerDifference(file)
             || forbiddenPaths.some(pattern => pattern.test(file))
             || sourceContext.sameIdentity('upstream', file)) continue;
         // Metadata proves additions/deletions and mode/type changes. Other
@@ -836,6 +865,7 @@ if (sourceContext) {
             const restoredToUpstream = !filesDifferentFromUpstream.has(file);
             if (allowedSourceDifferences.has(file)
                 || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))
+                || isReviewedJsoConsumerDifference(file)
                 || forbiddenPaths.some(pattern => pattern.test(file))
                 || restoredToUpstream) continue;
             failures.push(`${file}: differs from ${sourceRef} outside the subtraction allowlist`);

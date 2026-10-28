@@ -170,3 +170,27 @@ test('matches the real Git empty tree for an empty comparison frame', t => {
     assert.equal(f.data.source.tree, '4b825dc642cb6eb9a060e54bf8d69288fbee4904');
     assert.deepEqual(f.load().changedPaths('source'), ['input.js']);
 });
+
+test('exact event blob matching uses complete verified metadata without admitting bodies', t => {
+    const f = fixture(t);
+    const entry = { path: 'docs/reviewed.md', mode: '100644', type: 'blob', sha: '1'.repeat(40), size: 7 };
+    f.data.event.entries.push(entry); f.bindTrees(['event']); f.write();
+    const c = f.load();
+    assert.equal(c.matchesEventBlob(entry.path, '100644', entry.sha), true);
+    assert.equal(c.matchesEventBlob(entry.path, '100755', entry.sha), false);
+    assert.equal(c.matchesEventBlob(entry.path, '100644', '2'.repeat(40)), false);
+    assert.equal(c.matchesEventBlob('docs/other.md', '100644', entry.sha), false);
+    assert.equal(c.matchesEventBlob('docs/REVIEWED.md', '100644', entry.sha), false);
+    assert.throws(() => c.readCommitted(entry.path), /not in the admitted projection/);
+    assert.throws(() => c.matchesEventBlob('../escape', '100644', entry.sha), /invalid relative path/);
+});
+for (const [mode, type] of [['120000', 'blob'], ['160000', 'commit']]) {
+    test('exact event blob matching rejects special modes: ' + mode, t => {
+        const f = fixture(t);
+        const entry = { path: 'metadata-only/special', mode, type, sha: '1'.repeat(40), size: 7 };
+        f.data.event.entries.push(entry); f.bindTrees(['event']); f.write();
+        const c = f.load();
+        assert.equal(c.matchesEventBlob(entry.path, mode, entry.sha), false);
+        assert.equal(c.matchesEventBlob(entry.path, '100644', entry.sha), false);
+    });
+}

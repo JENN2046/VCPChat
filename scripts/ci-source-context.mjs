@@ -121,6 +121,13 @@ export function loadCiSourceContext(root, env = process.env) {
         sourceCommit: frames.source.commit,
         upstreamCommit: frames.upstream.commit,
         readCommitted,
+        // Compare against the authenticated complete event tree without reading
+        // a body excluded from the projection or granting access to that body.
+        matchesEventBlob(name, mode, sha) {
+            const item = frames.event.entries.get(relativePath(name));
+            return ['100644', '100755'].includes(mode)
+                && item?.type === 'blob' && item.mode === mode && item.sha === sha;
+        },
         changedPaths(label) {
             if (!['source', 'upstream'].includes(label)) fail('unknown comparison');
             return [...new Set([...frames.event.entries.keys(), ...frames[label].entries.keys()])]

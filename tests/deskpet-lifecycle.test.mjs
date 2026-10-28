@@ -367,8 +367,12 @@ test('click-through mode: the mouse passes the pet, hits are ignored, the talk b
     handlers.closeAll();
 });
 
-test('dropping the pet near a screen edge slides it flush; Alt or a far drop leaves it', async () => {
+test('dropping the pet near a screen edge slides it flush; Alt or a far drop leaves it', async (t) => {
+    // This case tests snapping, not release velocity. Instant synthetic drops
+    // must not cross a real millisecond and accidentally become a throw.
+    t.mock.timers.enable({ apis: ['Date', 'setInterval'], now: 1700000000000 });
     const { handlers, fake, open, fromPet } = await loadHandlers();
+    t.after(() => handlers.closeAll());
     const pet = await open();
     const figure = { x: 40, y: 100, width: 200, height: 300 };
     const dropAt = (x, y, report) => {
@@ -381,24 +385,24 @@ test('dropping the pet near a screen edge slides it flush; Alt or a far drop lea
     // 角色左边离屏幕左边 15：滑过去贴齐；脚底离工作区底边也近：一起落到任务栏上
     const bottom = 1000 - figure.y - figure.height;
     dropAt(-25, bottom - 10, { figure });
-    await sleep(200);
+    t.mock.timers.tick(200);
     assert.deepEqual(pet.getPosition(), [-40, bottom]);
     // 按着 Alt 松手：不吸
     dropAt(-25, bottom - 10, { figure, free: true });
-    await sleep(200);
+    t.mock.timers.tick(200);
     assert.deepEqual(pet.getPosition(), [-25, bottom - 10]);
     // 离边很远：不动；出去了但不到四成（离边超过吸附距离）：也不动
     dropAt(500, 300, { figure });
-    await sleep(200);
+    t.mock.timers.tick(200);
     assert.deepEqual(pet.getPosition(), [500, 300]);
     dropAt(-100, 300, { figure });
-    await sleep(200);
+    t.mock.timers.tick(200);
     assert.deepEqual(pet.getPosition(), [-100, 300]);
     // 页面没报包围盒（老页面、后端没起来）：照旧放下
     dropAt(-25, 300);
-    await sleep(200);
+    t.mock.timers.tick(200);
     assert.deepEqual(pet.getPosition(), [-25, 300]);
-    handlers.closeAll();
+    await handlers.closeAll();
 });
 
 test('a pending tool approval reaches the pet of the agent that asked, and only main answers it', async (t) => {

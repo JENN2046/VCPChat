@@ -477,9 +477,24 @@ function formatSuveiAuthorityPacket(packet) {
             `Source Candidate: ${intent.sourceCandidateId || '—'} rev ${intent.sourceCandidateRevision ?? '—'}`,
             `Source Candidate SHA256: ${intent.sourceCandidateSha256 || '—'}`,
             `Source Critic: ${intent.sourceCriticResultId || '—'}`,
+            ...(intent.sourceOwnerAssessmentId ? [`Owner correction assessment: ${intent.sourceOwnerAssessmentId}`] : []),
             `Mask: ${intent.maskMediaObjectId || '—'}`,
             `Mask SHA256: ${intent.maskContentSha256 || '—'}`,
             `修正指令: ${intent.editInstruction || '—'}`
+        );
+    }
+    if (intent.imageRiskContext) {
+        const risk = intent.imageRiskContext;
+        lines.push(
+            '',
+            'Core 已保存的 Workbench 双风险 H0（本次仅恢复执行通道确认）',
+            `接受旧结果未决及潜在重复生成／计费风险: ${authorization.acceptUnresolvedPriorOutcome === true}`,
+            `确认保留旧责任: ${authorization.acceptRetainedResponsibility === true}`,
+            `未决 ${risk.unresolvedCount} 笔；历史 Core 调用 ${risk.priorCoreCalls} 次；本笔最多新增 ${risk.addedCoreCalls} 次调用／${risk.addedOutputs} 张图`,
+            `旧保留 ${risk.reservedInternalUnits} 内部单位；历史消耗 ${risk.consumedInternalUnits} 内部单位；占用 ${risk.occupiedSlots} 槽位`,
+            `本地未决结果上界: ${risk.maximumLocalExposure}；Provider 内部重试数量: ${risk.providerInternalRetries}`,
+            '内部单位不是货币上限；原任务结果、费用、保留额和责任继续保留；本笔无自动重试。',
+            `Risk target digest: ${risk.targetDigest}`
         );
     }
     if (intent.recoveryContext) {

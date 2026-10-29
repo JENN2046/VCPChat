@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const test = require('node:test');
 const { ShootingPlannerSyncService } = require('../modules/services/shootingPlannerSyncService');
 
 function jsonResponse(status, body) {
@@ -13,7 +14,7 @@ function jsonResponse(status, body) {
     };
 }
 
-async function run() {
+test('snapshot and acknowledgement validation contracts remain intact', async () => {
     const calls = [];
     const service = new ShootingPlannerSyncService({
         baseUrl: 'https://schedule.example.test',
@@ -85,10 +86,76 @@ async function run() {
     const replayed = { ...validAck(), replayed: true };
     assert.deepStrictEqual(await pushBody(replayed), replayed);
 
-    console.log('shooting-planner-sync-service.test.js: all assertions passed');
-}
+});
 
-run().catch(error => {
-    console.error(error);
-    process.exitCode = 1;
+test('pull and push retain root, proxy, nested and encoded base paths', async () => {
+    const valid = () => ({ schemaVersion: 1, revision: 0, updatedAt: '2026-10-29T00:00:00.000Z', products: [], tasks: [], sessions: [] });
+    const validAck = () => ({ ok: true, revision: 4, updatedAt: '2026-10-29T00:00:00.000Z' });
+    for (const [baseUrl, expectedUrl] of [
+        ['https://synthetic.example.test', 'https://synthetic.example.test/api/v1/snapshot'],
+        ['https://synthetic.example.test/', 'https://synthetic.example.test/api/v1/snapshot'],
+        ['https://synthetic.example.test/jso', 'https://synthetic.example.test/jso/api/v1/snapshot'],
+        ['https://synthetic.example.test/jso/', 'https://synthetic.example.test/jso/api/v1/snapshot'],
+        ['https://synthetic.example.test/proxy/jso/', 'https://synthetic.example.test/proxy/jso/api/v1/snapshot'],
+        ['https://synthetic.example.test/team%20one/jso', 'https://synthetic.example.test/team%20one/jso/api/v1/snapshot'],
+    ]) {
+        const requested = [];
+        const client = new ShootingPlannerSyncService({ baseUrl, schedulerToken: 'synthetic-only-token-1234',
+            fetchImpl: async (url, options) => { requested.push({ url: url.toString(), options });
+                return jsonResponse(200, options.method === 'GET' ? { ok: true, snapshot: valid() } : validAck()); } });
+        const binding = client.baseUrl.toString();
+        await client.pull(); await client.push({}, { expectedRevision: 3, operationId: 'synthetic-original-operation' });
+        assert.deepStrictEqual(requested.map(r => r.url), [expectedUrl, expectedUrl]);
+        assert.strictEqual(client.baseUrl.toString(), binding, 'requests must not mutate the configured binding');
+        for (const request of requested) {
+            assert.strictEqual(request.options.headers.Authorization, 'Bearer synthetic-only-token-1234');
+            assert.strictEqual(request.options.redirect, 'error');
+        }
+    }
+});
+
+test('public failures never expose arbitrary response or transport error data', async () => {
+    const marker = 'FAKE_ONLY_NOT_A_REAL_CREDENTIAL';
+    const failure = async (status, body) => {
+        const client = new ShootingPlannerSyncService({ baseUrl: 'https://synthetic.example.test/jso', schedulerToken: marker,
+            fetchImpl: async () => ({ ...jsonResponse(500, body), status, ok: false }) });
+        try { await client.pull(); assert.fail('expected a public failure'); } catch (error) { return error; }
+    };
+    for (const [status, body, expectedCode] of [
+        [409, { code: marker, revision: { raw: marker } }, 'HTTP_409'], [500, { code: 'X'.repeat(20000), raw: marker }, 'HTTP_500'],
+        [500, { code: 'REVISION_CONFLICT', revision: 9 }, 'HTTP_500'], [500, null, 'HTTP_500'], [403, [], 'HTTP_403'], [502, marker, 'HTTP_502'],
+        [{ raw: marker }, { code: marker, revision: marker }, 'HTTP_502'],
+    ]) {
+        const error = await failure(status, body);
+        assert.strictEqual(error.code, expectedCode);
+        assert.strictEqual(error.status, Number(expectedCode.slice(5)));
+        assert.strictEqual(error.revision, undefined);
+        assert.ok(!JSON.stringify(error).includes(marker)); assert.ok(!error.message.includes(marker));
+        assert.ok(!error.stack.includes(marker)); assert.strictEqual(error.cause, undefined);
+    }
+    for (const revision of [-1, Number.MAX_SAFE_INTEGER + 1, '9', { raw: marker }]) {
+        const error = await failure(409, { code: 'REVISION_CONFLICT', revision });
+        assert.strictEqual(error.code, 'REVISION_CONFLICT'); assert.strictEqual(error.revision, undefined);
+    }
+    for (const [status, code] of [[401, 'UNAUTHORIZED'], [403, 'FORBIDDEN'], [503, 'WRITE_ADMISSION_DISABLED']]) {
+        assert.strictEqual((await failure(status, { code })).code, code);
+    }
+    const safeConflict = await failure(409, { code: 'REVISION_CONFLICT', revision: 9 });
+    assert.strictEqual(safeConflict.code, 'REVISION_CONFLICT'); assert.strictEqual(safeConflict.revision, 9);
+    for (const aborted of [false, true]) {
+        const client = new ShootingPlannerSyncService({ baseUrl: 'https://synthetic.example.test', schedulerToken: marker,
+            fetchImpl: async () => { throw Object.assign(new Error(marker), { name: aborted ? 'AbortError' : 'Error', code: marker, cause: { raw: marker } }); } });
+        await assert.rejects(client.pull(), error => {
+            assert.strictEqual(error.code, aborted ? 'SHOOTING_SYNC_TIMEOUT' : 'SHOOTING_SYNC_NETWORK_ERROR');
+            assert.ok(!error.message.includes(marker)); assert.ok(!JSON.stringify(error).includes(marker));
+            assert.strictEqual(error.cause, undefined); return true;
+        });
+    }
+    const oversized = new ShootingPlannerSyncService({ baseUrl: 'https://synthetic.example.test', schedulerToken: marker, maxBytes: 1024,
+        fetchImpl: async () => jsonResponse(200, { padding: 'X'.repeat(2048) }) });
+    await assert.rejects(oversized.pull(), { code: 'SHOOTING_SYNC_RESPONSE_TOO_LARGE' });
+    const invalidJson = new ShootingPlannerSyncService({ baseUrl: 'https://synthetic.example.test', schedulerToken: marker,
+        fetchImpl: async () => ({ ok: true, status: 200, headers: { get: () => null }, arrayBuffer: async () => Buffer.from('invalid-' + marker) }) });
+    await assert.rejects(invalidJson.pull(), { code: 'SHOOTING_SYNC_INVALID_RESPONSE' });
+
 });

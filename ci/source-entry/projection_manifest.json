@@ -11209,9 +11209,9 @@
           "path": "modules/services/shootingPlannerSyncService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "2f4e7d1211c5473e4eb6882268674c6fa87b4734",
-          "size": 6103,
-          "sha256": "049d9104632bf26ec85320840c47078cb2c650b5e1eafcd9d5926e01145e62b8",
+          "blob": "926238e75340c46010ab414b33c639c57be25c52",
+          "size": 7368,
+          "sha256": "5aaa272182e8ca7cfe5631d8ac6dafbc281111cc0819f2384af107a26368f298",
           "kind": "source"
         },
         {
@@ -17693,9 +17693,9 @@
           "path": "tests/shooting-planner-sync-service.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "199d6dbb2b0c018efba170a0aa32f72b46571950",
-          "size": 5162,
-          "sha256": "4107bd680beb800e3ed3ac22213018aefe17a8b8a9bcb7309fafe4bd8bdfd9de",
+          "blob": "af43aaaf5a220452e678407e92e0fa79ac8ff8a7",
+          "size": 10511,
+          "sha256": "9284c7db8cf0d4e45f7306977ab5483383534411b5464163a8102a87999985c6",
           "kind": "source"
         },
         {
@@ -28942,9 +28942,9 @@
           "path": "modules/services/shootingPlannerSyncService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "2f4e7d1211c5473e4eb6882268674c6fa87b4734",
-          "size": 6103,
-          "sha256": "049d9104632bf26ec85320840c47078cb2c650b5e1eafcd9d5926e01145e62b8",
+          "blob": "926238e75340c46010ab414b33c639c57be25c52",
+          "size": 7368,
+          "sha256": "5aaa272182e8ca7cfe5631d8ac6dafbc281111cc0819f2384af107a26368f298",
           "kind": "source"
         },
         {
@@ -35917,9 +35917,9 @@
           "path": "tests/shooting-planner-sync-service.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "199d6dbb2b0c018efba170a0aa32f72b46571950",
-          "size": 5162,
-          "sha256": "4107bd680beb800e3ed3ac22213018aefe17a8b8a9bcb7309fafe4bd8bdfd9de",
+          "blob": "af43aaaf5a220452e678407e92e0fa79ac8ff8a7",
+          "size": 10511,
+          "sha256": "9284c7db8cf0d4e45f7306977ab5483383534411b5464163a8102a87999985c6",
           "kind": "source"
         },
         {

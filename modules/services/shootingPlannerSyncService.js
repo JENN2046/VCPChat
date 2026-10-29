@@ -1,10 +1,32 @@
 'use strict';
 
+const ownedErrors = new WeakSet();
+// Public V1 outcomes only. Unknown values must not become loggable error data.
+const PUBLIC_FAILURE_STATUS = new Map([
+    ['REVISION_CONFLICT', 409], ['IDEMPOTENCY_KEY_REUSE', 409],
+    ['INVALID_SNAPSHOT', 422], ['MISSING_CONCURRENCY_HEADERS', 400],
+    ['UNAUTHORIZED', 401], ['AUTH_NOT_CONFIGURED', 401], ['FORBIDDEN', 403],
+    ['WRITE_ADMISSION_DISABLED', 503], ['INVALID_JSON', 400],
+    ['REQUEST_TOO_LARGE', 413], ['NOT_FOUND', 404], ['INTERNAL_ERROR', 500],
+]);
+
 function createError(message, code, details = {}) {
     const error = new Error(message);
     error.code = code;
     Object.assign(error, details);
+    ownedErrors.add(error);
     return error;
+}
+
+function publicFailure(payload, responseStatus) {
+    const status = Number.isInteger(responseStatus) && responseStatus >= 300 && responseStatus <= 599 ? responseStatus : 502;
+    const claimed = typeof payload?.code === 'string' ? payload.code : null;
+    const code = PUBLIC_FAILURE_STATUS.get(claimed) === status ? claimed : `HTTP_${status}`;
+    const details = { status };
+    if (code === 'REVISION_CONFLICT' && Number.isSafeInteger(payload?.revision) && payload.revision >= 0) {
+        details.revision = payload.revision;
+    }
+    return createError('拍摄排班云同步请求失败。', code, details);
 }
 
 function normalizeBaseUrl(value) {
@@ -96,7 +118,9 @@ class ShootingPlannerSyncService {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
         try {
-            const response = await this.fetch(new URL(pathname, this.baseUrl), {
+            const endpoint = new URL(this.baseUrl.href);
+            endpoint.pathname = `${endpoint.pathname.replace(/\/+$/, '')}/${pathname.replace(/^\/+/, '')}`;
+            const response = await this.fetch(endpoint, {
                 ...options,
                 headers: {
                     Authorization: `Bearer ${this.schedulerToken}`,
@@ -120,17 +144,15 @@ class ShootingPlannerSyncService {
                 throw createError('云端响应不是有效 JSON。', 'SHOOTING_SYNC_INVALID_RESPONSE');
             }
             if (!response.ok) {
-                throw createError('拍摄排班云同步请求失败。', payload.code || 'SHOOTING_SYNC_HTTP_ERROR', {
-                    status: response.status,
-                    revision: payload.revision,
-                });
+                throw publicFailure(payload, response.status);
             }
             return payload;
         } catch (error) {
-            if (error.name === 'AbortError') {
+            if (error?.name === 'AbortError') {
                 throw createError('拍摄排班云同步超时。', 'SHOOTING_SYNC_TIMEOUT');
             }
-            throw error;
+            if (ownedErrors.has(error)) throw error;
+            throw createError('拍摄排班云同步网络请求失败。', 'SHOOTING_SYNC_NETWORK_ERROR');
         } finally {
             clearTimeout(timeout);
         }

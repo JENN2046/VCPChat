@@ -4691,7 +4691,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1345,
+          "line": 1360,
           "kind": "custom-event-listener"
         },
         {
@@ -6229,7 +6229,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1345,
+          "line": 1360,
           "kind": "custom-event-listener",
           "match": "reasonInput.addEventListener('click'"
         },
@@ -8710,7 +8710,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 933,
+          "line": 948,
           "kind": "custom-event-listener"
         },
         {
@@ -8854,7 +8854,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 933,
+          "line": 948,
           "kind": "custom-event-listener",
           "match": "element.addEventListener('contextmenu'"
         },
@@ -16350,7 +16350,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1777,
+          "line": 1792,
           "kind": "custom-event-listener"
         },
         {
@@ -16410,7 +16410,7 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1777,
+          "line": 1792,
           "kind": "custom-event-listener",
           "match": "window.addEventListener('focus'"
         },
@@ -19269,12 +19269,12 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 934,
+          "line": 949,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1346,
+          "line": 1361,
           "kind": "custom-event-listener"
         },
         {
@@ -19647,13 +19647,13 @@
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 934,
+          "line": 949,
           "kind": "custom-event-listener",
           "match": "element.addEventListener('keydown'"
         },
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1346,
+          "line": 1361,
           "kind": "custom-event-listener",
           "match": "reasonInput.addEventListener('keydown'"
         },
@@ -34306,7 +34306,7 @@
       "consumers": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1520,
+          "line": 1535,
           "kind": "custom-event-listener"
         },
         {
@@ -34328,7 +34328,7 @@
       "evidence": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1520,
+          "line": 1535,
           "kind": "custom-event-listener",
           "match": "toastElement.addEventListener('transitionend'"
         },
@@ -36289,7 +36289,7 @@
       "producers": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1689,
+          "line": 1704,
           "kind": "custom-event-create"
         }
       ],
@@ -36297,7 +36297,7 @@
       "evidence": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1689,
+          "line": 1704,
           "kind": "custom-event-create",
           "match": "new CustomEvent('vcp:tool-approval-pending'"
         }
@@ -36308,7 +36308,7 @@
       "producers": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1564,
+          "line": 1579,
           "kind": "custom-event-create"
         }
       ],
@@ -36316,7 +36316,7 @@
       "evidence": [
         {
           "file": "modules/notificationRenderer.js",
-          "line": 1564,
+          "line": 1579,
           "kind": "custom-event-create",
           "match": "new CustomEvent('vcp:tool-approval-settled'"
         }
@@ -38585,7 +38585,7 @@
     },
     {
       "file": "modules/notificationRenderer.js",
-      "line": 1717,
+      "line": 1732,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",

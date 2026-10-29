@@ -16,6 +16,7 @@ const { PRELOAD_ROLES, resolveProjectPreload } = require('../services/preloadPat
 
 let chartService = null;
 let chartDataSourceService = null;
+let shootingPlannerSyncService = null;
 let workbenchWindow = null;
 let projectRoot = null;
 let openChildWindows = null;
@@ -514,6 +515,8 @@ function registerIpcHandlers() {
         'chart:get-snapshot',
         'chart:get-initial-selection',
         'chart:read-data-source',
+        'chart:replace-data',
+        'chart:shooting-planner-sync',
         'chart:delete',
         'chart:open-in-canvas',
     ].forEach(channel => ipcMain.removeHandler(channel));
@@ -627,6 +630,104 @@ function registerIpcHandlers() {
         });
     });
 
+    ipcMain.handle('chart:replace-data', async (event, request = {}) => {
+        if (!senderIsKnown(event.sender)) {
+            const error = new Error('未知图表窗口无权写入数据。');
+            error.code = 'CHART_SENDER_FORBIDDEN';
+            throw error;
+        }
+        const chartId = String(request.chartId || '').trim();
+        const selectedChartId = selectionByWebContents.get(event.sender.id);
+        if (!chartId || chartId !== selectedChartId) {
+            const error = new Error('图表只能写入当前选中的自身数据。');
+            error.code = 'CHART_WRITE_SCOPE_FORBIDDEN';
+            throw error;
+        }
+        return chartService.replaceData(chartId, request.data, {
+            expectedDataRevision: request.expectedDataRevision,
+        }, {
+            vcpContext: { source: 'chart-runtime' },
+        });
+    });
+
+    ipcMain.handle('chart:shooting-planner-sync', async (event, request = {}) => {
+        if (!senderIsKnown(event.sender)) {
+            const error = new Error('未知图表窗口无权执行拍摄排班同步。');
+            error.code = 'CHART_SENDER_FORBIDDEN';
+            throw error;
+        }
+        const chartId = String(request.chartId || '').trim();
+        const selectedChartId = selectionByWebContents.get(event.sender.id);
+        if (chartId !== 'jenn-shooting-planner' || chartId !== selectedChartId) {
+            const error = new Error('当前图表无权使用拍摄排班同步服务。');
+            error.code = 'SHOOTING_SYNC_SCOPE_FORBIDDEN';
+            throw error;
+        }
+        if (!shootingPlannerSyncService?.status().enabled) {
+            return { enabled: false, reason: 'NOT_CONFIGURED' };
+        }
+        const action = String(request.action || 'status');
+        if (action === 'status') return shootingPlannerSyncService.status();
+
+        const { data: local, manifest } = await chartService.readDataSnapshot(chartId);
+        if (action === 'pull') {
+            const remote = await shootingPlannerSyncService.pull();
+            const next = {
+                ...local,
+                products: remote.products,
+                tasks: remote.tasks,
+                sessions: remote.sessions,
+                cloudRevision: remote.revision,
+                cloudUpdatedAt: remote.updatedAt,
+                updatedAt: remote.updatedAt,
+            };
+            await chartService.replaceData(chartId, next, {
+                expectedDataRevision: manifest.dataRevision,
+            }, { vcpContext: { source: 'shooting-planner-cloud-pull' } });
+            return { enabled: true, action, revision: remote.revision, data: next };
+        }
+        if (action === 'push') {
+            if (!Number.isInteger(local.cloudRevision)) {
+                const error = new Error('首次写入云端前必须先拉取当前版本。');
+                error.code = 'SHOOTING_SYNC_INITIAL_PULL_REQUIRED';
+                throw error;
+            }
+            const snapshot = {
+                schemaVersion: 1,
+                revision: local.cloudRevision,
+                updatedAt: local.cloudUpdatedAt || local.updatedAt || new Date().toISOString(),
+                products: local.products || [],
+                tasks: local.tasks || [],
+                sessions: local.sessions || [],
+            };
+            const result = await shootingPlannerSyncService.push(snapshot, {
+                expectedRevision: local.cloudRevision,
+                operationId: request.operationId,
+            });
+            let revision = result.revision;
+            try {
+                // Patch the latest queued data, preserving edits made during PUT.
+                await chartService.applyDataOperations(chartId, [
+                    { op: 'test', path: '/cloudRevision', value: local.cloudRevision },
+                    { op: 'set', path: '/cloudRevision', value: result.revision },
+                    { op: 'set', path: '/cloudUpdatedAt', value: result.updatedAt },
+                ], {
+                    operationId: `shooting-planner-push:${chartId}:${request.operationId}`,
+                }, { vcpContext: { source: 'shooting-planner-cloud-push' } });
+            } catch (error) {
+                if (error.code !== 'CHART_DATA_TEST_FAILED') throw error;
+                const latest = await chartService.readDataSnapshot(chartId);
+                if (!Number.isInteger(latest.data.cloudRevision) || latest.data.cloudRevision < result.revision) throw error;
+                // A newer pull or acknowledgement already reconciled this push.
+                revision = latest.data.cloudRevision;
+            }
+            return { enabled: true, action, revision };
+        }
+        const error = new Error('不支持的拍摄排班同步动作。');
+        error.code = 'SHOOTING_SYNC_ACTION_UNSUPPORTED';
+        throw error;
+    });
+
     [
         'chart:runtime-status',
         'chart:runtime-error',
@@ -709,6 +810,7 @@ async function initialize(options = {}) {
     });
     chartDataSourceService = options.chartDataSourceService
         || new ChartDataSourceService({ logger: options.logger || console });
+    shootingPlannerSyncService = options.shootingPlannerSyncService || null;
     await chartService.initialize();
     chartService.setDataSourceAdapter(chartDataSourceService);
     chartService.setWindowAdapter({
@@ -772,6 +874,7 @@ async function shutdown() {
     await chartService?.shutdown?.();
     chartService = null;
     chartDataSourceService = null;
+    shootingPlannerSyncService = null;
 }
 
 module.exports = {

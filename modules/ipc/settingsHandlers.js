@@ -152,7 +152,11 @@ function initialize(paths) {
                 settingsToSave.flowlockContinueDelay = 5; // 如果无效，则设置为默认值
             }
 
-            const result = await settingsManager.updateSettings(ops ? { __vcpSettingsOps: ops } : settingsToSave, { expectedRevision, operationId });
+            const PROTECTED_SETTINGS_ROOT_KEYS = new Set(['userAvatarUrl', 'combinedItemOrder', 'agentOrder', 'workspaces', 'activeWorkspaceId', 'workspacePromptSettings']);
+            const safeOps = Array.isArray(ops)
+                ? ops.filter(op => !(op && Array.isArray(op.path) && op.path.length > 0 && PROTECTED_SETTINGS_ROOT_KEYS.has(op.path[0])))
+                : null;
+            const result = await settingsManager.updateSettings(safeOps ? { __vcpSettingsOps: safeOps } : settingsToSave, { expectedRevision, operationId });
             return result;
         } catch (error) {
             console.error('保存设置失败:', error);

@@ -432,6 +432,7 @@
     "modules/services/scriptoriumImportService.js",
     "modules/services/scriptoriumPptxImportService.js",
     "modules/services/senderTaskRegistry.js",
+    "modules/services/shootingPlannerSyncService.js",
     "modules/services/sourceService.js",
     "modules/services/suveiHumanAuthorizationService.js",
     "modules/services/themePreviewVariables.js",
@@ -3039,7 +3040,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 744,
+          "line": 846,
           "kind": "event-listener"
         },
         {
@@ -3213,7 +3214,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 744,
+          "line": 846,
           "kind": "event-listener",
           "match": "chartService.on('change'"
         },
@@ -3322,14 +3323,14 @@
       "consumers": [
         {
           "file": "preloads/chart.js",
-          "line": 41,
+          "line": 43,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "preloads/chart.js",
-          "line": 41,
+          "line": 43,
           "kind": "event-listener",
           "match": "subscribe('chart:changed'"
         }
@@ -3340,27 +3341,27 @@
       "producers": [
         {
           "file": "preloads/chart.js",
-          "line": 23,
+          "line": 25,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 573,
+          "line": 576,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 573,
+          "line": 576,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:delete'"
         },
         {
           "file": "preloads/chart.js",
-          "line": 23,
+          "line": 25,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('chart:delete'"
         }
@@ -3378,14 +3379,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 528,
+          "line": 531,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 528,
+          "line": 531,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:detach'"
         },
@@ -3402,27 +3403,27 @@
       "producers": [
         {
           "file": "preloads/chart.js",
-          "line": 30,
+          "line": 32,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 678,
+          "line": 779,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 678,
+          "line": 779,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:diagnostics'"
         },
         {
           "file": "preloads/chart.js",
-          "line": 30,
+          "line": 32,
           "kind": "event-send",
           "match": "ipcRenderer.send('chart:diagnostics'"
         }
@@ -3440,14 +3441,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 543,
+          "line": 546,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 543,
+          "line": 546,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:dock'"
         },
@@ -3471,14 +3472,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 473,
+          "line": 474,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 473,
+          "line": 474,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:embed-acquire'"
         },
@@ -3521,14 +3522,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 502,
+          "line": 503,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 502,
+          "line": 503,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:embed-open'"
         },
@@ -3552,14 +3553,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 492,
+          "line": 493,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 492,
+          "line": 493,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:embed-read-data-source'"
         },
@@ -3583,14 +3584,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 487,
+          "line": 488,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 487,
+          "line": 488,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:embed-release'"
         },
@@ -3614,14 +3615,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 483,
+          "line": 484,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 483,
+          "line": 484,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:embed-snapshot'"
         },
@@ -3664,14 +3665,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 524,
+          "line": 527,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 524,
+          "line": 527,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:floating-state'"
         },
@@ -3695,14 +3696,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 535,
+          "line": 538,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 535,
+          "line": 538,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:focus-floating'"
         },
@@ -3726,14 +3727,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 569,
+          "line": 572,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 569,
+          "line": 572,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:get-initial-selection'"
         },
@@ -3757,14 +3758,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 564,
+          "line": 567,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 564,
+          "line": 567,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:get-snapshot'"
         },
@@ -3788,14 +3789,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 560,
+          "line": 563,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 560,
+          "line": 563,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:list'"
         },
@@ -3812,27 +3813,27 @@
       "producers": [
         {
           "file": "preloads/chart.js",
-          "line": 24,
+          "line": 26,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 585,
+          "line": 588,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 585,
+          "line": 588,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:open-in-canvas'"
         },
         {
           "file": "preloads/chart.js",
-          "line": 24,
+          "line": 26,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('chart:open-in-canvas'"
         }
@@ -3850,14 +3851,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 604,
+          "line": 607,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 604,
+          "line": 607,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:read-data-source'"
         },
@@ -3870,19 +3871,50 @@
       ]
     },
     {
+      "name": "chart:replace-data",
+      "producers": [
+        {
+          "file": "preloads/chart.js",
+          "line": 23,
+          "kind": "event-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/ipc/chartHandlers.js",
+          "line": 633,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/ipc/chartHandlers.js",
+          "line": 633,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('chart:replace-data'"
+        },
+        {
+          "file": "preloads/chart.js",
+          "line": 23,
+          "kind": "event-send",
+          "match": "ipcRenderer.invoke('chart:replace-data'"
+        }
+      ]
+    },
+    {
       "name": "chart:request-diagnostics",
       "producers": [],
       "consumers": [
         {
           "file": "preloads/chart.js",
-          "line": 43,
+          "line": 45,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "preloads/chart.js",
-          "line": 43,
+          "line": 45,
           "kind": "event-listener",
           "match": "subscribe('chart:request-diagnostics'"
         }
@@ -3893,27 +3925,27 @@
       "producers": [
         {
           "file": "preloads/chart.js",
-          "line": 28,
+          "line": 30,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 658,
+          "line": 759,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 658,
+          "line": 759,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:runtime-error'"
         },
         {
           "file": "preloads/chart.js",
-          "line": 28,
+          "line": 30,
           "kind": "event-send",
           "match": "ipcRenderer.send('chart:runtime-error'"
         }
@@ -3924,27 +3956,27 @@
       "producers": [
         {
           "file": "preloads/chart.js",
-          "line": 29,
+          "line": 31,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 670,
+          "line": 771,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 670,
+          "line": 771,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:runtime-event'"
         },
         {
           "file": "preloads/chart.js",
-          "line": 29,
+          "line": 31,
           "kind": "event-send",
           "match": "ipcRenderer.send('chart:runtime-event'"
         }
@@ -3955,27 +3987,27 @@
       "producers": [
         {
           "file": "preloads/chart.js",
-          "line": 27,
+          "line": 29,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 637,
+          "line": 738,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 637,
+          "line": 738,
           "kind": "event-listener",
           "match": "ipcMain.on('chart:runtime-status'"
         },
         {
           "file": "preloads/chart.js",
-          "line": 27,
+          "line": 29,
           "kind": "event-send",
           "match": "ipcRenderer.send('chart:runtime-status'"
         }
@@ -3987,16 +4019,47 @@
       "consumers": [
         {
           "file": "preloads/chart.js",
-          "line": 42,
+          "line": 44,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "preloads/chart.js",
-          "line": 42,
+          "line": 44,
           "kind": "event-listener",
           "match": "subscribe('chart:select'"
+        }
+      ]
+    },
+    {
+      "name": "chart:shooting-planner-sync",
+      "producers": [
+        {
+          "file": "preloads/chart.js",
+          "line": 24,
+          "kind": "event-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/ipc/chartHandlers.js",
+          "line": 653,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/ipc/chartHandlers.js",
+          "line": 653,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('chart:shooting-planner-sync'"
+        },
+        {
+          "file": "preloads/chart.js",
+          "line": 24,
+          "kind": "event-send",
+          "match": "ipcRenderer.invoke('chart:shooting-planner-sync'"
         }
       ]
     },
@@ -4012,14 +4075,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 552,
+          "line": 555,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 552,
+          "line": 555,
           "kind": "event-listener",
           "match": "ipcMain.handle('chart:toggle-pin'"
         },
@@ -7849,7 +7912,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 38,
+          "line": 40,
           "kind": "event-send"
         },
         {
@@ -7908,7 +7971,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 38,
+          "line": 40,
           "kind": "event-send",
           "match": "ipcRenderer.send('close-window'"
         },
@@ -7987,12 +8050,12 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 93,
+          "line": 94,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 195,
+          "line": 196,
           "kind": "event-listener"
         },
         {
@@ -8230,13 +8293,13 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 93,
+          "line": 94,
           "kind": "event-listener",
           "match": "win.once('closed'"
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 195,
+          "line": 196,
           "kind": "event-listener",
           "match": "win.once('closed'"
         },
@@ -13417,12 +13480,12 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 85,
+          "line": 86,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 700,
+          "line": 801,
           "kind": "event-listener"
         },
         {
@@ -13512,13 +13575,13 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 85,
+          "line": 86,
           "kind": "event-listener",
           "match": "win.webContents.once('destroyed'"
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 700,
+          "line": 801,
           "kind": "event-listener",
           "match": "mainContents?.on('destroyed'"
         },
@@ -13974,7 +14037,7 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 701,
+          "line": 802,
           "kind": "event-listener"
         },
         {
@@ -13986,7 +14049,7 @@
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 701,
+          "line": 802,
           "kind": "event-listener",
           "match": "mainContents?.on('did-navigate'"
         },
@@ -16963,7 +17026,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 25,
+          "line": 27,
           "kind": "event-send"
         },
         {
@@ -16999,7 +17062,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 25,
+          "line": 27,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('get-current-theme'"
         },
@@ -20640,14 +20703,14 @@
       "consumers": [
         {
           "file": "modules/ipc/settingsHandlers.js",
-          "line": 231,
+          "line": 235,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/settingsHandlers.js",
-          "line": 231,
+          "line": 235,
           "kind": "event-listener",
           "match": "ipcMain.handle('load-webindex-models'"
         },
@@ -22068,7 +22131,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 37,
+          "line": 39,
           "kind": "event-send"
         },
         {
@@ -22121,7 +22184,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 37,
+          "line": 39,
           "kind": "event-send",
           "match": "ipcRenderer.send('maximize-window'"
         },
@@ -22333,7 +22396,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 36,
+          "line": 38,
           "kind": "event-send"
         },
         {
@@ -22386,7 +22449,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 36,
+          "line": 38,
           "kind": "event-send",
           "match": "ipcRenderer.send('minimize-window'"
         },
@@ -26408,14 +26471,14 @@
       "consumers": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 755,
+          "line": 857,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 755,
+          "line": 857,
           "kind": "event-listener",
           "match": "ipcMain.handle('open-chart-window'"
         }
@@ -26462,7 +26525,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 39,
+          "line": 41,
           "kind": "event-send"
         },
         {
@@ -26493,7 +26556,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 39,
+          "line": 41,
           "kind": "event-send",
           "match": "ipcRenderer.send('open-dev-tools'"
         },
@@ -28881,7 +28944,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 171,
+          "line": 172,
           "kind": "event-listener"
         },
         {
@@ -29013,7 +29076,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 171,
+          "line": 172,
           "kind": "event-listener",
           "match": "workbenchWindow.once('ready-to-show'"
         },
@@ -29419,7 +29482,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 199,
+          "line": 200,
           "kind": "event-listener"
         },
         {
@@ -29481,7 +29544,7 @@
         },
         {
           "file": "modules/ipc/chartHandlers.js",
-          "line": 199,
+          "line": 200,
           "kind": "event-listener",
           "match": "win.webContents.once('render-process-gone'"
         },
@@ -30109,14 +30172,14 @@
       "consumers": [
         {
           "file": "modules/ipc/settingsHandlers.js",
-          "line": 164,
+          "line": 168,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/settingsHandlers.js",
-          "line": 164,
+          "line": 168,
           "kind": "event-listener",
           "match": "ipcMain.handle('save-avatar-color'"
         },
@@ -31607,14 +31670,14 @@
       "consumers": [
         {
           "file": "modules/ipc/settingsHandlers.js",
-          "line": 291,
+          "line": 295,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/settingsHandlers.js",
-          "line": 291,
+          "line": 295,
           "kind": "event-listener",
           "match": "ipcMain.on('set-theme'"
         },
@@ -33820,7 +33883,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 44,
+          "line": 46,
           "kind": "event-listener"
         },
         {
@@ -33849,7 +33912,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 44,
+          "line": 46,
           "kind": "event-listener",
           "match": "subscribe('theme-updated'"
         },
@@ -37629,7 +37692,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 31,
+          "line": 33,
           "kind": "event-send"
         },
         {
@@ -37648,7 +37711,7 @@
         },
         {
           "file": "preloads/chart.js",
-          "line": 31,
+          "line": 33,
           "kind": "event-send",
           "match": "ipcRenderer.send('window-lifecycle:ready'"
         },
@@ -38274,7 +38337,7 @@
     },
     {
       "file": "modules/ipc/chartHandlers.js",
-      "line": 50,
+      "line": 51,
       "reason": "dynamic event name: channel",
       "kind": "event-send",
       "match": "win.webContents.send(channel",

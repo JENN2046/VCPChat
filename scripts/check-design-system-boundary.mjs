@@ -48,6 +48,19 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // PR #72: serialize synchronization snapshots and preserve concurrent edits.
+    'modules/services/chartService.js',
+    'tests/chart-sync-races.test.cjs',
+    // Reviewed local sidebar/save-field ownership changes.
+    'modules/event-listeners.js',
+    'modules/ipc/settingsHandlers.js',
+    // Preserve the already-reviewed local chart persistence and shooting sync.
+    'Chartmodules/chart-runtime.js',
+    'modules/ipc/chartHandlers.js',
+    'modules/services/shootingPlannerSyncService.js',
+    'preloads/chart.js',
+    'tests/chart-runtime-persistence-contract.test.mjs',
+    'tests/shooting-planner-sync-service.test.js',
     'modules/renderer/chartEmbedHost.js', // Replay visibility after sandbox remount.
     'tests/chart-embed.test.mjs',
     // Reviewed delivery regressions: conversation ownership/acceptance and

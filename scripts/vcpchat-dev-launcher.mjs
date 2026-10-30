@@ -177,7 +177,8 @@ export async function runManagedLauncher({
     const root = path.resolve(projectRoot || options.projectRoot || path.dirname(path.dirname(fileURLToPath(import.meta.url))));
     const stateRoot = resolveStateRoot({ env });
     const operationId = createOperationId('launch');
-    const report = collectDoctorReport({ projectRoot: root, deep: options.deepDoctor, env });
+    const { withoutOwnerCredentials } = require('../modules/services/trustedConversation/credentialVault.cjs');
+    const report = collectDoctorReport({ projectRoot: root, deep: options.deepDoctor, env: withoutOwnerCredentials(env) });
     if (!report.ok) {
         io.stderr.write(`VCPChat Doctor 阻止启动：\n${formatDoctorFailure(report)}\n`);
         io.stderr.write('当前 M2 只读启动器不会自动安装或重建依赖，请先修复环境后重试。\n');

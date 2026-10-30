@@ -1,6 +1,19 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const {createNativeTransport}=require('../modules/services/trustedConversation/transport.cjs');
+test('Owner authorization is captured before child inheritance; doctor probes receive a stripped copy',async t=>{
+ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{randomUUID}=require('node:crypto');
+ const {captureFromEnvironment,withoutOwnerCredentials}=require('../modules/services/trustedConversation/credentialVault.cjs');
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'native-owner-memory-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ const file=path.join(root,'binding.json'),binding={transport:'vcp-websocket',clientInstanceId:randomUUID(),toolName:'Example',applicationAuthorizationEnv:'EXISTING_OWNER'};
+ fs.writeFileSync(file,JSON.stringify(binding));const credential='Bearer '+'synthetic-owner'.padEnd(40,'x');
+ const env={EXISTING_OWNER:credential,JSO_OWNER_SESSION_AUTHORIZATION:credential,VCPCHAT_NATIVE_TOOL_BINDING_FILE:file,ORDINARY:'preserved'};
+ const doctor=withoutOwnerCredentials(env);assert.equal(doctor.EXISTING_OWNER,undefined);assert.equal(doctor.JSO_OWNER_SESSION_AUTHORIZATION,undefined);assert.equal(doctor.ORDINARY,'preserved');assert.equal(env.EXISTING_OWNER,credential);
+ captureFromEnvironment(env);assert.equal(env.EXISTING_OWNER,undefined);assert.equal(env.JSO_OWNER_SESSION_AUTHORIZATION,undefined);assert.equal(env.ORDINARY,'preserved');
+ captureFromEnvironment(env);let calls=0;const transport=createNativeTransport({binding,env,nativeRequest:async request=>{assert.equal(request.authorization,credential);calls++;return {ok:true};}});
+ assert.equal((await transport.request('status')).ok,true);assert.equal(calls,1);assert.equal(JSON.stringify(env).includes(credential),false);
+ assert.throws(()=>createNativeTransport({binding,env:{...env},nativeRequest:async()=>({ok:true})}),/NATIVE_CREDENTIAL_REFERENCE_REQUIRED/);
+});
 test('native session diagnostics reflect verified status/recovery only and disclose no credentials or business payload',async t=>{
  const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{randomUUID}=require('node:crypto');
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'native-session-status-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));

@@ -8328,9 +8328,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b638eca617cee3add6dc2870496bfc50c4bdca58",
-          "size": 114695,
-          "sha256": "4b30d668507f768444e9bdcdb49244d13950fd4e2cb5fe5e1942b9d91537b8f9",
+          "blob": "7a5e57e881ea2e93664485986ffb37e65a583e3a",
+          "size": 114791,
+          "sha256": "1a05f1928842e4c0a7e93b070f303e4ce2b77e11182962a37abaffb4bb9fdedf",
           "kind": "source"
         },
         {
@@ -11245,9 +11245,18 @@
           "path": "modules/services/trustedConversation/README.md",
           "mode": "100644",
           "type": "blob",
-          "blob": "f6c48107d9a3c775eee343040c8a22a4dccb2ea7",
-          "size": 4273,
-          "sha256": "216c7d098c931c1c4b34524238cef5961f63e3f9566ad85d9e84d85a6ea2a6ce",
+          "blob": "1bd939505281611cc6b5ca7f05d56b0080e4fea5",
+          "size": 4702,
+          "sha256": "bcf88415472b93cbee753aa72068c562068a53b2ba51e2f38e52fbd3413273ce",
+          "kind": "source"
+        },
+        {
+          "path": "modules/services/trustedConversation/credentialVault.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "145f146dc3bac49c54f9b768786842926569fb47",
+          "size": 1525,
+          "sha256": "f78f727cb32f3c10ff40f6d52a3244c3078e8acf3fd047d3d746c79a282b0501",
           "kind": "source"
         },
         {
@@ -11272,9 +11281,9 @@
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "44781a0714e928752df764801e55e93b4d30bfa3",
-          "size": 4803,
-          "sha256": "328002b9904d2165fb66af89990f4efa3f3873d536d307f9cf004d13838b574a",
+          "blob": "81eaea35c03da21b699738d5ad01fd87cba03baa",
+          "size": 4851,
+          "sha256": "1af0640a0cf424eddeee2b009c5513424be21fce161a9fa4e505c4f635163e46",
           "kind": "source"
         },
         {
@@ -15668,9 +15677,9 @@
           "path": "scripts/vcpchat-dev-launcher.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "4e11be9716be3c01e33f0c276d62b1e7339674bb",
-          "size": 12417,
-          "sha256": "75b1548b0838360aa68bf5d1c124c11fe925bda1d46de484e408b845eee1860f",
+          "blob": "f0cec815711bf322680dd9b2b73ac80b97dd9636",
+          "size": 12559,
+          "sha256": "d5ba3b91b8e50094e656b080aa17cd2443117a089b4b3551009ecca4d9b1f75d",
           "kind": "source"
         },
         {
@@ -17468,9 +17477,9 @@
           "path": "tests/native-projection-recovery.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "31029fce7ac6ca46adfef2f5ac5401d816a4eebb",
-          "size": 3744,
-          "sha256": "9eba1883a7c94623c5a5265b57731a80cc346f79add6f926f1b3c3f7fca5ef05",
+          "blob": "618e4ab308dedd18e0fdb94f9bb3189b5a6d774b",
+          "size": 5555,
+          "sha256": "4ea26ae7f4bac065c7310c6c0e68aff3082fc149e6ec7d3f2bd159895d607252",
           "kind": "source"
         },
         {
@@ -25747,9 +25756,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "224f2aeac195cbe5d6ae8a2f96a332e76f0742bf",
-          "size": 1077920,
-          "sha256": "2edb8e1bea04fac335c1e633a6246f8657b2cff722ae2cb443df6033629affab",
+          "blob": "6ee9aa483d1cdab0082702b5c26fe9fe3b15df74",
+          "size": 1077986,
+          "sha256": "2afd455a48ae9e48c1d6ac73b259384b6b3e29a2f8e53877597a19a9fdcebd10",
           "kind": "source"
         },
         {
@@ -26107,9 +26116,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b638eca617cee3add6dc2870496bfc50c4bdca58",
-          "size": 114695,
-          "sha256": "4b30d668507f768444e9bdcdb49244d13950fd4e2cb5fe5e1942b9d91537b8f9",
+          "blob": "7a5e57e881ea2e93664485986ffb37e65a583e3a",
+          "size": 114791,
+          "sha256": "1a05f1928842e4c0a7e93b070f303e4ce2b77e11182962a37abaffb4bb9fdedf",
           "kind": "source"
         },
         {
@@ -28984,6 +28993,15 @@
           "kind": "source"
         },
         {
+          "path": "modules/services/trustedConversation/credentialVault.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "145f146dc3bac49c54f9b768786842926569fb47",
+          "size": 1525,
+          "sha256": "f78f727cb32f3c10ff40f6d52a3244c3078e8acf3fd047d3d746c79a282b0501",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/trustedConversation/nativePort.cjs",
           "mode": "100644",
           "type": "blob",
@@ -29005,9 +29023,9 @@
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "44781a0714e928752df764801e55e93b4d30bfa3",
-          "size": 4803,
-          "sha256": "328002b9904d2165fb66af89990f4efa3f3873d536d307f9cf004d13838b574a",
+          "blob": "81eaea35c03da21b699738d5ad01fd87cba03baa",
+          "size": 4851,
+          "sha256": "1af0640a0cf424eddeee2b009c5513424be21fce161a9fa4e505c4f635163e46",
           "kind": "source"
         },
         {
@@ -33091,9 +33109,9 @@
           "path": "scripts/vcpchat-dev-launcher.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "4e11be9716be3c01e33f0c276d62b1e7339674bb",
-          "size": 12417,
-          "sha256": "75b1548b0838360aa68bf5d1c124c11fe925bda1d46de484e408b845eee1860f",
+          "blob": "f0cec815711bf322680dd9b2b73ac80b97dd9636",
+          "size": 12559,
+          "sha256": "d5ba3b91b8e50094e656b080aa17cd2443117a089b4b3551009ecca4d9b1f75d",
           "kind": "source"
         },
         {
@@ -35566,9 +35584,9 @@
           "path": "tests/native-projection-recovery.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "31029fce7ac6ca46adfef2f5ac5401d816a4eebb",
-          "size": 3744,
-          "sha256": "9eba1883a7c94623c5a5265b57731a80cc346f79add6f926f1b3c3f7fca5ef05",
+          "blob": "618e4ab308dedd18e0fdb94f9bb3189b5a6d774b",
+          "size": 5555,
+          "sha256": "4ea26ae7f4bac065c7310c6c0e68aff3082fc149e6ec7d3f2bd159895d607252",
           "kind": "source"
         },
         {

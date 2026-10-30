@@ -1,13 +1,14 @@
 'use strict';
 const {isNativeClientInstanceId}=require('./webSocket.cjs');
 const {createSessionStatus}=require('./sessionStatus.cjs');
+const {authorizationFor}=require('./credentialVault.cjs');
 function validateNativeBinding({binding,env=process.env}){
  const websocket=binding.transport==='vcp-websocket';
  if(websocket&&!isNativeClientInstanceId(binding.clientInstanceId))throw Error('NATIVE_CLIENT_BINDING_REQUIRED');
  if(typeof binding.toolName!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(binding.toolName))throw Error('NATIVE_LOCAL_BINDING_INVALID');
  const url=websocket?null:new URL(binding.toolboxUrl);
  if(!websocket&&(url.protocol!=='http:'||!['127.0.0.1','[::1]'].includes(url.hostname)||url.username||url.password||url.search||url.hash||!/^\/?$/.test(url.pathname)))throw Error('NATIVE_LOCAL_BINDING_INVALID');
- const key=env[binding.transportTokenEnv],application=env[binding.applicationAuthorizationEnv];if((!websocket&&!key)||!/^Bearer [\x21-\x7e]{32,4096}$/.test(application||''))throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
+ const key=env[binding.transportTokenEnv],application=authorizationFor(binding,env);if((!websocket&&!key)||!/^Bearer [\x21-\x7e]{32,4096}$/.test(application||''))throw Error('NATIVE_CREDENTIAL_REFERENCE_REQUIRED');
  return {websocket,url,key,application};
 }
 function createNativeTransport({binding,env=process.env,fetchImpl=fetch,chartService,controller,nativeRequest}){

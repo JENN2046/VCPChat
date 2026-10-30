@@ -1,3 +1,4 @@
+require('./modules/services/trustedConversation/credentialVault.cjs').captureFromEnvironment();
 const quitAdmission = require('./modules/services/quitAdmission.cjs');
 const { prepareProjectForgeQuit, cancelProjectForgeQuit } = require('./modules/ipc/projectForgeCloseGuard');
 // main.js - Electron 主窗口

@@ -436,6 +436,7 @@
     "modules/services/sourceService.js",
     "modules/services/suveiHumanAuthorizationService.js",
     "modules/services/themePreviewVariables.js",
+    "modules/services/trustedConversation/credentialVault.cjs",
     "modules/services/trustedConversation/nativePort.cjs",
     "modules/services/trustedConversation/sessionStatus.cjs",
     "modules/services/trustedConversation/transport.cjs",
@@ -1162,14 +1163,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2020,
+          "line": 2021,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2020,
+          "line": 2021,
           "kind": "event-listener",
           "match": "app.on('activate'"
         }
@@ -1293,7 +1294,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1664,
+          "line": 1665,
           "kind": "event-send"
         }
       ],
@@ -1307,7 +1308,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1664,
+          "line": 1665,
           "kind": "event-send",
           "match": "win.webContents.send('agent-mood-changed'"
         },
@@ -1354,7 +1355,7 @@
         },
         {
           "file": "main.js",
-          "line": 243,
+          "line": 244,
           "kind": "event-listener"
         }
       ],
@@ -1373,7 +1374,7 @@
         },
         {
           "file": "main.js",
-          "line": 243,
+          "line": 244,
           "kind": "event-listener",
           "match": "historyWatcher.on('all'"
         }
@@ -1852,14 +1853,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2126,
+          "line": 2127,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2126,
+          "line": 2127,
           "kind": "event-listener",
           "match": "app.on('before-quit'"
         }
@@ -4101,14 +4102,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1806,
+          "line": 1807,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1806,
+          "line": 1807,
           "kind": "event-listener",
           "match": "ipcMain.handle('chat-data-service-reconcile'"
         }
@@ -4120,14 +4121,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1799,
+          "line": 1800,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1799,
+          "line": 1800,
           "kind": "event-listener",
           "match": "ipcMain.handle('chat-data-service-status'"
         }
@@ -4262,14 +4263,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 825,
+          "line": 826,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 825,
+          "line": 826,
           "kind": "event-listener",
           "match": "app.on('child-process-gone'"
         }
@@ -4417,12 +4418,12 @@
         },
         {
           "file": "main.js",
-          "line": 1093,
+          "line": 1094,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 1114,
+          "line": 1115,
           "kind": "event-listener"
         },
         {
@@ -5900,13 +5901,13 @@
         },
         {
           "file": "main.js",
-          "line": 1093,
+          "line": 1094,
           "kind": "event-listener",
           "match": "tray.on('click'"
         },
         {
           "file": "main.js",
-          "line": 1114,
+          "line": 1115,
           "kind": "event-listener",
           "match": "tray.on('click'"
         },
@@ -7572,22 +7573,22 @@
         },
         {
           "file": "main.js",
-          "line": 667,
+          "line": 668,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 696,
+          "line": 697,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 892,
+          "line": 893,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2101,
+          "line": 2102,
           "kind": "event-listener"
         },
         {
@@ -7717,25 +7718,25 @@
         },
         {
           "file": "main.js",
-          "line": 667,
+          "line": 668,
           "kind": "event-listener",
           "match": "audioEngineProcess.on('close'"
         },
         {
           "file": "main.js",
-          "line": 696,
+          "line": 697,
           "kind": "event-listener",
           "match": "processRef.once('close'"
         },
         {
           "file": "main.js",
-          "line": 892,
+          "line": 893,
           "kind": "event-listener",
           "match": "mainWindow.on('close'"
         },
         {
           "file": "main.js",
-          "line": 2101,
+          "line": 2102,
           "kind": "event-listener",
           "match": "pythonProcess.on('close'"
         },
@@ -7843,14 +7844,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1238,
+          "line": 1239,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1238,
+          "line": 1239,
           "kind": "event-listener",
           "match": "ipcMain.on('close-app'"
         },
@@ -8011,7 +8012,7 @@
         },
         {
           "file": "main.js",
-          "line": 925,
+          "line": 926,
           "kind": "event-listener"
         },
         {
@@ -8246,7 +8247,7 @@
         },
         {
           "file": "main.js",
-          "line": 925,
+          "line": 926,
           "kind": "event-listener",
           "match": "mainWindow.on('closed'"
         },
@@ -8607,14 +8608,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2307,
+          "line": 2308,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2307,
+          "line": 2308,
           "kind": "event-listener",
           "match": "ipcMain.on('connect-vcplog'"
         },
@@ -9265,7 +9266,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1447,
+          "line": 1448,
           "kind": "event-send"
         }
       ],
@@ -9279,7 +9280,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1447,
+          "line": 1448,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('create-unlocked-topic'"
         },
@@ -9427,22 +9428,22 @@
         },
         {
           "file": "main.js",
-          "line": 648,
+          "line": 649,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 659,
+          "line": 660,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2093,
+          "line": 2094,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2097,
+          "line": 2098,
           "kind": "event-listener"
         },
         {
@@ -9690,25 +9691,25 @@
         },
         {
           "file": "main.js",
-          "line": 648,
+          "line": 649,
           "kind": "event-listener",
           "match": "audioEngineProcess.stdout.on('data'"
         },
         {
           "file": "main.js",
-          "line": 659,
+          "line": 660,
           "kind": "event-listener",
           "match": "audioEngineProcess.stderr.on('data'"
         },
         {
           "file": "main.js",
-          "line": 2093,
+          "line": 2094,
           "kind": "event-listener",
           "match": "pythonProcess.stdout.on('data'"
         },
         {
           "file": "main.js",
-          "line": 2097,
+          "line": 2098,
           "kind": "event-listener",
           "match": "pythonProcess.stderr.on('data'"
         },
@@ -13466,7 +13467,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 308,
+          "line": 309,
           "kind": "event-listener"
         },
         {
@@ -13558,7 +13559,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 308,
+          "line": 309,
           "kind": "event-listener",
           "match": "sender.once('destroyed'"
         },
@@ -13697,14 +13698,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1965,
+          "line": 1966,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1965,
+          "line": 1966,
           "kind": "event-listener",
           "match": "ipcMain.handle('diagnostics:export-snapshot'"
         },
@@ -13791,7 +13792,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 936,
+          "line": 937,
           "kind": "event-listener"
         },
         {
@@ -13833,7 +13834,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 936,
+          "line": 937,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('did-fail-load'"
         },
@@ -13892,12 +13893,12 @@
         },
         {
           "file": "main.js",
-          "line": 955,
+          "line": 956,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 985,
+          "line": 986,
           "kind": "event-listener"
         },
         {
@@ -13960,13 +13961,13 @@
         },
         {
           "file": "main.js",
-          "line": 955,
+          "line": 956,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('did-finish-load'"
         },
         {
           "file": "main.js",
-          "line": 985,
+          "line": 986,
           "kind": "event-listener",
           "match": "mainWindow.webContents.once('did-finish-load'"
         },
@@ -14068,7 +14069,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 940,
+          "line": 941,
           "kind": "event-listener"
         },
         {
@@ -14100,7 +14101,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 940,
+          "line": 941,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('did-start-loading'"
         },
@@ -14279,14 +14280,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2318,
+          "line": 2319,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2318,
+          "line": 2319,
           "kind": "event-listener",
           "match": "ipcMain.on('disconnect-vcplog'"
         },
@@ -14805,14 +14806,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1896,
+          "line": 1897,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1896,
+          "line": 1897,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:activate'"
         },
@@ -14836,14 +14837,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1916,
+          "line": 1917,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1916,
+          "line": 1917,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:cancel'"
         },
@@ -14867,14 +14868,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1904,
+          "line": 1905,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1904,
+          "line": 1905,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:close'"
         },
@@ -14898,14 +14899,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1969,
+          "line": 1970,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1969,
+          "line": 1970,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:close-all'"
         },
@@ -14929,14 +14930,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1885,
+          "line": 1886,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1885,
+          "line": 1886,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:create'"
         },
@@ -14960,14 +14961,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1909,
+          "line": 1910,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1909,
+          "line": 1910,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:detach'"
         },
@@ -14991,14 +14992,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1892,
+          "line": 1893,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1892,
+          "line": 1893,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:list'"
         },
@@ -15022,14 +15023,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1975,
+          "line": 1976,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1975,
+          "line": 1976,
           "kind": "event-listener",
           "match": "ipcMain.on('embedded-vchat-app:request-close'"
         },
@@ -15053,14 +15054,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1900,
+          "line": 1901,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1900,
+          "line": 1901,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:set-bounds'"
         },
@@ -15429,22 +15430,22 @@
         },
         {
           "file": "main.js",
-          "line": 31,
+          "line": 32,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 255,
+          "line": 256,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 675,
+          "line": 676,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2108,
+          "line": 2109,
           "kind": "event-listener"
         },
         {
@@ -15756,25 +15757,25 @@
         },
         {
           "file": "main.js",
-          "line": 31,
+          "line": 32,
           "kind": "event-listener",
           "match": "process[streamName].on('error'"
         },
         {
           "file": "main.js",
-          "line": 255,
+          "line": 256,
           "kind": "event-listener",
           "match": "historyWatcher.on('error'"
         },
         {
           "file": "main.js",
-          "line": 675,
+          "line": 676,
           "kind": "event-listener",
           "match": "audioEngineProcess.on('error'"
         },
         {
           "file": "main.js",
-          "line": 2108,
+          "line": 2109,
           "kind": "event-listener",
           "match": "pythonProcess.on('error'"
         },
@@ -15942,14 +15943,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2082,
+          "line": 2083,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2082,
+          "line": 2083,
           "kind": "event-listener",
           "match": "ipcMain.handle('execute-python-code'"
         },
@@ -16179,14 +16180,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2383,
+          "line": 2384,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2383,
+          "line": 2384,
           "kind": "event-listener",
           "match": "ipcMain.handle('export-topic-as-markdown'"
         },
@@ -16936,14 +16937,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1553,
+          "line": 1554,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1553,
+          "line": 1554,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-cached-models'"
         },
@@ -17155,14 +17156,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1569,
+          "line": 1570,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1569,
+          "line": 1570,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-favorite-models'"
         },
@@ -17310,14 +17311,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1558,
+          "line": 1559,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1558,
+          "line": 1559,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-hot-models'"
         },
@@ -17496,25 +17497,25 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1358,
+          "line": 1359,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2057,
+          "line": 2058,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1358,
+          "line": 1359,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-platform'"
         },
         {
           "file": "main.js",
-          "line": 2057,
+          "line": 2058,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-platform'"
         },
@@ -18462,7 +18463,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1783,
+          "line": 1784,
           "kind": "event-send"
         }
       ],
@@ -18476,7 +18477,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1783,
+          "line": 1784,
           "kind": "event-send",
           "match": "sender.send('history-file-updated'"
         },
@@ -19035,14 +19036,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2418,
+          "line": 2419,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2418,
+          "line": 2419,
           "kind": "event-listener",
           "match": "ipcMain.handle('interrupt-group-request'"
         },
@@ -19159,14 +19160,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1332,
+          "line": 1333,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1332,
+          "line": 1333,
           "kind": "event-listener",
           "match": "ipcMain.handle('jev:decide'"
         },
@@ -19190,14 +19191,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1320,
+          "line": 1321,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1320,
+          "line": 1321,
           "kind": "event-listener",
           "match": "ipcMain.handle('jev:get-status'"
         },
@@ -20051,14 +20052,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1941,
+          "line": 1942,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1941,
+          "line": 1942,
           "kind": "event-listener",
           "match": "ipcMain.handle('lifecycle:get-main-snapshot'"
         },
@@ -20082,14 +20083,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1947,
+          "line": 1948,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1947,
+          "line": 1948,
           "kind": "event-listener",
           "match": "ipcMain.on('lifecycle:renderer-ready'"
         },
@@ -22087,7 +22088,7 @@
         },
         {
           "file": "main.js",
-          "line": 970,
+          "line": 971,
           "kind": "event-listener"
         },
         {
@@ -22105,7 +22106,7 @@
         },
         {
           "file": "main.js",
-          "line": 970,
+          "line": 971,
           "kind": "event-listener",
           "match": "mainWindow.on('maximize'"
         },
@@ -22363,14 +22364,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2009,
+          "line": 2010,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2009,
+          "line": 2010,
           "kind": "event-listener",
           "match": "ipcMain.on('minimize-to-tray'"
         },
@@ -22798,7 +22799,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1548,
+          "line": 1549,
           "kind": "event-send"
         }
       ],
@@ -22806,7 +22807,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1548,
+          "line": 1549,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('models-update-failed'"
         }
@@ -22817,17 +22818,17 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1543,
+          "line": 1544,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 1602,
+          "line": 1603,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 1606,
+          "line": 1607,
           "kind": "event-send"
         }
       ],
@@ -22841,19 +22842,19 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1543,
+          "line": 1544,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('models-updated'"
         },
         {
           "file": "main.js",
-          "line": 1602,
+          "line": 1603,
           "kind": "event-send",
           "match": "event.sender.send('models-updated'"
         },
         {
           "file": "main.js",
-          "line": 1606,
+          "line": 1607,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('models-updated'"
         },
@@ -26612,7 +26613,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 172,
+          "line": 173,
           "kind": "event-listener"
         },
         {
@@ -26624,7 +26625,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 172,
+          "line": 173,
           "kind": "event-listener",
           "match": "ipcMain.handle('open-docx-window'"
         },
@@ -27228,14 +27229,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1621,
+          "line": 1622,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1621,
+          "line": 1622,
           "kind": "event-listener",
           "match": "ipcMain.handle('path:basename'"
         },
@@ -27259,14 +27260,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1614,
+          "line": 1615,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1614,
+          "line": 1615,
           "kind": "event-listener",
           "match": "ipcMain.handle('path:dirname'"
         },
@@ -27290,14 +27291,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1618,
+          "line": 1619,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1618,
+          "line": 1619,
           "kind": "event-listener",
           "match": "ipcMain.handle('path:extname'"
         },
@@ -29240,14 +29241,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1591,
+          "line": 1592,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1591,
+          "line": 1592,
           "kind": "event-listener",
           "match": "ipcMain.handle('refresh-models'"
         },
@@ -29458,7 +29459,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 944,
+          "line": 945,
           "kind": "event-listener"
         },
         {
@@ -29515,7 +29516,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 944,
+          "line": 945,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('render-process-gone'"
         },
@@ -29820,25 +29821,25 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 960,
+          "line": 961,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 962,
+          "line": 963,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 960,
+          "line": 961,
           "kind": "event-listener",
           "match": "mainWindow.on('responsive'"
         },
         {
           "file": "main.js",
-          "line": 962,
+          "line": 963,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('responsive'"
         }
@@ -29900,14 +29901,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1098,
+          "line": 1099,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1098,
+          "line": 1099,
           "kind": "event-listener",
           "match": "tray.on('right-click'"
         }
@@ -31360,14 +31361,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1157,
+          "line": 1158,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1157,
+          "line": 1158,
           "kind": "event-listener",
           "match": "app.on('second-instance'"
         }
@@ -31609,14 +31610,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2330,
+          "line": 2331,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2330,
+          "line": 2331,
           "kind": "event-listener",
           "match": "ipcMain.on('send-vcplog-message'"
         },
@@ -31640,14 +31641,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2341,
+          "line": 2342,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2341,
+          "line": 2342,
           "kind": "event-listener",
           "match": "ipcMain.handle('send-vcplog-message-confirmed'"
         },
@@ -34033,14 +34034,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1580,
+          "line": 1581,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1580,
+          "line": 1581,
           "kind": "event-listener",
           "match": "ipcMain.handle('toggle-favorite-model'"
         },
@@ -34378,14 +34379,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1109,
+          "line": 1110,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1109,
+          "line": 1110,
           "kind": "event-listener",
           "match": "hostHooks.on('tray:refresh'"
         }
@@ -34503,14 +34504,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 9,
+          "line": 10,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 9,
+          "line": 10,
           "kind": "event-listener",
           "match": "process.on('uncaughtExceptionMonitor'"
         }
@@ -34625,7 +34626,7 @@
         },
         {
           "file": "main.js",
-          "line": 975,
+          "line": 976,
           "kind": "event-listener"
         },
         {
@@ -34648,7 +34649,7 @@
         },
         {
           "file": "main.js",
-          "line": 975,
+          "line": 976,
           "kind": "event-listener",
           "match": "mainWindow.on('unmaximize'"
         },
@@ -34714,25 +34715,25 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 959,
+          "line": 960,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 961,
+          "line": 962,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 959,
+          "line": 960,
           "kind": "event-listener",
           "match": "mainWindow.on('unresponsive'"
         },
         {
           "file": "main.js",
-          "line": 961,
+          "line": 962,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('unresponsive'"
         }
@@ -35558,17 +35559,17 @@
         },
         {
           "file": "main.js",
-          "line": 2263,
+          "line": 2264,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2278,
+          "line": 2279,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2281,
+          "line": 2282,
           "kind": "event-send"
         }
       ],
@@ -35588,19 +35589,19 @@
         },
         {
           "file": "main.js",
-          "line": 2263,
+          "line": 2264,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-message'"
         },
         {
           "file": "main.js",
-          "line": 2278,
+          "line": 2279,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-message'"
         },
         {
           "file": "main.js",
-          "line": 2281,
+          "line": 2282,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-message'"
         },
@@ -35617,32 +35618,32 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 2240,
+          "line": 2241,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2253,
+          "line": 2254,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2261,
+          "line": 2262,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2287,
+          "line": 2288,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2300,
+          "line": 2301,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2326,
+          "line": 2327,
           "kind": "event-send"
         }
       ],
@@ -35656,37 +35657,37 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 2240,
+          "line": 2241,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2253,
+          "line": 2254,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2261,
+          "line": 2262,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2287,
+          "line": 2288,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2300,
+          "line": 2301,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2326,
+          "line": 2327,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
@@ -37023,14 +37024,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1763,
+          "line": 1764,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1763,
+          "line": 1764,
           "kind": "event-listener",
           "match": "ipcMain.handle('watcher:begin'"
         },
@@ -37054,14 +37055,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1770,
+          "line": 1771,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1770,
+          "line": 1771,
           "kind": "event-listener",
           "match": "ipcMain.handle('watcher:start'"
         },
@@ -37085,14 +37086,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1790,
+          "line": 1791,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1790,
+          "line": 1791,
           "kind": "event-listener",
           "match": "ipcMain.handle('watcher:stop'"
         },
@@ -37110,14 +37111,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1220,
+          "line": 1221,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1220,
+          "line": 1221,
           "kind": "event-listener",
           "match": "app.on('web-contents-created'"
         }
@@ -37539,7 +37540,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 881,
+          "line": 882,
           "kind": "event-listener"
         },
         {
@@ -37566,7 +37567,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 881,
+          "line": 882,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('will-navigate'"
         },
@@ -37621,7 +37622,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2168,
+          "line": 2169,
           "kind": "event-listener"
         },
         {
@@ -37633,7 +37634,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 2168,
+          "line": 2169,
           "kind": "event-listener",
           "match": "app.on('will-quit'"
         },
@@ -37670,14 +37671,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2120,
+          "line": 2121,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2120,
+          "line": 2121,
           "kind": "event-listener",
           "match": "app.on('window-all-closed'"
         }
@@ -37729,7 +37730,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 972,
+          "line": 973,
           "kind": "event-send"
         }
       ],
@@ -37748,7 +37749,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 972,
+          "line": 973,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('window-maximized'"
         },
@@ -37821,7 +37822,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 977,
+          "line": 978,
           "kind": "event-send"
         }
       ],
@@ -37840,7 +37841,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 977,
+          "line": 978,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('window-unmaximized'"
         },

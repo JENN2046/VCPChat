@@ -120,6 +120,7 @@
     "VCPDistributedServer/shared/fileKit/reader.js",
     "VCPDistributedServer/shared/fileKit/text.js",
     "VCPDistributedServer/shared/fileKit/validator.js",
+    "VCPDistributedServer/shared/memoryProtocolProjection.js",
     "main.js",
     "modules/SovitsTTS.js",
     "modules/agentMood.js",
@@ -236,6 +237,9 @@
     "modules/game/gameRuntime.js",
     "modules/game/gameSeatResolver.js",
     "modules/game/gameToolAdapter.js",
+    "modules/game/vtrade/client.js",
+    "modules/game/vtrade/orchestrator.js",
+    "modules/game/vtrade/window.js",
     "modules/global-settings-manager.js",
     "modules/hostHooks.js",
     "modules/image-viewer.js",
@@ -394,6 +398,8 @@
     "modules/renderer/streamSpeechOwner.js",
     "modules/renderer/streamStableBoundary.js",
     "modules/renderer/surfaceTaskOwner.js",
+    "modules/renderer/toolBatchRegions.js",
+    "modules/renderer/toolDataHtml.js",
     "modules/renderer/toolPresentation.js",
     "modules/renderer/toolRequestMarkers.js",
     "modules/renderer/toolRequestScanner.js",
@@ -792,7 +798,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 13,
+          "line": 15,
           "kind": "custom-event-listener"
         },
         {
@@ -812,7 +818,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 107,
+          "line": 146,
           "kind": "custom-event-listener"
         },
         {
@@ -871,7 +877,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 13,
+          "line": 15,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('DOMContentLoaded'"
         },
@@ -895,7 +901,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 107,
+          "line": 146,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('DOMContentLoaded'"
         },
@@ -1244,7 +1250,7 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 859,
+          "line": 886,
           "kind": "event-send"
         }
       ],
@@ -1258,7 +1264,7 @@
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 859,
+          "line": 886,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('add-file-to-input'"
         },
@@ -1731,27 +1737,27 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 223,
+          "line": 226,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 44,
+          "line": 45,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 223,
+          "line": 226,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('audio-engine-error'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 44,
+          "line": 45,
           "kind": "preload-channel-definition",
           "match": "on('audio-engine-error'"
         }
@@ -1917,12 +1923,12 @@
         },
         {
           "file": "modules/renderer/streamManager.js",
-          "line": 350,
+          "line": 351,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 98,
+          "line": 137,
           "kind": "custom-event-listener"
         },
         {
@@ -1988,13 +1994,13 @@
         },
         {
           "file": "modules/renderer/streamManager.js",
-          "line": 350,
+          "line": 351,
           "kind": "custom-event-listener",
           "match": "transientCleanupWindow.addEventListener('beforeunload'"
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 98,
+          "line": 137,
           "kind": "custom-event-listener",
           "match": "window.addEventListener('beforeunload'"
         },
@@ -4663,17 +4669,17 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3607,
+          "line": 3610,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3666,
+          "line": 3669,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3704,
+          "line": 3707,
           "kind": "custom-event-listener"
         },
         {
@@ -4888,7 +4894,7 @@
         },
         {
           "file": "modules/renderer/toolPresentation.js",
-          "line": 587,
+          "line": 595,
           "kind": "custom-event-listener"
         },
         {
@@ -5053,37 +5059,32 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1448,
+          "line": 1492,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1521,
+          "line": 1564,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1690,
+          "line": 1737,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1708,
+          "line": 1755,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1740,
+          "line": 1787,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1758,
-          "kind": "custom-event-listener"
-        },
-        {
-          "file": "modules/text-viewer.js",
-          "line": 1776,
+          "line": 1805,
           "kind": "custom-event-listener"
         },
         {
@@ -5093,7 +5094,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1845,
+          "line": 1870,
           "kind": "custom-event-listener"
         },
         {
@@ -5103,62 +5104,67 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1905,
+          "line": 1939,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2066,
+          "line": 1952,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2078,
+          "line": 2112,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2090,
+          "line": 2124,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2111,
+          "line": 2136,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2125,
+          "line": 2157,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2130,
+          "line": 2171,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2140,
+          "line": 2176,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2263,
+          "line": 2186,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2286,
+          "line": 2309,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2290,
+          "line": 2332,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2294,
+          "line": 2336,
+          "kind": "custom-event-listener"
+        },
+        {
+          "file": "modules/text-viewer.js",
+          "line": 2340,
           "kind": "custom-event-listener"
         },
         {
@@ -5308,7 +5314,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 89,
+          "line": 99,
           "kind": "custom-event-listener"
         },
         {
@@ -5633,72 +5639,72 @@
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1280,
+          "line": 1295,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1380,
+          "line": 1395,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1460,
+          "line": 1475,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1616,
+          "line": 1631,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1659,
+          "line": 1674,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1858,
+          "line": 1873,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1916,
+          "line": 1931,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1932,
+          "line": 1947,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1933,
+          "line": 1948,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1958,
+          "line": 1973,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2065,
+          "line": 2080,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2069,
+          "line": 2084,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2073,
+          "line": 2088,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2135,
+          "line": 2150,
           "kind": "custom-event-listener"
         },
         {
@@ -6195,19 +6201,19 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3607,
+          "line": 3610,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('click'"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3666,
+          "line": 3669,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('click'"
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3704,
+          "line": 3707,
           "kind": "custom-event-listener",
           "match": "removeBtn.addEventListener('click'"
         },
@@ -6465,7 +6471,7 @@
         },
         {
           "file": "modules/renderer/toolPresentation.js",
-          "line": 587,
+          "line": 595,
           "kind": "custom-event-listener",
           "match": "root.addEventListener('click'"
         },
@@ -6663,133 +6669,133 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1448,
+          "line": 1492,
           "kind": "custom-event-listener",
           "match": "editAllButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1521,
+          "line": 1564,
           "kind": "custom-event-listener",
           "match": "shareToNotesButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1690,
+          "line": 1737,
           "kind": "custom-event-listener",
           "match": "playButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1708,
+          "line": 1755,
           "kind": "custom-event-listener",
           "match": "exitButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1740,
+          "line": 1787,
           "kind": "custom-event-listener",
           "match": "pyPlayButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1758,
+          "line": 1805,
           "kind": "custom-event-listener",
           "match": "playButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1776,
+          "line": 1823,
           "kind": "custom-event-listener",
           "match": "exitButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1823,
+          "line": 1870,
           "kind": "custom-event-listener",
           "match": "editButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1845,
+          "line": 1892,
           "kind": "custom-event-listener",
           "match": "copyButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1892,
+          "line": 1939,
           "kind": "custom-event-listener",
           "match": "header.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1905,
+          "line": 1952,
           "kind": "custom-event-listener",
           "match": "header.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2066,
+          "line": 2112,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2078,
+          "line": 2124,
           "kind": "custom-event-listener",
           "match": "contextMenuCopyButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2090,
+          "line": 2136,
           "kind": "custom-event-listener",
           "match": "contextMenuCutButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2111,
+          "line": 2157,
           "kind": "custom-event-listener",
           "match": "contextMenuDeleteButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2125,
+          "line": 2171,
           "kind": "custom-event-listener",
           "match": "contextMenuEditAllButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2130,
+          "line": 2176,
           "kind": "custom-event-listener",
           "match": "contextMenuCopyAllButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2140,
+          "line": 2186,
           "kind": "custom-event-listener",
           "match": "contextMenuShareScreenshotButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2263,
+          "line": 2309,
           "kind": "custom-event-listener",
           "match": "contextMenuShareNoteButton.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2286,
+          "line": 2332,
           "kind": "custom-event-listener",
           "match": "minimizeBtn.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2290,
+          "line": 2336,
           "kind": "custom-event-listener",
           "match": "maximizeBtn.addEventListener('click'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2294,
+          "line": 2340,
           "kind": "custom-event-listener",
           "match": "closeBtn.addEventListener('click'"
         },
@@ -6969,7 +6975,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 89,
+          "line": 99,
           "kind": "custom-event-listener",
           "match": "root.addEventListener('click'"
         },
@@ -7359,85 +7365,85 @@
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1280,
+          "line": 1295,
           "kind": "custom-event-listener",
           "match": "close.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1380,
+          "line": 1395,
           "kind": "custom-event-listener",
           "match": "button.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1460,
+          "line": 1475,
           "kind": "custom-event-listener",
           "match": "row.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1616,
+          "line": 1631,
           "kind": "custom-event-listener",
           "match": "button.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1659,
+          "line": 1674,
           "kind": "custom-event-listener",
           "match": "button.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1858,
+          "line": 1873,
           "kind": "custom-event-listener",
           "match": "closeButton.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1916,
+          "line": 1931,
           "kind": "custom-event-listener",
           "match": "close.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1932,
+          "line": 1947,
           "kind": "custom-event-listener",
           "match": "cancel.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1933,
+          "line": 1948,
           "kind": "custom-event-listener",
           "match": "confirm.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1958,
+          "line": 1973,
           "kind": "custom-event-listener",
           "match": "cancel.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2065,
+          "line": 2080,
           "kind": "custom-event-listener",
           "match": "minimize.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2069,
+          "line": 2084,
           "kind": "custom-event-listener",
           "match": "maximize.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2073,
+          "line": 2088,
           "kind": "custom-event-listener",
           "match": "close.element.addEventListener('click'"
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2135,
+          "line": 2150,
           "kind": "custom-event-listener",
           "match": "retry.element.addEventListener('click'"
         },
@@ -7618,7 +7624,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 155,
+          "line": 158,
           "kind": "event-listener"
         },
         {
@@ -7653,7 +7659,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1866,
+          "line": 1888,
           "kind": "event-listener"
         },
         {
@@ -7772,7 +7778,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 155,
+          "line": 158,
           "kind": "event-listener",
           "match": "musicWindow.on('close'"
         },
@@ -7814,7 +7820,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1866,
+          "line": 1888,
           "kind": "event-listener",
           "match": "win.once('close'"
         },
@@ -8036,6 +8042,11 @@
           "kind": "event-listener"
         },
         {
+          "file": "modules/game/vtrade/window.js",
+          "line": 39,
+          "kind": "event-listener"
+        },
+        {
           "file": "modules/ipc/assistantHandlers.js",
           "line": 1071,
           "kind": "event-listener"
@@ -8112,22 +8123,22 @@
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 54,
+          "line": 71,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 81,
+          "line": 98,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 162,
+          "line": 165,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 254,
+          "line": 257,
           "kind": "event-listener"
         },
         {
@@ -8197,12 +8208,12 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1895,
+          "line": 1917,
           "kind": "event-listener"
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2201,
+          "line": 2223,
           "kind": "event-listener"
         },
         {
@@ -8274,6 +8285,12 @@
           "line": 306,
           "kind": "event-listener",
           "match": "pet.win.once('closed'"
+        },
+        {
+          "file": "modules/game/vtrade/window.js",
+          "line": 39,
+          "kind": "event-listener",
+          "match": "win.on('closed'"
         },
         {
           "file": "modules/ipc/assistantHandlers.js",
@@ -8367,25 +8384,25 @@
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 54,
+          "line": 71,
           "kind": "event-listener",
           "match": "win.once('closed'"
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 81,
+          "line": 98,
           "kind": "event-listener",
           "match": "win.on('closed'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 162,
+          "line": 165,
           "kind": "event-listener",
           "match": "musicWindow.on('closed'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 254,
+          "line": 257,
           "kind": "event-listener",
           "match": "win.once('closed'"
         },
@@ -8469,13 +8486,13 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1895,
+          "line": 1917,
           "kind": "event-listener",
           "match": "win.on('closed'"
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2201,
+          "line": 2223,
           "kind": "event-listener",
           "match": "win.on('closed'"
         },
@@ -8707,7 +8724,7 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3608,
+          "line": 3611,
           "kind": "custom-event-listener"
         },
         {
@@ -8757,7 +8774,12 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2020,
+          "line": 2066,
+          "kind": "custom-event-listener"
+        },
+        {
+          "file": "modules/ui-system/music-capsule.js",
+          "line": 128,
           "kind": "custom-event-listener"
         },
         {
@@ -8850,7 +8872,7 @@
         },
         {
           "file": "modules/messageRenderer.js",
-          "line": 3608,
+          "line": 3611,
           "kind": "custom-event-listener",
           "match": "attachmentElement.addEventListener('contextmenu'"
         },
@@ -8910,9 +8932,15 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2020,
+          "line": 2066,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('contextmenu'"
+        },
+        {
+          "file": "modules/ui-system/music-capsule.js",
+          "line": 128,
+          "kind": "custom-event-listener",
+          "match": "trigger.addEventListener('contextmenu'"
         },
         {
           "file": "modules/ui-system/settings/group-slots.js",
@@ -9322,16 +9350,6 @@
           "kind": "event-listener"
         },
         {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 469,
-          "kind": "event-listener"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 472,
-          "kind": "event-listener"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js",
           "line": 9,
           "kind": "event-listener"
@@ -9398,7 +9416,7 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/TopicMemo/TopicMemo.js",
-          "line": 58,
+          "line": 59,
           "kind": "event-listener"
         },
         {
@@ -9564,18 +9582,6 @@
           "match": "process.stdin.on('data'"
         },
         {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 469,
-          "kind": "event-listener",
-          "match": "child.stdout.on('data'"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 472,
-          "kind": "event-listener",
-          "match": "child.stderr.on('data'"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js",
           "line": 9,
           "kind": "event-listener",
@@ -9655,7 +9661,7 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/TopicMemo/TopicMemo.js",
-          "line": 58,
+          "line": 59,
           "kind": "event-listener",
           "match": "process.stdin.on('data'"
         },
@@ -11458,7 +11464,7 @@
       "producers": [
         {
           "file": "modules/deskpet/petMotion.js",
-          "line": 59,
+          "line": 65,
           "kind": "event-send"
         }
       ],
@@ -11466,7 +11472,7 @@
       "evidence": [
         {
           "file": "modules/deskpet/petMotion.js",
-          "line": 59,
+          "line": 65,
           "kind": "event-send",
           "match": "pet.win.webContents.send('deskpet:landed'"
         }
@@ -12045,12 +12051,12 @@
       "producers": [
         {
           "file": "modules/deskpet/petMotion.js",
-          "line": 142,
+          "line": 159,
           "kind": "event-send"
         },
         {
           "file": "modules/deskpet/petMotion.js",
-          "line": 152,
+          "line": 169,
           "kind": "event-send"
         }
       ],
@@ -12058,13 +12064,13 @@
       "evidence": [
         {
           "file": "modules/deskpet/petMotion.js",
-          "line": 142,
+          "line": 159,
           "kind": "event-send",
           "match": "pet.win.webContents.send('deskpet:walk'"
         },
         {
           "file": "modules/deskpet/petMotion.js",
-          "line": 152,
+          "line": 169,
           "kind": "event-send",
           "match": "pet.win.webContents.send('deskpet:walk'"
         }
@@ -13802,12 +13808,12 @@
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 53,
+          "line": 70,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 187,
+          "line": 190,
           "kind": "event-listener"
         },
         {
@@ -13822,7 +13828,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1821,
+          "line": 1843,
           "kind": "event-listener"
         },
         {
@@ -13846,13 +13852,13 @@
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 53,
+          "line": 70,
           "kind": "event-listener",
           "match": "contents.on('did-fail-load'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 187,
+          "line": 190,
           "kind": "event-listener",
           "match": "musicWindow.webContents.on('did-fail-load'"
         },
@@ -13870,7 +13876,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1821,
+          "line": 1843,
           "kind": "event-listener",
           "match": "contents.on('did-fail-load'"
         },
@@ -13913,7 +13919,7 @@
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 52,
+          "line": 69,
           "kind": "event-listener"
         },
         {
@@ -13943,7 +13949,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1789,
+          "line": 1811,
           "kind": "event-listener"
         },
         {
@@ -13985,7 +13991,7 @@
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 52,
+          "line": 69,
           "kind": "event-listener",
           "match": "contents.once('did-finish-load'"
         },
@@ -14021,7 +14027,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1789,
+          "line": 1811,
           "kind": "event-listener",
           "match": "contents.on('did-finish-load'"
         },
@@ -14089,7 +14095,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1779,
+          "line": 1801,
           "kind": "event-listener"
         },
         {
@@ -14125,7 +14131,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1779,
+          "line": 1801,
           "kind": "event-listener",
           "match": "contents.on('did-start-loading'"
         },
@@ -14143,7 +14149,7 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1766,
+          "line": 1785,
           "kind": "event-listener"
         },
         {
@@ -14165,7 +14171,7 @@
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1766,
+          "line": 1785,
           "kind": "event-listener",
           "match": "contents.on('did-start-navigation'"
         },
@@ -14195,14 +14201,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1784,
+          "line": 1806,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1784,
+          "line": 1806,
           "kind": "event-listener",
           "match": "contents.on('did-stop-loading'"
         }
@@ -15104,7 +15110,7 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/TopicMemo/TopicMemo.js",
-          "line": 59,
+          "line": 60,
           "kind": "event-listener"
         },
         {
@@ -15176,7 +15182,7 @@
         },
         {
           "file": "VCPDistributedServer/Plugin/TopicMemo/TopicMemo.js",
-          "line": 59,
+          "line": 60,
           "kind": "event-listener",
           "match": "process.stdin.on('end'"
         },
@@ -15296,11 +15302,6 @@
         {
           "file": "VCPDistributedServer/Plugin/CodeSearcher/CodeSearcher.js",
           "line": 91,
-          "kind": "event-listener"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 475,
           "kind": "event-listener"
         },
         {
@@ -15515,7 +15516,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 754,
+          "line": 781,
           "kind": "event-listener"
         },
         {
@@ -15555,7 +15556,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1935,
+          "line": 1982,
           "kind": "custom-event-listener"
         },
         {
@@ -15598,12 +15599,6 @@
           "line": 91,
           "kind": "event-listener",
           "match": "child.on('error'"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 475,
-          "kind": "event-listener",
-          "match": "child.once('error'"
         },
         {
           "file": "VCPDistributedServer/Plugin/FileOperator/FileOperator.js",
@@ -15859,7 +15854,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 754,
+          "line": 781,
           "kind": "event-listener",
           "match": "worker.on('error'"
         },
@@ -15907,7 +15902,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1935,
+          "line": 1982,
           "kind": "custom-event-listener",
           "match": "img.addEventListener('error'"
         },
@@ -15982,11 +15977,6 @@
           "kind": "event-listener"
         },
         {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 479,
-          "kind": "event-listener"
-        },
-        {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
           "line": 206,
           "kind": "event-listener"
@@ -16038,7 +16028,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 759,
+          "line": 786,
           "kind": "event-listener"
         },
         {
@@ -16075,12 +16065,6 @@
           "line": 95,
           "kind": "event-listener",
           "match": "child.on('exit'"
-        },
-        {
-          "file": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
-          "line": 479,
-          "kind": "event-listener",
-          "match": "child.once('exit'"
         },
         {
           "file": "VCPDistributedServer/Plugin/ProjectForge/indexerClient.js",
@@ -16144,7 +16128,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 759,
+          "line": 786,
           "kind": "event-listener",
           "match": "worker.on('exit'"
         },
@@ -16225,7 +16209,7 @@
         },
         {
           "file": "modules/renderer/streamManager.js",
-          "line": 937,
+          "line": 938,
           "kind": "custom-event-listener"
         }
       ],
@@ -16256,7 +16240,7 @@
         },
         {
           "file": "modules/renderer/streamManager.js",
-          "line": 937,
+          "line": 938,
           "kind": "custom-event-listener",
           "match": "animation.addEventListener('finish'"
         }
@@ -16476,7 +16460,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 76,
+          "line": 86,
           "kind": "custom-event-listener"
         },
         {
@@ -16500,7 +16484,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 76,
+          "line": 86,
           "kind": "custom-event-listener",
           "match": "root.addEventListener('focusin'"
         },
@@ -16518,7 +16502,7 @@
       "consumers": [
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 77,
+          "line": 87,
           "kind": "custom-event-listener"
         },
         {
@@ -16530,7 +16514,7 @@
       "evidence": [
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 77,
+          "line": 87,
           "kind": "custom-event-listener",
           "match": "root.addEventListener('focusout'"
         },
@@ -17087,27 +17071,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 24,
+          "line": 25,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 799,
+          "line": 826,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 799,
+          "line": 826,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-custom-playlists'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 24,
+          "line": 25,
           "kind": "preload-channel-definition",
           "match": "invoke('get-custom-playlists'"
         }
@@ -17397,27 +17381,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 22,
+          "line": 23,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 774,
+          "line": 801,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 774,
+          "line": 801,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-music-playlist'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 22,
+          "line": 23,
           "kind": "preload-channel-definition",
           "match": "invoke('get-music-playlist'"
         }
@@ -19361,17 +19345,17 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1492,
+          "line": 1535,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2072,
+          "line": 2118,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2270,
+          "line": 2316,
           "kind": "custom-event-listener"
         },
         {
@@ -19426,7 +19410,12 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 81,
+          "line": 91,
+          "kind": "custom-event-listener"
+        },
+        {
+          "file": "modules/ui-system/music-capsule.js",
+          "line": 129,
           "kind": "custom-event-listener"
         },
         {
@@ -19757,19 +19746,19 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1492,
+          "line": 1535,
           "kind": "custom-event-listener",
           "match": "textarea.addEventListener('keydown'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2072,
+          "line": 2118,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('keydown'"
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2270,
+          "line": 2316,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('keydown'"
         },
@@ -19835,9 +19824,15 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 81,
+          "line": 91,
           "kind": "custom-event-listener",
           "match": "root.addEventListener('keydown'"
+        },
+        {
+          "file": "modules/ui-system/music-capsule.js",
+          "line": 129,
+          "kind": "custom-event-listener",
+          "match": "trigger.addEventListener('keydown'"
         },
         {
           "file": "modules/ui-system/next-shell/escape-dispatcher.js",
@@ -20267,7 +20262,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1934,
+          "line": 1981,
           "kind": "custom-event-listener"
         },
         {
@@ -20302,7 +20297,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1934,
+          "line": 1981,
           "kind": "custom-event-listener",
           "match": "img.addEventListener('load'"
         },
@@ -20779,14 +20774,14 @@
       "consumers": [
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 42,
+          "line": 51,
           "kind": "custom-event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 42,
+          "line": 51,
           "kind": "custom-event-listener",
           "match": "document.fonts?.addEventListener('loadingdone'"
         }
@@ -21021,14 +21016,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2371,
+          "line": 2393,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2371,
+          "line": 2393,
           "kind": "event-listener",
           "match": "handle('loom:clear-session'"
         },
@@ -21052,14 +21047,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2370,
+          "line": 2392,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2370,
+          "line": 2392,
           "kind": "event-listener",
           "match": "handle('loom:close-app'"
         },
@@ -21083,14 +21078,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2364,
+          "line": 2386,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2364,
+          "line": 2386,
           "kind": "event-listener",
           "match": "handle('loom:create-app'"
         },
@@ -21108,14 +21103,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2360,
+          "line": 2382,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2360,
+          "line": 2382,
           "kind": "event-listener",
           "match": "handle('loom:create-persistent-web-agent-target'"
         }
@@ -21133,14 +21128,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2367,
+          "line": 2389,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2367,
+          "line": 2389,
           "kind": "event-listener",
           "match": "handle('loom:delete-app'"
         },
@@ -21183,14 +21178,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2366,
+          "line": 2388,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2366,
+          "line": 2388,
           "kind": "event-listener",
           "match": "handle('loom:edit-app-sources'"
         },
@@ -21208,14 +21203,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2362,
+          "line": 2384,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2362,
+          "line": 2384,
           "kind": "event-listener",
           "match": "handle('loom:execute-web-agent-action'"
         }
@@ -21233,14 +21228,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2374,
+          "line": 2396,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2374,
+          "line": 2396,
           "kind": "event-listener",
           "match": "handle('loom:export-app'"
         },
@@ -21264,14 +21259,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2356,
+          "line": 2378,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2356,
+          "line": 2378,
           "kind": "event-listener",
           "match": "handle('loom:get-app'"
         },
@@ -21295,14 +21290,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2358,
+          "line": 2380,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2358,
+          "line": 2380,
           "kind": "event-listener",
           "match": "handle('loom:get-rendered-text'"
         },
@@ -21326,14 +21321,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2357,
+          "line": 2379,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2357,
+          "line": 2379,
           "kind": "event-listener",
           "match": "handle('loom:get-runtime-source'"
         },
@@ -21351,14 +21346,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2359,
+          "line": 2381,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2359,
+          "line": 2381,
           "kind": "event-listener",
           "match": "handle('loom:get-web-agent-page-info'"
         }
@@ -21376,14 +21371,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2375,
+          "line": 2397,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2375,
+          "line": 2397,
           "kind": "event-listener",
           "match": "handle('loom:import-app'"
         },
@@ -21412,14 +21407,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2354,
+          "line": 2376,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2354,
+          "line": 2376,
           "kind": "event-listener",
           "match": "handle('loom:list-apps'"
         },
@@ -21449,14 +21444,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2355,
+          "line": 2377,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2355,
+          "line": 2377,
           "kind": "event-listener",
           "match": "handle('loom:list-open-apps'"
         },
@@ -21485,14 +21480,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2369,
+          "line": 2391,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2369,
+          "line": 2391,
           "kind": "event-listener",
           "match": "handle('loom:open-app'"
         },
@@ -21522,14 +21517,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2377,
+          "line": 2399,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2377,
+          "line": 2399,
           "kind": "event-listener",
           "match": "handle('loom:open-app-folder'"
         },
@@ -21558,14 +21553,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2373,
+          "line": 2395,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2373,
+          "line": 2395,
           "kind": "event-listener",
           "match": "handle('loom:open-manager'"
         },
@@ -21595,14 +21590,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2376,
+          "line": 2398,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2376,
+          "line": 2398,
           "kind": "event-listener",
           "match": "handle('loom:open-skill-manager'"
         },
@@ -21619,7 +21614,7 @@
       "producers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2324,
+          "line": 2346,
           "kind": "event-send"
         }
       ],
@@ -21638,7 +21633,7 @@
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2324,
+          "line": 2346,
           "kind": "event-send",
           "match": "win.webContents.send('loom:registry-changed'"
         },
@@ -21668,14 +21663,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2372,
+          "line": 2394,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2372,
+          "line": 2394,
           "kind": "event-listener",
           "match": "handle('loom:reload-registry'"
         },
@@ -21699,14 +21694,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2365,
+          "line": 2387,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2365,
+          "line": 2387,
           "kind": "event-listener",
           "match": "handle('loom:save-app'"
         },
@@ -21730,14 +21725,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2368,
+          "line": 2390,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2368,
+          "line": 2390,
           "kind": "event-listener",
           "match": "handle('loom:set-enabled'"
         },
@@ -21754,7 +21749,7 @@
       "producers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2116,
+          "line": 2138,
           "kind": "event-send"
         }
       ],
@@ -21768,7 +21763,7 @@
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2116,
+          "line": 2138,
           "kind": "event-send",
           "match": "this.mainWindow.webContents.send('loom:share-text-to-input'"
         },
@@ -21792,14 +21787,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2388,
+          "line": 2410,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2388,
+          "line": 2410,
           "kind": "event-listener",
           "match": "handle('loom:shell-action'"
         },
@@ -21823,14 +21818,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2383,
+          "line": 2405,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2383,
+          "line": 2405,
           "kind": "event-listener",
           "match": "handle('loom:shell-ready'"
         },
@@ -22093,7 +22088,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1763,
+          "line": 1782,
           "kind": "event-listener"
         }
       ],
@@ -22112,7 +22107,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1763,
+          "line": 1782,
           "kind": "event-listener",
           "match": "win.on('maximize'"
         }
@@ -22230,7 +22225,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 739,
+          "line": 766,
           "kind": "event-listener"
         },
         {
@@ -22291,7 +22286,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 739,
+          "line": 766,
           "kind": "event-listener",
           "match": "worker.on('message'"
         },
@@ -23147,7 +23142,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 74,
+          "line": 84,
           "kind": "custom-event-listener"
         },
         {
@@ -23194,7 +23189,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 74,
+          "line": 84,
           "kind": "custom-event-listener",
           "match": "surface.addEventListener('mouseenter'"
         },
@@ -23273,7 +23268,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 75,
+          "line": 85,
           "kind": "custom-event-listener"
         },
         {
@@ -23361,7 +23356,7 @@
         },
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 75,
+          "line": 85,
           "kind": "custom-event-listener",
           "match": "surface.addEventListener('mouseleave'"
         },
@@ -23658,27 +23653,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 26,
+          "line": 27,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 673,
+          "line": 700,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 673,
+          "line": 700,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-add-folder'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 26,
+          "line": 27,
           "kind": "preload-channel-definition",
           "match": "invoke('music-add-folder'"
         }
@@ -23689,27 +23684,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 83,
+          "line": 84,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 951,
+          "line": 978,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 951,
+          "line": 978,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-apply-lyrics-candidate'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 83,
+          "line": 84,
           "kind": "preload-channel-definition",
           "match": "invoke('music-apply-lyrics-candidate'"
         }
@@ -23720,27 +23715,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 41,
+          "line": 42,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 611,
+          "line": 638,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 611,
+          "line": 638,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-cancel-preload'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 41,
+          "line": 42,
           "kind": "preload-channel-definition",
           "match": "invoke('music-cancel-preload'"
         }
@@ -23751,27 +23746,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 16,
+          "line": 17,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 416,
+          "line": 443,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 416,
+          "line": 443,
           "kind": "event-listener",
           "match": "ipcMain.on('music-capsule-command'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 16,
+          "line": 17,
           "kind": "preload-channel-definition",
           "match": "send('music-capsule-command'"
         }
@@ -23789,14 +23784,14 @@
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 400,
+          "line": 411,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 400,
+          "line": 411,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-capsule-get-state'"
         },
@@ -23813,27 +23808,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 17,
+          "line": 18,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 405,
+          "line": 432,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 405,
+          "line": 432,
           "kind": "event-listener",
           "match": "ipcMain.on('music-capsule-publish'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 17,
+          "line": 18,
           "kind": "preload-channel-definition",
           "match": "send('music-capsule-publish'"
         }
@@ -23844,7 +23839,7 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 22,
+          "line": 25,
           "kind": "event-send"
         }
       ],
@@ -23858,7 +23853,7 @@
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 22,
+          "line": 25,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('music-capsule-state'"
         },
@@ -23875,27 +23870,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 64,
+          "line": 65,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 533,
+          "line": 560,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 533,
+          "line": 560,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-configure-normalization'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 64,
+          "line": 65,
           "kind": "preload-channel-definition",
           "match": "invoke('music-configure-normalization'"
         }
@@ -23906,27 +23901,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 52,
+          "line": 53,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 528,
+          "line": 555,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 528,
+          "line": 555,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-configure-optimizations'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 52,
+          "line": 53,
           "kind": "preload-channel-definition",
           "match": "invoke('music-configure-optimizations'"
         }
@@ -23937,27 +23932,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 50,
+          "line": 51,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 505,
+          "line": 532,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 505,
+          "line": 532,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-configure-output'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 50,
+          "line": 51,
           "kind": "preload-channel-definition",
           "match": "invoke('music-configure-output'"
         }
@@ -23968,27 +23963,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 51,
+          "line": 52,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 588,
+          "line": 615,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 588,
+          "line": 615,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-configure-output-bits'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 51,
+          "line": 52,
           "kind": "preload-channel-definition",
           "match": "invoke('music-configure-output-bits'"
         }
@@ -23999,27 +23994,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 54,
+          "line": 55,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 520,
+          "line": 547,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 520,
+          "line": 547,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-configure-resampling'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 54,
+          "line": 55,
           "kind": "preload-channel-definition",
           "match": "invoke('music-configure-resampling'"
         }
@@ -24030,27 +24025,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 53,
+          "line": 54,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 515,
+          "line": 542,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 515,
+          "line": 542,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-configure-upsampling'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 53,
+          "line": 54,
           "kind": "preload-channel-definition",
           "match": "invoke('music-configure-upsampling'"
         }
@@ -24061,93 +24056,93 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 342,
+          "line": 345,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 349,
+          "line": 352,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 357,
+          "line": 360,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 363,
+          "line": 366,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 419,
+          "line": 446,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 840,
+          "line": 867,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 847,
+          "line": 874,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 43,
+          "line": 44,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 342,
+          "line": 345,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-control'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 349,
+          "line": 352,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-control'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 357,
+          "line": 360,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-control'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 363,
+          "line": 366,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-control'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 419,
+          "line": 446,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-control'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 840,
+          "line": 867,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-control'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 847,
+          "line": 874,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-control'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 43,
+          "line": 44,
           "kind": "preload-channel-definition",
           "match": "on('music-control'"
         }
@@ -24158,27 +24153,27 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 256,
+          "line": 259,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 78,
+          "line": 79,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 256,
+          "line": 259,
           "kind": "event-send",
           "match": "win.webContents.send('music-current-lyrics-request'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 78,
+          "line": 79,
           "kind": "preload-channel-definition",
           "match": "on('music-current-lyrics-request'"
         }
@@ -24189,27 +24184,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 79,
+          "line": 80,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 253,
+          "line": 256,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 253,
+          "line": 256,
           "kind": "event-listener",
           "match": "ipcMain.on('music-current-lyrics-response'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 79,
+          "line": 80,
           "kind": "preload-channel-definition",
           "match": "send('music-current-lyrics-response'"
         }
@@ -24220,27 +24215,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 81,
+          "line": 82,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 913,
+          "line": 940,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 913,
+          "line": 940,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-fetch-lyrics'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 81,
+          "line": 82,
           "kind": "preload-channel-definition",
           "match": "invoke('music-fetch-lyrics'"
         }
@@ -24252,14 +24247,14 @@
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 28,
+          "line": 29,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "preloads/api/music.js",
-          "line": 28,
+          "line": 29,
           "kind": "preload-channel-definition",
           "match": "on('music-files'"
         }
@@ -24270,27 +24265,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 70,
+          "line": 71,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 562,
+          "line": 589,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 562,
+          "line": 589,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-crossfeed'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 70,
+          "line": 71,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-crossfeed'"
         }
@@ -24301,27 +24296,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 49,
+          "line": 50,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 500,
+          "line": 527,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 500,
+          "line": 527,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-devices'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 49,
+          "line": 50,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-devices'"
         }
@@ -24332,27 +24327,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 72,
+          "line": 73,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 571,
+          "line": 598,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 571,
+          "line": 598,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-dynamic-loudness'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 72,
+          "line": 73,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-dynamic-loudness'"
         }
@@ -24363,27 +24358,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 63,
+          "line": 64,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 640,
+          "line": 667,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 640,
+          "line": 667,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-ir-preset-path'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 63,
+          "line": 64,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-ir-preset-path'"
         }
@@ -24394,27 +24389,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 61,
+          "line": 62,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 593,
+          "line": 620,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 593,
+          "line": 620,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-ir-status'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 61,
+          "line": 62,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-ir-status'"
         }
@@ -24425,27 +24420,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 65,
+          "line": 66,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 540,
+          "line": 567,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 540,
+          "line": 567,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-loudness-info'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 65,
+          "line": 66,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-loudness-info'"
         }
@@ -24456,27 +24451,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 80,
+          "line": 81,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 865,
+          "line": 892,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 865,
+          "line": 892,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-lyrics'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 80,
+          "line": 81,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-lyrics'"
         }
@@ -24488,14 +24483,14 @@
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 580,
+          "line": 607,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 580,
+          "line": 607,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-noise-shaper-curve'"
         }
@@ -24506,27 +24501,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 19,
+          "line": 20,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 422,
+          "line": 449,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 422,
+          "line": 449,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-pending-track'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 19,
+          "line": 20,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-pending-track'"
         }
@@ -24537,27 +24532,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 68,
+          "line": 69,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 553,
+          "line": 580,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 553,
+          "line": 580,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-saturation'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 68,
+          "line": 69,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-saturation'"
         }
@@ -24568,27 +24563,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 74,
+          "line": 75,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 598,
+          "line": 625,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 598,
+          "line": 625,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-settings'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 74,
+          "line": 75,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-settings'"
         }
@@ -24599,27 +24594,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 38,
+          "line": 39,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 491,
+          "line": 518,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 491,
+          "line": 518,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-get-state'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 38,
+          "line": 39,
           "kind": "preload-channel-definition",
           "match": "invoke('music-get-state'"
         }
@@ -24630,29 +24625,60 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 18,
+          "line": 19,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 401,
+          "line": 428,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 401,
+          "line": 428,
           "kind": "event-listener",
           "match": "ipcMain.on('music-groove-publish'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 18,
+          "line": 19,
           "kind": "preload-channel-definition",
           "match": "send('music-groove-publish'"
+        }
+      ]
+    },
+    {
+      "name": "music-info-injection-toggle",
+      "producers": [
+        {
+          "file": "preloads/api/music.js",
+          "line": 16,
+          "kind": "preload-channel-definition"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/ipc/musicHandlers.js",
+          "line": 415,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/ipc/musicHandlers.js",
+          "line": 415,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('music-info-injection-toggle'"
+        },
+        {
+          "file": "preloads/api/music.js",
+          "line": 16,
+          "kind": "preload-channel-definition",
+          "match": "invoke('music-info-injection-toggle'"
         }
       ]
     },
@@ -24661,27 +24687,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 62,
+          "line": 63,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 625,
+          "line": 652,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 625,
+          "line": 652,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-list-ir-presets'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 62,
+          "line": 63,
           "kind": "preload-channel-definition",
           "match": "invoke('music-list-ir-presets'"
         }
@@ -24692,27 +24718,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 34,
+          "line": 35,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 435,
+          "line": 462,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 435,
+          "line": 462,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-load'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 34,
+          "line": 35,
           "kind": "preload-channel-definition",
           "match": "invoke('music-load'"
         }
@@ -24723,27 +24749,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 58,
+          "line": 59,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 616,
+          "line": 643,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 616,
+          "line": 643,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-load-ir'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 58,
+          "line": 59,
           "kind": "preload-channel-definition",
           "match": "invoke('music-load-ir'"
         }
@@ -24754,27 +24780,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 36,
+          "line": 37,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 483,
+          "line": 510,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 483,
+          "line": 510,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-pause'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 36,
+          "line": 37,
           "kind": "preload-channel-definition",
           "match": "invoke('music-pause'"
         }
@@ -24785,27 +24811,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 35,
+          "line": 36,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 475,
+          "line": 502,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 475,
+          "line": 502,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-play'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 35,
+          "line": 36,
           "kind": "preload-channel-definition",
           "match": "invoke('music-play'"
         }
@@ -24816,27 +24842,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 40,
+          "line": 41,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 607,
+          "line": 634,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 607,
+          "line": 634,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-queue-next'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 40,
+          "line": 41,
           "kind": "preload-channel-definition",
           "match": "invoke('music-queue-next'"
         }
@@ -24847,27 +24873,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 46,
+          "line": 47,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 822,
+          "line": 849,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 822,
+          "line": 849,
           "kind": "event-listener",
           "match": "ipcMain.on('music-remote-command'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 46,
+          "line": 47,
           "kind": "preload-channel-definition",
           "match": "send('music-remote-command'"
         }
@@ -24885,14 +24911,14 @@
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 153,
+          "line": 156,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 153,
+          "line": 156,
           "kind": "event-listener",
           "match": "ipcMain.on('music-renderer-ready'"
         },
@@ -24909,27 +24935,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 75,
+          "line": 76,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 602,
+          "line": 629,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 602,
+          "line": 629,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-save-settings'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 75,
+          "line": 76,
           "kind": "preload-channel-definition",
           "match": "invoke('music-save-settings'"
         }
@@ -24940,38 +24966,38 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 709,
+          "line": 736,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 770,
+          "line": 797,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 31,
+          "line": 32,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 709,
+          "line": 736,
           "kind": "event-send",
           "match": "event.sender.send('music-scan-complete'"
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 770,
+          "line": 797,
           "kind": "event-send",
           "match": "event.sender.send('music-scan-complete'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 31,
+          "line": 32,
           "kind": "preload-channel-definition",
           "match": "on('music-scan-complete'"
         }
@@ -24982,27 +25008,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 66,
+          "line": 67,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 544,
+          "line": 571,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 544,
+          "line": 571,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-scan-loudness'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 66,
+          "line": 67,
           "kind": "preload-channel-definition",
           "match": "invoke('music-scan-loudness'"
         }
@@ -25013,27 +25039,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 67,
+          "line": 68,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 548,
+          "line": 575,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 548,
+          "line": 575,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-scan-loudness-background'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 67,
+          "line": 68,
           "kind": "preload-channel-definition",
           "match": "invoke('music-scan-loudness-background'"
         }
@@ -25045,14 +25071,14 @@
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 30,
+          "line": 31,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "preloads/api/music.js",
-          "line": 30,
+          "line": 31,
           "kind": "preload-channel-definition",
           "match": "on('music-scan-progress'"
         }
@@ -25063,27 +25089,27 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 704,
+          "line": 731,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 29,
+          "line": 30,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 704,
+          "line": 731,
           "kind": "event-send",
           "match": "event.sender.send('music-scan-start'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 29,
+          "line": 30,
           "kind": "preload-channel-definition",
           "match": "onSignal('music-scan-start'"
         }
@@ -25094,27 +25120,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 82,
+          "line": 83,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 931,
+          "line": 958,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 931,
+          "line": 958,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-search-lyrics-candidates'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 82,
+          "line": 83,
           "kind": "preload-channel-definition",
           "match": "invoke('music-search-lyrics-candidates'"
         }
@@ -25125,27 +25151,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 37,
+          "line": 38,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 487,
+          "line": 514,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 487,
+          "line": 514,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-seek'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 37,
+          "line": 38,
           "kind": "preload-channel-definition",
           "match": "invoke('music-seek'"
         }
@@ -25156,27 +25182,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 71,
+          "line": 72,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 566,
+          "line": 593,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 566,
+          "line": 593,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-set-crossfeed'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 71,
+          "line": 72,
           "kind": "preload-channel-definition",
           "match": "invoke('music-set-crossfeed'"
         }
@@ -25187,27 +25213,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 73,
+          "line": 74,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 575,
+          "line": 602,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 575,
+          "line": 602,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-set-dynamic-loudness'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 73,
+          "line": 74,
           "kind": "preload-channel-definition",
           "match": "invoke('music-set-dynamic-loudness'"
         }
@@ -25218,27 +25244,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 56,
+          "line": 57,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 510,
+          "line": 537,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 510,
+          "line": 537,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-set-eq'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 56,
+          "line": 57,
           "kind": "preload-channel-definition",
           "match": "invoke('music-set-eq'"
         }
@@ -25249,27 +25275,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 57,
+          "line": 58,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 524,
+          "line": 551,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 524,
+          "line": 551,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-set-eq-type'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 57,
+          "line": 58,
           "kind": "preload-channel-definition",
           "match": "invoke('music-set-eq-type'"
         }
@@ -25280,27 +25306,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 55,
+          "line": 56,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 584,
+          "line": 611,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 584,
+          "line": 611,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-set-noise-shaper-curve'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 55,
+          "line": 56,
           "kind": "preload-channel-definition",
           "match": "invoke('music-set-noise-shaper-curve'"
         }
@@ -25311,27 +25337,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 69,
+          "line": 70,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 557,
+          "line": 584,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 557,
+          "line": 584,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-set-saturation'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 69,
+          "line": 70,
           "kind": "preload-channel-definition",
           "match": "invoke('music-set-saturation'"
         }
@@ -25342,27 +25368,27 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 319,
+          "line": 322,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 42,
+          "line": 43,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 319,
+          "line": 322,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('music-set-track'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 42,
+          "line": 43,
           "kind": "preload-channel-definition",
           "match": "on('music-set-track'"
         }
@@ -25373,27 +25399,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 39,
+          "line": 40,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 495,
+          "line": 522,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 495,
+          "line": 522,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-set-volume'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 39,
+          "line": 40,
           "kind": "preload-channel-definition",
           "match": "invoke('music-set-volume'"
         }
@@ -25404,27 +25430,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 27,
+          "line": 28,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 856,
+          "line": 883,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 856,
+          "line": 883,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-share-track'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 27,
+          "line": 28,
           "kind": "preload-channel-definition",
           "match": "invoke('music-share-track'"
         }
@@ -25435,27 +25461,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 59,
+          "line": 60,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 620,
+          "line": 647,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 620,
+          "line": 647,
           "kind": "event-listener",
           "match": "ipcMain.handle('music-unload-ir'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 59,
+          "line": 60,
           "kind": "preload-channel-definition",
           "match": "invoke('music-unload-ir'"
         }
@@ -25901,14 +25927,14 @@
       "consumers": [
         {
           "file": "modules/renderer/desktopPushConsumer.js",
-          "line": 93,
+          "line": 94,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/renderer/desktopPushConsumer.js",
-          "line": 93,
+          "line": 94,
           "kind": "preload-subscription",
           "match": "electronAPI.onDesktopStatus("
         }
@@ -26083,14 +26109,14 @@
       "consumers": [
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 94,
+          "line": 133,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/ui-system/music-capsule.js",
-          "line": 94,
+          "line": 133,
           "kind": "preload-subscription",
           "match": "api.onMusicCapsuleState("
         }
@@ -26308,7 +26334,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1159,
+          "line": 1203,
           "kind": "preload-subscription"
         },
         {
@@ -26326,7 +26352,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 1159,
+          "line": 1203,
           "kind": "preload-subscription",
           "match": "viewerAPI.onThemeUpdated("
         },
@@ -26374,7 +26400,7 @@
       "consumers": [
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2053,
+          "line": 2068,
           "kind": "preload-subscription"
         },
         {
@@ -26386,7 +26412,7 @@
       "evidence": [
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2053,
+          "line": 2068,
           "kind": "preload-subscription",
           "match": "window.utilityAPI.onWindowPinnedChanged("
         },
@@ -26841,14 +26867,14 @@
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 391,
+          "line": 402,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 391,
+          "line": 402,
           "kind": "event-listener",
           "match": "ipcMain.on('open-music-window'"
         },
@@ -27138,7 +27164,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1830,
+          "line": 1852,
           "kind": "event-listener"
         }
       ],
@@ -27151,7 +27177,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1830,
+          "line": 1852,
           "kind": "event-listener",
           "match": "contents.on('page-title-updated'"
         }
@@ -28981,7 +29007,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 129,
+          "line": 132,
           "kind": "event-listener"
         },
         {
@@ -29036,12 +29062,12 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1734,
+          "line": 1753,
           "kind": "event-listener"
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2200,
+          "line": 2222,
           "kind": "event-listener"
         }
       ],
@@ -29120,7 +29146,7 @@
         },
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 129,
+          "line": 132,
           "kind": "event-listener",
           "match": "musicWindow.once('ready-to-show'"
         },
@@ -29186,13 +29212,13 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1734,
+          "line": 1753,
           "kind": "event-listener",
           "match": "win.once('ready-to-show'"
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 2200,
+          "line": 2222,
           "kind": "event-listener",
           "match": "win.once('ready-to-show'"
         }
@@ -29499,7 +29525,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1860,
+          "line": 1882,
           "kind": "event-listener"
         },
         {
@@ -29564,7 +29590,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1860,
+          "line": 1882,
           "kind": "event-listener",
           "match": "contents.on('render-process-gone'"
         },
@@ -29613,7 +29639,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1762,
+          "line": 1781,
           "kind": "event-listener"
         },
         {
@@ -29643,7 +29669,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2304,
+          "line": 2350,
           "kind": "custom-event-listener"
         },
         {
@@ -29705,7 +29731,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1762,
+          "line": 1781,
           "kind": "event-listener",
           "match": "win.on('resize'"
         },
@@ -29741,7 +29767,7 @@
         },
         {
           "file": "modules/text-viewer.js",
-          "line": 2304,
+          "line": 2350,
           "kind": "custom-event-listener",
           "match": "window.addEventListener('resize'"
         },
@@ -30291,27 +30317,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 25,
+          "line": 26,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 811,
+          "line": 838,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 811,
+          "line": 838,
           "kind": "event-listener",
           "match": "ipcMain.handle('save-custom-playlists'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 25,
+          "line": 26,
           "kind": "preload-channel-definition",
           "match": "invoke('save-custom-playlists'"
         }
@@ -30539,27 +30565,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 23,
+          "line": 24,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 786,
+          "line": 813,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 786,
+          "line": 813,
           "kind": "event-listener",
           "match": "ipcMain.handle('save-music-playlist'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 23,
+          "line": 24,
           "kind": "preload-channel-definition",
           "match": "invoke('save-music-playlist'"
         }
@@ -31411,14 +31437,14 @@
       "consumers": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1433,
+          "line": 1452,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1433,
+          "line": 1452,
           "kind": "event-listener",
           "match": "contents.on('select-bluetooth-device'"
         }
@@ -31491,27 +31517,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 60,
+          "line": 61,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 658,
+          "line": 685,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 658,
+          "line": 685,
           "kind": "event-listener",
           "match": "ipcMain.handle('select-ir-file'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 60,
+          "line": 61,
           "kind": "preload-channel-definition",
           "match": "invoke('select-ir-file'"
         }
@@ -31800,7 +31826,7 @@
       "producers": [
         {
           "file": "modules/utils/appSettingsManager.js",
-          "line": 672,
+          "line": 673,
           "kind": "event-send"
         }
       ],
@@ -31808,7 +31834,7 @@
       "evidence": [
         {
           "file": "modules/utils/appSettingsManager.js",
-          "line": 672,
+          "line": 673,
           "kind": "event-send",
           "match": "this.emit('settings-external-error'"
         }
@@ -31824,11 +31850,16 @@
         },
         {
           "file": "modules/utils/appSettingsManager.js",
-          "line": 670,
+          "line": 671,
           "kind": "event-send"
         }
       ],
       "consumers": [
+        {
+          "file": "modules/ipc/musicHandlers.js",
+          "line": 398,
+          "kind": "event-listener"
+        },
         {
           "file": "modules/ipc/settingsHandlers.js",
           "line": 18,
@@ -31846,6 +31877,12 @@
         }
       ],
       "evidence": [
+        {
+          "file": "modules/ipc/musicHandlers.js",
+          "line": 398,
+          "kind": "event-listener",
+          "match": "settingsManager?.on('settings-external-updated'"
+        },
         {
           "file": "modules/ipc/settingsHandlers.js",
           "line": 18,
@@ -31866,7 +31903,7 @@
         },
         {
           "file": "modules/utils/appSettingsManager.js",
-          "line": 670,
+          "line": 671,
           "kind": "event-send",
           "match": "this.emit('settings-external-updated'"
         },
@@ -31902,11 +31939,16 @@
       "producers": [
         {
           "file": "modules/utils/appSettingsManager.js",
-          "line": 505,
+          "line": 506,
           "kind": "event-send"
         }
       ],
       "consumers": [
+        {
+          "file": "modules/ipc/musicHandlers.js",
+          "line": 397,
+          "kind": "event-listener"
+        },
         {
           "file": "modules/ipc/voiceHandlers.js",
           "line": 756,
@@ -31919,6 +31961,12 @@
         }
       ],
       "evidence": [
+        {
+          "file": "modules/ipc/musicHandlers.js",
+          "line": 397,
+          "kind": "event-listener",
+          "match": "settingsManager?.on('settings-updated'"
+        },
         {
           "file": "modules/ipc/voiceHandlers.js",
           "line": 756,
@@ -31933,7 +31981,7 @@
         },
         {
           "file": "modules/utils/appSettingsManager.js",
-          "line": 505,
+          "line": 506,
           "kind": "event-send",
           "match": "this.emit('settings-updated'"
         }
@@ -32795,7 +32843,7 @@
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1959,
+          "line": 1974,
           "kind": "custom-event-listener"
         }
       ],
@@ -32862,7 +32910,7 @@
         },
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 1959,
+          "line": 1974,
           "kind": "custom-event-listener",
           "match": "form.addEventListener('submit'"
         }
@@ -34636,7 +34684,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1764,
+          "line": 1783,
           "kind": "event-listener"
         }
       ],
@@ -34661,7 +34709,7 @@
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1764,
+          "line": 1783,
           "kind": "event-listener",
           "match": "win.on('unmaximize'"
         }
@@ -34862,14 +34910,14 @@
       "consumers": [
         {
           "file": "modules/renderer/toolPresentation.js",
-          "line": 588,
+          "line": 596,
           "kind": "custom-event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/renderer/toolPresentation.js",
-          "line": 588,
+          "line": 596,
           "kind": "custom-event-listener",
           "match": "win.addEventListener('vcp-appearance-changed'"
         },
@@ -35180,14 +35228,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 144,
+          "line": 168,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 144,
+          "line": 168,
           "kind": "event-listener",
           "match": "handle('vcp-game:agents'"
         },
@@ -35211,14 +35259,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 172,
+          "line": 196,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 172,
+          "line": 196,
           "kind": "event-listener",
           "match": "handle('vcp-game:continue'"
         },
@@ -35242,14 +35290,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 145,
+          "line": 169,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 145,
+          "line": 169,
           "kind": "event-listener",
           "match": "handle('vcp-game:create'"
         },
@@ -35273,14 +35321,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 185,
+          "line": 209,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 185,
+          "line": 209,
           "kind": "event-listener",
           "match": "ipcMain.handle('vcp-game:launch'"
         },
@@ -35304,14 +35352,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 150,
+          "line": 174,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 150,
+          "line": 174,
           "kind": "event-listener",
           "match": "handle('vcp-game:next'"
         },
@@ -35335,14 +35383,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 155,
+          "line": 179,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 155,
+          "line": 179,
           "kind": "event-listener",
           "match": "handle('vcp-game:observe'"
         },
@@ -35442,14 +35490,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 177,
+          "line": 201,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 177,
+          "line": 201,
           "kind": "event-listener",
           "match": "handle('vcp-game:stop'"
         },
@@ -35473,14 +35521,14 @@
       "consumers": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 167,
+          "line": 191,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 167,
+          "line": 191,
           "kind": "event-listener",
           "match": "handle('vcp-game:submit'"
         },
@@ -36073,14 +36121,14 @@
       "consumers": [
         {
           "file": "modules/renderer/toolPresentation.js",
-          "line": 589,
+          "line": 597,
           "kind": "custom-event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/renderer/toolPresentation.js",
-          "line": 589,
+          "line": 597,
           "kind": "custom-event-listener",
           "match": "win.addEventListener('vcp-tool-presentation-changed'"
         },
@@ -36139,7 +36187,7 @@
       "producers": [
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2480,
+          "line": 2495,
           "kind": "custom-event-create"
         }
       ],
@@ -36147,7 +36195,7 @@
       "evidence": [
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2480,
+          "line": 2495,
           "kind": "custom-event-create",
           "match": "new CustomEvent('vcp-ui-density-changed'"
         }
@@ -36177,7 +36225,7 @@
       "producers": [
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2501,
+          "line": 2516,
           "kind": "custom-event-create"
         }
       ],
@@ -36185,7 +36233,7 @@
       "evidence": [
         {
           "file": "modules/ui-system/vcp-ui.js",
-          "line": 2501,
+          "line": 2516,
           "kind": "custom-event-create",
           "match": "new CustomEvent('vcp-ui-ready'"
         }
@@ -36340,7 +36388,7 @@
         },
         {
           "file": "modules/renderer/streamManager.js",
-          "line": 351,
+          "line": 352,
           "kind": "custom-event-listener"
         },
         {
@@ -36369,7 +36417,7 @@
         },
         {
           "file": "modules/renderer/streamManager.js",
-          "line": 351,
+          "line": 352,
           "kind": "custom-event-listener",
           "match": "transientCleanupWindow.document?.addEventListener?.('visibilitychange'"
         },
@@ -37129,27 +37177,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 87,
+          "line": 88,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 974,
+          "line": 1001,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 974,
+          "line": 1001,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-add-server'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 87,
+          "line": 88,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-add-server'"
         }
@@ -37160,27 +37208,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 92,
+          "line": 93,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1029,
+          "line": 1056,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1029,
+          "line": 1056,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-get-file-url'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 92,
+          "line": 93,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-get-file-url'"
         }
@@ -37192,14 +37240,14 @@
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1034,
+          "line": 1061,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1034,
+          "line": 1061,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-get-server-credentials'"
         }
@@ -37210,27 +37258,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 90,
+          "line": 91,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 993,
+          "line": 1020,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 993,
+          "line": 1020,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-list-directory'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 90,
+          "line": 91,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-list-directory'"
         }
@@ -37241,27 +37289,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 86,
+          "line": 87,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 983,
+          "line": 1010,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 983,
+          "line": 1010,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-list-servers'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 86,
+          "line": 87,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-list-servers'"
         }
@@ -37272,27 +37320,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 93,
+          "line": 94,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1040,
+          "line": 1067,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1040,
+          "line": 1067,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-load-track'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 93,
+          "line": 94,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-load-track'"
         }
@@ -37303,27 +37351,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 88,
+          "line": 89,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 978,
+          "line": 1005,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 978,
+          "line": 1005,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-remove-server'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 88,
+          "line": 89,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-remove-server'"
         }
@@ -37334,27 +37382,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 91,
+          "line": 92,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1007,
+          "line": 1034,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1007,
+          "line": 1034,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-scan-audio'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 91,
+          "line": 92,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-scan-audio'"
         }
@@ -37365,27 +37413,27 @@
       "producers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1021,
+          "line": 1048,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/api/music.js",
-          "line": 94,
+          "line": 95,
           "kind": "preload-channel-definition"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 1021,
+          "line": 1048,
           "kind": "event-send",
           "match": "musicWindow.webContents.send('webdav-scan-progress'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 94,
+          "line": 95,
           "kind": "preload-channel-definition",
           "match": "on('webdav-scan-progress'"
         }
@@ -37396,27 +37444,27 @@
       "producers": [
         {
           "file": "preloads/api/music.js",
-          "line": 89,
+          "line": 90,
           "kind": "preload-channel-definition"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 988,
+          "line": 1015,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/musicHandlers.js",
-          "line": 988,
+          "line": 1015,
           "kind": "event-listener",
           "match": "ipcMain.handle('webdav-test-connection'"
         },
         {
           "file": "preloads/api/music.js",
-          "line": 89,
+          "line": 90,
           "kind": "preload-channel-definition",
           "match": "invoke('webdav-test-connection'"
         }
@@ -37549,18 +37597,23 @@
           "kind": "event-listener"
         },
         {
+          "file": "modules/game/vtrade/window.js",
+          "line": 38,
+          "kind": "event-listener"
+        },
+        {
           "file": "modules/ipc/browserHandlers.js",
           "line": 209,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 80,
+          "line": 97,
           "kind": "event-listener"
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1837,
+          "line": 1859,
           "kind": "event-listener"
         }
       ],
@@ -37578,6 +37631,12 @@
           "match": "capture.webContents.on('will-navigate'"
         },
         {
+          "file": "modules/game/vtrade/window.js",
+          "line": 38,
+          "kind": "event-listener",
+          "match": "win.webContents.on('will-navigate'"
+        },
+        {
           "file": "modules/ipc/browserHandlers.js",
           "line": 209,
           "kind": "event-listener",
@@ -37585,13 +37644,13 @@
         },
         {
           "file": "modules/ipc/gameHandlers.js",
-          "line": 80,
+          "line": 97,
           "kind": "event-listener",
           "match": "win.webContents.on('will-navigate'"
         },
         {
           "file": "modules/loom/VCPLoomManager.js",
-          "line": 1837,
+          "line": 1859,
           "kind": "event-listener",
           "match": "contents.on('will-navigate'"
         }
@@ -38379,7 +38438,7 @@
     },
     {
       "file": "modules/ipc/gameHandlers.js",
-      "line": 138,
+      "line": 162,
       "reason": "dynamic event listener name: channel",
       "kind": "event-listener",
       "match": "ipcMain.handle(channel",
@@ -38387,7 +38446,7 @@
     },
     {
       "file": "modules/ipc/gameHandlers.js",
-      "line": 196,
+      "line": 220,
       "reason": "dynamic event listener name: channel",
       "kind": "event-listener",
       "match": "ipcMain.handle(channel",
@@ -38403,7 +38462,7 @@
     },
     {
       "file": "modules/ipc/musicHandlers.js",
-      "line": 724,
+      "line": 751,
       "reason": "dynamic event name: channel",
       "kind": "event-send",
       "match": "event.sender.send(channel",
@@ -38491,7 +38550,7 @@
     },
     {
       "file": "modules/loom/VCPLoomManager.js",
-      "line": 1375,
+      "line": 1394,
       "reason": "dynamic event listener name: protocol.addedEvent",
       "kind": "event-listener",
       "match": "persistentSession.on(protocol.addedEvent",
@@ -38499,7 +38558,7 @@
     },
     {
       "file": "modules/loom/VCPLoomManager.js",
-      "line": 1376,
+      "line": 1395,
       "reason": "dynamic event listener name: protocol.removedEvent",
       "kind": "event-listener",
       "match": "persistentSession.on(protocol.removedEvent",
@@ -38507,7 +38566,7 @@
     },
     {
       "file": "modules/loom/VCPLoomManager.js",
-      "line": 1393,
+      "line": 1412,
       "reason": "dynamic event listener name: protocol.selectEvent",
       "kind": "event-listener",
       "match": "persistentSession.on(protocol.selectEvent",
@@ -38515,7 +38574,7 @@
     },
     {
       "file": "modules/loom/VCPLoomManager.js",
-      "line": 1394,
+      "line": 1413,
       "reason": "dynamic event listener name: protocol.revokedEvent",
       "kind": "event-listener",
       "match": "persistentSession.on(protocol.revokedEvent",
@@ -38523,7 +38582,7 @@
     },
     {
       "file": "modules/loom/VCPLoomManager.js",
-      "line": 2344,
+      "line": 2366,
       "reason": "dynamic event listener name: channel",
       "kind": "event-listener",
       "match": "ipcMain.handle(channel",
@@ -38555,7 +38614,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 693,
+      "line": 699,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -38563,7 +38622,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 2740,
+      "line": 2743,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -38571,7 +38630,7 @@
     },
     {
       "file": "modules/messageRenderer.js",
-      "line": 3497,
+      "line": 3500,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -38907,7 +38966,7 @@
     },
     {
       "file": "modules/ui-system/vcp-ui.js",
-      "line": 43,
+      "line": 58,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "target.addEventListener(type",
@@ -38915,7 +38974,7 @@
     },
     {
       "file": "modules/ui-system/vcp-ui.js",
-      "line": 837,
+      "line": 852,
       "reason": "dynamic listener name: type",
       "kind": "custom-event-listener",
       "match": "wa.addEventListener(type",

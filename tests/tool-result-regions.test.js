@@ -110,6 +110,7 @@ test('smooth tracker honors shared framing across every split and resumes paced 
     const source = fs.readFileSync(require.resolve('../modules/renderer/streamManager.js'), 'utf8');
     const tracker = source.slice(source.indexOf('const TOOL_RESULT_MARKER_OVERLAP ='), source.indexOf('function flushSmoothQueueForBurst('));
     const { findToolResultEnd } = await loadRegions();
+    const { collectToolBatchRanges } = await import('../modules/renderer/toolBatchRegions.js');
     for (const newline of ['\n', '\r\n']) {
         const bodies = [
             `const literal = '${START}';`,
@@ -124,7 +125,7 @@ test('smooth tracker honors shared framing across every split and resumes paced 
             assert.ok(findToolResultEnd(block, 0) > 0);
             for (let split = 0; split <= block.length; split++) {
                 const state = { toolResultDepth: 0, toolResultScannedTo: 0 };
-                const context = { TOOL_RESULT_START: START, TOOL_RESULT_END: END, SMOOTH_STREAM_BURST_CHUNK_CHARS: 10000, getOrCreateStreamSegmentState: () => state };
+                const context = { collectToolBatchRanges, TOOL_RESULT_START: START, TOOL_RESULT_END: END, SMOOTH_STREAM_BURST_CHUNK_CHARS: 10000, getOrCreateStreamSegmentState: () => state };
                 vm.runInNewContext(tracker, context);
                 let text = '';
                 for (const chunk of [block.slice(0, split), ...block.slice(split)]) {
@@ -137,7 +138,7 @@ test('smooth tracker honors shared framing across every split and resumes paced 
             }
         }
         const state = { toolResultDepth: 0, toolResultScannedTo: 0 };
-        const context = { TOOL_RESULT_START: START, TOOL_RESULT_END: END, SMOOTH_STREAM_BURST_CHUNK_CHARS: 10000, getOrCreateStreamSegmentState: () => state };
+        const context = { collectToolBatchRanges, TOOL_RESULT_START: START, TOOL_RESULT_END: END, SMOOTH_STREAM_BURST_CHUNK_CHARS: 10000, getOrCreateStreamSegmentState: () => state };
         vm.runInNewContext(tracker, context);
         const unclosed = `${START}${newline}${START}${newline}inner${newline}${END}`;
         assert.equal(context.shouldBypassSmoothQueue('test', unclosed, unclosed), true);

@@ -15,6 +15,44 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 
 const quiet = { warn() {}, error() {}, log() {} };
 
+test('feature annotations expose only bounded test metadata, never diagnostic payloads', async () => {
+    const annotate = require('../scripts/feature-test-annotations.cjs');
+    const secret = 'synthetic-sensitive-diagnostic';
+    async function* events() {
+        yield { type: 'test:stdout', data: { message: secret } };
+        yield { type: 'test:stderr', data: { message: secret } };
+        yield { type: 'test:diagnostic', data: { message: secret } };
+        yield { type: 'test:fail', data: { name: 'safe failure\n::notice::literal',
+            file: path.join(projectRoot, 'tests', 'fixture.test.cjs'), line: 7,
+            details: { error: { message: secret, stack: secret, actual: secret, expected: secret } } } };
+        yield { type: 'test:fail', data: { name: '/outside/private.test.cjs', file: '/outside/private.test.cjs', line: -1 } };
+    }
+    let output = '';
+    for await (const chunk of annotate(events())) output += chunk;
+    assert.match(output, /::error file=tests\/fixture\.test\.cjs,line=7::Feature test failed: safe failure%0A::notice::literal/);
+    assert.match(output, /::error file=unknown-test,line=1::Feature test failed: unknown-test/);
+    assert.equal(output.includes(secret), false);
+    assert.equal(output.includes('/outside/'), false);
+});
+
+test('feature annotation reporter keeps the failing Node test exit status', t => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'feature-annotation-'));
+    t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+    const file = path.join(directory, 'failure.test.cjs');
+    fs.writeFileSync(file, "require('node:test')('annotation fixture failure',()=>{throw Error('controlled fixture failure')});\n");
+    const env = { ...process.env };
+    delete env.NODE_TEST_CONTEXT; // The child is a standalone runner, not another test-file worker.
+    let result;
+    try {
+        execFileSync(process.execPath, ['--test', '--test-reporter=spec', '--test-reporter-destination=stdout',
+            '--test-reporter=./scripts/feature-test-annotations.cjs', '--test-reporter-destination=stdout', file],
+            { cwd: projectRoot, encoding: 'utf8', windowsHide: true, env });
+        assert.fail('a failing test must fail the process');
+    } catch (error) { result = error; }
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /::error file=unknown-test,line=1::Feature test failed: annotation fixture failure/);
+});
+
 function fixture(t, features) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'app-features-'));
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));

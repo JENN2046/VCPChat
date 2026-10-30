@@ -44,7 +44,7 @@ test('stream completion presents once with or without restored DOM using real ho
  const AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
  const hook=renderer.split('\n').find(l=>l.includes('if (!renderContext.suppressNativePresentation')&&l.includes('presentNativeProposal'));
  const renderHook=new AsyncFunction('presentNativeProposal','messageItem','message','isInitialLoad','mainRendererReferences','window','renderContext',hook);
- const start=stream.indexOf('        if (!messageItem) {\r\n            const finalMessage ='),end=stream.indexOf('\n        if (messageItem) {',start);assert.ok(start>0&&end>start);
+ const start=stream.search(/        if \(!messageItem\) \{\r?\n            const finalMessage =/),end=stream.indexOf('\n        if (messageItem) {',start);assert.ok(start>0&&end>start);
  const finalHook=stream.split('\n').find(l=>l.includes("if(finishReason==='completed'||finishReason==='stop')await presentNativeProposal"));
  const run=new AsyncFunction('messageItem','presentNativeProposal','refs','message','finalFullText','storedContext','messageId',`let finishReason='completed',expectedOperationId=null;${stream.slice(start,end)}\n${finalHook}`);
  for(const missing of [false,true]){let calls=0;const present=async()=>calls++,refs={electronAPI:{},renderMessage:async(m,initial,append,session,context)=>{const e=dom();await renderHook(present,e,m,initial,{}, {},context);return e}};await run(missing?null:dom(),present,refs,{role:'assistant'},content,{agentId:'A',topicId:'T'},'M');assert.equal(calls,1);}

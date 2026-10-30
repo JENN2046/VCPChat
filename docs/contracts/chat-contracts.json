@@ -469,7 +469,7 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/musicHandlers.js",
-        "line": 724,
+        "line": 751,
         "kind": "event-send",
         "match": "event.sender.send(channel"
       }
@@ -585,31 +585,31 @@
     "dynamicSites": [
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1375,
+        "line": 1394,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.addedEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1376,
+        "line": 1395,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.removedEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1393,
+        "line": 1412,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.selectEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 1394,
+        "line": 1413,
         "kind": "event-listener",
         "match": "persistentSession.on(protocol.revokedEvent"
       },
       {
         "file": "modules/loom/VCPLoomManager.js",
-        "line": 2344,
+        "line": 2366,
         "kind": "event-listener",
         "match": "ipcMain.handle(channel"
       }
@@ -628,19 +628,19 @@
     "dynamicSites": [
       {
         "file": "modules/messageRenderer.js",
-        "line": 693,
+        "line": 699,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 2740,
+        "line": 2743,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 3497,
+        "line": 3500,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
@@ -1253,13 +1253,13 @@
     "dynamicSites": [
       {
         "file": "modules/ui-system/vcp-ui.js",
-        "line": 43,
+        "line": 58,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/ui-system/vcp-ui.js",
-        "line": 837,
+        "line": 852,
         "kind": "custom-event-listener",
         "match": "wa.addEventListener(type"
       }
@@ -1529,13 +1529,13 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/gameHandlers.js",
-        "line": 138,
+        "line": 162,
         "kind": "event-listener",
         "match": "ipcMain.handle(channel"
       },
       {
         "file": "modules/ipc/gameHandlers.js",
-        "line": 196,
+        "line": 220,
         "kind": "event-listener",
         "match": "ipcMain.handle(channel"
       }

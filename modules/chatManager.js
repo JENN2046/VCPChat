@@ -2232,9 +2232,13 @@ export const chatManager = (() => {
                         finalHistory.push(assistantMessage);
                         
                         // Save the final, complete history to the correct file
-                        const finalSave = await saveHistory(responseContext.agentId, responseContext.itemType || 'agent', responseContext.topicId, finalHistory);
-                        // 和流式一样：没存下来就按保存失败收尾，侧栏辅助对话据此亮「保存失败」并拦住关闭，而不是当作已完成
-                        if (finalSave?.success === false || finalSave?.error) persistenceError = finalSave.error || '保存聊天记录失败';
+                        try {
+                            const finalSave = await saveHistory(responseContext.agentId, responseContext.itemType || 'agent', responseContext.topicId, finalHistory);
+                            if (finalSave?.success === false || finalSave?.error) persistenceError = finalSave.error || '保存聊天记录失败';
+                        } catch (error) {
+                            // Keep the visible reply available for retry when durable storage rejects.
+                            persistenceError = error?.message || '保存聊天记录失败';
+                        }
 
                         if (isForActiveChat) {
                             // If it's the active chat, also update the UI and in-memory state

@@ -17,6 +17,7 @@ test('runtime configuration registers every game IPC once without launching game
     const source = fs.readFileSync(path.join(__dirname, '../modules/ipc/gameHandlers.js'), 'utf8');
     vm.runInNewContext(source, {
         module: exported, URL, __dirname: path.join(__dirname, '../modules/ipc'),
+        setTimeout() { throw new Error('startup must not schedule provider-backed games'); },
         require(name) {
             if (name === 'electron') return {
                 BrowserWindow: class { constructor() { throw new Error('must not open a window'); } },
@@ -27,6 +28,14 @@ test('runtime configuration registers every game IPC once without launching game
             };
             if (name === '../game/gameRuntime') return { GameRuntime: class {
                 constructor(options) { constructions++; this.gameService = options.gameService; }
+            } };
+            if (name === '../game/vtrade/client') return { VTradeClient: class {
+                duel() { throw new Error('startup must not read credentials or contact VTrade'); }
+            } };
+            if (name === '../game/vtrade/window') return {};
+            if (name === '../game/vtrade/orchestrator') return { VTradeOrchestrator: class {
+                start() { throw new Error('startup must not start VTrade'); }
+                resumeIfWaiting() { throw new Error('startup must not resume VTrade'); }
             } };
             if (name === 'path' || name === 'url') return require(name);
             throw new Error(`Unexpected runtime load: ${name}`);

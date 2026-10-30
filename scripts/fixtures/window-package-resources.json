@@ -340,8 +340,8 @@
     },
     {
       "path": "Gamemodules/doudizhu/ui.js",
-      "size": 10175,
-      "sha256": "c57ee3043c0033ab002964a51b8e9852be55f360831f18e587baaca9a6d2c116"
+      "size": 10358,
+      "sha256": "dcaa2059a520a3c268e3124313afac7fcde242d3e51eead04b38ecf72654cba9"
     },
     {
       "path": "Gamemodules/forge-tax/audio.js",
@@ -395,8 +395,8 @@
     },
     {
       "path": "Gamemodules/game.html",
-      "size": 4291,
-      "sha256": "6f18767b82fcf292d18f9f0b5e9a2d70709d4028e308c971066bde9ddaab8c6b"
+      "size": 4764,
+      "sha256": "4f9652b70ee90f8c341d37a1f5968e0ac0ba94bb80d5f6acdac1de2a2ab00d41"
     },
     {
       "path": "Gamemodules/game.js",

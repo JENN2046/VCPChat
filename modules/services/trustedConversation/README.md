@@ -17,3 +17,14 @@ ToolBox 必须有最小宿主修改：server.js 路由注册、Plugin.js 每调�
 WS候选：使用 docs/native-conversation-websocket.example.json 的transport选择既有分布式连接；不修改模型/API/WS设置，分布式连接须已启用且为可信WSS（或本机隔离测试WS）。clientInstanceId是安装时为每个独立profile生成的非秘密UUID，仅定位回执journal，不是凭据；示例值仅供合成测试，不能多设备共用。主进程重启可按同一namespace读回执，旧连接的方案和输入资格不恢复。断线旧方案须重新提议与展示，网络不会重发execute。本人授权仍引用现有JSO身份，不能由模型/插件字段创建。
 
 当前合并基线保留 #59 的冷启动输入消费、持久失效队列和窗口重建重试。WS 连接变化额外清除主进程待处理输入/方案及物理输入缓存，并拒绝跨连接晚到的 prepare/propose/presented 结果；HTTP 绑定不受无关 WS 重连影响。WS 失败不会自动改走 HTTP。
+
+可选的本机核验记录由 `VCPCHAT_NATIVE_SESSION_STATUS_FILE`（既有目录内的绝对 JSON 路径）与
+`VCPCHAT_NATIVE_SESSION_OPERATION_ID`（本次启动的非秘密 UUID）开启。只有 `status` / `recover`
+响应会更新记录；它仅包含固定协议名、启动操作与客户端 UUID、主进程 PID、通道类型、检查时间、
+请求类型及核验结果，不保存凭据、服务端原始响应或业务内容。网络和协议错误记为不可用，且不改变原错误对象或重试语义。
+记录表示该主进程最近一次收到成功的 Owner 会话核验结果，不表示此刻仍在线、客户端已获生产准入、
+本人已确认任何业务动作或写入已启用。不能用该文件授权、恢复旧确认资格或替代原操作回执。
+
+启动时，main.js 在导入其他服务前将所配置的 Bearer 引用收入进程内存，并移除可继承的 Owner 环境变量。
+托管启动器向环境诊断/版本探测子进程传递去除 Owner 凭据后的环境副本，真正的 Electron 主进程仍接收一次性引用。
+凭据不写入绑定 JSON、状态记录或持久系统环境；退出后的下一次受控启动须重新提供既有 Owner 会话。

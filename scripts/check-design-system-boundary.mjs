@@ -164,6 +164,10 @@ const allowedSourceDifferences = new Set([
     'modules/services/trustedConversation/README.md',
     'modules/services/trustedConversation/nativePort.cjs',
     'modules/services/trustedConversation/transport.cjs',
+    // PR #79: exact native-session diagnostics and process-local Owner capture.
+    // No directory exemption, sender permission or business-write admission change.
+    'modules/services/trustedConversation/sessionStatus.cjs',
+    'modules/services/trustedConversation/credentialVault.cjs',
     'preloads/api/nativeConversation.js',
     'tests/native-config-startup.test.cjs',
     'tests/native-conversation-ipc.test.cjs',

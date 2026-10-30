@@ -1957,9 +1957,9 @@
           "path": "Gamemodules/doudizhu/ui.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d67f58088e545856a679a7324ae5a7f9ea6c48bd",
-          "size": 10175,
-          "sha256": "c57ee3043c0033ab002964a51b8e9852be55f360831f18e587baaca9a6d2c116",
+          "blob": "635311380dd4070eec700ff07cb1592924c01fbb",
+          "size": 10358,
+          "sha256": "dcaa2059a520a3c268e3124313afac7fcde242d3e51eead04b38ecf72654cba9",
           "kind": "source"
         },
         {
@@ -2056,9 +2056,9 @@
           "path": "Gamemodules/game.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "26d59962b19191d11b519fa35481b0a6ccb3b39f",
-          "size": 4291,
-          "sha256": "6f18767b82fcf292d18f9f0b5e9a2d70709d4028e308c971066bde9ddaab8c6b",
+          "blob": "970327fba005bded1f15f84d8befbf0737340d75",
+          "size": 4764,
+          "sha256": "4f9652b70ee90f8c341d37a1f5968e0ac0ba94bb80d5f6acdac1de2a2ab00d41",
           "kind": "source"
         },
         {
@@ -4500,6 +4500,15 @@
           "blob": "20ae5966568944e18a40e89614e93a34042b09c8",
           "size": 7412,
           "sha256": "a74b77edf6c947d47916b6c4a85a486c0570fc512aabaca905238a9bd91c405a",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/shared/memoryProtocolProjection.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e2b6af919d4799a6239142386c22e880dd4335b",
+          "size": 5690,
+          "sha256": "5c96c36108a0db792432eb39d1bb45ad6c364e378152a895928913490a36b214",
           "kind": "source"
         },
         {
@@ -8031,9 +8040,9 @@
           "path": "docs/chat-kernel-consumer-report.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "119be976aa9ed0759a3a6a15a0d7a813f381edd5",
-          "size": 709449,
-          "sha256": "829d28f57a714d767863c7d4061af83198831f3231e0acd9800b3be417437bdb",
+          "blob": "2e6364c4a020cc5d449179b37d5a5819369e4398",
+          "size": 725075,
+          "sha256": "c5add41806f85856e3391c464ab3553ede4263b4d0e37ad07180483f068d0259",
           "kind": "source"
         },
         {
@@ -8328,9 +8337,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b638eca617cee3add6dc2870496bfc50c4bdca58",
-          "size": 114695,
-          "sha256": "4b30d668507f768444e9bdcdb49244d13950fd4e2cb5fe5e1942b9d91537b8f9",
+          "blob": "a10eb7ab75ed7c986a51c003a9d91f25fb0a1fdc",
+          "size": 114732,
+          "sha256": "56bc5bc98d2a279eedb7f1cbbd917456bee0366150a3c331bb741cab228d46e9",
           "kind": "source"
         },
         {
@@ -8814,18 +8823,18 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "cd5dafd8b46509a37d17631f4ddb0f5fe6d63f4e",
-          "size": 139610,
-          "sha256": "548c6823eb5e6c87fa7e898370e72ed4913d44029465adc73f11aab804ffb510",
+          "blob": "775dd45d6fb8da180b382511af0d5aa36b1af231",
+          "size": 139741,
+          "sha256": "4075effda12ac20374f39530b1fb65478ddf241399274c518c7421b37262f8c2",
           "kind": "source"
         },
         {
           "path": "modules/contextSanitizer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "62128e1f5a5c4721163bf9f840c4f5ede7d90087",
-          "size": 18585,
-          "sha256": "ddbef2472d52fb641b25d64690bde04bfc074294a8457561b5b1ed6eeacd057f",
+          "blob": "40c08b4f726830ddd46fe387846d201576476b31",
+          "size": 18647,
+          "sha256": "b33dc18335cecbbb3f4ff271d6142505b1e2021860c694e6b91fdc9b6d5abc7d",
           "kind": "source"
         },
         {
@@ -8940,9 +8949,9 @@
           "path": "modules/deskpet/petAssets.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8c410d40e97dbb28d5efc1b5dc47e6fb9944216e",
-          "size": 13123,
-          "sha256": "bc614de020c328785f5a74954d8a2117fd51740c832c185cacdc2d8678a74a41",
+          "blob": "9710e424e1a15228cb323567329f1f3d1d43be56",
+          "size": 13146,
+          "sha256": "ebf09ccb34d3fa9275741f3be3746e7079e5c20481f6e4f45efe72e7750341b4",
           "kind": "source"
         },
         {
@@ -9030,9 +9039,9 @@
           "path": "modules/deskpet/petMotion.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d99d16f4982e6088d917ecd2e4885189991132dc",
-          "size": 10873,
-          "sha256": "04a329a2292236dbf4770237c085df2a30f5de9db2e8c417368ae74a035f2db2",
+          "blob": "889a8a033c365665d9799ea71ce0d8fc43ef15de",
+          "size": 11418,
+          "sha256": "2b4d5f65a4625d14d76e110d3ccd243b49da5909b1fbd0fd0a757c47cc319de1",
           "kind": "source"
         },
         {
@@ -9405,6 +9414,33 @@
           "kind": "source"
         },
         {
+          "path": "modules/game/vtrade/client.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4761323cf7203425ea8d981987de2e28a4df0f8c",
+          "size": 3575,
+          "sha256": "997fc0d1aced816df249a7e1b50e8d7cf1589cef9b58f4b305dfd492ccc8d12e",
+          "kind": "source"
+        },
+        {
+          "path": "modules/game/vtrade/orchestrator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5f80a70f39c8bf0ef2b3ed41b7bb02caa358f96b",
+          "size": 9436,
+          "sha256": "cfb345df0b045deb00f316018dc60abbf3eab7cfbe1ca4fcfd70aaba9951919d",
+          "kind": "source"
+        },
+        {
+          "path": "modules/game/vtrade/window.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85b70b6196eb20ae3dab2c4c97245f93291889b1",
+          "size": 2235,
+          "sha256": "6b0dcf25227930b7ca7b55083767ab4a720b9f2bc61ba869695b1ff1b778004c",
+          "kind": "source"
+        },
+        {
           "path": "modules/global-settings-manager.js",
           "mode": "100644",
           "type": "blob",
@@ -9516,9 +9552,9 @@
           "path": "modules/ipc/chatHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "592d333b9970c8e39fd0d730af13ad341f0d6171",
-          "size": 92673,
-          "sha256": "f90662d7f057d07346650b82a377d51e0b7ec1218dced8dcd407c6c2375e1e81",
+          "blob": "72b59ae92bc51f3e83ecd636e65909d66a7225fd",
+          "size": 92743,
+          "sha256": "f343dec8fe3fe2a47c7c07c69e8dccfd73bf28cae1a3ec3f06b01921cd973be2",
           "kind": "source"
         },
         {
@@ -9624,9 +9660,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "290d9810934e88da21d0491682203a763860ab1d",
-          "size": 8922,
-          "sha256": "89e47fcd728f2ed68c8df7e041a555355eef74e8a103e40b2832e1550486db1c",
+          "blob": "189189a450e47ae9b9ec55e6bba0f8a06713bc62",
+          "size": 10196,
+          "sha256": "b95b4a7ea072b2ac406582bacc9e812f148cf8d40127de51e8b29307b399ee48",
           "kind": "source"
         },
         {
@@ -9705,9 +9741,9 @@
           "path": "modules/ipc/musicHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3a50caacfd8e38cf899878bb0f6dd3412c1129be",
-          "size": 47896,
-          "sha256": "7d95e388c47cccab6b31665e1794e942ff048e9a467d8cbb769d7a5b30cbaa19",
+          "blob": "ead9f4d0b833233d08e85bbf19ff978a5af7eb16",
+          "size": 49356,
+          "sha256": "d30e51b044bfe9db954b3e7c08d800bc387f812a9cd65fabbf82624de5dc2cf7",
           "kind": "source"
         },
         {
@@ -9930,9 +9966,9 @@
           "path": "modules/loom/VCPLoomManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d16b336bf4e2979e50f1608161bd70209bd276e8",
-          "size": 103053,
-          "sha256": "dd62215b3160ead364b5b68ad5138844148578548a4bc1cc31d2aab71643b268",
+          "blob": "3d787be6b38c8b75bbebd9e5b76c37d80e62b487",
+          "size": 104476,
+          "sha256": "452af999e14df76581629171480759bd7c8087c4c1b6398d666f5c953487c2c4",
           "kind": "source"
         },
         {
@@ -10119,9 +10155,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9df58a37a28e5e176c3ca4b0ec86c73a99789166",
-          "size": 234129,
-          "sha256": "f368df29153ba02172bc2b6ad7e05d1eed48a06b62481fdfc798bcb3c958092a",
+          "blob": "c3b997f26eea66daf8dd9979bd36984f66d2abf0",
+          "size": 234972,
+          "sha256": "3eea5532a5d9acba3b51324ef428d79486a9f5c9f5d85b0202f2e78c76391003",
           "kind": "source"
         },
         {
@@ -10182,9 +10218,9 @@
           "path": "modules/renderer/animation.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "25df54c7b0f25f0318740bb7570f587f8937e71e",
-          "size": 30184,
-          "sha256": "821913f08c42d012ec02d532795fe6ee9e71748ba78e016dbba6989e62e5cef8",
+          "blob": "df9a0657305b95c20620b0aef1c8e00f512769e4",
+          "size": 30289,
+          "sha256": "77f398d2146929a55c005f886022771a47312d0ec1ffd1af4b778878c1ad31cf",
           "kind": "source"
         },
         {
@@ -10200,9 +10236,9 @@
           "path": "modules/renderer/chartEmbedHost.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ec5de4fa268e529271b6ebb12dcad07cc730813c",
-          "size": 15525,
-          "sha256": "0dada04a39979a1308e61b77df8de9321f8c21e2fa241f27204b393ea1c3861d",
+          "blob": "829a41d4aa6b44ce8f9a5c302c77fd3dc7eb88fd",
+          "size": 15583,
+          "sha256": "92c431138758dea69c7cf4dda4705f4777dd55d014b46a1f49e19a3818ddf18c",
           "kind": "source"
         },
         {
@@ -10245,9 +10281,9 @@
           "path": "modules/renderer/contentPipeline.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a7b095c0b8c35aa50ad6bfc83954b915a822e804",
-          "size": 24685,
-          "sha256": "86f652837affd9c5dd90b8d01481c6781f66f7f03ca635985823b30dcad686c3",
+          "blob": "4498f5c31812798c058d63eeb9e3ee371e7c936b",
+          "size": 25930,
+          "sha256": "40136ff36ce2ae13427f8f951602b81b08dfa8431ace50f03b1bef0041449532",
           "kind": "source"
         },
         {
@@ -10263,9 +10299,9 @@
           "path": "modules/renderer/desktopPushConsumer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a38a4fbb5ea2f83bb25a2dc848cba146dfbef798",
-          "size": 12223,
-          "sha256": "3052da5ec2989577f6d17891641ca12bac2dd4662aab90b5452b66ed6774b79d",
+          "blob": "b15a8d857fdc32840f9fed59bd499eec1d7b88e5",
+          "size": 12847,
+          "sha256": "d512de1a109b66f65136f6559bc507d720f057d80091f3a2eea425a74df4742c",
           "kind": "source"
         },
         {
@@ -10794,9 +10830,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "493367129381ea26cc6a1da21d2a03f772b671b0",
-          "size": 100700,
-          "sha256": "bcb8c1c0290cfbf14f76283448d17af9fbed2cf8eaeacae05210e8a34d5a61aa",
+          "blob": "0c7e88e5a903130eb180d1d3e015068d80b7def1",
+          "size": 101009,
+          "sha256": "6213f965114e0ab52ff1dbb4d156ad955bf73d975dc859acde38da297e7f2ce2",
           "kind": "source"
         },
         {
@@ -10812,9 +10848,9 @@
           "path": "modules/renderer/streamSpeech.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9a6d97c3c04be29828580ab1e3071f238bb150c8",
-          "size": 4686,
-          "sha256": "7bb3d28def08961be298ca0da0b0d65eb5c690c41e103cc4fb591482ebe115a0",
+          "blob": "28759bcf7f19117535153821a6062646c5053a7f",
+          "size": 4855,
+          "sha256": "17f803e467a9aac369cd8ca28b4d47f3f248649c895cb3a21a857f2a837009a8",
           "kind": "source"
         },
         {
@@ -10830,9 +10866,9 @@
           "path": "modules/renderer/streamStableBoundary.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f831397b176e2666b6cd20c5e947fdac10dc426a",
-          "size": 26415,
-          "sha256": "53e14cfebd05324078bd480055b0531a9e6e692de9d01cb88ebc92420fc9d376",
+          "blob": "efb3875063ac20e864ff698ec77b8670f6fb82f8",
+          "size": 26738,
+          "sha256": "6371e6eacf35fe50f8d2943b1f3596e89ec6c56f266ff5b7054b445d46e2a1b1",
           "kind": "source"
         },
         {
@@ -10845,12 +10881,30 @@
           "kind": "source"
         },
         {
+          "path": "modules/renderer/toolBatchRegions.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "29bc6b4812a8773391611a6aee19ebe76e4b14c8",
+          "size": 1951,
+          "sha256": "a910cd17f9b15214298136496a8425450598d047069ee6f7b51bfa79a98e7c82",
+          "kind": "source"
+        },
+        {
+          "path": "modules/renderer/toolDataHtml.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2dd1b194d5e1b0e1d2ad12ee97725ffd96aafe53",
+          "size": 1942,
+          "sha256": "6aeb10afada38933b4d0e149c650dbcb8bbc2b56234b64282fead64b99f83a41",
+          "kind": "source"
+        },
+        {
           "path": "modules/renderer/toolPresentation.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cb0598c5deefb63c4120cf407f534fc569931a7d",
-          "size": 37017,
-          "sha256": "043040afbad87863d8d95c820410daeb134310498c15394683c2ab051306251a",
+          "blob": "ab210bea631a624f69f54e9a48a3c13f3e902985",
+          "size": 37453,
+          "sha256": "4efcbced51b613793a2643a059d0a9c5d244e5db0d6d336646e3be6b572e807a",
           "kind": "source"
         },
         {
@@ -10866,18 +10920,18 @@
           "path": "modules/renderer/toolRequestScanner.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "62a91a6e7172f42876fbce19d731befc17c4c922",
-          "size": 15887,
-          "sha256": "b66d22111be2022f57087719fdcdfa3ca415d0d8a722a1e4c4afbf456afb5879",
+          "blob": "75f7f707af0f032a39346b1d6ba57e898a44c206",
+          "size": 15912,
+          "sha256": "9d95142ba990022fb37c3f290028d907b155c276a10f22c7dc6aa9087f691aaf",
           "kind": "source"
         },
         {
           "path": "modules/renderer/toolResultRegions.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4ec21b392ff6e09f074b44060a4bbfb578a78f2",
-          "size": 9700,
-          "sha256": "8a31ed6b6fed9f9f94865e1350eb827cea7699a030b676298866a3c72269389b",
+          "blob": "07628c29022ca26f971f1df8d1a21ba490a46acc",
+          "size": 11772,
+          "sha256": "c0f9c6d2b82e8ed377f873e741069e92257555c62dded6a8550cba9d2e70e919",
           "kind": "source"
         },
         {
@@ -11578,9 +11632,9 @@
           "path": "modules/text-viewer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6bc39cdff6a5ecd53cdb9e4f5bb9a69dea05bdbf",
-          "size": 113859,
-          "sha256": "f938d0b4b8b55b772dbe8184255dc78e67f5d45369068a3a09aa03c3b8af203e",
+          "blob": "4b681b32aebb8cb1d352f45dda61a3bbf21b4ef7",
+          "size": 116413,
+          "sha256": "21e1cc5ea3c85d33d5cf6af6569719748fd5d86a6200eb0f9ab362d49a723661",
           "kind": "source"
         },
         {
@@ -11929,9 +11983,9 @@
           "path": "modules/ui-system/music-capsule.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "49631699c96ab4c2c86d217b161c07cb3d516b75",
-          "size": 5770,
-          "sha256": "c821105ccb5280c5c0ce56d5b3b07aa1e412aade5d34fb7412a080d070d79241",
+          "blob": "71414732d1b6070bc278683f620d10c884306d8a",
+          "size": 7641,
+          "sha256": "8f6e73b45d03319655eb0400706afa9afeb2884bb1c12875ece905407f7a4f9c",
           "kind": "source"
         },
         {
@@ -13000,9 +13054,9 @@
           "path": "modules/ui-system/vcp-ui.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7b18887977f818eeabab6b2a4c86eeab85f332bd",
-          "size": 116493,
-          "sha256": "a11e7cceb639ece726ff0eec2a92712332f065c97300b9ca531a9720105a7e68",
+          "blob": "621a4f005863d3efe0e39b71fc14eb2e0de59949",
+          "size": 117053,
+          "sha256": "222e117980b6ac79a7be1babfe5f192e6fb10057c39f32cb4b10797149cff742",
           "kind": "source"
         },
         {
@@ -13432,9 +13486,9 @@
           "path": "modules/utils/appSettingsManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7f5e44b4a65c835f844f3118b2ffbe941173b1da",
-          "size": 32613,
-          "sha256": "145c45ec1585553bd1ab7179ca89db3a596b0127639d2b7cf218885420b46202",
+          "blob": "21596fb05d60ccf2a29e0f5832a98a9983a766d8",
+          "size": 32659,
+          "sha256": "0d982fd98a007b4db11118387ad9f0bbc61e34f42b092dcfd29170643246abbb",
           "kind": "source"
         },
         {
@@ -13819,9 +13873,9 @@
           "path": "preloads/api/music.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "2071c8c5078d5087af9ea858dec26934a1b6c8d9",
-          "size": 5597,
-          "sha256": "62726d5b6e5918fb6e381da0976149ee21097fd4d8516446fa0c96da58c69c04",
+          "blob": "4352a8163d8400c63fe07a8bb4dcb77f02a5589f",
+          "size": 5684,
+          "sha256": "b1a2dcef7489ea69f40ddc384a0e668fb161ec5a3233771a14d4ba04d4614aa3",
           "kind": "source"
         },
         {
@@ -14768,9 +14822,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ab08b1a65530a8fdb5e0c13e85a2f3c392495b9d",
-          "size": 45666,
-          "sha256": "6de30068370a5657c1a586b197047263ae970041d3b4f2cb1a536681ac16e04b",
+          "blob": "18a83b57b96e0eb14d55dd3c852c0242cfe9b147",
+          "size": 45783,
+          "sha256": "977bad41465599fb4220d752a05b3eaa6554a9c7782ed2e8efec438e541a7b68",
           "kind": "source"
         },
         {
@@ -15209,9 +15263,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8c07f30fc37bfdd5c243958542ddf3edc43c0891",
+          "blob": "07dc6d17c274f2621909935ca97db7ac328da040",
           "size": 27398,
-          "sha256": "ae5460f79fb6502d58bdd437612d554eddc02648e9920b678117e61d73944dda",
+          "sha256": "eff508994b82a1e394759b7ee89bc87ca8c2b1184fbd6c11fbadae1c501f67e6",
           "kind": "source"
         },
         {
@@ -15254,9 +15308,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f957020416c7205c8ddc7d41cbe6a712ef20e09f",
-          "size": 16189,
-          "sha256": "41bc31ae34c632426d73f07a3435cbe81238b85353c871c823ee9c40e4d124d3",
+          "blob": "5735212b256a4ea3b260f8acd22aa0c78965bc5b",
+          "size": 16999,
+          "sha256": "22ba0ebe71db7ced0c17bbeb45c9621c0f387d24cec3b2a2bacc34354b545a4d",
           "kind": "source"
         },
         {
@@ -15857,9 +15911,9 @@
           "path": "styles/messageRenderer.css",
           "mode": "100755",
           "type": "blob",
-          "blob": "a8ab8a4b99b593fe971ff6ad24da3d01120d7901",
-          "size": 91688,
-          "sha256": "c5505786f7c36ec21ee2ecac74050ab8157e23e90f4451441ebbd32736347ab7",
+          "blob": "221bcb8d53377bc3910383fd358464da75a33143",
+          "size": 91826,
+          "sha256": "3de2b3f0b7ed0b5be48c92588bef73e7d286ef73e9e9121c8c5a54c6e3c304e4",
           "kind": "source"
         },
         {
@@ -16289,9 +16343,9 @@
           "path": "styles/ui-system/music-capsule.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "151e358fe2bc0e6a0167ee0a523002c4dbf5fc89",
-          "size": 2804,
-          "sha256": "2ecbde976b4cf179b72f802727a1ddfd71827c17e7971533bc9b82a508d8f474",
+          "blob": "c7e30fe2d5fe1234abf7534ae9047971c9ba3520",
+          "size": 3292,
+          "sha256": "fdd28d1ec138699e7ee796d72efe7451ba7dc9320b54a89894ffe4b39aad50a0",
           "kind": "source"
         },
         {
@@ -16820,9 +16874,9 @@
           "path": "tests/deskpet-assets.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e71e2aeac139e7635a5b8de7701b50954aec1c9d",
-          "size": 5779,
-          "sha256": "681e4df01e28b19bc3206c65cd6ebc180dea5ba877727b23fa8c1dd3b4b637e8",
+          "blob": "88c7749d9b8f9564f1a119bae7cedd7208b8340f",
+          "size": 7459,
+          "sha256": "d9dc7c6d3efafd02a3996be10016f1484223f5b574111900e46fcee27c265632",
           "kind": "source"
         },
         {
@@ -17225,9 +17279,9 @@
           "path": "tests/game-launcher.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a392256dfe59b3bbe7a0e7554a415ca16626c867",
-          "size": 9377,
-          "sha256": "60bccfdba5f031fa43db4417e6b722ce56665143ddb75af953f289232d7609d3",
+          "blob": "5f457e345413752dbf426219459250980e0b99cf",
+          "size": 10006,
+          "sha256": "5821a081ecbc9ac53e1b9ad36c110a1a1948a88d43139b0b1d569fa4986c0aaf",
           "kind": "source"
         },
         {
@@ -17450,9 +17504,9 @@
           "path": "tests/native-presentation-lifecycle.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "544b9aa58043370b6c36a22cd8fe3ef5ca7f1470",
-          "size": 9100,
-          "sha256": "dda4d1624a98fd72fdc4bdf4b069dc27c573906acbc4177ea611bedd102ecd17",
+          "blob": "1ef219d9811230b219d453b88f1659abd3c50fb0",
+          "size": 9103,
+          "sha256": "eaac5c20a43b2972199566c655d831af5ea27be8fe953527f338d58468a6f394",
           "kind": "source"
         },
         {
@@ -17864,9 +17918,9 @@
           "path": "tests/tool-result-regions.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c063018cb559747e6cd18edfa0a1d764e7e938ea",
-          "size": 9404,
-          "sha256": "0a3b7d1b0e21a95b1493d72400b7547fc1b52c619463f13a329d4dadecbf94b0",
+          "blob": "4bc73d03940507573ab2193ba7b944bacce772ef",
+          "size": 9548,
+          "sha256": "eea2ba10f27701bd64570238e4f37b1684fd77d8cb0979bfac269b59e8ef0797",
           "kind": "source"
         },
         {
@@ -20231,12 +20285,12 @@
       ],
       "source_context": {
         "source": {
-          "commit": "ff064b8222789589c799751b24ba6bb4cec8e0f1",
-          "tree": "de7f5e602540c325ea295ed5f073bb6ce6943bdd"
+          "commit": "ff4c05b12f5675bf713766d05d7340f2a1dc47f9",
+          "tree": "e7f1731b9bbd9077caed8be1a5f4392bbabee277"
         },
         "upstream": {
-          "commit": "74d4a4919e953f8b85c9cec642500ea5ac99eed9",
-          "tree": "4b37d3f0ce3f903c47aa6c64895d840515b18211"
+          "commit": "942ad422b678fb87f46a70eb3de4e64bb9e5bdf4",
+          "tree": "6db6c35ac02509357768e7a2cec34ffcff66d72a"
         }
       }
     },
@@ -21561,9 +21615,9 @@
           "path": "Gamemodules/doudizhu/ui.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d67f58088e545856a679a7324ae5a7f9ea6c48bd",
-          "size": 10175,
-          "sha256": "c57ee3043c0033ab002964a51b8e9852be55f360831f18e587baaca9a6d2c116",
+          "blob": "635311380dd4070eec700ff07cb1592924c01fbb",
+          "size": 10358,
+          "sha256": "dcaa2059a520a3c268e3124313afac7fcde242d3e51eead04b38ecf72654cba9",
           "kind": "source"
         },
         {
@@ -21660,9 +21714,9 @@
           "path": "Gamemodules/game.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "26d59962b19191d11b519fa35481b0a6ccb3b39f",
-          "size": 4291,
-          "sha256": "6f18767b82fcf292d18f9f0b5e9a2d70709d4028e308c971066bde9ddaab8c6b",
+          "blob": "970327fba005bded1f15f84d8befbf0737340d75",
+          "size": 4764,
+          "sha256": "4f9652b70ee90f8c341d37a1f5968e0ac0ba94bb80d5f6acdac1de2a2ab00d41",
           "kind": "source"
         },
         {
@@ -23235,9 +23289,9 @@
           "path": "VCPDistributedServer/Plugin/DeepMemo/DeepMemoService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "562039c47c81dc3c95210b782c1afef511a4fb5b",
-          "size": 22653,
-          "sha256": "b5ba9bc3fa60c0a2a2d14a728d2c35e0f82bb9c55f9c7719006f71d09bd454d7",
+          "blob": "b78773298ad3eb1c778ad8e390713424b7764f0b",
+          "size": 20103,
+          "sha256": "6459cb290c2348349eee1eb0fade48777961e62993ccba1cf18b455055609319",
           "kind": "source"
         },
         {
@@ -23758,9 +23812,9 @@
           "path": "VCPDistributedServer/Plugin/TopicMemo/TopicMemo.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7a5e9eae99d7474824f81212e40d23348c143ffe",
-          "size": 8504,
-          "sha256": "c1f66874dd0c4f310de7838e2b4ae5f5ec38282f2d060e0e16e9eb04cdd7112f",
+          "blob": "9beb247b8efc9ce66f025974e5950b2cef0e1660",
+          "size": 8886,
+          "sha256": "6966e2cce89910d126a188989d073dacaa8aaf944e737f911a81fc9d935fe1a7",
           "kind": "source"
         },
         {
@@ -24229,6 +24283,15 @@
           "blob": "20ae5966568944e18a40e89614e93a34042b09c8",
           "size": 7412,
           "sha256": "a74b77edf6c947d47916b6c4a85a486c0570fc512aabaca905238a9bd91c405a",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/shared/memoryProtocolProjection.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e2b6af919d4799a6239142386c22e880dd4335b",
+          "size": 5690,
+          "sha256": "5c96c36108a0db792432eb39d1bb45ad6c364e378152a895928913490a36b214",
           "kind": "source"
         },
         {
@@ -25675,9 +25738,9 @@
           "path": "docs/chat-kernel-consumer-report.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "119be976aa9ed0759a3a6a15a0d7a813f381edd5",
-          "size": 709449,
-          "sha256": "829d28f57a714d767863c7d4061af83198831f3231e0acd9800b3be417437bdb",
+          "blob": "2e6364c4a020cc5d449179b37d5a5819369e4398",
+          "size": 725075,
+          "sha256": "c5add41806f85856e3391c464ab3553ede4263b4d0e37ad07180483f068d0259",
           "kind": "source"
         },
         {
@@ -25729,18 +25792,18 @@
           "path": "docs/contracts/chat-contracts.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "fdfb95ade3d8defcf92361723ab943c53280f63d",
+          "blob": "e6e7adcd3b9eef5810fba281094c24906f87772c",
           "size": 65293,
-          "sha256": "c01e6afd34e0d271fffb30fbeea2df673d1bc57985602eb4f12f7f81d1b5dd39",
+          "sha256": "dbcc3689a281b1dfed614e5689d70bb93c715529f001ccf53221e7deda834ecf",
           "kind": "source"
         },
         {
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "fd673dc2c2c07010cbede229a2c6aff5524e6869",
-          "size": 1077858,
-          "sha256": "2600400082eb0b347ced29a28f698ab5c1fefeb19636fcb72ebecba9505d3d78",
+          "blob": "edfc7405b9db3da25494017e06099b395e4720cf",
+          "size": 1079454,
+          "sha256": "f56015f6dafe415ab88965dab44daf41a97dcdabff7828797c2f14e8195f9a5a",
           "kind": "source"
         },
         {
@@ -26098,9 +26161,9 @@
           "path": "main.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b638eca617cee3add6dc2870496bfc50c4bdca58",
-          "size": 114695,
-          "sha256": "4b30d668507f768444e9bdcdb49244d13950fd4e2cb5fe5e1942b9d91537b8f9",
+          "blob": "a10eb7ab75ed7c986a51c003a9d91f25fb0a1fdc",
+          "size": 114732,
+          "sha256": "56bc5bc98d2a279eedb7f1cbbd917456bee0366150a3c331bb741cab228d46e9",
           "kind": "source"
         },
         {
@@ -26575,18 +26638,18 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "cd5dafd8b46509a37d17631f4ddb0f5fe6d63f4e",
-          "size": 139610,
-          "sha256": "548c6823eb5e6c87fa7e898370e72ed4913d44029465adc73f11aab804ffb510",
+          "blob": "775dd45d6fb8da180b382511af0d5aa36b1af231",
+          "size": 139741,
+          "sha256": "4075effda12ac20374f39530b1fb65478ddf241399274c518c7421b37262f8c2",
           "kind": "source"
         },
         {
           "path": "modules/contextSanitizer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "62128e1f5a5c4721163bf9f840c4f5ede7d90087",
-          "size": 18585,
-          "sha256": "ddbef2472d52fb641b25d64690bde04bfc074294a8457561b5b1ed6eeacd057f",
+          "blob": "40c08b4f726830ddd46fe387846d201576476b31",
+          "size": 18647,
+          "sha256": "b33dc18335cecbbb3f4ff271d6142505b1e2021860c694e6b91fdc9b6d5abc7d",
           "kind": "source"
         },
         {
@@ -26701,9 +26764,9 @@
           "path": "modules/deskpet/petAssets.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8c410d40e97dbb28d5efc1b5dc47e6fb9944216e",
-          "size": 13123,
-          "sha256": "bc614de020c328785f5a74954d8a2117fd51740c832c185cacdc2d8678a74a41",
+          "blob": "9710e424e1a15228cb323567329f1f3d1d43be56",
+          "size": 13146,
+          "sha256": "ebf09ccb34d3fa9275741f3be3746e7079e5c20481f6e4f45efe72e7750341b4",
           "kind": "source"
         },
         {
@@ -26791,9 +26854,9 @@
           "path": "modules/deskpet/petMotion.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d99d16f4982e6088d917ecd2e4885189991132dc",
-          "size": 10873,
-          "sha256": "04a329a2292236dbf4770237c085df2a30f5de9db2e8c417368ae74a035f2db2",
+          "blob": "889a8a033c365665d9799ea71ce0d8fc43ef15de",
+          "size": 11418,
+          "sha256": "2b4d5f65a4625d14d76e110d3ccd243b49da5909b1fbd0fd0a757c47cc319de1",
           "kind": "source"
         },
         {
@@ -27166,6 +27229,33 @@
           "kind": "source"
         },
         {
+          "path": "modules/game/vtrade/client.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4761323cf7203425ea8d981987de2e28a4df0f8c",
+          "size": 3575,
+          "sha256": "997fc0d1aced816df249a7e1b50e8d7cf1589cef9b58f4b305dfd492ccc8d12e",
+          "kind": "source"
+        },
+        {
+          "path": "modules/game/vtrade/orchestrator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5f80a70f39c8bf0ef2b3ed41b7bb02caa358f96b",
+          "size": 9436,
+          "sha256": "cfb345df0b045deb00f316018dc60abbf3eab7cfbe1ca4fcfd70aaba9951919d",
+          "kind": "source"
+        },
+        {
+          "path": "modules/game/vtrade/window.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85b70b6196eb20ae3dab2c4c97245f93291889b1",
+          "size": 2235,
+          "sha256": "6b0dcf25227930b7ca7b55083767ab4a720b9f2bc61ba869695b1ff1b778004c",
+          "kind": "source"
+        },
+        {
           "path": "modules/global-settings-manager.js",
           "mode": "100644",
           "type": "blob",
@@ -27277,9 +27367,9 @@
           "path": "modules/ipc/chatHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "592d333b9970c8e39fd0d730af13ad341f0d6171",
-          "size": 92673,
-          "sha256": "f90662d7f057d07346650b82a377d51e0b7ec1218dced8dcd407c6c2375e1e81",
+          "blob": "72b59ae92bc51f3e83ecd636e65909d66a7225fd",
+          "size": 92743,
+          "sha256": "f343dec8fe3fe2a47c7c07c69e8dccfd73bf28cae1a3ec3f06b01921cd973be2",
           "kind": "source"
         },
         {
@@ -27376,9 +27466,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "290d9810934e88da21d0491682203a763860ab1d",
-          "size": 8922,
-          "sha256": "89e47fcd728f2ed68c8df7e041a555355eef74e8a103e40b2832e1550486db1c",
+          "blob": "189189a450e47ae9b9ec55e6bba0f8a06713bc62",
+          "size": 10196,
+          "sha256": "b95b4a7ea072b2ac406582bacc9e812f148cf8d40127de51e8b29307b399ee48",
           "kind": "source"
         },
         {
@@ -27457,9 +27547,9 @@
           "path": "modules/ipc/musicHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3a50caacfd8e38cf899878bb0f6dd3412c1129be",
-          "size": 47896,
-          "sha256": "7d95e388c47cccab6b31665e1794e942ff048e9a467d8cbb769d7a5b30cbaa19",
+          "blob": "ead9f4d0b833233d08e85bbf19ff978a5af7eb16",
+          "size": 49356,
+          "sha256": "d30e51b044bfe9db954b3e7c08d800bc387f812a9cd65fabbf82624de5dc2cf7",
           "kind": "source"
         },
         {
@@ -27682,9 +27772,9 @@
           "path": "modules/loom/VCPLoomManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d16b336bf4e2979e50f1608161bd70209bd276e8",
-          "size": 103053,
-          "sha256": "dd62215b3160ead364b5b68ad5138844148578548a4bc1cc31d2aab71643b268",
+          "blob": "3d787be6b38c8b75bbebd9e5b76c37d80e62b487",
+          "size": 104476,
+          "sha256": "452af999e14df76581629171480759bd7c8087c4c1b6398d666f5c953487c2c4",
           "kind": "source"
         },
         {
@@ -27871,9 +27961,9 @@
           "path": "modules/messageRenderer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9df58a37a28e5e176c3ca4b0ec86c73a99789166",
-          "size": 234129,
-          "sha256": "f368df29153ba02172bc2b6ad7e05d1eed48a06b62481fdfc798bcb3c958092a",
+          "blob": "c3b997f26eea66daf8dd9979bd36984f66d2abf0",
+          "size": 234972,
+          "sha256": "3eea5532a5d9acba3b51324ef428d79486a9f5c9f5d85b0202f2e78c76391003",
           "kind": "source"
         },
         {
@@ -27934,9 +28024,9 @@
           "path": "modules/renderer/animation.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "25df54c7b0f25f0318740bb7570f587f8937e71e",
-          "size": 30184,
-          "sha256": "821913f08c42d012ec02d532795fe6ee9e71748ba78e016dbba6989e62e5cef8",
+          "blob": "df9a0657305b95c20620b0aef1c8e00f512769e4",
+          "size": 30289,
+          "sha256": "77f398d2146929a55c005f886022771a47312d0ec1ffd1af4b778878c1ad31cf",
           "kind": "source"
         },
         {
@@ -27952,9 +28042,9 @@
           "path": "modules/renderer/chartEmbedHost.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ec5de4fa268e529271b6ebb12dcad07cc730813c",
-          "size": 15525,
-          "sha256": "0dada04a39979a1308e61b77df8de9321f8c21e2fa241f27204b393ea1c3861d",
+          "blob": "829a41d4aa6b44ce8f9a5c302c77fd3dc7eb88fd",
+          "size": 15583,
+          "sha256": "92c431138758dea69c7cf4dda4705f4777dd55d014b46a1f49e19a3818ddf18c",
           "kind": "source"
         },
         {
@@ -27997,9 +28087,9 @@
           "path": "modules/renderer/contentPipeline.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a7b095c0b8c35aa50ad6bfc83954b915a822e804",
-          "size": 24685,
-          "sha256": "86f652837affd9c5dd90b8d01481c6781f66f7f03ca635985823b30dcad686c3",
+          "blob": "4498f5c31812798c058d63eeb9e3ee371e7c936b",
+          "size": 25930,
+          "sha256": "40136ff36ce2ae13427f8f951602b81b08dfa8431ace50f03b1bef0041449532",
           "kind": "source"
         },
         {
@@ -28015,9 +28105,9 @@
           "path": "modules/renderer/desktopPushConsumer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a38a4fbb5ea2f83bb25a2dc848cba146dfbef798",
-          "size": 12223,
-          "sha256": "3052da5ec2989577f6d17891641ca12bac2dd4662aab90b5452b66ed6774b79d",
+          "blob": "b15a8d857fdc32840f9fed59bd499eec1d7b88e5",
+          "size": 12847,
+          "sha256": "d512de1a109b66f65136f6559bc507d720f057d80091f3a2eea425a74df4742c",
           "kind": "source"
         },
         {
@@ -28546,9 +28636,9 @@
           "path": "modules/renderer/streamManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "493367129381ea26cc6a1da21d2a03f772b671b0",
-          "size": 100700,
-          "sha256": "bcb8c1c0290cfbf14f76283448d17af9fbed2cf8eaeacae05210e8a34d5a61aa",
+          "blob": "0c7e88e5a903130eb180d1d3e015068d80b7def1",
+          "size": 101009,
+          "sha256": "6213f965114e0ab52ff1dbb4d156ad955bf73d975dc859acde38da297e7f2ce2",
           "kind": "source"
         },
         {
@@ -28564,9 +28654,9 @@
           "path": "modules/renderer/streamSpeech.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9a6d97c3c04be29828580ab1e3071f238bb150c8",
-          "size": 4686,
-          "sha256": "7bb3d28def08961be298ca0da0b0d65eb5c690c41e103cc4fb591482ebe115a0",
+          "blob": "28759bcf7f19117535153821a6062646c5053a7f",
+          "size": 4855,
+          "sha256": "17f803e467a9aac369cd8ca28b4d47f3f248649c895cb3a21a857f2a837009a8",
           "kind": "source"
         },
         {
@@ -28582,9 +28672,9 @@
           "path": "modules/renderer/streamStableBoundary.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f831397b176e2666b6cd20c5e947fdac10dc426a",
-          "size": 26415,
-          "sha256": "53e14cfebd05324078bd480055b0531a9e6e692de9d01cb88ebc92420fc9d376",
+          "blob": "efb3875063ac20e864ff698ec77b8670f6fb82f8",
+          "size": 26738,
+          "sha256": "6371e6eacf35fe50f8d2943b1f3596e89ec6c56f266ff5b7054b445d46e2a1b1",
           "kind": "source"
         },
         {
@@ -28597,12 +28687,30 @@
           "kind": "source"
         },
         {
+          "path": "modules/renderer/toolBatchRegions.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "29bc6b4812a8773391611a6aee19ebe76e4b14c8",
+          "size": 1951,
+          "sha256": "a910cd17f9b15214298136496a8425450598d047069ee6f7b51bfa79a98e7c82",
+          "kind": "source"
+        },
+        {
+          "path": "modules/renderer/toolDataHtml.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2dd1b194d5e1b0e1d2ad12ee97725ffd96aafe53",
+          "size": 1942,
+          "sha256": "6aeb10afada38933b4d0e149c650dbcb8bbc2b56234b64282fead64b99f83a41",
+          "kind": "source"
+        },
+        {
           "path": "modules/renderer/toolPresentation.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cb0598c5deefb63c4120cf407f534fc569931a7d",
-          "size": 37017,
-          "sha256": "043040afbad87863d8d95c820410daeb134310498c15394683c2ab051306251a",
+          "blob": "ab210bea631a624f69f54e9a48a3c13f3e902985",
+          "size": 37453,
+          "sha256": "4efcbced51b613793a2643a059d0a9c5d244e5db0d6d336646e3be6b572e807a",
           "kind": "source"
         },
         {
@@ -28618,18 +28726,18 @@
           "path": "modules/renderer/toolRequestScanner.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "62a91a6e7172f42876fbce19d731befc17c4c922",
-          "size": 15887,
-          "sha256": "b66d22111be2022f57087719fdcdfa3ca415d0d8a722a1e4c4afbf456afb5879",
+          "blob": "75f7f707af0f032a39346b1d6ba57e898a44c206",
+          "size": 15912,
+          "sha256": "9d95142ba990022fb37c3f290028d907b155c276a10f22c7dc6aa9087f691aaf",
           "kind": "source"
         },
         {
           "path": "modules/renderer/toolResultRegions.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4ec21b392ff6e09f074b44060a4bbfb578a78f2",
-          "size": 9700,
-          "sha256": "8a31ed6b6fed9f9f94865e1350eb827cea7699a030b676298866a3c72269389b",
+          "blob": "07628c29022ca26f971f1df8d1a21ba490a46acc",
+          "size": 11772,
+          "sha256": "c0f9c6d2b82e8ed377f873e741069e92257555c62dded6a8550cba9d2e70e919",
           "kind": "source"
         },
         {
@@ -29302,9 +29410,9 @@
           "path": "modules/text-viewer.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6bc39cdff6a5ecd53cdb9e4f5bb9a69dea05bdbf",
-          "size": 113859,
-          "sha256": "f938d0b4b8b55b772dbe8184255dc78e67f5d45369068a3a09aa03c3b8af203e",
+          "blob": "4b681b32aebb8cb1d352f45dda61a3bbf21b4ef7",
+          "size": 116413,
+          "sha256": "21e1cc5ea3c85d33d5cf6af6569719748fd5d86a6200eb0f9ab362d49a723661",
           "kind": "source"
         },
         {
@@ -29653,9 +29761,9 @@
           "path": "modules/ui-system/music-capsule.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "49631699c96ab4c2c86d217b161c07cb3d516b75",
-          "size": 5770,
-          "sha256": "c821105ccb5280c5c0ce56d5b3b07aa1e412aade5d34fb7412a080d070d79241",
+          "blob": "71414732d1b6070bc278683f620d10c884306d8a",
+          "size": 7641,
+          "sha256": "8f6e73b45d03319655eb0400706afa9afeb2884bb1c12875ece905407f7a4f9c",
           "kind": "source"
         },
         {
@@ -30724,9 +30832,9 @@
           "path": "modules/ui-system/vcp-ui.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7b18887977f818eeabab6b2a4c86eeab85f332bd",
-          "size": 116493,
-          "sha256": "a11e7cceb639ece726ff0eec2a92712332f065c97300b9ca531a9720105a7e68",
+          "blob": "621a4f005863d3efe0e39b71fc14eb2e0de59949",
+          "size": 117053,
+          "sha256": "222e117980b6ac79a7be1babfe5f192e6fb10057c39f32cb4b10797149cff742",
           "kind": "source"
         },
         {
@@ -31156,9 +31264,9 @@
           "path": "modules/utils/appSettingsManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "7f5e44b4a65c835f844f3118b2ffbe941173b1da",
-          "size": 32613,
-          "sha256": "145c45ec1585553bd1ab7179ca89db3a596b0127639d2b7cf218885420b46202",
+          "blob": "21596fb05d60ccf2a29e0f5832a98a9983a766d8",
+          "size": 32659,
+          "sha256": "0d982fd98a007b4db11118387ad9f0bbc61e34f42b092dcfd29170643246abbb",
           "kind": "source"
         },
         {
@@ -31534,9 +31642,9 @@
           "path": "preloads/api/music.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "2071c8c5078d5087af9ea858dec26934a1b6c8d9",
-          "size": 5597,
-          "sha256": "62726d5b6e5918fb6e381da0976149ee21097fd4d8516446fa0c96da58c69c04",
+          "blob": "4352a8163d8400c63fe07a8bb4dcb77f02a5589f",
+          "size": 5684,
+          "sha256": "b1a2dcef7489ea69f40ddc384a0e668fb161ec5a3233771a14d4ba04d4614aa3",
           "kind": "source"
         },
         {
@@ -32182,9 +32290,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ab08b1a65530a8fdb5e0c13e85a2f3c392495b9d",
-          "size": 45666,
-          "sha256": "6de30068370a5657c1a586b197047263ae970041d3b4f2cb1a536681ac16e04b",
+          "blob": "18a83b57b96e0eb14d55dd3c852c0242cfe9b147",
+          "size": 45783,
+          "sha256": "977bad41465599fb4220d752a05b3eaa6554a9c7782ed2e8efec438e541a7b68",
           "kind": "source"
         },
         {
@@ -32623,9 +32731,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8c07f30fc37bfdd5c243958542ddf3edc43c0891",
+          "blob": "07dc6d17c274f2621909935ca97db7ac328da040",
           "size": 27398,
-          "sha256": "ae5460f79fb6502d58bdd437612d554eddc02648e9920b678117e61d73944dda",
+          "sha256": "eff508994b82a1e394759b7ee89bc87ca8c2b1184fbd6c11fbadae1c501f67e6",
           "kind": "source"
         },
         {
@@ -32668,9 +32776,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f957020416c7205c8ddc7d41cbe6a712ef20e09f",
-          "size": 16189,
-          "sha256": "41bc31ae34c632426d73f07a3435cbe81238b85353c871c823ee9c40e4d124d3",
+          "blob": "5735212b256a4ea3b260f8acd22aa0c78965bc5b",
+          "size": 16999,
+          "sha256": "22ba0ebe71db7ced0c17bbeb45c9621c0f387d24cec3b2a2bacc34354b545a4d",
           "kind": "source"
         },
         {
@@ -33280,9 +33388,9 @@
           "path": "styles/messageRenderer.css",
           "mode": "100755",
           "type": "blob",
-          "blob": "a8ab8a4b99b593fe971ff6ad24da3d01120d7901",
-          "size": 91688,
-          "sha256": "c5505786f7c36ec21ee2ecac74050ab8157e23e90f4451441ebbd32736347ab7",
+          "blob": "221bcb8d53377bc3910383fd358464da75a33143",
+          "size": 91826,
+          "sha256": "3de2b3f0b7ed0b5be48c92588bef73e7d286ef73e9e9121c8c5a54c6e3c304e4",
           "kind": "source"
         },
         {
@@ -33712,9 +33820,9 @@
           "path": "styles/ui-system/music-capsule.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "151e358fe2bc0e6a0167ee0a523002c4dbf5fc89",
-          "size": 2804,
-          "sha256": "2ecbde976b4cf179b72f802727a1ddfd71827c17e7971533bc9b82a508d8f474",
+          "blob": "c7e30fe2d5fe1234abf7534ae9047971c9ba3520",
+          "size": 3292,
+          "sha256": "fdd28d1ec138699e7ee796d72efe7451ba7dc9320b54a89894ffe4b39aad50a0",
           "kind": "source"
         },
         {
@@ -34531,9 +34639,9 @@
           "path": "tests/deskpet-assets.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e71e2aeac139e7635a5b8de7701b50954aec1c9d",
-          "size": 5779,
-          "sha256": "681e4df01e28b19bc3206c65cd6ebc180dea5ba877727b23fa8c1dd3b4b637e8",
+          "blob": "88c7749d9b8f9564f1a119bae7cedd7208b8340f",
+          "size": 7459,
+          "sha256": "d9dc7c6d3efafd02a3996be10016f1484223f5b574111900e46fcee27c265632",
           "kind": "source"
         },
         {
@@ -35008,9 +35116,9 @@
           "path": "tests/game-launcher.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a392256dfe59b3bbe7a0e7554a415ca16626c867",
-          "size": 9377,
-          "sha256": "60bccfdba5f031fa43db4417e6b722ce56665143ddb75af953f289232d7609d3",
+          "blob": "5f457e345413752dbf426219459250980e0b99cf",
+          "size": 10006,
+          "sha256": "5821a081ecbc9ac53e1b9ad36c110a1a1948a88d43139b0b1d569fa4986c0aaf",
           "kind": "source"
         },
         {
@@ -35422,9 +35530,9 @@
           "path": "tests/message-renderer-tool-cards.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "7b95c92128a156276d9fa0f3a593eccb45615968",
-          "size": 24281,
-          "sha256": "dbf2e3b1f0ec659aa6fd1b7b73398b3231995860c3848174b339225834acaa9e",
+          "blob": "92fa282265d3cf58a3bca17cd362ddc2e4a9f99f",
+          "size": 30458,
+          "sha256": "bb4ade4be7aa7a63557f551619aca3b79ec7a26e95826653f3b724412214fdfb",
           "kind": "source"
         },
         {
@@ -35539,9 +35647,9 @@
           "path": "tests/native-presentation-lifecycle.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "544b9aa58043370b6c36a22cd8fe3ef5ca7f1470",
-          "size": 9100,
-          "sha256": "dda4d1624a98fd72fdc4bdf4b069dc27c573906acbc4177ea611bedd102ecd17",
+          "blob": "1ef219d9811230b219d453b88f1659abd3c50fb0",
+          "size": 9103,
+          "sha256": "eaac5c20a43b2972199566c655d831af5ea27be8fe953527f338d58468a6f394",
           "kind": "source"
         },
         {
@@ -36133,9 +36241,9 @@
           "path": "tests/side-chat-save-failure.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2b3c46d908d3d2ebd2fc9d65cc6945e595da92c9",
-          "size": 3520,
-          "sha256": "daef3a5c6302d01200159ef1f5dc8559e18b1f4ded434ec1e4b2426e8ebcc0d6",
+          "blob": "0ebd62f15e47653aa87bfbe8044463385fa83973",
+          "size": 4889,
+          "sha256": "3fc1004200ec94b192076fe26eec14bf1d283441634c6d543a023b8eba26fe78",
           "kind": "source"
         },
         {
@@ -36952,9 +37060,9 @@
           "path": "tests/tool-result-regions.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "c063018cb559747e6cd18edfa0a1d764e7e938ea",
-          "size": 9404,
-          "sha256": "0a3b7d1b0e21a95b1493d72400b7547fc1b52c619463f13a329d4dadecbf94b0",
+          "blob": "4bc73d03940507573ab2193ba7b944bacce772ef",
+          "size": 9548,
+          "sha256": "eea2ba10f27701bd64570238e4f37b1684fd77d8cb0979bfac269b59e8ef0797",
           "kind": "source"
         },
         {
@@ -39244,12 +39352,12 @@
       ],
       "source_context": {
         "source": {
-          "commit": "ff064b8222789589c799751b24ba6bb4cec8e0f1",
-          "tree": "de7f5e602540c325ea295ed5f073bb6ce6943bdd"
+          "commit": "ff4c05b12f5675bf713766d05d7340f2a1dc47f9",
+          "tree": "e7f1731b9bbd9077caed8be1a5f4392bbabee277"
         },
         "upstream": {
-          "commit": "74d4a4919e953f8b85c9cec642500ea5ac99eed9",
-          "tree": "4b37d3f0ce3f903c47aa6c64895d840515b18211"
+          "commit": "942ad422b678fb87f46a70eb3de4e64bb9e5bdf4",
+          "tree": "6db6c35ac02509357768e7a2cec34ffcff66d72a"
         }
       }
     }

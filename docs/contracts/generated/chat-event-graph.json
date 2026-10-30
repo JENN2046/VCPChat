@@ -437,6 +437,7 @@
     "modules/services/suveiHumanAuthorizationService.js",
     "modules/services/themePreviewVariables.js",
     "modules/services/trustedConversation/nativePort.cjs",
+    "modules/services/trustedConversation/sessionStatus.cjs",
     "modules/services/trustedConversation/transport.cjs",
     "modules/services/trustedConversation/webSocket.cjs",
     "modules/services/windowAppIds.js",

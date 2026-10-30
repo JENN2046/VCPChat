@@ -14687,9 +14687,9 @@
           "path": "scripts/app-features.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "0f3e2fd450a9490ff224ce8d67d30b099eed421a",
-          "size": 2897,
-          "sha256": "da8bc70c25024aa3979f3ff959f0047c2f610c27936bab10398024229eb6151f",
+          "blob": "878cd35b34d6deaa162de491c9fb9a46207d8cb2",
+          "size": 3166,
+          "sha256": "5bab83e3f28afe110405262e26fee852fe18ca547d8296db04ce2223f4e1386d",
           "kind": "source"
         },
         {
@@ -14822,9 +14822,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "18a83b57b96e0eb14d55dd3c852c0242cfe9b147",
-          "size": 45783,
-          "sha256": "977bad41465599fb4220d752a05b3eaa6554a9c7782ed2e8efec438e541a7b68",
+          "blob": "6276b79bb4bdcc1e6a8b56d11437e9d47756cf9c",
+          "size": 46005,
+          "sha256": "2196813912220d29ec79ba6c3ec0522afe0cbf9a5f553191a2084af5069c8407",
           "kind": "source"
         },
         {
@@ -15248,6 +15248,15 @@
           "blob": "20c7615861b4624b2cbc493ab681293304fcc4ed",
           "size": 2311,
           "sha256": "74687d5778cf8bbd42682738130494a4f54c5792980673a23ec99738d07cbdce",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/feature-test-annotations.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "40a283eca394617448263989131c2017dfa7ec97",
+          "size": 1186,
+          "sha256": "256dbdadcc14901f9880ce4e5d9046c8b6bd14b4e6d6d82b4666931b55333c5c",
           "kind": "source"
         },
         {
@@ -16739,9 +16748,9 @@
           "path": "tests/app-features.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2ba007b7261a2eadf4f260ada60b7a516bcc43ed",
-          "size": 13734,
-          "sha256": "70ef48387531d49bd26359d1438a101e01e4f84dd57ca37b4091dfbf523515cf",
+          "blob": "2a95d0b16da79913fd22cd2a541eba2c81e234fc",
+          "size": 16186,
+          "sha256": "2b5a5a2d5b9f03b6dde23b887a1387bc94f81266840fd66ff07ca7290437ac9b",
           "kind": "source"
         },
         {
@@ -32155,9 +32164,9 @@
           "path": "scripts/app-features.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "0f3e2fd450a9490ff224ce8d67d30b099eed421a",
-          "size": 2897,
-          "sha256": "da8bc70c25024aa3979f3ff959f0047c2f610c27936bab10398024229eb6151f",
+          "blob": "878cd35b34d6deaa162de491c9fb9a46207d8cb2",
+          "size": 3166,
+          "sha256": "5bab83e3f28afe110405262e26fee852fe18ca547d8296db04ce2223f4e1386d",
           "kind": "source"
         },
         {
@@ -32290,9 +32299,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "18a83b57b96e0eb14d55dd3c852c0242cfe9b147",
-          "size": 45783,
-          "sha256": "977bad41465599fb4220d752a05b3eaa6554a9c7782ed2e8efec438e541a7b68",
+          "blob": "6276b79bb4bdcc1e6a8b56d11437e9d47756cf9c",
+          "size": 46005,
+          "sha256": "2196813912220d29ec79ba6c3ec0522afe0cbf9a5f553191a2084af5069c8407",
           "kind": "source"
         },
         {
@@ -32716,6 +32725,15 @@
           "blob": "20c7615861b4624b2cbc493ab681293304fcc4ed",
           "size": 2311,
           "sha256": "74687d5778cf8bbd42682738130494a4f54c5792980673a23ec99738d07cbdce",
+          "kind": "source"
+        },
+        {
+          "path": "scripts/feature-test-annotations.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "40a283eca394617448263989131c2017dfa7ec97",
+          "size": 1186,
+          "sha256": "256dbdadcc14901f9880ce4e5d9046c8b6bd14b4e6d6d82b4666931b55333c5c",
           "kind": "source"
         },
         {
@@ -34216,9 +34234,9 @@
           "path": "tests/app-features.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "2ba007b7261a2eadf4f260ada60b7a516bcc43ed",
-          "size": 13734,
-          "sha256": "70ef48387531d49bd26359d1438a101e01e4f84dd57ca37b4091dfbf523515cf",
+          "blob": "2a95d0b16da79913fd22cd2a541eba2c81e234fc",
+          "size": 16186,
+          "sha256": "2b5a5a2d5b9f03b6dde23b887a1387bc94f81266840fd66ff07ca7290437ac9b",
           "kind": "source"
         },
         {

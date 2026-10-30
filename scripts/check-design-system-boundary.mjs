@@ -72,6 +72,8 @@ const allowedSourceDifferences = new Set([
     // Scoped upstream integration regressions. No directory, sender or permission exemption.
     'tests/native-context-compaction-boundary.test.cjs',
     'tests/side-chat-save-failure.test.mjs', // Rejected reply-save retention/retry regression; no new UI authority.
+    'scripts/feature-test-annotations.cjs', // Fixed CI test metadata only; no runtime or diagnostic payload authority.
+    'scripts/app-features.cjs', // Dual CI reporters preserve test selection and failing exit status.
     'tests/app-features.test.mjs',
     'tests/deskpet-stream.test.mjs',
     'tests/deskpet-lifecycle.test.mjs', // Deterministic snap-test clock and unconditional fixture cleanup.

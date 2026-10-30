@@ -15,6 +15,28 @@ for (const [label, failure] of [['IPC 的 { error } 形状', { error: 'EACCES: p
     });
 }
 
+test('a rejected reply save retains the visible answer for retry and blocks close', async t => {
+    let saveFails = true;
+    const f = await fixture(t, { onSave: messages => {
+        if (saveFails && messages.some(m => m.role === 'assistant')) throw new Error('EIO: reply save failed');
+        return null;
+    } });
+    f.submit('q1');
+    await f.untilIdle();
+    assert.equal(f.badgeHidden(), false);
+    assert.deepEqual(f.handle.getUnsavedStatus(), { hasUnsavedChanges: true, error: 'EIO: reply save failed' });
+    assert.deepEqual(await f.handle.requestClose(), { closed: false, reason: 'UNSAVED_CHANGES' });
+    assert.equal(f.getHistory().some(m => m.role === 'assistant'), false, 'failed save does not claim durable history');
+    assert.ok(f.getConversation().historyRef.get().some(m => m.role === 'assistant' && m.content === 'answer'));
+    assert.ok([...f.doc.querySelectorAll('.message-item')].some(node => node.textContent === 'answer'));
+    saveFails = false;
+    assert.deepEqual(await f.handle.retryPersistence(), { ok: true });
+    assert.equal(f.badgeHidden(), true);
+    assert.equal(f.handle.getUnsavedStatus().hasUnsavedChanges, false);
+    assert.equal(f.getHistory().filter(m => m.role === 'assistant' && m.content === 'answer').length, 1);
+    assert.equal(f.requests.length, 1, 'saving again does not send another model request');
+});
+
 test('a non-streaming reply that saves fine still completes normally', async t => {
     const f = await fixture(t, { stream: false });
     f.submit('q1');

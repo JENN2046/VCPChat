@@ -60,7 +60,11 @@ function runTests(only) {
     }
     const files = [...new Set([...(only ? [] : HOST_TESTS), ...selected.flatMap((feature) => feature.tests)])];
     if (!files.length) return true;
-    return run(['--test', ...files]);
+    const reporters = process.env.GITHUB_ACTIONS === 'true'
+        ? ['--test-reporter=spec', '--test-reporter-destination=stdout',
+            '--test-reporter=./scripts/feature-test-annotations.cjs', '--test-reporter-destination=stdout']
+        : [];
+    return run(['--test', ...reporters, ...files]);
 }
 
 const [command, arg] = process.argv.slice(2);

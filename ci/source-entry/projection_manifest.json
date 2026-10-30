@@ -15740,9 +15740,9 @@
           "path": "scripts/vcpchat-dev-launcher.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f0cec815711bf322680dd9b2b73ac80b97dd9636",
-          "size": 12559,
-          "sha256": "d5ba3b91b8e50094e656b080aa17cd2443117a089b4b3551009ecca4d9b1f75d",
+          "blob": "6affd038d01562a0e5f67b94e1420817388377ba",
+          "size": 12802,
+          "sha256": "3490fd9d941d5cb65e0856f86375a40baa5099bb1b5cdf35491adb4b17334447",
           "kind": "source"
         },
         {
@@ -17540,9 +17540,9 @@
           "path": "tests/native-projection-recovery.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "618e4ab308dedd18e0fdb94f9bb3189b5a6d774b",
-          "size": 5555,
-          "sha256": "4ea26ae7f4bac065c7310c6c0e68aff3082fc149e6ec7d3f2bd159895d607252",
+          "blob": "38ae9fdecbc95ba038990c359bd0bd5d7af7c5b8",
+          "size": 5972,
+          "sha256": "a966ee45c387271d4f6bd06f6196093e5fbd1e141ea4f67496d3adf27fadc723",
           "kind": "source"
         },
         {
@@ -33235,9 +33235,9 @@
           "path": "scripts/vcpchat-dev-launcher.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f0cec815711bf322680dd9b2b73ac80b97dd9636",
-          "size": 12559,
-          "sha256": "d5ba3b91b8e50094e656b080aa17cd2443117a089b4b3551009ecca4d9b1f75d",
+          "blob": "6affd038d01562a0e5f67b94e1420817388377ba",
+          "size": 12802,
+          "sha256": "3490fd9d941d5cb65e0856f86375a40baa5099bb1b5cdf35491adb4b17334447",
           "kind": "source"
         },
         {
@@ -35710,9 +35710,9 @@
           "path": "tests/native-projection-recovery.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "618e4ab308dedd18e0fdb94f9bb3189b5a6d774b",
-          "size": 5555,
-          "sha256": "4ea26ae7f4bac065c7310c6c0e68aff3082fc149e6ec7d3f2bd159895d607252",
+          "blob": "38ae9fdecbc95ba038990c359bd0bd5d7af7c5b8",
+          "size": 5972,
+          "sha256": "a966ee45c387271d4f6bd06f6196093e5fbd1e141ea4f67496d3adf27fadc723",
           "kind": "source"
         },
         {

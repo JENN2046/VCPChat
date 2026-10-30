@@ -173,11 +173,15 @@ export async function runManagedLauncher({
     spawnProcess = spawn,
     now = new Date(),
 } = {}) {
+    const { captureFromEnvironment, withoutOwnerCredentials } = require('../modules/services/trustedConversation/credentialVault.cjs');
+    if (env === process.env) {
+        env = { ...env }; // Retain the one explicit Electron launch environment.
+        captureFromEnvironment(process.env); // Git/termination probes inherit no Owner credential.
+    }
     const options = parseArguments(argv);
     const root = path.resolve(projectRoot || options.projectRoot || path.dirname(path.dirname(fileURLToPath(import.meta.url))));
     const stateRoot = resolveStateRoot({ env });
     const operationId = createOperationId('launch');
-    const { withoutOwnerCredentials } = require('../modules/services/trustedConversation/credentialVault.cjs');
     const report = collectDoctorReport({ projectRoot: root, deep: options.deepDoctor, env: withoutOwnerCredentials(env) });
     if (!report.ok) {
         io.stderr.write(`VCPChat Doctor 阻止启动：\n${formatDoctorFailure(report)}\n`);

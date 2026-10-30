@@ -10,6 +10,8 @@ test('Owner authorization is captured before child inheritance; doctor probes re
  const env={EXISTING_OWNER:credential,JSO_OWNER_SESSION_AUTHORIZATION:credential,VCPCHAT_NATIVE_TOOL_BINDING_FILE:file,ORDINARY:'preserved'};
  const doctor=withoutOwnerCredentials(env);assert.equal(doctor.EXISTING_OWNER,undefined);assert.equal(doctor.JSO_OWNER_SESSION_AUTHORIZATION,undefined);assert.equal(doctor.ORDINARY,'preserved');assert.equal(env.EXISTING_OWNER,credential);
  captureFromEnvironment(env);assert.equal(env.EXISTING_OWNER,undefined);assert.equal(env.JSO_OWNER_SESSION_AUTHORIZATION,undefined);assert.equal(env.ORDINARY,'preserved');
+ const child=require('node:child_process').spawnSync(process.execPath,['-e','process.stdout.write(JSON.stringify({ownerPresent:!!process.env.EXISTING_OWNER,canonicalPresent:!!process.env.JSO_OWNER_SESSION_AUTHORIZATION,ordinary:process.env.ORDINARY}))'],{env,encoding:'utf8'});
+ assert.equal(child.status,0);assert.deepEqual(JSON.parse(child.stdout),{ownerPresent:false,canonicalPresent:false,ordinary:'preserved'});
  captureFromEnvironment(env);let calls=0;const transport=createNativeTransport({binding,env,nativeRequest:async request=>{assert.equal(request.authorization,credential);calls++;return {ok:true};}});
  assert.equal((await transport.request('status')).ok,true);assert.equal(calls,1);assert.equal(JSON.stringify(env).includes(credential),false);
  assert.throws(()=>createNativeTransport({binding,env:{...env},nativeRequest:async()=>({ok:true})}),/NATIVE_CREDENTIAL_REFERENCE_REQUIRED/);

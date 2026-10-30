@@ -11245,9 +11245,9 @@
           "path": "modules/services/trustedConversation/README.md",
           "mode": "100644",
           "type": "blob",
-          "blob": "af17986947595f0d3eef644db365b09d403c3a04",
-          "size": 3478,
-          "sha256": "9f2115d36d959d70217ae87c5684bc2dc50a0ae601d4118ff012d7b962e8f816",
+          "blob": "f6c48107d9a3c775eee343040c8a22a4dccb2ea7",
+          "size": 4273,
+          "sha256": "216c7d098c931c1c4b34524238cef5961f63e3f9566ad85d9e84d85a6ea2a6ce",
           "kind": "source"
         },
         {
@@ -11260,12 +11260,21 @@
           "kind": "source"
         },
         {
+          "path": "modules/services/trustedConversation/sessionStatus.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4ae7500f26e1f1882bd4802ee08476e2e74d6b79",
+          "size": 1859,
+          "sha256": "0d5336f385bfd38f9ffd5e1b9400afb54583261c2248a9a4a230236a9060351b",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "0d1f0e05b3fd1d9f2574643f30f2d619119d0b3c",
-          "size": 4596,
-          "sha256": "37d99d5e9c60ed44ba61cb810fbfc90a2d8797689022abce809ea8bb0f29393c",
+          "blob": "44781a0714e928752df764801e55e93b4d30bfa3",
+          "size": 4803,
+          "sha256": "328002b9904d2165fb66af89990f4efa3f3873d536d307f9cf004d13838b574a",
           "kind": "source"
         },
         {
@@ -17459,9 +17468,9 @@
           "path": "tests/native-projection-recovery.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "cd80ff17b460d4b71de489e7db22308ce54a5400",
-          "size": 1542,
-          "sha256": "306d3729e08de88c5742c9050f4520d6e0f2071fdb440a7b54db56428e9aa7fb",
+          "blob": "31029fce7ac6ca46adfef2f5ac5401d816a4eebb",
+          "size": 3744,
+          "sha256": "9eba1883a7c94623c5a5265b57731a80cc346f79add6f926f1b3c3f7fca5ef05",
           "kind": "source"
         },
         {
@@ -28984,12 +28993,21 @@
           "kind": "source"
         },
         {
+          "path": "modules/services/trustedConversation/sessionStatus.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4ae7500f26e1f1882bd4802ee08476e2e74d6b79",
+          "size": 1859,
+          "sha256": "0d5336f385bfd38f9ffd5e1b9400afb54583261c2248a9a4a230236a9060351b",
+          "kind": "source"
+        },
+        {
           "path": "modules/services/trustedConversation/transport.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "0d1f0e05b3fd1d9f2574643f30f2d619119d0b3c",
-          "size": 4596,
-          "sha256": "37d99d5e9c60ed44ba61cb810fbfc90a2d8797689022abce809ea8bb0f29393c",
+          "blob": "44781a0714e928752df764801e55e93b4d30bfa3",
+          "size": 4803,
+          "sha256": "328002b9904d2165fb66af89990f4efa3f3873d536d307f9cf004d13838b574a",
           "kind": "source"
         },
         {
@@ -35548,9 +35566,9 @@
           "path": "tests/native-projection-recovery.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "cd80ff17b460d4b71de489e7db22308ce54a5400",
-          "size": 1542,
-          "sha256": "306d3729e08de88c5742c9050f4520d6e0f2071fdb440a7b54db56428e9aa7fb",
+          "blob": "31029fce7ac6ca46adfef2f5ac5401d816a4eebb",
+          "size": 3744,
+          "sha256": "9eba1883a7c94623c5a5265b57731a80cc346f79add6f926f1b3c3f7fca5ef05",
           "kind": "source"
         },
         {

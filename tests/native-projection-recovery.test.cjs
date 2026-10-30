@@ -1,6 +1,20 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const {createNativeTransport}=require('../modules/services/trustedConversation/transport.cjs');
+test('native session diagnostics reflect verified status/recovery only and disclose no credentials or business payload',async t=>{
+ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{randomUUID}=require('node:crypto');
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'native-session-status-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ const file=path.join(root,'status.json'),operationId=randomUUID(),clientInstanceId=randomUUID(),secret='SYNTHETIC-OWNER-SECRET'.padEnd(40,'x');
+ let result={ok:true,sequence:1,privateBusinessData:'SYNTHETIC-PRIVATE',credential:secret},failure=null;
+ const transport=createNativeTransport({binding:{transport:'vcp-websocket',clientInstanceId,toolName:'Example',applicationAuthorizationEnv:'OWNER'},env:{OWNER:'Bearer '+secret,VCPCHAT_NATIVE_SESSION_STATUS_FILE:file,VCPCHAT_NATIVE_SESSION_OPERATION_ID:operationId},nativeRequest:async()=>{if(failure)throw failure;return result;}});
+ await transport.request('status');let record=JSON.parse(fs.readFileSync(file,'utf8'));
+ assert.equal(record.state,'OWNER_SESSION_VERIFIED');assert.equal(record.mainPid,process.pid);assert.equal(record.operationId,operationId);assert.equal(record.clientInstanceId,clientInstanceId);
+ const text=fs.readFileSync(file,'utf8');assert.equal(text.includes(secret),false);assert.equal(text.includes('SYNTHETIC-PRIVATE'),false);assert.equal(Object.keys(record).length,8);
+ result={ok:false,code:secret};await transport.request('recover');record=JSON.parse(fs.readFileSync(file,'utf8'));assert.equal(record.state,'UNAVAILABLE');assert.equal(record.request,'recover');assert.equal(fs.readFileSync(file,'utf8').includes(secret),false);
+ result={ok:true};await transport.request('prepare',{text:'unrelated'}).catch(()=>{});assert.equal(JSON.parse(fs.readFileSync(file,'utf8')).request,'recover');
+ failure=Error(secret);await assert.rejects(transport.request('status'),e=>e===failure);assert.equal(JSON.parse(fs.readFileSync(file,'utf8')).state,'UNAVAILABLE');
+ result={ok:true};failure=null;fs.writeFileSync(file,'{"unrelated":"preserve"}');await transport.request('status');assert.equal(fs.readFileSync(file,'utf8'),'{"unrelated":"preserve"}');
+});
 test('committed projection retries once after transient failure and never resends business; newest version wins',async()=>{
  let fail=true,data={_nativeProjectionVersion:[1,1]},writes=0,requests=0;
  const transport=createNativeTransport({binding:{toolboxUrl:'http://127.0.0.1',toolName:'Example',transportTokenEnv:'T',applicationAuthorizationEnv:'A'},env:{T:'synthetic',A:'Bearer '+'x'.repeat(40)},fetchImpl:async()=>{requests++;throw Error('no business request expected');},chartService:{readManifest:async()=>{if(fail)throw Error('temporary');return {dataRevision:1};},readData:async()=>data},controller:{processToolCall:async command=>{writes++;data=command.data;}}});

@@ -315,18 +315,18 @@
     },
     {
       "path": "Forummodules/forum.css",
-      "size": 31544,
-      "sha256": "4d547161d5596958dfff28d8eeb1d0633850711a6d20dc24644bd020c86d135b"
+      "size": 38939,
+      "sha256": "5cdf540562ed5d923bcf02fce92836719a8f133053100ebf38ff724dc19b40b9"
     },
     {
       "path": "Forummodules/forum.html",
-      "size": 11222,
-      "sha256": "c7bc9c779d433de918d386f96b7b3ccbcf6d84aaed98893735528514b02ff807"
+      "size": 11492,
+      "sha256": "ba2229a3d6f43dd1ad531ba078fd5a7cba3bf6f9be66fcfc3fba7af41156e9c4"
     },
     {
       "path": "Forummodules/forum.js",
-      "size": 71217,
-      "sha256": "a7dfb1b7978a42432665e999c95aacd7da8ced02cdad38ae5941b975db7a217c"
+      "size": 87099,
+      "sha256": "4723ef05cbfd19b6d8d80e5da7f1b060e0cf81c0ec7b6841344e734a7b503782"
     },
     {
       "path": "Gamemodules/doudizhu/index.html",
@@ -814,7 +814,7 @@
       "sha256": "51dab9067c10c2f2770d7e924aa8686d6438c705d0ad5689d390ae7906e6b605"
     }
   ],
-  "sourceBaseline": "d68be6afb8d4b0d73041f3b60d84203baf28e74f",
-  "upstreamTarget": "3cde846645bab109dfb3b635a43287e63e2ed294",
+  "sourceBaseline": "20268e79fe62718fcc14dd3ac2748abbec574515",
+  "upstreamTarget": "c20cc942826cd2b61fe179097602f6a85b648b2f",
   "status": "candidate-identities-not-installation-acceptance"
 }

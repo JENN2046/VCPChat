@@ -20,6 +20,7 @@ const CHANNELS = [
     'project-forge:get-node',
     'project-forge:revert-file',
     'project-forge:delete-project',
+    'project-forge:accept-project',
 ];
 
 // 工程变更推送的订阅主题：V工程窗口、主窗口的状态面板和侧栏有人在看时才订阅，推送只发给订阅了的窗口
@@ -85,7 +86,7 @@ function isProjectForgeSender(event) {
 function wrap(fn, projectForgeOnly = false) {
     return async (event, ...args) => {
         if (projectForgeOnly && !isProjectForgeSender(event)) {
-            return { success: false, error: '当前窗口无权删除 ProjectForge 项目。' };
+            return { success: false, error: '当前窗口无权修改 ProjectForge 项目。' };
         }
         try {
             return { success: true, data: await fn(...args) };
@@ -128,6 +129,7 @@ function initialize({ workspaceService = null, subscriptions = null, ipcMain: in
         });
     }));
     ipcMain.handle('project-forge:delete-project', wrap((projectId, signature) => forge().deleteProject(projectId, signature), true));
+    ipcMain.handle('project-forge:accept-project', wrap((projectId, signature) => forge().acceptProject(projectId, signature), true));
 }
 
 async function cleanupForQuit() {

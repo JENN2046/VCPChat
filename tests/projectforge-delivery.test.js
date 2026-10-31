@@ -265,19 +265,25 @@ test('all supported ProjectForge runtime targets are packaged and unpacked', () 
         count++;
     }
     assert.equal(count, 6);
+    for (const worker of ['evalWorker.cjs', 'evalWorker.py']) {
+        const relative = `VCPDistributedServer/Plugin/ProjectForge/${worker}`;
+        assert.ok(build.files.includes(relative), relative);
+        assert.ok(build.asarUnpack.includes(relative), relative);
+    }
     const packaged = relative => build.files.some(pattern => !pattern.startsWith('!') && minimatch(relative, pattern));
     for (const relative of ['config.env', 'bin/linux-x64/scratch', 'bin/linux-ia32/projectforge_indexer', 'bin/linux-x64/projectforge_indexer.tmp']) {
         assert.equal(packaged(`VCPDistributedServer/Plugin/ProjectForge/${relative}`), false, relative);
     }
 });
 
-test('delete-project rejects unrelated windows and frames before runtime/config access', async () => {
+test('delete and accept reject unrelated windows and frames before runtime/config access', async () => {
     const vm = require('node:vm');
     const { pathToFileURL } = require('node:url');
     const handlers = new Map();
-    const counts = { config: 0, runtime: 0, deleted: 0 };
+    const counts = { config: 0, runtime: 0, deleted: 0, accepted: 0 };
     const service = { events: new EventEmitter(), ensureRuntime() { counts.runtime++; }, gui: {
         deleteProject(id, signature) { counts.deleted++; return { id, signature }; },
+        acceptProject(id, signature) { counts.accepted++; return { id, signature }; },
     } };
     const handlerDirectory = path.resolve(__dirname, '../modules/ipc');
     const context = { module: { exports: {} }, __dirname: handlerDirectory, URL, process: { platform: process.platform }, console,
@@ -292,7 +298,7 @@ test('delete-project rejects unrelated windows and frames before runtime/config 
     };
     vm.runInNewContext(fs.readFileSync(path.join(handlerDirectory, 'projectForgeHandlers.js'), 'utf8'), context);
     context.module.exports.initialize();
-    const remove = handlers.get('project-forge:delete-project');
+    const mutations = ['project-forge:delete-project', 'project-forge:accept-project'].map(name => handlers.get(name));
     const trusted = pathToFileURL(path.resolve(__dirname, '../ProjectForgemodules/projectforge.html')).href;
     const other = pathToFileURL(path.resolve(__dirname, '../Notepadmodules/notepad.html')).href;
     const event = (windowUrl, frameUrl) => ({ sender: { getURL: () => windowUrl }, senderFrame: { url: frameUrl } });
@@ -300,14 +306,16 @@ test('delete-project rejects unrelated windows and frames before runtime/config 
         event('https://example.test/projectforge.html', trusted), event(`${trusted}.evil`, trusted),
         event('file:///other-app/ProjectForgemodules/projectforge.html', trusted), event('not a URL', trusted),
         event(trusted, ''), { sender: { getURL() { throw new Error('destroyed'); } } }]) {
-        assert.equal((await remove(value, 'synthetic-project', 'test')).success, false);
-        assert.deepEqual(counts, { config: 0, runtime: 0, deleted: 0 });
+        for (const mutate of mutations) assert.equal((await mutate(value, 'synthetic-project', 'test')).success, false);
+        assert.deepEqual(counts, { config: 0, runtime: 0, deleted: 0, accepted: 0 });
     }
     for (const value of [event(trusted, trusted), { sender: { getURL: () => trusted } }]) {
-        const result = await remove(value, 'synthetic-project', 'test');
-        assert.equal(result.success, true);
-        assert.equal(result.data.id, 'synthetic-project');
-        assert.equal(result.data.signature, 'test');
+        for (const mutate of mutations) {
+            const result = await mutate(value, 'synthetic-project', 'test');
+            assert.equal(result.success, true);
+            assert.equal(result.data.id, 'synthetic-project');
+            assert.equal(result.data.signature, 'test');
+        }
     }
-    assert.deepEqual(counts, { config: 2, runtime: 2, deleted: 2 });
+    assert.deepEqual(counts, { config: 4, runtime: 4, deleted: 2, accepted: 2 });
 });

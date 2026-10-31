@@ -628,19 +628,19 @@
     "dynamicSites": [
       {
         "file": "modules/messageRenderer.js",
-        "line": 699,
+        "line": 700,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 2743,
+        "line": 2792,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 3500,
+        "line": 3549,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }

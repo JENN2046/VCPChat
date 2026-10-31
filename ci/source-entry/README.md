@@ -201,3 +201,21 @@ a real Electron installation after the ignore-scripts dependency step. The stati
 ProjectForge declaration reader inventories feature-owned preloadApi.js files as
 literal AST data, under the existing file/byte/symlink limits. It never requires or
 evaluates workspace declarations. Native recipe identities refer to Git blob bytes.
+
+## October 30 author integration
+
+The reviewed fork comparison is `20268e79fe62718fcc14dd3ac2748abbec574515`
+(tree `ba994f5b26a6f030543c972eca49813f7043705d`); the frozen author target is
+`c20cc942826cd2b61fe179097602f6a85b648b2f`
+(tree `40d0ade18cc9dc9344dcde04ae7b879d2d1c6da4`). Required changed identities
+and ten new source inputs are refreshed, including the ProjectForge evaluation
+workers, per-conversation context, image optimization and isolated tool-batch
+rendering helpers. All six inline manifest pins are refreshed together. The
+controller, denied paths/blobs, native admissions, transport and product commands
+remain unchanged.
+
+The auxiliary-window contract retains its existing eleven windows and exact
+package paths. Only the forum HTML/CSS/JavaScript identities advance to the
+reviewed author bytes. Generated event registrations retain the same listener
+expressions after line shifts. This source integration does not install a daily
+client, migrate local plugins or establish live business-service acceptance.

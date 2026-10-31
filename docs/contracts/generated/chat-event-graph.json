@@ -929,6 +929,25 @@
       ]
     },
     {
+      "name": "Debugger.scriptParsed",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs",
+          "line": 70,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs",
+          "line": 70,
+          "kind": "event-listener",
+          "match": "session.on('Debugger.scriptParsed'"
+        }
+      ]
+    },
+    {
       "name": "SIGINT",
       "producers": [],
       "consumers": [

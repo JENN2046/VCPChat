@@ -132,9 +132,10 @@ test('Python: certify source bytes instead of a matching timestamp bytecode cach
     const python = process.platform === 'win32' ? 'python.exe' : 'python3';
     const probe = await runProcess(python, ['--version'], { timeoutMs: 3000 });
     if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Python unavailable');
-    for (const mode of ['TIMESTAMP', 'UNCHECKED_HASH']) for (const kind of ['module', 'package', 'filename']) {
+    for (const mode of ['TIMESTAMP', 'UNCHECKED_HASH']) for (const kind of ['module', 'package', 'filename', 'collision']) {
         const packaged = kind === 'package', prefix = `review_cached_${mode.toLowerCase()}`;
-        const name = packaged ? `${prefix}_package/entry.py` : kind === 'filename' ? `${prefix}-source.py` : `${prefix}_source.py`;
+        const name = packaged ? `${prefix}_package/entry.py` : kind === 'filename' ? `${prefix}-source.py`
+            : kind === 'collision' ? `${prefix}/math.py` : `${prefix}_source.py`;
         if (packaged) fixture(`${prefix}_package/__init__.py`, 'from .entry import value\nobserved = value()\n');
         const oldSource = 'def value():\n    return 1\n' + (packaged
             ? 'def observed_at_import():\n    from . import observed\n    return observed\n' : '');
@@ -168,6 +169,50 @@ test('Python: certify source bytes instead of a matching timestamp bytecode cach
     }
     const changed = fixture('review_source_mutation.py', 'from pathlib import Path\ndef run():\n    Path(__file__).write_text("# changed\\n")\n    return 1\n');
     assert.equal((await evaluate(changed, 'run')).status, 'source_changed');
+});
+
+test('Python: standalone names do not replace modules already used by the worker', async t => {
+    const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Python unavailable');
+    for (const name of ['math', 'json', 'asyncio', 'inspect', 'sys']) {
+        const file = fixture(`standalone/${name}.py`, `import ${name} as original\nimport sys\ndef add(a,b):\n    assert original is not sys.modules[__name__]\n    return a+b\n`);
+        const result = await evaluate(file, 'add', { args: [2, 5] });
+        assert.equal(result.status, 'returned', JSON.stringify(result));
+        assert.equal(result.value, 7);
+    }
+    // A conflicting real package cannot safely be renamed: its relative
+    // imports need the package identity, unlike a standalone source file.
+    const conflict = fixture('json/__init__.py', 'def run():\n    return 1\n');
+    assert.equal((await evaluate(conflict, 'run')).status, 'load_error');
+});
+
+test('Python: module loading and synchronous calls own their asyncio lifecycle', async t => {
+    const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Python unavailable');
+    const common = 'import asyncio\nasync def inner():\n    await asyncio.sleep(0)\n    return 7\n';
+    for (const [name, body] of [
+        ['sync_lifecycle', 'def run():\n    return asyncio.run(inner())\n'],
+        ['import_lifecycle', 'initial = asyncio.run(inner())\ndef run():\n    return initial\n'],
+        ['returned_coroutine', 'def run():\n    return inner()\n'],
+        ['returned_awaitable', 'class Value:\n    def __await__(self):\n        return inner().__await__()\ndef run():\n    return Value()\n'],
+        ['async_target', 'async def run():\n    return await inner()\n'],
+    ]) {
+        await t.test(name, async () => {
+            const file = fixture(`${name}.py`, common + body);
+            const result = await evaluate(file, 'run');
+            assert.equal(result.status, 'returned', JSON.stringify(result));
+            assert.equal(result.value, 7);
+        });
+    }
+    fixture('lifecycle_pkg/__init__.py', common + 'initial = asyncio.run(inner())\n');
+    const packaged = fixture('lifecycle_pkg/entry.py', 'from . import initial\ndef run():\n    return initial\n');
+    assert.equal((await evaluate(packaged, 'run')).value, 7);
+    const setup = fixture('async_setup.py', common + 'def add(a):\n    return a + asyncio.run(inner())\n');
+    const configured = await evaluate(setup, 'add', { setup: 'import asyncio\nawait asyncio.sleep(0)\nreturn [4]' });
+    assert.equal(configured.status, 'returned', JSON.stringify(configured));
+    assert.equal(configured.value, 11);
+    const failure = fixture('async_failure.py', 'async def run():\n    raise ValueError("expected async failure")\n');
+    assert.equal((await evaluate(failure, 'run')).status, 'execution_error');
 });
 
 test('worker spawn failure is explicit', async () => {

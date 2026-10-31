@@ -6,6 +6,7 @@ const path = require('node:path');
 const os = require('node:os');
 const forge = require('../VCPDistributedServer/Plugin/ProjectForge/ProjectForgeService');
 const { resolveDefaultBinaryPath } = require('../VCPDistributedServer/Plugin/ProjectForge/indexerClient');
+const { runProcess } = require('../VCPDistributedServer/Plugin/ProjectForge/evalProcess');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-eval-int-'));
 let enabled = true;
 let pid;
@@ -20,6 +21,25 @@ test.before(async () => {
         logger: { log() {}, warn() {}, error() {} },
     });
     pid = (await call({ command: 'CreateProject', name: 'eval', dir: 'project' })).details.project.id;
+});
+
+test('EvalSymbol full entry: Python standalone names and synchronous asyncio lifecycles', {
+    skip: !fs.existsSync(resolveDefaultBinaryPath()) && 'AST binary unavailable',
+}, async t => {
+    const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Python unavailable');
+    const common = 'import asyncio\nasync def inner():\n    await asyncio.sleep(0)\n    return 7\n';
+    for (const [name, source, symbol, args] of [
+        ['math.py', 'def add(a,b):\n    return a+b\n', 'add', [2, 5]],
+        ['sync_lifecycle.py', common + 'def run():\n    return asyncio.run(inner())\n', 'run', []],
+        ['import_lifecycle.py', common + 'initial=asyncio.run(inner())\ndef run():\n    return initial\n', 'run', []],
+        ['returned_coroutine.py', common + 'def run():\n    return inner()\n', 'run', []],
+    ]) {
+        fs.writeFileSync(path.join(tmp, 'project', name), source);
+        const result = await call({ command: 'EvalSymbol', projectId: pid, path: `${name}#${symbol}`, args });
+        assert.equal(result.details.status, 'returned', JSON.stringify(result));
+        assert.equal(result.details.value, 7);
+    }
 });
 test.after(async () => { await forge.cleanup(); fs.rmSync(tmp, { force: true, recursive: true }); });
 test('EvalSymbol full entry: JS/MJS/CJS and stopped workspace', {

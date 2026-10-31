@@ -66,18 +66,26 @@ def load_module(file, source):
             # accepted, without consulting timestamp- or hash-based .pyc files.
             return compile(source, str(file), "exec", dont_inherit=True)
 
-    if names and all(name.isidentifier() for name in names):
-        sys.path.insert(0, str(parent))
+    conventional_name = names and all(name.isidentifier() for name in names)
+    if conventional_name:
         module_name = ".".join(names)
         existing = sys.modules.get(module_name)
         if existing is not None:
             origin = getattr(existing, "__file__", None)
             if origin is None or Path(origin).resolve() != file:
-                raise ImportError("Import resolved to another file; configure the project package layout")
-            # Interpreter startup hooks may have loaded a stale target already.
-            # Re-import only this exact file; do not reuse its old module object.
-            del sys.modules[module_name]
+                if len(names) != 1 or file.name == "__init__.py":
+                    raise ImportError("Import resolved to another file; configure the project package layout")
+                # A standalone file can share a worker/stdlib module's name.
+                # Keep that module intact and give the selected file a private
+                # identity; packages still need their real import hierarchy.
+                conventional_name = False
+            else:
+                # Interpreter startup hooks may have loaded a stale target already.
+                # Re-import only this exact file; do not reuse its old module object.
+                del sys.modules[module_name]
 
+    if conventional_name:
+        sys.path.insert(0, str(parent))
         class CertifiedTargetFinder(importlib.abc.MetaPathFinder):
             def find_spec(self, fullname, package_path, target=None):
                 if fullname != module_name:
@@ -99,7 +107,9 @@ def load_module(file, source):
                 sys.meta_path.remove(finder)
     else:
         sys.path.insert(0, str(file.parent))
-        name = "_projectforge_eval_target"
+        name = "_projectforge_eval_" + hashlib.sha256(str(file).encode("utf-8")).hexdigest()
+        while name in sys.modules:
+            name += "_"
         spec = importlib.util.spec_from_file_location(name, file, loader=CertifiedSourceLoader(name, str(file)))
         if spec is None or spec.loader is None:
             raise ImportError("Cannot construct a Python module loader")
@@ -112,7 +122,17 @@ def load_module(file, source):
     return module
 
 
-async def execute(request):
+def complete_awaitable(value):
+    if not inspect.isawaitable(value):
+        return value
+
+    async def wait():
+        return await value
+
+    return asyncio.run(wait())
+
+
+def execute(request):
     global stage
     file = Path(request["file"]).resolve()
 
@@ -148,14 +168,12 @@ async def execute(request):
         ) + "\n"
         scope = {"module": module}
         exec(compile(source, "<EvalSymbol.setup>", "exec"), scope)
-        args = await scope["__pf_setup__"]()
+        args = complete_awaitable(scope["__pf_setup__"]())
         if type(args) is not list:
             raise TypeError("setup must return an argument list")
     stage = "call"
     inspect.signature(target).bind(*args, **kwargs)
-    value = target(*args, **kwargs)
-    if inspect.isawaitable(value):
-        value = await value
+    value = complete_awaitable(target(*args, **kwargs))
     stage = "encode"
     encoded = encode(value)
     stage = "source"
@@ -171,7 +189,7 @@ async def execute(request):
 request = None
 try:
     request = json.load(sys.stdin)
-    result = asyncio.run(execute(request))
+    result = execute(request)
 except BaseException as error:
     statuses = {
         "input": "invalid_arguments", "source": "source_changed",

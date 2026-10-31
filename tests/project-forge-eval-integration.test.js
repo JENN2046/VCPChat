@@ -36,6 +36,17 @@ test('EvalSymbol full entry: JS/MJS/CJS and stopped workspace', {
         assert.equal(result.details.checks.passed, 0);
         assert.match(result.details.sourceHash, /^[a-f0-9]{64}$/);
     }
+    for (const [name, text, symbol, args, value] of [
+        ['receiver.cjs', "'use strict'; exports.n=0; exports.run=function(){return ++this.n;};", 'run', [], 1],
+        ['module-receiver.cjs', "'use strict'; module.exports.n=0; module.exports.run=function(){return ++this.n;};", 'run', [], 1],
+        ['direct.cjs', 'function add(a,b){return a+b;} module.exports=add;', 'add', [2, 5], 7],
+        ['direct.mjs', 'export default function add(a,b){return a+b;}', 'add', [2, 5], 7],
+    ]) {
+        fs.writeFileSync(path.join(tmp, 'project', name), text);
+        const result = await call({ command: 'EvalSymbol', projectId: pid, path: `${name}#${symbol}`, args });
+        assert.equal(result.details.status, 'returned', JSON.stringify(result));
+        assert.equal(result.details.value, value);
+    }
     enabled = false;
     try {
         await assert.rejects(call({ command: 'EvalSymbol', projectId: pid, path: 'math.js#plus' }), /只读|停用/);

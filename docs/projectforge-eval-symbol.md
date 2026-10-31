@@ -51,7 +51,11 @@ setup 只准备输入，不替换目标模块词法绑定，不提供自动 mock
 
 Python 优先工程配置、工程根 .venv、PATH（Windows python.exe / 其他 python3）。选择后失败不回退，回执记录来源与实际解释器版本。
 JS 默认宿主可执行文件的 Node 模式，清空 NODE_OPTIONS；支持真实 CommonJS/ESM 导出及对象方法 this。
+CommonJS 方法保留实际 `module.exports` 接收者。具名的直接默认导出可按所选源码函数名解析；
+名称无法对应或运行时导出多义时拒绝调用，不把任意默认函数替换成所选符号。
 Python 支持常规包相对导入；不自动推测 namespace package、构建系统 import mapping 或任意 src-layout 安装。
+被校验的 Python 目标直接从已核对摘要的源码字节编译，不采用该文件的 `.pyc` 或预先导入的旧模块；既有磁盘缓存不会被删除。
+父包和其他依赖仍采用普通导入规则，不构成依赖指纹或依赖冻结。
 TS、宿主 Electron/DOM 现场、局部闭包与自动构造实例暂不支持。
 
 ## Rust v1

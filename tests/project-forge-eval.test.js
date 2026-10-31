@@ -89,6 +89,87 @@ test('JS: ESM module and bounded logs', async () => {
     assert.ok(result.logs.stdout.text.length <= 65536);
 });
 
+test('JS: synthetic named CommonJS exports retain the real export object receiver', async () => {
+    fixture('review-commonjs/package.json', '{"type":"commonjs"}');
+    for (const ext of ['cjs', 'js']) {
+        const file = fixture(`review-commonjs/receiver.${ext}`, "'use strict'; exports.n = 0; exports.run = function () { return ++this.n; };\n");
+        for (const symbol of ['run', 'exports.run', 'module.exports.run']) {
+            const result = await evaluate(file, symbol);
+            assert.equal(result.status, 'returned', JSON.stringify(result));
+            assert.equal(result.value, 1);
+        }
+    }
+});
+
+test('JS: a directly exported default callable resolves by its selected source name', async () => {
+    for (const [name, source] of [
+        ['review-default.mjs', 'export default function add(a,b) { return a+b; }'],
+        ['review-default.cjs', 'function add(a,b) { return a+b; } module.exports = add;'],
+        ['review-default-arrow.mjs', 'const add = (a,b) => a+b; export default add;'],
+    ]) {
+        const file = fixture(name, source);
+        for (const args of [{ args: [2, 5] }, { setup: 'return [3, 4];' }]) {
+            const result = await evaluate(file, 'add', args);
+            assert.equal(result.status, 'returned', JSON.stringify(result));
+            assert.equal(result.value, 7);
+        }
+    }
+});
+
+test('JS: default-callable fallback cannot substitute a different or ambiguous source symbol', async () => {
+    const file = fixture('review-default-other.mjs', 'function hidden(){ return 1; } export default function actual(){ return 2; }');
+    const rejected = await evaluate(file, 'hidden', { setup: 'throw new Error("setup must not run");' });
+    assert.equal(rejected.status, 'not_callable');
+    const ambiguous = fixture('review-default-ambiguous.mjs', 'export const run = () => 1; export default { run: () => 2 };');
+    assert.equal((await evaluate(ambiguous, 'run')).status, 'not_callable');
+    const qualified = fixture('review-esm-exports.mjs', 'export const exports={n:3,run(){return this.n;}}; export default {run(){return 99;}};');
+    assert.equal((await evaluate(qualified, 'exports.run')).value, 3);
+    const direct = fixture('review-cjs-default-member.cjs', 'function add(){return 99;} module.exports=add;');
+    assert.equal((await evaluate(direct, 'exports.add')).status, 'not_callable');
+});
+
+test('Python: certify source bytes instead of a matching timestamp bytecode cache', async t => {
+    const python = process.platform === 'win32' ? 'python.exe' : 'python3';
+    const probe = await runProcess(python, ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Python unavailable');
+    for (const mode of ['TIMESTAMP', 'UNCHECKED_HASH']) for (const kind of ['module', 'package', 'filename']) {
+        const packaged = kind === 'package', prefix = `review_cached_${mode.toLowerCase()}`;
+        const name = packaged ? `${prefix}_package/entry.py` : kind === 'filename' ? `${prefix}-source.py` : `${prefix}_source.py`;
+        if (packaged) fixture(`${prefix}_package/__init__.py`, 'from .entry import value\nobserved = value()\n');
+        const oldSource = 'def value():\n    return 1\n' + (packaged
+            ? 'def observed_at_import():\n    from . import observed\n    return observed\n' : '');
+        const file = fixture(name, oldSource);
+        const timestamp = new Date('2024-01-01T00:00:00Z');
+        fs.utimesSync(file, timestamp, timestamp);
+        const compile = await runProcess(python, ['-c', 'import py_compile,sys; print(py_compile.compile(sys.argv[1], doraise=True, invalidation_mode=getattr(py_compile.PycInvalidationMode,sys.argv[2])))', file, mode], { timeoutMs: 3000 });
+        assert.equal(compile.exitCode, 0, JSON.stringify(compile));
+        const cache = compile.stdout.text.trim(), bytecode = fs.readFileSync(cache);
+        const newSource = oldSource.replace('return 1', 'return 2');
+        assert.equal(Buffer.byteLength(oldSource), Buffer.byteLength(newSource));
+        fs.writeFileSync(file, newSource);fs.utimesSync(file, timestamp, timestamp);
+        const result = await evaluate(file, 'value');
+        assert.equal(result.status, 'returned', JSON.stringify(result));
+        assert.equal(result.value, 2);
+        if (kind === 'module') {
+            const hook = path.dirname(fixture(`preload-${mode}/sitecustomize.py`, `import ${prefix}_source\n`));
+            const inherited = process.env.PYTHONPATH;
+            try {
+                process.env.PYTHONPATH = [hook, tmp, inherited].filter(Boolean).join(path.delimiter);
+                const preloaded = await evaluate(file, 'value');
+                assert.equal(preloaded.status, 'returned', JSON.stringify(preloaded));
+                assert.equal(preloaded.value, 2);
+            } finally {
+                if (inherited === undefined) delete process.env.PYTHONPATH;
+                else process.env.PYTHONPATH = inherited;
+            }
+        }
+        if (packaged) assert.equal((await evaluate(file, 'observed_at_import')).value, 2);
+        assert.deepEqual(fs.readFileSync(cache), bytecode, 'an existing cache is neither trusted nor rewritten/deleted');
+    }
+    const changed = fixture('review_source_mutation.py', 'from pathlib import Path\ndef run():\n    Path(__file__).write_text("# changed\\n")\n    return 1\n');
+    assert.equal((await evaluate(changed, 'run')).status, 'source_changed');
+});
+
 test('worker spawn failure is explicit', async () => {
     const result = await runProcess(path.join(tmp, 'no-such-runtime'), [], { timeoutMs: 1000 });
     assert.equal(result.status, 'environment_error');

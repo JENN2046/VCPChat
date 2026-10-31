@@ -2,6 +2,8 @@
 import asyncio
 import hashlib
 import importlib
+import importlib.abc
+import importlib.machinery
 import importlib.util
 import inspect
 import json
@@ -50,7 +52,7 @@ def encode(value, seen=None, depth=0):
         seen.remove(id(value))
 
 
-def load_module(file):
+def load_module(file, source):
     # Preserve conventional package-relative imports; do not pretend to resolve
     # arbitrary namespace-package or build-system import mappings.
     parent = file.parent
@@ -58,12 +60,47 @@ def load_module(file):
     while (parent / "__init__.py").is_file():
         names.insert(0, parent.name)
         parent = parent.parent
+    class CertifiedSourceLoader(importlib.machinery.SourceFileLoader):
+        def get_code(self, fullname):
+            # -B only disables cache writes. Compile the bytes whose digest was
+            # accepted, without consulting timestamp- or hash-based .pyc files.
+            return compile(source, str(file), "exec", dont_inherit=True)
+
     if names and all(name.isidentifier() for name in names):
         sys.path.insert(0, str(parent))
-        module = importlib.import_module(".".join(names))
+        module_name = ".".join(names)
+        existing = sys.modules.get(module_name)
+        if existing is not None:
+            origin = getattr(existing, "__file__", None)
+            if origin is None or Path(origin).resolve() != file:
+                raise ImportError("Import resolved to another file; configure the project package layout")
+            # Interpreter startup hooks may have loaded a stale target already.
+            # Re-import only this exact file; do not reuse its old module object.
+            del sys.modules[module_name]
+
+        class CertifiedTargetFinder(importlib.abc.MetaPathFinder):
+            def find_spec(self, fullname, package_path, target=None):
+                if fullname != module_name:
+                    return None
+                spec = importlib.machinery.PathFinder.find_spec(fullname, package_path)
+                if spec is None or spec.origin is None or Path(spec.origin).resolve() != file:
+                    raise ImportError("Import resolved to another file; configure the project package layout")
+                spec.loader = CertifiedSourceLoader(fullname, str(file))
+                return spec
+
+        # Install before importing parents, which may themselves import the
+        # target from __init__.py. Their first view must see the certified code.
+        finder = CertifiedTargetFinder()
+        sys.meta_path.insert(0, finder)
+        try:
+            module = importlib.import_module(module_name)
+        finally:
+            if finder in sys.meta_path:
+                sys.meta_path.remove(finder)
     else:
         sys.path.insert(0, str(file.parent))
-        spec = importlib.util.spec_from_file_location("_projectforge_eval_target", file)
+        name = "_projectforge_eval_target"
+        spec = importlib.util.spec_from_file_location(name, file, loader=CertifiedSourceLoader(name, str(file)))
         if spec is None or spec.loader is None:
             raise ImportError("Cannot construct a Python module loader")
         module = importlib.util.module_from_spec(spec)
@@ -83,10 +120,11 @@ async def execute(request):
         return hashlib.sha256(file.read_bytes()).hexdigest()
 
     stage = "source"
-    if source_hash() != request["sourceHash"]:
+    source = file.read_bytes()
+    if hashlib.sha256(source).hexdigest() != request["sourceHash"]:
         raise RuntimeError("Target source changed before import; retry")
     stage = "load"
-    module = load_module(file)
+    module = load_module(file, source)
     stage = "resolve"
     target = module
     for name in request["symbol"].split("."):

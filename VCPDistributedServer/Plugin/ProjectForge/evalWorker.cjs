@@ -73,7 +73,17 @@ function send(payload) {
         if (hash() !== request.sourceHash) throw new Error('Target source changed before module load; retry');
         stage = 'load';
         const namespace = await import(pathToFileURL(request.file).href);
-        const parts = request.symbol.split('.');
+        stage = 'resolve';
+        let parts = request.symbol.split('.');
+        if (Object.hasOwn(namespace, 'default')) {
+            const cached = createRequire(request.file).cache[fs.realpathSync(request.file)];
+            const commonjs = request.file.endsWith('.cjs')
+                || cached && Object.getOwnPropertyDescriptor(cached, 'exports')?.value === namespace.default;
+            // The AST retains CommonJS wrapper names; the runtime namespace
+            // exposes their members directly. Do not strip real ESM objects.
+            if (commonjs && parts.length > 2 && parts[0] === 'module' && parts[1] === 'exports') parts = parts.slice(2);
+            else if (commonjs && parts.length > 1 && parts[0] === 'exports') parts = parts.slice(1);
+        }
         const candidates = [];
         const direct = locate(namespace, parts);
         if (direct) candidates.push(direct);
@@ -81,7 +91,20 @@ function send(payload) {
         if (Object.hasOwn(namespace, 'default')) {
             const fallback = locate(namespace.default, parts);
             if (fallback && !candidates.some(c => c.fn === fallback.fn && c.owner === fallback.owner)) {
-                if (!direct || direct.fn !== fallback.fn) candidates.push(fallback);
+                if (direct?.fn === fallback.fn) {
+                    // The same callable's export object owns the method, not
+                    // its immutable namespace wrapper (notably synthetic CJS).
+                    candidates[candidates.indexOf(direct)] = fallback;
+                } else candidates.push(fallback);
+            }
+            const value = namespace.default;
+            // A direct default value has no property named after its source
+            // declaration. Admit only a matching, unqualified function name;
+            // never substitute an arbitrary default for another source symbol.
+            if (typeof value === 'function' && parts.length === 1 && request.symbol === parts[0]
+                && Object.getOwnPropertyDescriptor(value, 'name')?.value === parts[0]
+                && !candidates.some(c => c.fn === value)) {
+                candidates.push({ owner: undefined, fn: value });
             }
         }
         if (candidates.length !== 1) {

@@ -48,10 +48,13 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
-    // c20cc942 integration: exact packaged-worker repair and its red/green
-    // JS/Python layout regressions. No directory or permission exemption.
+    // c20cc942 integration/review: exact worker delivery, certified-source and
+    // export-resolution repairs, with red/green regressions. No directory or permission exemption.
     'VCPDistributedServer/Plugin/ProjectForge/evalSymbol.js',
+    'VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs',
+    'VCPDistributedServer/Plugin/ProjectForge/evalWorker.py',
     'tests/project-forge-eval.test.js',
+    'tests/project-forge-eval-integration.test.js',
     'docs/projectforge-eval-symbol.md',
     // PR #72: serialize synchronization snapshots and preserve concurrent edits.
     'modules/services/chartService.js',

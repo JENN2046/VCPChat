@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f37ea85155eb13a84741d77d900c3faf4706186a",
-          "size": 31194,
-          "sha256": "57a36fe4f1b8d531d72dc55857eaa3a975ab64667eecc3ecd37b2ee91ec9fb59",
+          "blob": "a9a8ca96b20dc85c244ad12021cd6a74776fa261",
+          "size": 31227,
+          "sha256": "41b5cbfc9fe0d6a67f24ecb9451f0081ee9acffd4261287d7db9f7b21a24c16d",
           "kind": "source"
         },
         {
@@ -3985,18 +3985,18 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "db8e826446da8f1ad23ab4e5b2f78795ca96d4d3",
-          "size": 6239,
-          "sha256": "8d3372620a36549cb7e6d1d8f4dcc9be01adad86230d6634ff94473904ef7115"
+          "blob": "71f967b50ae5529350fff96f9cf099b0bf67ba50",
+          "size": 7812,
+          "sha256": "8ee956cee0c41787b1449af09116475e7ea6df12fa6f0f96311cc00d4930cdf0"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.py",
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "af182d3715ca44efb7fe7f1ffc99d9e0b8a5fed7",
-          "size": 6170,
-          "sha256": "b3cbc24d76be01bc870eca2c2c720c318afac68783bf44319a8d68d54a47627c"
+          "blob": "7d86637837461985f98d39fc1908bcdbdefe12dd",
+          "size": 8211,
+          "sha256": "324cb983879b8332fafbe5e31579777aeba17ddd45052653c435958f93c1a599"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -13765,9 +13765,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f37ea85155eb13a84741d77d900c3faf4706186a",
-          "size": 31194,
-          "sha256": "57a36fe4f1b8d531d72dc55857eaa3a975ab64667eecc3ecd37b2ee91ec9fb59",
+          "blob": "a9a8ca96b20dc85c244ad12021cd6a74776fa261",
+          "size": 31227,
+          "sha256": "41b5cbfc9fe0d6a67f24ecb9451f0081ee9acffd4261287d7db9f7b21a24c16d",
           "kind": "source"
         },
         {
@@ -14930,9 +14930,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "338d401fb5df316c1d0273cb512d9488bbf833f7",
-          "size": 46590,
-          "sha256": "9532b7efb43a8f1795b91a7273f8261b4c6381556c84cbaa1c8970a0cdcd2fd6",
+          "blob": "3dda0d10455f93c07d96c900acd7f1076d77289b",
+          "size": 46796,
+          "sha256": "79baa19575ebf75c7be1a0cdbe3400551574f5db9d30132fb593696444b4382a",
           "kind": "source"
         },
         {
@@ -17762,6 +17762,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/project-forge-eval.test.js",
+          "kind": "source",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7477e5f46c9256e4cc16c7db6d52ca4e3e6f4b79",
+          "size": 13309,
+          "sha256": "27ce1cd6bd0364f9f45ecb3c0fb39d55e673ff7e3b16c9919c3c7e2ab29681eb"
+        },
+        {
           "path": "tests/project-forge-trace.test.js",
           "mode": "100644",
           "type": "blob",
@@ -20397,6 +20406,12 @@
           "files": [
             "assets/wallpaper/relic_obsidian_dark.jpg",
             "assets/wallpaper/relic_ivory_light.jpg"
+          ]
+        },
+        {
+          "name": "reviewed-projectforge-eval-regression-input",
+          "files": [
+            "tests/project-forge-eval.test.js"
           ]
         }
       ],
@@ -23831,18 +23846,18 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "db8e826446da8f1ad23ab4e5b2f78795ca96d4d3",
-          "size": 6239,
-          "sha256": "8d3372620a36549cb7e6d1d8f4dcc9be01adad86230d6634ff94473904ef7115"
+          "blob": "71f967b50ae5529350fff96f9cf099b0bf67ba50",
+          "size": 7812,
+          "sha256": "8ee956cee0c41787b1449af09116475e7ea6df12fa6f0f96311cc00d4930cdf0"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.py",
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "af182d3715ca44efb7fe7f1ffc99d9e0b8a5fed7",
-          "size": 6170,
-          "sha256": "b3cbc24d76be01bc870eca2c2c720c318afac68783bf44319a8d68d54a47627c"
+          "blob": "7d86637837461985f98d39fc1908bcdbdefe12dd",
+          "size": 8211,
+          "sha256": "324cb983879b8332fafbe5e31579777aeba17ddd45052653c435958f93c1a599"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -31660,9 +31675,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "f37ea85155eb13a84741d77d900c3faf4706186a",
-          "size": 31194,
-          "sha256": "57a36fe4f1b8d531d72dc55857eaa3a975ab64667eecc3ecd37b2ee91ec9fb59",
+          "blob": "a9a8ca96b20dc85c244ad12021cd6a74776fa261",
+          "size": 31227,
+          "sha256": "41b5cbfc9fe0d6a67f24ecb9451f0081ee9acffd4261287d7db9f7b21a24c16d",
           "kind": "source"
         },
         {
@@ -32515,9 +32530,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "338d401fb5df316c1d0273cb512d9488bbf833f7",
-          "size": 46590,
-          "sha256": "9532b7efb43a8f1795b91a7273f8261b4c6381556c84cbaa1c8970a0cdcd2fd6",
+          "blob": "3dda0d10455f93c07d96c900acd7f1076d77289b",
+          "size": 46796,
+          "sha256": "79baa19575ebf75c7be1a0cdbe3400551574f5db9d30132fb593696444b4382a",
           "kind": "source"
         },
         {
@@ -36076,6 +36091,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/project-forge-eval.test.js",
+          "kind": "source",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7477e5f46c9256e4cc16c7db6d52ca4e3e6f4b79",
+          "size": 13309,
+          "sha256": "27ce1cd6bd0364f9f45ecb3c0fb39d55e673ff7e3b16c9919c3c7e2ab29681eb"
+        },
+        {
           "path": "tests/project-forge-trace.test.js",
           "mode": "100644",
           "type": "blob",
@@ -39159,6 +39183,7 @@
             "tests/performance-recorder.test.js",
             "tests/popover-window-blur.test.mjs",
             "tests/powershell-output-boundaries.test.js",
+            "tests/project-forge-eval.test.js",
             "tests/projectforge-changes-source.test.mjs",
             "tests/projectforge-trace.test.cjs",
             "tests/quit-lifecycle.test.cjs",

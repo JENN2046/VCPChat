@@ -215,6 +215,41 @@ test('Python: module loading and synchronous calls own their asyncio lifecycle',
     assert.equal((await evaluate(failure, 'run')).status, 'execution_error');
 });
 
+test('Python: async setup fixtures keep their loop until target execution completes', async t => {
+    const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Python unavailable');
+    for (const [name, source, setup] of [
+        ['future', 'async def run(future):\n    import asyncio\n    asyncio.get_running_loop().call_soon(future.set_result, 7)\n    return await future\n',
+            'import asyncio\nreturn [asyncio.get_running_loop().create_future()]'],
+        ['background_task', 'async def run(task):\n    return await task\n',
+            'import asyncio\nasync def produce():\n    await asyncio.sleep(0)\n    return 7\nreturn [asyncio.create_task(produce())]'],
+        ['sync_factory', 'def run(future):\n    import asyncio\n    async def inner():\n        return 1\n    assert asyncio.run(inner()) == 1\n    async def finish():\n        asyncio.get_running_loop().call_soon(future.set_result, 7)\n        return await future\n    return finish()\n',
+            'import asyncio\nreturn [asyncio.get_running_loop().create_future()]'],
+    ]) {
+        await t.test(name, async () => {
+            const file = fixture(`async_fixture_${name}.py`, source);
+            const result = await evaluate(file, 'run', { setup });
+            assert.equal(result.status, 'returned', JSON.stringify(result));
+            assert.equal(result.value, 7);
+        });
+    }
+    // Pending setup tasks are cleaned up only after the target, and their
+    // finalizers run before the source certificate is issued.
+    const finalizer = fixture('async_fixture_cleanup.py', 'from pathlib import Path\nasync def run(task):\n    assert not task.done()\n    return 7\n');
+    const setup = 'import asyncio\nfrom pathlib import Path\nasync def pending():\n    try:\n        await asyncio.Event().wait()\n    finally:\n        Path(module.__file__).write_text("# finalized\\n")\ntask=asyncio.create_task(pending())\nawait asyncio.sleep(0)\nreturn [task]';
+    const cleaned = await evaluate(finalizer, 'run', { setup });
+    assert.equal(cleaned.status, 'source_changed', JSON.stringify(cleaned));
+    assert.equal(fs.readFileSync(finalizer, 'utf8'), '# finalized\n');
+    const failed = fixture('async_fixture_failure.py', 'async def run(task):\n    raise ValueError("expected target failure")\n');
+    const failure = await evaluate(failed, 'run', { setup });
+    assert.equal(failure.status, 'execution_error', JSON.stringify(failure));
+    assert.equal(fs.readFileSync(failed, 'utf8'), '# finalized\n', 'pending setup tasks also finalize on target errors');
+    const setupFailed = fixture('async_fixture_setup_failure.py', 'async def run(task):\n    return 7\n');
+    const failedSetup = await evaluate(setupFailed, 'run', { setup: setup.replace('return [task]', 'raise ValueError("expected setup failure")') });
+    assert.equal(failedSetup.status, 'setup_error', JSON.stringify(failedSetup));
+    assert.equal(fs.readFileSync(setupFailed, 'utf8'), '# finalized\n', 'pending tasks also finalize on setup errors');
+});
+
 test('worker spawn failure is explicit', async () => {
     const result = await runProcess(path.join(tmp, 'no-such-runtime'), [], { timeoutMs: 1000 });
     assert.equal(result.status, 'environment_error');

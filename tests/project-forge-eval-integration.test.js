@@ -40,6 +40,12 @@ test('EvalSymbol full entry: Python standalone names and synchronous asyncio lif
         assert.equal(result.details.status, 'returned', JSON.stringify(result));
         assert.equal(result.details.value, 7);
     }
+    const name = 'async_fixture.py';
+    fs.writeFileSync(path.join(tmp, 'project', name), 'import asyncio\nasync def run(future,task):\n    asyncio.get_running_loop().call_soon(future.set_result, 3)\n    return await future + await task\n');
+    const result = await call({ command: 'EvalSymbol', projectId: pid, path: `${name}#run`,
+        setup: 'import asyncio\nasync def produce():\n    await asyncio.sleep(0)\n    return 4\nreturn [asyncio.get_running_loop().create_future(), asyncio.create_task(produce())]' });
+    assert.equal(result.details.status, 'returned', JSON.stringify(result));
+    assert.equal(result.details.value, 7);
 });
 test.after(async () => { await forge.cleanup(); fs.rmSync(tmp, { force: true, recursive: true }); });
 test('EvalSymbol full entry: JS/MJS/CJS and stopped workspace', {

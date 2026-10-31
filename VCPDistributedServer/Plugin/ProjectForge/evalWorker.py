@@ -1,5 +1,6 @@
 """Trusted project function runner. Not a security sandbox."""
 import asyncio
+from contextlib import contextmanager
 import hashlib
 import importlib
 import importlib.abc
@@ -122,14 +123,41 @@ def load_module(file, source):
     return module
 
 
-def complete_awaitable(value):
-    if not inspect.isawaitable(value):
-        return value
+@contextmanager
+def awaitable_runner():
+    loop = None
 
-    async def wait():
-        return await value
+    def complete(value):
+        nonlocal loop
+        if not inspect.isawaitable(value):
+            return value
+        if loop is None:
+            loop = asyncio.new_event_loop()
 
-    return asyncio.run(wait())
+        async def wait():
+            return await value
+
+        return loop.run_until_complete(wait())
+
+    try:
+        # Between calls the loop is idle, so synchronous project code may
+        # manage its own asyncio lifecycle. Setup fixtures retain this loop.
+        yield complete
+    finally:
+        if loop is not None:
+            async def shutdown():
+                pending = asyncio.all_tasks(loop) - {asyncio.current_task()}
+                for task in pending:
+                    task.cancel()
+                if pending:
+                    await asyncio.gather(*pending, return_exceptions=True)
+                await loop.shutdown_asyncgens()
+                await loop.shutdown_default_executor()
+
+            try:
+                loop.run_until_complete(shutdown())
+            finally:
+                loop.close()
 
 
 def execute(request):
@@ -158,22 +186,23 @@ def execute(request):
     if inspect.isfunction(target) and ".<locals>." in target.__qualname__:
         raise TypeError("Nested functions require a real runtime fixture")
 
-    args = request["args"]
-    kwargs = request.get("kwargs", {})
-    if "setup" in request:
-        stage = "setup"
-        body = request["setup"]
-        source = "async def __pf_setup__():\n" + "\n".join(
-            "    " + line for line in body.splitlines()
-        ) + "\n"
-        scope = {"module": module}
-        exec(compile(source, "<EvalSymbol.setup>", "exec"), scope)
-        args = complete_awaitable(scope["__pf_setup__"]())
-        if type(args) is not list:
-            raise TypeError("setup must return an argument list")
-    stage = "call"
-    inspect.signature(target).bind(*args, **kwargs)
-    value = complete_awaitable(target(*args, **kwargs))
+    with awaitable_runner() as complete:
+        args = request["args"]
+        kwargs = request.get("kwargs", {})
+        if "setup" in request:
+            stage = "setup"
+            body = request["setup"]
+            source = "async def __pf_setup__():\n" + "\n".join(
+                "    " + line for line in body.splitlines()
+            ) + "\n"
+            scope = {"module": module}
+            exec(compile(source, "<EvalSymbol.setup>", "exec"), scope)
+            args = complete(scope["__pf_setup__"]())
+            if type(args) is not list:
+                raise TypeError("setup must return an argument list")
+        stage = "call"
+        inspect.signature(target).bind(*args, **kwargs)
+        value = complete(target(*args, **kwargs))
     stage = "encode"
     encoded = encode(value)
     stage = "source"

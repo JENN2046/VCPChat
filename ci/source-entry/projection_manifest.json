@@ -3994,9 +3994,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "c368c19da1fc08f0c3b9660cea0f64f3250cf27c",
-          "size": 8890,
-          "sha256": "d770207c2161eb1889f678178bef3dfbc63c3d3af958b97d070b014d3f31d4ad"
+          "blob": "0ac94f175775c94527e98b04330e1e97a1240240",
+          "size": 9921,
+          "sha256": "c96037809f7a881a714da018b1ddeb5616887c0ba086394541f707c5957aa51c"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -17766,9 +17766,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "261bb1a02ac77db4a1094b4c236ff0de5ddb55e7",
-          "size": 16477,
-          "sha256": "553bbbfe149d056c565bf999e183b4b5b0d6ed468bf4772472bdda776b73dd08"
+          "blob": "3a39de78fbc52880b71e520492b1c6830f05f227",
+          "size": 19637,
+          "sha256": "35908f7fd5bd23b08ba696cd80b46df422bfd7f904a207f5873c44e1a22fe853"
         },
         {
           "path": "tests/project-forge-trace.test.js",
@@ -23855,9 +23855,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "c368c19da1fc08f0c3b9660cea0f64f3250cf27c",
-          "size": 8890,
-          "sha256": "d770207c2161eb1889f678178bef3dfbc63c3d3af958b97d070b014d3f31d4ad"
+          "blob": "0ac94f175775c94527e98b04330e1e97a1240240",
+          "size": 9921,
+          "sha256": "c96037809f7a881a714da018b1ddeb5616887c0ba086394541f707c5957aa51c"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -36095,9 +36095,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "261bb1a02ac77db4a1094b4c236ff0de5ddb55e7",
-          "size": 16477,
-          "sha256": "553bbbfe149d056c565bf999e183b4b5b0d6ed468bf4772472bdda776b73dd08"
+          "blob": "3a39de78fbc52880b71e520492b1c6830f05f227",
+          "size": 19637,
+          "sha256": "35908f7fd5bd23b08ba696cd80b46df422bfd7f904a207f5873c44e1a22fe853"
         },
         {
           "path": "tests/project-forge-trace.test.js",

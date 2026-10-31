@@ -123,6 +123,19 @@ def load_module(file, source):
     return module
 
 
+def verify_definition(target, file, definition):
+    function = target.__func__ if inspect.ismethod(target) else target
+    if not inspect.isfunction(function) or Path(function.__code__.co_filename).resolve() != file:
+        raise TypeError("Runtime callable does not belong to the selected source definition")
+    line = function.__code__.co_firstlineno
+    matches = [row for row in definition["callables"]
+               if row["fullStart"] <= line <= row["start"]]
+    if (len(matches) != 1 or matches[0]["index"] != definition["index"]
+            or function.__code__.co_name != definition["name"]):
+        raise TypeError("Runtime callable does not match the selected definition; no target call executed")
+    return {"file": str(file), "line": line}
+
+
 @contextmanager
 def awaitable_runner():
     loop = None
@@ -186,6 +199,11 @@ def execute(request):
     if inspect.isfunction(target) and ".<locals>." in target.__qualname__:
         raise TypeError("Nested functions require a real runtime fixture")
 
+    runtime_definition = None
+    if request.get("definition") is not None:
+        stage = "definition"
+        runtime_definition = verify_definition(target, file, request["definition"])
+
     with awaitable_runner() as complete:
         args = request["args"]
         kwargs = request.get("kwargs", {})
@@ -200,6 +218,9 @@ def execute(request):
             args = complete(scope["__pf_setup__"]())
             if type(args) is not list:
                 raise TypeError("setup must return an argument list")
+            if request.get("definition") is not None:
+                stage = "definition"
+                runtime_definition = verify_definition(target, file, request["definition"])
         stage = "call"
         inspect.signature(target).bind(*args, **kwargs)
         value = complete(target(*args, **kwargs))
@@ -210,6 +231,7 @@ def execute(request):
         raise RuntimeError("Target source changed during execution; result not certified")
     return {
         "status": "returned", "value": encoded,
+        **({"runtimeDefinition": runtime_definition} if runtime_definition else {}),
         "checks": {"passed": 0, "failed": 0},
         "runtime": {"executable": sys.executable, "version": sys.version.split()[0]},
     }
@@ -223,6 +245,7 @@ except BaseException as error:
     statuses = {
         "input": "invalid_arguments", "source": "source_changed",
         "load": "load_error", "resolve": "not_callable",
+        "definition": "definition_mismatch",
         "setup": "setup_error", "call": "execution_error",
         "encode": "encoding_error",
     }

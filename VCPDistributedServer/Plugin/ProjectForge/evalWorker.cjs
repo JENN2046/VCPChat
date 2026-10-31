@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const { pathToFileURL } = require('node:url');
 const { createRequire } = require('node:module');
-const { createHash } = require('node:crypto');
+const { createHash, randomUUID } = require('node:crypto');
 const { types } = require('node:util');
 const write = fs.writeSync.bind(fs);
 let stage = 'input';
@@ -55,6 +55,49 @@ function locate(root, parts) {
         value = d.value;
     }
     return typeof value === 'function' ? { owner, fn: value } : null;
+}
+
+async function verifyDefinition(fn, request) {
+    // An in-process inspector session reads V8's actual function location;
+    // it does not open a debugging port or execute the target function.
+    const session = new (require('node:inspector').Session)();
+    session.connect();
+    const key = `__projectforge_eval_${randomUUID()}`;
+    const scripts = new Map();
+    const url = pathToFileURL(request.file).href;
+    const post = (method, params = {}) => new Promise((resolve, reject) =>
+        session.post(method, params, (error, result) => error ? reject(error) : resolve(result)));
+    session.on('Debugger.scriptParsed', ({ params }) => {
+        if (params.url === url) scripts.set(params.scriptId, params.url);
+    });
+    try {
+        await post('Debugger.enable');
+        Object.defineProperty(globalThis, key, { value: fn, configurable: true });
+        const { result } = await post('Runtime.evaluate', {
+            expression: `globalThis[${JSON.stringify(key)}]`, objectGroup: key,
+        });
+        const properties = await post('Runtime.getProperties', { objectId: result.objectId });
+        const location = properties.internalProperties?.find(p => p.name === '[[FunctionLocation]]')?.value?.value;
+        if (!location || !scripts.has(location.scriptId)) {
+            throw new Error('Runtime callable does not belong to the selected source definition');
+        }
+        const { scriptSource } = await post('Debugger.getScriptSource', { scriptId: location.scriptId });
+        const normalize = text => text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+        if (normalize(scriptSource) !== normalize(fs.readFileSync(request.file, 'utf8'))) {
+            throw new Error('Runtime script does not match the selected source bytes');
+        }
+        const line = location.lineNumber + 1;
+        const containing = request.definition.callables.filter(row => row.start <= line && line <= row.end);
+        const width = Math.min(...containing.map(row => row.end - row.start));
+        const matches = containing.filter(row => row.end - row.start === width);
+        if (matches.length !== 1 || matches[0].index !== request.definition.index) {
+            throw new Error('Runtime callable does not match the selected definition; no setup or call executed');
+        }
+        return { file: request.file, line, column: location.columnNumber + 1 };
+    } finally {
+        delete globalThis[key];
+        session.disconnect();
+    }
 }
 
 function send(payload) {
@@ -113,6 +156,11 @@ function send(payload) {
                 ? 'Ambiguous runtime export; use its explicit export path'
                 : 'Symbol is not a callable export; local closures and instance methods require a real runtime fixture');
         }
+        let runtimeDefinition;
+        if (request.definition) {
+            stage = 'definition';
+            runtimeDefinition = await verifyDefinition(candidates[0].fn, request);
+        }
         let args = request.args;
         if (request.setup !== undefined) {
             stage = 'setup';
@@ -131,6 +179,7 @@ function send(payload) {
         stage = 'encode';
         send({
             status: 'returned', value: encoded,
+            ...(runtimeDefinition ? { runtimeDefinition } : {}),
             checks: { passed: 0, failed: 0 },
             runtime: { executable: process.execPath, version: process.version },
         });
@@ -138,6 +187,7 @@ function send(payload) {
     } catch (error) {
         const status = ({
             input: 'invalid_arguments', source: 'source_changed', load: 'load_error',
+            definition: 'definition_mismatch',
             resolve: 'not_callable', setup: 'setup_error', call: 'execution_error', encode: 'encoding_error',
         })[stage] || 'execution_error';
         try {

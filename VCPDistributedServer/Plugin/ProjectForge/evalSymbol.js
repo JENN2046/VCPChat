@@ -78,7 +78,7 @@ function languageOf(file) {
     return null;
 }
 
-async function evaluate({ root, file, symbol, sourceHash, args }) {
+async function evaluate({ root, file, symbol, sourceHash, definition, args }) {
     const language = languageOf(file);
     if (!language) return { status: 'unsupported', error: { message: 'Supported: JS/CJS/ESM, Python, Rust existing tests. TS requires a future explicit loader.' } };
     let options;
@@ -89,14 +89,20 @@ async function evaluate({ root, file, symbol, sourceHash, args }) {
     } catch (error) {
         return { status: 'invalid_arguments', error: { message: error.message } };
     }
-    const base = { language, symbol, sourceHash, timeoutMs: options.timeoutMs };
+    const selected = definition && Object.fromEntries(Object.entries(definition).filter(([key]) => key !== 'callables'));
+    const base = { language, symbol, sourceHash, ...(selected ? { definition: selected } : {}), timeoutMs: options.timeoutMs };
     if (language === 'rust') {
+        if (definition && definition.callables.filter(row => row.qualified === symbol).length !== 1) {
+            return { ...base, status: 'definition_mismatch', stage: 'definition', error: {
+                message: 'Cannot bind a duplicate Rust definition to the compiled test; no test executed',
+            } };
+        }
         return { ...base, ...await require('./evalRust').evaluate({ root, file, symbol, sourceHash, args, options, config }) };
     }
     let temp;
     try {
         const runtime = await planRuntime(root, language, config);
-        const request = { file, symbol, sourceHash, ...options };
+        const request = { file, symbol, sourceHash, definition, ...options };
         let worker;
         let argv;
         if (language === 'javascript') {
@@ -152,6 +158,8 @@ function render(result, rel) {
     if (result.candidates) lines.push(`- candidates: ${JSON.stringify(result.candidates)}`);
     if (result.runtime) lines.push(`- runtime: ${JSON.stringify(result.runtime)}`);
     if (result.sourceHash) lines.push(`- target source: ${result.sourceHash.slice(0, 12)} (not dependency fingerprint)`);
+    if (result.definition) lines.push(`- selected definition: L${result.definition.start}-${result.definition.end}`);
+    if (result.runtimeDefinition) lines.push(`- runtime definition: L${result.runtimeDefinition.line}`);
     for (const [name, log] of Object.entries(result.logs || {})) {
         if (log.truncated) lines.push(`- ${name}: truncated (${log.bytes} bytes)`);
         if (!['returned', 'passed'].includes(result.status) && log.text) lines.push(`- ${name}: ${log.text.slice(-3000)}`);

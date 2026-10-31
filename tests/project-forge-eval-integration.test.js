@@ -47,6 +47,60 @@ test('EvalSymbol full entry: Python standalone names and synchronous asyncio lif
     assert.equal(result.details.status, 'returned', JSON.stringify(result));
     assert.equal(result.details.value, 7);
 });
+test('EvalSymbol full entry: pick and line cannot certify a shadowed definition', {
+    skip: !fs.existsSync(resolveDefaultBinaryPath()) && 'AST binary unavailable',
+}, async t => {
+    for (const [name, source] of [
+        ['duplicate.py', 'def run():\n    return 1\ndef run():\n    return 2\n'],
+        ['duplicate.cjs', 'function run(){return 1;}\nfunction run(){return 2;}\nmodule.exports={run};\n'],
+        ['identical.cjs', 'function run(){return 2;}\nfunction run(){return 2;}\nmodule.exports={run};\n'],
+    ]) {
+        if (name.endsWith('.py')) {
+            const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+            if (probe.status !== 'exited' || probe.exitCode !== 0) { t.diagnostic('Python unavailable'); continue; }
+        }
+        fs.writeFileSync(path.join(tmp, 'project', name), source);
+        for (const choice of [{ pick: 1 }, { line: 1 }]) {
+            const rejected = await call({ command: 'EvalSymbol', projectId: pid, path: `${name}#run`, ...choice });
+            assert.equal(rejected.details.status, 'definition_mismatch', JSON.stringify(rejected));
+            assert.equal(rejected.details.definition.start, 1);
+        }
+        const actual = await call({ command: 'EvalSymbol', projectId: pid, path: `${name}#run`, pick: 2 });
+        assert.equal(actual.details.status, 'returned', JSON.stringify(actual));
+        assert.equal(actual.details.value, 2);
+        assert.equal(actual.details.runtimeDefinition.line, name.endsWith('.py') ? 3 : 2);
+    }
+    fs.writeFileSync(path.join(tmp, 'project', 'same-line.cjs'), 'function run(){return 1;} function run(){return 2;} module.exports={run};');
+    const ambiguous = await call({ command: 'EvalSymbol', projectId: pid, path: 'same-line.cjs#run', pick: 2 });
+    assert.equal(ambiguous.details.status, 'definition_mismatch', JSON.stringify(ambiguous));
+    fs.writeFileSync(path.join(tmp, 'project', 'duplicate.rs'), '#[cfg(any())]\nfn run() {}\n#[cfg(not(any()))]\nfn run() {}\n');
+    for (const pick of [1, 2]) {
+        const rust = await call({ command: 'EvalSymbol', projectId: pid, path: 'duplicate.rs#run', pick });
+        assert.equal(rust.details.status, 'definition_mismatch', JSON.stringify(rust));
+    }
+});
+
+test('EvalSymbol full entry: valid async functions and decorated method identities remain callable', {
+    skip: !fs.existsSync(resolveDefaultBinaryPath()) && 'AST binary unavailable',
+}, async t => {
+    for (const [name, source, symbol] of [
+        ['identity-async.mjs', 'export async function run(){return 7;}\n', 'run'],
+        ['identity_decorator.py', 'def keep(fn):\n    return fn\n@keep\ndef run():\n    return 7\n', 'run'],
+        ['identity_static.py', 'class Box:\n    @staticmethod\n    def run():\n        return 7\n', 'Box.run'],
+        ['identity_class.py', 'class Box:\n    @classmethod\n    def run(cls):\n        return 7\n', 'Box.run'],
+    ]) {
+        if (name.endsWith('.py')) {
+            const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+            if (probe.status !== 'exited' || probe.exitCode !== 0) { t.diagnostic('Python unavailable'); continue; }
+        }
+        fs.writeFileSync(path.join(tmp, 'project', name), source);
+        const result = await call({ command: 'EvalSymbol', projectId: pid, path: `${name}#${symbol}` });
+        assert.equal(result.details.status, 'returned', JSON.stringify(result));
+        assert.equal(result.details.value, 7);
+        assert.ok(result.details.runtimeDefinition.line);
+    }
+});
+
 test.after(async () => { await forge.cleanup(); fs.rmSync(tmp, { force: true, recursive: true }); });
 test('EvalSymbol full entry: JS/MJS/CJS and stopped workspace', {
     skip: !fs.existsSync(resolveDefaultBinaryPath()) && 'AST binary unavailable',

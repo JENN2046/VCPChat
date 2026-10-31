@@ -15,9 +15,9 @@ function fixture(name, text) {
     fs.writeFileSync(file, text);
     return file;
 }
-async function evaluate(file, symbol, args = {}) {
+async function evaluate(file, symbol, args = {}, definition) {
     return ES.evaluate({
-        root: tmp, file, symbol, args,
+        root: tmp, file, symbol, args, definition,
         sourceHash: crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),
     });
 }
@@ -45,6 +45,8 @@ for (const language of ['javascript', 'python']) test(`packaged ${language} eval
     const packaged = require(path.join(archived, 'evalSymbol.js'));
     try {
         const result = await packaged.evaluate({ root: project, file, symbol: 'plus', args: { args: [2, 5] },
+            definition: { index: 0, name: 'plus', start: 1, end: 2,
+                callables: [{ index: 0, name: 'plus', start: 1, fullStart: 1, end: 2 }] },
             sourceHash: crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex') });
         assert.equal(result.status, 'returned', JSON.stringify(result));
         assert.equal(result.value, 7);
@@ -248,6 +250,37 @@ test('Python: async setup fixtures keep their loop until target execution comple
     const failedSetup = await evaluate(setupFailed, 'run', { setup: setup.replace('return [task]', 'raise ValueError("expected setup failure")') });
     assert.equal(failedSetup.status, 'setup_error', JSON.stringify(failedSetup));
     assert.equal(fs.readFileSync(setupFailed, 'utf8'), '# finalized\n', 'pending tasks also finalize on setup errors');
+});
+
+test('workers: the runtime callable must match the selected source definition', async t => {
+    for (const [name, source, second] of [
+        ['identity.cjs', 'function run(){return 1;}\nfunction run(){return 2;}\nmodule.exports={run};\n', 2],
+        ['identity.py', 'def run():\n    return 1\ndef run():\n    return 2\n', 3],
+    ]) {
+        if (name.endsWith('.py')) {
+            const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+            if (probe.status !== 'exited' || probe.exitCode !== 0) { t.diagnostic('Python unavailable'); continue; }
+        }
+        const file = fixture(name, source);
+        const callables = [1, second].map((start, index) => ({ index, name: 'run', start, fullStart: start, end: start + (name.endsWith('.py') ? 1 : 0) }));
+        const first = { ...callables[0], callables };
+        const last = { ...callables[1], callables };
+        const rejected = await evaluate(file, 'run', { setup: 'this is invalid setup syntax' }, first);
+        assert.equal(rejected.status, 'definition_mismatch', JSON.stringify(rejected));
+        const actual = await evaluate(file, 'run', {}, last);
+        assert.equal(actual.status, 'returned', JSON.stringify(actual));
+        assert.equal(actual.value, 2);
+        assert.equal(actual.runtimeDefinition.line, second);
+    }
+});
+
+test('Python: setup cannot substitute another function code object', async t => {
+    const probe = await runProcess(process.platform === 'win32' ? 'python.exe' : 'python3', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Python unavailable');
+    const file = fixture('identity_setup.py', 'def run():\n    return 1\ndef other():\n    return 2\n');
+    const callables = [{ index: 0, name: 'run', start: 1, fullStart: 1, end: 2 }, { index: 1, name: 'other', start: 3, fullStart: 3, end: 4 }];
+    const result = await evaluate(file, 'run', { setup: 'module.run.__code__ = module.other.__code__\nreturn []' }, { ...callables[0], callables });
+    assert.equal(result.status, 'definition_mismatch', JSON.stringify(result));
 });
 
 test('worker spawn failure is explicit', async () => {

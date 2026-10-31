@@ -3911,9 +3911,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/ProjectForgeService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f9658a4f85bc239fb938a3596886e0d9ccdfdd64",
-          "size": 115289,
-          "sha256": "90a86d14ac2fc863473d86737e267356a21e3cd2f4ab141272fc50c453bb80ca",
+          "blob": "5b5c93e709df451e9a768f616d9d8d637c4747c4",
+          "size": 115718,
+          "sha256": "06dcd29ccbcdf847a88551fa5f2a7637f7e0a30311b6a230e8aab5e3a3a5c2ad",
           "kind": "source"
         },
         {
@@ -3976,27 +3976,27 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "75708666a38df1508db0ef8936104848632c43f6",
-          "size": 8088,
-          "sha256": "711029c0fe3afe825059224140e6410bc4ce439aa3f7c616767a78736f9898ed"
+          "blob": "5979de9eddec0cab7b9765ecfd5ad18ee8ea4f46",
+          "size": 8832,
+          "sha256": "e9af71d77b341f08bf7d3da419bb201deaa917dacfec776c802c099b6b530144"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs",
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "71f967b50ae5529350fff96f9cf099b0bf67ba50",
-          "size": 7812,
-          "sha256": "8ee956cee0c41787b1449af09116475e7ea6df12fa6f0f96311cc00d4930cdf0"
+          "blob": "226e906cd16b51bf5c40fc4a1c736e396b585981",
+          "size": 10599,
+          "sha256": "9ea0ab9cd979b9d83afbd8affd55b79239f2cd13dac6824962fc9043baf3bc66"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.py",
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "0ac94f175775c94527e98b04330e1e97a1240240",
-          "size": 9921,
-          "sha256": "c96037809f7a881a714da018b1ddeb5616887c0ba086394541f707c5957aa51c"
+          "blob": "c80d54dcbc6faeb2ec6a2732c07680170c49eb30",
+          "size": 11186,
+          "sha256": "deca17df022ae43201dc77bd076c72774bd728f1909e89088472fae6bbacd680"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -14930,9 +14930,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3dda0d10455f93c07d96c900acd7f1076d77289b",
-          "size": 46796,
-          "sha256": "79baa19575ebf75c7be1a0cdbe3400551574f5db9d30132fb593696444b4382a",
+          "blob": "8c8311981338970489377d199ef90eb70f22d76d",
+          "size": 46894,
+          "sha256": "28924918c3e0c3a0161f944b24f37246f5d5eb085779e3c7f61137e1262e0b6d",
           "kind": "source"
         },
         {
@@ -17766,9 +17766,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "3a39de78fbc52880b71e520492b1c6830f05f227",
-          "size": 19637,
-          "sha256": "35908f7fd5bd23b08ba696cd80b46df422bfd7f904a207f5873c44e1a22fe853"
+          "blob": "b9c4602350f304ab21facc17adb3f4990e1fdd34",
+          "size": 21995,
+          "sha256": "1de92f467bfd7acf4255fdcc98b5eb620c5c54c8fe7e6d467857533886a84518"
         },
         {
           "path": "tests/project-forge-trace.test.js",
@@ -23772,9 +23772,9 @@
           "path": "VCPDistributedServer/Plugin/ProjectForge/ProjectForgeService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f9658a4f85bc239fb938a3596886e0d9ccdfdd64",
-          "size": 115289,
-          "sha256": "90a86d14ac2fc863473d86737e267356a21e3cd2f4ab141272fc50c453bb80ca",
+          "blob": "5b5c93e709df451e9a768f616d9d8d637c4747c4",
+          "size": 115718,
+          "sha256": "06dcd29ccbcdf847a88551fa5f2a7637f7e0a30311b6a230e8aab5e3a3a5c2ad",
           "kind": "source"
         },
         {
@@ -23837,27 +23837,27 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "75708666a38df1508db0ef8936104848632c43f6",
-          "size": 8088,
-          "sha256": "711029c0fe3afe825059224140e6410bc4ce439aa3f7c616767a78736f9898ed"
+          "blob": "5979de9eddec0cab7b9765ecfd5ad18ee8ea4f46",
+          "size": 8832,
+          "sha256": "e9af71d77b341f08bf7d3da419bb201deaa917dacfec776c802c099b6b530144"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs",
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "71f967b50ae5529350fff96f9cf099b0bf67ba50",
-          "size": 7812,
-          "sha256": "8ee956cee0c41787b1449af09116475e7ea6df12fa6f0f96311cc00d4930cdf0"
+          "blob": "226e906cd16b51bf5c40fc4a1c736e396b585981",
+          "size": 10599,
+          "sha256": "9ea0ab9cd979b9d83afbd8affd55b79239f2cd13dac6824962fc9043baf3bc66"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.py",
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "0ac94f175775c94527e98b04330e1e97a1240240",
-          "size": 9921,
-          "sha256": "c96037809f7a881a714da018b1ddeb5616887c0ba086394541f707c5957aa51c"
+          "blob": "c80d54dcbc6faeb2ec6a2732c07680170c49eb30",
+          "size": 11186,
+          "sha256": "deca17df022ae43201dc77bd076c72774bd728f1909e89088472fae6bbacd680"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -32530,9 +32530,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3dda0d10455f93c07d96c900acd7f1076d77289b",
-          "size": 46796,
-          "sha256": "79baa19575ebf75c7be1a0cdbe3400551574f5db9d30132fb593696444b4382a",
+          "blob": "8c8311981338970489377d199ef90eb70f22d76d",
+          "size": 46894,
+          "sha256": "28924918c3e0c3a0161f944b24f37246f5d5eb085779e3c7f61137e1262e0b6d",
           "kind": "source"
         },
         {
@@ -36095,9 +36095,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "3a39de78fbc52880b71e520492b1c6830f05f227",
-          "size": 19637,
-          "sha256": "35908f7fd5bd23b08ba696cd80b46df422bfd7f904a207f5873c44e1a22fe853"
+          "blob": "b9c4602350f304ab21facc17adb3f4990e1fdd34",
+          "size": 21995,
+          "sha256": "1de92f467bfd7acf4255fdcc98b5eb620c5c54c8fe7e6d467857533886a84518"
         },
         {
           "path": "tests/project-forge-trace.test.js",

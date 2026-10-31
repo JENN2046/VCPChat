@@ -1884,6 +1884,14 @@ async function evalSymbolCmd(args) {
     const result = await ES.evaluate({
         root: ctx.rootInfo.root, file: realFile,
         symbol: resolved.res.symbol.qualified,
+        definition: {
+            ...resolved.res.symbol,
+            callables: resolved.outline.symbols.flatMap((symbol, index) =>
+                ['function', 'method'].includes(symbol.kind) ? [{
+                    index, name: symbol.name, qualified: symbol.qualified || symbol.name,
+                    start: symbol.start, fullStart: symbol.fullStart ?? symbol.start, end: symbol.end,
+                }] : []),
+        },
         sourceHash: resolved.disk.hash, args,
     });
     return textResult(ES.render(result, file.rel), {

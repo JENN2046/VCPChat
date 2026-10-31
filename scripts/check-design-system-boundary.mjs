@@ -49,7 +49,9 @@ const forbiddenPaths = [
 
 const allowedSourceDifferences = new Set([
     // c20cc942 integration/review: exact worker delivery, certified-source and
-    // export-resolution repairs, with red/green regressions. No directory or permission exemption.
+    // export-resolution/selected-definition repairs, with red/green regressions.
+    // No directory or permission exemption.
+    'VCPDistributedServer/Plugin/ProjectForge/ProjectForgeService.js',
     'VCPDistributedServer/Plugin/ProjectForge/evalSymbol.js',
     'VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs',
     'VCPDistributedServer/Plugin/ProjectForge/evalWorker.py',

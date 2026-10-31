@@ -53,6 +53,7 @@ const allowedSourceDifferences = new Set([
     // No directory or permission exemption.
     'VCPDistributedServer/Plugin/ProjectForge/ProjectForgeService.js',
     'VCPDistributedServer/Plugin/ProjectForge/evalSymbol.js',
+    'VCPDistributedServer/Plugin/ProjectForge/evalRust.js',
     'VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs',
     'VCPDistributedServer/Plugin/ProjectForge/evalWorker.py',
     'tests/project-forge-eval.test.js',

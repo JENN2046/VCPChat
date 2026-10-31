@@ -3967,9 +3967,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "c4fa61c6958ca623a4da83699d1572f612be575a",
-          "size": 8061,
-          "sha256": "be3cd4956073c9c5799d95dfa1a0f22aebcc8d4fdc3df2f465f5112d20084f40"
+          "blob": "96e1e65589baf239d2a1c5a48f18dba20274a896",
+          "size": 9017,
+          "sha256": "a764a7c15ee1dfc54f969fb0207e7f885f8a459729f8a20776cdd201c6c2457e"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalSymbol.js",
@@ -14930,9 +14930,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8c8311981338970489377d199ef90eb70f22d76d",
-          "size": 46894,
-          "sha256": "28924918c3e0c3a0161f944b24f37246f5d5eb085779e3c7f61137e1262e0b6d",
+          "blob": "906b16d362148c2692cfe8d17661fba63f652d5e",
+          "size": 46954,
+          "sha256": "31c6f5becf21f84115861553943d7ad84c3d20e19e0cd10e517dd8caecb1c128",
           "kind": "source"
         },
         {
@@ -17766,9 +17766,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "b9c4602350f304ab21facc17adb3f4990e1fdd34",
-          "size": 21995,
-          "sha256": "1de92f467bfd7acf4255fdcc98b5eb620c5c54c8fe7e6d467857533886a84518"
+          "blob": "56bfbe564ad17ff804d7b522e921865b2e21ed55",
+          "size": 26992,
+          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f"
         },
         {
           "path": "tests/project-forge-trace.test.js",
@@ -23828,9 +23828,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "c4fa61c6958ca623a4da83699d1572f612be575a",
-          "size": 8061,
-          "sha256": "be3cd4956073c9c5799d95dfa1a0f22aebcc8d4fdc3df2f465f5112d20084f40"
+          "blob": "96e1e65589baf239d2a1c5a48f18dba20274a896",
+          "size": 9017,
+          "sha256": "a764a7c15ee1dfc54f969fb0207e7f885f8a459729f8a20776cdd201c6c2457e"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalSymbol.js",
@@ -32530,9 +32530,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8c8311981338970489377d199ef90eb70f22d76d",
-          "size": 46894,
-          "sha256": "28924918c3e0c3a0161f944b24f37246f5d5eb085779e3c7f61137e1262e0b6d",
+          "blob": "906b16d362148c2692cfe8d17661fba63f652d5e",
+          "size": 46954,
+          "sha256": "31c6f5becf21f84115861553943d7ad84c3d20e19e0cd10e517dd8caecb1c128",
           "kind": "source"
         },
         {
@@ -36095,9 +36095,9 @@
           "kind": "source",
           "mode": "100644",
           "type": "blob",
-          "blob": "b9c4602350f304ab21facc17adb3f4990e1fdd34",
-          "size": 21995,
-          "sha256": "1de92f467bfd7acf4255fdcc98b5eb620c5c54c8fe7e6d467857533886a84518"
+          "blob": "56bfbe564ad17ff804d7b522e921865b2e21ed55",
+          "size": 26992,
+          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f"
         },
         {
           "path": "tests/project-forge-trace.test.js",

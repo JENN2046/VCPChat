@@ -318,10 +318,59 @@ def loop():
     assert.equal(fs.existsSync(path.join(tmp, 'pkg', '__pycache__')), false);
 });
 
+test('Rust: Cargo retains dynamic standard-library paths for listing and execution', { skip: process.platform !== 'linux' }, async t => {
+    const probe = await runProcess('cargo', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Cargo unavailable');
+    const manifest = fixture('rust-dynamic/Cargo.toml', '[package]\nname="pf_eval_dynamic"\nversion="0.1.0"\nedition="2021"\n[[example]]\nname="sample"\ntest=true\n');
+    fixture('rust-dynamic/.cargo/config.toml', '[build]\nrustflags=["-C", "prefer-dynamic"]\n');
+    const file = fixture('rust-dynamic/src/lib.rs', '#[test]\nfn success() { assert_eq!(2+2,4); }\n');
+    const binary = fixture('rust-dynamic/src/main.rs', 'fn main() {}\n#[test]\nfn success() { panic!("only the selected target may run"); }\n');
+    const integration = fixture('rust-dynamic/tests/check.rs', '#[test]\nfn success() { assert_eq!(2+2,4); }\n');
+    const example = fixture('rust-dynamic/examples/sample.rs', 'fn main() {}\n#[test]\nfn success() { assert_eq!(2+2,4); }\n');
+    const baseline = await runProcess('cargo', ['test', '--offline', '--lib'], { cwd: path.dirname(manifest), timeoutMs: 30000 });
+    assert.equal(baseline.exitCode, 0, JSON.stringify(baseline));
+    assert.match(baseline.stdout.text, /1 passed; 0 failed/);
+    const evaluated = await evaluate(file, 'success', { timeoutms: 30000 });
+    assert.equal(evaluated.status, 'passed', JSON.stringify(evaluated));
+    assert.deepEqual(evaluated.checks, { passed: 1, failed: 0 });
+    assert.equal((await evaluate(binary, 'success', { timeoutms: 30000 })).status, 'test_failed');
+    for (const target of [integration, example]) {
+        const result = await evaluate(target, 'success', { timeoutms: 30000 });
+        assert.equal(result.status, 'passed', JSON.stringify(result));
+        assert.deepEqual(result.checks, { passed: 1, failed: 0 });
+    }
+});
+
+test('Rust: Cargo preserves build-script dynamic-library output paths', { skip: process.platform !== 'linux' }, async t => {
+    const probe = await runProcess('cargo', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Cargo unavailable');
+    const manifest = fixture('rust-native/Cargo.toml', '[package]\nname="pf_eval_native"\nversion="0.1.0"\nedition="2021"\n');
+    fixture('rust-native/build.rs', `
+use std::{env,fs,path::PathBuf,process::Command};
+fn main() {
+    let out=PathBuf::from(env::var_os("OUT_DIR").unwrap());
+    let source=out.join("fixture.rs");
+    fs::write(&source, "#[no_mangle] pub extern \\"C\\" fn fixture_value() -> i32 { 7 }").unwrap();
+    let status=Command::new(env::var_os("RUSTC").unwrap())
+        .args(["--crate-name","fixture_native","--crate-type","cdylib"])
+        .arg(&source).arg("-o").arg(out.join("libfixture_native.so")).status().unwrap();
+    assert!(status.success());
+    println!("cargo:rustc-link-search=native={}",out.display());
+    println!("cargo:rustc-link-lib=dylib=fixture_native");
+}
+`);
+    const file = fixture('rust-native/src/lib.rs', 'extern "C" { fn fixture_value() -> i32; }\n#[test]\nfn success() { assert_eq!(unsafe { fixture_value() },7); }\n');
+    const baseline = await runProcess('cargo', ['test', '--offline', '--lib'], { cwd: path.dirname(manifest), timeoutMs: 30000 });
+    assert.equal(baseline.exitCode, 0, JSON.stringify(baseline));
+    const result = await evaluate(file, 'success', { timeoutms: 30000 });
+    assert.equal(result.status, 'passed', JSON.stringify(result));
+    assert.deepEqual(result.checks, { passed: 1, failed: 0 });
+});
+
 test('Rust: compile, list, exact test, fail, ignored and zero match', async t => {
     const probe = await runProcess('cargo', ['--version'], { timeoutMs: 3000 });
     if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Cargo unavailable');
-    fixture('Cargo.toml', '[package]\nname="pf_eval_fixture"\nversion="0.1.0"\nedition="2021"\n');
+    fixture('Cargo.toml', '[package]\nname="pf_eval_fixture"\nversion="0.1.0"\nedition="2021"\n[features]\nextra=[]\n');
     const file = fixture('src/lib.rs', `
 mod child;
 #[cfg(test)]
@@ -333,6 +382,9 @@ mod tests {
     #[test]
     #[ignore]
     fn ignored() {}
+    #[cfg(feature="extra")]
+    #[test]
+    fn feature_success() { assert!(true); }
 }
 `);
     const child = fixture('src/child.rs', '#[test]\nfn success() { assert!(true); }\nfn absent() {}\n');
@@ -343,4 +395,19 @@ mod tests {
     assert.equal((await evaluate(file, 'tests.failure', { timeoutms: 30000 })).status, 'test_failed');
     assert.equal((await evaluate(file, 'tests.ignored', { timeoutms: 30000 })).status, 'not_executed');
     assert.equal((await evaluate(file, 'tests.absent', { timeoutms: 30000 })).status, 'not_found');
+    assert.equal((await evaluate(file, 'tests.feature_success', { package: 'pf_eval_fixture', features: 'extra', timeoutms: 30000 })).status, 'passed');
+    assert.equal((await evaluate(file, 'tests.feature_success', { timeoutms: 30000 })).status, 'not_found');
+});
+
+test('Rust: Cargo execution selects the exact package from workspace discovery', async t => {
+    const probe = await runProcess('cargo', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Cargo unavailable');
+    fixture('rust-workspace/Cargo.toml', '[workspace]\nmembers=["a","b"]\nresolver="2"\n');
+    for (const name of ['a', 'b']) fixture(`rust-workspace/${name}/Cargo.toml`, `[package]\nname="pf_env_${name}"\nversion="0.1.0"\nedition="2021"\n`);
+    const selected = fixture('rust-workspace/a/src/lib.rs', '#[test]\nfn success() { assert!(true); }\n');
+    fixture('rust-workspace/b/src/lib.rs', '#[test]\nfn success() { panic!("another package must not execute"); }\n');
+    const result = await evaluate(selected, 'success', { package: '*', timeoutms: 30000 });
+    assert.equal(result.status, 'passed', JSON.stringify(result));
+    assert.deepEqual(result.checks, { passed: 1, failed: 0 });
+    assert.match(result.runtime.packageId, /pf_env_a/);
 });

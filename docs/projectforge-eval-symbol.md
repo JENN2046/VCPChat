@@ -69,6 +69,8 @@ TS、宿主 Electron/DOM 现场、局部闭包与自动构造实例暂不支持�
 
 仅执行已有标准 libtest 测试；不自动提取/编译普通函数。
 在目标文件至工程根间寻找最近 Cargo.toml，离线编译测试产物，列出测试，再精确执行唯一匹配。
+列举和执行均交给 Cargo，并限定已发现的 package ID 与 target 类型/名称，由 Cargo 保留动态库搜索路径、包工作目录及配置的 runner。
+这些阶段共享总截止时间；Cargo 可能检查或更新构建产物。回执的 `runtime.executable` 为 Cargo，`runtime.artifact` 记录发现的测试产物路径。
 匹配常规文件模块路径；自定义 #[path]、include!、宏生成模块、custom harness 不保证支持，不以猜测替代缺失信息。
 Cargo 可能生成/更新 Cargo.lock 和 target 产物；build.rs、过程宏仍可产生副作用。offline 不等于网络安全隔离。
 零命中、ignored、零实际执行都不返回 passed。

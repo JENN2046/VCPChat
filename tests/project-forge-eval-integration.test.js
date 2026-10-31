@@ -101,6 +101,22 @@ test('EvalSymbol full entry: valid async functions and decorated method identiti
     }
 });
 
+test('EvalSymbol full entry: Rust dynamic linking uses Cargo for both list and execution', {
+    skip: process.platform !== 'linux' || !fs.existsSync(resolveDefaultBinaryPath()),
+}, async t => {
+    const probe = await runProcess('cargo', ['--version'], { timeoutMs: 3000 });
+    if (probe.status !== 'exited' || probe.exitCode !== 0) return t.skip('Cargo unavailable');
+    const dir = path.join(tmp, 'project', 'dynamic');
+    fs.mkdirSync(path.join(dir, '.cargo'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'src'));
+    fs.writeFileSync(path.join(dir, 'Cargo.toml'), '[package]\nname="pf_entry_dynamic"\nversion="0.1.0"\nedition="2021"\n');
+    fs.writeFileSync(path.join(dir, '.cargo/config.toml'), '[build]\nrustflags=["-C", "prefer-dynamic"]\n');
+    fs.writeFileSync(path.join(dir, 'src/lib.rs'), '#[test]\nfn success() { assert_eq!(2+2,4); }\n');
+    const result = await call({ command: 'EvalSymbol', projectId: pid, path: 'dynamic/src/lib.rs#success', timeoutMs: 30000 });
+    assert.equal(result.details.status, 'passed', JSON.stringify(result));
+    assert.deepEqual(result.details.checks, { passed: 1, failed: 0 });
+});
+
 test.after(async () => { await forge.cleanup(); fs.rmSync(tmp, { force: true, recursive: true }); });
 test('EvalSymbol full entry: JS/MJS/CJS and stopped workspace', {
     skip: !fs.existsSync(resolveDefaultBinaryPath()) && 'AST binary unavailable',

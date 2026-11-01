@@ -110,7 +110,7 @@ function mutationApproval(requestId = "mutation-approval") {
     } };
 }
 
-function sharedRiskFixture(action = "inpaint_candidate", ownerDirected = false) {
+function sharedRiskFixture(action = "inpaint_candidate", ownerDirected = false, schemaVersion = "image_risk_context.v1", largeHistory = false) {
     const value = intent({ action, requestedOutputCount: 1, proposalState: "AUTHORIZED", revision: 1,
         authorizedBy: OWNER, authorizedAt: "2026-10-01T14:00:00.000Z",
         authorizationExpiresAt: "2026-10-01T14:30:00.000Z", executionGrantId: GRANT,
@@ -118,31 +118,41 @@ function sharedRiskFixture(action = "inpaint_candidate", ownerDirected = false) 
             sourceCandidateSha256: "1".repeat(64), sourceCriticResultId: ownerDirected ? null : SOURCE_CRITIC,
             ...(ownerDirected ? { sourceOwnerAssessmentId: SPEC_VERSION } : {}),
             maskMediaObjectId: MASK_MEDIA, maskContentSha256: "2".repeat(64), editInstruction: "Repair the masked defect only" } : {}) });
-    value.imageRiskContext = { schemaVersion: "image_risk_context.v1", organizationId: ORG, projectId: PROJECT,
+    value.imageRiskContext = { schemaVersion, organizationId: ORG, projectId: PROJECT,
         productionUnitId: UNIT, policyDigest: "3".repeat(64), targetDigest: "4".repeat(64),
         inputs: { action, delegateUserId: DELEGATE, recipeId: RECIPE },
         history: [{ id: RECIPE, state: "RECONCILIATION_REQUIRED", costObservation: { amount: "123", unit: "quota" } }],
         unresolvedCount: 1, priorCoreCalls: 4, consumedInternalUnits: "3", reservedInternalUnits: "1",
         occupiedSlots: 1, addedCoreCalls: 1, addedOutputs: 1, maximumLocalExposure: 2,
         automaticRetry: false, providerInternalRetries: "UNKNOWN" };
+    if (largeHistory) value.imageRiskContext.history.push({ id: SOURCE_CRITIC, state: "SUCCEEDED",
+        retainedEvidence: Array.from({ length: 32 }, (_, sequence) => ({ sequence, note: "旧责任".repeat(500) })) });
+    const sorted = input => Array.isArray(input) ? input.map(sorted) : input && typeof input === "object"
+        ? Object.fromEntries(Object.keys(input).sort().map(key => [key, sorted(input[key])])) : input;
+    const digest = input => require("node:crypto").createHash("sha256").update(JSON.stringify(sorted(input))).digest("hex");
+    const risk = value.imageRiskContext;
+    const binding = schemaVersion === "image_risk_context.v2" ? {
+        schemaVersion: "image_risk_context_reference.v1", contextSchemaVersion: schemaVersion,
+        contextDigest: digest(risk), policyDigest: risk.policyDigest, targetDigest: risk.targetDigest,
+        organizationId: risk.organizationId, projectId: risk.projectId, productionUnitId: risk.productionUnitId,
+    } : risk;
     // Independent Core terms fixture: do not obtain the expected digest from the client under test.
     const terms = { schemaVersion: "agent_generation_authorization.v1", intentId: value.id,
         requestFingerprint: value.requestFingerprint, delegateUserId: DELEGATE, authorizedBy: OWNER,
         expiresAt: value.authorizationExpiresAt, maxAttempts: 1, maxOutputCount: 1, maxTotalCredits: 1,
         maxConcurrentAttempts: 1, maxWallClockMs: 300000, maxAdapterCallsPerAttempt: 1,
-        imageRiskContext: value.imageRiskContext, acceptUnresolvedPriorOutcome: true, acceptRetainedResponsibility: true,
+        imageRiskContext: binding, acceptUnresolvedPriorOutcome: true, acceptRetainedResponsibility: true,
         ...(action === "inpaint_candidate" ? { action, sourceCandidateId: SOURCE_CANDIDATE,
             sourceCandidateSha256: value.sourceCandidateSha256, sourceCriticResultId: value.sourceCriticResultId,
             ...(ownerDirected ? { sourceOwnerAssessmentId: SPEC_VERSION } : {}), maskContentSha256: value.maskContentSha256 } : {}) };
-    const sorted = input => Array.isArray(input) ? input.map(sorted) : input && typeof input === "object"
-        ? Object.fromEntries(Object.keys(input).sort().map(key => [key, sorted(input[key])])) : input;
     value.authorizationTermsDigest = require("node:crypto").createHash("sha256").update(JSON.stringify(sorted(terms))).digest("hex");
     return value;
 }
 
 test("shared-risk H0 is reviewed and reconciled without another Core authorization", async () => {
-    for (const [action, ownerDirected] of [["generate_candidate", false], ["inpaint_candidate", false], ["inpaint_candidate", true]]) {
-        const h = harness(); const current = sharedRiskFixture(action, ownerDirected); h.setIntent(current);
+    for (const schema of ["image_risk_context.v1", "image_risk_context.v2"]) {
+      for (const [action, ownerDirected] of [["generate_candidate", false], ["inpaint_candidate", false], ["inpaint_candidate", true]]) {
+        const h = harness(); const current = sharedRiskFixture(action, ownerDirected, schema, schema.endsWith(".v2")); h.setIntent(current);
         await h.service.login("exact owner password");
         const packet = await h.service.prepare({ requestId: "shared-risk", toolName: "SUVEIStudio",
             args: { command: action === "generate_candidate" ? "ExecuteAuthorizedGeneration" : "ExecuteAuthorizedCorrection",
@@ -150,15 +160,18 @@ test("shared-risk H0 is reviewed and reconciled without another Core authorizati
         assert.equal(packet.decisionMode, "reconcile_authorized");
         assert.equal(packet.expectedAuthorizationTermsDigest, current.authorizationTermsDigest);
         assert.deepEqual(packet.intent.imageRiskContext, current.imageRiskContext);
+        if (schema.endsWith(".v2")) assert.ok(Buffer.byteLength(JSON.stringify(packet.intent.imageRiskContext)) > 100 * 1024);
         if (ownerDirected) assert.equal(packet.intent.sourceOwnerAssessmentId, SPEC_VERSION);
         const decision = await h.service.decide({ requestId: "shared-risk", approved: true });
         assert.equal(decision.approved, true); assert.equal(decision.reconciled, true);
         assert.equal(h.calls.filter(call => call.method === "POST" && !call.pathname.endsWith("/login")).length, 0);
+      }
     }
 });
 
 test("pending risk H0 remains in Workbench and committed risk drift is rejected", async () => {
-    const h = harness(); const current = sharedRiskFixture(); h.setIntent({ ...current, proposalState: "PENDING", revision: 0 });
+    for (const schema of ["image_risk_context.v1", "image_risk_context.v2"]) {
+    const h = harness(); const current = sharedRiskFixture("inpaint_candidate", false, schema, schema.endsWith(".v2")); h.setIntent({ ...current, proposalState: "PENDING", revision: 0 });
     await h.service.login("exact owner password");
     const request = { requestId: "shared-risk-drift", toolName: "SUVEIStudio",
         args: { command: "ExecuteAuthorizedCorrection", projectId: PROJECT, intentId: INTENT } };
@@ -181,6 +194,53 @@ test("pending risk H0 remains in Workbench and committed risk drift is rejected"
     await assert.rejects(h.service.decide({ requestId: "expired-shared-risk", approved: true }),
         { code: "SUVEI_EXPIRED_AUTHORIZATION_CANNOT_RECOVER" });
     assert.equal(h.calls.filter(call => call.method === "POST" && !call.pathname.endsWith("/login")).length, 0);
+    }
+});
+
+test("v2 still rejects unsupported schemas, identity changes and broad grants", async () => {
+    for (const change of [
+        i => { i.imageRiskContext.schemaVersion = "image_risk_context.v3"; },
+        i => { i.imageRiskContext.organizationId = PROJECT; },
+        i => { i.imageRiskContext.inputs.delegateUserId = OWNER; },
+        i => { i.imageRiskContext.inputs.recipeId = SPEC; },
+        i => { i.imageRiskContext.automaticRetry = true; },
+        i => { i.imageRiskContext.addedCoreCalls = 2; },
+        i => { i.requestedOutputCount = 2; },
+        i => { i.authorizedBy = DELEGATE; },
+        i => { i.imageRiskContext.history[0].costObservation.amount = "124"; },
+    ]) {
+        const h = harness(); const current = sharedRiskFixture("inpaint_candidate", false, "image_risk_context.v2");
+        change(current); h.setIntent(current); await h.service.login("exact owner password");
+        await assert.rejects(h.service.prepare({ requestId: "unsupported-v2", toolName: "SUVEIStudio",
+            args: { command: "ExecuteAuthorizedCorrection", projectId: PROJECT, intentId: INTENT } }));
+        assert.equal(h.calls.filter(c => c.method === "POST" && !c.pathname.endsWith("/login")).length, 0);
+    }
+});
+
+test("authorization digests match independent Core v2 vectors and preserve installed v1 vectors", () => {
+    const authorization = current => ({ expiresAt: current.authorizationExpiresAt, maxAttempts: 1,
+        maxOutputCount: 1, maxTotalCredits: 1, maxConcurrentAttempts: 1,
+        maxWallClockMs: 300000, maxAdapterCallsPerAttempt: 1 });
+    // Captured from the unmodified v1 client, before installing this compatibility patch.
+    for (const [action, ownerDirected, expected] of [
+        ["generate_candidate", false, "f0b03124a8c13f26a3161e9faf7a4458bc40dd6bb28855ddc63bdc81e3a65aef"],
+        ["inpaint_candidate", false, "a2b109791b4cac43e99595124d5d4d08e1f8509b2eac672f8b8f9c17a441f43d"],
+        ["inpaint_candidate", true, "ffb0be72e3f598b690a94c204ba94a1ecb3454a571998fce9d66209d59636fdd"],
+    ]) {
+        const current = sharedRiskFixture(action, ownerDirected);
+        assert.equal(authorizationTermsDigest(current, OWNER, authorization(current)), expected);
+    }
+    // Produced separately with Core imageRiskBinding + execution fingerprint;
+    // these fixed expected values do not call the client serializer under test.
+    for (const [action, expected] of [
+        ["generate_candidate", "9a427648a8fcf0927fc8bb340772ba5f1269cd850b39963f24b8e296c15bdcbc"],
+        ["inpaint_candidate", "21b31a6fba1a39b22dc8a92c3340aa5a7cff9c031f9d0e70098bd7dcabdf0e0a"],
+    ]) {
+        const current = sharedRiskFixture(action, false, "image_risk_context.v2", true);
+        current.imageRiskContext.policyDigest = "c96e030669fa65733514d08318286a7a7a687b01b0b9b366e56b7ccc988f7100";
+        assert.ok(Buffer.byteLength(JSON.stringify(current.imageRiskContext)) > 100 * 1024);
+        assert.equal(authorizationTermsDigest(current, OWNER, authorization(current)), expected);
+    }
 });
 
 function harness({

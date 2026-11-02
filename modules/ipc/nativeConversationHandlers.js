@@ -8,6 +8,10 @@ const initializedWindows=new WeakSet();
 // Main-process ownership: destroying a renderer must not forget a failed revoke.
 // Keep bindings separate; only identifiers, never credentials or proposal content.
 const invalidationScopes=new Map();
+// Diagnostics are fixed protocol codes only. Never surface an exception message,
+// server payload, credential, conversation identifier or proposal text.
+const invalidationFailureCodes=new Set(['APPLICATION_SESSION_REQUIRED','NATIVE_TOOL_UNAVAILABLE','NATIVE_PLUGIN_CONFIG_REQUIRED','DEFAULT_RESOURCE_REQUIRED','JOURNAL_BUSY_RECONCILE_REQUIRED','NATIVE_RESULT_UNKNOWN','NATIVE_SESSION_IN_USE','NATIVE_SESSION_CHANGED','NATIVE_CONNECTION_CHANGED','NATIVE_TRANSPORT_UNAVAILABLE','NATIVE_SECURE_CHANNEL_REQUIRED','NATIVE_SECURE_TRANSPORT_REQUIRED','NATIVE_REQUEST_BUSY','NATIVE_REQUEST_INVALID','NATIVE_RESPONSE_INVALID','NATIVE_HTTP_FAILURE','INVALID_NATIVE_REQUEST','CONVERSATION_REQUIRED','LOCAL_AGENT_BINDING_OR_ARGUMENTS_INVALID','READ_ONLY_POLICY']);
+const failureCode=(value,fallback)=>typeof value==='string'&&invalidationFailureCodes.has(value)?value:fallback;
 async function initialize({mainWindow,chartService,binding,nativeRequest,nativeEpoch=()=>0}){
  if(initializedWindows.has(mainWindow)||mainWindow.isDestroyed?.())return;
  const channels=['native-conversation:prepare','native-conversation:execute','native-conversation:propose','native-conversation:presented','native-conversation:invalidate'];
@@ -43,17 +47,21 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
  // History can contain a host-side plan absent from this fresh process's plans map.
  // Keep the conversation closed until every requested invalidation is acknowledged.
  const blocked=conversationId=>[...invalidations.values()].some(p=>p.conversationId===conversationId);
- const invalidationRequired=()=>({handled:true,ok:false,code:'PRESENTATION_INVALIDATION_REQUIRED'});
+ const invalidationRequired=conversationId=>{
+  const reason=[...invalidations.values()].find(p=>p.conversationId===conversationId&&p.failureCode)?.failureCode;
+  return {handled:true,ok:false,code:'PRESENTATION_INVALIDATION_REQUIRED',...(reason?{diagnosticCode:reason,message:`旧方案失效确认未完成（${reason}）。消息尚未发送，草稿已保留。`}:{})};
+ };
  const retireRequests=p=>{for(const [key,request] of proposalRequests)if(request.conversationId===p.conversationId&&(!p.messageId||request.messageId===p.messageId))proposalRequests.delete(key);};
  const retirePlans=p=>{for(const [id,plan] of plans)if(plan.conversationId===p.conversationId&&(!p.messageId||plan.messageId===p.messageId))plans.delete(id);};
  async function sendInvalidation(key,request){
   if(request.inFlight)return request.inFlight;
   const epoch=readEpoch();
   const attempt=(async()=>{
-   let result;try{result=await transport.request('invalidate',request.payload);}catch{return invalidationRequired();}
+   let result;try{result=await transport.request('invalidate',request.payload);}catch(error){request.failureCode=failureCode(error?.message,'INVALIDATION_TRANSPORT_FAILED');return invalidationRequired(request.conversationId);}
    // A late response may only acknowledge the exact generation that sent it.
    if(epoch===readEpoch()&&result?.ok===true&&invalidations.get(key)===request){invalidations.delete(key);if(request.coldStart)synchronized.add(request.conversationId);retirePlans(request.payload);return result;}
-   return invalidationRequired();
+   request.failureCode=epoch!==readEpoch()?'NATIVE_CONNECTION_CHANGED':failureCode(result?.code,'INVALIDATION_NOT_ACKNOWLEDGED');
+   return invalidationRequired(request.conversationId);
   })();
   request.inFlight=attempt;
   try{return await attempt;}finally{if(request.inFlight===attempt)request.inFlight=null;}
@@ -76,13 +84,13 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
  // creating a new proposal/source, even when the deleted proposal is absent from history.
  async function synchronizeConversation(conversationId){
   if(typeof conversationId!=='string'||!conversationId)return invalidationRequired();
-  if(blocked(conversationId))return invalidationRequired();
+  if(blocked(conversationId))return invalidationRequired(conversationId);
   if(synchronized.has(conversationId))return {ok:true,version:invalidationVersions.get(conversationId)};
   const attempt=queueInvalidation({conversationId},true),version=invalidationVersions.get(conversationId);
   return {...await attempt,version};
  }
  const port=installNativeConversationPort({window:mainWindow,observedSequence:transport.sequence,isSessionCurrent:async()=>{adoptInitialConnection();return !mainWindow.isDestroyed()&&connectionEpoch===readEpoch();},snapshot:async(kind,input)=>wc.executeJavaScript(`(()=>{const input=document.getElementById('messageInput'),button=document.getElementById('sendMessageBtn'),c=window.__nativeConversationContext,hit=${kind==='mouse'?`document.elementFromPoint(${Number(input.x)||0},${Number(input.y)||0})`:'null'};return {text:input?.value??'',conversationId:c?.conversationId,eligible:!!c&&(${kind==='keyboard'?`!!button&&!button.disabled&&button.dataset.mode!=='interrupt'&&(document.activeElement===button||(${JSON.stringify(input.key)}==='Enter'&&document.activeElement===input))`:"!!button&&!button.disabled&&(hit===button||button.contains(hit))&&button.dataset.mode!=='interrupt'"})};})()`)});
- ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};if(refreshConnection())return connectionChanged();const epoch=readEpoch();if(blocked(p.conversationId))return invalidationRequired();const arrivalVersion=invalidationVersions.get(p.conversationId);let context;try{context=await port.consume(p);}catch{
+ ipcMain.handle(channels[0],async(e,p={})=>{if(!owned(e))return {handled:true,ok:false,code:'TRUSTED_CLIENT_REQUIRED'};if(refreshConnection())return connectionChanged();const epoch=readEpoch();if(blocked(p.conversationId))return invalidationRequired(p.conversationId);const arrivalVersion=invalidationVersions.get(p.conversationId);let context;try{context=await port.consume(p);}catch{
    // Denial-only recognition: never mint a trusted source from renderer/voice text.
    const text=typeof p.text==='string'?p.text.trim():'',hasPlan=[...plans.values()].some(plan=>plan.conversationId===p.conversationId);
    const nativeIntent=/^把.+(?:延后|推迟|提前)[1-9][0-9]{0,3}分钟[。！!]?$/u.test(text)||/^再(?:延后|推迟|提前)/u.test(text)||(hasPlan&&/^(可以|同意|执行吧|取消|不要|不用了|不同意|改成|改为)/u.test(text));
@@ -91,10 +99,10 @@ async function initialize({mainWindow,chartService,binding,nativeRequest,nativeE
   // Consume the short-lived physical event before any network await. The retained
   // trusted context is single-use, but cannot prepare until reconciliation succeeds.
   if(epoch!==readEpoch())return connectionChanged();
-  if(!owned(e)||blocked(p.conversationId)||invalidationVersions.get(p.conversationId)!==arrivalVersion)return invalidationRequired();
+  if(!owned(e)||blocked(p.conversationId)||invalidationVersions.get(p.conversationId)!==arrivalVersion)return invalidationRequired(p.conversationId);
   const sync=await synchronizeConversation(p.conversationId),version=sync.version;
   if(epoch!==readEpoch())return connectionChanged();
-  if(!sync.ok||!owned(e)||blocked(p.conversationId)||invalidationVersions.get(p.conversationId)!==version)return invalidationRequired();
+  if(!sync.ok||!owned(e)||blocked(p.conversationId)||invalidationVersions.get(p.conversationId)!==version)return invalidationRequired(p.conversationId);
   // A removed/failed display cannot remain confirmable even if renderer cleanup lost its IPC.
   for(const [id,plan] of plans){
    const visible=await wc.executeJavaScript(`(()=>{const e=[...(document.getElementById('chatMessages')?.querySelectorAll('[data-native-plan-id]')||[])].find(e=>e.dataset.nativePlanId===${JSON.stringify(id)});return !!e?.isConnected&&e.textContent===${JSON.stringify(plan.presentation)}&&window.__nativeConversationContext?.conversationId===${JSON.stringify(plan.conversationId)};})()`);

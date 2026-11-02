@@ -48,6 +48,16 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Preserve existing portrait originals while retaining explicit-import optimization.
+    'tests/side-pane-agent-portraits.test.mjs',
+    // Standalone SRPG host facade and its regression; distributed result fixture.
+    'Gamemodules/srpg/src/st.js',
+    // SRPG review fixes: file sender authorization and committed partial-state delivery.
+    'Gamemodules/srpg/service.cjs',
+    'Gamemodules/srpg/session-store.cjs',
+    'Gamemodules/srpg/ui.js',
+    'tests/srpg-sandbox.test.js',
+    'tests/loom-controller.test.js',
     // c20cc942 integration/review: exact worker delivery, certified-source and
     // export-resolution/selected-definition repairs, with red/green regressions.
     // No directory or permission exemption.

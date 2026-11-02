@@ -38233,6 +38233,60 @@
           "kind": "source"
         },
         {
+          "path": "vendor/fontawesome-v6/LICENSE.txt",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e69c5e39a30ce8d112e012cac36289e77691a9b7",
+          "size": 7427,
+          "sha256": "9b914eae88817d63b576eab5aafde7068c7a1abae125d7cdfb034f1da43a9afc",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-brands-400.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5d28021697ff1f32507b1bcbcbf9e6a41d0ac99f",
+          "size": 117852,
+          "sha256": "232c6f6a7678304f9efaa26f30b1610debc2ba9f4cd636b5e6751c8d73761b92",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-regular-400.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18400d7fad27fc52cfbabbda495b871bd912d045",
+          "size": 25392,
+          "sha256": "c27da6f833431da5aa295c44540bfac0fd8270ba6a3c4346427006d8a7b34b76",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-solid-900.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "758dd4f6070c7cb399334ae997ae9ff6523d3b55",
+          "size": 156400,
+          "sha256": "ae17c16afbea216707b2203ea1cf9bdb45b9bfe47d0f4ae3258ddbc6294dd02f",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-v4compatibility.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f94bec22756c48039ad405859f0d0e542033c1b2",
+          "size": 4792,
+          "sha256": "c7a869faca299d15be10a01f19d0765a7c4d46d8922d9b9317235c1e4a6f0982",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fontawesome-v6.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e8b9a13b0f8d91fc6ea27c1e4011a36a2afc466",
+          "size": 141065,
+          "sha256": "f64bbef6a51bdda26f300aba5f015799e2aa43a89dff13628789144b9e088bc7",
+          "kind": "source"
+        },
+        {
           "path": "vendor/fonts/KaTeX_AMS-Regular.woff2",
           "mode": "100644",
           "type": "blob",

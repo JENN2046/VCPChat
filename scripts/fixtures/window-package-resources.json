@@ -100,13 +100,13 @@
     },
     {
       "path": "Desktopmodules/api/ipcBridge.js",
-      "size": 19277,
-      "sha256": "74e2509e6ce8739296c89a516cb435058d68e436ec8cc8ab7e49bfa55d8426e7"
+      "size": 19988,
+      "sha256": "ca8365d969253dddf5a9612b36874988fc7d77d63635323c51b26c8e53bf5f7d"
     },
     {
       "path": "Desktopmodules/api/vcpProxy.js",
-      "size": 7198,
-      "sha256": "b7c2f5858b3c5ffc0d023bfd31a6ccc737c51d14c1c4d16f270c31538e34eb42"
+      "size": 7847,
+      "sha256": "0d7c25280fe88330fa005a2f3352d884ec2530b01b577a6dbb054baacc1a5958"
     },
     {
       "path": "Desktopmodules/builtinWidgets/appTrayWidget.js",
@@ -190,8 +190,8 @@
     },
     {
       "path": "Desktopmodules/core/widgetManager.js",
-      "size": 38465,
-      "sha256": "684bf144ea4cda2a74ef275ebee59c00abe66558795b7bda969ae5556b530b3f"
+      "size": 42172,
+      "sha256": "62bbfc26d89f1de6c3f44be30363c269c980069356bd43cd8670e9a699e38c8d"
     },
     {
       "path": "Desktopmodules/core/zIndexManager.js",
@@ -270,8 +270,8 @@
     },
     {
       "path": "Desktopmodules/favorites/favoritesManager.js",
-      "size": 8326,
-      "sha256": "f2cb3bbd6d5387211edc840c09718ab49e555d53357656923159c75d3f78907e"
+      "size": 8710,
+      "sha256": "eb2e8d49f2125a9e7f4728f0ce8daa53bd73ebb5277fa212aa2449936d56ad66"
     },
     {
       "path": "Desktopmodules/favorites/thumbnail.js",
@@ -395,13 +395,193 @@
     },
     {
       "path": "Gamemodules/game.html",
-      "size": 4764,
-      "sha256": "4f9652b70ee90f8c341d37a1f5968e0ac0ba94bb80d5f6acdac1de2a2ab00d41"
+      "size": 5259,
+      "sha256": "334dda02467613777060caaf4c161b932ee5a5fe7667bc4f249539a6c0c3b703"
     },
     {
       "path": "Gamemodules/game.js",
       "size": 9532,
       "sha256": "d04aefe30ccf2b5e1c5d0d5d9564802961ce409ce8790c5426b973da267fda46"
+    },
+    {
+      "path": "Gamemodules/srpg/index.html",
+      "size": 4823,
+      "sha256": "7134c9dab7c374893676706f513939908afb8dad462b47598ddb2c46517558c9"
+    },
+    {
+      "path": "Gamemodules/srpg/package.json",
+      "size": 74,
+      "sha256": "d9c63f2cad92d8afe210dd3402c199da22589bcd8ff47758a30139c2b9aba7ac"
+    },
+    {
+      "path": "Gamemodules/srpg/preload.cjs",
+      "size": 938,
+      "sha256": "f949ef3f48592e29158e5dc61e405dfdbe1a30ed0b39faf52044b27bb4782ac6"
+    },
+    {
+      "path": "Gamemodules/srpg/service.cjs",
+      "size": 4364,
+      "sha256": "2d535530eaad3c876746960076711bebd593c34f951c2c5acd55bb8f9db76dbb"
+    },
+    {
+      "path": "Gamemodules/srpg/session-store.cjs",
+      "size": 25637,
+      "sha256": "1db922686069d2f36c0876e759552f97834994d1f4d854e51a032836a150a8cd"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ai-api.js",
+      "size": 3667,
+      "sha256": "32865a76eac2f7ef8b570cb71a41628641bec5633fbf4ce003f7cd93c981fe90"
+    },
+    {
+      "path": "Gamemodules/srpg/src/commander.js",
+      "size": 5666,
+      "sha256": "261da8f643d4feb7a55b6efa6e1abf3da89bd9517b8b7e4dd4c9f07e061f06c2"
+    },
+    {
+      "path": "Gamemodules/srpg/src/commands.js",
+      "size": 14330,
+      "sha256": "c85aab3f5d8ce847c20b16c8a59d5dcd4c85d5daebe4c2c0b3d231d65a9a29f9"
+    },
+    {
+      "path": "Gamemodules/srpg/src/context.js",
+      "size": 12708,
+      "sha256": "b2f676c0e9abb47d31ace6cf77b34afbec92c280f433505d92570ae327e52ddc"
+    },
+    {
+      "path": "Gamemodules/srpg/src/defaults.js",
+      "size": 30080,
+      "sha256": "17f3c789e24a0290419312f3bf51a4b500505af822377548393a9b8109f4555c"
+    },
+    {
+      "path": "Gamemodules/srpg/src/designer.js",
+      "size": 30244,
+      "sha256": "6cd67fa34b548ae0ea4e8f56904ba280d052cdce61b5f254f51b5b5f088e6d0e"
+    },
+    {
+      "path": "Gamemodules/srpg/src/engine.js",
+      "size": 93992,
+      "sha256": "88e76e26c3246dbf19741bebff12fee71b10f14dc05409b3eed34c382c3b840b"
+    },
+    {
+      "path": "Gamemodules/srpg/src/exchange.js",
+      "size": 1203,
+      "sha256": "10ab45174a227f8d5b9527fa82e2d037e0b3ab70f6f74013d95bd3bb201a4fd4"
+    },
+    {
+      "path": "Gamemodules/srpg/src/history.js",
+      "size": 2882,
+      "sha256": "88725f0e8513ba6b45a4ad7c19e3dac34fc4292022abbb1fb4c7bb14bea407f3"
+    },
+    {
+      "path": "Gamemodules/srpg/src/llm.js",
+      "size": 4497,
+      "sha256": "1748863b670a9dfde3fcc25ba170d9765b03393a172a56d43c4e2a06e5cf9c4d"
+    },
+    {
+      "path": "Gamemodules/srpg/src/manual.js",
+      "size": 6247,
+      "sha256": "72a6f10c1791918e3869560d9e60dfb425ffc84e43c2045d2d800d1adfbe0fb9"
+    },
+    {
+      "path": "Gamemodules/srpg/src/narrator.js",
+      "size": 18430,
+      "sha256": "96376ac88c576fc46f1cb52b82940b17547d8c4c5571e740ca6ebbf01d896955"
+    },
+    {
+      "path": "Gamemodules/srpg/src/profiles.js",
+      "size": 3720,
+      "sha256": "a308ca5b385df5f3fbc645578f651cb92724f613203aef305fa33b956ccb8979"
+    },
+    {
+      "path": "Gamemodules/srpg/src/st.js",
+      "size": 20113,
+      "sha256": "fbdc495c03bcc2ffc758c08ef020e24def9545ee78ae46922b3c77bbbb7d3efe"
+    },
+    {
+      "path": "Gamemodules/srpg/src/story.js",
+      "size": 22252,
+      "sha256": "89b585ebd01980f60fa5d7b125b49dfd57792286c7e0596b6c4498a1c5d9def2"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/action-process.js",
+      "size": 7955,
+      "sha256": "00fe563d5249d944a024066dea351eae55eb7f251be95f3b24e4f18edf2fd21e"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/battle.js",
+      "size": 71467,
+      "sha256": "daf019c37db4e60d5cd3966d1754c8a847b5cd41be1109a99a77e7d264fd6aa9"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/chat-messages.js",
+      "size": 3929,
+      "sha256": "0ac09b860e0d535dfc1e5c53d7b4c219ae4baa39408598002eea080dfef93bd5"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/designer-tab.js",
+      "size": 37133,
+      "sha256": "bf236428537b97af91b56f7d97df15b8ead86496be3c4df52db524960188e39a"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/dom.js",
+      "size": 12257,
+      "sha256": "1ebc8252b5ac641a95190d6dc23e97ff4283b8a0ee0727a5898c66ed55d92c2e"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/editors.js",
+      "size": 50371,
+      "sha256": "1653baaf8f605ffafef93b602e49340d5763c3598ccf84b8f45167eb6414d53c"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/files.js",
+      "size": 1092,
+      "sha256": "1840db743c3d923c5263c158549106c80397e44582580669a6e6579afe402a46"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/llm-flow.js",
+      "size": 9704,
+      "sha256": "9c75355d92a4a4102c88f0eeb60c2732189dcbcf6b034a2eae0ee113d26d5cab"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/panel.js",
+      "size": 20130,
+      "sha256": "18a6e93ff52743afe12c3ecd51af8411462361377553430dfadce66e06755fe7"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/profiles-tab.js",
+      "size": 10756,
+      "sha256": "631ce65ba3cdb7dec3ac187770027334815c2e13cb3420bac5904b65afe193f9"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/settings.js",
+      "size": 18354,
+      "sha256": "503166f9807335cba0036b875ef11a4294dd94f72839d880b998b40b6290c51a"
+    },
+    {
+      "path": "Gamemodules/srpg/src/ui/story-flow.js",
+      "size": 14680,
+      "sha256": "3494d92252e884bb0ea851337320fe444e764e1773c9db57b57c0adc7a7a2bd3"
+    },
+    {
+      "path": "Gamemodules/srpg/src/unit-lore.js",
+      "size": 4184,
+      "sha256": "6db75abe3b172bf193454c86aa4064fd56593c4936d674140a91a186d30a111c"
+    },
+    {
+      "path": "Gamemodules/srpg/style.css",
+      "size": 48244,
+      "sha256": "678b1dc8a058230322809e062ee7e9415df27cb3cddd9608e1c9bec788eacf93"
+    },
+    {
+      "path": "Gamemodules/srpg/tool-result.cjs",
+      "size": 1650,
+      "sha256": "47771118933db4f7c180861f97b6e30f6b395133cf82bdc0471a1853ca2f8e14"
+    },
+    {
+      "path": "Gamemodules/srpg/ui.js",
+      "size": 6650,
+      "sha256": "e9d36016fecbf3d18c7fedc8d77299ab2f24bb3a6900dda0f4ad093f6dd9e98d"
     },
     {
       "path": "Gamemodules/vcp-neon-game/index.html",
@@ -812,6 +992,16 @@
       "path": "VCPDistributedServer/Plugin/GameController/plugin-manifest.json",
       "size": 2287,
       "sha256": "51dab9067c10c2f2770d7e924aa8686d6438c705d0ad5689d390ae7906e6b605"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/TavernSRPG/plugin-manifest.json",
+      "size": 3979,
+      "sha256": "9a43591857f6a741c0f2d595d8078c9ebfb188ed639edce8034be65c32e71156"
+    },
+    {
+      "path": "VCPDistributedServer/Plugin/TavernSRPG/tavern-srpg-service.js",
+      "size": 281,
+      "sha256": "0b9f6ba0c7e17cc9e36cfce0422b792d22ed29e4baa387d8c1a00ab169428bac"
     }
   ],
   "sourceBaseline": "20268e79fe62718fcc14dd3ac2748abbec574515",

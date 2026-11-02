@@ -61,6 +61,11 @@ test('game tools are exact package inputs with checked manifest and service byte
         'VCPDistributedServer/Plugin/GameController/GameControllerService.js',
         'VCPDistributedServer/Plugin/ForgeTax/plugin-manifest.json',
         'VCPDistributedServer/Plugin/ForgeTax/forge-tax-service.js',
+        'VCPDistributedServer/Plugin/TavernSRPG/plugin-manifest.json',
+        'VCPDistributedServer/Plugin/TavernSRPG/tavern-srpg-service.js',
+        'Gamemodules/srpg/package.json',
+        'Gamemodules/srpg/src/engine.js',
+        'Gamemodules/srpg/service.cjs',
     ];
     const read = relative => { const target = path.join(root, relative); return fs.existsSync(target) ? fs.readFileSync(target) : null; };
     for (const file of paths) {

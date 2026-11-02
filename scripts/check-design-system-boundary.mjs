@@ -48,6 +48,8 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Preserve existing portrait originals while retaining explicit-import optimization.
+    'tests/side-pane-agent-portraits.test.mjs',
     // c20cc942 integration/review: exact worker delivery, certified-source and
     // export-resolution/selected-definition repairs, with red/green regressions.
     // No directory or permission exemption.

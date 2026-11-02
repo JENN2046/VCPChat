@@ -495,8 +495,8 @@
     },
     {
       "path": "Gamemodules/srpg/src/st.js",
-      "size": 20113,
-      "sha256": "fbdc495c03bcc2ffc758c08ef020e24def9545ee78ae46922b3c77bbbb7d3efe"
+      "size": 20302,
+      "sha256": "584930f24838082b9ad50de877c41b6b7637e54858d91e31af81eebdca5f5eed"
     },
     {
       "path": "Gamemodules/srpg/src/story.js",

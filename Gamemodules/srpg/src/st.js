@@ -157,12 +157,14 @@ export function isEnabledForChat() {
 
 // ---------------------------------------------------------------- 世界书
 
-let wiModule = null;
 async function worldInfoModule() {
-    if (!wiModule) {
-        wiModule = import('/scripts/world-info.js').catch(() => import('../../../../world-info.js')).catch(() => null);
-    }
-    return wiModule;
+    // The standalone VCP window receives optional world-book capabilities from
+    // its host facade; SillyTavern server paths are outside the packaged app.
+    const c = ctx();
+    return {
+        world_names: Array.isArray(c.world_names) ? c.world_names : [],
+        loadWorldInfo: typeof c.loadWorldInfo === 'function' ? name => c.loadWorldInfo(name) : undefined,
+    };
 }
 
 export async function listWorldBooks() {

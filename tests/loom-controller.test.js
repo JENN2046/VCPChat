@@ -290,6 +290,7 @@ async function run() {
         pluginManager.processToolCall = (_name, args) => loomController.processToolCall(args);
         pluginManager.getPlugin = () => loomManifest;
         await DistributedServer.prototype.handleToolExecutionRequest.call({
+            handleAdmittedToolExecutionRequest: DistributedServer.prototype.handleAdmittedToolExecutionRequest,
             serverName: 'test', debugMode: false,
             sendMessage: payload => sent.push(JSON.parse(JSON.stringify(payload))),
         }, {

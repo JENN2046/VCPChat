@@ -1,5 +1,16 @@
 'use strict';
 const test = require('node:test');
+
+test('standalone world-book adapter uses the host facade without server-relative modules', async t => {
+    const previous = globalThis.SillyTavern;
+    t.after(() => {
+        if (previous === undefined) delete globalThis.SillyTavern;
+        else globalThis.SillyTavern = previous;
+    });
+    globalThis.SillyTavern = { getContext: () => ({ world_names: ['Beta', 'Alpha'] }) };
+    const { listWorldBooks } = await import('../Gamemodules/srpg/src/st.js');
+    assert.deepEqual(await listWorldBooks(), ['Alpha', 'Beta']);
+});
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');

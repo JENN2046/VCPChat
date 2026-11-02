@@ -491,6 +491,13 @@ class SessionStore {
             }
         }
 
+        // A failed command/save may have changed the in-memory object. Broadcast
+        // only the last committed session, including earlier successful steps.
+        if (failedStep !== null) {
+            const persisted = await this.load(boardId);
+            if (!persisted) throw new Error('无法读取已保存的战棋状态');
+            session = persisted;
+        }
         const summary = await this.buildSummary(session);
         const output = {
             ok: failedStep === null,

@@ -169,7 +169,10 @@ document.getElementById('vcp-copy-report-btn')?.addEventListener('click', () => 
 
 if (remote) {
     remote.onUpdate(output => {
-        if (!output?.ok || !output.state || output.source === 'ui') return;
+        if ((output?.ok !== true && output?.partial !== true) || !output.state || output.source === 'ui') return;
+        // Discard an older snapshot queued before this authoritative update.
+        clearTimeout(syncTimer);
+        syncTimer = null;
         applyingRemote = true;
         try {
             if (output.state.settings) {

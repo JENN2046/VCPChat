@@ -1,7 +1,7 @@
 'use strict';
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
+const { fileURLToPath } = require('node:url');
 const { SessionStore } = require('./session-store.cjs');
 
 const PAGE = path.join(__dirname, 'index.html');
@@ -24,7 +24,13 @@ function assertValidSender(event) {
         throw new Error('非法 SRPG 窗口请求');
     }
     const url = new URL(event.senderFrame.url);
-    if (url.protocol !== 'file:' || pathToFileURL(PAGE).href !== url.origin + url.pathname) {
+    if (url.protocol !== 'file:') throw new Error('非法 SRPG 窗口来源');
+    const actual = path.resolve(fileURLToPath(url));
+    const expected = path.resolve(PAGE);
+    const samePage = process.platform === 'win32'
+        ? actual.toLowerCase() === expected.toLowerCase()
+        : actual === expected;
+    if (!samePage) {
         throw new Error('非法 SRPG 窗口来源');
     }
 }

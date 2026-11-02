@@ -251,6 +251,19 @@ export const chatManager = (() => {
         return repository.saveHistory(itemId, itemType, topicId, history);
     }
 
+    async function mutateHistory(itemId, itemType, topicId, transform, options = {}) {
+        if (historyMutationAuthority) {
+            return historyMutationAuthority.mutate({ itemId, itemType, topicId, category: 'chat-manager', ...options }, transform);
+        }
+        const repository = requireHistoryRepository();
+        const current = await repository.getHistory(itemId, itemType, topicId);
+        if (!Array.isArray(current)) throw new Error(current?.error || '读取聊天记录失败');
+        const next = await transform(structuredClone(current));
+        const result = await repository.saveHistory(itemId, itemType, topicId, next, repository.revisionOf?.(current));
+        if (result?.success === false || result?.error) throw new Error(result.error || '保存聊天记录失败');
+        return { history: Array.isArray(result?.history) ? result.history : next, result };
+    }
+
     // DOM Elements from renderer.js
     let elements = {};
     
@@ -313,23 +326,14 @@ export const chatManager = (() => {
         const signature = `${sendContext.agentId}:${sendContext.topicId}`;
         const previous = outgoingPersistenceQueues.get(signature) || Promise.resolve();
         const operation = previous.catch(() => {}).then(async () => {
-            const persisted = await getHistory(sendContext.agentId, sendContext.itemType || 'agent', sendContext.topicId);
-            if (!Array.isArray(persisted)) {
-                throw new Error(persisted?.error || '读取聊天记录失败');
-            }
-            const nextHistory = persisted.some(message => message?.id === userMessage.id)
-                ? persisted
-                : [...persisted, userMessage];
-            const saveResult = await saveHistory(
+            const commit = await mutateHistory(
                 sendContext.agentId,
                 sendContext.itemType || 'agent',
                 sendContext.topicId,
-                nextHistory
+                current => current.some(message => message?.id === userMessage.id) ? current : [...current, userMessage],
+                { category: 'outgoing-message' }
             );
-            if (saveResult?.success === false) {
-                throw new Error(saveResult.error || '保存聊天记录失败');
-            }
-            return nextHistory;
+            return [...commit.history];
         });
         outgoingPersistenceQueues.set(signature, operation);
         operation.finally(() => {
@@ -1951,12 +1955,14 @@ export const chatManager = (() => {
             try {
                 const sourceHistory = await getHistory(sendContext.agentId, sendContext.itemType || 'agent', sendContext.topicId);
                 if (!Array.isArray(sourceHistory)) return null;
-                const cleanedHistory = sourceHistory.filter(message => message.id !== thinkingMessage.id);
+                let cleanedHistory = sourceHistory.filter(message => message.id !== thinkingMessage.id);
                 if (cleanedHistory.length !== sourceHistory.length) {
-                    const saveResult = await saveHistory(sendContext.agentId, sendContext.itemType || 'agent', sendContext.topicId, cleanedHistory);
-                    if (saveResult?.success === false) {
-                        throw new Error(saveResult.error || '清理临时消息失败');
-                    }
+                    const commit = await mutateHistory(
+                        sendContext.agentId, sendContext.itemType || 'agent', sendContext.topicId,
+                        current => current.filter(message => message.id !== thinkingMessage.id),
+                        { category: 'remove-thinking-message', deleteIds: [thinkingMessage.id] }
+                    );
+                    cleanedHistory = [...commit.history];
                 }
                 if (isSendContextCurrent()) {
                     sendHistoryRef.set(
@@ -2228,12 +2234,18 @@ export const chatManager = (() => {
                     let persistenceError = null;
                     if (historyForSave && !historyForSave.error) {
                         // Remove any lingering 'thinking' message and add the new one
-                        const finalHistory = historyForSave.filter(msg => msg.id !== thinkingMessage.id);
+                        let finalHistory = historyForSave.filter(msg => msg.id !== thinkingMessage.id);
                         finalHistory.push(assistantMessage);
                         
                         // Save the final, complete history to the correct file
                         try {
-                            const finalSave = await saveHistory(responseContext.agentId, responseContext.itemType || 'agent', responseContext.topicId, finalHistory);
+                            const commit = await mutateHistory(
+                                responseContext.agentId, responseContext.itemType || 'agent', responseContext.topicId,
+                                current => [...current.filter(msg => msg.id !== thinkingMessage.id), assistantMessage],
+                                { category: 'non-stream-reply', deleteIds: [thinkingMessage.id] }
+                            );
+                            finalHistory = [...commit.history];
+                            const finalSave = commit.result;
                             if (finalSave?.success === false || finalSave?.error) persistenceError = finalSave.error || '保存聊天记录失败';
                         } catch (error) {
                             // Keep the visible reply available for retry when durable storage rejects.

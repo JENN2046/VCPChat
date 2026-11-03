@@ -106,10 +106,9 @@ test('embedded session manager bounds its view pool and preserves the active nat
         assert.equal(manager.activate(actions[1]).success, true);
         assert.equal(FakeView.instances[0].visible, false);
         assert.deepEqual(nativeCalls.filter(([, view]) => view === FakeView.instances[1]), [
-            ['remove', FakeView.instances[1]],
             ['add', FakeView.instances[1]],
             ['visible', FakeView.instances[1], true],
-        ], 'switching sessions must reorder the new target without first hiding it');
+        ], 'switching sessions must reorder the existing child without detaching it (Linux/Electron 44 stops painting reattached views)');
         assert.equal(manager.activate(actions[0]).success, true);
         assert.equal(manager.setBounds(actions[0], { x: 0, y: 35.2, width: 960, height: 684.8 }).success, true);
         assert.deepEqual(FakeView.instances[0].bounds, { x: 0, y: 44, width: 1200, height: 856 });

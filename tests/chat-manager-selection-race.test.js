@@ -31,6 +31,9 @@ function createFixture(options = {}) {
         <ul class="topic-list" id="topicList"></ul>
     </body></html>`, { runScripts: 'outside-only', url: 'https://vcpchat.local/' });
     const { window } = dom;
+    // jsdom omits this browser API; use Node's standard implementation so the
+    // real repository-only persistence path is exercised in the test window.
+    window.structuredClone = structuredClone;
     window.buildDefaultMessageContent = async ({ message }) => [{
         type: 'text',
         text: typeof message?.content === 'string' ? message.content : '',

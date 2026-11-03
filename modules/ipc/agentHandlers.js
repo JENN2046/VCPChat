@@ -7,7 +7,7 @@ const { clearTrajectoriesOfOwner } = require('../modelTrajectory');
 const { getAgentMoodStore } = require('../agentMood');
 const { resolvePortraitDisplayPath, forgetPortraitDisplayImages } = require('../services/agentPortraitImages');
 const { hostHooks } = require('../hostHooks');
-const { optimizePortraitBuffer, withPortraitLock, migratePortraitsUnlocked } = require('../services/portraitOptimizer');
+const { optimizePortraitBuffer, withPortraitLock } = require('../services/portraitOptimizer');
 
 let AGENT_DIR_CACHE; // Cache the agent directory path
 let USER_DATA_DIR_CACHE; // Cache the user data directory path
@@ -50,7 +50,7 @@ function portraitCacheDir() {
 
 async function findPortraitUrls(agentDir) {
     return withPortraitLock(agentDir, async () => {
-        await migratePortraitsUnlocked(agentDir);
+        // Listing existing portraits must preserve original files. Optimize only explicit imports.
         return findPortraitUrlsUnlocked(agentDir);
     });
 }

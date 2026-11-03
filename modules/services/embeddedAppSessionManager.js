@@ -273,7 +273,9 @@ function createEmbeddedAppSessionManager({ mainWindow, launchStandalone, powerMo
         const wasActive = activeAction === appAction;
         if (mainWindow && !mainWindow.isDestroyed() && !wasActive) {
             try {
-                mainWindow.contentView.removeChildView(session.view);
+                // Adding an existing child reorders it to the front. Detaching
+                // first leaves WebContentsView unpainted on Linux/Electron 44
+                // (electron/electron#54626), even after setVisible(true).
                 mainWindow.contentView.addChildView(session.view);
             } catch { /* ignored */ }
         }

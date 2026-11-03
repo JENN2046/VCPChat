@@ -55,7 +55,7 @@ test('integrated boundary allows product work and rejects retained runtime, asse
         const valid = run();
         assert.equal(valid.status, 0, valid.stderr);
         // Pin a synthetic ancestry frame, then exercise the actual guard on
-        // the two already-merged JSO declarations, not a broad path exemption.
+        // the reviewed JSO declarations and plan-panel identities.
         const git = args => {
             const result = spawnSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true });
             assert.equal(result.status, 0, result.stderr); return result.stdout.trim();
@@ -70,10 +70,18 @@ test('integrated boundary allows product work and rejects retained runtime, asse
         const frozen = JSON.parse(fs.readFileSync(new URL('./fixtures/reviewed-jso-consumer-sources.json', import.meta.url), 'utf8'));
         assert.equal(frozen.schema, 'reviewed-jso-consumer-test-data/v1');
         assert.deepEqual(Object.keys(frozen.sources).sort(), [...reviewed.keys()].sort());
+        const planSources = new Map([
+            ['modules/ui-system/side-pane/planDetailSideProvider.js', '632ad8b643df23934e692cf273ab3ec59fbf01c5'],
+            ['modules/ui-system/side-pane/tab-types/plan-detail.js', '3bbf461867a1a9076f8f4daa9bd71078a09caa52'],
+            ['tests/side-pane-plan-detail.test.mjs', '5603a27d3604ffc1ce0a72713022466f2ea129d5'],
+        ]);
+        for (const [file, blob] of planSources) reviewed.set(file, blob);
         const originals = new Map();
         for (const file of reviewed.keys()) {
-            assert.equal(frozen.sources[file].gitBlob, reviewed.get(file));
-            const bytes = frozen.sources[file].text;
+            const bytes = frozen.sources[file]?.text
+                ?? fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+            const data = Buffer.from(bytes);
+            assert.equal(createHash('sha1').update(`blob ${data.length}\0`).update(data).digest('hex'), reviewed.get(file));
             originals.set(file, bytes); write(file, bytes); git(['add', '--', file]);
         }
         assert.equal(run().status, 0, 'only the reviewed declaration identities are admitted');
@@ -86,6 +94,15 @@ test('integrated boundary allows product work and rejects retained runtime, asse
         assert.match(run().stderr, /outside the subtraction allowlist/);
         git(['rm', '--cached', '--', 'docs/TRUSTED_ACTION_V1_OTHER.md']);
         fs.unlinkSync(path.join(root, 'docs/TRUSTED_ACTION_V1_OTHER.md'));
+        const planPath = 'modules/ui-system/side-pane/planDetailSideProvider.js';
+        git(['update-index', '--cacheinfo', '100755,' + reviewed.get(planPath) + ',' + planPath]);
+        assert.match(run().stderr, /outside the subtraction allowlist/);
+        git(['update-index', '--cacheinfo', '100644,' + reviewed.get(planPath) + ',' + planPath]);
+        write('modules/ui-system/side-pane/unreviewed-plan.js', 'export const unreviewed = true;');
+        git(['add', '--', 'modules/ui-system/side-pane/unreviewed-plan.js']);
+        assert.match(run().stderr, /outside the subtraction allowlist/);
+        git(['rm', '--cached', '--', 'modules/ui-system/side-pane/unreviewed-plan.js']);
+        fs.unlinkSync(path.join(root, 'modules/ui-system/side-pane/unreviewed-plan.js'));
 
         // A reviewed working file must not hide a different staged blob.
         const stagedMutation = spawnSync('git', ['hash-object', '-w', '--stdin'], { cwd: root, encoding: 'utf8', input: 'unreviewed staged content' });
@@ -101,7 +118,7 @@ test('integrated boundary allows product work and rejects retained runtime, asse
             return { path: file, mode, type, sha, size: Number(size) };
         });
         const baseline = { commit: git(['rev-parse', 'HEAD']), tree: git(['rev-parse', 'HEAD^{tree}']), entries: entries('HEAD') };
-        const projection = entries(git(['write-tree'])).filter(row => !reviewed.has(row.path)).map(row => ({
+        const projection = entries(git(['write-tree'])).filter(row => !frozen.sources[row.path]).map(row => ({
             path: row.path, mode: row.mode, blob: row.sha, size: row.size,
             sha256: createHash('sha256').update(fs.readFileSync(path.join(root, row.path))).digest('hex'),
         }));
@@ -115,7 +132,9 @@ test('integrated boundary allows product work and rejects retained runtime, asse
                 VCPCHAT_CI_SOURCE_CONTEXT: contextFile, VCPCHAT_CI_SOURCE_CONTEXT_SHA256: createHash('sha256').update(bytes).digest('hex') };
             return spawnSync(process.execPath, [guard], { cwd: root, env, encoding: 'utf8', windowsHide: true });
         };
-        for (const file of reviewed.keys()) fs.unlinkSync(path.join(root, file));
+        // Only metadata-only declarations are absent in real CI projections;
+        // product plan sources remain materialized and scanned by the guard.
+        for (const file of Object.keys(frozen.sources)) fs.unlinkSync(path.join(root, file));
         const admitted = runContext(); assert.equal(admitted.status, 0, admitted.stderr);
         git(['update-index', '--cacheinfo', '100755,' + reviewed.get('docs/TRUSTED_ACTION_V1_CONSUMER.md') + ',docs/TRUSTED_ACTION_V1_CONSUMER.md']);
         assert.match(runContext().stderr, /outside the subtraction allowlist/);

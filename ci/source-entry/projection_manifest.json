@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "a9a8ca96b20dc85c244ad12021cd6a74776fa261",
-          "size": 31227,
-          "sha256": "41b5cbfc9fe0d6a67f24ecb9451f0081ee9acffd4261287d7db9f7b21a24c16d",
+          "blob": "8451b49912675d7cfdd7c2cdbaaf58ef88f2953a",
+          "size": 32902,
+          "sha256": "19269653e45fd8adf8c050271a2fc6ba2aa30548d1bc6bbf8518398983b0d9a2",
           "kind": "source"
         },
         {
@@ -1444,18 +1444,18 @@
           "path": "Desktopmodules/api/ipcBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f429c458a32cb489f994825ea96f908c5860b743",
-          "size": 19277,
-          "sha256": "74e2509e6ce8739296c89a516cb435058d68e436ec8cc8ab7e49bfa55d8426e7",
+          "blob": "e230f4edbd83c8c9dcbf5a8fcdc7899c7bd3fe72",
+          "size": 19988,
+          "sha256": "ca8365d969253dddf5a9612b36874988fc7d77d63635323c51b26c8e53bf5f7d",
           "kind": "source"
         },
         {
           "path": "Desktopmodules/api/vcpProxy.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9c665002c44345b697a3853cc88ff55d956f0344",
-          "size": 7198,
-          "sha256": "b7c2f5858b3c5ffc0d023bfd31a6ccc737c51d14c1c4d16f270c31538e34eb42",
+          "blob": "d5c378d201007f06a43d58dc69ef9b2d649a1f9d",
+          "size": 7847,
+          "sha256": "0d7c25280fe88330fa005a2f3352d884ec2530b01b577a6dbb054baacc1a5958",
           "kind": "source"
         },
         {
@@ -1606,9 +1606,9 @@
           "path": "Desktopmodules/core/widgetManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5b2d7eeae64f03f856da06bc26a2ef52f4f91721",
-          "size": 38465,
-          "sha256": "684bf144ea4cda2a74ef275ebee59c00abe66558795b7bda969ae5556b530b3f",
+          "blob": "919cf27ee35487f723664828b991f1ca0246e657",
+          "size": 42172,
+          "sha256": "62bbfc26d89f1de6c3f44be30363c269c980069356bd43cd8670e9a699e38c8d",
           "kind": "source"
         },
         {
@@ -1750,9 +1750,9 @@
           "path": "Desktopmodules/favorites/favoritesManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "625ac833e74120a02bca4caf61b3161991c585ea",
-          "size": 8326,
-          "sha256": "f2cb3bbd6d5387211edc840c09718ab49e555d53357656923159c75d3f78907e",
+          "blob": "e7e4cbdf59990ec351dac8f4985b9c21b97d0eac",
+          "size": 8710,
+          "sha256": "eb2e8d49f2125a9e7f4728f0ce8daa53bd73ebb5277fa212aa2449936d56ad66",
           "kind": "source"
         },
         {
@@ -2056,9 +2056,9 @@
           "path": "Gamemodules/game.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "970327fba005bded1f15f84d8befbf0737340d75",
-          "size": 4764,
-          "sha256": "4f9652b70ee90f8c341d37a1f5968e0ac0ba94bb80d5f6acdac1de2a2ab00d41",
+          "blob": "89e027fa71e080c94f626616dabe927df986d640",
+          "size": 5259,
+          "sha256": "334dda02467613777060caaf4c161b932ee5a5fe7667bc4f249539a6c0c3b703",
           "kind": "source"
         },
         {
@@ -2068,6 +2068,330 @@
           "blob": "ece1f09ffb074b8a182ab0e91717909e8c51ff91",
           "size": 9532,
           "sha256": "d04aefe30ccf2b5e1c5d0d5d9564802961ce409ce8790c5426b973da267fda46",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "022d0a714ced403e4a98dd1a0901ea4dc6b0ba15",
+          "size": 4823,
+          "sha256": "7134c9dab7c374893676706f513939908afb8dad462b47598ddb2c46517558c9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/package.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b32c3ccc35418d09190eb5d9bd4d7dedaa04fdc9",
+          "size": 74,
+          "sha256": "d9c63f2cad92d8afe210dd3402c199da22589bcd8ff47758a30139c2b9aba7ac",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/preload.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e65c185919dec395bdd51499afadc2ef8953d050",
+          "size": 938,
+          "sha256": "f949ef3f48592e29158e5dc61e405dfdbe1a30ed0b39faf52044b27bb4782ac6",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/service.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a4b2566495b61660b3986352a4c1a7b3d54f4edf",
+          "size": 4604,
+          "sha256": "7cbf3849b4481f9ed776521259853eca2d23fc64abc243c1ee606b2b3d276c43",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/session-store.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "16fdeb5403fd237740af0c0767d80078006dd6a3",
+          "size": 26019,
+          "sha256": "f79d514b9c08007be52e344fdbe0dbb83ef31bf9cd7378c07d9c95a676a0368f",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ai-api.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e944cbc354e1749afe96600546faa54f83a7952e",
+          "size": 3667,
+          "sha256": "32865a76eac2f7ef8b570cb71a41628641bec5633fbf4ce003f7cd93c981fe90",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/commander.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "825290e18e3b49fd0ce064f2afa0070842ef01d3",
+          "size": 5666,
+          "sha256": "261da8f643d4feb7a55b6efa6e1abf3da89bd9517b8b7e4dd4c9f07e061f06c2",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/commands.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6dc9a6ed8d70ed54845eb8c1c53541997b1652c0",
+          "size": 14330,
+          "sha256": "c85aab3f5d8ce847c20b16c8a59d5dcd4c85d5daebe4c2c0b3d231d65a9a29f9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/context.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c03cfdb4377ec4542a767256683a94e0a8404edb",
+          "size": 12708,
+          "sha256": "b2f676c0e9abb47d31ace6cf77b34afbec92c280f433505d92570ae327e52ddc",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/defaults.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f6ad0a2987e19551138f05f789887af6b26a9c03",
+          "size": 30080,
+          "sha256": "17f3c789e24a0290419312f3bf51a4b500505af822377548393a9b8109f4555c",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/designer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "80962cdcc28a2dead1e45632697c5ec1288c7619",
+          "size": 30244,
+          "sha256": "6cd67fa34b548ae0ea4e8f56904ba280d052cdce61b5f254f51b5b5f088e6d0e",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/engine.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c0a9c6ced48d6bd68b387cb633a6ab0993130e64",
+          "size": 93992,
+          "sha256": "88e76e26c3246dbf19741bebff12fee71b10f14dc05409b3eed34c382c3b840b",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/exchange.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c0d4c24dd3e8e5cd036463bbc2d8751da350a5cf",
+          "size": 1203,
+          "sha256": "10ab45174a227f8d5b9527fa82e2d037e0b3ab70f6f74013d95bd3bb201a4fd4",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/history.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "28f782bdefaa62b28f855536e9c5366e3c7d9cf7",
+          "size": 2882,
+          "sha256": "88725f0e8513ba6b45a4ad7c19e3dac34fc4292022abbb1fb4c7bb14bea407f3",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/llm.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9823eb9654a8ad0a701e20a67d7bca381a0caaa5",
+          "size": 4497,
+          "sha256": "1748863b670a9dfde3fcc25ba170d9765b03393a172a56d43c4e2a06e5cf9c4d",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/manual.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0dff0b1fb4a480290d75c9e581ab0287dd1c5d18",
+          "size": 6247,
+          "sha256": "72a6f10c1791918e3869560d9e60dfb425ffc84e43c2045d2d800d1adfbe0fb9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/narrator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4ae2c9d63c54a9925c9a464be96f311ad2e3e829",
+          "size": 18430,
+          "sha256": "96376ac88c576fc46f1cb52b82940b17547d8c4c5571e740ca6ebbf01d896955",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/profiles.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2124e8710b81ad7f0af8e7f01ebdb853965d1cce",
+          "size": 3720,
+          "sha256": "a308ca5b385df5f3fbc645578f651cb92724f613203aef305fa33b956ccb8979",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/st.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4e66a901424ea1c55c5b1ad35c7f084aa16bd0c3",
+          "size": 20302,
+          "sha256": "584930f24838082b9ad50de877c41b6b7637e54858d91e31af81eebdca5f5eed",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/story.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0ccaec009cc613b137405d429499506d213cb988",
+          "size": 22252,
+          "sha256": "89b585ebd01980f60fa5d7b125b49dfd57792286c7e0596b6c4498a1c5d9def2",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/action-process.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "49efc5e5bc37fbb831574605b7653a9d0702540c",
+          "size": 7955,
+          "sha256": "00fe563d5249d944a024066dea351eae55eb7f251be95f3b24e4f18edf2fd21e",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/battle.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac3b682e440810359a69fc14468b0f7e39de372e",
+          "size": 71467,
+          "sha256": "daf019c37db4e60d5cd3966d1754c8a847b5cd41be1109a99a77e7d264fd6aa9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/chat-messages.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5030ef3ead6788187701803535a31ab3fb811549",
+          "size": 3929,
+          "sha256": "0ac09b860e0d535dfc1e5c53d7b4c219ae4baa39408598002eea080dfef93bd5",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/designer-tab.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "31c717be81e866e0e334f09b84306262599aa075",
+          "size": 37133,
+          "sha256": "bf236428537b97af91b56f7d97df15b8ead86496be3c4df52db524960188e39a",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/dom.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "80a0c8b767b534b9288c2a9156476b09d03b7c80",
+          "size": 12257,
+          "sha256": "1ebc8252b5ac641a95190d6dc23e97ff4283b8a0ee0727a5898c66ed55d92c2e",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/editors.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ecf15dd85ab1c5b4f551d9740cdbd5f7bef69bde",
+          "size": 50371,
+          "sha256": "1653baaf8f605ffafef93b602e49340d5763c3598ccf84b8f45167eb6414d53c",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/files.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "60846d2d8477c36abf26c611b733e7378e2b5a9f",
+          "size": 1092,
+          "sha256": "1840db743c3d923c5263c158549106c80397e44582580669a6e6579afe402a46",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/llm-flow.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8f0ffa6d7da3aba16350b7aa83e04c25b5afa965",
+          "size": 9704,
+          "sha256": "9c75355d92a4a4102c88f0eeb60c2732189dcbcf6b034a2eae0ee113d26d5cab",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/panel.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3497cfe67c63442a33296089559f4e109db61f79",
+          "size": 20130,
+          "sha256": "18a6e93ff52743afe12c3ecd51af8411462361377553430dfadce66e06755fe7",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/profiles-tab.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "058a38f26cec121608f256208b78f6e5a42df9a3",
+          "size": 10756,
+          "sha256": "631ce65ba3cdb7dec3ac187770027334815c2e13cb3420bac5904b65afe193f9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/settings.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9ab1db556473d0a00100a177e0d8f2375a5c0ecc",
+          "size": 18354,
+          "sha256": "503166f9807335cba0036b875ef11a4294dd94f72839d880b998b40b6290c51a",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/story-flow.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "58f2be123674542dad6922d6a8d3d93d3bafa810",
+          "size": 14680,
+          "sha256": "3494d92252e884bb0ea851337320fe444e764e1773c9db57b57c0adc7a7a2bd3",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/unit-lore.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a2014d1c3836bd76b7d4ecfc0691ed43e7f119c",
+          "size": 4184,
+          "sha256": "6db75abe3b172bf193454c86aa4064fd56593c4936d674140a91a186d30a111c",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/style.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "42abcb58c5b29a40c9f6045113c69a225d968a69",
+          "size": 48244,
+          "sha256": "678b1dc8a058230322809e062ee7e9415df27cb3cddd9608e1c9bec788eacf93",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/tool-result.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8743aee19f21d833b9ce23144b0718c9905b1f20",
+          "size": 1650,
+          "sha256": "47771118933db4f7c180861f97b6e30f6b395133cf82bdc0471a1853ca2f8e14",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/ui.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b3c740396712f42e877ca7a1c4c7804364112744",
+          "size": 6826,
+          "sha256": "a9816c5812e94c134c8f475f775ebd818f8c2187843881869822ae3e9d9b5a14",
           "kind": "source"
         },
         {
@@ -3955,48 +4279,48 @@
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalProcess.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "aa90e52b54153140dca285e853d82cded2724acf",
           "size": 5474,
-          "sha256": "aa1333e7739ee81d2626cb4028df214a525c8d4469cc7c7ff15ff8500f23f67c"
+          "sha256": "aa1333e7739ee81d2626cb4028df214a525c8d4469cc7c7ff15ff8500f23f67c",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalRust.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "96e1e65589baf239d2a1c5a48f18dba20274a896",
           "size": 9017,
-          "sha256": "a764a7c15ee1dfc54f969fb0207e7f885f8a459729f8a20776cdd201c6c2457e"
+          "sha256": "a764a7c15ee1dfc54f969fb0207e7f885f8a459729f8a20776cdd201c6c2457e",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalSymbol.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "5979de9eddec0cab7b9765ecfd5ad18ee8ea4f46",
           "size": 8832,
-          "sha256": "e9af71d77b341f08bf7d3da419bb201deaa917dacfec776c802c099b6b530144"
+          "sha256": "e9af71d77b341f08bf7d3da419bb201deaa917dacfec776c802c099b6b530144",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "226e906cd16b51bf5c40fc4a1c736e396b585981",
           "size": 10599,
-          "sha256": "9ea0ab9cd979b9d83afbd8affd55b79239f2cd13dac6824962fc9043baf3bc66"
+          "sha256": "9ea0ab9cd979b9d83afbd8affd55b79239f2cd13dac6824962fc9043baf3bc66",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.py",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "c80d54dcbc6faeb2ec6a2732c07680170c49eb30",
           "size": 11186,
-          "sha256": "deca17df022ae43201dc77bd076c72774bd728f1909e89088472fae6bbacd680"
+          "sha256": "deca17df022ae43201dc77bd076c72774bd728f1909e89088472fae6bbacd680",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -4086,6 +4410,24 @@
           "blob": "4f3445351c27792eaebd3537caac1819e0f4b4b0",
           "size": 6583,
           "sha256": "4e71e286fa626c49a7263b5d0208f2ca736a31913fb57cc4d2d17dccab0d121b",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/TavernSRPG/plugin-manifest.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0122d076581a7c196a1ca8e15dbbe573696400b9",
+          "size": 3979,
+          "sha256": "9a43591857f6a741c0f2d595d8078c9ebfb188ed639edce8034be65c32e71156",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/TavernSRPG/tavern-srpg-service.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67a4d0db6631cd9bdeccf8ff21d4343e7846bd88",
+          "size": 281,
+          "sha256": "0b9f6ba0c7e17cc9e36cfce0422b792d22ed29e4baa387d8c1a00ab169428bac",
           "kind": "source"
         },
         {
@@ -8625,9 +8967,9 @@
           "path": "modules/chat/chatHistoryPersistence.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "720d9fb0f481329ed49b62b647f6cf6e33ab0089",
-          "size": 6036,
-          "sha256": "6bfc97482eaa938c9faa30da13a1bf47841c0b03e0df98f39687b7758189b28d",
+          "blob": "a47963ef052a4dc576fa8cf546739d846e5bbef5",
+          "size": 6875,
+          "sha256": "85abd83f41ba3a5beb91444a77188455ad7d2dc73d2778f40ba95c349f22a8ab",
           "kind": "source"
         },
         {
@@ -8868,9 +9210,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "775dd45d6fb8da180b382511af0d5aa36b1af231",
-          "size": 139741,
-          "sha256": "4075effda12ac20374f39530b1fb65478ddf241399274c518c7421b37262f8c2",
+          "blob": "042dc653a721adaf41ae4785276d05a8de4c5c95",
+          "size": 140722,
+          "sha256": "28f1d48f7d43e37e24032990c7b93db061cc35f934f84612420877089cbeec0c",
           "kind": "source"
         },
         {
@@ -8974,12 +9316,12 @@
         },
         {
           "path": "modules/deskpet/live2dTextureOptimizer.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "bab43eda00244d4f1e9019344862852267b59c98",
           "size": 4613,
-          "sha256": "f1eb267be4b64d95fdf46ce5128cdf6371c8735c9889cc7ec4b44537ad3f9e5e"
+          "sha256": "f1eb267be4b64d95fdf46ce5128cdf6371c8735c9889cc7ec4b44537ad3f9e5e",
+          "kind": "source"
         },
         {
           "path": "modules/deskpet/live2dWardrobe.js",
@@ -9552,9 +9894,9 @@
           "path": "modules/ipc/agentHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "bdf4f0d53dff9c4ee3b0da32e05a78a787fbecef",
-          "size": 35030,
-          "sha256": "26b3bafe3818a97e55217cfab53d6ddc2a6140b9b59c77de29bf4c0b670b20a3",
+          "blob": "074001adb22f9197057dcfec250be0efb553c3ec",
+          "size": 35054,
+          "sha256": "3c71dfa21da6050d1dc5380d2d3de55c9256e89901ad3aa828b76cecbf7be2f6",
           "kind": "source"
         },
         {
@@ -9579,9 +9921,9 @@
           "path": "modules/ipc/browserHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a3ba5120fdc54ee9bf9c97194b1a7ff63ee8cff4",
-          "size": 13644,
-          "sha256": "ac5701e1a1a75f80d952d1314844f7f94e6f60337d0ec0a2bad7aceecc30fc9b",
+          "blob": "a3f36653da6f8f1485d7a279d35fa9abd101f7ef",
+          "size": 14487,
+          "sha256": "66e1777680a8f36cc891769aef54010cb4ca2f62c40ec18ac77576ed939b4bf3",
           "kind": "source"
         },
         {
@@ -9624,9 +9966,9 @@
           "path": "modules/ipc/desktopHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "494840abb0cd4bb9f5649a3dcbcba188e9cd3dc0",
-          "size": 125190,
-          "sha256": "b1d826ee2aa82999dfee6647649f3c1fba56656592cc450c36b2fb733c7b1887",
+          "blob": "a2d990d223120ba16b7dc390cb0ad985cf611ba1",
+          "size": 128700,
+          "sha256": "9979316973b85c332780b23de3c3fb7e0ac5c55a1c34770e8bbf830c3b3eb792",
           "kind": "source"
         },
         {
@@ -9642,9 +9984,9 @@
           "path": "modules/ipc/desktopRemoteHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "eeec803a99058d88fc58a013669394db2dcd7366",
-          "size": 25444,
-          "sha256": "9642c20039b1e29ce3a798ca44b51377eac5871c74e85cbe29b98288d6064e28",
+          "blob": "c5a95dc36a806ef82e96af377b5bbba94145beb2",
+          "size": 25805,
+          "sha256": "46f4e40929cd537bd4ffb77f2a9e8491336b111832c77a0010cf58a848111d3b",
           "kind": "source"
         },
         {
@@ -9714,9 +10056,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "189189a450e47ae9b9ec55e6bba0f8a06713bc62",
-          "size": 10196,
-          "sha256": "b95b4a7ea072b2ac406582bacc9e812f148cf8d40127de51e8b29307b399ee48",
+          "blob": "aaaf81b6ba33d0a067c5cbcef22344469d38e34a",
+          "size": 10454,
+          "sha256": "9759ff64663b2ccd73fad1112c1059060f491acfffa8f8dcc4300d588a7b9b8c",
           "kind": "source"
         },
         {
@@ -9804,9 +10146,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "bfbf97e2318b692e5b90470453f73241f1b6be09",
-          "size": 15835,
-          "sha256": "da5d916e8e91264172fe4d05decb93e3746973ea7dab8ab5bf6fd11d0ee8d3e2",
+          "blob": "04a20cc55b827e68be05acd355b6fd8ed5c2cce7",
+          "size": 17303,
+          "sha256": "0ed65d768070c088ff6692e0322c30609bf75674cd3f73990f951fde701760b0",
           "kind": "source"
         },
         {
@@ -10029,9 +10371,9 @@
           "path": "modules/loom/sideBrowserService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ea824aeca66276292f8e932a80ee9375bd7cc0c2",
-          "size": 14041,
-          "sha256": "21affd5e4a8f9e57966f5c2f6be03f6a6e5d6f36aac1ebc532dccd44db33800d",
+          "blob": "2275c11ec3996d81dc621011a97f0a7ef23ec2e2",
+          "size": 15758,
+          "sha256": "892a8b979766f6e7decb90d53dd6f59078afbb99a7e5d04997fba563a2ee76a6",
           "kind": "source"
         },
         {
@@ -10936,12 +11278,12 @@
         },
         {
           "path": "modules/renderer/toolBatchDomains.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "cc18b6ec0ff64e3bdbfecbb3ef67e36e718491a7",
           "size": 2562,
-          "sha256": "036aba74c171af7ea2820045c66164914be67f48877248ee76282403383f8725"
+          "sha256": "036aba74c171af7ea2820045c66164914be67f48877248ee76282403383f8725",
+          "kind": "source"
         },
         {
           "path": "modules/renderer/toolBatchRegions.js",
@@ -11037,9 +11379,9 @@
           "path": "modules/searchManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "acf8cab8c523ec9af3cbf6e951ee194437ae9c70",
-          "size": 26755,
-          "sha256": "8cabc5f207ef18287e220fec3cc649753639660f3ad3dca76909580b64fed269",
+          "blob": "2ad719ee4e305eedb4797d2b15989c1f57929fba",
+          "size": 26788,
+          "sha256": "6bb4cf40d7f84d10424155b53e5b9fcf25341cda790ab1f5d275a6d69dae0b0a",
           "kind": "source"
         },
         {
@@ -11135,21 +11477,21 @@
         },
         {
           "path": "modules/services/conversationContext.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "12d3aad1fe568e2749a4c3544f7c18bfe6f4c1ac",
           "size": 3210,
-          "sha256": "7104f4f8eb55fb3385df2a8dd8a136b83188d73472652395d89d0de0a22d5074"
+          "sha256": "7104f4f8eb55fb3385df2a8dd8a136b83188d73472652395d89d0de0a22d5074",
+          "kind": "source"
         },
         {
           "path": "modules/services/conversationOverrides.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "8d4d209f7969ca71e520e6e08e5bdaa953357154",
           "size": 2110,
-          "sha256": "b45a3a49bc0e925907f374e5838c9b96c93a4f572efc6ad804d074f0022fc6a9"
+          "sha256": "b45a3a49bc0e925907f374e5838c9b96c93a4f572efc6ad804d074f0022fc6a9",
+          "kind": "source"
         },
         {
           "path": "modules/services/deepWikiService.js",
@@ -11173,9 +11515,9 @@
           "path": "modules/services/embeddedAppSessionManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1d1c4e6692eee446371ec76895ad54ccada61542",
-          "size": 18779,
-          "sha256": "8ed7e7f7710663902d8e219b520256cb45d9195ada81bebbde189c02135e884b",
+          "blob": "40569826c6000286463adfe41d61e84031240fda",
+          "size": 18943,
+          "sha256": "fab684a03ab4607d950c83a3a1ebc7060ea5b83dc5ea5fe6eac2a9585a562314",
           "kind": "source"
         },
         {
@@ -11279,12 +11621,12 @@
         },
         {
           "path": "modules/services/portraitOptimizer.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "f679f52d5565897f86f8c71dabaffedab00c280e",
           "size": 5716,
-          "sha256": "fb1fc8d0eb96bc7282512cf4c1e9f3c9132a8045163a0f99b5530ddddfaa2a96"
+          "sha256": "fb1fc8d0eb96bc7282512cf4c1e9f3c9132a8045163a0f99b5530ddddfaa2a96",
+          "kind": "source"
         },
         {
           "path": "modules/services/preloadPaths.js",
@@ -12082,9 +12424,9 @@
           "path": "modules/ui-system/message-file-changes.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1942e7b2cd43d4280180a4a7c7a1246b6c9abf05",
-          "size": 24230,
-          "sha256": "ae67ea283efc38797e69777da56d3de733e7a4cd31cc47d200587c28d7df32dd",
+          "blob": "f93ac7a04702f218f25463cda1637b9a6ebaa090",
+          "size": 27761,
+          "sha256": "39b15aba7f17eb9da3aa7deeedd61059e8e26e2e0dfdf5fb909f3d386db259ad",
           "kind": "source"
         },
         {
@@ -12496,9 +12838,9 @@
           "path": "modules/ui-system/side-pane/browserSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "06bcaa753f745ad140a6c4719518e72fde5a6fae",
-          "size": 32572,
-          "sha256": "732b8a35866f108ee5203c89941c6bfc723302fb65737f95749f5f55c949d8fb",
+          "blob": "836b956cb64f2de053e715d3ca89684bf53c88e1",
+          "size": 42529,
+          "sha256": "e0503ff01d2f86dfa65a7890f2d22080bbcd42d733782a68058bc80643b334c1",
           "kind": "source"
         },
         {
@@ -12658,9 +13000,9 @@
           "path": "modules/ui-system/side-pane/planDetailSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b55555c007909e48f86973754c6370e8a622677e",
-          "size": 66736,
-          "sha256": "6d262adcc5268d468e0cd0c9942a96d87cfd8a40764b6ecff3bbece9dab4e91f",
+          "blob": "632ad8b643df23934e692cf273ab3ec59fbf01c5",
+          "size": 65740,
+          "sha256": "c40073708de3ae939594e0c243c8e8183779a3124110f5be0d31f82bd59573f5",
           "kind": "source"
         },
         {
@@ -12946,9 +13288,9 @@
           "path": "modules/ui-system/side-pane/tab-types/plan-detail.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8705668d6666e016d8066eb6ffcd9f51127e3ffb",
-          "size": 2057,
-          "sha256": "f34cab73c600d0d21e1134dbff3955705a376a9e07111210c81e2beb6cc66f67",
+          "blob": "3bbf461867a1a9076f8f4daa9bd71078a09caa52",
+          "size": 1541,
+          "sha256": "758c963f2d5e48f8c49cecbe972632ff9be38c22ef4cfb0d3ba0addc87ba58e2",
           "kind": "source"
         },
         {
@@ -13765,9 +14107,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "a9a8ca96b20dc85c244ad12021cd6a74776fa261",
-          "size": 31227,
-          "sha256": "41b5cbfc9fe0d6a67f24ecb9451f0081ee9acffd4261287d7db9f7b21a24c16d",
+          "blob": "8451b49912675d7cfdd7c2cdbaaf58ef88f2953a",
+          "size": 32902,
+          "sha256": "19269653e45fd8adf8c050271a2fc6ba2aa30548d1bc6bbf8518398983b0d9a2",
           "kind": "source"
         },
         {
@@ -14930,9 +15272,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "906b16d362148c2692cfe8d17661fba63f652d5e",
-          "size": 46954,
-          "sha256": "31c6f5becf21f84115861553943d7ad84c3d20e19e0cd10e517dd8caecb1c128",
+          "blob": "200c9df62963c14b7ddc1a4479a148c4e4d9a023",
+          "size": 47912,
+          "sha256": "32f9da6686bf1d32c6a33c2c7dc93b1e07e444a3df88675b30825465d17c0a4e",
           "kind": "source"
         },
         {
@@ -15380,9 +15722,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8eb4fa2c56c37004729b2000293ea410d6e7b876",
-          "size": 27398,
-          "sha256": "c788016f0974dc6232e43885fa59e82d179edca3b12d075f9e187df3e5b228ba",
+          "blob": "129bcf9901e691011c2bb541c173ef4301ecbf2d",
+          "size": 33769,
+          "sha256": "4a1a565b8fda973a6abe66e52db4894cf94d6e72b4353e8518e4cad623cbb2b9",
           "kind": "source"
         },
         {
@@ -15425,9 +15767,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "d823f02b8e477bb069bee3b8f37445835f7a12e3",
-          "size": 17282,
-          "sha256": "2472fbcd54fa695417e18149293a71e7192c76315c90e3d547c22de2904d43bf",
+          "blob": "38518cda528161f42e0a1af4b02123cf38c188c8",
+          "size": 17998,
+          "sha256": "1393290e478e7df3da90312359174eec1413c56d5a3aae8d81c6c65b1e616757",
           "kind": "source"
         },
         {
@@ -16613,9 +16955,9 @@
           "path": "styles/ui-system/side-pane-browser.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "744093091dbf01477fa823bd567303d80419311e",
-          "size": 10020,
-          "sha256": "d65b84512744ab1207e3b60e89939c1a318f4f4a337c06e42d4457b690eeaf8a",
+          "blob": "8260808cee32f2fd7211a636c2140fb6d0add53e",
+          "size": 11611,
+          "sha256": "7b185ece86d4c7753b649402d3001ef0325c2b18950de34b3f479fc69a1e6c6a",
           "kind": "source"
         },
         {
@@ -16928,9 +17270,9 @@
           "path": "tests/chat-manager-selection-race.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8edbf044b962e1c18e57b61c623691a25675096c",
-          "size": 57370,
-          "sha256": "e60df32f271c833616bea93157eb61c24a83845dea9837c98c9588f207ae1912",
+          "blob": "613d6d8100b59c38a6b3a89f1191fec215b06541",
+          "size": 57573,
+          "sha256": "280f2e983b05c4f1c27cfaf5e6d5ba25cff9647ae4f8ecf8bf19b973b9f70e97",
           "kind": "source"
         },
         {
@@ -16973,9 +17315,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
-          "size": 11427,
-          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
+          "blob": "b7a721062cf4c6331b0e097efd45e32451797d12",
+          "size": 12997,
+          "sha256": "fd931ca031ee8dfde35acb7cc0da4ec86063141e367918f08de348cda66c5792",
           "kind": "source"
         },
         {
@@ -17360,9 +17702,9 @@
           "path": "tests/embedded-app-security.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "415e3eb8a4f445163709a06add7194e30d37e509",
-          "size": 6569,
-          "sha256": "b112e3be9072cfad248320e21e463f978353498332d872c3e23d7a3f191964ed",
+          "blob": "88692823df42e4f915821cc8b3f552ba2feac35f",
+          "size": 6575,
+          "sha256": "ba55b1a0562b742622a12c123fdc6cf2de7e9d1c94cf57bdbe6445abe9d01c72",
           "kind": "source"
         },
         {
@@ -17396,9 +17738,9 @@
           "path": "tests/game-launcher.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5f457e345413752dbf426219459250980e0b99cf",
-          "size": 10006,
-          "sha256": "5821a081ecbc9ac53e1b9ad36c110a1a1948a88d43139b0b1d569fa4986c0aaf",
+          "blob": "69d9fe3ee611e7496d924b8f61fce96a3dbe9eac",
+          "size": 10884,
+          "sha256": "7c74f7429bb0142803b346f7d57339385a5a6782d49e791c9188b2903ea71d9f",
           "kind": "source"
         },
         {
@@ -17594,9 +17936,9 @@
           "path": "tests/native-conversation-ipc.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4a7d51ed9026a71a2f093c646e8542fe898a037",
-          "size": 37473,
-          "sha256": "8f52e71e3646c8de1042d75cef5b721b319d291e59df7c5c7136744042e7819a",
+          "blob": "197505ce188699ed59e77ffa692ecccae4fdbbfc",
+          "size": 39933,
+          "sha256": "9cbbc6e8b5fe457a39fecc54390c15f6c11b8066d077ad0697f1b04c052aa8cf",
           "kind": "source"
         },
         {
@@ -17763,12 +18105,12 @@
         },
         {
           "path": "tests/project-forge-eval.test.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "56bfbe564ad17ff804d7b522e921865b2e21ed55",
           "size": 26992,
-          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f"
+          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f",
+          "kind": "source"
         },
         {
           "path": "tests/project-forge-trace.test.js",
@@ -17882,9 +18224,9 @@
           "path": "tests/side-browser-address.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "4a1825d30ad2ab8a2d4456dbbbb16f935a4362e2",
-          "size": 21066,
-          "sha256": "a362457aac5dd694653a3ac31c8af18185a27ef2d5cb4f46eb50b97c996635df",
+          "blob": "83ee4666c4a7390707f4e1855c2459843cd4d8d2",
+          "size": 26112,
+          "sha256": "5889d215a6eb3c8c0e16a3f572169a56855bdb0e8eaa3215e4b8b1b25faa90c4",
           "kind": "source"
         },
         {
@@ -17912,6 +18254,15 @@
           "blob": "11a3fbd0559474623a7e99e192b7b52b0f78ff47",
           "size": 1049,
           "sha256": "74c0af2cd3f0f9a5013f4357e7a5cb7cd5d7f599b03cc5b20bc357a2f3f059eb",
+          "kind": "source"
+        },
+        {
+          "path": "tests/srpg-sandbox.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5c8bffcb411aa6e98bbfcd2c77a3f9c0eb6d377",
+          "size": 13211,
+          "sha256": "d1d0bb3e3aff03f290fda06b3de80126b907ccda2f7ef0238043ee065b4f2425",
           "kind": "source"
         },
         {
@@ -18143,9 +18494,9 @@
           "path": "tests/window-package-contract.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "9155fbf09f49b174911c24d3d8edfe3d55c9fa49",
-          "size": 4846,
-          "sha256": "2d66441f8bfc3242e29bac4a3f68adfa82fcfa92899980ef31757d9868215a57",
+          "blob": "87be207e60311ec70ea5fb06c523961f9553acc7",
+          "size": 5113,
+          "sha256": "51bf6ae9e9a632934d0807e809df5adc1fc3164e6fe472eaae1097d262cfb86f",
           "kind": "source"
         },
         {
@@ -20417,12 +20768,12 @@
       ],
       "source_context": {
         "source": {
-          "commit": "20268e79fe62718fcc14dd3ac2748abbec574515",
-          "tree": "ba994f5b26a6f030543c972eca49813f7043705d"
+          "commit": "fb37badf5a302a6e8768a3e4b0b1e6d50efa085d",
+          "tree": "f41414598adac088a5acaadd1dcda8ad27fa32cc"
         },
         "upstream": {
-          "commit": "c20cc942826cd2b61fe179097602f6a85b648b2f",
-          "tree": "40d0ade18cc9dc9344dcde04ae7b879d2d1c6da4"
+          "commit": "c1334d7c7ce2377f0e1a030139c79d7c75590085",
+          "tree": "8d9b3833dfa6e15ee5d8fb05156df49b0160cbe5"
         }
       }
     },
@@ -21243,18 +21594,18 @@
           "path": "Desktopmodules/api/ipcBridge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f429c458a32cb489f994825ea96f908c5860b743",
-          "size": 19277,
-          "sha256": "74e2509e6ce8739296c89a516cb435058d68e436ec8cc8ab7e49bfa55d8426e7",
+          "blob": "e230f4edbd83c8c9dcbf5a8fcdc7899c7bd3fe72",
+          "size": 19988,
+          "sha256": "ca8365d969253dddf5a9612b36874988fc7d77d63635323c51b26c8e53bf5f7d",
           "kind": "source"
         },
         {
           "path": "Desktopmodules/api/vcpProxy.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9c665002c44345b697a3853cc88ff55d956f0344",
-          "size": 7198,
-          "sha256": "b7c2f5858b3c5ffc0d023bfd31a6ccc737c51d14c1c4d16f270c31538e34eb42",
+          "blob": "d5c378d201007f06a43d58dc69ef9b2d649a1f9d",
+          "size": 7847,
+          "sha256": "0d7c25280fe88330fa005a2f3352d884ec2530b01b577a6dbb054baacc1a5958",
           "kind": "source"
         },
         {
@@ -21405,9 +21756,9 @@
           "path": "Desktopmodules/core/widgetManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5b2d7eeae64f03f856da06bc26a2ef52f4f91721",
-          "size": 38465,
-          "sha256": "684bf144ea4cda2a74ef275ebee59c00abe66558795b7bda969ae5556b530b3f",
+          "blob": "919cf27ee35487f723664828b991f1ca0246e657",
+          "size": 42172,
+          "sha256": "62bbfc26d89f1de6c3f44be30363c269c980069356bd43cd8670e9a699e38c8d",
           "kind": "source"
         },
         {
@@ -21549,9 +21900,9 @@
           "path": "Desktopmodules/favorites/favoritesManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "625ac833e74120a02bca4caf61b3161991c585ea",
-          "size": 8326,
-          "sha256": "f2cb3bbd6d5387211edc840c09718ab49e555d53357656923159c75d3f78907e",
+          "blob": "e7e4cbdf59990ec351dac8f4985b9c21b97d0eac",
+          "size": 8710,
+          "sha256": "eb2e8d49f2125a9e7f4728f0ce8daa53bd73ebb5277fa212aa2449936d56ad66",
           "kind": "source"
         },
         {
@@ -21846,9 +22197,9 @@
           "path": "Gamemodules/game.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "970327fba005bded1f15f84d8befbf0737340d75",
-          "size": 4764,
-          "sha256": "4f9652b70ee90f8c341d37a1f5968e0ac0ba94bb80d5f6acdac1de2a2ab00d41",
+          "blob": "89e027fa71e080c94f626616dabe927df986d640",
+          "size": 5259,
+          "sha256": "334dda02467613777060caaf4c161b932ee5a5fe7667bc4f249539a6c0c3b703",
           "kind": "source"
         },
         {
@@ -21858,6 +22209,330 @@
           "blob": "ece1f09ffb074b8a182ab0e91717909e8c51ff91",
           "size": 9532,
           "sha256": "d04aefe30ccf2b5e1c5d0d5d9564802961ce409ce8790c5426b973da267fda46",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/index.html",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "022d0a714ced403e4a98dd1a0901ea4dc6b0ba15",
+          "size": 4823,
+          "sha256": "7134c9dab7c374893676706f513939908afb8dad462b47598ddb2c46517558c9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/package.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b32c3ccc35418d09190eb5d9bd4d7dedaa04fdc9",
+          "size": 74,
+          "sha256": "d9c63f2cad92d8afe210dd3402c199da22589bcd8ff47758a30139c2b9aba7ac",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/preload.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e65c185919dec395bdd51499afadc2ef8953d050",
+          "size": 938,
+          "sha256": "f949ef3f48592e29158e5dc61e405dfdbe1a30ed0b39faf52044b27bb4782ac6",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/service.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a4b2566495b61660b3986352a4c1a7b3d54f4edf",
+          "size": 4604,
+          "sha256": "7cbf3849b4481f9ed776521259853eca2d23fc64abc243c1ee606b2b3d276c43",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/session-store.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "16fdeb5403fd237740af0c0767d80078006dd6a3",
+          "size": 26019,
+          "sha256": "f79d514b9c08007be52e344fdbe0dbb83ef31bf9cd7378c07d9c95a676a0368f",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ai-api.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e944cbc354e1749afe96600546faa54f83a7952e",
+          "size": 3667,
+          "sha256": "32865a76eac2f7ef8b570cb71a41628641bec5633fbf4ce003f7cd93c981fe90",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/commander.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "825290e18e3b49fd0ce064f2afa0070842ef01d3",
+          "size": 5666,
+          "sha256": "261da8f643d4feb7a55b6efa6e1abf3da89bd9517b8b7e4dd4c9f07e061f06c2",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/commands.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6dc9a6ed8d70ed54845eb8c1c53541997b1652c0",
+          "size": 14330,
+          "sha256": "c85aab3f5d8ce847c20b16c8a59d5dcd4c85d5daebe4c2c0b3d231d65a9a29f9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/context.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c03cfdb4377ec4542a767256683a94e0a8404edb",
+          "size": 12708,
+          "sha256": "b2f676c0e9abb47d31ace6cf77b34afbec92c280f433505d92570ae327e52ddc",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/defaults.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f6ad0a2987e19551138f05f789887af6b26a9c03",
+          "size": 30080,
+          "sha256": "17f3c789e24a0290419312f3bf51a4b500505af822377548393a9b8109f4555c",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/designer.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "80962cdcc28a2dead1e45632697c5ec1288c7619",
+          "size": 30244,
+          "sha256": "6cd67fa34b548ae0ea4e8f56904ba280d052cdce61b5f254f51b5b5f088e6d0e",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/engine.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c0a9c6ced48d6bd68b387cb633a6ab0993130e64",
+          "size": 93992,
+          "sha256": "88e76e26c3246dbf19741bebff12fee71b10f14dc05409b3eed34c382c3b840b",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/exchange.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c0d4c24dd3e8e5cd036463bbc2d8751da350a5cf",
+          "size": 1203,
+          "sha256": "10ab45174a227f8d5b9527fa82e2d037e0b3ab70f6f74013d95bd3bb201a4fd4",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/history.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "28f782bdefaa62b28f855536e9c5366e3c7d9cf7",
+          "size": 2882,
+          "sha256": "88725f0e8513ba6b45a4ad7c19e3dac34fc4292022abbb1fb4c7bb14bea407f3",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/llm.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9823eb9654a8ad0a701e20a67d7bca381a0caaa5",
+          "size": 4497,
+          "sha256": "1748863b670a9dfde3fcc25ba170d9765b03393a172a56d43c4e2a06e5cf9c4d",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/manual.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0dff0b1fb4a480290d75c9e581ab0287dd1c5d18",
+          "size": 6247,
+          "sha256": "72a6f10c1791918e3869560d9e60dfb425ffc84e43c2045d2d800d1adfbe0fb9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/narrator.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4ae2c9d63c54a9925c9a464be96f311ad2e3e829",
+          "size": 18430,
+          "sha256": "96376ac88c576fc46f1cb52b82940b17547d8c4c5571e740ca6ebbf01d896955",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/profiles.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2124e8710b81ad7f0af8e7f01ebdb853965d1cce",
+          "size": 3720,
+          "sha256": "a308ca5b385df5f3fbc645578f651cb92724f613203aef305fa33b956ccb8979",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/st.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4e66a901424ea1c55c5b1ad35c7f084aa16bd0c3",
+          "size": 20302,
+          "sha256": "584930f24838082b9ad50de877c41b6b7637e54858d91e31af81eebdca5f5eed",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/story.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0ccaec009cc613b137405d429499506d213cb988",
+          "size": 22252,
+          "sha256": "89b585ebd01980f60fa5d7b125b49dfd57792286c7e0596b6c4498a1c5d9def2",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/action-process.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "49efc5e5bc37fbb831574605b7653a9d0702540c",
+          "size": 7955,
+          "sha256": "00fe563d5249d944a024066dea351eae55eb7f251be95f3b24e4f18edf2fd21e",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/battle.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ac3b682e440810359a69fc14468b0f7e39de372e",
+          "size": 71467,
+          "sha256": "daf019c37db4e60d5cd3966d1754c8a847b5cd41be1109a99a77e7d264fd6aa9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/chat-messages.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5030ef3ead6788187701803535a31ab3fb811549",
+          "size": 3929,
+          "sha256": "0ac09b860e0d535dfc1e5c53d7b4c219ae4baa39408598002eea080dfef93bd5",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/designer-tab.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "31c717be81e866e0e334f09b84306262599aa075",
+          "size": 37133,
+          "sha256": "bf236428537b97af91b56f7d97df15b8ead86496be3c4df52db524960188e39a",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/dom.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "80a0c8b767b534b9288c2a9156476b09d03b7c80",
+          "size": 12257,
+          "sha256": "1ebc8252b5ac641a95190d6dc23e97ff4283b8a0ee0727a5898c66ed55d92c2e",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/editors.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ecf15dd85ab1c5b4f551d9740cdbd5f7bef69bde",
+          "size": 50371,
+          "sha256": "1653baaf8f605ffafef93b602e49340d5763c3598ccf84b8f45167eb6414d53c",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/files.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "60846d2d8477c36abf26c611b733e7378e2b5a9f",
+          "size": 1092,
+          "sha256": "1840db743c3d923c5263c158549106c80397e44582580669a6e6579afe402a46",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/llm-flow.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8f0ffa6d7da3aba16350b7aa83e04c25b5afa965",
+          "size": 9704,
+          "sha256": "9c75355d92a4a4102c88f0eeb60c2732189dcbcf6b034a2eae0ee113d26d5cab",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/panel.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3497cfe67c63442a33296089559f4e109db61f79",
+          "size": 20130,
+          "sha256": "18a6e93ff52743afe12c3ecd51af8411462361377553430dfadce66e06755fe7",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/profiles-tab.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "058a38f26cec121608f256208b78f6e5a42df9a3",
+          "size": 10756,
+          "sha256": "631ce65ba3cdb7dec3ac187770027334815c2e13cb3420bac5904b65afe193f9",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/settings.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9ab1db556473d0a00100a177e0d8f2375a5c0ecc",
+          "size": 18354,
+          "sha256": "503166f9807335cba0036b875ef11a4294dd94f72839d880b998b40b6290c51a",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/ui/story-flow.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "58f2be123674542dad6922d6a8d3d93d3bafa810",
+          "size": 14680,
+          "sha256": "3494d92252e884bb0ea851337320fe444e764e1773c9db57b57c0adc7a7a2bd3",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/src/unit-lore.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a2014d1c3836bd76b7d4ecfc0691ed43e7f119c",
+          "size": 4184,
+          "sha256": "6db75abe3b172bf193454c86aa4064fd56593c4936d674140a91a186d30a111c",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/style.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "42abcb58c5b29a40c9f6045113c69a225d968a69",
+          "size": 48244,
+          "sha256": "678b1dc8a058230322809e062ee7e9415df27cb3cddd9608e1c9bec788eacf93",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/tool-result.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8743aee19f21d833b9ce23144b0718c9905b1f20",
+          "size": 1650,
+          "sha256": "47771118933db4f7c180861f97b6e30f6b395133cf82bdc0471a1853ca2f8e14",
+          "kind": "source"
+        },
+        {
+          "path": "Gamemodules/srpg/ui.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b3c740396712f42e877ca7a1c4c7804364112744",
+          "size": 6826,
+          "sha256": "a9816c5812e94c134c8f475f775ebd818f8c2187843881869822ae3e9d9b5a14",
           "kind": "source"
         },
         {
@@ -22791,9 +23466,9 @@
           "path": "README.md",
           "mode": "100644",
           "type": "blob",
-          "blob": "b5c6c7bf0c4e3788bf2f9c8392e6aa15e80d309f",
-          "size": 31592,
-          "sha256": "e2e0b142ddcda95a8f19015f5e8c740ea05fbeb92e570502dc36e4b8f93bdbeb",
+          "blob": "d5b40e539aa960ce6f4732da089f6d0e5018b8ac",
+          "size": 38807,
+          "sha256": "d382b2e70241755df8763b0128cb1861087b731e582cce004ec069368f669f92",
           "kind": "source"
         },
         {
@@ -23430,9 +24105,9 @@
           "path": "VCPDistributedServer/Plugin/DesktopRemote/desktop-remote.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "638072a5ee2749577b22faac8474fc6c7cdacadd",
-          "size": 9348,
-          "sha256": "40052843d63dbf14c04316877b5063c4b2db938dc99e1ed896f7b73718f1457f",
+          "blob": "2653f849696eed75083ceaa62df16c69c2d48955",
+          "size": 9521,
+          "sha256": "1dee579ec171151b360a00b97c8af7fc00e00e61d3b59be32b8a4fcacc12f795",
           "kind": "source"
         },
         {
@@ -23502,9 +24177,9 @@
           "path": "VCPDistributedServer/Plugin/LoomController/LoomControllerService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8c89cd79b0d32f7c21da0acbd0f15e927cf9f949",
-          "size": 42598,
-          "sha256": "3b4b036e28d498747369f9a07e3589b3205dd667ae113beeb124089971c0ced2",
+          "blob": "0a9ab400496a844216dfbbd8d6ec3a8aa5b82733",
+          "size": 43028,
+          "sha256": "4a8ce3588599b7c5965a286fb6f9d4fdd7562cf13125bdbc0ea161d4081e2829",
           "kind": "source"
         },
         {
@@ -23520,9 +24195,9 @@
           "path": "VCPDistributedServer/Plugin/LoomController/plugin-manifest.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "c8a36f7add6e341d9aa700937f5bbcb84afa1e00",
-          "size": 24978,
-          "sha256": "09c5f0fffb61cc6af633f95ea4883e2c125da38d7170e799adad913698b72b47",
+          "blob": "2d79904d03d9dbe92f834ccbfe0613e482c0d1f9",
+          "size": 25176,
+          "sha256": "b5145fcc08ae7d367d9783c1d695c26cc0e50327a365fef72867e5e1eebe681b",
           "kind": "source"
         },
         {
@@ -23816,48 +24491,48 @@
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalProcess.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "aa90e52b54153140dca285e853d82cded2724acf",
           "size": 5474,
-          "sha256": "aa1333e7739ee81d2626cb4028df214a525c8d4469cc7c7ff15ff8500f23f67c"
+          "sha256": "aa1333e7739ee81d2626cb4028df214a525c8d4469cc7c7ff15ff8500f23f67c",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalRust.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "96e1e65589baf239d2a1c5a48f18dba20274a896",
           "size": 9017,
-          "sha256": "a764a7c15ee1dfc54f969fb0207e7f885f8a459729f8a20776cdd201c6c2457e"
+          "sha256": "a764a7c15ee1dfc54f969fb0207e7f885f8a459729f8a20776cdd201c6c2457e",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalSymbol.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "5979de9eddec0cab7b9765ecfd5ad18ee8ea4f46",
           "size": 8832,
-          "sha256": "e9af71d77b341f08bf7d3da419bb201deaa917dacfec776c802c099b6b530144"
+          "sha256": "e9af71d77b341f08bf7d3da419bb201deaa917dacfec776c802c099b6b530144",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.cjs",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "226e906cd16b51bf5c40fc4a1c736e396b585981",
           "size": 10599,
-          "sha256": "9ea0ab9cd979b9d83afbd8affd55b79239f2cd13dac6824962fc9043baf3bc66"
+          "sha256": "9ea0ab9cd979b9d83afbd8affd55b79239f2cd13dac6824962fc9043baf3bc66",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/evalWorker.py",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "c80d54dcbc6faeb2ec6a2732c07680170c49eb30",
           "size": 11186,
-          "sha256": "deca17df022ae43201dc77bd076c72774bd728f1909e89088472fae6bbacd680"
+          "sha256": "deca17df022ae43201dc77bd076c72774bd728f1909e89088472fae6bbacd680",
+          "kind": "source"
         },
         {
           "path": "VCPDistributedServer/Plugin/ProjectForge/gui-revert-file.js",
@@ -23983,6 +24658,24 @@
           "blob": "a842eaf743b12d4d138a68074228570afefc31eb",
           "size": 38916,
           "sha256": "1f1b1402f4356a5fd106752cd45accdfe340a22cb414324c398f9ed33b8d6841",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/TavernSRPG/plugin-manifest.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0122d076581a7c196a1ca8e15dbbe573696400b9",
+          "size": 3979,
+          "sha256": "9a43591857f6a741c0f2d595d8078c9ebfb188ed639edce8034be65c32e71156",
+          "kind": "source"
+        },
+        {
+          "path": "VCPDistributedServer/Plugin/TavernSRPG/tavern-srpg-service.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67a4d0db6631cd9bdeccf8ff21d4343e7846bd88",
+          "size": 281,
+          "sha256": "0b9f6ba0c7e17cc9e36cfce0422b792d22ed29e4baa387d8c1a00ab169428bac",
           "kind": "source"
         },
         {
@@ -25969,18 +26662,18 @@
           "path": "docs/contracts/chat-contracts.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "dfd0ba13a3ae5aab391e7b197160b3447c2cd1a0",
-          "size": 65293,
-          "sha256": "dd2fcb330fdd9c46762c7ed15c4d808c6102c663634b3dabc24b64397a8baab4",
+          "blob": "48fd050026ced78e6cc6b4bbec272d87674655c1",
+          "size": 65281,
+          "sha256": "6c4d869c952e44e6cbaa5d4797cf79c19874309873cfe2b9610322d936f9065f",
           "kind": "source"
         },
         {
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "21a52d78a89614f9f76e298aa064b651968685ab",
-          "size": 1086620,
-          "sha256": "034c13eff529d0bed514c3ba60883fad397fb8fda50700d77c71afdf0be63bba",
+          "blob": "71f7f6f6ed769adaaae8bd634cee3b86ed2ac747",
+          "size": 1087363,
+          "sha256": "152e0ecd33641612a0fcb2fd6bad8c12de9fe2f345bbf8eac98dd4c5b2116330",
           "kind": "source"
         },
         {
@@ -26572,9 +27265,9 @@
           "path": "modules/chat/chatHistoryPersistence.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "720d9fb0f481329ed49b62b647f6cf6e33ab0089",
-          "size": 6036,
-          "sha256": "6bfc97482eaa938c9faa30da13a1bf47841c0b03e0df98f39687b7758189b28d",
+          "blob": "a47963ef052a4dc576fa8cf546739d846e5bbef5",
+          "size": 6875,
+          "sha256": "85abd83f41ba3a5beb91444a77188455ad7d2dc73d2778f40ba95c349f22a8ab",
           "kind": "source"
         },
         {
@@ -26815,9 +27508,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "775dd45d6fb8da180b382511af0d5aa36b1af231",
-          "size": 139741,
-          "sha256": "4075effda12ac20374f39530b1fb65478ddf241399274c518c7421b37262f8c2",
+          "blob": "042dc653a721adaf41ae4785276d05a8de4c5c95",
+          "size": 140722,
+          "sha256": "28f1d48f7d43e37e24032990c7b93db061cc35f934f84612420877089cbeec0c",
           "kind": "source"
         },
         {
@@ -26921,12 +27614,12 @@
         },
         {
           "path": "modules/deskpet/live2dTextureOptimizer.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "bab43eda00244d4f1e9019344862852267b59c98",
           "size": 4613,
-          "sha256": "f1eb267be4b64d95fdf46ce5128cdf6371c8735c9889cc7ec4b44537ad3f9e5e"
+          "sha256": "f1eb267be4b64d95fdf46ce5128cdf6371c8735c9889cc7ec4b44537ad3f9e5e",
+          "kind": "source"
         },
         {
           "path": "modules/deskpet/live2dWardrobe.js",
@@ -27499,9 +28192,9 @@
           "path": "modules/ipc/agentHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "bdf4f0d53dff9c4ee3b0da32e05a78a787fbecef",
-          "size": 35030,
-          "sha256": "26b3bafe3818a97e55217cfab53d6ddc2a6140b9b59c77de29bf4c0b670b20a3",
+          "blob": "074001adb22f9197057dcfec250be0efb553c3ec",
+          "size": 35054,
+          "sha256": "3c71dfa21da6050d1dc5380d2d3de55c9256e89901ad3aa828b76cecbf7be2f6",
           "kind": "source"
         },
         {
@@ -27526,9 +28219,9 @@
           "path": "modules/ipc/browserHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a3ba5120fdc54ee9bf9c97194b1a7ff63ee8cff4",
-          "size": 13644,
-          "sha256": "ac5701e1a1a75f80d952d1314844f7f94e6f60337d0ec0a2bad7aceecc30fc9b",
+          "blob": "a3f36653da6f8f1485d7a279d35fa9abd101f7ef",
+          "size": 14487,
+          "sha256": "66e1777680a8f36cc891769aef54010cb4ca2f62c40ec18ac77576ed939b4bf3",
           "kind": "source"
         },
         {
@@ -27571,9 +28264,9 @@
           "path": "modules/ipc/desktopHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "494840abb0cd4bb9f5649a3dcbcba188e9cd3dc0",
-          "size": 125190,
-          "sha256": "b1d826ee2aa82999dfee6647649f3c1fba56656592cc450c36b2fb733c7b1887",
+          "blob": "a2d990d223120ba16b7dc390cb0ad985cf611ba1",
+          "size": 128700,
+          "sha256": "9979316973b85c332780b23de3c3fb7e0ac5c55a1c34770e8bbf830c3b3eb792",
           "kind": "source"
         },
         {
@@ -27589,9 +28282,9 @@
           "path": "modules/ipc/desktopRemoteHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "eeec803a99058d88fc58a013669394db2dcd7366",
-          "size": 25444,
-          "sha256": "9642c20039b1e29ce3a798ca44b51377eac5871c74e85cbe29b98288d6064e28",
+          "blob": "c5a95dc36a806ef82e96af377b5bbba94145beb2",
+          "size": 25805,
+          "sha256": "46f4e40929cd537bd4ffb77f2a9e8491336b111832c77a0010cf58a848111d3b",
           "kind": "source"
         },
         {
@@ -27652,9 +28345,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "189189a450e47ae9b9ec55e6bba0f8a06713bc62",
-          "size": 10196,
-          "sha256": "b95b4a7ea072b2ac406582bacc9e812f148cf8d40127de51e8b29307b399ee48",
+          "blob": "aaaf81b6ba33d0a067c5cbcef22344469d38e34a",
+          "size": 10454,
+          "sha256": "9759ff64663b2ccd73fad1112c1059060f491acfffa8f8dcc4300d588a7b9b8c",
           "kind": "source"
         },
         {
@@ -27742,9 +28435,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "bfbf97e2318b692e5b90470453f73241f1b6be09",
-          "size": 15835,
-          "sha256": "da5d916e8e91264172fe4d05decb93e3746973ea7dab8ab5bf6fd11d0ee8d3e2",
+          "blob": "04a20cc55b827e68be05acd355b6fd8ed5c2cce7",
+          "size": 17303,
+          "sha256": "0ed65d768070c088ff6692e0322c30609bf75674cd3f73990f951fde701760b0",
           "kind": "source"
         },
         {
@@ -27967,9 +28660,9 @@
           "path": "modules/loom/sideBrowserService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ea824aeca66276292f8e932a80ee9375bd7cc0c2",
-          "size": 14041,
-          "sha256": "21affd5e4a8f9e57966f5c2f6be03f6a6e5d6f36aac1ebc532dccd44db33800d",
+          "blob": "2275c11ec3996d81dc621011a97f0a7ef23ec2e2",
+          "size": 15758,
+          "sha256": "892a8b979766f6e7decb90d53dd6f59078afbb99a7e5d04997fba563a2ee76a6",
           "kind": "source"
         },
         {
@@ -28874,12 +29567,12 @@
         },
         {
           "path": "modules/renderer/toolBatchDomains.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "cc18b6ec0ff64e3bdbfecbb3ef67e36e718491a7",
           "size": 2562,
-          "sha256": "036aba74c171af7ea2820045c66164914be67f48877248ee76282403383f8725"
+          "sha256": "036aba74c171af7ea2820045c66164914be67f48877248ee76282403383f8725",
+          "kind": "source"
         },
         {
           "path": "modules/renderer/toolBatchRegions.js",
@@ -28975,9 +29668,9 @@
           "path": "modules/searchManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "acf8cab8c523ec9af3cbf6e951ee194437ae9c70",
-          "size": 26755,
-          "sha256": "8cabc5f207ef18287e220fec3cc649753639660f3ad3dca76909580b64fed269",
+          "blob": "2ad719ee4e305eedb4797d2b15989c1f57929fba",
+          "size": 26788,
+          "sha256": "6bb4cf40d7f84d10424155b53e5b9fcf25341cda790ab1f5d275a6d69dae0b0a",
           "kind": "source"
         },
         {
@@ -29054,21 +29747,21 @@
         },
         {
           "path": "modules/services/conversationContext.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "12d3aad1fe568e2749a4c3544f7c18bfe6f4c1ac",
           "size": 3210,
-          "sha256": "7104f4f8eb55fb3385df2a8dd8a136b83188d73472652395d89d0de0a22d5074"
+          "sha256": "7104f4f8eb55fb3385df2a8dd8a136b83188d73472652395d89d0de0a22d5074",
+          "kind": "source"
         },
         {
           "path": "modules/services/conversationOverrides.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "8d4d209f7969ca71e520e6e08e5bdaa953357154",
           "size": 2110,
-          "sha256": "b45a3a49bc0e925907f374e5838c9b96c93a4f572efc6ad804d074f0022fc6a9"
+          "sha256": "b45a3a49bc0e925907f374e5838c9b96c93a4f572efc6ad804d074f0022fc6a9",
+          "kind": "source"
         },
         {
           "path": "modules/services/deepWikiService.js",
@@ -29092,9 +29785,9 @@
           "path": "modules/services/embeddedAppSessionManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1d1c4e6692eee446371ec76895ad54ccada61542",
-          "size": 18779,
-          "sha256": "8ed7e7f7710663902d8e219b520256cb45d9195ada81bebbde189c02135e884b",
+          "blob": "40569826c6000286463adfe41d61e84031240fda",
+          "size": 18943,
+          "sha256": "fab684a03ab4607d950c83a3a1ebc7060ea5b83dc5ea5fe6eac2a9585a562314",
           "kind": "source"
         },
         {
@@ -29198,12 +29891,12 @@
         },
         {
           "path": "modules/services/portraitOptimizer.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "f679f52d5565897f86f8c71dabaffedab00c280e",
           "size": 5716,
-          "sha256": "fb1fc8d0eb96bc7282512cf4c1e9f3c9132a8045163a0f99b5530ddddfaa2a96"
+          "sha256": "fb1fc8d0eb96bc7282512cf4c1e9f3c9132a8045163a0f99b5530ddddfaa2a96",
+          "kind": "source"
         },
         {
           "path": "modules/services/preloadPaths.js",
@@ -29992,9 +30685,9 @@
           "path": "modules/ui-system/message-file-changes.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1942e7b2cd43d4280180a4a7c7a1246b6c9abf05",
-          "size": 24230,
-          "sha256": "ae67ea283efc38797e69777da56d3de733e7a4cd31cc47d200587c28d7df32dd",
+          "blob": "f93ac7a04702f218f25463cda1637b9a6ebaa090",
+          "size": 27761,
+          "sha256": "39b15aba7f17eb9da3aa7deeedd61059e8e26e2e0dfdf5fb909f3d386db259ad",
           "kind": "source"
         },
         {
@@ -30406,9 +31099,9 @@
           "path": "modules/ui-system/side-pane/browserSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "06bcaa753f745ad140a6c4719518e72fde5a6fae",
-          "size": 32572,
-          "sha256": "732b8a35866f108ee5203c89941c6bfc723302fb65737f95749f5f55c949d8fb",
+          "blob": "836b956cb64f2de053e715d3ca89684bf53c88e1",
+          "size": 42529,
+          "sha256": "e0503ff01d2f86dfa65a7890f2d22080bbcd42d733782a68058bc80643b334c1",
           "kind": "source"
         },
         {
@@ -30568,9 +31261,9 @@
           "path": "modules/ui-system/side-pane/planDetailSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b55555c007909e48f86973754c6370e8a622677e",
-          "size": 66736,
-          "sha256": "6d262adcc5268d468e0cd0c9942a96d87cfd8a40764b6ecff3bbece9dab4e91f",
+          "blob": "632ad8b643df23934e692cf273ab3ec59fbf01c5",
+          "size": 65740,
+          "sha256": "c40073708de3ae939594e0c243c8e8183779a3124110f5be0d31f82bd59573f5",
           "kind": "source"
         },
         {
@@ -30856,9 +31549,9 @@
           "path": "modules/ui-system/side-pane/tab-types/plan-detail.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8705668d6666e016d8066eb6ffcd9f51127e3ffb",
-          "size": 2057,
-          "sha256": "f34cab73c600d0d21e1134dbff3955705a376a9e07111210c81e2beb6cc66f67",
+          "blob": "3bbf461867a1a9076f8f4daa9bd71078a09caa52",
+          "size": 1541,
+          "sha256": "758c963f2d5e48f8c49cecbe972632ff9be38c22ef4cfb0d3ba0addc87ba58e2",
           "kind": "source"
         },
         {
@@ -31675,9 +32368,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "a9a8ca96b20dc85c244ad12021cd6a74776fa261",
-          "size": 31227,
-          "sha256": "41b5cbfc9fe0d6a67f24ecb9451f0081ee9acffd4261287d7db9f7b21a24c16d",
+          "blob": "8451b49912675d7cfdd7c2cdbaaf58ef88f2953a",
+          "size": 32902,
+          "sha256": "19269653e45fd8adf8c050271a2fc6ba2aa30548d1bc6bbf8518398983b0d9a2",
           "kind": "source"
         },
         {
@@ -32530,9 +33223,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "906b16d362148c2692cfe8d17661fba63f652d5e",
-          "size": 46954,
-          "sha256": "31c6f5becf21f84115861553943d7ad84c3d20e19e0cd10e517dd8caecb1c128",
+          "blob": "200c9df62963c14b7ddc1a4479a148c4e4d9a023",
+          "size": 47912,
+          "sha256": "32f9da6686bf1d32c6a33c2c7dc93b1e07e444a3df88675b30825465d17c0a4e",
           "kind": "source"
         },
         {
@@ -32980,9 +33673,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8eb4fa2c56c37004729b2000293ea410d6e7b876",
-          "size": 27398,
-          "sha256": "c788016f0974dc6232e43885fa59e82d179edca3b12d075f9e187df3e5b228ba",
+          "blob": "129bcf9901e691011c2bb541c173ef4301ecbf2d",
+          "size": 33769,
+          "sha256": "4a1a565b8fda973a6abe66e52db4894cf94d6e72b4353e8518e4cad623cbb2b9",
           "kind": "source"
         },
         {
@@ -33025,9 +33718,9 @@
           "path": "scripts/next-delta-shared-baseline.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "d823f02b8e477bb069bee3b8f37445835f7a12e3",
-          "size": 17282,
-          "sha256": "2472fbcd54fa695417e18149293a71e7192c76315c90e3d547c22de2904d43bf",
+          "blob": "38518cda528161f42e0a1af4b02123cf38c188c8",
+          "size": 17998,
+          "sha256": "1393290e478e7df3da90312359174eec1413c56d5a3aae8d81c6c65b1e616757",
           "kind": "source"
         },
         {
@@ -34222,9 +34915,9 @@
           "path": "styles/ui-system/side-pane-browser.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "744093091dbf01477fa823bd567303d80419311e",
-          "size": 10020,
-          "sha256": "d65b84512744ab1207e3b60e89939c1a318f4f4a337c06e42d4457b690eeaf8a",
+          "blob": "8260808cee32f2fd7211a636c2140fb6d0add53e",
+          "size": 11611,
+          "sha256": "7b185ece86d4c7753b649402d3001ef0325c2b18950de34b3f479fc69a1e6c6a",
           "kind": "source"
         },
         {
@@ -34492,9 +35185,9 @@
           "path": "tests/browser-handlers.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "99d182fcd6ad87e427a8405227a023706bf4ada0",
-          "size": 14729,
-          "sha256": "640d27efc829eac1fe4add6f4e2eaee9d8c53eab3caf0575b013f1330b6fb446",
+          "blob": "44fb8495ff5801454dc9e3b5fbc403100efd9f86",
+          "size": 15187,
+          "sha256": "1778580e5c3a428d6409355e55e1ccc9adca018ff79d6ff9d07799a7d5574a13",
           "kind": "source"
         },
         {
@@ -34627,18 +35320,18 @@
           "path": "tests/chat-history-persistence.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ede4c5a62f82837db00fa727aec2e8e8ce17559a",
-          "size": 5434,
-          "sha256": "85358bd9a33d907db73e9a2dac7939f9f3bebbee11ef7ff78b48e9dff0c7a4bf",
+          "blob": "f39d44326cbb29aa436019a9a13d0a7c65ecb206",
+          "size": 7855,
+          "sha256": "fc97e2c51b041950887722808b5944471df21af47374d54127c1f463137f90c8",
           "kind": "source"
         },
         {
           "path": "tests/chat-manager-selection-race.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8edbf044b962e1c18e57b61c623691a25675096c",
-          "size": 57370,
-          "sha256": "e60df32f271c833616bea93157eb61c24a83845dea9837c98c9588f207ae1912",
+          "blob": "613d6d8100b59c38a6b3a89f1191fec215b06541",
+          "size": 57573,
+          "sha256": "280f2e983b05c4f1c27cfaf5e6d5ba25cff9647ae4f8ecf8bf19b973b9f70e97",
           "kind": "source"
         },
         {
@@ -34708,9 +35401,9 @@
           "path": "tests/chat-send-acceptance.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "835fca7b179a4b7f89f02e2520ce66eb3fa12f4b",
-          "size": 2679,
-          "sha256": "2818343b66bc94823074d8cdeb1c6f955f9c5215a65fa0bd399cca1d6ee28d2f",
+          "blob": "aa1795c8e396861b24952c6673d64693e49c12cc",
+          "size": 6545,
+          "sha256": "03f53720eb72e28a18241a1c8bd223999463044806f1dca29dad68f838750af5",
           "kind": "source"
         },
         {
@@ -34870,9 +35563,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
-          "size": 11427,
-          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
+          "blob": "b7a721062cf4c6331b0e097efd45e32451797d12",
+          "size": 12997,
+          "sha256": "fd931ca031ee8dfde35acb7cc0da4ec86063141e367918f08de348cda66c5792",
           "kind": "source"
         },
         {
@@ -35293,9 +35986,9 @@
           "path": "tests/embedded-app-security.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "415e3eb8a4f445163709a06add7194e30d37e509",
-          "size": 6569,
-          "sha256": "b112e3be9072cfad248320e21e463f978353498332d872c3e23d7a3f191964ed",
+          "blob": "88692823df42e4f915821cc8b3f552ba2feac35f",
+          "size": 6575,
+          "sha256": "ba55b1a0562b742622a12c123fdc6cf2de7e9d1c94cf57bdbe6445abe9d01c72",
           "kind": "source"
         },
         {
@@ -35365,9 +36058,9 @@
           "path": "tests/game-launcher.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5f457e345413752dbf426219459250980e0b99cf",
-          "size": 10006,
-          "sha256": "5821a081ecbc9ac53e1b9ad36c110a1a1948a88d43139b0b1d569fa4986c0aaf",
+          "blob": "69d9fe3ee611e7496d924b8f61fce96a3dbe9eac",
+          "size": 10884,
+          "sha256": "7c74f7429bb0142803b346f7d57339385a5a6782d49e791c9188b2903ea71d9f",
           "kind": "source"
         },
         {
@@ -35752,18 +36445,18 @@
           "path": "tests/message-file-changes-projectforge.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "be264e01256df4197cfa71316af2ec2cdd80e6d4",
-          "size": 12312,
-          "sha256": "57f72ae8f599eac3d2fa52f97db91bbd0fdf7dc0bc7e4588558254c3d6f0b7c2",
+          "blob": "f5d502490b694c895c89d4fb3aad589352c4e300",
+          "size": 14268,
+          "sha256": "31a4471b789208398b549069ec334fcbd750068feae3ed1f572e6fa983841da2",
           "kind": "source"
         },
         {
           "path": "tests/message-file-changes.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e9818edda8d94d214105150aaa262a61fa50cde5",
-          "size": 12421,
-          "sha256": "a50d96078ac466723684c9835859359a0c5096a95a64b94087226a3959373fda",
+          "blob": "2986ae02e17d1e140f26c2e06d13675b754bcad8",
+          "size": 12856,
+          "sha256": "b4a43b6142793bd14ca67a659587da3427048759298b018534a2648faa66bd7e",
           "kind": "source"
         },
         {
@@ -35869,9 +36562,9 @@
           "path": "tests/native-conversation-ipc.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4a7d51ed9026a71a2f093c646e8542fe898a037",
-          "size": 37473,
-          "sha256": "8f52e71e3646c8de1042d75cef5b721b319d291e59df7c5c7136744042e7819a",
+          "blob": "197505ce188699ed59e77ffa692ecccae4fdbbfc",
+          "size": 39933,
+          "sha256": "9cbbc6e8b5fe457a39fecc54390c15f6c11b8066d077ad0697f1b04c052aa8cf",
           "kind": "source"
         },
         {
@@ -36092,12 +36785,12 @@
         },
         {
           "path": "tests/project-forge-eval.test.js",
-          "kind": "source",
           "mode": "100644",
           "type": "blob",
           "blob": "56bfbe564ad17ff804d7b522e921865b2e21ed55",
           "size": 26992,
-          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f"
+          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f",
+          "kind": "source"
         },
         {
           "path": "tests/project-forge-trace.test.js",
@@ -36292,9 +36985,9 @@
           "path": "tests/side-browser-address.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "4a1825d30ad2ab8a2d4456dbbbb16f935a4362e2",
-          "size": 21066,
-          "sha256": "a362457aac5dd694653a3ac31c8af18185a27ef2d5cb4f46eb50b97c996635df",
+          "blob": "83ee4666c4a7390707f4e1855c2459843cd4d8d2",
+          "size": 26112,
+          "sha256": "5889d215a6eb3c8c0e16a3f572169a56855bdb0e8eaa3215e4b8b1b25faa90c4",
           "kind": "source"
         },
         {
@@ -36571,9 +37264,9 @@
           "path": "tests/side-pane-agent-portraits.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "c2987a487fde1f7f02de5d6b4d157d38ccfe1cf8",
-          "size": 11823,
-          "sha256": "20b3470400263a2fc7e3591541b6aced3d748d8792f19995c608d95e67ddfad9",
+          "blob": "6b8f78feb22e4d5d112761a3fede8333df7fd4ee",
+          "size": 12781,
+          "sha256": "086747e6f2e3f5df388ac9ce070c5e463054e64f9d004a085428242ed4dbd83b",
           "kind": "source"
         },
         {
@@ -36796,9 +37489,9 @@
           "path": "tests/side-pane-plan-detail.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d2f3986177af979b080896e3eca8167a6b72e654",
-          "size": 30550,
-          "sha256": "1ffbaf580009408aeb410a0066ce160fbe1e650a56cfb394694aaa3bac7b2cd9",
+          "blob": "5603a27d3604ffc1ce0a72713022466f2ea129d5",
+          "size": 34179,
+          "sha256": "8737457c92e944a911f8c73079ba2c421c5661a2d7e306c840b59159a31e0071",
           "kind": "source"
         },
         {
@@ -37060,6 +37753,15 @@
           "blob": "0ecad6ae860dee3050da1e3eda830040f29a6c11",
           "size": 9271,
           "sha256": "437bff333740cfe0f6fbff94c7049e1b0b7eb146da8052bbdd39d153a8ddd2f5",
+          "kind": "source"
+        },
+        {
+          "path": "tests/srpg-sandbox.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f5c8bffcb411aa6e98bbfcd2c77a3f9c0eb6d377",
+          "size": 13211,
+          "sha256": "d1d0bb3e3aff03f290fda06b3de80126b907ccda2f7ef0238043ee065b4f2425",
           "kind": "source"
         },
         {
@@ -37462,9 +38164,9 @@
           "path": "tests/window-package-contract.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "9155fbf09f49b174911c24d3d8edfe3d55c9fa49",
-          "size": 4846,
-          "sha256": "2d66441f8bfc3242e29bac4a3f68adfa82fcfa92899980ef31757d9868215a57",
+          "blob": "87be207e60311ec70ea5fb06c523961f9553acc7",
+          "size": 5113,
+          "sha256": "51bf6ae9e9a632934d0807e809df5adc1fc3164e6fe472eaae1097d262cfb86f",
           "kind": "source"
         },
         {
@@ -37528,6 +38230,60 @@
           "blob": "74f07c2f99bc40c895f9e9bc353b9377962d0723",
           "size": 3478,
           "sha256": "9cb8dacfc086c2966c9ec4ba54f4a2dc43b7cbe2b33cec1a2743d886c7fb47a7",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/LICENSE.txt",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e69c5e39a30ce8d112e012cac36289e77691a9b7",
+          "size": 7427,
+          "sha256": "9b914eae88817d63b576eab5aafde7068c7a1abae125d7cdfb034f1da43a9afc",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-brands-400.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5d28021697ff1f32507b1bcbcbf9e6a41d0ac99f",
+          "size": 117852,
+          "sha256": "232c6f6a7678304f9efaa26f30b1610debc2ba9f4cd636b5e6751c8d73761b92",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-regular-400.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18400d7fad27fc52cfbabbda495b871bd912d045",
+          "size": 25392,
+          "sha256": "c27da6f833431da5aa295c44540bfac0fd8270ba6a3c4346427006d8a7b34b76",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-solid-900.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "758dd4f6070c7cb399334ae997ae9ff6523d3b55",
+          "size": 156400,
+          "sha256": "ae17c16afbea216707b2203ea1cf9bdb45b9bfe47d0f4ae3258ddbc6294dd02f",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fa-v4compatibility.woff2",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f94bec22756c48039ad405859f0d0e542033c1b2",
+          "size": 4792,
+          "sha256": "c7a869faca299d15be10a01f19d0765a7c4d46d8922d9b9317235c1e4a6f0982",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/fontawesome-v6/fontawesome-v6.css",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e8b9a13b0f8d91fc6ea27c1e4011a36a2afc466",
+          "size": 141065,
+          "sha256": "f64bbef6a51bdda26f300aba5f015799e2aa43a89dff13628789144b9e088bc7",
           "kind": "source"
         },
         {
@@ -39611,12 +40367,12 @@
       ],
       "source_context": {
         "source": {
-          "commit": "20268e79fe62718fcc14dd3ac2748abbec574515",
-          "tree": "ba994f5b26a6f030543c972eca49813f7043705d"
+          "commit": "fb37badf5a302a6e8768a3e4b0b1e6d50efa085d",
+          "tree": "f41414598adac088a5acaadd1dcda8ad27fa32cc"
         },
         "upstream": {
-          "commit": "c20cc942826cd2b61fe179097602f6a85b648b2f",
-          "tree": "40d0ade18cc9dc9344dcde04ae7b879d2d1c6da4"
+          "commit": "c1334d7c7ce2377f0e1a030139c79d7c75590085",
+          "tree": "8d9b3833dfa6e15ee5d8fb05156df49b0160cbe5"
         }
       }
     }

@@ -48,6 +48,16 @@ const forbiddenPaths = [
 ];
 
 const allowedSourceDifferences = new Set([
+    // Preserve existing portrait originals while retaining explicit-import optimization.
+    'tests/side-pane-agent-portraits.test.mjs',
+    // Standalone SRPG host facade and its regression; distributed result fixture.
+    'Gamemodules/srpg/src/st.js',
+    // SRPG review fixes: file sender authorization and committed partial-state delivery.
+    'Gamemodules/srpg/service.cjs',
+    'Gamemodules/srpg/session-store.cjs',
+    'Gamemodules/srpg/ui.js',
+    'tests/srpg-sandbox.test.js',
+    'tests/loom-controller.test.js',
     // c20cc942 integration/review: exact worker delivery, certified-source and
     // export-resolution/selected-definition repairs, with red/green regressions.
     // No directory or permission exemption.
@@ -614,12 +624,17 @@ const allowedSourceDifferences = new Set([
 // Already-merged JSO consumer metadata, not a new UI/runtime authority surface.
 // Pin exact regular-file Git identities rather than exempting paths/directories.
 // Caller: merged PR #74. Consumer declaration: commit 42a285d3.
-const reviewedJsoConsumerBlobs = new Map([
+const reviewedSourceBlobs = new Map([
     ['.github/workflows/jso-agent-paired-candidate.yml', '38940cb06947455cc2a5f41b53a4cc314ae9c92c'],
     ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
+    // PR #84: reviewed open-before-lookup plan panel, its topic adapter and
+    // regressions. Exact bytes/mode only; future mutations still need review.
+    ['modules/ui-system/side-pane/planDetailSideProvider.js', '632ad8b643df23934e692cf273ab3ec59fbf01c5'],
+    ['modules/ui-system/side-pane/tab-types/plan-detail.js', '3bbf461867a1a9076f8f4daa9bd71078a09caa52'],
+    ['tests/side-pane-plan-detail.test.mjs', '5603a27d3604ffc1ce0a72713022466f2ea129d5'],
 ]);
-function isReviewedJsoConsumerDifference(file) {
-    const reviewed = reviewedJsoConsumerBlobs.get(file);
+function isReviewedSourceDifference(file) {
+    const reviewed = reviewedSourceBlobs.get(file);
     if (!reviewed) return false;
     if (sourceContext) return sourceContext.matchesEventBlob(file, '100644', reviewed);
     try {
@@ -862,7 +877,7 @@ if (sourceContext) {
     for (const file of sourceContext.changedPaths('source')) {
         if (allowedSourceDifferences.has(file)
             || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))
-            || isReviewedJsoConsumerDifference(file)
+            || isReviewedSourceDifference(file)
             || forbiddenPaths.some(pattern => pattern.test(file))
             || sourceContext.sameIdentity('upstream', file)) continue;
         // Metadata proves additions/deletions and mode/type changes. Other
@@ -896,7 +911,7 @@ if (sourceContext) {
             const restoredToUpstream = !filesDifferentFromUpstream.has(file);
             if (allowedSourceDifferences.has(file)
                 || allowedSourceDifferencePatterns.some(pattern => pattern.test(file))
-                || isReviewedJsoConsumerDifference(file)
+                || isReviewedSourceDifference(file)
                 || forbiddenPaths.some(pattern => pattern.test(file))
                 || restoredToUpstream) continue;
             failures.push(`${file}: differs from ${sourceRef} outside the subtraction allowlist`);

@@ -179,7 +179,7 @@ function committedImageRiskTerms(intent, authorization) {
     const risk = intent.imageRiskContext;
     if (risk == null) return {};
     if (intent.proposalState === "PENDING") fail("SUVEI_IMAGE_RISK_H0_REQUIRES_WORKBENCH");
-    if (intent.recoveryContext != null || risk.schemaVersion !== "image_risk_context.v1"
+    if (intent.recoveryContext != null || !["image_risk_context.v1", "image_risk_context.v2"].includes(risk.schemaVersion)
         || risk.organizationId !== intent.organizationId || risk.projectId !== intent.projectId
         || risk.productionUnitId !== intent.productionUnitId
         || risk.inputs?.action !== intent.action || risk.inputs?.delegateUserId !== intent.delegateUserId
@@ -194,7 +194,20 @@ function committedImageRiskTerms(intent, authorization) {
         fail("SUVEI_IMAGE_RISK_AUTHORIZATION_UNSUPPORTED");
     }
     // These flags are verified against Core's committed digest below, never submitted as new consent.
-    return { imageRiskContext: JSON.parse(canonicalJson(risk)),
+    // Core v2 commits a reference to the entire canonical snapshot. Keep the
+    // full snapshot in canonicalIntentSnapshot/Owner review and recheck it on
+    // decide; only the authorization digest preimage uses this bounded reference.
+    const binding = risk.schemaVersion === "image_risk_context.v2" ? {
+        schemaVersion: "image_risk_context_reference.v1",
+        contextSchemaVersion: risk.schemaVersion,
+        contextDigest: canonicalDigest(risk),
+        policyDigest: risk.policyDigest,
+        targetDigest: risk.targetDigest,
+        organizationId: risk.organizationId,
+        projectId: risk.projectId,
+        productionUnitId: risk.productionUnitId,
+    } : JSON.parse(canonicalJson(risk));
+    return { imageRiskContext: binding,
         acceptUnresolvedPriorOutcome: true, acceptRetainedResponsibility: true };
 }
 

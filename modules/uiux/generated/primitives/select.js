@@ -19,7 +19,9 @@ export function mountSelect(select, props = {}, scope) {
     ensureStyles();
     const originalTabIndex = select.getAttribute('tabindex');
     const originalAriaHidden = select.getAttribute('aria-hidden');
-    const previousActive = document.activeElement;
+    // A long-lived select must not retain a closed view through its old focus
+    // target. Connected elements remain document-owned and can still be restored.
+    const previousActiveRef = document.activeElement ? new WeakRef(document.activeElement) : null;
     const wrap = document.createElement('span');
     wrap.className = 'vcp-uiux-select';
     wrap.style.width = '100%';
@@ -169,7 +171,7 @@ export function mountSelect(select, props = {}, scope) {
     sync();
     menu.remove();
     return scope.own(() => {
-        // Only restore focus when this primitive still owns it. `previousActive`
+        // Only restore focus when this primitive still owns it. The weak target
         // is snapshotted at mount time, so an unconditional refocus yanks the
         // caret out of whatever the user is typing into every time an option
         // list repopulates and the select is remounted.
@@ -186,6 +188,7 @@ export function mountSelect(select, props = {}, scope) {
             select.setAttribute('aria-hidden', originalAriaHidden);
         select.classList.remove('vcp-uiux-select-native');
         wrap.replaceWith(select);
+        const previousActive = previousActiveRef?.deref();
         if (ownsFocus && previousActive && typeof previousActive.focus === 'function' && document.contains(previousActive))
             previousActive.focus();
     }, 'uiux-select', 'ui-primitive');

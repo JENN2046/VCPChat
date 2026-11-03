@@ -51,6 +51,7 @@ const NOT_PERSISTED = /^(sidechat-|terminal:|tool-output:)/;
 const report = { startedAt: new Date().toISOString(), data, rounds: ROUNDS, phases: [], errors: [], counters: {} };
 const errors = report.errors;
 let phase = 'startup';
+let smokeAgentIds = null;
 const recordError = (source, text) => {
     const line = String(text).slice(0, 600);
     if (IGNORED_ERRORS.some(re => re.test(line))) return;
@@ -302,6 +303,7 @@ function kinds(pageUrl) {
         terminal: {
             open: page => entry(page, 'terminal'),
             use: async page => {
+                await page.bringToFront();
                 const marker = 'SMOKE_TERM_' + Date.now();
                 await waitIn(page, () => !!document.querySelector('.side-pane-view.active .xterm-helper-textarea'), null, 'terminal mounted');
                 const diagnostic = { phase, marker, startedAt: Date.now(), samples: [] };
@@ -398,14 +400,56 @@ async function step(name, fn) {
 }
 
 async function selectAgent(page, name) {
-    await waitIn(page, n => [...document.querySelectorAll('li[data-item-id]')].some(li => li.textContent.includes(n)), name, `agent ${name} listed`);
-    await page.evaluate(n => [...document.querySelectorAll('li[data-item-id]')].find(li => li.textContent.includes(n)).click(), name);
-    await wait(1200);
+    // SmokeAgent is a substring of SmokeAgentB. Select by the native creation
+    // result, then wait for its topic owner instead of racing a fixed sleep.
+    const id = smokeAgentIds?.[name];
+    assert.ok(id, `native agent identity for ${name} missing`);
+    await waitIn(page, id => !!document.querySelector(`li[data-item-id="${CSS.escape(id)}"][data-item-type="agent"]`), id, `agent ${name} listed`);
+    await page.evaluate(async ({ id, name }) => {
+        const api = window.chatAPI || window.electronAPI;
+        const config = await api.getAgentConfig(id);
+        if (!config || config.error) throw new Error('Synthetic agent config unavailable');
+        const { chatManager } = await import('./modules/chatManager.js');
+        await chatManager.selectItem(id, 'agent', name, null, config);
+    }, { id, name });
+    try {
+        await waitIn(page, id => window.VCPMainChatState?.snapshot?.().selectedItem?.id === id
+            && !!window.VCPMainChatState?.snapshot?.().topicId
+            && document.getElementById('messageInput')?.disabled === false, id, `agent ${name} topics ready`);
+    } catch (error) {
+        report.seedSelectionDiagnostic = await page.evaluate(async id => {
+            const api = window.chatAPI || window.electronAPI;
+            const state = window.VCPMainChatState?.snapshot?.();
+            const topics = await api.getAgentTopics(id);
+            const config = await api.getAgentConfig(id);
+            const { chatManager } = await import('./modules/chatManager.js');
+            return { requestedId: id, selectedId: state?.selectedItem?.id, topicId: state?.topicId,
+                chatManagerReady: chatManager.isReady(), nativeTopicCount: Array.isArray(topics) ? topics.length : null,
+                configTopicCount: Array.isArray(config?.topics) ? config.topics.length : null,
+                topicContainerCount: document.querySelectorAll('#topicList').length,
+                visibleTopicCount: document.querySelectorAll('#topicList li[data-topic-id]').length,
+                loading: !!document.querySelector('#topicList [aria-busy=true]'),
+                settingsOpen: document.getElementById('globalSettingsModal')?.classList.contains('active') === true,
+                errorNotice: [...document.querySelectorAll('.message-item.system')].some(n=>/选择.*时出错/.test(n.textContent)) };
+        }, id);
+        throw error;
+    }
 }
-const topicIds = page => page.evaluate(() => [...document.querySelectorAll('#topicList li[data-topic-id]')].map(li => li.dataset.topicId));
+// Next UI may leave the legacy topic list unmounted. The native repository is
+// the topic authority; drive the same awaited controller as the actual list.
+const topicIds = page => page.evaluate(async () => {
+    const state = window.VCPMainChatState.snapshot();
+    const topics = await (window.chatAPI || window.electronAPI).getAgentTopics(state.selectedItem.id);
+    if (!Array.isArray(topics)) throw new Error('Native topics unavailable');
+    return topics.map(topic => topic.id);
+});
 async function pickTopic(page, id) {
-    await page.evaluate(id => document.querySelector(`#topicList li[data-topic-id="${id}"]`)?.click(), id);
-    await wait(900);
+    await page.evaluate(async id => {
+        const { chatManager } = await import('./modules/chatManager.js');
+        await chatManager.selectTopic(id);
+    }, id);
+    await waitIn(page, id => window.VCPMainChatState?.snapshot?.().topicId === id
+        && document.getElementById('messageInput')?.disabled === false, id, 'native topic selected');
 }
 
 // ---- 主流程 ----
@@ -421,23 +465,26 @@ try {
     session = await step('launch', () => launch());
     await step('seed agents, workspace and model endpoint', async () => {
         const { page } = session;
-        await page.evaluate(async ({ ws, url }) => {
+        smokeAgentIds = await page.evaluate(async ({ ws, url }) => {
             const api = window.chatAPI || window.electronAPI;
-            await api.createAgent('SmokeAgent');
-            await api.createAgent('SmokeAgentB');
+            const ids = {};
+            for (const name of ['SmokeAgent', 'SmokeAgentB']) {
+                const created = await api.createAgent(name);
+                if (!created?.success) throw new Error(`Could not create synthetic agent ${name}`);
+                ids[name] = created.agentId;
+                const topic = await api.createNewTopicForAgent(created.agentId, 'Smoke second topic');
+                if (!topic?.success) throw new Error(`Could not create synthetic topic for ${name}`);
+            }
             await api.addWorkspace(ws);
             const settings = await api.loadSettings();
             await api.saveSettings({ ...settings, vcpServerUrl: url, vcpApiKey: 'smoke' });
+            return ids;
         }, { ws: workspace, url: `http://127.0.0.1:${modelPort}/v1/chat/completions` });
         await page.reload({ waitUntil: 'load' });
         await page.waitForFunction(() => !!window.VCPContributions?.commands, { timeout: 60000 });
         await wait(3000);
         await selectAgent(page, 'SmokeAgentB');
         await selectAgent(page, 'SmokeAgent');
-        if ((await topicIds(page)).length < 2) {
-            await page.evaluate(() => document.getElementById('currentAgentSettingsBtn')?.click());
-            await wait(1500);
-        }
         const topics = await topicIds(page);
         assert.ok(topics.length >= 2, `need two topics, have ${topics.length}`);
         return { topics: topics.length };

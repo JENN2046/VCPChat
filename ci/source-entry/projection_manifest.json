@@ -8967,9 +8967,9 @@
           "path": "modules/chat/chatHistoryPersistence.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "720d9fb0f481329ed49b62b647f6cf6e33ab0089",
-          "size": 6036,
-          "sha256": "6bfc97482eaa938c9faa30da13a1bf47841c0b03e0df98f39687b7758189b28d",
+          "blob": "a47963ef052a4dc576fa8cf546739d846e5bbef5",
+          "size": 6875,
+          "sha256": "85abd83f41ba3a5beb91444a77188455ad7d2dc73d2778f40ba95c349f22a8ab",
           "kind": "source"
         },
         {
@@ -9210,9 +9210,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "775dd45d6fb8da180b382511af0d5aa36b1af231",
-          "size": 139741,
-          "sha256": "4075effda12ac20374f39530b1fb65478ddf241399274c518c7421b37262f8c2",
+          "blob": "042dc653a721adaf41ae4785276d05a8de4c5c95",
+          "size": 140722,
+          "sha256": "28f1d48f7d43e37e24032990c7b93db061cc35f934f84612420877089cbeec0c",
           "kind": "source"
         },
         {
@@ -10146,9 +10146,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "bfbf97e2318b692e5b90470453f73241f1b6be09",
-          "size": 15835,
-          "sha256": "da5d916e8e91264172fe4d05decb93e3746973ea7dab8ab5bf6fd11d0ee8d3e2",
+          "blob": "04a20cc55b827e68be05acd355b6fd8ed5c2cce7",
+          "size": 17303,
+          "sha256": "0ed65d768070c088ff6692e0322c30609bf75674cd3f73990f951fde701760b0",
           "kind": "source"
         },
         {
@@ -17936,9 +17936,9 @@
           "path": "tests/native-conversation-ipc.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4a7d51ed9026a71a2f093c646e8542fe898a037",
-          "size": 37473,
-          "sha256": "8f52e71e3646c8de1042d75cef5b721b319d291e59df7c5c7136744042e7819a",
+          "blob": "197505ce188699ed59e77ffa692ecccae4fdbbfc",
+          "size": 39933,
+          "sha256": "9cbbc6e8b5fe457a39fecc54390c15f6c11b8066d077ad0697f1b04c052aa8cf",
           "kind": "source"
         },
         {
@@ -27265,9 +27265,9 @@
           "path": "modules/chat/chatHistoryPersistence.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "720d9fb0f481329ed49b62b647f6cf6e33ab0089",
-          "size": 6036,
-          "sha256": "6bfc97482eaa938c9faa30da13a1bf47841c0b03e0df98f39687b7758189b28d",
+          "blob": "a47963ef052a4dc576fa8cf546739d846e5bbef5",
+          "size": 6875,
+          "sha256": "85abd83f41ba3a5beb91444a77188455ad7d2dc73d2778f40ba95c349f22a8ab",
           "kind": "source"
         },
         {
@@ -27508,9 +27508,9 @@
           "path": "modules/chatManager.js",
           "mode": "100755",
           "type": "blob",
-          "blob": "775dd45d6fb8da180b382511af0d5aa36b1af231",
-          "size": 139741,
-          "sha256": "4075effda12ac20374f39530b1fb65478ddf241399274c518c7421b37262f8c2",
+          "blob": "042dc653a721adaf41ae4785276d05a8de4c5c95",
+          "size": 140722,
+          "sha256": "28f1d48f7d43e37e24032990c7b93db061cc35f934f84612420877089cbeec0c",
           "kind": "source"
         },
         {
@@ -28435,9 +28435,9 @@
           "path": "modules/ipc/nativeConversationHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "bfbf97e2318b692e5b90470453f73241f1b6be09",
-          "size": 15835,
-          "sha256": "da5d916e8e91264172fe4d05decb93e3746973ea7dab8ab5bf6fd11d0ee8d3e2",
+          "blob": "04a20cc55b827e68be05acd355b6fd8ed5c2cce7",
+          "size": 17303,
+          "sha256": "0ed65d768070c088ff6692e0322c30609bf75674cd3f73990f951fde701760b0",
           "kind": "source"
         },
         {
@@ -35320,9 +35320,9 @@
           "path": "tests/chat-history-persistence.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ede4c5a62f82837db00fa727aec2e8e8ce17559a",
-          "size": 5434,
-          "sha256": "85358bd9a33d907db73e9a2dac7939f9f3bebbee11ef7ff78b48e9dff0c7a4bf",
+          "blob": "f39d44326cbb29aa436019a9a13d0a7c65ecb206",
+          "size": 7855,
+          "sha256": "fc97e2c51b041950887722808b5944471df21af47374d54127c1f463137f90c8",
           "kind": "source"
         },
         {
@@ -35401,9 +35401,9 @@
           "path": "tests/chat-send-acceptance.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "835fca7b179a4b7f89f02e2520ce66eb3fa12f4b",
-          "size": 2679,
-          "sha256": "2818343b66bc94823074d8cdeb1c6f955f9c5215a65fa0bd399cca1d6ee28d2f",
+          "blob": "aa1795c8e396861b24952c6673d64693e49c12cc",
+          "size": 6545,
+          "sha256": "03f53720eb72e28a18241a1c8bd223999463044806f1dca29dad68f838750af5",
           "kind": "source"
         },
         {
@@ -36562,9 +36562,9 @@
           "path": "tests/native-conversation-ipc.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4a7d51ed9026a71a2f093c646e8542fe898a037",
-          "size": 37473,
-          "sha256": "8f52e71e3646c8de1042d75cef5b721b319d291e59df7c5c7136744042e7819a",
+          "blob": "197505ce188699ed59e77ffa692ecccae4fdbbfc",
+          "size": 39933,
+          "sha256": "9cbbc6e8b5fe457a39fecc54390c15f6c11b8066d077ad0697f1b04c052aa8cf",
           "kind": "source"
         },
         {

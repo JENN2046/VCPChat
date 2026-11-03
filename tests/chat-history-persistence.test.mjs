@@ -121,3 +121,46 @@ test('terminal persistence rejects when saveHistory resolves with error object o
         );
     }
 });
+
+test('native terminal commits use the owning adapter without renderer replacement', async () => {
+    const value = projected([{ id: 'assistant-a', role: 'assistant', content: 'answer a' }]);
+    let calls = 0;
+    const persistence = createChatHistoryPersistence({
+        async getHistory() { assert.fail('native adapter owns the fresh read'); },
+        async saveHistory() { assert.fail('native adapter owns the write'); },
+        async commitTerminal(input) { assert.equal(input, value); calls++; return { handled: true, success: true }; },
+    });
+    assert.equal((await persistence.commit(value)).messageId, 'assistant-a');
+    assert.equal(calls, 1);
+});
+
+for (const result of [undefined, null, { handled: true }, { handled: true, success: false, error: 'TERMINAL_MESSAGE_DELETED' }]) {
+    test('native terminal rejection or malformed result never falls back: ' + JSON.stringify(result), async () => {
+        const persistence = createChatHistoryPersistence({
+            async getHistory() { assert.fail('failed native commit cannot fall back'); },
+            async saveHistory() { assert.fail('failed native commit cannot replace history'); },
+            async commitTerminal() { return result; },
+        });
+        await assert.rejects(persistence.commit(projected([])), /Native terminal persistence failed|TERMINAL_MESSAGE_DELETED/);
+    });
+}
+
+test('explicit non-native terminal fallback keeps the original read revision', async () => {
+    const history = [];
+    const persistence = createChatHistoryPersistence({
+        async commitTerminal() { return { handled: false }; },
+        async getHistory() { return history; },
+        revisionOf(value) { assert.equal(value, history); return 'read-revision'; },
+        async saveHistory(_item, _type, _topic, _history, revision) { assert.equal(revision, 'read-revision'); return { success: true }; },
+    });
+    await persistence.commit(projected([]));
+});
+
+test('transient auxiliary persistence never claims the native durable terminal adapter', async () => {
+    const persistence = createTransientChatHistoryPersistence({
+        async commitTerminal() { assert.fail('transient history has no native durable ownership'); },
+        async getHistory() { return []; },
+        async saveHistory() { return { success: true }; },
+    });
+    await persistence.commit({ ...projected([]), context: { agentId: 'a', topicId: 'assistant_chat' } });
+});

@@ -34,6 +34,18 @@ function createHistoryPersistence(repository, { durable, skipTemporaryContexts }
                 throw new Error('Stream terminal persistence requires item and topic identity');
             }
 
+            // Native sync owns terminal merging and tombstones inside its queue.
+            // An explicit non-native result retains the legacy repository path.
+            if (durable && typeof repository.commitTerminal === 'function') {
+                const native = await repository.commitTerminal(projected);
+                if (native?.handled !== false) {
+                    if (native?.handled !== true || native.success !== true || native.error) {
+                        throw new Error(typeof native?.error === 'string' ? native.error : 'Native terminal persistence failed');
+                    }
+                    return Object.freeze({ messageId: projected.messageId, context, content: projected.content, finishReason: projected.finishReason });
+                }
+            }
+
             const projectedHistory = cloneHistory(
                 projected.history.filter(message => !message?.isThinking && !message?.isPendingStream)
             );
@@ -98,7 +110,7 @@ function createHistoryPersistence(repository, { durable, skipTemporaryContexts }
                 return cleanMessage;
             });
 
-            const saveResult = await repository.saveHistory(itemId, itemType, context.topicId, mergedHistory);
+            const saveResult = await repository.saveHistory(itemId, itemType, context.topicId, mergedHistory, repository.revisionOf?.(durableHistory));
             if (saveResult && (saveResult.success === false || saveResult.error)) {
                 const message = typeof saveResult.error === 'string'
                     ? saveResult.error

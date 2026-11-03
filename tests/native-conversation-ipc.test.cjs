@@ -135,6 +135,39 @@ function rebuiltWindows(t,request,{acknowledgeColdStart=true,portClock}={}){
 }
 const readyResponse=(action,p)=>action==='prepare'?{ok:true,sourceId:p.messageId}:{ok:true};
 
+test('cold invalidation exposes its fixed rejection code, preserves the barrier and clears after acknowledgement',async t=>{
+ let online=false;
+ const f=rebuiltWindows(t,async(action,p)=>action==='invalidate'&&!online?{ok:false,code:'APPLICATION_SESSION_REQUIRED'}:readyResponse(action,p),{acknowledgeColdStart:false});
+ const w=await f.open();
+ for(let i=0;i<2;i++){
+  const r=await w.prepare();
+  assert.equal(r.code,'PRESENTATION_INVALIDATION_REQUIRED');assert.equal(r.diagnosticCode,'APPLICATION_SESSION_REQUIRED');
+  assert.match(r.message,/APPLICATION_SESSION_REQUIRED/);assert.match(r.message,/草稿已保留/);
+ }
+ assert.equal(f.calls.filter(c=>['prepare','propose','execute'].includes(c.action)).length,0);
+ online=true;await f.tick();const ready=await w.prepare();assert.ok(ready.sourceId);assert.equal(ready.diagnosticCode,undefined);
+});
+
+for(const mode of ['exception','response'])test('invalidation diagnostics never disclose arbitrary '+mode+' content',async t=>{
+ const privateText='Bearer synthetic-private-value; private proposal and URL';
+ const f=rebuiltWindows(t,async(action,p)=>{
+  if(action==='invalidate'){if(mode==='exception')throw Error(privateText);return {ok:false,code:privateText,message:privateText};}
+  return readyResponse(action,p);
+ });
+ const w=await f.open();await w.invoke('invalidate',{conversationId:'C',messageId:'M'});
+ const r=await w.prepare();assert.equal(r.code,'PRESENTATION_INVALIDATION_REQUIRED');
+ assert.equal(r.diagnosticCode,mode==='exception'?'INVALIDATION_TRANSPORT_FAILED':'INVALIDATION_NOT_ACKNOWLEDGED');
+ assert.equal(JSON.stringify(r).includes(privateText),false);assert.equal(f.calls.filter(c=>['prepare','execute'].includes(c.action)).length,0);
+});
+
+test('an invalidation diagnostic belongs to its conversation and cannot contaminate another send',async t=>{
+ const f=rebuiltWindows(t,async(action,p)=>action==='invalidate'?{ok:false,code:p.conversationId==='C'?'NATIVE_SESSION_IN_USE':'JOURNAL_BUSY_RECONCILE_REQUIRED'}:readyResponse(action,p));
+ const w=await f.open();await w.invoke('invalidate',{conversationId:'C',messageId:'M'});
+ assert.equal((await w.prepare()).diagnosticCode,'NATIVE_SESSION_IN_USE');assert.ok((await w.prepare('unrelated')).sourceId);
+ await w.invoke('invalidate',{conversationId:'D',messageId:'M'});
+ const r=await w.prepare('D');assert.equal(r.diagnosticCode,'JOURNAL_BUSY_RECONCILE_REQUIRED');assert.equal(r.message.includes('NATIVE_SESSION_IN_USE'),false);
+});
+
 test('deleted proposal stays blocked across window rebuild and reconnect retries without renderer ownership',async t=>{
  let online=false;const f=rebuiltWindows(t,async(action,p)=>{if(action==='invalidate'&&!online)throw Error('offline');return readyResponse(action,p);});
  const old=await f.open();const prepared=await old.prepare();

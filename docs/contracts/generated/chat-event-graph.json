@@ -13676,12 +13676,12 @@
         },
         {
           "file": "modules/ipc/nativeConversationHandlers.js",
-          "line": 14,
+          "line": 18,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/nativeConversationHandlers.js",
-          "line": 155,
+          "line": 163,
           "kind": "event-listener"
         },
         {
@@ -13775,13 +13775,13 @@
         },
         {
           "file": "modules/ipc/nativeConversationHandlers.js",
-          "line": 14,
+          "line": 18,
           "kind": "event-listener",
           "match": "mainWindow.webContents.once('destroyed'"
         },
         {
           "file": "modules/ipc/nativeConversationHandlers.js",
-          "line": 155,
+          "line": 163,
           "kind": "event-listener",
           "match": "wc.once('destroyed'"
         },
@@ -18830,7 +18830,7 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1679,
+          "line": 1683,
           "kind": "custom-event-listener"
         },
         {
@@ -18991,7 +18991,7 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1679,
+          "line": 1683,
           "kind": "custom-event-listener",
           "match": "input.addEventListener?.('input'"
         },
@@ -26052,14 +26052,14 @@
       "consumers": [
         {
           "file": "modules/chatManager.js",
-          "line": 599,
+          "line": 603,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/chatManager.js",
-          "line": 599,
+          "line": 603,
           "kind": "preload-subscription",
           "match": "electronAPI.onCanvasContentUpdate("
         }
@@ -26071,14 +26071,14 @@
       "consumers": [
         {
           "file": "modules/chatManager.js",
-          "line": 600,
+          "line": 604,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/chatManager.js",
-          "line": 600,
+          "line": 604,
           "kind": "preload-subscription",
           "match": "electronAPI.onCanvasWindowClosed("
         }
@@ -38733,7 +38733,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 14,
+      "line": 18,
       "reason": "dynamic event listener name: c",
       "kind": "event-listener",
       "match": "ipcMain.handle(c",
@@ -38741,7 +38741,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 85,
+      "line": 93,
       "reason": "dynamic event listener name: channels[0]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[0]",
@@ -38749,7 +38749,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 110,
+      "line": 118,
       "reason": "dynamic event listener name: channels[1]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[1]",
@@ -38757,7 +38757,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 129,
+      "line": 137,
       "reason": "dynamic event listener name: channels[2]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[2]",
@@ -38765,7 +38765,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 145,
+      "line": 153,
       "reason": "dynamic event listener name: channels[3]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[3]",
@@ -38773,7 +38773,7 @@
     },
     {
       "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 146,
+      "line": 154,
       "reason": "dynamic event listener name: channels[4]",
       "kind": "event-listener",
       "match": "ipcMain.handle(channels[4]",

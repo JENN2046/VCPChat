@@ -17270,9 +17270,9 @@
           "path": "tests/chat-manager-selection-race.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8edbf044b962e1c18e57b61c623691a25675096c",
-          "size": 57370,
-          "sha256": "e60df32f271c833616bea93157eb61c24a83845dea9837c98c9588f207ae1912",
+          "blob": "613d6d8100b59c38a6b3a89f1191fec215b06541",
+          "size": 57573,
+          "sha256": "280f2e983b05c4f1c27cfaf5e6d5ba25cff9647ae4f8ecf8bf19b973b9f70e97",
           "kind": "source"
         },
         {
@@ -35329,9 +35329,9 @@
           "path": "tests/chat-manager-selection-race.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8edbf044b962e1c18e57b61c623691a25675096c",
-          "size": 57370,
-          "sha256": "e60df32f271c833616bea93157eb61c24a83845dea9837c98c9588f207ae1912",
+          "blob": "613d6d8100b59c38a6b3a89f1191fec215b06541",
+          "size": 57573,
+          "sha256": "280f2e983b05c4f1c27cfaf5e6d5ba25cff9647ae4f8ecf8bf19b973b9f70e97",
           "kind": "source"
         },
         {

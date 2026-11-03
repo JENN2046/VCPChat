@@ -11713,9 +11713,9 @@
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "e659d8a91eb7748e7d1500377448244989f95975",
-          "size": 51038,
-          "sha256": "af6b6ad05d96a94dd9a576ce3f938f15875b43f241f1f9d14f97cd56d9123a03",
+          "blob": "30a026652b547168aa9c46eb78f13093d4dc71bf",
+          "size": 51765,
+          "sha256": "a51836875078e0a306ae48719ceaa21f76ecc4c1da34a19cb48d9a859b0cc453",
           "kind": "source"
         },
         {
@@ -18350,9 +18350,9 @@
           "path": "tests/suvei-human-authorization.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cf7bb274f2c30367873e7b448f1aeef32ab9a072",
-          "size": 63421,
-          "sha256": "a25dedb5ba4f11e368aa40e2dab86e530626ba19dc1636560b341f7aa3f8ef9b",
+          "blob": "318780e6388f6abf5d7ef3a65515e78bc9ad9a46",
+          "size": 67636,
+          "sha256": "41dec02b2c3fdc8d8a5eb6986b0eb94852f586479d43e41058358791b8692da6",
           "kind": "source"
         },
         {
@@ -29983,9 +29983,9 @@
           "path": "modules/services/suveiHumanAuthorizationService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "e659d8a91eb7748e7d1500377448244989f95975",
-          "size": 51038,
-          "sha256": "af6b6ad05d96a94dd9a576ce3f938f15875b43f241f1f9d14f97cd56d9123a03",
+          "blob": "30a026652b547168aa9c46eb78f13093d4dc71bf",
+          "size": 51765,
+          "sha256": "a51836875078e0a306ae48719ceaa21f76ecc4c1da34a19cb48d9a859b0cc453",
           "kind": "source"
         },
         {
@@ -37921,9 +37921,9 @@
           "path": "tests/suvei-human-authorization.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cf7bb274f2c30367873e7b448f1aeef32ab9a072",
-          "size": 63421,
-          "sha256": "a25dedb5ba4f11e368aa40e2dab86e530626ba19dc1636560b341f7aa3f8ef9b",
+          "blob": "318780e6388f6abf5d7ef3a65515e78bc9ad9a46",
+          "size": 67636,
+          "sha256": "41dec02b2c3fdc8d8a5eb6986b0eb94852f586479d43e41058358791b8692da6",
           "kind": "source"
         },
         {

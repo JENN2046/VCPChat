@@ -77,8 +77,7 @@ export function buildPlanModel(data) {
  */
 export async function resolveDefaultProject(api, storage = null) {
     if (!api?.projectForgeListProjects) return null;
-    const listed = await api.projectForgeListProjects({});
-    const projects = (listed?.success ? listed.data : []) || [];
+    const projects = await call(api.projectForgeListProjects({})) || [];
     const alive = projects.filter(project => !project.deleted_at);
     if (!alive.length) return null;
 
@@ -107,8 +106,6 @@ export function createPlanDetailSideProvider({
     document: doc = document,
     api = (typeof window !== 'undefined' ? window.electronAPI : null),
     sidePaneController = null,
-    // 当前话题用过的 V工程（最近的在前）；不传时退回旧的默认工程选择
-    getConversationProjects = null,
     // 当前话题的作用域（conversation-scope.js：projectIds、batchIds）
     getTopicScope = null,
     // 聊天记录变化时回调（新的施工结果进来），返回取消订阅
@@ -128,41 +125,22 @@ export function createPlanDetailSideProvider({
 
         /**
          * 打开（或聚焦）计划详情。话题里不传 projectId 时显示话题的工程（与状态面板同一条规则）；
-         * focus 可以定位到某条计划（todoId）或某个区块（section）。没有任何工程时给出提示而不是开一个空标签。
-         * page 切到某一页；page 为 'git' 时没有工程也照样打开，focusPath 展开那个文件的 diff。
+         * focus 可以定位到某条计划（todoId）或某个区块（section）。没有任何工程时显示空状态。
+         * 点击后先打开界面，挂载时再选取/加载工程；空数据、慢请求或失败不阻止面板显示。
+         * page 切到某一页，focusPath 展开那个文件的 diff。
          */
         async openPlanDetailTab({ projectId = null, projectName = '', focus = null, page = null, focusPath = null } = {}) {
             if (!sidePaneController) return null;
-            let id = projectId;
-            let name = projectName;
+            const id = projectId;
+            const name = projectName;
             // 计划跟着话题走：标签记在打开它的话题下，切到别的话题就收起
             const snapshot = sidePaneController.getSnapshot?.() || null;
             const parent = snapshot?.parent || null;
-            if (!id && parent && typeof getConversationProjects === 'function') {
-                const used = (await getConversationProjects()) || [];
-                if (!used.length && page !== 'git') {
-                    toast('这个话题还没用过 V工程：让助手用 ProjectForge 建好工程后，这里会显示它的计划', 'info');
-                    return null;
-                }
-                // 和状态面板同一条规则：最近用过、有计划的工程
-                const picked = pickTopicProject(used);
-                id = picked?.id || null;
-                name = picked?.name || '';
-            }
-            if (!id && !parent) {
-                const project = await resolveDefaultProject(api, storage);
-                if (!project && page !== 'git') {
-                    toast('还没有 V工程 工程：让管家用 ProjectForge 创建工程后，这里会显示它的计划', 'info');
-                    return null;
-                }
-                id = project?.id || null;
-                name = project?.name || '';
-            }
             const parentKey = parent ? getParentKey(parent) : '';
             // 这个话题已经有计划标签（包括旧版按工程开的）就用它
-            const existing = parent
-                ? (snapshot?.tabs || []).find(t => t.kind === kind && t.parent && getParentKey(t.parent) === parentKey)
-                : null;
+            const existing = (snapshot?.tabs || []).find(t => t.kind === kind && (parent
+                ? t.parent && getParentKey(t.parent) === parentKey
+                : !id && !t.parent && (t.id === planTabId(null) || t.payload?.pinned === false)));
             const tabId = existing?.id || planTabId(id, parent);
             const pinned = Boolean(projectId);
             const payload = { ...(existing?.payload || {}), projectId: existing && !pinned ? (existing.payload?.projectId || id) : id, projectName: name, pinned: pinned || Boolean(existing?.payload?.pinned), focus };
@@ -171,7 +149,7 @@ export function createPlanDetailSideProvider({
             const handle = await sidePaneController.openTab({
                 id: tabId,
                 kind,
-                title: name ? `计划 · ${name}` : (existing?.title || '计划详情'),
+                title: name ? `计划 · ${name}` : (existing?.title || 'V工程'),
                 icon: 'checklist',
                 closable: true,
                 scopeMode: parent ? 'topic' : 'global',
@@ -983,10 +961,11 @@ export function createPlanDetailSideProvider({
                     if (topicMode && isCurrentTopic()) lastScope = readScope();
                     const scoped = lastScope;
                     const projects = topicMode ? await listTopicProjects(scoped.projectIds) : [];
+                    const defaultProject = !topicMode && !projectId ? await resolveDefaultProject(api, storage) : null;
                     if (disposed() || seq !== refreshSeq) return;
                     // 没手动选过工程就和状态面板走同一条规则；话题模式下原工程已被删除时不再死守残留 ID
                     const topicPicked = pickTopicProject(projects)?.id || null;
-                    const chosen = (pinned && projectId) || topicPicked || (!topicMode || !scoped.projectIds.length ? projectId : null);
+                    const chosen = (pinned && projectId) || topicPicked || (!topicMode || !scoped.projectIds.length ? projectId : null) || defaultProject?.id || null;
                     if (!chosen) {
                         projectId = null;
                         model = null;

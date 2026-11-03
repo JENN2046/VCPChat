@@ -8,14 +8,6 @@ export function definePlanDetailTabType({ document: doc, window: win, chatAPI, s
     const provider = createLazyProvider(async () => (await import('../planDetailSideProvider.js')).createPlanDetailSideProvider({
         document: doc, api: chatAPI || win.electronAPI, sidePaneController, uiHelper,
         onOpenProjectForge: openProjectForge,
-        getConversationProjects: async () => {
-            const api = chatAPI || win.electronAPI;
-            const ids = collectConversationScope(historyRef.get() || []).projectIds;
-            if (!ids.length || !api?.projectForgeListProjects) return [];
-            const res = await api.projectForgeListProjects({});
-            const byId = new Map((res?.success ? res.data || [] : []).filter(p => !p.deleted_at).map(p => [p.id, p]));
-            return ids.map(id => byId.get(id)).filter(Boolean);
-        },
         getTopicScope: () => collectConversationScope(historyRef.get() || []),
         // 和状态面板一样跟着当前会话的记录：新的施工结果写进记录后重新圈定话题批次
         watchTopic: (callback) => {

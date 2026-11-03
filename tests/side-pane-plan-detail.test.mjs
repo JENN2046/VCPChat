@@ -87,21 +87,84 @@ function makeEnv(overrides = {}) {
     return { dom, doc, provider, calls, view: doc.getElementById('view'), fire: (p) => changed?.(p), wasUnsubscribed: () => unsubscribed };
 }
 
-test('openPlanDetailTab opens a per-project tab with a searchable title', async () => {
-    const { provider, calls } = makeEnv();
+test('openPlanDetailTab opens first, then selects the default project while mounting', async () => {
+    const { provider, calls, view, dom } = makeEnv();
     await provider.openPlanDetailTab();
     assert.equal(calls.opened.length, 1);
-    assert.equal(calls.opened[0].id, planTabId('p1'));
+    assert.equal(calls.opened[0].id, planTabId(null));
     assert.equal(calls.opened[0].kind, 'plan-detail');
-    assert.match(calls.opened[0].title, /算法工程/);
-    assert.equal(calls.opened[0].payload.projectId, 'p1');
+    assert.equal(calls.opened[0].title, 'V工程');
+    const handle = await provider.mountTab(calls.opened[0], view);
+    assert.match(view.querySelector('.side-plan-title').textContent, /算法工程/);
+    assert.equal(calls.updated.at(-1).payload.projectId, 'p1');
+    handle.dispose();dom.window.close();
 });
 
-test('openPlanDetailTab tells the user instead of opening an empty tab when there is no project', async () => {
-    const { provider, calls } = makeEnv({ projectForgeListProjects: async () => ({ success: true, data: [] }) });
-    assert.equal(await provider.openPlanDetailTab(), null);
-    assert.equal(calls.opened.length, 0);
-    assert.equal(calls.toasts.length, 1);
+test('openPlanDetailTab opens an empty interface when no projects exist', async () => {
+    const { provider, calls, view, dom } = makeEnv({ projectForgeListProjects: async () => ({ success: true, data: [] }) });
+    await provider.openPlanDetailTab();
+    assert.equal(calls.opened.length, 1);
+    assert.equal(calls.toasts.length, 0);
+    const handle = await provider.mountTab(calls.opened[0], view);
+    assert.match(view.textContent, /还没有 V工程/);
+    assert.ok(view.querySelector('[data-plan-page="git"]'));
+    handle.dispose();dom.window.close();
+});
+
+test('a pending project lookup does not delay opening or the loading interface', async () => {
+    let finish;
+    const pending = new Promise(resolve => { finish = resolve; });
+    const { provider, calls, view, dom } = makeEnv({ projectForgeListProjects: () => pending });
+    await provider.openPlanDetailTab();
+    assert.equal(calls.opened.length, 1);
+    const mounting = provider.mountTab(calls.opened[0], view);
+    assert.match(view.textContent, /正在读取 V工程/);
+    finish({ success: true, data: [] });
+    const handle = await mounting;
+    assert.match(view.textContent, /还没有 V工程/);
+    handle.dispose();dom.window.close();
+});
+
+test('a failed project lookup opens a visible error tab and retry can recover the default project', async () => {
+    let failed = true;
+    const { provider, calls, view, dom } = makeEnv({ projectForgeListProjects: async () => failed
+        ? { success: false, error: 'PROJECTFORGE_WRITER_UNAVAILABLE' }
+        : { success: true, data: [{ id: 'p1', name: '算法工程' }] } });
+    await provider.openPlanDetailTab();
+    assert.equal(calls.opened.length, 1, 'backend failure must not silently prevent opening the panel');
+    assert.equal(calls.toasts.length, 0, 'a failed lookup is not an empty project list');
+    const handle = await provider.mountTab(calls.opened[0], view);
+    assert.match(view.querySelector('.side-plan-error').textContent, /PROJECTFORGE_WRITER_UNAVAILABLE/);
+    failed = false;
+    const retry = [...view.querySelectorAll('button')].find(el => el.textContent.includes('重试'));
+    retry.click();
+    await waitFor(() => view.querySelector('.side-plan-title')?.textContent.includes('算法工程'));
+    assert.equal(view.querySelector('.side-plan-error'), null);
+    handle.dispose();dom.window.close();
+});
+
+test('opening the default plan again reuses an unpinned global tab without reading projects', async (t) => {
+    const { provider, calls, dom } = makeEnv({ projectForgeListProjects: () => {
+        assert.fail('opening a tab must not read projects before mounting');
+    } });
+    t.after(() => dom.window.close());
+    calls.tabs = [{ id: planTabId('p1'), kind: 'plan-detail', title: '计划 · 算法工程',
+        payload: { projectId: 'p1', pinned: false } }];
+    await provider.openPlanDetailTab();
+    assert.equal(calls.opened[0].id, planTabId('p1'));
+    assert.equal(calls.opened[0].payload.projectId, 'p1');
+    assert.equal(calls.opened[0].title, '计划 · 算法工程');
+    assert.equal(calls.opened[0].payload.pinned, false);
+});
+
+test('an explicit project does not reuse the unpinned global plan tab', async (t) => {
+    const { provider, calls, dom } = makeEnv();
+    t.after(() => dom.window.close());
+    calls.tabs = [{ id: planTabId(null), kind: 'plan-detail', payload: { pinned: false } }];
+    await provider.openPlanDetailTab({ projectId: 'p2', projectName: '指定工程' });
+    assert.equal(calls.opened[0].id, planTabId('p2'));
+    assert.equal(calls.opened[0].payload.projectId, 'p2');
+    assert.equal(calls.opened[0].payload.pinned, true);
 });
 
 test('mountTab renders plan, files, timeline and reloads on matching change events', async (t) => {
@@ -310,31 +373,33 @@ test('a renamed project renames its tab, once', async (t) => {
     handle.dispose();
 });
 
-test('inside a topic the plan tab belongs to that topic and shows the project the topic used', async () => {
+test('inside a topic the plan tab opens even when that topic has no project yet', async () => {
     const dom = new JSDOM('<div></div>');
     const opened = [];
     const toasts = [];
     const parent = { itemType: 'agent', itemId: 'nova', topicId: 't1' };
-    let used = [{ id: 'p2', name: '话题工程' }];
     const provider = createPlanDetailSideProvider({
         document: dom.window.document,
         api: { projectForgeListProjects: async () => ({ success: true, data: [{ id: 'p1', name: '别的工程' }] }) },
         sidePaneController: { getSnapshot: () => ({ parent }), openTab: async (tab) => { opened.push(tab); return null; }, setVisible() {} },
         uiHelper: { showToastNotification: (m) => toasts.push(m) },
-        getConversationProjects: async () => used
+        getTopicScope: () => ({ projectIds: [], batchIds: new Set() })
     });
 
     await provider.openPlanDetailTab();
-    assert.equal(opened[0].payload.projectId, 'p2');
+    assert.equal(opened[0].payload.projectId, null);
     assert.equal(opened[0].scopeMode, 'topic');
     assert.deepEqual(opened[0].parent, parent);
-    assert.equal(opened[0].id, planTabId('p2', parent));
+    assert.equal(opened[0].id, planTabId(null, parent));
 
-    // 话题没用过 V工程：不塞一个默认工程进来
-    used = [];
+    const view = dom.window.document.createElement('div');
+    const handle = await provider.mountTab(opened[0], view);
+    assert.match(view.textContent, /这个话题还没用过 V工程/);
     await provider.openPlanDetailTab();
-    assert.equal(opened.length, 1);
-    assert.equal(toasts.length, 1);
+    assert.equal(opened.length, 2);
+    assert.equal(opened[1].id, opened[0].id);
+    assert.equal(toasts.length, 0);
+    handle.dispose();
     dom.window.close();
 });
 

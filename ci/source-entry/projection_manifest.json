@@ -11515,9 +11515,9 @@
           "path": "modules/services/embeddedAppSessionManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1d1c4e6692eee446371ec76895ad54ccada61542",
-          "size": 18779,
-          "sha256": "8ed7e7f7710663902d8e219b520256cb45d9195ada81bebbde189c02135e884b",
+          "blob": "40569826c6000286463adfe41d61e84031240fda",
+          "size": 18943,
+          "sha256": "fab684a03ab4607d950c83a3a1ebc7060ea5b83dc5ea5fe6eac2a9585a562314",
           "kind": "source"
         },
         {
@@ -13000,9 +13000,9 @@
           "path": "modules/ui-system/side-pane/planDetailSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b55555c007909e48f86973754c6370e8a622677e",
-          "size": 66736,
-          "sha256": "6d262adcc5268d468e0cd0c9942a96d87cfd8a40764b6ecff3bbece9dab4e91f",
+          "blob": "632ad8b643df23934e692cf273ab3ec59fbf01c5",
+          "size": 65740,
+          "sha256": "c40073708de3ae939594e0c243c8e8183779a3124110f5be0d31f82bd59573f5",
           "kind": "source"
         },
         {
@@ -13288,9 +13288,9 @@
           "path": "modules/ui-system/side-pane/tab-types/plan-detail.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8705668d6666e016d8066eb6ffcd9f51127e3ffb",
-          "size": 2057,
-          "sha256": "f34cab73c600d0d21e1134dbff3955705a376a9e07111210c81e2beb6cc66f67",
+          "blob": "3bbf461867a1a9076f8f4daa9bd71078a09caa52",
+          "size": 1541,
+          "sha256": "758c963f2d5e48f8c49cecbe972632ff9be38c22ef4cfb0d3ba0addc87ba58e2",
           "kind": "source"
         },
         {
@@ -15272,9 +15272,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b94bfe7001c2214083198a2c04556001af503e41",
-          "size": 47478,
-          "sha256": "5ee33c1092c10178f30ee982649c1bbbac52b2126b68a44c3ada292436532494",
+          "blob": "200c9df62963c14b7ddc1a4479a148c4e4d9a023",
+          "size": 47912,
+          "sha256": "32f9da6686bf1d32c6a33c2c7dc93b1e07e444a3df88675b30825465d17c0a4e",
           "kind": "source"
         },
         {
@@ -17315,9 +17315,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
-          "size": 11427,
-          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
+          "blob": "b7a721062cf4c6331b0e097efd45e32451797d12",
+          "size": 12997,
+          "sha256": "fd931ca031ee8dfde35acb7cc0da4ec86063141e367918f08de348cda66c5792",
           "kind": "source"
         },
         {
@@ -17702,9 +17702,9 @@
           "path": "tests/embedded-app-security.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "415e3eb8a4f445163709a06add7194e30d37e509",
-          "size": 6569,
-          "sha256": "b112e3be9072cfad248320e21e463f978353498332d872c3e23d7a3f191964ed",
+          "blob": "88692823df42e4f915821cc8b3f552ba2feac35f",
+          "size": 6575,
+          "sha256": "ba55b1a0562b742622a12c123fdc6cf2de7e9d1c94cf57bdbe6445abe9d01c72",
           "kind": "source"
         },
         {
@@ -26671,9 +26671,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8473194c2c2c59e64f2e965ccd893c2c1dc74a14",
+          "blob": "71f7f6f6ed769adaaae8bd634cee3b86ed2ac747",
           "size": 1087363,
-          "sha256": "0c3d632dc59d083382ca4a087355fcc9e188377b9c8058047f9f17b29578a5e5",
+          "sha256": "152e0ecd33641612a0fcb2fd6bad8c12de9fe2f345bbf8eac98dd4c5b2116330",
           "kind": "source"
         },
         {
@@ -29785,9 +29785,9 @@
           "path": "modules/services/embeddedAppSessionManager.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1d1c4e6692eee446371ec76895ad54ccada61542",
-          "size": 18779,
-          "sha256": "8ed7e7f7710663902d8e219b520256cb45d9195ada81bebbde189c02135e884b",
+          "blob": "40569826c6000286463adfe41d61e84031240fda",
+          "size": 18943,
+          "sha256": "fab684a03ab4607d950c83a3a1ebc7060ea5b83dc5ea5fe6eac2a9585a562314",
           "kind": "source"
         },
         {
@@ -31261,9 +31261,9 @@
           "path": "modules/ui-system/side-pane/planDetailSideProvider.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b55555c007909e48f86973754c6370e8a622677e",
-          "size": 66736,
-          "sha256": "6d262adcc5268d468e0cd0c9942a96d87cfd8a40764b6ecff3bbece9dab4e91f",
+          "blob": "632ad8b643df23934e692cf273ab3ec59fbf01c5",
+          "size": 65740,
+          "sha256": "c40073708de3ae939594e0c243c8e8183779a3124110f5be0d31f82bd59573f5",
           "kind": "source"
         },
         {
@@ -31549,9 +31549,9 @@
           "path": "modules/ui-system/side-pane/tab-types/plan-detail.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8705668d6666e016d8066eb6ffcd9f51127e3ffb",
-          "size": 2057,
-          "sha256": "f34cab73c600d0d21e1134dbff3955705a376a9e07111210c81e2beb6cc66f67",
+          "blob": "3bbf461867a1a9076f8f4daa9bd71078a09caa52",
+          "size": 1541,
+          "sha256": "758c963f2d5e48f8c49cecbe972632ff9be38c22ef4cfb0d3ba0addc87ba58e2",
           "kind": "source"
         },
         {
@@ -33223,9 +33223,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "b94bfe7001c2214083198a2c04556001af503e41",
-          "size": 47478,
-          "sha256": "5ee33c1092c10178f30ee982649c1bbbac52b2126b68a44c3ada292436532494",
+          "blob": "200c9df62963c14b7ddc1a4479a148c4e4d9a023",
+          "size": 47912,
+          "sha256": "32f9da6686bf1d32c6a33c2c7dc93b1e07e444a3df88675b30825465d17c0a4e",
           "kind": "source"
         },
         {
@@ -35563,9 +35563,9 @@
           "path": "tests/design-system-boundary.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e801b8d4a9324b8a6ab50dc2cbd79041289fcd2d",
-          "size": 11427,
-          "sha256": "f76e914deb2a2756c3f5d029ad40ac121308cf79d2fbe975e55e6978b504f514",
+          "blob": "b7a721062cf4c6331b0e097efd45e32451797d12",
+          "size": 12997,
+          "sha256": "fd931ca031ee8dfde35acb7cc0da4ec86063141e367918f08de348cda66c5792",
           "kind": "source"
         },
         {
@@ -35986,9 +35986,9 @@
           "path": "tests/embedded-app-security.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "415e3eb8a4f445163709a06add7194e30d37e509",
-          "size": 6569,
-          "sha256": "b112e3be9072cfad248320e21e463f978353498332d872c3e23d7a3f191964ed",
+          "blob": "88692823df42e4f915821cc8b3f552ba2feac35f",
+          "size": 6575,
+          "sha256": "ba55b1a0562b742622a12c123fdc6cf2de7e9d1c94cf57bdbe6445abe9d01c72",
           "kind": "source"
         },
         {
@@ -37489,9 +37489,9 @@
           "path": "tests/side-pane-plan-detail.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "d2f3986177af979b080896e3eca8167a6b72e654",
-          "size": 30550,
-          "sha256": "1ffbaf580009408aeb410a0066ce160fbe1e650a56cfb394694aaa3bac7b2cd9",
+          "blob": "5603a27d3604ffc1ce0a72713022466f2ea129d5",
+          "size": 34179,
+          "sha256": "8737457c92e944a911f8c73079ba2c421c5661a2d7e306c840b59159a31e0071",
           "kind": "source"
         },
         {

@@ -201,7 +201,14 @@ function stopChild() {
 
 // ---- 测量 ----
 async function measure({ page, client, browser }) {
-    await client.send('HeapProfiler.collectGarbage');
+    // Match the other native lifecycle gates: cross-realm DOM wrappers can
+    // survive one GC until renderer tasks/finalizers have run. Keep thresholds
+    // unchanged and settle before counting; genuinely retained nodes still fail.
+    for (let pass = 0; pass < 3; pass++) {
+        await client.send('HeapProfiler.collectGarbage');
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 0)));
+        await wait(25);
+    }
     await mainSend('HeapProfiler.collectGarbage').catch(() => {});
     const dom = await client.send('Memory.getDOMCounters');
     const r = await page.evaluate(async () => {

@@ -14,8 +14,12 @@ function visit(node) {
         else if (value && typeof value === 'object') visit(value);
     }
 }
-visit(parse(source, { sourceType: 'module' }));
-const timerCode = source.slice(source.indexOf('const INTERRUPT_SETTLE_MS'), source.indexOf('// 有差分立绘'));
+const syntax = parse(source, { sourceType: 'module' });
+visit(syntax);
+const timers = syntax.program.body.filter(node => node.type === 'VariableDeclaration'
+    && node.declarations.some(declaration => ['INTERRUPT_SETTLE_MS', 'settlesWithin'].includes(declaration.id.name)));
+assert.equal(timers.length, 2, 'the fixture must load both real interruption timer declarations');
+const timerCode = timers.map(node => source.slice(node.start, node.end)).join('\n');
 function fixture(success = true) {
     const events = [], timers = new Map(), requests = new Map(), signals = new Map();
     let nextTimer = 0;

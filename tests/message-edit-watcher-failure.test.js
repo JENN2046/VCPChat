@@ -10,8 +10,10 @@ const source = fs.readFileSync('modules/renderer/messageContextMenu.js', 'utf8')
 async function setupContextMenuDom(html) {
     const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'https://vcpchat.local/' });
     Object.assign(dom.window, await import('../modules/chat/contextCompactionState.js'));
+    Object.assign(dom.window, await import('../modules/chat/chatContextPipeline.js'));
     const executableSource = source
         .replace(/^import .*contextCompactionState\.js';\s*/m, '')
+        .replace(/^import .*chatContextPipeline\.js';\s*/m, '')
         .replace('export function createMessageContextMenu()', 'function createMessageContextMenu()')
         .concat('\nwindow.__messageEditTestApi = createMessageContextMenu();\n');
     dom.window.eval(executableSource);

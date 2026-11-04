@@ -148,6 +148,7 @@
     "modules/bootstrap/update-manager.js",
     "modules/chat/chartEmbedTransform.js",
     "modules/chat/chatContext.js",
+    "modules/chat/chatContextPipeline.js",
     "modules/chat/chatDomRenderer.js",
     "modules/chat/chatEventContract.js",
     "modules/chat/chatHistoryMutationAuthority.js",
@@ -415,6 +416,19 @@
     "modules/renderer/ttsSurfaceOwner.js",
     "modules/renderer/visibilityOptimizer.js",
     "modules/renderer/windowStreamRuntime.js",
+    "modules/scriptorium/atomicReplace.js",
+    "modules/scriptorium/dropOpen.js",
+    "modules/scriptorium/fileAccess/index.js",
+    "modules/scriptorium/fileTypes.js",
+    "modules/scriptorium/fileViews.js",
+    "modules/scriptorium/markdownFiles/index.js",
+    "modules/scriptorium/pdfFiles/edit.js",
+    "modules/scriptorium/pdfFiles/fonts.js",
+    "modules/scriptorium/pdfFiles/index.js",
+    "modules/scriptorium/sheetFiles/index.js",
+    "modules/scriptorium/textEncoding.js",
+    "modules/scriptorium/viewFiles/index.js",
+    "modules/scriptorium/webPages/index.js",
     "modules/searchManager.js",
     "modules/services/agentPortraitImages.js",
     "modules/services/attachmentDialogState.js",
@@ -1198,14 +1212,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2035,
+          "line": 2039,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2035,
+          "line": 2039,
           "kind": "event-listener",
           "match": "app.on('activate'"
         }
@@ -1329,7 +1343,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1665,
+          "line": 1668,
           "kind": "event-send"
         }
       ],
@@ -1343,7 +1357,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1665,
+          "line": 1668,
           "kind": "event-send",
           "match": "win.webContents.send('agent-mood-changed'"
         },
@@ -1390,7 +1404,7 @@
         },
         {
           "file": "main.js",
-          "line": 244,
+          "line": 247,
           "kind": "event-listener"
         }
       ],
@@ -1409,7 +1423,7 @@
         },
         {
           "file": "main.js",
-          "line": 244,
+          "line": 247,
           "kind": "event-listener",
           "match": "historyWatcher.on('all'"
         }
@@ -1888,14 +1902,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2141,
+          "line": 2145,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2141,
+          "line": 2145,
           "kind": "event-listener",
           "match": "app.on('before-quit'"
         }
@@ -1907,7 +1921,7 @@
       "consumers": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 493,
+          "line": 374,
           "kind": "custom-event-listener"
         },
         {
@@ -1969,7 +1983,7 @@
       "evidence": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 493,
+          "line": 374,
           "kind": "custom-event-listener",
           "match": "window.addEventListener('beforeunload'"
         },
@@ -3057,12 +3071,12 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 625,
+          "line": 578,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 748,
+          "line": 701,
           "kind": "custom-event-listener"
         },
         {
@@ -3227,13 +3241,13 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 625,
+          "line": 578,
           "kind": "custom-event-listener",
           "match": "input.addEventListener('change'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 748,
+          "line": 701,
           "kind": "custom-event-listener",
           "match": "document.getElementById(rustSourceId)?.addEventListener('change'"
         },
@@ -4137,14 +4151,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1807,
+          "line": 1810,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1807,
+          "line": 1810,
           "kind": "event-listener",
           "match": "ipcMain.handle('chat-data-service-reconcile'"
         }
@@ -4156,14 +4170,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1800,
+          "line": 1803,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1800,
+          "line": 1803,
           "kind": "event-listener",
           "match": "ipcMain.handle('chat-data-service-status'"
         }
@@ -4298,14 +4312,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 826,
+          "line": 829,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 826,
+          "line": 829,
           "kind": "event-listener",
           "match": "app.on('child-process-gone'"
         }
@@ -4453,12 +4467,12 @@
         },
         {
           "file": "main.js",
-          "line": 1094,
+          "line": 1097,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 1115,
+          "line": 1118,
           "kind": "event-listener"
         },
         {
@@ -4473,72 +4487,72 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 543,
+          "line": 496,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 608,
+          "line": 561,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 679,
+          "line": 632,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 861,
+          "line": 814,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 904,
+          "line": 857,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 927,
+          "line": 880,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1171,
+          "line": 1124,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1182,
+          "line": 1135,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1193,
+          "line": 1146,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1203,
+          "line": 1156,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1232,
+          "line": 1185,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1376,
+          "line": 1329,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1414,
+          "line": 1367,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1436,
+          "line": 1389,
           "kind": "custom-event-listener"
         },
         {
@@ -4768,7 +4782,7 @@
         },
         {
           "file": "modules/renderer/messageContextMenu.js",
-          "line": 33,
+          "line": 34,
           "kind": "custom-event-listener"
         },
         {
@@ -5936,13 +5950,13 @@
         },
         {
           "file": "main.js",
-          "line": 1094,
+          "line": 1097,
           "kind": "event-listener",
           "match": "tray.on('click'"
         },
         {
           "file": "main.js",
-          "line": 1115,
+          "line": 1118,
           "kind": "event-listener",
           "match": "tray.on('click'"
         },
@@ -5960,85 +5974,85 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 543,
+          "line": 496,
           "kind": "custom-event-listener",
           "match": "closeButton.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 608,
+          "line": 561,
           "kind": "custom-event-listener",
           "match": "trigger.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 679,
+          "line": 632,
           "kind": "custom-event-listener",
           "match": "btn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 861,
+          "line": 814,
           "kind": "custom-event-listener",
           "match": "resetUserAvatarColorsBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 904,
+          "line": 857,
           "kind": "custom-event-listener",
           "match": "currentItemActionBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 927,
+          "line": 880,
           "kind": "custom-event-listener",
           "match": "chatAgentPill.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1171,
+          "line": 1124,
           "kind": "custom-event-listener",
           "match": "openTranslatorBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1182,
+          "line": 1135,
           "kind": "custom-event-listener",
           "match": "openNotesBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1193,
+          "line": 1146,
           "kind": "custom-event-listener",
           "match": "openMusicBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1203,
+          "line": 1156,
           "kind": "custom-event-listener",
           "match": "openCanvasBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1232,
+          "line": 1185,
           "kind": "custom-event-listener",
           "match": "toggleNotificationsBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1376,
+          "line": 1329,
           "kind": "custom-event-listener",
           "match": "toggleAssistantBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1414,
+          "line": 1367,
           "kind": "custom-event-listener",
           "match": "toggleSidebarModeBtn.addEventListener('click'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1436,
+          "line": 1389,
           "kind": "custom-event-listener",
           "match": "voiceChatBtn.addEventListener('click'"
         },
@@ -6314,7 +6328,7 @@
         },
         {
           "file": "modules/renderer/messageContextMenu.js",
-          "line": 33,
+          "line": 34,
           "kind": "custom-event-listener",
           "match": "ownerDocument.addEventListener('click'"
         },
@@ -7618,22 +7632,22 @@
         },
         {
           "file": "main.js",
-          "line": 668,
+          "line": 671,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 697,
+          "line": 700,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 893,
+          "line": 896,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2116,
+          "line": 2120,
           "kind": "event-listener"
         },
         {
@@ -7775,25 +7789,25 @@
         },
         {
           "file": "main.js",
-          "line": 668,
+          "line": 671,
           "kind": "event-listener",
           "match": "audioEngineProcess.on('close'"
         },
         {
           "file": "main.js",
-          "line": 697,
+          "line": 700,
           "kind": "event-listener",
           "match": "processRef.once('close'"
         },
         {
           "file": "main.js",
-          "line": 893,
+          "line": 896,
           "kind": "event-listener",
           "match": "mainWindow.on('close'"
         },
         {
           "file": "main.js",
-          "line": 2116,
+          "line": 2120,
           "kind": "event-listener",
           "match": "pythonProcess.on('close'"
         },
@@ -7901,14 +7915,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1239,
+          "line": 1242,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1239,
+          "line": 1242,
           "kind": "event-listener",
           "match": "ipcMain.on('close-app'"
         },
@@ -7976,7 +7990,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 52,
+          "line": 58,
           "kind": "event-send"
         },
         {
@@ -8036,7 +8050,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 52,
+          "line": 58,
           "kind": "event-send",
           "match": "ipcRenderer.send('close-window'"
         },
@@ -8069,7 +8083,7 @@
         },
         {
           "file": "main.js",
-          "line": 926,
+          "line": 929,
           "kind": "event-listener"
         },
         {
@@ -8159,7 +8173,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1247,
+          "line": 1252,
           "kind": "event-listener"
         },
         {
@@ -8309,7 +8323,7 @@
         },
         {
           "file": "main.js",
-          "line": 926,
+          "line": 929,
           "kind": "event-listener",
           "match": "mainWindow.on('closed'"
         },
@@ -8417,7 +8431,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1247,
+          "line": 1252,
           "kind": "event-listener",
           "match": "docxWindow.on('closed'"
         },
@@ -8676,14 +8690,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2322,
+          "line": 2326,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2322,
+          "line": 2326,
           "kind": "event-listener",
           "match": "ipcMain.on('connect-vcplog'"
         },
@@ -8720,7 +8734,7 @@
       "consumers": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 371,
+          "line": 252,
           "kind": "custom-event-listener"
         },
         {
@@ -8750,17 +8764,17 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 914,
+          "line": 867,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1236,
+          "line": 1189,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1426,
+          "line": 1379,
           "kind": "custom-event-listener"
         },
         {
@@ -8857,7 +8871,7 @@
       "evidence": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 371,
+          "line": 252,
           "kind": "custom-event-listener",
           "match": "chatNameElement.addEventListener('contextmenu'"
         },
@@ -8893,19 +8907,19 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 914,
+          "line": 867,
           "kind": "custom-event-listener",
           "match": "currentItemActionBtn.addEventListener('contextmenu'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1236,
+          "line": 1189,
           "kind": "custom-event-listener",
           "match": "toggleNotificationsBtn.addEventListener('contextmenu'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1426,
+          "line": 1379,
           "kind": "custom-event-listener",
           "match": "toggleSidebarModeBtn.addEventListener('contextmenu'"
         },
@@ -9407,7 +9421,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1448,
+          "line": 1451,
           "kind": "event-send"
         }
       ],
@@ -9421,7 +9435,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1448,
+          "line": 1451,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('create-unlocked-topic'"
         },
@@ -9574,22 +9588,22 @@
         },
         {
           "file": "main.js",
-          "line": 649,
+          "line": 652,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 660,
-          "kind": "event-listener"
-        },
-        {
-          "file": "main.js",
-          "line": 2108,
+          "line": 663,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
           "line": 2112,
+          "kind": "event-listener"
+        },
+        {
+          "file": "main.js",
+          "line": 2116,
           "kind": "event-listener"
         },
         {
@@ -9649,7 +9663,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 760,
+          "line": 763,
           "kind": "event-listener"
         },
         {
@@ -9843,25 +9857,25 @@
         },
         {
           "file": "main.js",
-          "line": 649,
+          "line": 652,
           "kind": "event-listener",
           "match": "audioEngineProcess.stdout.on('data'"
         },
         {
           "file": "main.js",
-          "line": 660,
+          "line": 663,
           "kind": "event-listener",
           "match": "audioEngineProcess.stderr.on('data'"
         },
         {
           "file": "main.js",
-          "line": 2108,
+          "line": 2112,
           "kind": "event-listener",
           "match": "pythonProcess.stdout.on('data'"
         },
         {
           "file": "main.js",
-          "line": 2112,
+          "line": 2116,
           "kind": "event-listener",
           "match": "pythonProcess.stderr.on('data'"
         },
@@ -9933,7 +9947,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 760,
+          "line": 763,
           "kind": "event-listener",
           "match": "response.on('data'"
         },
@@ -13641,7 +13655,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 309,
+          "line": 312,
           "kind": "event-listener"
         },
         {
@@ -13705,6 +13719,31 @@
           "kind": "event-listener"
         },
         {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 52,
+          "kind": "event-listener"
+        },
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 282,
+          "kind": "event-listener"
+        },
+        {
+          "file": "modules/scriptorium/pdfFiles/index.js",
+          "line": 38,
+          "kind": "event-listener"
+        },
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 130,
+          "kind": "event-listener"
+        },
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 268,
+          "kind": "event-listener"
+        },
+        {
           "file": "modules/services/embeddedAppSessionManager.js",
           "line": 215,
           "kind": "event-listener"
@@ -13733,7 +13772,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 309,
+          "line": 312,
           "kind": "event-listener",
           "match": "sender.once('destroyed'"
         },
@@ -13810,6 +13849,36 @@
           "match": "sender.once('destroyed'"
         },
         {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 52,
+          "kind": "event-listener",
+          "match": "sender.once?.('destroyed'"
+        },
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 282,
+          "kind": "event-listener",
+          "match": "contents.once('destroyed'"
+        },
+        {
+          "file": "modules/scriptorium/pdfFiles/index.js",
+          "line": 38,
+          "kind": "event-listener",
+          "match": "sender.once?.('destroyed'"
+        },
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 130,
+          "kind": "event-listener",
+          "match": "sender.once('destroyed'"
+        },
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 268,
+          "kind": "event-listener",
+          "match": "sender.once('destroyed'"
+        },
+        {
           "file": "modules/services/embeddedAppSessionManager.js",
           "line": 215,
           "kind": "event-listener",
@@ -13872,14 +13941,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1966,
+          "line": 1970,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1966,
+          "line": 1970,
           "kind": "event-listener",
           "match": "ipcMain.handle('diagnostics:export-snapshot'"
         },
@@ -13966,7 +14035,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 937,
+          "line": 940,
           "kind": "event-listener"
         },
         {
@@ -14000,6 +14069,11 @@
           "kind": "event-listener"
         },
         {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 170,
+          "kind": "event-listener"
+        },
+        {
           "file": "modules/services/embeddedAppSessionManager.js",
           "line": 210,
           "kind": "event-listener"
@@ -14008,7 +14082,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 937,
+          "line": 940,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('did-fail-load'"
         },
@@ -14049,6 +14123,12 @@
           "match": "contents.on('did-fail-load'"
         },
         {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 170,
+          "kind": "event-listener",
+          "match": "contents.on('did-fail-load'"
+        },
+        {
           "file": "modules/services/embeddedAppSessionManager.js",
           "line": 210,
           "kind": "event-listener",
@@ -14067,12 +14147,12 @@
         },
         {
           "file": "main.js",
-          "line": 956,
+          "line": 959,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 986,
+          "line": 989,
           "kind": "event-listener"
         },
         {
@@ -14135,13 +14215,13 @@
         },
         {
           "file": "main.js",
-          "line": 956,
+          "line": 959,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('did-finish-load'"
         },
         {
           "file": "main.js",
-          "line": 986,
+          "line": 989,
           "kind": "event-listener",
           "match": "mainWindow.webContents.once('did-finish-load'"
         },
@@ -14243,7 +14323,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 941,
+          "line": 944,
           "kind": "event-listener"
         },
         {
@@ -14275,7 +14355,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 941,
+          "line": 944,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('did-start-loading'"
         },
@@ -14454,14 +14534,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2333,
+          "line": 2337,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2333,
+          "line": 2337,
           "kind": "event-listener",
           "match": "ipcMain.on('disconnect-vcplog'"
         },
@@ -14541,14 +14621,14 @@
       "consumers": [
         {
           "file": "preloads/docx.js",
-          "line": 61,
+          "line": 80,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "preloads/docx.js",
-          "line": 61,
+          "line": 80,
           "kind": "event-listener",
           "match": "subscribe('docx:agent-checkpoint-proposed'"
         }
@@ -14559,27 +14639,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 14,
+          "line": 20,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1330,
+          "line": 1335,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1330,
+          "line": 1335,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:choose-open'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 14,
+          "line": 20,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('docx:choose-open'"
         }
@@ -14590,27 +14670,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 36,
+          "line": 42,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1352,
+          "line": 1358,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1352,
+          "line": 1358,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:fonts-list'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 36,
+          "line": 42,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('docx:fonts-list'"
         }
@@ -14621,38 +14701,49 @@
       "producers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1208,
+          "line": 1213,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1241,
+          "line": 1246,
+          "kind": "event-send"
+        },
+        {
+          "file": "modules/scriptorium/dropOpen.js",
+          "line": 26,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/docx.js",
-          "line": 58,
+          "line": 64,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1208,
+          "line": 1213,
           "kind": "event-send",
           "match": "docxWindow.webContents.send('docx:open-path-request'"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1241,
+          "line": 1246,
           "kind": "event-send",
           "match": "docxWindow.webContents.send('docx:open-path-request'"
         },
         {
+          "file": "modules/scriptorium/dropOpen.js",
+          "line": 26,
+          "kind": "event-send",
+          "match": "sender.send('docx:open-path-request'"
+        },
+        {
           "file": "preloads/docx.js",
-          "line": 58,
+          "line": 64,
           "kind": "event-listener",
           "match": "subscribe('docx:open-path-request'"
         }
@@ -14663,27 +14754,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 18,
+          "line": 24,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1333,
+          "line": 1339,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1333,
+          "line": 1339,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:read-external-resource'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 18,
+          "line": 24,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('docx:read-external-resource'"
         }
@@ -14694,27 +14785,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 16,
+          "line": 22,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1332,
+          "line": 1337,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1332,
+          "line": 1337,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:read-path'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 16,
+          "line": 22,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('docx:read-path'"
         }
@@ -14725,27 +14816,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 27,
+          "line": 33,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1347,
+          "line": 1353,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1347,
+          "line": 1353,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:recent-list'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 27,
+          "line": 33,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('docx:recent-list'"
         }
@@ -14756,27 +14847,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 23,
+          "line": 29,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1344,
+          "line": 1350,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1344,
+          "line": 1350,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:save'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 23,
+          "line": 29,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('docx:save'"
         }
@@ -14852,6 +14943,11 @@
           "file": "modules/ui-system/settings/group-slots.js",
           "line": 196,
           "kind": "custom-event-listener"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 110,
+          "kind": "custom-event-listener"
         }
       ],
       "evidence": [
@@ -14866,6 +14962,12 @@
           "line": 196,
           "kind": "custom-event-listener",
           "match": "item.addEventListener('dragover'"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 110,
+          "kind": "custom-event-listener",
+          "match": "window.addEventListener('dragover'"
         }
       ]
     },
@@ -14920,6 +15022,11 @@
           "file": "modules/ui-system/settings/group-slots.js",
           "line": 206,
           "kind": "custom-event-listener"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 115,
+          "kind": "custom-event-listener"
         }
       ],
       "evidence": [
@@ -14934,6 +15041,12 @@
           "line": 206,
           "kind": "custom-event-listener",
           "match": "item.addEventListener('drop'"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 115,
+          "kind": "custom-event-listener",
+          "match": "window.addEventListener('drop'"
         }
       ]
     },
@@ -14980,14 +15093,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1897,
+          "line": 1901,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1897,
+          "line": 1901,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:activate'"
         },
@@ -15011,14 +15124,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1917,
+          "line": 1921,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1917,
+          "line": 1921,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:cancel'"
         },
@@ -15042,14 +15155,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1905,
+          "line": 1909,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1905,
+          "line": 1909,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:close'"
         },
@@ -15073,14 +15186,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1970,
+          "line": 1974,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1970,
+          "line": 1974,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:close-all'"
         },
@@ -15104,14 +15217,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1886,
+          "line": 1890,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1886,
+          "line": 1890,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:create'"
         },
@@ -15135,14 +15248,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1910,
+          "line": 1914,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1910,
+          "line": 1914,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:detach'"
         },
@@ -15166,14 +15279,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1893,
+          "line": 1897,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1893,
+          "line": 1897,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:list'"
         },
@@ -15197,14 +15310,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1976,
+          "line": 1980,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1976,
+          "line": 1980,
           "kind": "event-listener",
           "match": "ipcMain.on('embedded-vchat-app:request-close'"
         },
@@ -15228,14 +15341,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1901,
+          "line": 1905,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1901,
+          "line": 1905,
           "kind": "event-listener",
           "match": "ipcMain.handle('embedded-vchat-app:set-bounds'"
         },
@@ -15303,7 +15416,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 768,
+          "line": 771,
           "kind": "event-listener"
         },
         {
@@ -15380,7 +15493,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 768,
+          "line": 771,
           "kind": "event-listener",
           "match": "response.on('end'"
         },
@@ -15619,17 +15732,17 @@
         },
         {
           "file": "main.js",
-          "line": 256,
+          "line": 259,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 676,
+          "line": 679,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2123,
+          "line": 2127,
           "kind": "event-listener"
         },
         {
@@ -15679,12 +15792,12 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 778,
+          "line": 781,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 781,
+          "line": 784,
           "kind": "event-listener"
         },
         {
@@ -15711,6 +15824,21 @@
           "file": "modules/itemListManager.js",
           "line": 903,
           "kind": "custom-event-listener"
+        },
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 328,
+          "kind": "event-listener"
+        },
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 114,
+          "kind": "event-listener"
+        },
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 255,
+          "kind": "event-listener"
         },
         {
           "file": "modules/services/chatDataService/lifecycle.js",
@@ -15959,19 +16087,19 @@
         },
         {
           "file": "main.js",
-          "line": 256,
+          "line": 259,
           "kind": "event-listener",
           "match": "historyWatcher.on('error'"
         },
         {
           "file": "main.js",
-          "line": 676,
+          "line": 679,
           "kind": "event-listener",
           "match": "audioEngineProcess.on('error'"
         },
         {
           "file": "main.js",
-          "line": 2123,
+          "line": 2127,
           "kind": "event-listener",
           "match": "pythonProcess.on('error'"
         },
@@ -16031,13 +16159,13 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 778,
+          "line": 781,
           "kind": "event-listener",
           "match": "response.on('error'"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 781,
+          "line": 784,
           "kind": "event-listener",
           "match": "request.on('error'"
         },
@@ -16070,6 +16198,24 @@
           "line": 903,
           "kind": "custom-event-listener",
           "match": "img.addEventListener('error'"
+        },
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 328,
+          "kind": "event-listener",
+          "match": "watcher.on('error'"
+        },
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 114,
+          "kind": "event-listener",
+          "match": "watcher.on('error'"
+        },
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 255,
+          "kind": "event-listener",
+          "match": "watcher.on('error'"
         },
         {
           "file": "modules/services/chatDataService/lifecycle.js",
@@ -16139,14 +16285,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2097,
+          "line": 2101,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2097,
+          "line": 2101,
           "kind": "event-listener",
           "match": "ipcMain.handle('execute-python-code'"
         },
@@ -16365,14 +16511,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2398,
+          "line": 2402,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2398,
+          "line": 2402,
           "kind": "event-listener",
           "match": "ipcMain.handle('export-topic-as-markdown'"
         },
@@ -17122,14 +17268,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1554,
+          "line": 1557,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1554,
+          "line": 1557,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-cached-models'"
         },
@@ -17218,7 +17364,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 43,
+          "line": 49,
           "kind": "event-send"
         },
         {
@@ -17255,7 +17401,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 43,
+          "line": 49,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('get-current-theme'"
         },
@@ -17341,14 +17487,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1570,
+          "line": 1573,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1570,
+          "line": 1573,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-favorite-models'"
         },
@@ -17496,14 +17642,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1559,
+          "line": 1562,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1559,
+          "line": 1562,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-hot-models'"
         },
@@ -17682,25 +17828,25 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1359,
+          "line": 1362,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 2072,
+          "line": 2076,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1359,
+          "line": 1362,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-platform'"
         },
         {
           "file": "main.js",
-          "line": 2072,
+          "line": 2076,
           "kind": "event-listener",
           "match": "ipcMain.handle('get-platform'"
         },
@@ -18383,7 +18529,7 @@
       "consumers": [
         {
           "file": "modules/event-listeners.js",
-          "line": 615,
+          "line": 568,
           "kind": "custom-event-listener"
         },
         {
@@ -18415,7 +18561,7 @@
       "evidence": [
         {
           "file": "modules/event-listeners.js",
-          "line": 615,
+          "line": 568,
           "kind": "custom-event-listener",
           "match": "window.addEventListener('global-settings-updated'"
         },
@@ -18648,7 +18794,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1784,
+          "line": 1787,
           "kind": "event-send"
         }
       ],
@@ -18662,7 +18808,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1784,
+          "line": 1787,
           "kind": "event-send",
           "match": "sender.send('history-file-updated'"
         },
@@ -18830,22 +18976,22 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1683,
+          "line": 1666,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 713,
+          "line": 666,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 717,
+          "line": 670,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1460,
+          "line": 1413,
           "kind": "custom-event-listener"
         },
         {
@@ -18860,7 +19006,7 @@
         },
         {
           "file": "modules/renderer/messageContextMenu.js",
-          "line": 830,
+          "line": 831,
           "kind": "custom-event-listener"
         },
         {
@@ -18991,25 +19137,25 @@
         },
         {
           "file": "modules/chatManager.js",
-          "line": 1683,
+          "line": 1666,
           "kind": "custom-event-listener",
           "match": "input.addEventListener?.('input'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 713,
+          "line": 666,
           "kind": "custom-event-listener",
           "match": "picker.addEventListener('input'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 717,
+          "line": 670,
           "kind": "custom-event-listener",
           "match": "text.addEventListener('input'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1460,
+          "line": 1413,
           "kind": "custom-event-listener",
           "match": "agentSearchInput.addEventListener('input'"
         },
@@ -19027,7 +19173,7 @@
         },
         {
           "file": "modules/renderer/messageContextMenu.js",
-          "line": 830,
+          "line": 831,
           "kind": "custom-event-listener",
           "match": "textarea.addEventListener('input'"
         },
@@ -19221,14 +19367,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2433,
+          "line": 2437,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2433,
+          "line": 2437,
           "kind": "event-listener",
           "match": "ipcMain.handle('interrupt-group-request'"
         },
@@ -19345,14 +19491,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1333,
+          "line": 1336,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1333,
+          "line": 1336,
           "kind": "event-listener",
           "match": "ipcMain.handle('jev:decide'"
         },
@@ -19376,14 +19522,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1321,
+          "line": 1324,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1321,
+          "line": 1324,
           "kind": "event-listener",
           "match": "ipcMain.handle('jev:get-status'"
         },
@@ -19401,7 +19547,7 @@
       "consumers": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 428,
+          "line": 309,
           "kind": "custom-event-listener"
         },
         {
@@ -19431,12 +19577,12 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 933,
+          "line": 886,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1465,
+          "line": 1418,
           "kind": "custom-event-listener"
         },
         {
@@ -19466,7 +19612,7 @@
         },
         {
           "file": "modules/renderer/messageContextMenu.js",
-          "line": 831,
+          "line": 832,
           "kind": "custom-event-listener"
         },
         {
@@ -19773,7 +19919,7 @@
       "evidence": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 428,
+          "line": 309,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('keydown'"
         },
@@ -19809,13 +19955,13 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 933,
+          "line": 886,
           "kind": "custom-event-listener",
           "match": "chatAgentPill.addEventListener('keydown'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1465,
+          "line": 1418,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('keydown'"
         },
@@ -19851,7 +19997,7 @@
         },
         {
           "file": "modules/renderer/messageContextMenu.js",
-          "line": 831,
+          "line": 832,
           "kind": "custom-event-listener",
           "match": "textarea.addEventListener('keydown'"
         },
@@ -20248,14 +20394,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1942,
+          "line": 1946,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1942,
+          "line": 1946,
           "kind": "event-listener",
           "match": "ipcMain.handle('lifecycle:get-main-snapshot'"
         },
@@ -20279,14 +20425,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1948,
+          "line": 1952,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1948,
+          "line": 1952,
           "kind": "event-listener",
           "match": "ipcMain.on('lifecycle:renderer-ready'"
         },
@@ -20526,7 +20672,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 41,
+          "line": 47,
           "kind": "event-send"
         }
       ],
@@ -20552,7 +20698,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 41,
+          "line": 47,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('load-agent-avatar'"
         }
@@ -20568,7 +20714,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 39,
+          "line": 45,
           "kind": "event-send"
         }
       ],
@@ -20594,7 +20740,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 39,
+          "line": 45,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('load-agents-list'"
         }
@@ -20857,7 +21003,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 40,
+          "line": 46,
           "kind": "event-send"
         }
       ],
@@ -20883,7 +21029,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 40,
+          "line": 46,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('load-user-avatar'"
         }
@@ -22284,7 +22430,7 @@
         },
         {
           "file": "main.js",
-          "line": 971,
+          "line": 974,
           "kind": "event-listener"
         },
         {
@@ -22302,7 +22448,7 @@
         },
         {
           "file": "main.js",
-          "line": 971,
+          "line": 974,
           "kind": "event-listener",
           "match": "mainWindow.on('maximize'"
         },
@@ -22334,7 +22480,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 50,
+          "line": 56,
           "kind": "event-send"
         },
         {
@@ -22388,7 +22534,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 50,
+          "line": 56,
           "kind": "event-send",
           "match": "ipcRenderer.send('maximize-window'"
         },
@@ -22560,14 +22706,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2024,
+          "line": 2028,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2024,
+          "line": 2028,
           "kind": "event-listener",
           "match": "ipcMain.on('minimize-to-tray'"
         },
@@ -22599,7 +22745,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 49,
+          "line": 55,
           "kind": "event-send"
         },
         {
@@ -22653,7 +22799,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 49,
+          "line": 55,
           "kind": "event-send",
           "match": "ipcRenderer.send('minimize-window'"
         },
@@ -22677,7 +22823,7 @@
       "consumers": [
         {
           "file": "modules/event-listeners.js",
-          "line": 612,
+          "line": 565,
           "kind": "custom-event-listener"
         },
         {
@@ -22704,7 +22850,7 @@
       "evidence": [
         {
           "file": "modules/event-listeners.js",
-          "line": 612,
+          "line": 565,
           "kind": "custom-event-listener",
           "match": "document.addEventListener('modal-ready'"
         },
@@ -22995,7 +23141,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1549,
+          "line": 1552,
           "kind": "event-send"
         }
       ],
@@ -23003,7 +23149,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1549,
+          "line": 1552,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('models-update-failed'"
         }
@@ -23014,17 +23160,17 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 1544,
+          "line": 1547,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 1603,
+          "line": 1606,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 1607,
+          "line": 1610,
           "kind": "event-send"
         }
       ],
@@ -23038,19 +23184,19 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 1544,
+          "line": 1547,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('models-updated'"
         },
         {
           "file": "main.js",
-          "line": 1603,
+          "line": 1606,
           "kind": "event-send",
           "match": "event.sender.send('models-updated'"
         },
         {
           "file": "main.js",
-          "line": 1607,
+          "line": 1610,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('models-updated'"
         },
@@ -23068,7 +23214,7 @@
       "consumers": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 395,
+          "line": 276,
           "kind": "custom-event-listener"
         },
         {
@@ -23078,12 +23224,12 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1345,
+          "line": 1298,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1399,
+          "line": 1352,
           "kind": "custom-event-listener"
         },
         {
@@ -23180,7 +23326,7 @@
       "evidence": [
         {
           "file": "Flowlockmodules/flowlock-integration.js",
-          "line": 395,
+          "line": 276,
           "kind": "custom-event-listener",
           "match": "chatNameElement.addEventListener('mousedown'"
         },
@@ -23192,13 +23338,13 @@
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1345,
+          "line": 1298,
           "kind": "custom-event-listener",
           "match": "toggleAssistantBtn.addEventListener('mousedown'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1399,
+          "line": 1352,
           "kind": "custom-event-listener",
           "match": "toggleSidebarModeBtn.addEventListener('mousedown'"
         },
@@ -23414,12 +23560,12 @@
       "consumers": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1374,
+          "line": 1327,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1413,
+          "line": 1366,
           "kind": "custom-event-listener"
         },
         {
@@ -23491,13 +23637,13 @@
       "evidence": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1374,
+          "line": 1327,
           "kind": "custom-event-listener",
           "match": "toggleAssistantBtn.addEventListener('mouseleave'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1413,
+          "line": 1366,
           "kind": "custom-event-listener",
           "match": "toggleSidebarModeBtn.addEventListener('mouseleave'"
         },
@@ -23699,12 +23845,12 @@
       "consumers": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1371,
+          "line": 1324,
           "kind": "custom-event-listener"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1410,
+          "line": 1363,
           "kind": "custom-event-listener"
         },
         {
@@ -23741,13 +23887,13 @@
       "evidence": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1371,
+          "line": 1324,
           "kind": "custom-event-listener",
           "match": "toggleAssistantBtn.addEventListener('mouseup'"
         },
         {
           "file": "modules/event-listeners.js",
-          "line": 1410,
+          "line": 1363,
           "kind": "custom-event-listener",
           "match": "toggleSidebarModeBtn.addEventListener('mouseup'"
         },
@@ -26052,14 +26198,14 @@
       "consumers": [
         {
           "file": "modules/chatManager.js",
-          "line": 603,
+          "line": 586,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/chatManager.js",
-          "line": 603,
+          "line": 586,
           "kind": "preload-subscription",
           "match": "electronAPI.onCanvasContentUpdate("
         }
@@ -26071,14 +26217,14 @@
       "consumers": [
         {
           "file": "modules/chatManager.js",
-          "line": 604,
+          "line": 587,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/chatManager.js",
-          "line": 604,
+          "line": 587,
           "kind": "preload-subscription",
           "match": "electronAPI.onCanvasWindowClosed("
         }
@@ -26109,14 +26255,14 @@
       "consumers": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1531,
+          "line": 1484,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1531,
+          "line": 1484,
           "kind": "preload-subscription",
           "match": "chatAPI.onCreateUnlockedTopic("
         }
@@ -26147,14 +26293,14 @@
       "consumers": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1246,
+          "line": 1199,
           "kind": "preload-subscription"
         }
       ],
       "evidence": [
         {
           "file": "modules/event-listeners.js",
-          "line": 1246,
+          "line": 1199,
           "kind": "preload-subscription",
           "match": "chatAPI.onDoToggleNotificationsSidebar("
         }
@@ -26759,7 +26905,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 53,
+          "line": 59,
           "kind": "event-send"
         }
       ],
@@ -26791,7 +26937,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 53,
+          "line": 59,
           "kind": "event-send",
           "match": "ipcRenderer.send('open-dev-tools'"
         }
@@ -26833,38 +26979,38 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 13,
+          "line": 19,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "main.js",
-          "line": 173,
+          "line": 176,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1326,
+          "line": 1331,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 173,
+          "line": 176,
           "kind": "event-listener",
           "match": "ipcMain.handle('open-docx-window'"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1326,
+          "line": 1331,
           "kind": "event-listener",
           "match": "ipcMain.handle('open-docx-window'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 13,
+          "line": 19,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('open-docx-window'"
         }
@@ -27456,14 +27602,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1622,
+          "line": 1625,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1622,
+          "line": 1625,
           "kind": "event-listener",
           "match": "ipcMain.handle('path:basename'"
         },
@@ -27487,14 +27633,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1615,
+          "line": 1618,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1615,
+          "line": 1618,
           "kind": "event-listener",
           "match": "ipcMain.handle('path:dirname'"
         },
@@ -27518,14 +27664,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1619,
+          "line": 1622,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1619,
+          "line": 1622,
           "kind": "event-listener",
           "match": "ipcMain.handle('path:extname'"
         },
@@ -29224,7 +29370,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1237,
+          "line": 1242,
           "kind": "event-listener"
         },
         {
@@ -29360,7 +29506,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1237,
+          "line": 1242,
           "kind": "event-listener",
           "match": "docxWindow.once('ready-to-show'"
         },
@@ -29499,14 +29645,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1592,
+          "line": 1595,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1592,
+          "line": 1595,
           "kind": "event-listener",
           "match": "ipcMain.handle('refresh-models'"
         },
@@ -29717,7 +29863,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 945,
+          "line": 948,
           "kind": "event-listener"
         },
         {
@@ -29774,7 +29920,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 945,
+          "line": 948,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('render-process-gone'"
         },
@@ -30079,25 +30225,25 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 961,
+          "line": 964,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 963,
+          "line": 966,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 961,
+          "line": 964,
           "kind": "event-listener",
           "match": "mainWindow.on('responsive'"
         },
         {
           "file": "main.js",
-          "line": 963,
+          "line": 966,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('responsive'"
         }
@@ -30159,14 +30305,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1099,
+          "line": 1102,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1099,
+          "line": 1102,
           "kind": "event-listener",
           "match": "tray.on('right-click'"
         }
@@ -31046,14 +31192,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1327,
+          "line": 1332,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1327,
+          "line": 1332,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:agent-call'"
         }
@@ -31064,27 +31210,27 @@
       "producers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 186,
+          "line": 189,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "preloads/docx.js",
-          "line": 62,
+          "line": 81,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 186,
+          "line": 189,
           "kind": "event-send",
           "match": "docxWindow.webContents.send('scriptorium:agent-request'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 62,
+          "line": 81,
           "kind": "event-listener",
           "match": "subscribe('scriptorium:agent-request'"
         }
@@ -31095,27 +31241,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 63,
+          "line": 82,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1329,
+          "line": 1334,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1329,
+          "line": 1334,
           "kind": "event-listener",
           "match": "ipcMain.on('scriptorium:agent-response'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 63,
+          "line": 82,
           "kind": "event-send",
           "match": "ipcRenderer.send('scriptorium:agent-response'"
         }
@@ -31126,27 +31272,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 15,
+          "line": 21,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1331,
+          "line": 1336,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1331,
+          "line": 1336,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:choose-import'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 15,
+          "line": 21,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:choose-import'"
         }
@@ -31157,29 +31303,60 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 26,
+          "line": 32,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1346,
+          "line": 1352,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1346,
+          "line": 1352,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:document-library'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 26,
+          "line": 32,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:document-library'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:drop",
+      "producers": [
+        {
+          "file": "preloads/docx.js",
+          "line": 122,
+          "kind": "event-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/dropOpen.js",
+          "line": 32,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/dropOpen.js",
+          "line": 32,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:drop'"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 122,
+          "kind": "event-send",
+          "match": "ipcRenderer.invoke('scriptorium:drop'"
         }
       ]
     },
@@ -31188,29 +31365,205 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 24,
+          "line": 30,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1345,
+          "line": 1351,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1345,
+          "line": 1351,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:export-rich-document'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 24,
+          "line": 30,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:export-rich-document'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:file",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/fileAccess/index.js",
+          "line": 62,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/fileAccess/index.js",
+          "line": 62,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:file'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:markdown-event",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "preloads/docx.js",
+          "line": 69,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "preloads/docx.js",
+          "line": 69,
+          "kind": "event-listener",
+          "match": "subscribe('scriptorium:markdown-event'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:markdown-file",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 375,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 375,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:markdown-file'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:markdown-link",
+      "producers": [
+        {
+          "file": "preloads/docx.js",
+          "line": 67,
+          "kind": "event-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 373,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/markdownFiles/index.js",
+          "line": 373,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:markdown-link'"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 67,
+          "kind": "event-send",
+          "match": "plainInvoke('scriptorium:markdown-link'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:page",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 282,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 282,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:page'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:page-blocked",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "preloads/docx.js",
+          "line": 73,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "preloads/docx.js",
+          "line": 73,
+          "kind": "event-listener",
+          "match": "subscribe('scriptorium:page-blocked'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:page-changed",
+      "producers": [
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 246,
+          "kind": "event-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "preloads/docx.js",
+          "line": 72,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 246,
+          "kind": "event-send",
+          "match": "sender.send('scriptorium:page-changed'"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 72,
+          "kind": "event-listener",
+          "match": "subscribe('scriptorium:page-changed'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:pdf",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/pdfFiles/index.js",
+          "line": 250,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/pdfFiles/index.js",
+          "line": 250,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:pdf'"
         }
       ]
     },
@@ -31219,27 +31572,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 20,
+          "line": 26,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1334,
+          "line": 1340,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1334,
+          "line": 1340,
           "kind": "event-listener",
           "match": "ipcMain.handle(\n        'scriptorium:resolve-font-stylesheet'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 20,
+          "line": 26,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:resolve-font-stylesheet'"
         }
@@ -31250,29 +31603,48 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 22,
+          "line": 28,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1339,
+          "line": 1345,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1339,
+          "line": 1345,
           "kind": "event-listener",
           "match": "ipcMain.handle(\n        'scriptorium:resolve-font-url'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 22,
+          "line": 28,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:resolve-font-url'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:sheet",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/sheetFiles/index.js",
+          "line": 247,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/sheetFiles/index.js",
+          "line": 247,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:sheet'"
         }
       ]
     },
@@ -31281,27 +31653,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 29,
+          "line": 35,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1348,
+          "line": 1354,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1348,
+          "line": 1354,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:style-packs-load'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 29,
+          "line": 35,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:style-packs-load'"
         }
@@ -31312,27 +31684,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 31,
+          "line": 37,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1349,
+          "line": 1355,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1349,
+          "line": 1355,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:style-packs-save'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 31,
+          "line": 37,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:style-packs-save'"
         }
@@ -31343,27 +31715,27 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 33,
+          "line": 39,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1350,
+          "line": 1356,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1350,
+          "line": 1356,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:svg-assets-load'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 33,
+          "line": 39,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:svg-assets-load'"
         }
@@ -31374,29 +31746,79 @@
       "producers": [
         {
           "file": "preloads/docx.js",
-          "line": 35,
+          "line": 41,
           "kind": "event-send"
         }
       ],
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1351,
+          "line": 1357,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1351,
+          "line": 1357,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:svg-assets-save'"
         },
         {
           "file": "preloads/docx.js",
-          "line": 35,
+          "line": 41,
           "kind": "event-send",
           "match": "ipcRenderer.invoke('scriptorium:svg-assets-save'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:view",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 165,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 165,
+          "kind": "event-listener",
+          "match": "ipcMain.handle('scriptorium:view'"
+        }
+      ]
+    },
+    {
+      "name": "scriptorium:view-changed",
+      "producers": [
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 106,
+          "kind": "event-send"
+        }
+      ],
+      "consumers": [
+        {
+          "file": "preloads/docx.js",
+          "line": 77,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/viewFiles/index.js",
+          "line": 106,
+          "kind": "event-send",
+          "match": "sender.send('scriptorium:view-changed'"
+        },
+        {
+          "file": "preloads/docx.js",
+          "line": 77,
+          "kind": "event-listener",
+          "match": "subscribe('scriptorium:view-changed'"
         }
       ]
     },
@@ -31619,14 +32041,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1158,
+          "line": 1161,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1158,
+          "line": 1161,
           "kind": "event-listener",
           "match": "app.on('second-instance'"
         }
@@ -31868,14 +32290,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2345,
+          "line": 2349,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2345,
+          "line": 2349,
           "kind": "event-listener",
           "match": "ipcMain.on('send-vcplog-message'"
         },
@@ -31899,14 +32321,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2356,
+          "line": 2360,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2356,
+          "line": 2360,
           "kind": "event-listener",
           "match": "ipcMain.handle('send-vcplog-message-confirmed'"
         },
@@ -33025,7 +33447,7 @@
       "consumers": [
         {
           "file": "modules/event-listeners.js",
-          "line": 549,
+          "line": 502,
           "kind": "custom-event-listener"
         },
         {
@@ -33082,7 +33504,7 @@
       "evidence": [
         {
           "file": "modules/event-listeners.js",
-          "line": 549,
+          "line": 502,
           "kind": "custom-event-listener",
           "match": "form.addEventListener('submit'"
         },
@@ -34201,7 +34623,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 55,
+          "line": 61,
           "kind": "event-listener"
         },
         {
@@ -34231,7 +34653,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 55,
+          "line": 61,
           "kind": "event-listener",
           "match": "subscribe('theme-updated'"
         },
@@ -34254,7 +34676,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 780,
+          "line": 783,
           "kind": "event-listener"
         },
         {
@@ -34272,7 +34694,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 780,
+          "line": 783,
           "kind": "event-listener",
           "match": "request.on('timeout'"
         },
@@ -34345,14 +34767,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1581,
+          "line": 1584,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1581,
+          "line": 1584,
           "kind": "event-listener",
           "match": "ipcMain.handle('toggle-favorite-model'"
         },
@@ -34690,14 +35112,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1110,
+          "line": 1113,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1110,
+          "line": 1113,
           "kind": "event-listener",
           "match": "hostHooks.on('tray:refresh'"
         }
@@ -34937,7 +35359,7 @@
         },
         {
           "file": "main.js",
-          "line": 976,
+          "line": 979,
           "kind": "event-listener"
         },
         {
@@ -34960,7 +35382,7 @@
         },
         {
           "file": "main.js",
-          "line": 976,
+          "line": 979,
           "kind": "event-listener",
           "match": "mainWindow.on('unmaximize'"
         },
@@ -34988,7 +35410,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 51,
+          "line": 57,
           "kind": "event-send"
         }
       ],
@@ -35014,7 +35436,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 51,
+          "line": 57,
           "kind": "event-send",
           "match": "ipcRenderer.send('unmaximize-window'"
         }
@@ -35026,25 +35448,25 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 960,
+          "line": 963,
           "kind": "event-listener"
         },
         {
           "file": "main.js",
-          "line": 962,
+          "line": 965,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 960,
+          "line": 963,
           "kind": "event-listener",
           "match": "mainWindow.on('unresponsive'"
         },
         {
           "file": "main.js",
-          "line": 962,
+          "line": 965,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('unresponsive'"
         }
@@ -35870,17 +36292,17 @@
         },
         {
           "file": "main.js",
-          "line": 2278,
+          "line": 2282,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2293,
+          "line": 2297,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2296,
+          "line": 2300,
           "kind": "event-send"
         }
       ],
@@ -35900,19 +36322,19 @@
         },
         {
           "file": "main.js",
-          "line": 2278,
+          "line": 2282,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-message'"
         },
         {
           "file": "main.js",
-          "line": 2293,
+          "line": 2297,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-message'"
         },
         {
           "file": "main.js",
-          "line": 2296,
+          "line": 2300,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-message'"
         },
@@ -35929,32 +36351,32 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 2255,
+          "line": 2259,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2268,
+          "line": 2272,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2276,
+          "line": 2280,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2302,
+          "line": 2306,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2315,
+          "line": 2319,
           "kind": "event-send"
         },
         {
           "file": "main.js",
-          "line": 2341,
+          "line": 2345,
           "kind": "event-send"
         }
       ],
@@ -35968,37 +36390,37 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 2255,
+          "line": 2259,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2268,
+          "line": 2272,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2276,
+          "line": 2280,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2302,
+          "line": 2306,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2315,
+          "line": 2319,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
         {
           "file": "main.js",
-          "line": 2341,
+          "line": 2345,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('vcp-log-status'"
         },
@@ -37335,14 +37757,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1764,
+          "line": 1767,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1764,
+          "line": 1767,
           "kind": "event-listener",
           "match": "ipcMain.handle('watcher:begin'"
         },
@@ -37366,14 +37788,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1771,
+          "line": 1774,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1771,
+          "line": 1774,
           "kind": "event-listener",
           "match": "ipcMain.handle('watcher:start'"
         },
@@ -37397,14 +37819,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1791,
+          "line": 1794,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1791,
+          "line": 1794,
           "kind": "event-listener",
           "match": "ipcMain.handle('watcher:stop'"
         },
@@ -37422,16 +37844,27 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 1221,
+          "line": 1224,
+          "kind": "event-listener"
+        },
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 156,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 1221,
+          "line": 1224,
           "kind": "event-listener",
           "match": "app.on('web-contents-created'"
+        },
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 156,
+          "kind": "event-listener",
+          "match": "appApi.on('web-contents-created'"
         }
       ]
     },
@@ -37846,12 +38279,31 @@
       ]
     },
     {
+      "name": "will-frame-navigate",
+      "producers": [],
+      "consumers": [
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 160,
+          "kind": "event-listener"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "modules/scriptorium/webPages/index.js",
+          "line": 160,
+          "kind": "event-listener",
+          "match": "contents.on('will-frame-navigate'"
+        }
+      ]
+    },
+    {
       "name": "will-navigate",
       "producers": [],
       "consumers": [
         {
           "file": "main.js",
-          "line": 882,
+          "line": 885,
           "kind": "event-listener"
         },
         {
@@ -37883,7 +38335,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 882,
+          "line": 885,
           "kind": "event-listener",
           "match": "mainWindow.webContents.on('will-navigate'"
         },
@@ -37944,7 +38396,7 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2183,
+          "line": 2187,
           "kind": "event-listener"
         },
         {
@@ -37956,7 +38408,7 @@
       "evidence": [
         {
           "file": "main.js",
-          "line": 2183,
+          "line": 2187,
           "kind": "event-listener",
           "match": "app.on('will-quit'"
         },
@@ -37993,14 +38445,14 @@
       "consumers": [
         {
           "file": "main.js",
-          "line": 2135,
+          "line": 2139,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 2135,
+          "line": 2139,
           "kind": "event-listener",
           "match": "app.on('window-all-closed'"
         }
@@ -38021,7 +38473,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 44,
+          "line": 50,
           "kind": "event-send"
         }
       ],
@@ -38041,7 +38493,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 44,
+          "line": 50,
           "kind": "event-send",
           "match": "ipcRenderer.send('window-lifecycle:ready'"
         }
@@ -38052,7 +38504,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 973,
+          "line": 976,
           "kind": "event-send"
         }
       ],
@@ -38064,14 +38516,14 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 56,
+          "line": 62,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 973,
+          "line": 976,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('window-maximized'"
         },
@@ -38083,7 +38535,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 56,
+          "line": 62,
           "kind": "event-listener",
           "match": "subscribe('window-maximized'"
         }
@@ -38144,7 +38596,7 @@
       "producers": [
         {
           "file": "main.js",
-          "line": 978,
+          "line": 981,
           "kind": "event-send"
         }
       ],
@@ -38156,14 +38608,14 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 57,
+          "line": 63,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "main.js",
-          "line": 978,
+          "line": 981,
           "kind": "event-send",
           "match": "mainWindow.webContents.send('window-unmaximized'"
         },
@@ -38175,7 +38627,7 @@
         },
         {
           "file": "preloads/docx.js",
-          "line": 57,
+          "line": 63,
           "kind": "event-listener",
           "match": "subscribe('window-unmaximized'"
         }
@@ -39401,6 +39853,22 @@
       "reason": "dynamic event listener name: channel",
       "kind": "event-listener",
       "match": "ipcRenderer.on(channel",
+      "contractId": "source.dynamic.preloads.docx"
+    },
+    {
+      "file": "preloads/docx.js",
+      "line": 13,
+      "reason": "dynamic event name: channel",
+      "kind": "event-send",
+      "match": "ipcRenderer.invoke(channel",
+      "contractId": "source.dynamic.preloads.docx"
+    },
+    {
+      "file": "preloads/docx.js",
+      "line": 16,
+      "reason": "dynamic local IPC wrapper channel: channel",
+      "kind": "event-send",
+      "match": "plainInvoke(channel",
       "contractId": "source.dynamic.preloads.docx"
     },
     {

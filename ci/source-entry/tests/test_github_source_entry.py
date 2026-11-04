@@ -268,6 +268,37 @@ class EntryTests(unittest.TestCase):
         self.assertEqual(server.bodies,[])
 
 
+class FailureDiagnosticTests(unittest.TestCase):
+    def test_only_fixed_codes_are_disclosed(self):
+        canary = 'SYNTHETIC_DIAGNOSTIC_CANARY'
+        for error, expected in [(AdmissionError(canary), 'ADMISSION'),
+                                (ValueError(canary), 'UNEXPECTED'),
+                                (OSError(canary), 'FILESYSTEM'),
+                                (AdmissionError('encoded body refused'), 'BODY_ENCODING'),
+                                (AdmissionError('body size mismatch'), 'BODY_SIZE')]:
+            self.assertEqual(entry.failure_code(error), expected)
+            self.assertNotIn(canary, entry.failure_code(error))
+
+    def test_http_status_survives_suppressed_context_without_payload(self):
+        error = entry.urllib.error.HTTPError('https://example.invalid/private', 429,
+                    'SYNTHETIC_DIAGNOSTIC_CANARY', {'Authorization':'SYNTHETIC'}, io.BytesIO(b'SYNTHETIC'))
+        try:
+            try:raise error
+            except Exception:raise AdmissionError('public source request failed; no fallback') from None
+        except AdmissionError as wrapped:
+            self.assertEqual(entry.failure_code(wrapped), 'HTTP_429')
+        error.code = 'SYNTHETIC_DIAGNOSTIC_CANARY'
+        self.assertEqual(entry.failure_code(error), 'HTTP')
+        error.close()
+
+    def test_timeout_and_cyclic_context_are_bounded(self):
+        self.assertEqual(entry.failure_code(TimeoutError('SYNTHETIC')), 'TIMEOUT')
+        self.assertEqual(entry.failure_code(entry.urllib.error.URLError(TimeoutError('SYNTHETIC'))), 'TIMEOUT')
+        first = ValueError('SYNTHETIC'); second = ValueError('SYNTHETIC')
+        first.__context__ = second; second.__context__ = first
+        self.assertEqual(entry.failure_code(first), 'UNEXPECTED')
+
+
 class ManifestRefreshTests(unittest.TestCase):
     """Read-only maintainer checks against staged Git metadata; no source hydration.
 

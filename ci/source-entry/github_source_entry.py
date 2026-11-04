@@ -379,6 +379,35 @@ def project_event(manifest, event_commit, profile, transport, private_parent, co
     return placed
 
 
+def failure_code(error):
+    """Bounded diagnostics only: never stringify transport errors or their payloads."""
+    reasons = {
+        'manifest limit exceeded': 'MANIFEST_LIMIT',
+        'body size mismatch': 'BODY_SIZE',
+        'encoded body refused': 'BODY_ENCODING',
+        'public source identity mismatch': 'BODY_IDENTITY',
+        'response size bound exceeded': 'METADATA_SIZE',
+        'unexpected body destination or status': 'BODY_DESTINATION',
+        'unexpected transport destination or status': 'METADATA_DESTINATION',
+    }
+    result = 'UNEXPECTED'
+    for _ in range(8):
+        if isinstance(error, urllib.error.HTTPError):
+            return f'HTTP_{error.code}' if type(error.code) is int and 100 <= error.code <= 599 else 'HTTP'
+        if isinstance(error, TimeoutError):
+            return 'TIMEOUT'
+        if isinstance(error, urllib.error.URLError):
+            if isinstance(error.reason, TimeoutError):return 'TIMEOUT'
+            result = 'NETWORK'
+        elif isinstance(error, AdmissionError):
+            result = reasons.get(str(error), 'ADMISSION' if result == 'UNEXPECTED' else result)
+        elif isinstance(error, OSError) and result == 'UNEXPECTED':
+            result = 'FILESYSTEM'
+        error = error.__context__
+        if error is None:break
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", required=True)
@@ -401,8 +430,8 @@ def main():
             if context_output:
                 output.write(f"context_path={context_output['path']}\ncontext_sha256={context_output['sha256']}\n")
         print(f"Verified source projection: {result.file_count} files; event commit {result.commit}")
-    except Exception:
-        raise SystemExit("Source projection failed; no checkout or fallback; no completed source directory published") from None
+    except Exception as error:
+        raise SystemExit(f"Source projection failed [{failure_code(error)}]; no checkout or fallback; no completed source directory published") from None
 
 
 if __name__ == "__main__":

@@ -23200,7 +23200,7 @@
           "blob": "254e1e48c86f51e103ee5a7f1fe0ee09e17af80c",
           "size": 104852,
           "sha256": "e6bee67724a7b5436fe8162638e3708cfc8d52b6342db69a49715e30ff27cfdc",
-          "kind": "source"
+          "kind": "static-native"
         },
         {
           "path": "vendor/pdfjs/wasm/jbig2_nowasm_fallback.js",
@@ -23218,7 +23218,7 @@
           "blob": "5acce73fd95c1baa3aa68cfe9d29aa3f97b7ce18",
           "size": 252032,
           "sha256": "004a0e62db930ba9ff2a22212f4554d0bb57a0635a8287caf70f98117cee14ba",
-          "kind": "source"
+          "kind": "static-native"
         },
         {
           "path": "vendor/pdfjs/wasm/openjpeg_nowasm_fallback.js",
@@ -23236,7 +23236,7 @@
           "blob": "fccd641fef6ae956dc1d13c0c173a3f0be5303fa",
           "size": 88837,
           "sha256": "bfdaeb649178748e54bcdaa819bcd5c5c5a4278c8eaaf5feb5a26071e1c25bfc",
-          "kind": "source"
+          "kind": "static-native"
         },
         {
           "path": "vendor/pele.global.js",
@@ -24467,6 +24467,36 @@
           "sha256": "db57bd214dd0a5b34ff7522acabc9cfc7479fecde9e6a3d4d42409214de43223",
           "kind": "static-native",
           "format": "PE"
+        },
+        {
+          "path": "vendor/pdfjs/wasm/jbig2.wasm",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "254e1e48c86f51e103ee5a7f1fe0ee09e17af80c",
+          "size": 104852,
+          "sha256": "e6bee67724a7b5436fe8162638e3708cfc8d52b6342db69a49715e30ff27cfdc",
+          "kind": "static-native",
+          "format": "WASM"
+        },
+        {
+          "path": "vendor/pdfjs/wasm/openjpeg.wasm",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5acce73fd95c1baa3aa68cfe9d29aa3f97b7ce18",
+          "size": 252032,
+          "sha256": "004a0e62db930ba9ff2a22212f4554d0bb57a0635a8287caf70f98117cee14ba",
+          "kind": "static-native",
+          "format": "WASM"
+        },
+        {
+          "path": "vendor/pdfjs/wasm/qcms_bg.wasm",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fccd641fef6ae956dc1d13c0c173a3f0be5303fa",
+          "size": 88837,
+          "sha256": "bfdaeb649178748e54bcdaa819bcd5c5c5a4278c8eaaf5feb5a26071e1c25bfc",
+          "kind": "static-native",
+          "format": "WASM"
         }
       ],
       "required_scans": [

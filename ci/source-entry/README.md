@@ -219,3 +219,11 @@ package paths. Only the forum HTML/CSS/JavaScript identities advance to the
 reviewed author bytes. Generated event registrations retain the same listener
 expressions after line shifts. This source integration does not install a daily
 client, migrate local plugins or establish live business-service acceptance.
+
+## November 4: upstream PDF.js WASM inventory
+
+The upstream PDF viewer ships three WASM v1 assets from npm pdfjs-dist@5.7.284. Their bytes match the SHA512-integrity-checked official tarball. Only package-smoke adds their separately reviewed static-native entries, with exact path/blob/size/SHA256 and WASM format; the native-inventory regression pins all three identities. Existing excluded paths/blobs/aliases and runtime permissions remain unchanged.
+
+The writer identifies the version-1 header without executing a module. Ordinary-source WASM, disguised/unregistered modules, unknown WASM versions and mismatched formats/digests still fail; admitted files are non-executable mode 0600. No vendor-directory exemption is added. Metadata/body validity alone does not establish filesystem placement: the complete package projection now has a real private placement regression in addition to synthetic negative paths.
+
+Source refusals emit only fixed diagnostic categories as check annotations. HTTP status/timeout and known size/identity categories never include URLs, headers, credentials, response bodies or arbitrary exception text. Canary and suppressed-context tests cover this boundary; no Git/archive/LFS fallback or admission bypass is introduced.

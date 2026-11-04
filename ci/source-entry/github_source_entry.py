@@ -219,7 +219,7 @@ def prepare_event_policy(manifest, event_commit, profile, transport):
         path = _identity(entry)
         if entry.get("kind") not in {"source", "static-asset", "static-native"}:
             raise AdmissionError("missing source admission category")
-        if path.lower().endswith((".exe", ".dll", ".so", ".dylib", ".node")) and entry["kind"] != "static-native":
+        if path.lower().endswith((".exe", ".dll", ".so", ".dylib", ".node", ".wasm")) and entry["kind"] != "static-native":
             raise AdmissionError("native path lacks separate admission")
         if path in by_path or protected_name(path) or path in manifest.get("denied_paths", []):
             raise AdmissionError("duplicate or protected selected input")

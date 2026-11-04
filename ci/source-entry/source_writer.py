@@ -36,6 +36,8 @@ def _native_format(data):
         return "PE"
     if data[:4] in {b"\xfe\xed\xfa\xce", b"\xce\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xcf\xfa\xed\xfe"}:
         return "Mach-O"
+    if data.startswith(b"\0asm\x01\0\0\0"):
+        return "WASM"
     if data[:4] in {b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca", b"\xca\xfe\xba\xbf", b"\xbf\xba\xfe\xca", b"\0asm"}:
         return "other-executable-format"
     return None
@@ -51,7 +53,7 @@ def validate_native_assets(policy):
         path = row.get("path")
         if (path in native_assets or path not in admitted
                 or any(row.get(key) != admitted[path].get(key) for key in ("mode", "blob", "size", "sha256"))
-                or row.get("format") not in {"ELF", "PE", "Mach-O"}):
+                or row.get("format") not in {"ELF", "PE", "Mach-O", "WASM"}):
             raise PlacementError("invalid separately admitted native asset")
         native_assets[path] = row
     return native_assets

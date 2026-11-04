@@ -193,6 +193,34 @@ class EntryTests(unittest.TestCase):
             with self.assertRaises(AdmissionError): entry.project_event(manifest, COMMIT, "test", api, parent)
             self.assertEqual(os.listdir(parent), [])
 
+    def test_wasm_requires_exact_native_admission_before_bodies(self):
+        data = b"\0asm\x01\0\0\0"; row = source('assets/helper.wasm', data)
+        manifest, server, api = self.fixture([row], data)
+        with tempfile.TemporaryDirectory() as parent, self.assertRaises(AdmissionError):
+            entry.project_event(manifest, COMMIT, 'test', api, parent)
+        self.assertEqual(server.bodies, [])
+
+    def test_exact_wasm_v1_is_placed_without_executable_permissions(self):
+        data = b"\0asm\x01\0\0\0"; row = source('assets/helper.wasm', data, 'static-native')
+        manifest, server, api = self.fixture([row], data)
+        manifest['profiles']['test']['static_native_assets'] = [{**row, 'format':'WASM'}]
+        with tempfile.TemporaryDirectory() as parent:
+            result = entry.project_event(manifest, COMMIT, 'test', api, parent)
+            p = Path(result.directory, row['path'])
+            self.assertEqual(p.read_bytes(), data)
+            self.assertEqual(p.stat().st_mode & 0o777, 0o600)
+
+    def test_unregistered_disguised_or_unknown_wasm_is_refused(self):
+        for data, kind, admission in [(b"\0asm\x01\0\0\0", 'source', False),
+                                       (b"\0asm\x02\0\0\0", 'static-native', True),
+                                       (b"MZsynthetic", 'static-native', True)]:
+            row = source('assets/helper.bin', data, kind)
+            manifest, server, api = self.fixture([row], data)
+            if admission:manifest['profiles']['test']['static_native_assets'] = [{**row, 'format':'WASM'}]
+            with tempfile.TemporaryDirectory() as parent:
+                with self.assertRaises(AdmissionError):entry.project_event(manifest, COMMIT, 'test', api, parent)
+                self.assertEqual(os.listdir(parent), [])
+
     def test_duplicate_json_key(self):
         with self.assertRaises(AdmissionError): entry.strict_json(b'{"sha":"a","sha":"b"}')
 
@@ -408,6 +436,18 @@ class ManifestRefreshTests(unittest.TestCase):
             if name == "package-smoke":
                 allowed_additions.add(reviewed_searcher)
                 allowed_additions.add("audio_engine/audio_server_rubato_dsp.exe")
+            # These exact PDF.js 5.7.284 bytes match the integrity-checked
+            # official npm package. This is not a vendor-directory exemption.
+            reviewed_pdf_wasm = {
+                'vendor/pdfjs/wasm/jbig2.wasm': ('254e1e48c86f51e103ee5a7f1fe0ee09e17af80c', 104852, 'e6bee67724a7b5436fe8162638e3708cfc8d52b6342db69a49715e30ff27cfdc'),
+                'vendor/pdfjs/wasm/openjpeg.wasm': ('5acce73fd95c1baa3aa68cfe9d29aa3f97b7ce18', 252032, '004a0e62db930ba9ff2a22212f4554d0bb57a0635a8287caf70f98117cee14ba'),
+                'vendor/pdfjs/wasm/qcms_bg.wasm': ('fccd641fef6ae956dc1d13c0c173a3f0be5303fa', 88837, 'bfdaeb649178748e54bcdaa819bcd5c5c5a4278c8eaaf5feb5a26071e1c25bfc'),
+            }
+            if name == 'package-smoke':
+                allowed_additions.update(reviewed_pdf_wasm)
+                for path, (blob, size, digest) in reviewed_pdf_wasm.items():
+                    self.assertEqual(native[path], {'path':path, 'mode':'100644', 'type':'blob',
+                        'blob':blob, 'size':size, 'sha256':digest, 'kind':'static-native', 'format':'WASM'})
             self.assertEqual(set(native), set(old) | allowed_additions)
             if reviewed_searcher in allowed_additions:
                 self.assertEqual(native[reviewed_searcher], {

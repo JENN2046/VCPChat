@@ -269,6 +269,20 @@ class EntryTests(unittest.TestCase):
 
 
 class FailureDiagnosticTests(unittest.TestCase):
+    def test_main_publishes_only_fixed_annotation_on_refusal(self):
+        from contextlib import redirect_stdout
+        from unittest.mock import patch
+        canary = 'SYNTHETIC_DIAGNOSTIC_CANARY'
+        with tempfile.TemporaryDirectory() as parent:
+            manifest = Path(parent)/'manifest.json'; manifest.write_text('{}')
+            output = io.StringIO()
+            env = {'GITHUB_REPOSITORY':entry.REPOSITORY, 'GITHUB_SHA':COMMIT, 'RUNNER_TEMP':parent}
+            with patch.dict(os.environ, env, clear=True), patch.object(sys, 'argv', ['entry', '--manifest', str(manifest), '--profile', 'test']), \
+                 patch.object(entry, 'project_event', side_effect=AdmissionError(canary)), redirect_stdout(output):
+                with self.assertRaises(SystemExit) as raised:entry.main()
+            self.assertIn('::error title=Source projection refused::Source projection failed [ADMISSION]', output.getvalue())
+            self.assertNotIn(canary, output.getvalue()+str(raised.exception))
+
     def test_only_fixed_codes_are_disclosed(self):
         canary = 'SYNTHETIC_DIAGNOSTIC_CANARY'
         for error, expected in [(AdmissionError(canary), 'ADMISSION'),

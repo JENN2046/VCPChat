@@ -431,7 +431,9 @@ def main():
                 output.write(f"context_path={context_output['path']}\ncontext_sha256={context_output['sha256']}\n")
         print(f"Verified source projection: {result.file_count} files; event commit {result.commit}")
     except Exception as error:
-        raise SystemExit(f"Source projection failed [{failure_code(error)}]; no checkout or fallback; no completed source directory published") from None
+        code = failure_code(error)
+        print(f"::error title=Source projection refused::Source projection failed [{code}]; no checkout or fallback", flush=True)
+        raise SystemExit(f"Source projection failed [{code}]; no checkout or fallback; no completed source directory published") from None
 
 
 if __name__ == "__main__":

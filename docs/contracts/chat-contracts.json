@@ -1443,17 +1443,30 @@
     "owner": "preloads/docx.js",
     "status": "reviewed",
     "dynamic": true,
-    "review": "Private subscribe helper is called by fixed document preload methods; callback receives payload only and returns exact-listener unsubscribe.",
+    "review": "Private subscribe helper is called by fixed document preload methods; callback receives payload only and returns exact-listener unsubscribe. Upstream ce988226 adds private plainInvoke/command helpers: channels are selected by fixed scriptoriumAPI methods, never supplied by renderer arguments. Only command name/payload cross the exported methods; main-process fileAccess and sender checks retain authority. The helpers themselves are not exposed by contextBridge.",
     "dynamicSites": [
       {
         "file": "preloads/docx.js",
         "line": 8,
         "kind": "event-listener",
         "match": "ipcRenderer.on(channel"
+      },
+      {
+        "file": "preloads/docx.js",
+        "line": 13,
+        "kind": "event-send",
+        "match": "ipcRenderer.invoke(channel"
+      },
+      {
+        "file": "preloads/docx.js",
+        "line": 16,
+        "kind": "event-send",
+        "match": "plainInvoke(channel"
       }
     ],
     "evidence": [
-      "Source review at integration base 8eb9593a; exact operation matches below; new or changed dynamic sites still fail the contract gate."
+      "Source review at integration base 8eb9593a; exact operation matches below; new or changed dynamic sites still fail the contract gate.",
+      "2026-11-04: review exact plainInvoke and command call sites at lines 13 and 16; preserve source scanner unknown-site failures and existing exact subscribe site."
     ]
   },
   {
@@ -1554,37 +1567,37 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 18,
+        "line": 18,
         "kind": "event-listener",
         "match": "ipcMain.handle(c"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 93,
+        "line": 93,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[0]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 118,
+        "line": 118,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[1]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 137,
+        "line": 137,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[2]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 153,
+        "line": 153,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[3]"
       },
       {
         "file": "modules/ipc/nativeConversationHandlers.js",
-      "line": 154,
+        "line": 154,
         "kind": "event-listener",
         "match": "ipcMain.handle(channels[4]"
       }

@@ -617,7 +617,7 @@ test('show and hide from the settings page, and a closed pet remembers the size 
     assert.equal(coco.isVisible(), false);
     assert.equal(page.anyVisible, false);
     await env.fake.handlers.get('deskpet-settings:set-scale')(fromMain(env), 'Nova', 1.5);
-    await sleep(30);
+    await waitFor(() => env.readJson(path.join(env.root, 'deskpet', 'state.json')).Nova?.scale === 1.5);
     assert.equal(env.readJson(path.join(env.root, 'deskpet', 'state.json')).Nova.scale, 1.5);
     env.handlers.closeAll();
 });

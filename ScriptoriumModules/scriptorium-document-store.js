@@ -127,13 +127,19 @@
         function replaceDocument(documentModel, metadata = {}) {
             assertActive();
             const normalized = core.normalizeDocument(documentModel);
+            // Content history does not roll back the active file's disk version or resource base.
+            if (['history-undo', 'history-redo', 'lineage-restore'].includes(metadata.reason)
+                && metadata.filePath === state.currentPath && state.document?.manifest.markdownFile) {
+                normalized.manifest.markdownFile = { ...state.document.manifest.markdownFile };
+            }
             revokeResources();
             state.generation += 1;
             state.document = normalized;
             state.currentPath = metadata.filePath || null;
             state.currentName = String(metadata.name || defaultNameFor(normalized));
             const extension = core.extensionForKind(normalized.manifest.scene.kind);
-            if (!state.currentName.toLowerCase().endsWith(extension)) {
+            // 从 .md 原位打开的文稿保存回原文件（modules/scriptorium/markdownFiles），保留原文件名。
+            if (!normalized.manifest.markdownFile && !state.currentName.toLowerCase().endsWith(extension)) {
                 state.currentName = `${
                     state.currentName.replace(/\.[^.]+$/, '')
                 }${extension}`;
@@ -216,6 +222,9 @@
             assertActive();
             if (metadata.filePath !== undefined) state.currentPath = metadata.filePath;
             if (metadata.name !== undefined) state.currentName = String(metadata.name);
+            if (metadata.markdownFile && state.document?.manifest.markdownFile) {
+                state.document.manifest.markdownFile = { ...state.document.manifest.markdownFile, ...metadata.markdownFile };
+            }
             const savedRevision = metadata.revision;
             if (savedRevision === undefined || savedRevision === state.revision) {
                 state.dirty = false;

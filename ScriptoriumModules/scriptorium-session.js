@@ -18,6 +18,26 @@
         let checkpointQueue = Promise.resolve();
         let disposed = false;
 
+        let openSequence = 0;
+        function beginOpen() {
+            if (disposed) return null;
+            context.networkFontPort?.cancel?.();
+            context.invalidateNavigation?.();
+            return { request: ++openSequence, owner: documentPort.captureContext(), navigation: context.navigationStamp?.() };
+        }
+        function canOpen(read) {
+            return Boolean(read && !disposed && read.request === openSequence
+                && read.navigation === context.navigationStamp?.() && documentPort.isContextCurrent(read.owner, { revision: true }));
+        }
+        function activateRead(read, model, metadata) {
+            const activation = activateDocument(model, metadata, read);
+            // activateDocument installs its new owner synchronously before its first await.
+            // Later errors still belong to that installation, not the replaced document.
+            if (!disposed && read.request === openSequence && read.navigation === context.navigationStamp?.()) read.owner = documentPort.captureContext();
+            return activation;
+        }
+
+
         function setElements(nextElements) {
             elements = nextElements || {};
         }
@@ -28,7 +48,11 @@
             return resolved;
         }
 
-        async function activateDocument(documentModel, metadata = {}) {
+        async function activateDocument(documentModel, metadata = {}, read = null) {
+            if (disposed) return false;
+            let owner = documentPort.captureContext();
+            const navigation = context.navigationStamp?.();
+            const current = () => !disposed && navigation === context.navigationStamp?.() && documentPort.isContextCurrent(owner, { revision: true });
             const previousDocumentId = documentPort.status().documentId;
             documentPort.setActivity({
                 loading: true,
@@ -46,20 +70,32 @@
                 });
                 const activeAdapter = context.resolveAdapter(normalized);
                 context.activateAdapter(activeAdapter);
+                owner = documentPort.captureContext();
 
                 // 导入的 Markdown/HTML 可能把网络字体声明放在混合源码的
                 // <style> 中。必须在首次 Surface 渲染前完成受控下载、工程
                 // 资源注册和 URL 改写，否则首屏只能使用回退字体。
                 if (metadata.imported && context.networkFontPort) {
+                    const write = (method, args) => {
+                        if (!current()) { context.networkFontPort.cancel?.(); return false; }
+                        const changed = activeAdapter[method](...args);
+                        owner = documentPort.captureContext();
+                        if (read) read.owner = owner;
+                        return changed;
+                    };
+                    const ownedAdapter = { ...activeAdapter,
+                        replaceCurrentSource: (...args) => write('replaceCurrentSource', args),
+                        replaceCurrentCss: (...args) => write('replaceCurrentCss', args) };
                     try {
                         await context.networkFontPort.processDocument(
-                            activeAdapter,
+                            ownedAdapter,
                             {
                                 dirty: false,
                                 notify: true,
                             }
                         );
                     } catch (error) {
+                        if (!current()) return false;
                         console.warn(
                             '[ScriptoriumSession] Imported network fonts could not be localized:',
                             error
@@ -72,6 +108,7 @@
                     }
                 }
 
+                if (!current()) return false;
                 context.historyPort.reset({ capture: false });
                 context.renderPort.invalidate('document-opened');
 
@@ -102,6 +139,7 @@
                 if (!editActivated) {
                     context.renderPort.renderEdit({ force: true });
                 }
+                if (!current()) return false;
                 context.historyPort.capture({ reason: 'document-opened' });
                 context.lineagePort?.load?.(normalized);
                 notificationPort.show?.(
@@ -112,17 +150,17 @@
                 );
                 return true;
             } finally {
-                documentPort.setActivity({
-                    loading: false,
-                    reason: 'document-loaded',
-                });
-                if (elements['loading-state']) {
-                    elements['loading-state'].hidden = true;
+                if (owner && documentPort.isContextCurrent(owner)) {
+                    documentPort.setActivity({ loading: false, reason: 'document-loaded' });
+                    if (elements['loading-state']) elements['loading-state'].hidden = true;
                 }
             }
         }
 
         function create(documentModel = null, metadata = {}) {
+            openSequence += 1;
+            context.networkFontPort?.cancel?.();
+            context.invalidateNavigation?.();
             return activateDocument(
                 documentModel || core.createDocument(),
                 metadata
@@ -136,8 +174,8 @@
             }));
         }
 
-        async function openResult(result) {
-            if (!result?.success) return false;
+        async function openResult(result, read = beginOpen()) {
+            if (!result?.success || !canOpen(read)) return false;
             if (result.kind === 'imported') {
                 const title = String(result.name || '导入文稿')
                     .replace(/\.[^.]+$/, '');
@@ -156,31 +194,38 @@
                     sourceFormat: result.importedKind,
                     sourceName: result.name,
                 };
-                const opened = await activateDocument(model, {
+                const opened = await activateRead(read, model, {
                     filePath: null,
                     name: `${title}${deck ? '.vpptx' : '.vdocx'}`,
                     imported: true,
                 });
-                if (opened) {
+                if (opened && canOpen(read)) {
                     documentPort.markDirty({
                         reason: 'imported-document',
                     });
                 }
-                return opened;
+                return Boolean(opened && read.request === openSequence && read.navigation === context.navigationStamp?.());
             }
             const bytes = Uint8Array.from(result.bytes || []);
-            const unpacked = await containerModule.unpack(bytes, core);
-            return activateDocument(unpacked.document, {
+            let unpacked;
+            try { unpacked = await containerModule.unpack(bytes, core); }
+            catch (error) { if (!canOpen(read)) return false; throw error; }
+            if (!canOpen(read)) return false;
+            return activateRead(read, unpacked.document, {
                 ...result,
                 resourceData: unpacked.resourceData,
             });
         }
 
         async function runAfterUnsavedDecision(message, action) {
+            if (disposed) return false;
+            context.editorResolver?.()?.flush?.();
             if (!documentPort.status().dirty) return action();
+            const owner = documentPort.captureContext();
+            const navigation = context.navigationStamp?.();
             const decision = await requestUnsavedDecision(message);
-            if (decision === 'cancel') return false;
-            if (decision === 'save' && !await save(false)) return false;
+            if (decision === 'cancel' || navigation !== context.navigationStamp?.() || !documentPort.isContextCurrent(owner, { revision: true })) return false;
+            if (decision === 'save' && (!await save(false) || documentPort.status().dirty || navigation !== context.navigationStamp?.())) return false;
             return action();
         }
 
@@ -188,9 +233,12 @@
             return runAfterUnsavedDecision(
                 '打开另一份文档前，可以保存当前修改，或舍弃这些修改。',
                 async () => {
+                    const read = beginOpen();
+                    if (!read) return false;
                     try {
-                        return openResult(await persistencePort.chooseOpen());
+                        return openResult(await persistencePort.chooseOpen(), read);
                     } catch (error) {
+                        if (!canOpen(read)) return false;
                         notificationPort.show?.(
                             `打开失败：${error.message}`,
                             'error',
@@ -206,9 +254,12 @@
             return runAfterUnsavedDecision(
                 '导入文档会建立一份新工程。可以先保存当前修改。',
                 async () => {
+                    const read = beginOpen();
+                    if (!read) return false;
                     try {
-                        return openResult(await persistencePort.chooseImport());
+                        return openResult(await persistencePort.chooseImport(), read);
                     } catch (error) {
+                        if (!canOpen(read)) return false;
                         notificationPort.show?.(
                             `导入失败：${error.message}`,
                             'error',
@@ -224,11 +275,12 @@
             return runAfterUnsavedDecision(
                 '载入另一份文档前，可以保存当前修改。',
                 async () => {
+                    const read = beginOpen();
+                    if (!read) return false;
                     try {
-                        return openResult(
-                            await persistencePort.readPath(filePath)
-                        );
+                        return openResult(await persistencePort.readPath(filePath), read);
                     } catch (error) {
+                        if (!canOpen(read)) return false;
                         notificationPort.show?.(
                             `载入失败：${error.message}`,
                             'error',
@@ -270,11 +322,17 @@
                     || !documentPort.isContextCurrent(operationContext)) {
                     return false;
                 }
+                const previousMarkdown = documentPort.document()?.manifest.markdownFile;
                 documentPort.markSaved({
                     filePath: result.filePath,
                     name: result.name,
                     revision: operationContext.revision,
+                    markdownFile: result.markdownFile,
                 });
+                if (result.markdownFile && (previousMarkdown?.dir !== result.markdownFile.dir || previousMarkdown?.root !== result.markdownFile.root)) {
+                    context.renderPort.invalidate('markdown-save-location');
+                    await context.surfacePort?.switchMode?.(context.surfacePort?.mode?.() || 'edit', { force: true });
+                }
                 notificationPort.show?.(
                     `已保存 · ${result.name}`,
                     'success'
@@ -350,6 +408,9 @@
         }
 
         async function showHome() {
+            openSequence += 1;
+            context.networkFontPort?.cancel?.();
+            context.invalidateNavigation?.();
             return runAfterUnsavedDecision(
                 '回到首页前，可以保存当前修改，或舍弃这些修改。',
                 async () => {
@@ -389,6 +450,9 @@
         }
 
         async function close() {
+            openSequence += 1;
+            context.networkFontPort?.cancel?.();
+            context.invalidateNavigation?.();
             return runAfterUnsavedDecision(
                 '关闭 Scriptorium 前，可以保存当前修改。',
                 () => persistencePort.closeWindow()
@@ -434,6 +498,7 @@
             if (disposed) return;
             if (unsavedResolver) resolveUnsavedDecision('cancel');
             disposed = true;
+            context.networkFontPort?.cancel?.();
         }
 
         return Object.freeze({

@@ -133,7 +133,7 @@ async function readWorkbook(bytes) {
         if (sheet.state && sheet.state !== 'visible') return; // 藏起来的表不列
         const rows = [];
         let truncated = false;
-        const width = Math.min(MAX_COLS, sheet.actualColumnCount || sheet.columnCount || 0);
+        const width = Math.min(MAX_COLS, sheet.columnCount || 0);
         if ((sheet.columnCount || 0) > MAX_COLS) truncated = true;
         const formulas = {};
         sheet.eachRow({ includeEmpty: true }, (row, number) => {
@@ -148,7 +148,7 @@ async function readWorkbook(bytes) {
         });
         for (let k = 0; k < rows.length; k += 1) if (!rows[k]) rows[k] = [];
         // 末尾全空的行不要
-        while (rows.length && rows[rows.length - 1].every((cell) => cell === '')) rows.pop();
+        while (rows.length && rows[rows.length - 1].every((cell, col) => cell === '' && !Object.hasOwn(formulas, `${rows.length - 1}:${col}`))) rows.pop();
         sheets.push({ name: sheet.name, rows, truncated, formulas });
     });
     return sheets;

@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "0eade2dc6d2a8baacf05fb93c208711da35a3384",
-          "size": 32979,
-          "sha256": "463e9e0c0544b2590ea8dff98c74259d53aac8275f11208315564f272e4d4aff",
+          "blob": "01b0e158c4763826cd8615b984f7fa9220d8dc00",
+          "size": 33022,
+          "sha256": "6d2863bc8d4169db50d5e7d19c53d9d44fe0c4ca24aff6762778b47016686b67",
           "kind": "source"
         },
         {
@@ -3658,9 +3658,9 @@
           "path": "ScriptoriumModules/scriptorium-pdf-view.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0337ebe7dd8430c6ad10d1bcc243d9d4fc2c1ed4",
-          "size": 110472,
-          "sha256": "d075c72812113f99b00828d09253414926eb65bd7cdac7a5d2bca60a9268b319",
+          "blob": "44b62717c355e22227a237cafdb3447d62bccb61",
+          "size": 113834,
+          "sha256": "57dc1a7357a9f1d9b59ba6ca228315084b518df4571888fa301371c83e546af4",
           "kind": "source"
         },
         {
@@ -5491,7 +5491,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/E11-V工程即时施工协作图.jpg",
+          "path": "assets/E11-V\u5de5\u7a0b\u5373\u65f6\u65bd\u5de5\u534f\u4f5c\u56fe.jpg",
           "mode": "100644",
           "type": "blob",
           "blob": "6a38e27701455601b7b53c4c16078b3132778b7c",
@@ -7777,7 +7777,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/AI记忆.gif",
+          "path": "assets/iconset/VChatOfficial/AI\u8bb0\u5fc6.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "fc47ac99370ae8004f1fc1d756723d2c63011697",
@@ -7786,7 +7786,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/AI记忆.png",
+          "path": "assets/iconset/VChatOfficial/AI\u8bb0\u5fc6.png",
           "mode": "100644",
           "type": "blob",
           "blob": "c2146fc1dd9a6ee0e7ef17ce03086c5e7373c0f2",
@@ -7831,7 +7831,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/主题.gif",
+          "path": "assets/iconset/VChatOfficial/\u4e3b\u9898.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "a2ad64ccdd05df782d21a3a0aae426ed1be76b84",
@@ -7840,7 +7840,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/主题.png",
+          "path": "assets/iconset/VChatOfficial/\u4e3b\u9898.png",
           "mode": "100644",
           "type": "blob",
           "blob": "b901eab65f591136337a2ef4a40c1ff57f9feb25",
@@ -7849,7 +7849,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/人类笔记.gif",
+          "path": "assets/iconset/VChatOfficial/\u4eba\u7c7b\u7b14\u8bb0.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "ebba46b95c9d396409762635b9f32c7e0a79e5f1",
@@ -7858,7 +7858,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/人类笔记.png",
+          "path": "assets/iconset/VChatOfficial/\u4eba\u7c7b\u7b14\u8bb0.png",
           "mode": "100644",
           "type": "blob",
           "blob": "ecaa7f90247035f2768faa0d87f613a261a99ffb",
@@ -7867,7 +7867,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/信息流.gif",
+          "path": "assets/iconset/VChatOfficial/\u4fe1\u606f\u6d41.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "de3fb1411cc4768b39aa792e05a45805a6465f3b",
@@ -7876,7 +7876,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/信息流.png",
+          "path": "assets/iconset/VChatOfficial/\u4fe1\u606f\u6d41.png",
           "mode": "100644",
           "type": "blob",
           "blob": "0e0f4664c7189c980788febff978ed431517fcf6",
@@ -7885,7 +7885,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/协同.png",
+          "path": "assets/iconset/VChatOfficial/\u534f\u540c.png",
           "mode": "100644",
           "type": "blob",
           "blob": "054af328bb49c0c0498d41580c70c0ffe5bb0539",
@@ -7894,7 +7894,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/工具箱.gif",
+          "path": "assets/iconset/VChatOfficial/\u5de5\u5177\u7bb1.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "dba6be67e2eec1f6c020a99ac95d5416900eb92d",
@@ -7903,7 +7903,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/工具箱.png",
+          "path": "assets/iconset/VChatOfficial/\u5de5\u5177\u7bb1.png",
           "mode": "100644",
           "type": "blob",
           "blob": "3f9925f0d4c701d3e5ab1edb2b9c3dc4fc2b57a6",
@@ -7912,7 +7912,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/数据库.gif",
+          "path": "assets/iconset/VChatOfficial/\u6570\u636e\u5e93.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "a93f84dc3e89acd43755721483900398b0ec8948",
@@ -7921,7 +7921,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/数据库.png",
+          "path": "assets/iconset/VChatOfficial/\u6570\u636e\u5e93.png",
           "mode": "100644",
           "type": "blob",
           "blob": "57692d7f223376525491adac06f501b3bdad3409",
@@ -7930,7 +7930,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/翻译.png",
+          "path": "assets/iconset/VChatOfficial/\u7ffb\u8bd1.png",
           "mode": "100644",
           "type": "blob",
           "blob": "c9ebd35509335c24b4390c56597a45e6a5722185",
@@ -7939,7 +7939,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/论坛.gif",
+          "path": "assets/iconset/VChatOfficial/\u8bba\u575b.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "62e53cfe1d3d0b014c4db0324ebbd39f28751d17",
@@ -7948,7 +7948,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/论坛.png",
+          "path": "assets/iconset/VChatOfficial/\u8bba\u575b.png",
           "mode": "100644",
           "type": "blob",
           "blob": "5be134173a970823db27e4f83022e995993592d9",
@@ -7957,7 +7957,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/音乐.png",
+          "path": "assets/iconset/VChatOfficial/\u97f3\u4e50.png",
           "mode": "100644",
           "type": "blob",
           "blob": "3629637a191728366d11e364bc2b1d519e428fcd",
@@ -8362,7 +8362,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/春信.jpg",
+          "path": "assets/wallpaper/\u6625\u4fe1.jpg",
           "mode": "100644",
           "type": "blob",
           "blob": "03bfe414f595cd460a03dce5d4f05acb1e7ffca6",
@@ -8371,7 +8371,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/月影.jpg",
+          "path": "assets/wallpaper/\u6708\u5f71.jpg",
           "mode": "100644",
           "type": "blob",
           "blob": "10f6c16958d433c481a6fbbab79d58fd166cf332",
@@ -8380,7 +8380,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/樱夜倒影.png",
+          "path": "assets/wallpaper/\u6a31\u591c\u5012\u5f71.png",
           "mode": "100644",
           "type": "blob",
           "blob": "7da03d934b40531ac070ec182d18e7456fcaf092",
@@ -8389,7 +8389,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/绿影猫咪.png",
+          "path": "assets/wallpaper/\u7eff\u5f71\u732b\u54aa.png",
           "mode": "100644",
           "type": "blob",
           "blob": "c2f1ad9d43482d2da04a498d693d4557fae03798",
@@ -8398,7 +8398,7 @@
           "kind": "source"
         },
         {
-          "path": "audio_engine/IRPreset/ADX5000预设.wav",
+          "path": "audio_engine/IRPreset/ADX5000\u9884\u8bbe.wav",
           "mode": "100644",
           "type": "blob",
           "blob": "1e2b3d5b8cf343eefa4ba849b12626b5a12e6818",
@@ -8407,7 +8407,7 @@
           "kind": "source"
         },
         {
-          "path": "audio_engine/IRPreset/音频IR脉冲预设放在这.txt",
+          "path": "audio_engine/IRPreset/\u97f3\u9891IR\u8109\u51b2\u9884\u8bbe\u653e\u5728\u8fd9.txt",
           "mode": "100644",
           "type": "blob",
           "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
@@ -8461,7 +8461,7 @@
           "kind": "static-native"
         },
         {
-          "path": "audio_engine/audio_server_x86兼容版.exe",
+          "path": "audio_engine/audio_server_x86\u517c\u5bb9\u7248.exe",
           "mode": "100644",
           "type": "blob",
           "blob": "17890ccd866829d1af0c62774bb3d970ed63d79b",
@@ -11542,9 +11542,9 @@
           "path": "modules/scriptorium/pdfFiles/edit.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "96a333156b1165088f749a96fde4e059fe08bc5c",
-          "size": 13518,
-          "sha256": "9d1c427ff5e3a3bc21aecdc9fbfebc0573dd5cb79db09adff95757c6c5466858",
+          "blob": "755be7b8d6d393a29096edbe6720372f3803b664",
+          "size": 13714,
+          "sha256": "68476166d4407d19a730acdc4ce29cbd837fa7ca57f319fb458000afcfb63ba9",
           "kind": "source"
         },
         {
@@ -11569,9 +11569,9 @@
           "path": "modules/scriptorium/sheetFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f3a57a4d9959174b69bfc977d3c0e4b9977f6921",
-          "size": 13669,
-          "sha256": "07f443e2b6e5551bc040ac76000ecd76c5e06d8207669b324b55d7decddeee04",
+          "blob": "5a684772701c5d6d790425d40386b7a673240069",
+          "size": 13704,
+          "sha256": "4407f090dc0296ae03a5549b61b01261a8ef05e73fd3f57c526aaa8bd5d8d88a",
           "kind": "source"
         },
         {
@@ -14332,9 +14332,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "0eade2dc6d2a8baacf05fb93c208711da35a3384",
-          "size": 32979,
-          "sha256": "463e9e0c0544b2590ea8dff98c74259d53aac8275f11208315564f272e4d4aff",
+          "blob": "01b0e158c4763826cd8615b984f7fa9220d8dc00",
+          "size": 33022,
+          "sha256": "6d2863bc8d4169db50d5e7d19c53d9d44fe0c4ca24aff6762778b47016686b67",
           "kind": "source"
         },
         {
@@ -15502,9 +15502,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3f96166c08089d0e5ef2ddb7fb8227f4fc165b60",
-          "size": 50821,
-          "sha256": "236969a2ada900cab126e78d6fd5523e3c8abbbb1aaff8cd5c257ee6a5055496",
+          "blob": "0a1d103273be66ec85d938267604ca39a5c42318",
+          "size": 50991,
+          "sha256": "464d7db76a8675e6cc3f12bc6ebb74e9c5d68098f5e365dd765a9b1b41096568",
           "kind": "source"
         },
         {
@@ -16723,7 +16723,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes冰火魔歌.css",
+          "path": "styles/themes/themes\u51b0\u706b\u9b54\u6b4c.css",
           "mode": "100644",
           "type": "blob",
           "blob": "0844c22b4ea6cf0c4530283e5e3e5c38b767854d",
@@ -16732,7 +16732,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes卡提西亚.css",
+          "path": "styles/themes/themes\u5361\u63d0\u897f\u4e9a.css",
           "mode": "100644",
           "type": "blob",
           "blob": "01b2ac289977927c38824882f3371157424900a1",
@@ -16741,7 +16741,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes夜樱猫语.css",
+          "path": "styles/themes/themes\u591c\u6a31\u732b\u8bed.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4a82db3d6776eef5f109e70ff44f86267cf5f074",
@@ -16750,7 +16750,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes星咏与狼嗥.css",
+          "path": "styles/themes/themes\u661f\u548f\u4e0e\u72fc\u55e5.css",
           "mode": "100644",
           "type": "blob",
           "blob": "03a678702c9c09fdb534f11ce0fc9c20250397cf",
@@ -16759,7 +16759,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes星渊雪境.css",
+          "path": "styles/themes/themes\u661f\u6e0a\u96ea\u5883.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e987a60adab5bb2b7543007cfe9230cbfaf0ca5e",
@@ -16768,7 +16768,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes月影春信.css",
+          "path": "styles/themes/themes\u6708\u5f71\u6625\u4fe1.css",
           "mode": "100644",
           "type": "blob",
           "blob": "338c727291ff198249f1428b0d261f236dd574c5",
@@ -16777,7 +16777,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes极简Aero.css",
+          "path": "styles/themes/themes\u6781\u7b80Aero.css",
           "mode": "100644",
           "type": "blob",
           "blob": "3b4fc059d395395f3125844201d9a8c0fbccd1bf",
@@ -16786,7 +16786,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes熊熊假日.css",
+          "path": "styles/themes/themes\u718a\u718a\u5047\u65e5.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e3bbe7d87b8d43778780dc5903bdbc94848f0051",
@@ -16795,7 +16795,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes瓷与锦.css",
+          "path": "styles/themes/themes\u74f7\u4e0e\u9526.css",
           "mode": "100644",
           "type": "blob",
           "blob": "a9a173bfd433e0b7de916779f680051f66487615",
@@ -16804,7 +16804,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes童趣梦境.css",
+          "path": "styles/themes/themes\u7ae5\u8da3\u68a6\u5883.css",
           "mode": "100644",
           "type": "blob",
           "blob": "69cb1521dcc8d3c76a3edb24d33da176b3020dcc",
@@ -16813,7 +16813,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes第一适格者.css",
+          "path": "styles/themes/themes\u7b2c\u4e00\u9002\u683c\u8005.css",
           "mode": "100644",
           "type": "blob",
           "blob": "af66c3e161590b6b25193707bf42d368187abc7c",
@@ -16822,7 +16822,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes纸墨与机芯.css",
+          "path": "styles/themes/themes\u7eb8\u58a8\u4e0e\u673a\u82af.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c49004e55b0e228e9e0d94ae4e119f82ccfebc48",
@@ -16831,7 +16831,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes绯红天穹.css",
+          "path": "styles/themes/themes\u7eef\u7ea2\u5929\u7a79.css",
           "mode": "100644",
           "type": "blob",
           "blob": "ab57cfcae201eb336fe22db7fdea859cc3ee9033",
@@ -16840,7 +16840,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes赤与白昼.css",
+          "path": "styles/themes/themes\u8d64\u4e0e\u767d\u663c.css",
           "mode": "100644",
           "type": "blob",
           "blob": "81d187914e217aa0adc6a0bfdc12aaed126f888f",
@@ -16849,7 +16849,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes酸性玄武.css",
+          "path": "styles/themes/themes\u9178\u6027\u7384\u6b66.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4deeee641c6ec5b664b1af44dcaa0a619a6e7fbf",
@@ -16858,7 +16858,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes雪境晨昏.css",
+          "path": "styles/themes/themes\u96ea\u5883\u6668\u660f.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4d9bd63f828a24511e97ed39c763c380f96d7ea0",
@@ -16867,7 +16867,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes霓虹咖啡.css",
+          "path": "styles/themes/themes\u9713\u8679\u5496\u5561.css",
           "mode": "100644",
           "type": "blob",
           "blob": "cb0c5f1c13a0bceb58fcf407def44ed278d14847",
@@ -16876,7 +16876,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes静谧森岭.css",
+          "path": "styles/themes/themes\u9759\u8c27\u68ee\u5cad.css",
           "mode": "100644",
           "type": "blob",
           "blob": "1c9c0af822e656f9a181a7dad3846eec61ea0b5a",
@@ -16885,7 +16885,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes黑曜与星火.css",
+          "path": "styles/themes/themes\u9ed1\u66dc\u4e0e\u661f\u706b.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
@@ -16894,7 +16894,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes黑白简约.css",
+          "path": "styles/themes/themes\u9ed1\u767d\u7b80\u7ea6.css",
           "mode": "100644",
           "type": "blob",
           "blob": "2c278bcf9aa6412649f4c41b5954bae5e34da53a",
@@ -18454,18 +18454,18 @@
           "path": "tests/scriptorium-file-safety.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "40fb97385311bdff6f01afe912e2aed014100ac3",
-          "size": 39781,
-          "sha256": "9ea2d6956bad4904767be8a3584c3c08fc4062cbe7f70b10b1f9e5d8c96daede",
+          "blob": "fb7354c605276e8f4ebde84da5a13f33539ba59e",
+          "size": 42133,
+          "sha256": "258a7bf9d964aa023baf9b52b332f8f1ea751acbe69d0599ed5fd191a45f0fc0",
           "kind": "source"
         },
         {
           "path": "tests/scriptorium-file-views-electron.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "52ff4e2494c116720ddadf5257ba73d7c9805f17",
-          "size": 30267,
-          "sha256": "68109d2b350c1d96ba98cd0ca71d21cdd226071fb5f712ab96e13c4ec4563ac7",
+          "blob": "8f41205c067ffa6bb9bd13dc9088bf8ba02ff4bf",
+          "size": 35900,
+          "sha256": "3d06ed499d471567f55ab6e46d3777c82c7bfba0d9142a78b7481d6657a4242e",
           "kind": "source"
         },
         {
@@ -18475,6 +18475,15 @@
           "blob": "56bbeccf69580562fb252c4f4b3ee7e862b963eb",
           "size": 6117,
           "sha256": "0ba58f2cef4b18a8c836425611a39584277fe42aca8219a9b2b814bf3ce2c815",
+          "kind": "source"
+        },
+        {
+          "path": "tests/scriptorium-pdf-form-raster.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "636b77ff51c4ec31c757e19cad2292ec16be14fc",
+          "size": 5453,
+          "sha256": "de322853353f5b61815c9350d301546d83a5c1041deb427ad6952d9d026f573e",
           "kind": "source"
         },
         {
@@ -24436,7 +24445,7 @@
           "format": "PE"
         },
         {
-          "path": "audio_engine/audio_server_x86兼容版.exe",
+          "path": "audio_engine/audio_server_x86\u517c\u5bb9\u7248.exe",
           "mode": "100644",
           "type": "blob",
           "blob": "17890ccd866829d1af0c62774bb3d970ed63d79b",
@@ -24574,20 +24583,20 @@
             "ScriptoriumModules/font-name-diagnostics.json",
             "ScriptoriumModules/founder-font-conversion-check.json",
             "ScriptoriumModules/founder-font-summary.json",
-            "assets/E1-Vchat主界面.jpg",
-            "assets/E10-浪潮语义寻址可视化悬浮窗.jpg",
-            "assets/E2-Vchat主界面.jpg",
-            "assets/E3-VCP桌面.jpg",
-            "assets/E4-音乐播放器.jpg",
-            "assets/E5-V文坊.jpg",
-            "assets/E6-终端与日志.jpg",
-            "assets/E7-划词小助手应用于Vscode编程解释和辅助生成代码.jpg",
-            "assets/E8-基于浪潮的语义级记忆关联可视化神经云图.jpg",
-            "assets/E9-Agent论坛与留言板系统.jpg",
+            "assets/E1-Vchat\u4e3b\u754c\u9762.jpg",
+            "assets/E10-\u6d6a\u6f6e\u8bed\u4e49\u5bfb\u5740\u53ef\u89c6\u5316\u60ac\u6d6e\u7a97.jpg",
+            "assets/E2-Vchat\u4e3b\u754c\u9762.jpg",
+            "assets/E3-VCP\u684c\u9762.jpg",
+            "assets/E4-\u97f3\u4e50\u64ad\u653e\u5668.jpg",
+            "assets/E5-V\u6587\u574a.jpg",
+            "assets/E6-\u7ec8\u7aef\u4e0e\u65e5\u5fd7.jpg",
+            "assets/E7-\u5212\u8bcd\u5c0f\u52a9\u624b\u5e94\u7528\u4e8eVscode\u7f16\u7a0b\u89e3\u91ca\u548c\u8f85\u52a9\u751f\u6210\u4ee3\u7801.jpg",
+            "assets/E8-\u57fa\u4e8e\u6d6a\u6f6e\u7684\u8bed\u4e49\u7ea7\u8bb0\u5fc6\u5173\u8054\u53ef\u89c6\u5316\u795e\u7ecf\u4e91\u56fe.jpg",
+            "assets/E9-Agent\u8bba\u575b\u4e0e\u7559\u8a00\u677f\u7cfb\u7edf.jpg",
             "audio_engine/.env",
             ".editorconfig",
             ".yarnrc.yml",
-            "assets/E1.5-Vchat前端应用群.jpg"
+            "assets/E1.5-Vchat\u524d\u7aef\u5e94\u7528\u7fa4.jpg"
           ],
           "ignore_components": [
             "node_modules",
@@ -25196,6 +25205,12 @@
           "files": [
             "tests/scriptorium-read-races.test.cjs",
             "tests/scriptorium-cdn-localization-electron.test.js"
+          ]
+        },
+        {
+          "name": "reviewed-pr86-native-form-raster",
+          "files": [
+            "tests/scriptorium-pdf-form-raster.test.cjs"
           ]
         }
       ],
@@ -28214,9 +28229,9 @@
           "path": "ScriptoriumModules/scriptorium-pdf-view.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0337ebe7dd8430c6ad10d1bcc243d9d4fc2c1ed4",
-          "size": 110472,
-          "sha256": "d075c72812113f99b00828d09253414926eb65bd7cdac7a5d2bca60a9268b319",
+          "blob": "44b62717c355e22227a237cafdb3447d62bccb61",
+          "size": 113834,
+          "sha256": "57dc1a7357a9f1d9b59ba6ca228315084b518df4571888fa301371c83e546af4",
           "kind": "source"
         },
         {
@@ -34271,9 +34286,9 @@
           "path": "modules/scriptorium/pdfFiles/edit.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "96a333156b1165088f749a96fde4e059fe08bc5c",
-          "size": 13518,
-          "sha256": "9d1c427ff5e3a3bc21aecdc9fbfebc0573dd5cb79db09adff95757c6c5466858",
+          "blob": "755be7b8d6d393a29096edbe6720372f3803b664",
+          "size": 13714,
+          "sha256": "68476166d4407d19a730acdc4ce29cbd837fa7ca57f319fb458000afcfb63ba9",
           "kind": "source"
         },
         {
@@ -34298,9 +34313,9 @@
           "path": "modules/scriptorium/sheetFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f3a57a4d9959174b69bfc977d3c0e4b9977f6921",
-          "size": 13669,
-          "sha256": "07f443e2b6e5551bc040ac76000ecd76c5e06d8207669b324b55d7decddeee04",
+          "blob": "5a684772701c5d6d790425d40386b7a673240069",
+          "size": 13704,
+          "sha256": "4407f090dc0296ae03a5549b61b01261a8ef05e73fd3f57c526aaa8bd5d8d88a",
           "kind": "source"
         },
         {
@@ -37034,9 +37049,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "0eade2dc6d2a8baacf05fb93c208711da35a3384",
-          "size": 32979,
-          "sha256": "463e9e0c0544b2590ea8dff98c74259d53aac8275f11208315564f272e4d4aff",
+          "blob": "01b0e158c4763826cd8615b984f7fa9220d8dc00",
+          "size": 33022,
+          "sha256": "6d2863bc8d4169db50d5e7d19c53d9d44fe0c4ca24aff6762778b47016686b67",
           "kind": "source"
         },
         {
@@ -37898,9 +37913,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "3f96166c08089d0e5ef2ddb7fb8227f4fc165b60",
-          "size": 50821,
-          "sha256": "236969a2ada900cab126e78d6fd5523e3c8abbbb1aaff8cd5c257ee6a5055496",
+          "blob": "0a1d103273be66ec85d938267604ca39a5c42318",
+          "size": 50991,
+          "sha256": "464d7db76a8675e6cc3f12bc6ebb74e9c5d68098f5e365dd765a9b1b41096568",
           "kind": "source"
         },
         {
@@ -39128,7 +39143,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes冰火魔歌.css",
+          "path": "styles/themes/themes\u51b0\u706b\u9b54\u6b4c.css",
           "mode": "100644",
           "type": "blob",
           "blob": "0844c22b4ea6cf0c4530283e5e3e5c38b767854d",
@@ -39137,7 +39152,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes卡提西亚.css",
+          "path": "styles/themes/themes\u5361\u63d0\u897f\u4e9a.css",
           "mode": "100644",
           "type": "blob",
           "blob": "01b2ac289977927c38824882f3371157424900a1",
@@ -39146,7 +39161,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes夜樱猫语.css",
+          "path": "styles/themes/themes\u591c\u6a31\u732b\u8bed.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4a82db3d6776eef5f109e70ff44f86267cf5f074",
@@ -39155,7 +39170,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes星咏与狼嗥.css",
+          "path": "styles/themes/themes\u661f\u548f\u4e0e\u72fc\u55e5.css",
           "mode": "100644",
           "type": "blob",
           "blob": "03a678702c9c09fdb534f11ce0fc9c20250397cf",
@@ -39164,7 +39179,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes星渊雪境.css",
+          "path": "styles/themes/themes\u661f\u6e0a\u96ea\u5883.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e987a60adab5bb2b7543007cfe9230cbfaf0ca5e",
@@ -39173,7 +39188,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes月影春信.css",
+          "path": "styles/themes/themes\u6708\u5f71\u6625\u4fe1.css",
           "mode": "100644",
           "type": "blob",
           "blob": "338c727291ff198249f1428b0d261f236dd574c5",
@@ -39182,7 +39197,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes极简Aero.css",
+          "path": "styles/themes/themes\u6781\u7b80Aero.css",
           "mode": "100644",
           "type": "blob",
           "blob": "3b4fc059d395395f3125844201d9a8c0fbccd1bf",
@@ -39191,7 +39206,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes熊熊假日.css",
+          "path": "styles/themes/themes\u718a\u718a\u5047\u65e5.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e3bbe7d87b8d43778780dc5903bdbc94848f0051",
@@ -39200,7 +39215,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes瓷与锦.css",
+          "path": "styles/themes/themes\u74f7\u4e0e\u9526.css",
           "mode": "100644",
           "type": "blob",
           "blob": "a9a173bfd433e0b7de916779f680051f66487615",
@@ -39209,7 +39224,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes童趣梦境.css",
+          "path": "styles/themes/themes\u7ae5\u8da3\u68a6\u5883.css",
           "mode": "100644",
           "type": "blob",
           "blob": "69cb1521dcc8d3c76a3edb24d33da176b3020dcc",
@@ -39218,7 +39233,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes第一适格者.css",
+          "path": "styles/themes/themes\u7b2c\u4e00\u9002\u683c\u8005.css",
           "mode": "100644",
           "type": "blob",
           "blob": "af66c3e161590b6b25193707bf42d368187abc7c",
@@ -39227,7 +39242,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes纸墨与机芯.css",
+          "path": "styles/themes/themes\u7eb8\u58a8\u4e0e\u673a\u82af.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c49004e55b0e228e9e0d94ae4e119f82ccfebc48",
@@ -39236,7 +39251,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes绯红天穹.css",
+          "path": "styles/themes/themes\u7eef\u7ea2\u5929\u7a79.css",
           "mode": "100644",
           "type": "blob",
           "blob": "ab57cfcae201eb336fe22db7fdea859cc3ee9033",
@@ -39245,7 +39260,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes赤与白昼.css",
+          "path": "styles/themes/themes\u8d64\u4e0e\u767d\u663c.css",
           "mode": "100644",
           "type": "blob",
           "blob": "81d187914e217aa0adc6a0bfdc12aaed126f888f",
@@ -39254,7 +39269,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes酸性玄武.css",
+          "path": "styles/themes/themes\u9178\u6027\u7384\u6b66.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4deeee641c6ec5b664b1af44dcaa0a619a6e7fbf",
@@ -39263,7 +39278,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes雪境晨昏.css",
+          "path": "styles/themes/themes\u96ea\u5883\u6668\u660f.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4d9bd63f828a24511e97ed39c763c380f96d7ea0",
@@ -39272,7 +39287,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes霓虹咖啡.css",
+          "path": "styles/themes/themes\u9713\u8679\u5496\u5561.css",
           "mode": "100644",
           "type": "blob",
           "blob": "cb0c5f1c13a0bceb58fcf407def44ed278d14847",
@@ -39281,7 +39296,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes静谧森岭.css",
+          "path": "styles/themes/themes\u9759\u8c27\u68ee\u5cad.css",
           "mode": "100644",
           "type": "blob",
           "blob": "1c9c0af822e656f9a181a7dad3846eec61ea0b5a",
@@ -39290,7 +39305,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes黑曜与星火.css",
+          "path": "styles/themes/themes\u9ed1\u66dc\u4e0e\u661f\u706b.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
@@ -39299,7 +39314,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes黑白简约.css",
+          "path": "styles/themes/themes\u9ed1\u767d\u7b80\u7ea6.css",
           "mode": "100644",
           "type": "blob",
           "blob": "2c278bcf9aa6412649f4c41b5954bae5e34da53a",
@@ -41597,18 +41612,18 @@
           "path": "tests/scriptorium-file-safety.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "40fb97385311bdff6f01afe912e2aed014100ac3",
-          "size": 39781,
-          "sha256": "9ea2d6956bad4904767be8a3584c3c08fc4062cbe7f70b10b1f9e5d8c96daede",
+          "blob": "fb7354c605276e8f4ebde84da5a13f33539ba59e",
+          "size": 42133,
+          "sha256": "258a7bf9d964aa023baf9b52b332f8f1ea751acbe69d0599ed5fd191a45f0fc0",
           "kind": "source"
         },
         {
           "path": "tests/scriptorium-file-views-electron.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "52ff4e2494c116720ddadf5257ba73d7c9805f17",
-          "size": 30267,
-          "sha256": "68109d2b350c1d96ba98cd0ca71d21cdd226071fb5f712ab96e13c4ec4563ac7",
+          "blob": "8f41205c067ffa6bb9bd13dc9088bf8ba02ff4bf",
+          "size": 35900,
+          "sha256": "3d06ed499d471567f55ab6e46d3777c82c7bfba0d9142a78b7481d6657a4242e",
           "kind": "source"
         },
         {
@@ -41618,6 +41633,15 @@
           "blob": "56bbeccf69580562fb252c4f4b3ee7e862b963eb",
           "size": 6117,
           "sha256": "0ba58f2cef4b18a8c836425611a39584277fe42aca8219a9b2b814bf3ce2c815",
+          "kind": "source"
+        },
+        {
+          "path": "tests/scriptorium-pdf-form-raster.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "636b77ff51c4ec31c757e19cad2292ec16be14fc",
+          "size": 5453,
+          "sha256": "de322853353f5b61815c9350d301546d83a5c1041deb427ad6952d9d026f573e",
           "kind": "source"
         },
         {
@@ -44321,7 +44345,7 @@
           "kind": "source"
         },
         {
-          "path": "启动Vchat.vbs",
+          "path": "\u542f\u52a8Vchat.vbs",
           "mode": "100644",
           "type": "blob",
           "blob": "3f74df291d21232542005ebea68c6e6d90121bcd",
@@ -44474,6 +44498,7 @@
             "tests/notification-change-audit.test.js",
             "tests/owned-preload-subscription.test.mjs",
             "tests/scriptorium-file-safety.test.cjs",
+            "tests/scriptorium-pdf-form-raster.test.cjs",
             "tests/scriptorium-read-races.test.cjs",
             "tests/stability-log.test.js",
             "tests/stream-consumer-registry.test.mjs",
@@ -45218,6 +45243,12 @@
             "tests/scriptorium-read-races.test.cjs",
             "tests/scriptorium-cdn-localization-electron.test.js"
           ]
+        },
+        {
+          "name": "reviewed-pr86-native-form-raster",
+          "files": [
+            "tests/scriptorium-pdf-form-raster.test.cjs"
+          ]
         }
       ],
       "source_context": {
@@ -45248,18 +45279,18 @@
     "VCPDistributedServer/Plugin/VCPEverything/.env",
     "VCPDistributedServer/Plugin/WaitingForUrReply/config.env",
     "VCPDistributedServer/config.env",
-    "assets/E1-Vchat主界面.jpg",
-    "assets/E10-浪潮语义寻址可视化悬浮窗.jpg",
-    "assets/E2-Vchat主界面.jpg",
-    "assets/E3-VCP桌面.jpg",
-    "assets/E4-音乐播放器.jpg",
-    "assets/E5-V文坊.jpg",
-    "assets/E6-终端与日志.jpg",
-    "assets/E7-划词小助手应用于Vscode编程解释和辅助生成代码.jpg",
-    "assets/E8-基于浪潮的语义级记忆关联可视化神经云图.jpg",
-    "assets/E9-Agent论坛与留言板系统.jpg",
+    "assets/E1-Vchat\u4e3b\u754c\u9762.jpg",
+    "assets/E10-\u6d6a\u6f6e\u8bed\u4e49\u5bfb\u5740\u53ef\u89c6\u5316\u60ac\u6d6e\u7a97.jpg",
+    "assets/E2-Vchat\u4e3b\u754c\u9762.jpg",
+    "assets/E3-VCP\u684c\u9762.jpg",
+    "assets/E4-\u97f3\u4e50\u64ad\u653e\u5668.jpg",
+    "assets/E5-V\u6587\u574a.jpg",
+    "assets/E6-\u7ec8\u7aef\u4e0e\u65e5\u5fd7.jpg",
+    "assets/E7-\u5212\u8bcd\u5c0f\u52a9\u624b\u5e94\u7528\u4e8eVscode\u7f16\u7a0b\u89e3\u91ca\u548c\u8f85\u52a9\u751f\u6210\u4ee3\u7801.jpg",
+    "assets/E8-\u57fa\u4e8e\u6d6a\u6f6e\u7684\u8bed\u4e49\u7ea7\u8bb0\u5fc6\u5173\u8054\u53ef\u89c6\u5316\u795e\u7ecf\u4e91\u56fe.jpg",
+    "assets/E9-Agent\u8bba\u575b\u4e0e\u7559\u8a00\u677f\u7cfb\u7edf.jpg",
     "audio_engine/.env",
-    "assets/E1.5-Vchat前端应用群.jpg"
+    "assets/E1.5-Vchat\u524d\u7aef\u5e94\u7528\u7fa4.jpg"
   ],
   "denied_blobs": [
     "04201831b3f850b195afbcd5225cc6bfc8d6eebb",

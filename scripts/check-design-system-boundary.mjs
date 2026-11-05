@@ -625,6 +625,8 @@ const allowedSourceDifferences = new Set([
 // Pin exact regular-file Git identities rather than exempting paths/directories.
 // Caller: merged PR #74. Consumer declaration: commit 42a285d3.
 const reviewedSourceBlobs = new Map([
+    // PR #86 sparse coordinates and native form-value raster regression.
+    ['tests/scriptorium-pdf-form-raster.test.cjs', '636b77ff51c4ec31c757e19cad2292ec16be14fc'],
     // PR #86 atomic saves: preserve existing rwx, create private owned temporaries.
     ['modules/scriptorium/webPages/index.js', '258a549761b160b29423e3a9726eebe33a369a29'],
     ['modules/scriptorium/markdownFiles/index.js', '3357a1cbc1fa45d4e2f35674bb98c9964190eff9'],
@@ -647,15 +649,15 @@ const reviewedSourceBlobs = new Map([
     // PR #86 Windows fixture: await observed saved scale; preserve the original assertion.
     ['tests/deskpet-controls.test.mjs', 'ea96efa72b9cdd669c3d6db50f6d23c5fd749dff'],
     // PR #86 PDF save follow-up: exact dialog target grant and serialized edits; no directory grant.
-    ['tests/scriptorium-file-views-electron.test.js', '52ff4e2494c116720ddadf5257ba73d7c9805f17'],
+    ['tests/scriptorium-file-views-electron.test.js', '8f41205c067ffa6bb9bd13dc9088bf8ba02ff4bf'],
     // PR #86 PDF save follow-up: exact dialog target grant and serialized edits; no directory grant.
     ['modules/scriptorium/pdfFiles/index.js', 'a70528212f05a361d63d369c450ea9c66ea97313'],
     // PR #86 verified review repairs: exact PDF sanitization, CSV and authorized image navigation.
-    ['modules/scriptorium/pdfFiles/edit.js', '96a333156b1165088f749a96fde4e059fe08bc5c'],
-    ['modules/scriptorium/sheetFiles/index.js', 'f3a57a4d9959174b69bfc977d3c0e4b9977f6921'],
+    ['modules/scriptorium/pdfFiles/edit.js', '755be7b8d6d393a29096edbe6720372f3803b664'],
+    ['modules/scriptorium/sheetFiles/index.js', '5a684772701c5d6d790425d40386b7a673240069'],
     ['modules/scriptorium/viewFiles/index.js', 'f4d44aff675e0a9a5f18e796e495062eaacf9441'],
-    ['ScriptoriumModules/scriptorium-pdf-view.js', '0337ebe7dd8430c6ad10d1bcc243d9d4fc2c1ed4'],
-    ['tests/scriptorium-file-safety.test.cjs', '40fb97385311bdff6f01afe912e2aed014100ac3'],
+    ['ScriptoriumModules/scriptorium-pdf-view.js', '44b62717c355e22227a237cafdb3447d62bccb61'],
+    ['tests/scriptorium-file-safety.test.cjs', 'fb7354c605276e8f4ebde84da5a13f33539ba59e'],
     ['.github/workflows/jso-agent-paired-candidate.yml', '38940cb06947455cc2a5f41b53a4cc314ae9c92c'],
     ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
     // PR #84: reviewed open-before-lookup plan panel, its topic adapter and

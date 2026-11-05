@@ -37,6 +37,18 @@ async function writeFixtures() {
     pdf.addPage([300, 400]).drawText('FIRST-PAGE-ONLY');
     pdf.addPage([300, 400]).drawText('SECOND-PAGE-ONLY');
     fs.writeFileSync(file('two.pdf'), await pdf.save());
+    const formPdf = await PDFDocument.create(), formPage = formPdf.addPage([300, 300]), form = formPdf.getForm();
+    formPage.drawText('MASKED-AREA', { x: 10, y: 275, size: 12 });
+    const visible = form.createTextField('visible'); visible.setText('ORIGINAL'); visible.addToPage(formPage, { x: 20, y: 185, width: 180, height: 30 }); visible.setFontSize(16);
+    const hidden = form.createTextField('masked'); hidden.setText('MASK-OLD'); hidden.addToPage(formPage, { x: 110, y: 260, width: 150, height: 25 }); hidden.setFontSize(12);
+    const check = form.createCheckBox('accept'); check.addToPage(formPage, { x: 20, y: 140, width: 20, height: 20 });
+    const choice = form.createDropdown('choice'); choice.addOptions(['one', 'two']); choice.select('one'); choice.addToPage(formPage, { x: 20, y: 85, width: 120, height: 25 });
+    const radio = form.createRadioGroup('radio'); radio.addOptionToPage('A', formPage, { x: 20, y: 35, width: 18, height: 18 }); radio.addOptionToPage('B', formPage, { x: 70, y: 35, width: 18, height: 18 }); radio.select('A');
+    fs.writeFileSync(file('form-redact.pdf'), await formPdf.save());
+    const ExcelJS = require('exceljs'), sparse = new ExcelJS.Workbook(), sparseSheet = sparse.addWorksheet('Sparse');
+    sparseSheet.getCell('A1').value = 'LEFT'; sparseSheet.getCell('D1').value = 'RIGHT'; sparseSheet.getCell('A2').value = 1;
+    sparseSheet.getCell('D2').value = { formula: 'A2+41', result: 42 }; sparseSheet.getCell('D3').value = { formula: 'A2+2' };
+    fs.writeFileSync(file('sparse.xlsx'), Buffer.from(await sparse.xlsx.writeBuffer()));
     if (process.platform !== 'win32') for (const [name, mode] of [['note.md', 0o600], ['plain.txt', 0o700], ['table.csv', 0o600], ['other-table.csv', 0o600], ['empty-tail.csv', 0o600], ['other-page.html', 0o600], ['two.pdf', 0o600]]) fs.chmodSync(file(name), mode);
 }
 
@@ -128,7 +140,7 @@ app.whenReady().then(async () => {
             height: 900,
             show: false,
             frame: false,
-            webPreferences: { preload: path.join(projectRoot, 'preloads', 'docx.js'), contextIsolation: true, nodeIntegration: false, sandbox: false },
+            webPreferences: { preload: path.join(projectRoot, 'preloads', 'docx.js'), contextIsolation: true, nodeIntegration: false, sandbox: false, offscreen: true },
         });
         windowRef.webContents.setAudioMuted(true);
         windowRef.webContents.on('console-message', (...args) => {
@@ -241,6 +253,20 @@ app.whenReady().then(async () => {
         if (process.platform !== 'win32') assert.equal(fs.statSync(file('empty-tail.csv')).mode & 0o777, 0o600);
         await open('table.csv');
         await until(`window.ScriptoriumTableView.doc()?.filePath === ${JSON.stringify(file('table.csv'))}`, '返回表格 A');
+
+        await open('sparse.xlsx');
+        await until(`window.ScriptoriumTableView.doc()?.filePath === ${JSON.stringify(file('sparse.xlsx'))}`, '稀疏 XLSX 打开');
+        assert.equal(await page('return window.ScriptoriumTableView._state().columns.length;'), 4);
+        assert.equal(await page('return window.ScriptoriumTableView._state().rows;'), 2, '无缓存结果的末行公式仍在');
+        assert.ok((await page('return window.ScriptoriumTableView.agent.text();')).includes('RIGHT'));
+        await page(`const cell = document.querySelector('.scriptorium-table-row[data-at="0"] .c[data-col="0"]');
+            cell.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+            const input = document.querySelector('.scriptorium-table-editor'); input.value = '2'; input.dispatchEvent(new Event('input', { bubbles: true })); return true;`);
+        await pressCtrl('s'); await until('!window.ScriptoriumTableView.doc().dirty', '稀疏表已保存');
+        const ExcelJS = require('exceljs'), savedSparse = new ExcelJS.Workbook(); await savedSparse.xlsx.load(fs.readFileSync(file('sparse.xlsx')));
+        assert.equal(savedSparse.getWorksheet('Sparse').getCell('D1').value, 'RIGHT');
+        assert.equal(savedSparse.getWorksheet('Sparse').getCell('D2').formula, 'A2+41'); assert.equal(savedSparse.getWorksheet('Sparse').getCell('D3').formula, 'A2+2');
+        await open('table.csv'); await until(`window.ScriptoriumTableView.doc()?.filePath === ${JSON.stringify(file('table.csv'))}`, '返回表格 A');
 
         let tableRead = holdTextRead('table.csv', { extra: true });
         try {
@@ -419,6 +445,32 @@ app.whenReady().then(async () => {
             }).join('\n');
             assert.ok(streams.includes(Buffer.from('RECOVERED-EDIT').toString('hex').toUpperCase()));
         } finally { dialog.showSaveDialog = previousSaveDialog; }
+
+        // 表单当前值先进入原生渲染；涂黑最后覆盖，且保存后的 JPEG 必须是该计划生成的图像。
+        await open('form-redact.pdf');
+        await until(`window.ScriptoriumPdfView.doc()?.filePath === ${JSON.stringify(file('form-redact.pdf'))}`, '表单 PDF 打开');
+        const originalFormRaster = await page(`const view = window.ScriptoriumPdfView;
+            view._do.add({ page: view._state().pages[0].id, type: 'redact', x: 0, y: 0, w: 300, h: 50, color: [0, 0, 0] });
+            return (await view._plan()).pages[0].image;`);
+        let editedFormRaster = originalFormRaster;
+        for (const [name, value] of [['visible', 'CURRENT-VALUE'], ['accept', true], ['choice', 'two'], ['radio', 'B']]) {
+            const next = await page(`const view = window.ScriptoriumPdfView; view._do.setField(${JSON.stringify(name)}, ${JSON.stringify(value)}); return (await view._plan()).pages[0].image;`);
+            assert.notEqual(next, editedFormRaster, `${name} 的当前值进入原生图像`);
+            editedFormRaster = next;
+        }
+        const maskedFormRaster = await page(`const view = window.ScriptoriumPdfView; view._do.setField('masked', 'MASK-NEW-SECRET'); return (await view._plan()).pages[0].image;`);
+        assert.equal(maskedFormRaster, editedFormRaster, '涂黑遮罩在表单渲染之后，覆盖区域的值不露出');
+        assert.equal(await page('return await window.ScriptoriumPdfView.save();'), true);
+        const finalForm = await PDFDocument.load(fs.readFileSync(file('form-redact.pdf')));
+        const { PDFRawStream, PDFName, decodePDFRawStream } = require('../vendor/pdf-lib/pdf-lib.min.js');
+        const jpeg = finalForm.context.enumerateIndirectObjects().map(([, object]) => object)
+            .find(object => object instanceof PDFRawStream && object.dict.get(PDFName.of('Filter'))?.toString() === '/DCTDecode');
+        assert.ok(jpeg); assert.deepEqual(Buffer.from(jpeg.getContents()), Buffer.from(maskedFormRaster.split(',')[1], 'base64'));
+        const finalStreams = finalForm.context.enumerateIndirectObjects().map(([, object]) => {
+            if (!(object instanceof PDFRawStream)) return object.toString();
+            try { return Buffer.from(decodePDFRawStream(object).decode()).toString('latin1'); } catch { return ''; }
+        }).join('\n');
+        assert.ok(!finalStreams.includes('MASK-NEW-SECRET') && !finalStreams.includes(Buffer.from('MASK-NEW-SECRET').toString('hex').toUpperCase()));
 
         assert.deepEqual(errors, [], '页面没有报错');
         console.log('Scriptorium file views Electron test passed');

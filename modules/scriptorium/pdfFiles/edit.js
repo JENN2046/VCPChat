@@ -94,7 +94,8 @@ async function apply(bytes, plan = {}, deps = {}) {
         }
         if (entry.rotate !== undefined) page.setRotation(degrees(((Number(entry.rotate) % 360) + 360) % 360));
         if (entry.blank && entry.image) {
-            const data = Buffer.from(String(entry.image).replace(/^data:image\/\w+;base64,/, ''), 'base64');
+            // pdf-lib's JPEG decoder reads the entire ArrayBuffer; pooled Buffer offsets are unsafe.
+            const data = new Uint8Array(Buffer.from(String(entry.image).replace(/^data:image\/\w+;base64,/, ''), 'base64'));
             const image = /^data:image\/jpe?g/i.test(entry.image) ? await doc.embedJpg(data) : await doc.embedPng(data);
             page.drawImage(image, { x: 0, y: 0, width: page.getWidth(), height: page.getHeight() });
         }
@@ -118,7 +119,7 @@ async function apply(bytes, plan = {}, deps = {}) {
         } else if (item.type === 'line') {
             page.drawLine({ start: { x: item.x1, y: item.y1 }, end: { x: item.x2, y: item.y2 }, thickness: Number(item.width) || 1.5, color: color(item.color), opacity: item.opacity ?? 1 });
         } else if (item.type === 'image') {
-            const data = Buffer.from(String(item.data || '').replace(/^data:image\/\w+;base64,/, ''), 'base64');
+            const data = new Uint8Array(Buffer.from(String(item.data || '').replace(/^data:image\/\w+;base64,/, ''), 'base64'));
             const image = /^data:image\/jpe?g/i.test(item.data || '') ? await doc.embedJpg(data) : await doc.embedPng(data);
             page.drawImage(image, { x: item.x, y: item.y, width: item.w, height: item.h, rotate, opacity: item.opacity ?? 1 });
         } else if (item.type === 'text') {
@@ -214,12 +215,11 @@ async function fieldsOf(bytes) {
         const widgets = field.acroField.getWidgets().map((widget) => {
             const rect = widget.getRectangle();
             const ref = widget.P?.();
+            const own = doc.context.getObjectRef?.(widget.dict);
             let page = ref ? pages.findIndex((item) => item.ref === ref) : -1;
-            if (page < 0) {
-                const own = doc.context.getObjectRef?.(widget.dict);
-                page = pages.findIndex((item) => (item.node.Annots()?.asArray?.() || []).some((annot) => annot === own));
-            }
-            return { page, x: rect.x, y: rect.y, w: rect.width, h: rect.height };
+            if (page < 0) page = pages.findIndex((item) => (item.node.Annots()?.asArray?.() || []).some((annot) => annot === own));
+            const id = own ? `${own.objectNumber}R${own.generationNumber || ''}` : undefined;
+            return { page, id, x: rect.x, y: rect.y, w: rect.width, h: rect.height };
         }).filter((widget) => widget.page >= 0);
         if (widgets.length) out.push({ name: field.getName(), type, value, options, widgets, readOnly: field.isReadOnly() });
     }

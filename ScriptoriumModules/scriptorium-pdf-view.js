@@ -1879,6 +1879,7 @@
     async function planOf(state, only = null) {
         const entries = only ? state.pages.filter((entry) => only.has(entry.id)) : state.pages;
         const plan = { pages: [], objects: [], sources: {}, fields: [] };
+        const formValues = { ...state.values };
         for (const [n, entry] of entries.entries()) {
             const all = state.objects.filter((item) => item.page === entry.id);
             const redacts = all.filter((item) => item.type === 'redact');
@@ -1887,7 +1888,7 @@
             if (redacts.length) {
                 const size = baseSize(state, entry);
                 flat = { id: entry.id, blank: { w: size.w, h: size.h }, rot: 0 };
-                plan.pages.push({ blank: flat.blank, rotate: 0, image: await rasterize(state, entry, redacts) });
+                plan.pages.push({ blank: flat.blank, rotate: 0, image: await rasterize(state, entry, redacts, formValues) });
             } else {
                 plan.pages.push(entry.blank ? { blank: entry.blank, rotate: entry.rot } : { src: entry.src, index: entry.index, rotate: entry.rot });
                 if (entry.src && entry.src !== 'main') plan.sources[entry.src] = state.sources[entry.src];
@@ -1929,29 +1930,74 @@
                 }
             }
         }
-        for (const [name, value] of Object.entries(state.values)) {
+        for (const [name, value] of Object.entries(formValues)) {
             if (value !== state.original[name]) plan.fields.push({ name, value });
         }
         if (state.stamps.pageNumbers || state.stamps.watermark) plan.stamps = { ...state.stamps };
         return plan;
     }
-    // 涂黑的页画成图片：2 倍（大约 144 dpi），涂黑的块画死在图上。
-    async function rasterize(state, entry, redacts) {
-        const scale = 2;
-        const size = baseSize(state, entry);
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.ceil(size.w * scale);
-        canvas.height = Math.ceil(size.h * scale);
-        const context = canvas.getContext('2d');
-        context.fillStyle = 'white';
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        if (!entry.blank) {
-            const proxy = proxyOf(state, entry);
-            await proxy.render({ canvasContext: context, canvas, viewport: proxy.getViewport({ scale, rotation: entry.rot }) }).promise;
-        }
-        context.fillStyle = 'black';
-        for (const item of redacts) context.fillRect(item.x * scale, item.y * scale, item.w * scale, item.h * scale);
-        return canvas.toDataURL('image/jpeg', 0.92);
+    // 同一 PDF 的原生 annotationStorage 是共享的：临时表单值的渲染串行，
+    // 每次完成/失败均恢复，避免两个导出计划互相混入值。
+    const rasterJobs = new WeakMap();
+    function queueRaster(doc, render) {
+        const previous = rasterJobs.get(doc) || Promise.resolve();
+        const job = previous.catch(() => {}).then(render);
+        rasterJobs.set(doc, job);
+        return job.finally(() => { if (rasterJobs.get(doc) === job) rasterJobs.delete(doc); });
+    }
+    // 涂黑的页画成图片：原生表单值先画进页面，再画遮罩（约 144 dpi）。
+    async function rasterize(state, entry, redacts, values = state.values) {
+        // Editable fields belong to the main document, never to an imported namesake.
+        const formValues = entry.src && entry.src !== 'main' ? {} : { ...values };
+        const doc = state.docs[entry.src || 'main'];
+        const render = async () => {
+            const scale = 2, size = baseSize(state, entry);
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.ceil(size.w * scale);
+            canvas.height = Math.ceil(size.h * scale);
+            const context = canvas.getContext('2d');
+            context.fillStyle = 'white';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            const restored = [];
+            const storage = entry.blank ? null : doc.annotationStorage;
+            try {
+                if (!entry.blank) {
+                    const proxy = proxyOf(state, entry), lib = await pdfjs();
+                    const annotations = await proxy.getAnnotations({ intent: 'display' });
+                    for (const annotation of annotations) {
+                        if (!Object.hasOwn(formValues, annotation.fieldName)) continue;
+                        const raw = formValues[annotation.fieldName];
+                        let value;
+                        if (annotation.fieldType === 'Tx') value = String(raw ?? '');
+                        else if (annotation.fieldType === 'Ch') value = Array.isArray(raw) ? [...raw] : String(raw ?? '');
+                        else if (annotation.checkBox) value = Boolean(raw);
+                        else if (annotation.radioButton) {
+                            // PDF.js 使用原生 appearance 名（可能是数字），界面使用导出选项名。
+                            const field = state.fields?.find(item => item.name === annotation.fieldName && item.type === 'radio');
+                            let index = field?.widgets.findIndex(widget => widget.id && widget.id === annotation.id) ?? -1;
+                            if (index < 0 && annotation.rect) index = field?.widgets.findIndex(widget => widget.page === entry.index
+                                && Math.abs(widget.x - annotation.rect[0]) < 0.01 && Math.abs(widget.y - annotation.rect[1]) < 0.01) ?? -1;
+                            value = raw === (index >= 0 ? field.options[index] : annotation.buttonValue);
+                        }
+                        else continue;
+                        const before = storage.getRawValue(annotation.id);
+                        restored.push([annotation.id, before]);
+                        const current = { ...before, value };
+                        delete current.formattedValue; // 旧的格式化显示值不应覆盖新填写值。
+                        storage.remove(annotation.id);
+                        storage.setValue(annotation.id, current);
+                    }
+                    await proxy.render({ canvasContext: context, canvas, viewport: proxy.getViewport({ scale, rotation: entry.rot }),
+                        annotationMode: lib.AnnotationMode.ENABLE_STORAGE }).promise;
+                }
+                context.fillStyle = 'black';
+                for (const item of redacts) context.fillRect(item.x * scale, item.y * scale, item.w * scale, item.h * scale);
+                return canvas.toDataURL('image/jpeg', 0.92);
+            } finally {
+                for (const [id, before] of restored) { storage.remove(id); if (before !== undefined) storage.setValue(id, before); }
+            }
+        };
+        return entry.blank ? render() : queueRaster(doc, render);
     }
     async function save({ saveAs = false, force = false } = {}) {
         if (!S || S.saving) return false;

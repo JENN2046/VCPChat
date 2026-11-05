@@ -585,3 +585,34 @@ test('atomic temporary names do not depend on a long valid destination basename'
     assert.equal(await fs.readFile(target, 'utf8'), 'new'); assert.equal((await fs.stat(target)).mode & 0o777, 0o600);
     assert.deepEqual(await fs.readdir(dir), [path.basename(target)]);
 });
+
+test('XLSX sparse coordinates retain distant values, formulas and formula-only final rows', async t => {
+    const dir = await temporary(t), file = path.join(dir, 'sparse.xlsx');
+    access.configure({ libraryRoots: () => [dir], recentFiles: async () => [] });
+    const ExcelJS = require('exceljs'), book = new ExcelJS.Workbook(), sheet = book.addWorksheet('Sparse');
+    sheet.getCell('A1').value = 'LEFT'; sheet.getCell('D1').value = 'RIGHT';
+    sheet.getCell('A2').value = 1; sheet.getCell('D2').value = { formula: 'A2+41', result: 42 };
+    sheet.getCell('D3').value = { formula: 'A2+2' };
+    await fs.writeFile(file, Buffer.from(await book.xlsx.writeBuffer()));
+    const opened = await sheets._act(null, { command: 'read', path: file }), data = opened.sheets[0];
+    assert.deepEqual(data.rows[0], ['LEFT', '', '', 'RIGHT']);
+    assert.equal(data.rows[1][3], '42'); assert.equal(data.formulas['1:3'], '=A2+41');
+    assert.equal(data.rows.length, 3); assert.equal(data.formulas['2:3'], '=A2+2'); assert.equal(data.truncated, false);
+    await sheets._act(null, { command: 'save', path: file, mtime: opened.mtime, changes: [{ sheet: 'Sparse', row: 1, col: 0, text: '2' }] });
+    const saved = (await sheets._act(null, { command: 'read', path: file })).sheets[0];
+    assert.equal(saved.rows[0][3], 'RIGHT'); assert.equal(saved.formulas['1:3'], '=A2+41'); assert.equal(saved.formulas['2:3'], '=A2+2');
+});
+
+test('XLSX sparse extent respects the 500-column boundary and marks overflow partial', async t => {
+    const dir = await temporary(t); access.configure({ libraryRoots: () => [dir], recentFiles: async () => [] });
+    const ExcelJS = require('exceljs');
+    for (const column of [500, 501]) {
+        const book = new ExcelJS.Workbook(), sheet = book.addWorksheet('Sparse');
+        sheet.getCell(1, 1).value = 'LEFT'; sheet.getCell(1, column).value = 'FAR';
+        const file = path.join(dir, `${column}.xlsx`); await fs.writeFile(file, Buffer.from(await book.xlsx.writeBuffer()));
+        const opened = await sheets._act(null, { command: 'read', path: file });
+        assert.equal(opened.sheets[0].rows[0].length, 500);
+        assert.equal(opened.sheets[0].truncated, column > 500); assert.equal(Boolean(opened.lockReason), column > 500);
+        if (column === 500) assert.equal(opened.sheets[0].rows[0][499], 'FAR');
+    }
+});

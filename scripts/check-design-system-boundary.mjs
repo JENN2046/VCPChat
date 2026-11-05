@@ -625,6 +625,8 @@ const allowedSourceDifferences = new Set([
 // Pin exact regular-file Git identities rather than exempting paths/directories.
 // Caller: merged PR #74. Consumer declaration: commit 42a285d3.
 const reviewedSourceBlobs = new Map([
+    // PR #86 Windows fixture: await observed saved scale; preserve the original assertion.
+    ['tests/deskpet-controls.test.mjs', 'ea96efa72b9cdd669c3d6db50f6d23c5fd749dff'],
     // PR #86 PDF save follow-up: exact dialog target grant and serialized edits; no directory grant.
     ['tests/scriptorium-file-views-electron.test.js', '6a6ebe4d85c2232a271977967b747e31d9ce12e9'],
     // PR #86 PDF save follow-up: exact dialog target grant and serialized edits; no directory grant.

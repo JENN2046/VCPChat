@@ -15988,9 +15988,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "129bcf9901e691011c2bb541c173ef4301ecbf2d",
+          "blob": "b81171894a47b28e07d504e8b09c27155ee469bf",
           "size": 33769,
-          "sha256": "4a1a565b8fda973a6abe66e52db4894cf94d6e72b4353e8518e4cad623cbb2b9",
+          "sha256": "4d3b082204369dbe19b89a307fdd1f9a829c85a7a053d883196ac9d5f74e18aa",
           "kind": "source"
         },
         {
@@ -38480,9 +38480,9 @@
           "path": "scripts/fixtures/window-package-resources.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "129bcf9901e691011c2bb541c173ef4301ecbf2d",
+          "blob": "b81171894a47b28e07d504e8b09c27155ee469bf",
           "size": 33769,
-          "sha256": "4a1a565b8fda973a6abe66e52db4894cf94d6e72b4353e8518e4cad623cbb2b9",
+          "sha256": "4d3b082204369dbe19b89a307fdd1f9a829c85a7a053d883196ac9d5f74e18aa",
           "kind": "source"
         },
         {

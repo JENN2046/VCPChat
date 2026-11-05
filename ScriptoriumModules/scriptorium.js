@@ -564,6 +564,15 @@
                 markdownFile: model.manifest.markdownFile || null,
             });
         },
+        acceptDiskVersion(fingerprint, owner) {
+            const status = documentPort.status();
+            if (!/^[a-f0-9]{64}$/.test(fingerprint || '') || !owner || status.saving || status.loading
+                || status.currentPath !== owner.filePath || status.generation !== owner.generation || status.revision !== owner.revision) return false;
+            return documentPort.updateDerived((model) => {
+                if (!model.manifest.markdownFile) return false;
+                model.manifest.markdownFile.diskFingerprint = fingerprint;
+            }, { reason: 'markdown-disk-accepted' });
+        },
         subscribe: (listener) => documentPort.subscribe('*', listener),
         // 文稿正文（Markdown 混合源码）；替换后重绘当前工作面，源码编辑器也从模型重新载入。
         source() {

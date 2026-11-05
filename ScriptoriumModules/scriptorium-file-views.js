@@ -329,7 +329,7 @@
         } else {
             restoreChrome();
         }
-        const key = current ? `${current.filePath || ''}|${current.kind}|${current.generation ?? ''}` : null;
+        const key = current ? `${current.filePath || ''}|${current.kind}|${current.generation ?? ''}|${current.markdownFile?.diskFingerprint || ''}` : null;
         if (key !== lastDocKey) {
             lastDocKey = key;
             // 换了文件：“篇章”面板先显示为空，PDF、表格随后写入自己的标题和列表。

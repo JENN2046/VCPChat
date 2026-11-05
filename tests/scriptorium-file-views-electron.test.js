@@ -24,6 +24,11 @@ async function writeFixtures() {
     fs.mkdirSync(path.join(library, 'img'), { recursive: true });
     fs.writeFileSync(file('note.md'), '# 标题\r\n\r\n正文第一段。\r\n\r\n![图](img/dot.png)\r\n');
     fs.writeFileSync(file('img/dot.png'), PNG);
+    fs.writeFileSync(file('reload.md'), 'ORIGINAL\n');
+    fs.mkdirSync(file('markdown-dest/img'), { recursive: true });
+    fs.writeFileSync(file('markdown-dest/img/dot.png'), PNG);
+    fs.writeFileSync(file('next.md'), 'OLD-DIRECTORY-LINK\n');
+    fs.writeFileSync(file('markdown-dest/next.md'), 'DESTINATION-LINK\n');
     fs.writeFileSync(file('plain.txt'), '第一行\n第二行\n');
     fs.writeFileSync(file('other.txt'), '另一个文件\n');
     fs.writeFileSync(file('table.csv'), '名称,数量\n甲,1\n乙,2\n');
@@ -165,6 +170,57 @@ app.whenReady().then(async () => {
         await untilFile('note.md', (bytes) => bytes.toString('utf8').includes('已修改'), 'Markdown 保存');
         const markdown = fs.readFileSync(file('note.md'), 'utf8');
         assert.equal(markdown.split('\r\n').length - 1, markdown.split('\n').length - 1, '保存后的 .md 仍全部使用 CRLF');
+
+        // A rejected native Markdown reload never acknowledges the external disk version.
+        await until(`!window.ScriptoriumFileSession.current()?.dirty && !window.ScriptoriumFileSession.current()?.saving`, 'Markdown 初次保存完成');
+        await open('reload.md');
+        await until(`window.ScriptoriumFileSession.current()?.filePath === ${JSON.stringify(file('reload.md'))}`, 'Markdown 竞态夹具打开');
+        await page(`return await window.scriptoriumAPI.markdownFile('watch-file', { path: null });`);
+        fs.writeFileSync(file('reload.md'), 'EXTERNAL\n');
+        const heldMarkdown = holdTextRead('reload.md', { extra: true });
+        try {
+            await page(`window.mdReloadDone = false; window.mdReloadResult = null; void window.ScriptoriumFileSession.openPath(${JSON.stringify(file('reload.md'))}).then(result => { window.mdReloadResult = result; window.mdReloadDone = true; }); return true;`);
+            await heldMarkdown.entered;
+            await page(`return window.ScriptoriumFileSession.replaceSource('LOCAL-EDIT\\n');`);
+            heldMarkdown.release(); await until('window.mdReloadDone', '拒绝迟到 Markdown 重载');
+            assert.equal(await page('return window.mdReloadResult;'), false);
+            assert.equal(await page('return window.ScriptoriumFileSession.source();'), 'LOCAL-EDIT\n');
+        } finally { heldMarkdown.restore(); }
+        await click('#save-btn');
+        await until(`document.getElementById('toast-region').textContent.includes('被别处修改过')`, 'Markdown 保存冲突仍被拒绝');
+        assert.equal(fs.readFileSync(file('reload.md'), 'utf8'), 'EXTERNAL\n');
+        assert.equal(await page('return window.ScriptoriumFileSession.current().dirty;'), true);
+        await until(`!document.querySelector('.scriptorium-md-banner').hidden`, 'Markdown 冲突选择');
+        await page(`document.querySelector('.scriptorium-md-banner .primary').click(); return true;`);
+        await untilFile('reload.md', bytes => bytes.toString() === 'LOCAL-EDIT\n', '显式保留我的修改');
+        await until(`!window.ScriptoriumFileSession.current().dirty && !window.ScriptoriumFileSession.current().saving`, '显式覆盖后干净状态');
+
+        // Save As updates current rendering, link navigation and history to the destination base.
+        await open('note.md');
+        await until(`window.ScriptoriumFileSession.current()?.filePath === ${JSON.stringify(file('note.md'))}`, '返回原 Markdown');
+        await page(`const s = window.ScriptoriumFileSession; return s.replaceSource(s.source() + '\\n[下一份](next.md)\\n');`);
+        {
+            const { dialog } = require('electron'), previous = dialog.showSaveDialog;
+            const destination = file('markdown-dest/note.md');
+            dialog.showSaveDialog = async () => ({ canceled: false, filePath: destination });
+            try {
+                await click('#save-as-btn');
+                await until(`window.ScriptoriumFileSession.current()?.filePath === ${JSON.stringify(destination)} && !window.ScriptoriumFileSession.current().saving`, 'Markdown 另存到新目录');
+            } finally { dialog.showSaveDialog = previous; }
+            assert.equal(await page('return window.ScriptoriumFileSession.current().markdownFile.dir;'), file('markdown-dest'));
+            assert.equal(await page('return window.ScriptoriumFileSession.current().markdownFile.root;'), file('markdown-dest'));
+            await until(`[...(document.getElementById('page-stream').shadowRoot?.querySelectorAll('img') || [])].some(img => img.src.endsWith('/markdown-dest/img/dot.png'))`, '另存后当前图片切换到新目录');
+            await pressCtrl('z'); await pressCtrl('y');
+            assert.equal(await page('return window.ScriptoriumFileSession.current().markdownFile.dir;'), file('markdown-dest'), '撤销/重做保留新目录');
+            await click('#save-btn');
+            await until(`!window.ScriptoriumFileSession.current().dirty && !window.ScriptoriumFileSession.current().saving`, '撤销重做后可再次保存');
+            await page(`const anchor = document.getElementById('page-stream').shadowRoot.querySelector('a[href="next.md"]'); if (!anchor) throw new Error('missing relative link'); anchor.dispatchEvent(new MouseEvent('click', { button: 0, ctrlKey: true, bubbles: true, composed: true })); return true;`);
+            await until(`window.ScriptoriumFileSession.current()?.filePath === ${JSON.stringify(file('markdown-dest/next.md'))}`, '相对链接在目标目录打开');
+            assert.equal(await page('return window.ScriptoriumFileSession.source();'), 'DESTINATION-LINK\n');
+            await open('markdown-dest/note.md');
+            await until(`window.ScriptoriumFileSession.current()?.filePath === ${JSON.stringify(destination)}`, '重开另存后的文件');
+            assert.equal(await page('return window.ScriptoriumFileSession.current().markdownFile.dir;'), file('markdown-dest'));
+        }
 
         // 文本：在文档区域的位置上打开；标题栏显示文件名；不支持另存为；Ctrl+S 保存回原文件。
         await open('plain.txt');

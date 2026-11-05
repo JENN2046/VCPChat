@@ -91,13 +91,14 @@
         }), 250);
         return true;
     }
-    let watched = '';
+    let watched = '', watchedFingerprint = '';
     UI.on('document', (doc) => {
         if (bar.dataset.kind) hideBar();
         const file = isMarkdown(doc) ? doc.filePath : '';
-        if (file === watched || samePath(file, watched)) return;
-        watched = file;
-        void api()?.markdownFile?.('watch-file', { path: file || null }).catch(() => {});
+        const fingerprint = doc?.markdownFile?.diskFingerprint || '';
+        if ((file === watched || samePath(file, watched)) && fingerprint === watchedFingerprint) return;
+        watched = file; watchedFingerprint = fingerprint;
+        void api()?.markdownFile?.('watch-file', { path: file || null, fingerprint }).catch(() => {});
     });
     api()?.onMarkdownEvent?.((event) => {
         const doc = current();
@@ -116,7 +117,12 @@
             ['使用文件中的版本', false, () => { hideBar(); void reload(doc.filePath, { discard: true }); }],
             ['保留我的修改', true, async () => {
                 hideBar();
-                await api()?.markdownFile?.('accept-disk', { path: doc.filePath }).catch(() => {});
+                const owner = current();
+                if (!samePath(owner?.filePath, doc.filePath) || owner.generation !== doc.generation) return;
+                const result = await api()?.markdownFile?.('accept-disk', { path: doc.filePath }).catch(() => null);
+                if (!result?.ok || !session()?.acceptDiskVersion?.(result.fingerprint, owner)) {
+                    UI.toast('文档或磁盘版本已变化，请重新核对后再保存。'); return;
+                }
                 document.getElementById('save-btn')?.click();
             }],
         ]);

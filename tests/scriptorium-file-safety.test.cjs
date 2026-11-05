@@ -645,3 +645,48 @@ test('webpage protocol refuses symlink escape to a case-only sibling but accepts
     assert.equal(await fs.readFile((await pages.resolveRequest(new URL('alias.js', granted.url).href)).file, 'utf8'), 'IN-ROOT');
     await assert.rejects(pages.grant(path.join(lower, 'escape.html')), /范围/);
 });
+
+test('Markdown rejected reads cannot acknowledge external content for saves or watchers', async t => {
+    const dir = await temporary(t), target = path.join(dir, 'note.md');
+    const markdown = require('../modules/scriptorium/markdownFiles'), JSZip = require('jszip');
+    const sender = { id: 9511, once() {}, send() {}, isDestroyed: () => false }, handlers = new Map();
+    markdown.register({ removeHandler() {}, handle(name, fn) { handlers.set(name, fn); } });
+    const event = { sender }, command = payload => handlers.get('scriptorium:markdown-file')(event, payload);
+    t.after(() => command({ command: 'watch-file', path: null }));
+    await fs.writeFile(target, 'ORIGINAL\n'); const loaded = await markdown.read(target, { sender });
+    const zip = await JSZip.loadAsync(Buffer.from(loaded.bytes));
+    const loadedFingerprint = require('crypto').createHash('sha256').update('ORIGINAL\n').digest('hex');
+    await command({ command: 'watch-file', path: target, fingerprint: loadedFingerprint });
+    await fs.writeFile(target, 'EXTERNAL\n'); await markdown.read(target, { sender }); // rejected by renderer ownership guard
+    const disk = await command({ command: 'accept-disk', path: target }); // not installed in the editor yet
+    assert.equal(disk.fingerprint, require('crypto').createHash('sha256').update('EXTERNAL\n').digest('hex'));
+    assert.equal((await command({ command: 'check-file', path: target })).state, 'changed');
+    zip.file('source/document.md', 'LOCAL-EDIT\n');
+    await assert.rejects(markdown.save(event, { filePath: target, bytes: await zip.generateAsync({ type: 'uint8array' }) }), /被别处修改过/);
+    assert.equal(await fs.readFile(target, 'utf8'), 'EXTERNAL\n');
+    const accepted = await markdown.read(target, { sender });
+    await markdown.save(event, { filePath: target, bytes: accepted.bytes }); // accepted version remains saveable
+    const missing = await JSZip.loadAsync(Buffer.from(accepted.bytes)), model = JSON.parse(await missing.file('manifest.json').async('string'));
+    delete model.manifest.markdownFile.diskFingerprint; missing.file('manifest.json', JSON.stringify(model));
+    await assert.rejects(markdown.save(event, { filePath: target, bytes: await missing.generateAsync({ type: 'uint8array' }) }), /被别处修改过/);
+    const io = require('fs-extra'), originalRead = io.readFile;
+    io.readFile = async (file, ...args) => { if (file === target) throw Object.assign(new Error('controlled read denied'), { code: 'EACCES' }); return originalRead(file, ...args); };
+    try { await assert.rejects(markdown.save(event, { filePath: target, bytes: accepted.bytes }), /controlled read denied/); }
+    finally { io.readFile = originalRead; }
+    assert.equal(await fs.readFile(target, 'utf8'), 'EXTERNAL\n');
+});
+
+test('Markdown Save As returns destination resource metadata and the saved disk version', async t => {
+    const dir = await temporary(t), a = path.join(dir, 'a'), b = path.join(dir, 'b'); await fs.mkdir(a); await fs.mkdir(b);
+    const target = path.join(b, 'note.md'), markdown = require('../modules/scriptorium/markdownFiles'), JSZip = require('jszip');
+    await fs.writeFile(path.join(a, 'note.md'), '# title\r\n![img](img.png)\r\n[link](other.md)\r\n');
+    const opened = await markdown.read(path.join(a, 'note.md'));
+    const result = await markdown.save(null, { filePath: opened.filePath, bytes: opened.bytes, saveAs: true }, { dialog: { showSaveDialog: async () => ({ filePath: target }) } });
+    assert.equal(result.markdownFile.dir, b); assert.equal(result.markdownFile.root, b);
+    assert.equal(result.markdownFile.lineEnding, 'crlf');
+    assert.equal(result.markdownFile.diskFingerprint, require('crypto').createHash('sha256').update(await fs.readFile(target)).digest('hex'));
+    const reopened = await markdown.read(target), model = JSON.parse(await (await JSZip.loadAsync(Buffer.from(reopened.bytes))).file('manifest.json').async('string'));
+    assert.deepEqual(result.markdownFile, model.manifest.markdownFile);
+    const canceled = await markdown.save(null, { filePath: opened.filePath, bytes: opened.bytes, saveAs: true }, { dialog: { showSaveDialog: async () => ({ canceled: true }) } });
+    assert.equal(canceled.canceled, true); assert.equal(canceled.markdownFile, undefined);
+});

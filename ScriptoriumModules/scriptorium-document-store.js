@@ -127,6 +127,11 @@
         function replaceDocument(documentModel, metadata = {}) {
             assertActive();
             const normalized = core.normalizeDocument(documentModel);
+            // Content history does not roll back the active file's disk version or resource base.
+            if (['history-undo', 'history-redo', 'lineage-restore'].includes(metadata.reason)
+                && metadata.filePath === state.currentPath && state.document?.manifest.markdownFile) {
+                normalized.manifest.markdownFile = { ...state.document.manifest.markdownFile };
+            }
             revokeResources();
             state.generation += 1;
             state.document = normalized;
@@ -217,6 +222,9 @@
             assertActive();
             if (metadata.filePath !== undefined) state.currentPath = metadata.filePath;
             if (metadata.name !== undefined) state.currentName = String(metadata.name);
+            if (metadata.markdownFile && state.document?.manifest.markdownFile) {
+                state.document.manifest.markdownFile = { ...state.document.manifest.markdownFile, ...metadata.markdownFile };
+            }
             const savedRevision = metadata.revision;
             if (savedRevision === undefined || savedRevision === state.revision) {
                 state.dirty = false;

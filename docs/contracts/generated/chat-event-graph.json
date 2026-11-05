@@ -31435,14 +31435,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 369,
+          "line": 367,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 369,
+          "line": 367,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:markdown-file'"
         }
@@ -31460,14 +31460,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 367,
+          "line": 365,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 367,
+          "line": 365,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:markdown-link'"
         },

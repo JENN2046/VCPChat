@@ -187,3 +187,58 @@ test('board: a late render-frame completion cannot change a replacement board ba
     f.frames.resolve(); await pending;
     assert.equal(f.current(), target); assert.equal(f.text(), 'B'); assert.equal(target.saved, 'B'); assert.equal(f.c.dirty, false);
 });
+
+function markdownSaveFixture() {
+    const response = deferred(), changes = [], render = [], activities = [];
+    const c = { console, Map, Object, Date, Set };
+    c.window = c; vm.createContext(c);
+    vm.runInContext(fs.readFileSync(path.join(__dirname, '../ScriptoriumModules/scriptorium-document-store.js'), 'utf8'), c);
+    const store = c.ScriptoriumDocumentStore.createDocumentStore({ core: { normalizeDocument: model => model, extensionForKind: () => '.vdocx', PROJECT_KINDS: {} } });
+    store.replaceDocument({ manifest: { id: 'note', title: 'note', scene: { kind: 'flow' }, markdownFile: { dir: '/a', root: '/a', diskFingerprint: '1'.repeat(64), encoding: 'utf-8' } }, source: 'INITIAL' }, { filePath: '/a/note.md', name: 'note.md' });
+    store.mutate(model => { model.source = 'SUBMITTED'; });
+    Object.assign(c, { documentPort: store, context: { historyPort: { finalize() {} }, renderPort: { invalidate: reason => render.push(reason) }, surfacePort: { mode: () => 'read', switchMode: async (...args) => activities.push(args) } },
+        containerModule: { pack: async () => [] }, persistencePort: { save: async payload => { changes.push(payload); return response.promise; } }, notificationPort: { show() {} }, adapter: () => ({}), renderRecent() {} });
+    vm.runInContext(functions('scriptorium-session.js', ['save']), c);
+    return { c, store, response, changes, render, activities };
+}
+test('Markdown Save As installs destination metadata without losing edits made while saving', async () => {
+    const f = markdownSaveFixture(), operation = f.c.save(true); await turn();
+    f.store.mutate(model => { model.source = 'LATER-EDIT'; });
+    f.response.resolve({ success: true, filePath: '/b/note.md', name: 'note.md', markdownFile: { dir: '/b', root: '/b', diskFingerprint: '2'.repeat(64) } });
+    assert.equal(await operation, true); assert.equal(f.store.document().source, 'LATER-EDIT'); assert.equal(f.store.status().dirty, true);
+    assert.equal(f.store.status().currentPath, '/b/note.md'); assert.equal(f.store.document().manifest.markdownFile.dir, '/b');
+    assert.equal(f.store.document().manifest.markdownFile.encoding, 'utf-8'); assert.equal(f.store.document().manifest.markdownFile.diskFingerprint, '2'.repeat(64));
+    assert.ok(f.render.includes('markdown-save-location')); assert.equal(f.activities[0][0], 'read', 'resource rerender retains the current view mode');
+    for (const outcome of [{ success: false, canceled: true }, { success: false, error: 'write failed' }]) {
+        const g = markdownSaveFixture(), pending = g.c.save(true); await turn(); g.response.resolve(outcome);
+        assert.equal(await pending, false); assert.equal(g.store.status().currentPath, '/a/note.md');
+        assert.equal(g.store.document().manifest.markdownFile.dir, '/a'); assert.equal(g.store.status().dirty, true); assert.equal(g.render.length, 0);
+    }
+});
+
+test('Markdown keep-mine acknowledgement is tied to its current file, generation and edit revision', () => {
+    const f = markdownSaveFixture(), source = fs.readFileSync(path.join(__dirname, '../ScriptoriumModules/scriptorium.js'), 'utf8');
+    let operation;
+    (function visit(node) {
+        if (!node || typeof node !== 'object') return;
+        if (node.type === 'ObjectMethod' && node.key.name === 'acceptDiskVersion') operation = source.slice(node.start, node.end);
+        for (const value of Object.values(node)) { if (Array.isArray(value)) value.forEach(visit); else if (value && typeof value === 'object') visit(value); }
+    })(parse(source));
+    assert.ok(operation); const controller = vm.runInContext(`({ ${operation} })`, f.c);
+    const owner = { ...f.store.status(), filePath: f.store.status().currentPath }, fingerprint = '3'.repeat(64);
+    for (const stale of [{ ...owner, filePath: '/other.md' }, { ...owner, generation: owner.generation - 1 }, { ...owner, revision: owner.revision - 1 }]) assert.equal(controller.acceptDiskVersion(fingerprint, stale), false);
+    assert.equal(controller.acceptDiskVersion('invalid', owner), false);
+    assert.equal(controller.acceptDiskVersion(fingerprint, owner), true); assert.equal(f.store.document().manifest.markdownFile.diskFingerprint, fingerprint);
+    assert.equal(f.store.status().revision, owner.revision); assert.equal(f.store.status().dirty, true);
+});
+
+
+test('Markdown history restoration keeps the current file version and rebased resource directory', () => {
+    const f = markdownSaveFixture();
+    f.store.markSaved({ filePath: '/b/note.md', markdownFile: { dir: '/b', root: '/b', diskFingerprint: '2'.repeat(64) } });
+    for (const reason of ['history-undo', 'history-redo', 'lineage-restore']) {
+        f.store.replaceDocument({ manifest: { id: 'note', title: 'note', scene: { kind: 'flow' }, markdownFile: { dir: '/a', root: '/a', diskFingerprint: '1'.repeat(64) } }, source: reason }, { filePath: '/b/note.md', name: 'note.md', dirty: true, reason });
+        assert.equal(f.store.document().source, reason); assert.equal(f.store.document().manifest.markdownFile.dir, '/b');
+        assert.equal(f.store.document().manifest.markdownFile.diskFingerprint, '2'.repeat(64)); assert.equal(f.store.status().dirty, true);
+    }
+});

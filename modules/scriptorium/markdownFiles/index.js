@@ -38,8 +38,8 @@ function documentCss() {
     return defaultCss;
 }
 
-// 每份文件最后一次读到或写下的内容指纹，按页面分开记录：保存前与磁盘比对，不同即为别处修改过。
-// 没有页面的调用（测试、转工程）使用全局记录。
+// 监视器只记录页面已接受或保存的版本；普通读取不更新。
+// 保存冲突直接比对当前工程携带的 diskFingerprint，不依赖其他读请求。
 const known = new Map();
 const seen = new Map(); // contents.id → Map(文件 → 指纹)
 const keyOf = (filePath) => (process.platform === 'win32' ? filePath.toLowerCase() : filePath);
@@ -86,7 +86,7 @@ async function rootOf(dir) {
     return dir;
 }
 
-async function pack(filePath, decoded, stat, checkpoints = '[]') {
+async function pack(filePath, decoded, stat, checkpoints = '[]', diskFingerprint) {
     const dir = path.dirname(filePath);
     const now = new Date().toISOString();
     const model = {
@@ -108,7 +108,7 @@ async function pack(filePath, decoded, stat, checkpoints = '[]') {
             programmableDependencies: [],
             scene: { kind: 'flow-document' },
             import: null,
-            markdownFile: { bom: decoded.bom, encoding: decoded.encoding, lineEnding: decoded.lineEnding, mixed: decoded.mixed, dir, root: await rootOf(dir) },
+            markdownFile: { bom: decoded.bom, encoding: decoded.encoding, lineEnding: decoded.lineEnding, mixed: decoded.mixed, dir, root: await rootOf(dir), diskFingerprint },
         },
         source: { format: 'markdown-hybrid', content: null, documentCss: null, lineEnding: 'lf', deckCss: '', slides: [] },
         checkpoints: null,
@@ -164,7 +164,6 @@ async function read(filePath, deps = {}) {
     if (stat.size > MAX_BYTES) throw new Error('Markdown 文件超过 20 MB，不原位打开；可以使用“导入”。');
     const bytes = await fs.readFile(resolved);
     const decoded = decode(bytes);
-    remember(deps.sender, keyOf(resolved), fingerprint(bytes));
     await deps.rememberRecentFile?.(resolved)?.catch?.(() => {});
     return {
         success: true,
@@ -172,7 +171,7 @@ async function read(filePath, deps = {}) {
         name: path.basename(resolved),
         kind: 'vdocx',
         markdownFile: true,
-        bytes: await pack(resolved, decoded, stat, await loadLineage(resolved, deps)),
+        bytes: await pack(resolved, decoded, stat, await loadLineage(resolved, deps), fingerprint(bytes)),
         size: stat.size,
         modifiedAt: stat.mtimeMs,
     };
@@ -220,9 +219,9 @@ async function save(event, payload = {}, deps = {}) {
     const bytes = encode(text, markdownFile || {});
     const key = keyOf(target);
     const sender = event?.sender;
-    if (!saveAs && seenBy(sender, key)) {
-        const onDisk = await fs.readFile(target).catch(() => null);
-        if (onDisk && fingerprint(onDisk) !== seenBy(sender, key)) {
+    if (!saveAs) {
+        const onDisk = await fs.readFile(target).catch((error) => { if (error.code === 'ENOENT') return null; throw error; });
+        if (onDisk && fingerprint(onDisk) !== markdownFile?.diskFingerprint) {
             notify(sender, { type: 'file-changed', path: target, fromSave: true });
             throw new Error('磁盘上的这份文件在打开后被别处修改过，未覆盖。请在页面顶部的提示中选择保留哪一边。');
         }
@@ -232,7 +231,8 @@ async function save(event, payload = {}, deps = {}) {
     await keepLineage(target, checkpoints, deps).catch(() => {});
     await deps.rememberRecentFile?.(target)?.catch?.(() => {});
     const stat = await fs.stat(target);
-    return { success: true, filePath: target, name: path.basename(target), size: stat.size, modifiedAt: stat.mtimeMs };
+    return { success: true, filePath: target, name: path.basename(target), size: stat.size, modifiedAt: stat.mtimeMs,
+        markdownFile: { ...markdownFile, dir: path.dirname(target), root: await rootOf(path.dirname(target)), diskFingerprint: fingerprint(bytes) } };
 }
 
 // 点击 .md 中的链接：网页、邮件交给系统；相对路径的 .md 和 .html / .htm 返回给页面在文坊中打开；
@@ -283,7 +283,7 @@ function slotOf(contents) {
 // 除 fs.watch 外，每 POLL_MS 检查一次修改时间和大小：文件夹改名、网络盘和 WSL 路径不发通知时仍能发现变化。
 // 页面重新获得焦点、重新可见时还会请求立即检查（check-file）。文件被删除只提示一次。
 const POLL_MS = 2000;
-function watchFile(contents, filePath) {
+function watchFile(contents, filePath, acceptedFingerprint) {
     const slot = slotOf(contents);
     slot.file?.close();
     slot.file = null;
@@ -294,7 +294,8 @@ function watchFile(contents, filePath) {
     let timer = 0;
     let missing = false;
     let stamp = '';
-    if (!seen.get(contents.id)?.has(key) && known.has(key)) remember(contents, key, known.get(key));
+    // Only a version installed in the editor may advance its watcher baseline.
+    if (/^[a-f0-9]{64}$/.test(acceptedFingerprint || '')) remember(contents, key, acceptedFingerprint);
     const stampOf = (stat) => (stat ? `${stat.mtimeMs}:${stat.size}` : 'missing');
     void fs.stat(target).then((stat) => { stamp = stampOf(stat); }).catch(() => { stamp = 'missing'; });
     const check = async () => {
@@ -307,7 +308,6 @@ function watchFile(contents, filePath) {
         }
         missing = false;
         const print = fingerprint(bytes);
-        if (!seenBy(contents, key)) remember(contents, key, print);
         if (print === seenBy(contents, key)) return { state: 'same' };
         notify(contents, { type: 'file-changed', path: target });
         return { state: 'changed' };
@@ -338,13 +338,11 @@ function watchFile(contents, filePath) {
     return { watching: true, notifications: Boolean(watcher) };
 }
 
-// “保留我的”：把磁盘上的当前版本视为已读，下次保存照常覆盖。
-async function acceptDisk(filePath, sender = null) {
+// “保留我的”：先返回当前磁盘版本，页面确认归属后随文档/监视器接受。
+async function acceptDisk(filePath) {
     const target = path.resolve(String(filePath || ''));
     const bytes = await fs.readFile(target).catch(() => null);
-    if (bytes) remember(sender, keyOf(target), fingerprint(bytes));
-    else { known.delete(keyOf(target)); seen.get(sender?.id)?.delete(keyOf(target)); }
-    return { ok: true };
+    return { ok: true, fingerprint: bytes ? fingerprint(bytes) : null };
 }
 async function checkFile(contents, filePath) {
     const file = watches.get(contents.id)?.file;
@@ -355,8 +353,8 @@ async function checkFile(contents, filePath) {
 
 async function fileCommand(event, payload = {}, deps = {}) {
     switch (payload.command) {
-        case 'watch-file': return watchFile(event.sender, payload.path);
-        case 'accept-disk': return acceptDisk(payload.path, event.sender);
+        case 'watch-file': return watchFile(event.sender, payload.path, payload.fingerprint);
+        case 'accept-disk': return acceptDisk(payload.path);
         case 'check-file': return checkFile(event.sender, payload.path);
         default: throw new Error(`未知的 Markdown 文件命令：${payload.command}`);
     }

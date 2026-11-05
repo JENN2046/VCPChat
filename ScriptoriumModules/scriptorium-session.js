@@ -322,11 +322,17 @@
                     || !documentPort.isContextCurrent(operationContext)) {
                     return false;
                 }
+                const previousMarkdown = documentPort.document()?.manifest.markdownFile;
                 documentPort.markSaved({
                     filePath: result.filePath,
                     name: result.name,
                     revision: operationContext.revision,
+                    markdownFile: result.markdownFile,
                 });
+                if (result.markdownFile && (previousMarkdown?.dir !== result.markdownFile.dir || previousMarkdown?.root !== result.markdownFile.root)) {
+                    context.renderPort.invalidate('markdown-save-location');
+                    await context.surfacePort?.switchMode?.(context.surfacePort?.mode?.() || 'edit', { force: true });
+                }
                 notificationPort.show?.(
                     `已保存 · ${result.name}`,
                     'success'

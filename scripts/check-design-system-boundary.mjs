@@ -628,7 +628,7 @@ const reviewedSourceBlobs = new Map([
     // PR #86 sparse coordinates and native form-value raster regression.
     ['tests/scriptorium-pdf-form-raster.test.cjs', '636b77ff51c4ec31c757e19cad2292ec16be14fc'],
     // PR #86 atomic saves: preserve existing rwx, create private owned temporaries.
-    ['modules/scriptorium/webPages/index.js', '258a549761b160b29423e3a9726eebe33a369a29'],
+    ['modules/scriptorium/webPages/index.js', 'ca68b35149937ffaf54978c17beffbce972e49c1'],
     ['modules/scriptorium/markdownFiles/index.js', '3357a1cbc1fa45d4e2f35674bb98c9964190eff9'],
     ['modules/scriptorium/atomicReplace.js', '236c521a049420902eb415b9e09ab5e8f4ba20de'],
     ['modules/ipc/docxHandlers.js', 'b96186e688321546e9313e389a165077721ce155'],
@@ -657,7 +657,7 @@ const reviewedSourceBlobs = new Map([
     ['modules/scriptorium/sheetFiles/index.js', '5a684772701c5d6d790425d40386b7a673240069'],
     ['modules/scriptorium/viewFiles/index.js', 'f4d44aff675e0a9a5f18e796e495062eaacf9441'],
     ['ScriptoriumModules/scriptorium-pdf-view.js', '44b62717c355e22227a237cafdb3447d62bccb61'],
-    ['tests/scriptorium-file-safety.test.cjs', 'fb7354c605276e8f4ebde84da5a13f33539ba59e'],
+    ['tests/scriptorium-file-safety.test.cjs', '8fd665422fc23e8068aad5cc4a3e5a7e5fd60c9c'],
     ['.github/workflows/jso-agent-paired-candidate.yml', '38940cb06947455cc2a5f41b53a4cc314ae9c92c'],
     ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
     // PR #84: reviewed open-before-lookup plan panel, its topic adapter and

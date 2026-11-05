@@ -13740,7 +13740,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 258,
+          "line": 259,
           "kind": "event-listener"
         },
         {
@@ -13874,7 +13874,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 258,
+          "line": 259,
           "kind": "event-listener",
           "match": "sender.once('destroyed'"
         },
@@ -14070,7 +14070,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 171,
+          "line": 172,
           "kind": "event-listener"
         },
         {
@@ -14124,7 +14124,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 171,
+          "line": 172,
           "kind": "event-listener",
           "match": "contents.on('did-fail-load'"
         },
@@ -15837,7 +15837,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 245,
+          "line": 246,
           "kind": "event-listener"
         },
         {
@@ -16213,7 +16213,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 245,
+          "line": 246,
           "kind": "event-listener",
           "match": "watcher.on('error'"
         },
@@ -31485,14 +31485,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 272,
+          "line": 273,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 272,
+          "line": 273,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:page'"
         }
@@ -31522,7 +31522,7 @@
       "producers": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 236,
+          "line": 237,
           "kind": "event-send"
         }
       ],
@@ -31536,7 +31536,7 @@
       "evidence": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 236,
+          "line": 237,
           "kind": "event-send",
           "match": "sender.send('scriptorium:page-changed'"
         },
@@ -37849,7 +37849,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 157,
+          "line": 158,
           "kind": "event-listener"
         }
       ],
@@ -37862,7 +37862,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 157,
+          "line": 158,
           "kind": "event-listener",
           "match": "appApi.on('web-contents-created'"
         }
@@ -38284,14 +38284,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 161,
+          "line": 162,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 161,
+          "line": 162,
           "kind": "event-listener",
           "match": "contents.on('will-frame-navigate'"
         }

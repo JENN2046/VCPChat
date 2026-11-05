@@ -616,3 +616,32 @@ test('XLSX sparse extent respects the 500-column boundary and marks overflow par
         if (column === 500) assert.equal(opened.sheets[0].rows[0][499], 'FAR');
     }
 });
+
+test('webpage grants keep distinct canonical roots that differ only by case', async t => {
+    const dir = await temporary(t), lower = path.join(dir, 'site'), upper = path.join(dir, 'SITE');
+    await fs.mkdir(lower); await fs.mkdir(upper, { recursive: true });
+    if (await fs.realpath(lower) === await fs.realpath(upper)) { t.skip('filesystem has no distinct case-only directory names'); return; }
+    const pages = require('../modules/scriptorium/webPages');
+    await fs.writeFile(path.join(lower, 'index.html'), 'LOWER'); await fs.writeFile(path.join(upper, 'index.html'), 'UPPER');
+    const a = await pages.grant(path.join(lower, 'index.html')), b = await pages.grant(path.join(upper, 'index.html'));
+    assert.notEqual(new URL(a.url).host, new URL(b.url).host);
+    assert.equal(await fs.readFile((await pages.resolveRequest(a.url)).file, 'utf8'), 'LOWER');
+    assert.equal(await fs.readFile((await pages.resolveRequest(b.url)).file, 'utf8'), 'UPPER');
+    assert.equal((await pages.grant(path.join(lower, '.', 'index.html'))).url, a.url, 'same canonical root reuses its token');
+});
+
+test('webpage protocol refuses symlink escape to a case-only sibling but accepts in-root assets', async t => {
+    const dir = await temporary(t), lower = path.join(dir, 'site'), upper = path.join(dir, 'SITE');
+    await fs.mkdir(lower); await fs.mkdir(upper, { recursive: true });
+    if (await fs.realpath(lower) === await fs.realpath(upper)) { t.skip('filesystem has no distinct case-only directory names'); return; }
+    const pages = require('../modules/scriptorium/webPages');
+    await fs.writeFile(path.join(lower, 'index.html'), 'LOWER'); await fs.writeFile(path.join(lower, 'asset.js'), 'IN-ROOT');
+    await fs.writeFile(path.join(upper, 'private.js'), 'OUTSIDE');
+    await fs.symlink(path.join(upper, 'private.js'), path.join(lower, 'linked.js'));
+    await fs.symlink(path.join(lower, 'asset.js'), path.join(lower, 'alias.js'));
+    await fs.symlink(path.join(upper, 'private.js'), path.join(lower, 'escape.html'));
+    const granted = await pages.grant(path.join(lower, 'index.html'));
+    assert.equal(await pages.resolveRequest(new URL('linked.js', granted.url).href), null);
+    assert.equal(await fs.readFile((await pages.resolveRequest(new URL('alias.js', granted.url).href)).file, 'utf8'), 'IN-ROOT');
+    await assert.rejects(pages.grant(path.join(lower, 'escape.html')), /范围/);
+});

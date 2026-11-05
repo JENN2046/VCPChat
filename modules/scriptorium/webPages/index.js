@@ -52,7 +52,8 @@ const CSP = [
 ].join('; ');
 
 const handles = (file) => typeof file === 'string' && PAGE_EXTENSIONS.has(path.extname(file).toLowerCase());
-const key = (dir) => path.resolve(dir).toLowerCase();
+// Grant roots and real targets are canonical realpaths: retain their filesystem case.
+const key = (dir) => path.resolve(dir);
 const inside = (target, root) => {
     const t = key(target);
     const r = key(root);

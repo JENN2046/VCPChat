@@ -177,12 +177,14 @@
     }
     async function open(path) {
         if (!isText(path)) return false;
+        UI.invalidateReads?.();
+        const navigation = UI.navigationStamp?.();
         const request = ++opening;
         if (file && same(file.filePath, path)) return true;
         const previous = file;
         const revision = contentRevision;
         const result = await read(path);
-        if (request !== opening || file !== previous || contentRevision !== revision) return false;
+        if (request !== opening || navigation !== UI.navigationStamp?.() || file !== previous || contentRevision !== revision) return false;
         if (!result?.success) {
             UI.toast(`未能打开这个文件：${result?.error || '读取失败'}`, 'error', 5000);
             return false;
@@ -194,7 +196,7 @@
         enter();
         showFile(result);
         await applyLanguage(result.filePath);
-        if (file !== current || request !== opening) return false;
+        if (file !== current || request !== opening || navigation !== UI.navigationStamp?.()) return false;
         void api().view('watch', { file: result.filePath }).catch(() => {});
         UI.sync?.();
         refresh();
@@ -211,7 +213,7 @@
     }
 
     async function save({ force = false } = {}) {
-        if (!file || !editor) return false;
+        if (!file || !editor || file.saving) return false;
         if (!dirty() && !force) return true;
         const target = file;
         reloadSequence += 1; // 保存开始前的读结果不能覆盖刚保存的版本。
@@ -248,12 +250,13 @@
         const target = file;
         const request = ++reloadSequence;
         const openRequest = opening;
+        const navigation = UI.navigationStamp?.();
         const revision = contentRevision;
         const mtime = target.mtime;
         const result = await read(target.filePath);
         // 读取只对发起时的文件和编辑版本有效；迟到的成功和错误都不能影响新视图。
         if (file !== target || opening !== openRequest || request !== reloadSequence || target.saving
-            || target.mtime !== mtime || contentRevision !== revision) return false;
+            || target.mtime !== mtime || contentRevision !== revision || navigation !== UI.navigationStamp?.()) return false;
         if (!result?.success) {
             if (result) UI.toast(`未能重新读取：${result.error || ''}`, 'error', 5000);
             return false;
@@ -290,7 +293,8 @@
 
     UI.on('start', () => {
         session()?.subscribe?.((event) => {
-            if (file && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(leave, 0);
+            const target = file, request = opening;
+            if (target && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(() => { if (file === target && opening === request) leave(); }, 0);
         });
     });
 
@@ -305,7 +309,7 @@
         // 供 Agent 读取（scriptorium-file-agent.js）：当前内容（含未保存的修改）与截图范围。
         agent: Object.freeze({ text: () => editor?.getValue() ?? '', source: () => editor?.getValue() ?? '', surface: () => work }),
         doc: () => (file ? Object.freeze({ kind: 'text', filePath: file.filePath, name: file.name, generation: file.generation,
-            dirty: dirty(), saving: file.saving, readOnly: Boolean(file.readOnly), revision: 0 }) : null),
+            dirty: dirty(), saving: file.saving, readOnly: Boolean(file.readOnly), revision: contentRevision }) : null),
         _state: () => ({ file: file && { ...file }, dirty: dirty(), language: file ? Types.languageOf(file.filePath).name : '', mode: editor?.getOption('mode') ?? null }),
     });
     window.ScriptoriumTextView = view;

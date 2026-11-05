@@ -818,6 +818,8 @@
 
         sessionPort =
             window.ScriptoriumSession.createSessionController({
+                navigationStamp: () => window.ScriptoriumFileViews?.navigationStamp?.(),
+                invalidateNavigation: () => window.ScriptoriumFileViews?.invalidateReads?.(),
                 documentPort,
                 persistencePort,
                 containerModule,

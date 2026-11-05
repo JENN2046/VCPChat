@@ -42,6 +42,22 @@ async function until(expression, what, timeout = 20000) {
 }
 const open = (name) => page(`void window.ScriptoriumFileSession.openPath(${JSON.stringify(file(name))}); return true;`);
 
+function holdBoardRead(name) {
+    const original = fs.promises.readFile;
+    let release, started;
+    const gate = new Promise(resolve => { release = resolve; });
+    const entered = new Promise(resolve => { started = resolve; });
+    let armed = true;
+    const delayed = async function(target, ...args) {
+        const bytes = await original.call(this, target, ...args);
+        if (armed && typeof target === 'string' && path.resolve(target) === path.resolve(file(name))) { armed = false; started(); await gate; }
+        return bytes;
+    };
+    fs.promises.readFile = delayed;
+    return { entered, release, restore: () => { release(); if (fs.promises.readFile === delayed) fs.promises.readFile = original; } };
+}
+
+
 // 与 docxHandlers.requestAgentOperation 相同的通道：主进程发出请求，页面经 scriptorium.js 应答。
 let requestCount = 0;
 const answers = new Map();
@@ -63,6 +79,7 @@ app.whenReady().then(async () => {
     try {
         fs.mkdirSync(library, { recursive: true });
         fs.writeFileSync(file('plan.excalidraw'), EMPTY_BOARD);
+        fs.writeFileSync(file('other.excalidraw'), EMPTY_BOARD);
         fs.writeFileSync(file('notes.txt'), '第一行\n第二行\n');
         registerWindowIpc();
         require('../modules/ipc/docxHandlers').initialize({ mainWindow: null, openChildWindows: [], projectRoot, appDataRoot: dataRoot });
@@ -154,6 +171,32 @@ app.whenReady().then(async () => {
             assert.ok(saved.elements.some((element) => element.type === 'text' && element.originalText === '读取配置'));
             await until(`document.getElementById('save-state').textContent === '已保存'`, '白板已保存');
         }
+
+        let heldRead = holdBoardRead('plan.excalidraw');
+        try {
+            await page('window.boardReloadPending = window.ScriptoriumBoardView.reload(); return true;');
+            await heldRead.entered;
+            await open('other.excalidraw');
+            await until(`window.ScriptoriumBoardView.doc()?.filePath === ${JSON.stringify(file('other.excalidraw'))}`, '读取 A 时打开白板 B');
+            heldRead.release(); assert.equal(await page('return await window.boardReloadPending;'), false);
+            assert.equal((await agent('getBoard')).total, 0);
+        } finally { heldRead.restore(); }
+        assert.equal(await page('return await window.ScriptoriumBoardView.reload();'), true);
+        assert.equal(await page('return window.ScriptoriumBoardView.doc().dirty;'), false, '正常重载仍为已保存');
+        heldRead = holdBoardRead('other.excalidraw');
+        try {
+            await page('window.boardReloadPending = window.ScriptoriumBoardView.reload(); return true;');
+            await heldRead.entered;
+            const current = await agent('getBoard');
+            await agent('updateBoard', { expectedRevision: current.revision, add: [{ id: 'local-b', type: 'rectangle', x: 10, y: 10, label: { text: 'LOCAL-BOARD-B' } }] });
+            heldRead.release(); assert.equal(await page('return await window.boardReloadPending;'), false);
+            const kept = await agent('getBoard'); assert.equal(kept.total, 1); assert.equal(kept.elements[0].label, 'LOCAL-BOARD-B');
+            assert.equal(await page('return window.ScriptoriumBoardView.doc().dirty;'), true);
+            assert.equal(await page('return await window.ScriptoriumBoardView.save();'), true);
+            const savedB = JSON.parse(fs.readFileSync(file('other.excalidraw'), 'utf8'));
+            assert.ok(savedB.elements.some(element => element.id === 'local-b'));
+            assert.ok(!savedB.elements.some(element => element.id === 'a' || element.id === 'b'));
+        } finally { heldRead.restore(); }
 
         // 其他文件视图：Agent 读取当前文件，修改文稿的命令被拒绝。
         await open('notes.txt');

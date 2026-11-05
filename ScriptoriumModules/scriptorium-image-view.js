@@ -18,6 +18,8 @@
     const ZOOMS = [25, 50, 75, 100, 150, 200, 300, 400];
     let image = null; // { filePath, name, size, mtime, siblings, generation }
     let generation = 0;
+    let opening = 0;
+    let reloadSequence = 0;
     let zoom = 0; // 0 表示适合窗口
 
     const work = make('div', 'scriptorium-image-work');
@@ -104,8 +106,11 @@
     }
     async function open(file) {
         if (!isImage(file)) return false;
+        UI.invalidateReads?.();
+        const request = ++opening, navigation = UI.navigationStamp?.(), previous = image;
         if (image && same(image.filePath, file)) return true;
         const result = await info(file);
+        if (request !== opening || navigation !== UI.navigationStamp?.() || image !== previous) return false;
         if (!result?.success) {
             UI.toast(`未能打开这张图片：${result?.error || '读取失败'}`, 'error', 5000);
             return false;
@@ -115,6 +120,7 @@
         return true;
     }
     function leave() {
+        opening += 1;
         if (!image) return;
         image = null;
         document.body.classList.remove('scriptorium-image-mode');
@@ -125,7 +131,7 @@
     }
     function route(file) {
         if (isImage(file)) return open(file);
-        if (!image) return null;
+        if (!image) { leave(); return null; }
         const behind = session()?.current?.();
         leave();
         const stale = /\.(md|markdown)$/i.test(String(file)) && !behind?.dirty;
@@ -133,9 +139,13 @@
         return null;
     }
     async function reload() {
-        if (!image) return;
-        const result = await info(image.filePath);
-        if (image && result?.success) show(result);
+        if (!image) return false;
+        const target = image, request = ++reloadSequence, openRequest = opening, navigation = UI.navigationStamp?.();
+        const result = await info(target.filePath);
+        if (image !== target || request !== reloadSequence || openRequest !== opening || navigation !== UI.navigationStamp?.()) return false;
+        if (!result?.success) return false;
+        show(result);
+        return true;
     }
     api()?.onViewChanged?.((payload) => {
         if (image && same(payload?.file, image.filePath)) void reload();
@@ -146,6 +156,13 @@
         if (event.target?.closest?.('input, textarea, [contenteditable="true"], .CodeMirror')) return;
         if (event.key === 'ArrowLeft') step(-1);
         else if (event.key === 'ArrowRight') step(1);
+    });
+
+    UI.on('start', () => {
+        session()?.subscribe?.((event) => {
+            const target = image, request = opening;
+            if (target && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(() => { if (image === target && opening === request) leave(); }, 0);
+        });
     });
 
     const view = Object.freeze({

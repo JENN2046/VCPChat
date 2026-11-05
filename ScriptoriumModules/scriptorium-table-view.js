@@ -27,6 +27,9 @@
 
     let T = null; // { filePath, name, sheets, mtime, size, encoding, format, lockReason, generation, dirty, saving, revision, changes, past, undone }
     let generation = 0;
+    let opening = 0;
+    let reloadSequence = 0;
+    let contentRevision = 0;
     let sheetIndex = 0;
     let header = true;
     let sort = { col: -1, dir: 0 };
@@ -102,8 +105,11 @@
     }
     async function open(file) {
         if (!isSheet(file)) return false;
+        UI.invalidateReads?.();
+        const request = ++opening, navigation = UI.navigationStamp?.(), previous = T, revision = contentRevision;
         if (T && same(T.filePath, file)) return true;
         const result = await read(file);
+        if (request !== opening || navigation !== UI.navigationStamp?.() || T !== previous || contentRevision !== revision) return false;
         if (!result?.success) {
             UI.toast(`未能打开这个表格：${result?.error || '读取失败'}`, 'error', 5000);
             return false;
@@ -139,6 +145,7 @@
         if (T) remembered.set(norm(T.filePath), { sheet: sheetIndex, header, sort, scroll: scroller.scrollTop });
     }
     function leave() {
+        opening += 1;
         if (!T) return;
         finishEdit();
         remember();
@@ -153,7 +160,7 @@
     }
     function route(file) {
         if (isSheet(file)) return open(file);
-        if (!T) return null;
+        if (!T) { leave(); return null; }
         const behind = session()?.current?.();
         leave();
         const stale = /\.(md|markdown)$/i.test(String(file)) && !behind?.dirty;
@@ -161,15 +168,20 @@
         return null;
     }
     async function reload({ quiet = false, discard = false } = {}) {
-        if (!T || (T.dirty && !discard)) return;
-        const state = T;
+        if (!T || T.saving) return false;
+        finishEdit();
+        if (T.dirty && !discard) return false;
+        const state = T, revision = state.revision, draftRevision = contentRevision, mtime = state.mtime;
+        const request = ++reloadSequence, openRequest = opening, navigation = UI.navigationStamp?.();
         const result = await read(state.filePath);
-        if (T !== state) return;
+        if (T !== state || state.revision !== revision || contentRevision !== draftRevision || state.saving || state.mtime !== mtime
+            || request !== reloadSequence || openRequest !== opening || navigation !== UI.navigationStamp?.()) return false;
         if (!result?.success) {
             if (!quiet) UI.toast(`未能重新读取：${result?.error || ''}`, 'error', 5000);
-            return;
+            return false;
         }
         show(result, { sheet: sheetIndex, header, sort, scroll: scroller.scrollTop });
+        return true;
     }
     async function openWithDefault() {
         if (!T) return;
@@ -414,6 +426,7 @@
         if (!T) return;
         T.dirty = true;
         T.revision += 1;
+        contentRevision += 1;
         if (structure || sort.dir || query) {
             const keep = pick;
             rebuild({ scroll: scroller.scrollTop });
@@ -545,6 +558,7 @@
             leaveCell(0, event.shiftKey ? -1 : 1);
         }
     });
+    editor.addEventListener('input', () => { if (editing) { contentRevision += 1; UI.sync?.(); } });
     editor.addEventListener('blur', () => finishEdit());
     body.addEventListener('dblclick', (event) => {
         const cell = event.target.closest('.c');
@@ -697,9 +711,11 @@
     const savePayload = (state) => (state.format ? { rows: rowsToWrite(state), format: state.format } : { changes: [...state.changes.values()] });
     async function save({ force = false } = {}) {
         if (!T || !editable()) return true;
+        if (T.saving) return false;
         finishEdit();
         if (!T.dirty && !force) return true;
         const target = T;
+        reloadSequence += 1;
         const revision = target.revision;
         target.saving = true;
         UI.sync?.();
@@ -794,7 +810,8 @@
 
     UI.on('start', () => {
         session()?.subscribe?.((event) => {
-            if (T && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(leave, 0);
+            const target = T, request = opening;
+            if (target && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(() => { if (T === target && opening === request) leave(); }, 0);
         });
     });
 
@@ -805,6 +822,7 @@
         leave,
         save: () => save(),
         reload: () => reload({ discard: true }),
+        flush: () => finishEdit(),
         active: () => Boolean(T),
         // 供 Agent 读取：当前工作表的前 500 行（制表符分隔）与截图范围。
         agent: Object.freeze({

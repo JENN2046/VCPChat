@@ -63,6 +63,9 @@
     // objects：[{ id, page（页的 id）, type, x, y, w, h, ... }]，type：text、cover（改字）、image（签名、图片）、rect、mark、check、cross
     let S = null;
     let generation = 0;
+    let opening = 0;
+    let reloadSequence = 0;
+    let contentRevision = 0;
     let serial = 0;
     const uid = (prefix) => `${prefix}${Date.now().toString(36)}${(serial += 1).toString(36)}`;
     let zoom = 1;
@@ -93,6 +96,7 @@
     function amend(change) {
         if (!S || S.saving) return;
         change();
+        contentRevision += 1;
         S.stateId = uid('s');
         refresh();
     }
@@ -102,6 +106,7 @@
         if (S.history.length > 200) S.history.shift();
         S.future = [];
         change();
+        contentRevision += 1;
         S.stateId = uid('s');
         refresh();
     }
@@ -112,6 +117,7 @@
         const prev = S.history.pop();
         restore(prev.snap);
         S.stateId = prev.id;
+        contentRevision += 1;
         select(null);
         refresh();
     }
@@ -122,6 +128,7 @@
         const next = S.future.pop();
         restore(next.snap);
         S.stateId = next.id;
+        contentRevision += 1;
         select(null);
         refresh();
     }
@@ -275,8 +282,11 @@
     }
     async function open(file) {
         if (!isPdf(file)) return false;
+        UI.invalidateReads?.();
+        const request = ++opening, navigation = UI.navigationStamp?.(), previous = S, revision = contentRevision;
         if (S && same(S.filePath, file)) return true;
         const result = await read(file);
+        if (request !== opening || navigation !== UI.navigationStamp?.() || S !== previous || contentRevision !== revision) return false;
         if (!result?.success) {
             UI.toast(`未能打开这份 PDF：${result?.error || '读取失败'}`, 'error', 5000);
             return false;
@@ -288,6 +298,7 @@
             UI.toast(passwordProblem(error) || `无法解析这份 PDF：${error.message}`, 'error', 6000);
             return false;
         }
+        if (request !== opening || navigation !== UI.navigationStamp?.() || S !== previous || contentRevision !== revision) { destroy(next); return false; }
         if (S) destroy(S);
         S = next;
         enter();
@@ -320,6 +331,7 @@
         for (const doc of Object.values(state?.docs || {})) void doc?.destroy?.().catch(() => {});
     }
     function leave() {
+        opening += 1;
         if (!S) return;
         finishEditing(true);
         destroy(S);
@@ -335,7 +347,7 @@
     // 和网页一样：开别的东西时先离开 PDF；要开的正是藏在后面的那份文稿，直接露出来。
     function route(file) {
         if (isPdf(file)) return open(file);
-        if (!S) return null;
+        if (!S) { leave(); return null; }
         const behind = session()?.current?.();
         leave();
         const stale = /\.(md|markdown)$/i.test(String(file)) && !behind?.dirty;
@@ -614,6 +626,7 @@
         selection.removeAllRanges();
         selection.addRange(range);
         target.addEventListener('input', () => {
+            contentRevision += 1;
             if (item.type !== 'text') return;
             // 边打边长：宽高跟上（还没记进撤销）
             const probe = { ...item, text: target.innerText };
@@ -651,6 +664,7 @@
     // 新建后一个字没打就走了：当作没加过（也不留撤销记录）。
     function removeQuietly(id) {
         if (!S || S.saving) return;
+        contentRevision += 1;
         const index = S.history.length - 1;
         S.objects = S.objects.filter((item) => item.id !== id);
         if (index >= 0 && !S.history[index].snap.objects.some((item) => item.id === id)) {
@@ -927,6 +941,7 @@
                     input.addEventListener('change', () => setField(field.name, input.value));
                 }
                 if (!input) return;
+                input.addEventListener('input', () => { contentRevision += 1; });
                 input.className = `scriptorium-pdf-field ${field.type}`;
                 input.disabled = Boolean(field.readOnly);
                 input.setAttribute('aria-label', field.name);
@@ -1945,6 +1960,7 @@
         finishEditing(true);
         if (!saveAs && !dirty() && !force) return true;
         const state = S;
+        reloadSequence += 1;
         state.saving = true;
         work.inert = true;
         try {
@@ -1995,22 +2011,25 @@
     }
     async function reload({ discard = false, quiet = false, fromSave = false } = {}) {
         if (!S || (S.saving && !fromSave)) return false;
+        if (!S.saving) { document.activeElement?.blur?.(); finishEditing(true); }
         if (dirty() && !discard) return false;
-        const state = S;
+        const state = S, revision = contentRevision, mtime = state.mtime;
+        const request = ++reloadSequence, openRequest = opening, navigation = UI.navigationStamp?.();
+        const current = () => S === state && contentRevision === revision && state.mtime === mtime
+            && (!state.saving || fromSave) && request === reloadSequence && openRequest === opening && navigation === UI.navigationStamp?.();
         const result = await read(state.filePath);
-        if (S !== state) return false;
+        if (!current()) return false;
         if (!result?.success) {
             if (!quiet) UI.toast(`未能重新读取：${result?.error || ''}`, 'error', 5000);
             return false;
         }
         let next;
-        try {
-            next = await build(result);
-        } catch (error) {
-            UI.toast(passwordProblem(error) || `无法解析这份 PDF：${error.message}`, 'error', 6000);
+        try { next = await build(result); }
+        catch (error) {
+            if (current()) UI.toast(passwordProblem(error) || `无法解析这份 PDF：${error.message}`, 'error', 6000);
             return false;
         }
-        if (S !== state) { destroy(next); return false; }
+        if (!current()) { destroy(next); return false; }
         next.saved = state.saved;
         next.scroll = scroller.scrollTop;
         next.zoom = zoom;
@@ -2159,7 +2178,8 @@
     // ---------- 跟着文坊走 ----------
     UI.on('start', () => {
         session()?.subscribe?.((event) => {
-            if (S && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(leave, 0);
+            const target = S, request = opening;
+            if (target && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(() => { if (S === target && opening === request) leave(); }, 0);
         });
     });
 
@@ -2171,11 +2191,12 @@
         save: (options) => save(options),
         saveAs: true,
         reload: () => reload({ discard: true }),
+        flush: () => { if (S && !S.saving) { document.activeElement?.blur?.(); finishEditing(true); } },
         active: () => Boolean(S),
         // 供 Agent 读取：提取的文字（与“导出为 Markdown 初稿”相同）与截图范围。
         agent: Object.freeze({ text: async () => (await markdownOf(S)).text, surface: () => scroller }),
         doc: () => (S ? Object.freeze({ kind: 'pdf', filePath: S.filePath, name: S.name, generation: S.generation,
-            dirty: dirty(), saving: S.saving, revision: 0 }) : null),
+            dirty: dirty(), saving: S.saving, revision: contentRevision }) : null),
         // 测试用
         _state: () => (S ? { filePath: S.filePath, pages: S.pages.map((entry) => ({ ...entry })), objects: S.objects.map((item) => ({ ...item })),
             values: { ...S.values }, dirty: dirty(), zoom, tool, selected, cjk: S.cjk, history: S.history.length } : null),

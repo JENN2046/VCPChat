@@ -18,6 +18,9 @@
 
     let page = null; // { filePath, name, url, eol, bom, encoding, mtime, generation, saving, dark }
     let generation = 0;
+    let opening = 0;
+    let reloadSequence = 0;
+    let contentRevision = 0;
     let clean = 0; // CodeMirror 的 changeGeneration，用于判断是否有未保存的修改
     let editor = null;
     let loading = false; // 载入内容时不计为修改
@@ -129,6 +132,7 @@
             viewportMargin: 20,
         });
         editor.on('change', () => {
+            contentRevision += 1;
             if (loading || !page) return;
             UI.sync?.();
         });
@@ -204,6 +208,7 @@
 
     // ---------- 打开、离开 ----------
     function leave() {
+        opening += 1;
         if (!page) return;
         page = null;
         document.body.classList.remove('scriptorium-page-mode');
@@ -216,6 +221,8 @@
 
     async function open(file, { hash = '' } = {}) {
         if (!isPage(file)) return false;
+        UI.invalidateReads?.();
+        const request = ++opening, navigation = UI.navigationStamp?.(), previous = page, revision = contentRevision;
         if (page && same(page.filePath, file)) {
             if (hash) loadFrame(hash);
             return true;
@@ -226,6 +233,7 @@
         } catch (error) {
             result = { success: false, error: error.message };
         }
+        if (request !== opening || navigation !== UI.navigationStamp?.() || page !== previous || contentRevision !== revision) return false;
         if (!result?.success) {
             UI.toast(`未能打开这个网页：${result?.error || '读取失败'}`, 'error', 5000);
             return false;
@@ -247,7 +255,7 @@
     // 要打开的正是后面那份文档时直接露出，不重新读取；.md 例外，没有未保存的修改时照常重新读取，以取得外部修改。
     function route(file) {
         if (isPage(file)) return open(file);
-        if (!page) return null;
+        if (!page) { leave(); return null; }
         const behind = session()?.current?.();
         leave();
         const stale = /\.(md|markdown)$/i.test(String(file)) && !behind?.dirty;
@@ -257,9 +265,10 @@
 
     // ---------- 保存、重新载入、外部修改 ----------
     async function save({ force = false } = {}) {
-        if (!page || !editor) return false;
+        if (!page || !editor || page.saving) return false;
         if (!dirty() && !force) return true;
         const target = page;
+        reloadSequence += 1;
         const text = editor.getValue();
         const generationAtSave = editor.changeGeneration();
         target.saving = true;
@@ -290,22 +299,24 @@
         return true;
     }
     async function reload({ discard = false } = {}) {
-        if (!page || (dirty() && !discard)) return;
+        if (!page || !editor || page.saving || (dirty() && !discard)) return false;
+        const target = page, revision = contentRevision, mtime = target.mtime;
+        const request = ++reloadSequence, openRequest = opening, navigation = UI.navigationStamp?.();
         let result;
-        try {
-            result = await api().page('read', { file: page.filePath });
-        } catch (error) {
-            result = { success: false, error: error.message };
+        try { result = await api().page('read', { file: target.filePath }); }
+        catch (error) { result = { success: false, error: error.message }; }
+        if (page !== target || contentRevision !== revision || target.saving || target.mtime !== mtime
+            || request !== reloadSequence || openRequest !== opening || navigation !== UI.navigationStamp?.()) return false;
+        if (!result?.success) {
+            if (result) UI.toast(`未能重新读取：${result.error || ''}`, 'error', 5000);
+            return false;
         }
-        if (!page || !result?.success) {
-            if (result && !result.success) UI.toast(`未能重新读取：${result.error || ''}`, 'error', 5000);
-            return;
-        }
-        Object.assign(page, { mtime: result.mtime, eol: result.eol, bom: result.bom, encoding: result.encoding, url: result.url, dark: darkPage(result.text) });
+        Object.assign(target, { mtime: result.mtime, eol: result.eol, bom: result.bom, encoding: result.encoding, url: result.url, dark: darkPage(result.text) });
         conflict.hidden = true;
         setSource(result.text, { keepView: true });
         UI.sync?.();
         loadFrame();
+        return true;
     }
     function showConflict() {
         conflict.hidden = false;
@@ -344,7 +355,8 @@
     UI.on('start', () => {
         // 原有流程换了文稿（新建、导入、从首页打开）：离开网页，露出那份文稿。
         session()?.subscribe?.((event) => {
-            if (page && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(leave, 0);
+            const target = page, request = opening;
+            if (target && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(() => { if (page === target && opening === request) leave(); }, 0);
         });
     });
 
@@ -367,7 +379,7 @@
             surface: () => (mode === 'source' ? sourceHost : stage),
         }),
         doc: () => (page ? Object.freeze({ kind: 'web-page', filePath: page.filePath, name: page.name, generation: page.generation,
-            dirty: dirty(), saving: page.saving, revision: 0 }) : null),
+            dirty: dirty(), saving: page.saving, revision: contentRevision }) : null),
         _state: () => ({ page: page && { ...page }, dirty: dirty(), zoom, view: mode }),
     });
     window.ScriptoriumWebPage = view;

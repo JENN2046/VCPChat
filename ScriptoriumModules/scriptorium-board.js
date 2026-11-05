@@ -30,6 +30,10 @@
     let unmount = null;
     let file = null; // { filePath, name, mtime, generation, saving, saved }
     let generation = 0;
+    let opening = 0;
+    let reloadSequence = 0;
+    let contentRevision = 0;
+    let cancelMount = null;
     let dirty = false;
     let loading = false;
     let settleTimer = 0;
@@ -102,6 +106,7 @@
     }
     // 拖动时 onChange 持续触发，停下后才计为一次修改。
     function changed() {
+        if (file && scene && !loading) contentRevision += 1;
         clearTimeout(settleTimer);
         settleTimer = setTimeout(settle, 120);
     }
@@ -121,29 +126,38 @@
         event.preventDefault();
         void api().markdownOpenLink({ href: element.link, from: file?.filePath }).catch((error) => UI.toast(error.message, 'error', 4000));
     }
-    async function mount(data) {
+    async function mount(data, current, owns = current) {
         const restored = X.restore(data, null, null, { repairBindings: true });
         const libraryItems = await loadLibrary();
-        await new Promise((resolve) => {
-            unmount = X.mount(host, {
-                excalidrawAPI: (value) => { scene = value; resolve(); },
-                initialData: { elements: restored.elements, appState: { ...restored.appState, theme: themeOf(), collaborators: new Map() }, files: restored.files, libraryItems, scrollToContent: true },
-                langCode: 'zh-CN',
-                aiEnabled: false,
-                autoFocus: true,
-                handleKeyboardGlobally: false, // 快捷键只在画布中生效，不影响文坊其他位置
-                UIOptions: { canvasActions: { changeViewBackgroundColor: true, clearCanvas: true, export: false, loadScene: false, saveAsImage: false, saveToActiveFile: false, toggleTheme: false } },
-                onChange: changed,
-                onLibraryChange: libraryChanged,
-                onLinkOpen: openLink,
-            });
+        if (!current()) return false;
+        let finish;
+        const canceled = () => finish(false);
+        const ready = new Promise((resolve) => {
+            let settled = false;
+            finish = (ok) => { if (settled) return; settled = true; if (cancelMount === canceled) cancelMount = null; resolve(ok); };
         });
-        // 官方的初始载入是异步的，载入完成才算打开，否则紧接着的 Agent 修改会被覆盖。隐藏的窗口没有动画帧，用定时器等待。
-        for (let tries = 0; scene?.getAppState().isLoading && tries < 500; tries += 1) await new Promise((resolve) => setTimeout(resolve, 10));
-        // 打开时显示全貌：内容超出窗口时缩小，不放大。
-        if (restored.elements.length) scene?.scrollToContent(undefined, { fitToViewport: true, viewportZoomFactor: 0.9, maxZoom: 1, animate: false });
+        cancelMount = canceled;
+        unmount = X.mount(host, {
+            excalidrawAPI: (value) => { if (!current()) { finish(false); return; } scene = value; finish(true); },
+            initialData: { elements: restored.elements, appState: { ...restored.appState, theme: themeOf(), collaborators: new Map() }, files: restored.files, libraryItems, scrollToContent: true },
+            langCode: 'zh-CN', aiEnabled: false, autoFocus: true, handleKeyboardGlobally: false,
+            UIOptions: { canvasActions: { changeViewBackgroundColor: true, clearCanvas: true, export: false, loadScene: false, saveAsImage: false, saveToActiveFile: false, toggleTheme: false } },
+            onChange: () => { if (owns()) changed(); },
+            onLibraryChange: items => { if (owns()) libraryChanged(items); },
+            onLinkOpen: (element, event) => { if (owns()) openLink(element, event); else event.preventDefault(); },
+        });
+        if (!await ready || !current()) return false;
+        const mounted = scene;
+        for (let tries = 0; mounted?.getAppState().isLoading && tries < 500; tries += 1) {
+            await new Promise((resolve) => setTimeout(resolve, 10));
+            if (!current() || scene !== mounted) return false;
+        }
+        if (restored.elements.length) mounted?.scrollToContent(undefined, { fitToViewport: true, viewportZoomFactor: 0.9, maxZoom: 1, animate: false });
+        return true;
     }
     function unmountCanvas() {
+        cancelMount?.();
+        cancelMount = null;
         unmount?.();
         unmount = null;
         scene = null;
@@ -156,10 +170,13 @@
     }
 
     function leave() {
+        opening += 1;
         if (!file) return;
         clearTimeout(settleTimer);
         unmountCanvas();
         file = null;
+        loading = false;
+        work.inert = false;
         dirty = false;
         snapshots = [];
         document.body.classList.remove('scriptorium-board-mode');
@@ -177,37 +194,48 @@
     }
     async function open(path) {
         if (!isBoard(path)) return false;
-        if (file && same(file.filePath, path)) return true;
+        UI.invalidateReads?.();
+        if (loading) leave(); // 尚未就绪的旧画布必须在新打开意图前取消。
+        const request = ++opening, navigation = UI.navigationStamp?.(), previous = file, revision = contentRevision;
+        if (file && same(file.filePath, path) && !loading) return true;
+        const beforeInstall = () => request === opening && navigation === UI.navigationStamp?.() && file === previous && contentRevision === revision;
         const result = await readFile(path);
-        let data = null;
+        if (!beforeInstall()) return false;
+        let data;
         try {
             if (!result?.success) throw new Error(result?.error || '读取失败');
             data = parse(result.text);
             X = await loadVendor();
         } catch (error) {
-            UI.toast(`未能打开这个白板：${error.message}`, 'error', 5000);
+            if (beforeInstall()) UI.toast(`未能打开这个白板：${error.message}`, 'error', 5000);
             return false;
         }
-        if (file) {
-            clearTimeout(settleTimer);
-            unmountCanvas();
-        }
-        file = { filePath: result.filePath, name: result.name, mtime: result.mtime, generation: ++generation, saving: false, saved: '' };
+        if (!beforeInstall()) return false;
+        if (file) { clearTimeout(settleTimer); unmountCanvas(); }
+        const target = { filePath: result.filePath, name: result.name, mtime: result.mtime, generation: ++generation, saving: false, saved: '' };
+        file = target;
+        const current = () => file === target && request === opening && navigation === UI.navigationStamp?.();
         conflict.hidden = true;
         document.body.classList.add('scriptorium-board-mode');
         work.hidden = false;
+        work.inert = true;
         loading = true;
         UI.sync?.();
-        await mount(data);
-        loading = false;
-        baseline();
-        void api().view('watch', { file: result.filePath }).catch(() => {});
-        UI.sync?.();
-        return true;
+        try {
+            if (!await mount(data, current, () => file === target) || !current()) { if (file === target) leave(); return false; }
+            loading = false;
+            baseline();
+            void api().view('watch', { file: result.filePath }).catch(() => {});
+            UI.sync?.();
+            return true;
+        } catch (error) {
+            if (file === target) { leave(); UI.toast(`未能打开这个白板：${error.message}`, 'error', 5000); }
+            return false;
+        } finally { if (file === target) work.inert = false; }
     }
     function route(path) {
         if (isBoard(path)) return open(path);
-        if (!file) return null;
+        if (!file) { leave(); return null; }
         const behind = session()?.current?.();
         leave();
         const stale = /\.(md|markdown)$/i.test(String(path)) && !behind?.dirty;
@@ -216,10 +244,11 @@
     }
 
     async function save({ force = false } = {}) {
-        if (!file || !scene) return false;
+        if (!file || !scene || loading || file.saving) return false;
         settle();
         if (!dirty && !force) return true;
         const target = file;
+        reloadSequence += 1;
         const savedStamp = stamp();
         const text = serialize();
         target.saving = true;
@@ -255,30 +284,35 @@
         const added = Object.values(restored.files || {}).filter((item) => !known[item.id]);
         if (added.length) scene.addFiles(added);
         scene.updateScene({ elements: restored.elements, appState: { viewBackgroundColor: restored.appState.viewBackgroundColor }, captureUpdate: X.CaptureUpdateAction.NEVER });
+        return `${X.hashElementsVersion(X.getNonDeletedElements(restored.elements))}-${restored.appState.viewBackgroundColor ?? scene.getAppState().viewBackgroundColor}`;
     }
     async function reload({ discard = false } = {}) {
-        if (!file || !scene) return;
+        if (!file || !scene || loading || file.saving) return false;
         settle();
-        if (dirty && !discard) return;
-        const result = await readFile(file.filePath);
-        if (!file || !result?.success) {
-            if (result && !result.success) UI.toast(`未能重新读取：${result.error || ''}`, 'error', 5000);
-            return;
+        if (dirty && !discard) return false;
+        const target = file, canvas = scene, revision = contentRevision, version = stamp(), mtime = target.mtime;
+        const request = ++reloadSequence, openRequest = opening, navigation = UI.navigationStamp?.();
+        const current = () => file === target && scene === canvas && request === reloadSequence && openRequest === opening && navigation === UI.navigationStamp?.();
+        const result = await readFile(target.filePath);
+        if (!current() || contentRevision !== revision || stamp() !== version || target.saving || target.mtime !== mtime) return false;
+        if (!result?.success) {
+            if (result) UI.toast(`未能重新读取：${result.error || ''}`, 'error', 5000);
+            return false;
         }
         let data;
-        try {
-            data = parse(result.text);
-        } catch (error) {
-            UI.toast(`文件当前无法打开：${error.message}`, 'error', 5000);
-            return;
-        }
-        file.mtime = result.mtime;
+        try { data = parse(result.text); }
+        catch (error) { UI.toast(`文件当前无法打开：${error.message}`, 'error', 5000); return false; }
+        target.mtime = result.mtime;
         conflict.hidden = true;
-        applyToScene(data);
+        const saved = applyToScene(data);
         await nextFrames();
-        file.saved = remember();
-        dirty = false;
+        if (!current()) return false;
+        // 渲染帧之间的新修改保留为 dirty，不能把它们算进磁盘版本的基准。
+        target.saved = saved;
+        remember();
+        dirty = stamp() !== saved;
         UI.sync?.();
+        return true;
     }
     api()?.onViewChanged?.((payload) => {
         if (!file || !scene || !same(payload?.file, file.filePath) || Math.abs(Number(payload.mtime) - file.mtime) <= 1) return;
@@ -539,7 +573,8 @@
             && !element.groupIds?.length && !zones.some((zone) => zone.id !== element.id && within(element, zone))).map((element) => element.id);
     }
     async function update(payload = {}) {
-        if (!scene) throw new Error('白板尚未打开。');
+        if (!scene || loading) throw new Error('白板尚未打开。');
+        const target = file, canvas = scene, navigation = UI.navigationStamp?.();
         settle();
         const current = stamp();
         if (String(payload.expectedRevision ?? '') !== current) {
@@ -565,7 +600,7 @@
         // 官方按手写字体测量文字来折行；字体未载入时按备用字体测量，载入后文字变宽会顶到框边。
         const words = JSON.stringify([add, patches]).slice(0, 20000);
         await Promise.all(['Excalifont', 'Xiaolai'].map((family) => document.fonts.load(`20px "${family}"`, words).catch(() => null)));
-        if (stamp() !== current) throw new Error('白板刚刚发生变化，本次未修改。请用 GetBoard 重新读取后再提交。');
+        if (file !== target || scene !== canvas || navigation !== UI.navigationStamp?.() || stamp() !== current) throw new Error('白板刚刚发生变化，本次未修改。请用 GetBoard 重新读取后再提交。');
         const { created, bound, routed } = convert(fitCards(add, byId), byId);
         const gone = new Set(removals);
         for (const element of all) if (element.containerId && gone.has(element.containerId)) gone.add(element.id);
@@ -612,6 +647,7 @@
         // 空白板第一次写入内容时，与打开时一样显示全貌。
         if (wasEmpty && live().length) scene.scrollToContent(undefined, { fitToViewport: true, viewportZoomFactor: 0.9, maxZoom: 1, animate: false });
         await nextFrames();
+        if (file !== target || scene !== canvas || navigation !== UI.navigationStamp?.()) throw new Error('白板已切换，请重新读取。');
         settle();
         return { revision: stamp(), added: created.filter((element) => !element.containerId).map((element) => element.id),
             updated: [...patchOf.keys()], deleted: removals, saved: false, crowded: crowdedPairs(changedIds), loose: looseCards(newIds) };
@@ -658,7 +694,8 @@
     });
     UI.on('start', () => {
         session()?.subscribe?.((event) => {
-            if (file && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(leave, 0);
+            const target = file, request = opening;
+            if (target && event?.type === 'document-replaced' && !UI.replacedByLastOpen()) setTimeout(() => { if (file === target && opening === request) leave(); }, 0);
         });
     });
 
@@ -688,6 +725,7 @@
         create,
         save: () => save(),
         reload: () => reload({ discard: true }),
+        flush: () => settle(),
         active: () => Boolean(file),
         agent: Object.freeze({ text, surface: () => stage, picture, board: Object.freeze({ read, update }) }),
         // 画布载入完成才算打开。

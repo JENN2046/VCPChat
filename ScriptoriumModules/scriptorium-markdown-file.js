@@ -82,8 +82,14 @@
         const scrolled = ['read-host', 'render-host'].map((id) => document.getElementById(id)).filter(Boolean).map((node) => [node, node.scrollTop]);
         const opening = session()?.openPath?.(file);
         if (discard) await chooseDiscard();
-        await opening;
-        setTimeout(() => requestAnimationFrame(() => scrolled.forEach(([node, top]) => { node.scrollTop = top; })), 250);
+        if (!await opening || !samePath(current()?.filePath, file)) return false;
+        const owner = current();
+        setTimeout(() => requestAnimationFrame(() => {
+            const latest = current();
+            if (!samePath(latest?.filePath, file) || latest?.generation !== owner?.generation) return;
+            scrolled.forEach(([node, top]) => { node.scrollTop = top; });
+        }), 250);
+        return true;
     }
     let watched = '';
     UI.on('document', (doc) => {

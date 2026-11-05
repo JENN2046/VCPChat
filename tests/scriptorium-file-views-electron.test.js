@@ -27,7 +27,9 @@ async function writeFixtures() {
     fs.writeFileSync(file('plain.txt'), '第一行\n第二行\n');
     fs.writeFileSync(file('other.txt'), '另一个文件\n');
     fs.writeFileSync(file('table.csv'), '名称,数量\n甲,1\n乙,2\n');
+    fs.writeFileSync(file('other-table.csv'), 'OTHER,QTY\nB,9\n');
     fs.writeFileSync(file('page.html'), '<!doctype html><html><head><meta charset="utf-8"><title>网页</title></head><body><h1>网页正文</h1></body></html>');
+    fs.writeFileSync(file('other-page.html'), '<!doctype html><html><head><meta charset="utf-8"></head><body><h1>第二网页</h1></body></html>');
     fs.writeFileSync(file('dot.png'), PNG);
     const { PDFDocument } = require('../vendor/pdf-lib/pdf-lib.min.js');
     const pdf = await PDFDocument.create();
@@ -72,8 +74,9 @@ const title = () => page(`return document.getElementById('document-title').textC
 
 // Hold only one synthetic library read after its bytes are captured. Other
 // reads, including the next document, continue through the real main process.
-function holdTextRead(name) {
-    const original = fs.promises.readFile;
+function holdTextRead(name, { extra = false } = {}) {
+    const owner = extra ? require('fs-extra') : fs.promises;
+    const original = owner.readFile;
     let release, started;
     const gate = new Promise(resolve => { release = resolve; });
     const entered = new Promise(resolve => { started = resolve; });
@@ -85,11 +88,23 @@ function holdTextRead(name) {
         }
         return bytes;
     };
-    fs.promises.readFile = delayed;
-    return { entered, release, restore: () => { release(); if (fs.promises.readFile === delayed) fs.promises.readFile = original; } };
+    owner.readFile = delayed;
+    return { entered, release, restore: () => { release(); if (owner.readFile === delayed) owner.readFile = original; } };
 }
 
 const textEditor = `document.querySelector('.scriptorium-text-source .CodeMirror').CodeMirror`;
+
+const webEditor = `document.querySelector('.scriptorium-page-source .CodeMirror').CodeMirror`;
+async function untilHeading(expected) {
+    for (let tries = 0; tries < 100; tries++) {
+        const frame = windowRef.webContents.mainFrame.framesInSubtree.find(item => item.name === webPages.FRAME_NAME);
+        const heading = frame ? await frame.executeJavaScript("document.querySelector('h1')?.textContent || ''").catch(() => '') : '';
+        if (heading === expected) return;
+        await delay(100);
+    }
+    assert.fail(`网页预览未就绪：${expected}`);
+}
+
 
 app.whenReady().then(async () => {
     const errors = [];
@@ -202,6 +217,31 @@ app.whenReady().then(async () => {
         await until(`document.body.classList.contains('scriptorium-table-mode') && window.ScriptoriumTableView._state()?.rows === 2`, '表格打开');
         assert.equal(await page(`return document.querySelector('.outline-header h2').textContent;`), '工作表');
 
+        let tableRead = holdTextRead('table.csv', { extra: true });
+        try {
+            await page('window.tableReloadPending = window.ScriptoriumTableView.reload(); return true;');
+            await tableRead.entered;
+            await open('other-table.csv');
+            await until(`window.ScriptoriumTableView.doc()?.filePath === ${JSON.stringify(file('other-table.csv'))}`, '表格 B 打开');
+            const before = await page('return window.ScriptoriumTableView.agent.text();');
+            tableRead.release(); assert.equal(await page('return await window.tableReloadPending;'), false);
+            assert.equal(await page('return window.ScriptoriumTableView.agent.text();'), before);
+        } finally { tableRead.restore(); }
+        tableRead = holdTextRead('other-table.csv', { extra: true });
+        try {
+            await page('window.tableReloadPending = window.ScriptoriumTableView.reload(); return true;');
+            await tableRead.entered;
+            await page(`const cell = document.querySelector('.scriptorium-table-row[data-at="0"] .c[data-col="0"]');
+                cell.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+                const input = document.querySelector('.scriptorium-table-editor'); input.value = 'LOCAL-DRAFT';
+                input.dispatchEvent(new Event('input', { bubbles: true })); return true;`);
+            tableRead.release(); assert.equal(await page('return await window.tableReloadPending;'), false);
+            assert.equal(await page("return document.querySelector('.scriptorium-table-editor').value;"), 'LOCAL-DRAFT');
+            await pressCtrl('s');
+            await untilFile('other-table.csv', bytes => bytes.toString('utf8').includes('LOCAL-DRAFT,9'), '表格草稿正确保存');
+            await until('!window.ScriptoriumTableView.doc().dirty', '表格已保存');
+        } finally { tableRead.restore(); }
+
         // 网页：在 scriptorium-page:// 的框中原样显示；可切换到源码。
         await open('page.html');
         await until(`document.querySelector('.scriptorium-page-work:not([hidden]) iframe.scriptorium-page-frame')`, '网页打开');
@@ -221,6 +261,30 @@ app.whenReady().then(async () => {
         await until(`window.ScriptoriumFileSession && window.ScriptoriumWebPage`, '重新载入后网页视图可用');
         await open('page.html');
         await until(`document.querySelector('.scriptorium-page-work:not([hidden])')?.dataset.view === 'source'`, '重新载入后仍显示源码');
+
+        await untilHeading('网页正文');
+        let webRead = holdTextRead('page.html');
+        try {
+            await page('window.webReloadPending = window.ScriptoriumWebPage.reload(); return true;');
+            await webRead.entered;
+            await open('other-page.html');
+            await until(`window.ScriptoriumWebPage.doc()?.filePath === ${JSON.stringify(file('other-page.html'))}`, '网页 B 打开');
+            await untilHeading('第二网页');
+            const before = await page(`return { text: ${webEditor}.getValue(), frame: document.querySelector('.scriptorium-page-frame').src };`);
+            webRead.release(); assert.equal(await page('return await window.webReloadPending;'), false);
+            assert.deepEqual(await page(`return { text: ${webEditor}.getValue(), frame: document.querySelector('.scriptorium-page-frame').src };`), before);
+        } finally { webRead.restore(); }
+        webRead = holdTextRead('other-page.html');
+        try {
+            await page('window.webReloadPending = window.ScriptoriumWebPage.reload(); return true;');
+            await webRead.entered;
+            await page(`${webEditor}.replaceRange('<!-- LOCAL-HTML -->', { line: 0, ch: 0 }); return true;`);
+            webRead.release(); assert.equal(await page('return await window.webReloadPending;'), false);
+            assert.equal(await page('return window.ScriptoriumWebPage.doc().dirty;'), true);
+            await pressCtrl('s');
+            await untilFile('other-page.html', bytes => bytes.toString('utf8').startsWith('<!-- LOCAL-HTML -->') && !bytes.toString('utf8').includes('网页正文'), '网页 B 保存不含 A 内容');
+            await until('!window.ScriptoriumWebPage.doc().dirty', '网页已保存');
+        } finally { webRead.restore(); }
 
         // 图片
         await open('dot.png');

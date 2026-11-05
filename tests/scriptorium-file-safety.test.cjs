@@ -184,7 +184,7 @@ function saveFixture() {
         stateId: 'edited', savedId: 'original', filePath: '/synthetic/original.pdf', fingerprint: 'fingerprint', saving: false });
     let serial = 0, calls = 0;
     const original = model();
-    const c = { S: original, work: { inert: false }, document: { activeElement: { blur() {} } },
+    const c = { S: original, opening: 0, reloadSequence: 0, contentRevision: 0, work: { inert: false }, document: { activeElement: { blur() {} } },
         UI: { sync() {}, toast() {} }, scroller: { scrollTop: 0 }, zoom: 1,
         api: () => ({ pdf: async () => { calls++; return response.promise; } }),
         session: () => ({ openPath: () => opened.promise }), planOf: () => plan.promise,

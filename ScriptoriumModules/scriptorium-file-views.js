@@ -230,11 +230,19 @@
     // 选择保存则保存成功后通过，选择舍弃则视图立即离开（修改不保留），选择留在此处返回 false。
     UI.settle = async (path, message = '打开另一份文件前，可以保存当前修改，或舍弃这些修改。') => {
         const top = UI.overlay();
+        top?.flush?.();
         const current = top?.doc?.();
         if (!current?.dirty || (path && pathKey(path) === pathKey(current.filePath))) return true;
         const answer = await askUnsaved(current, message);
         if (answer === 'cancel') return false;
-        if (answer === 'save') return Boolean(await top.save?.());
+        const latest = top.doc?.();
+        if (UI.overlay() !== top || !latest || latest.filePath !== current.filePath
+            || latest.generation !== current.generation || latest.revision !== current.revision) return false;
+        if (answer === 'save') {
+            const saved = await top.save?.();
+            const after = top.doc?.();
+            return Boolean(saved && UI.overlay() === top && after?.filePath === current.filePath && !after.dirty);
+        }
         top.leave?.();
         return true;
     };
@@ -242,8 +250,12 @@
     // scriptorium.js 的 openPath、打开对话框、读取路径先问这里：由某个视图负责的文件交给它打开（上面显示着其他视图时先离开）；
     // 都不负责、但上面显示着视图时，让它先离开，返回 null 由原有流程打开。留在此处时返回 false。
     let routedDocument = '';
+    let navigationVersion = 0;
+    UI.navigationStamp = () => navigationVersion;
+    UI.invalidateReads = () => ++navigationVersion;
     UI.routeOverlay = async (path) => {
-        if (!await UI.settle(path)) return false;
+        const request = UI.invalidateReads();
+        if (!await UI.settle(path) || request !== navigationVersion) return false;
         const owner = UI.overlayFor(path);
         const top = UI.overlay();
         if (owner) {
@@ -332,8 +344,9 @@
     const LEAVING = new Set(['new-btn', 'new-deck-btn', 'open-btn', 'import-btn', 'close-btn']);
     const welcomeShown = () => $('welcome-state')?.hidden === false;
     async function goHome() {
+        const request = UI.invalidateReads();
         const top = UI.overlay();
-        if (!top || !await UI.settle(null, '回到首页前，可以保存当前修改，或舍弃这些修改。')) return;
+        if (!top || !await UI.settle(null, '回到首页前，可以保存当前修改，或舍弃这些修改。') || request !== navigationVersion) return;
         top.leave?.();
         // 视图是从首页打开的：离开后首页已经露出；否则由原有的“回到首页”处理后面的文档。
         if (session()?.current?.() && !welcomeShown()) $('home-btn')?.click();
@@ -355,7 +368,8 @@
             event.preventDefault();
             event.stopImmediatePropagation();
             const message = id === 'close-btn' ? '关闭 Scriptorium 前，可以保存当前修改。' : undefined;
-            void UI.settle(null, message).then((ok) => { if (ok) control.click(); });
+            const request = UI.navigationStamp();
+            void UI.settle(null, message).then((ok) => { if (ok && request === UI.navigationStamp()) control.click(); });
         }
     }
     // Ctrl+O、Ctrl+N 同样先询问；Ctrl+F 由有查找栏的视图（PDF、表格）处理，其余视图不让它去查找后面的文档。
@@ -374,8 +388,9 @@
         } else if ((key === 'o' || key === 'n') && top.doc?.()?.dirty) {
             event.preventDefault();
             event.stopImmediatePropagation();
+            const request = UI.navigationStamp();
             void UI.settle().then((ok) => {
-                if (ok) window.dispatchEvent(new KeyboardEvent('keydown', { key: event.key, ctrlKey: event.ctrlKey, metaKey: event.metaKey, bubbles: true, cancelable: true }));
+                if (ok && request === UI.navigationStamp()) window.dispatchEvent(new KeyboardEvent('keydown', { key: event.key, ctrlKey: event.ctrlKey, metaKey: event.metaKey, bubbles: true, cancelable: true }));
             });
         }
     }

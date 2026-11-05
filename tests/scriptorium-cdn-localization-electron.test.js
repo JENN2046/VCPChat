@@ -67,6 +67,8 @@ async function run() {
         show: false,
         frame: false,
         webPreferences: {
+            // 隐藏窗口仍需动画帧；保持原断言和超时，与白板测试一致。
+            offscreen: true,
             preload: path.join(projectRoot, 'preloads', 'docx.js'),
             contextIsolation: true,
             nodeIntegration: false,

@@ -156,8 +156,8 @@
     });
     const more = button('scriptorium-tb-drop', '', `导出${icon('i-chevron')}`, () => {
         UI.toggleMenu(more, () => [
-            { label: '导出选中的页', disabled: !S, act: () => void exportPages() },
-            { label: '拆分为多份', disabled: !S, act: () => void splitDialog() },
+            { label: '导出选中的页', hint: '仅页面内容；表单固定，书签/链接/批注/附件不导出', disabled: !S, act: () => void exportPages() },
+            { label: '拆分为多份', hint: '仅页面内容；表单固定，书签/链接/批注/附件不导出', disabled: !S, act: () => void splitDialog() },
             { sep: true },
             { label: '导出为 Markdown 初稿', disabled: !S, act: () => void exportMarkdown() },
         ]);
@@ -205,9 +205,9 @@
     document.getElementById('outline-panel')?.append(thumbs);
     const leftTools = {
         rotate: button('scriptorium-tb', '将选中的页面向右旋转', icon('i-reload'), () => rotatePages(1)),
-        remove: button('scriptorium-tb', '删除选中的页面', icon('i-trash'), () => removePages()),
+        remove: button('scriptorium-tb', '删除选中的页面（保存后表单固定，书签/链接/批注/附件移除）', icon('i-trash'), () => removePages()),
         blank: button('scriptorium-tb', '添加空白页', icon('i-plus'), () => addBlank()),
-        merge: button('scriptorium-tb', '合并其他 PDF', icon('i-attach'), () => void mergeFiles()),
+        merge: button('scriptorium-tb', '合并其他 PDF（保存后表单固定，书签/链接/批注/附件移除）', icon('i-attach'), () => void mergeFiles()),
         marks: button('scriptorium-tb-drop plain', '', '书签', () => setLeftList(leftList === 'marks' ? 'pages' : 'marks')),
     };
     // “篇章”面板中的书签（PDF 自带的目录）；没有书签的 PDF 不显示“书签”按钮。
@@ -1340,7 +1340,7 @@
         const label = numbers.length === 1 ? `第${numbers[0]}页` : `第${numbers[0]}-${numbers[numbers.length - 1]}页`;
         try {
             const result = await api().pdf('save', {
-                path: S.filePath, plan: await planOf(S, ids), fingerprint: S.fingerprint, saveAs: true,
+                path: S.filePath, plan: await planOf(S, ids), fingerprint: S.fingerprint, saveAs: true, pageSelectionOnly: true,
                 defaultPath: S.filePath.replace(/\.pdf$/i, ` ${label}.pdf`),
             });
             if (result?.success) UI.toast(`已导出：${result.filePath.split(/[\\/]/).pop()}`);

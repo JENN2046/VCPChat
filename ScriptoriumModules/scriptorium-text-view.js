@@ -17,6 +17,9 @@
 
     let file = null; // { filePath, name, eol, bom, encoding, mtime, generation, saving, readOnly }
     let generation = 0;
+    let opening = 0;
+    let reloadSequence = 0;
+    let contentRevision = 0;
     let clean = 0;
     let editor = null;
     let loading = false;
@@ -45,6 +48,7 @@
         editor = window.CodeMirror(host, { value: '', theme: 'material-darker', lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false,
             autoCloseBrackets: true, viewportMargin: 20 });
         editor.on('change', () => {
+            contentRevision += 1;
             if (loading || !file) return;
             UI.sync?.();
         });
@@ -155,6 +159,7 @@
         UI.sync?.();
     }
     function leave() {
+        opening += 1;
         if (!file) return;
         file = null;
         document.body.classList.remove('scriptorium-text-mode');
@@ -172,18 +177,24 @@
     }
     async function open(path) {
         if (!isText(path)) return false;
+        const request = ++opening;
         if (file && same(file.filePath, path)) return true;
+        const previous = file;
+        const revision = contentRevision;
         const result = await read(path);
+        if (request !== opening || file !== previous || contentRevision !== revision) return false;
         if (!result?.success) {
             UI.toast(`未能打开这个文件：${result?.error || '读取失败'}`, 'error', 5000);
             return false;
         }
         file = { filePath: result.filePath, name: result.name, eol: result.eol, bom: result.bom, encoding: result.encoding, mtime: result.mtime,
             generation: ++generation, saving: false };
+        const current = file;
         conflict.hidden = true;
         enter();
         showFile(result);
         await applyLanguage(result.filePath);
+        if (file !== current || request !== opening) return false;
         void api().view('watch', { file: result.filePath }).catch(() => {});
         UI.sync?.();
         refresh();
@@ -191,7 +202,7 @@
     }
     function route(path) {
         if (isText(path)) return open(path);
-        if (!file) return null;
+        if (!file) { leave(); return null; }
         const behind = session()?.current?.();
         leave();
         const stale = /\.(md|markdown)$/i.test(String(path)) && !behind?.dirty;
@@ -203,6 +214,7 @@
         if (!file || !editor) return false;
         if (!dirty() && !force) return true;
         const target = file;
+        reloadSequence += 1; // 保存开始前的读结果不能覆盖刚保存的版本。
         const text = editor.getValue();
         const generationAtSave = editor.changeGeneration();
         target.saving = true;
@@ -232,17 +244,26 @@
         return true;
     }
     async function reload({ discard = false } = {}) {
-        if (!file || (dirty() && !discard)) return;
-        const result = await read(file.filePath);
-        if (!file || !result?.success) {
-            if (result && !result.success) UI.toast(`未能重新读取：${result.error || ''}`, 'error', 5000);
-            return;
+        if (!file || !editor || file.saving || (dirty() && !discard)) return false;
+        const target = file;
+        const request = ++reloadSequence;
+        const openRequest = opening;
+        const revision = contentRevision;
+        const mtime = target.mtime;
+        const result = await read(target.filePath);
+        // 读取只对发起时的文件和编辑版本有效；迟到的成功和错误都不能影响新视图。
+        if (file !== target || opening !== openRequest || request !== reloadSequence || target.saving
+            || target.mtime !== mtime || contentRevision !== revision) return false;
+        if (!result?.success) {
+            if (result) UI.toast(`未能重新读取：${result.error || ''}`, 'error', 5000);
+            return false;
         }
-        Object.assign(file, { mtime: result.mtime, eol: result.eol, bom: result.bom, encoding: result.encoding });
+        Object.assign(target, { mtime: result.mtime, eol: result.eol, bom: result.bom, encoding: result.encoding });
         conflict.hidden = true;
-        if (file.readOnly || hasLongLine(result.text)) showFile(result);
+        if (target.readOnly || hasLongLine(result.text)) showFile(result);
         else setSource(result.text, { keepView: true });
         UI.sync?.();
+        return true;
     }
     api()?.onViewChanged?.((payload) => {
         if (!file || !same(payload?.file, file.filePath) || Math.abs(Number(payload.mtime) - file.mtime) <= 1) return;

@@ -31,8 +31,8 @@ async function writeFixtures() {
     fs.writeFileSync(file('dot.png'), PNG);
     const { PDFDocument } = require('../vendor/pdf-lib/pdf-lib.min.js');
     const pdf = await PDFDocument.create();
-    pdf.addPage([300, 400]);
-    pdf.addPage([300, 400]);
+    pdf.addPage([300, 400]).drawText('FIRST-PAGE-ONLY');
+    pdf.addPage([300, 400]).drawText('SECOND-PAGE-ONLY');
     fs.writeFileSync(file('two.pdf'), await pdf.save());
 }
 
@@ -69,6 +69,26 @@ const open = (name) => page(`void window.ScriptoriumFileSession.openPath(${JSON.
 const click = (selector) => page(`document.querySelector(${JSON.stringify(selector)}).click(); return true;`);
 const pressCtrl = (key) => page(`document.body.dispatchEvent(new KeyboardEvent('keydown', { key: ${JSON.stringify(key)}, ctrlKey: true, bubbles: true, cancelable: true })); return true;`);
 const title = () => page(`return document.getElementById('document-title').textContent;`);
+
+// Hold only one synthetic library read after its bytes are captured. Other
+// reads, including the next document, continue through the real main process.
+function holdTextRead(name) {
+    const original = fs.promises.readFile;
+    let release, started;
+    const gate = new Promise(resolve => { release = resolve; });
+    const entered = new Promise(resolve => { started = resolve; });
+    let armed = true;
+    const delayed = async function(target, ...args) {
+        const bytes = await original.call(this, target, ...args);
+        if (armed && typeof target === 'string' && path.resolve(target) === path.resolve(file(name))) {
+            armed = false; started(); await gate;
+        }
+        return bytes;
+    };
+    fs.promises.readFile = delayed;
+    return { entered, release, restore: () => { release(); if (fs.promises.readFile === delayed) fs.promises.readFile = original; } };
+}
+
 const textEditor = `document.querySelector('.scriptorium-text-source .CodeMirror').CodeMirror`;
 
 app.whenReady().then(async () => {
@@ -142,6 +162,33 @@ app.whenReady().then(async () => {
         // 外部修改：没有未保存的修改时自动重新载入。
         fs.writeFileSync(file('other.txt'), '另一个文件\n外部追加\n');
         await until(`${textEditor}.getValue().includes('外部追加')`, '外部修改后重新载入');
+
+        // A 的迟到重载不能覆盖已经打开的 B，也不能把 B 新输入的内容标成已保存。
+        await open('plain.txt');
+        await until(`window.ScriptoriumTextView.doc()?.filePath === ${JSON.stringify(file('plain.txt'))}`, '切到 A');
+        let heldRead = holdTextRead('plain.txt');
+        try {
+            await page('window.textReloadPending = window.ScriptoriumTextView.reload(); return true;');
+            await heldRead.entered;
+            await open('other.txt');
+            await until(`window.ScriptoriumTextView.doc()?.filePath === ${JSON.stringify(file('other.txt'))}`, '读取 A 期间打开 B');
+            const before = await page(`return { state: window.ScriptoriumTextView._state(), text: ${textEditor}.getValue() };`);
+            heldRead.release();
+            assert.equal(await page('return await window.textReloadPending;'), false);
+            assert.deepEqual(await page(`return { state: window.ScriptoriumTextView._state(), text: ${textEditor}.getValue() };`), before);
+        } finally { heldRead.restore(); }
+        heldRead = holdTextRead('other.txt');
+        try {
+            await page('window.textReloadPending = window.ScriptoriumTextView.reload(); return true;');
+            await heldRead.entered;
+            await page(`${textEditor}.replaceRange('重载期间的新输入\\n', { line: 0, ch: 0 }); return true;`);
+            heldRead.release();
+            assert.equal(await page('return await window.textReloadPending;'), false);
+            assert.equal(await page(`return window.ScriptoriumTextView.doc().dirty && ${textEditor}.getValue().startsWith('重载期间的新输入\\n');`), true);
+            await pressCtrl('s');
+            await untilFile('other.txt', bytes => bytes.toString('utf8') === '重载期间的新输入\n另一个文件\n外部追加\n', 'B 的后续保存不含 A 的内容');
+            await until('!window.ScriptoriumTextView.doc().dirty', 'B 新输入已保存');
+        } finally { heldRead.restore(); }
 
         // 回到首页：视图离开，标题栏和“篇章”面板还原，另存为恢复可用。
         await click('#home-btn');
@@ -238,6 +285,27 @@ app.whenReady().then(async () => {
             releaseDialog();
             dialog.showSaveDialog = originalDialog;
         }
+
+        // 从真实 PDF 视图执行拆分，检查每份输出的所有解压流，而不仅是页数。
+        const splitDir = path.join(dataRoot, 'pdf-split'); fs.mkdirSync(splitDir);
+        const originalOpenDialog = dialog.showOpenDialog;
+        dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [splitDir] });
+        try {
+            const result = await page("return await window.ScriptoriumPdfView._do.splitBy('each');");
+            assert.equal(result.success, true); assert.equal(result.files.length, 2);
+            const { PDFRawStream, decodePDFRawStream } = require('../vendor/pdf-lib/pdf-lib.min.js');
+            for (const [index, target] of result.files.entries()) {
+                const part = await PDFDocument.load(fs.readFileSync(target)); assert.equal(part.getPageCount(), 1);
+                const all = part.context.enumerateIndirectObjects().map(([, object]) => {
+                    if (object instanceof PDFRawStream) {
+                        try { return Buffer.from(decodePDFRawStream(object).decode()).toString('latin1'); } catch { return ''; }
+                    }
+                    return object.toString();
+                }).join('\n');
+                const omitted = index ? 'FIRST-PAGE-ONLY' : 'SECOND-PAGE-ONLY';
+                assert.ok(!all.includes(omitted) && !all.includes(Buffer.from(omitted).toString('hex').toUpperCase()));
+            }
+        } finally { dialog.showOpenDialog = originalOpenDialog; }
 
         assert.deepEqual(errors, [], '页面没有报错');
         console.log('Scriptorium file views Electron test passed');

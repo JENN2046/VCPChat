@@ -245,3 +245,158 @@ test('PDF Save As keeps the lock through reopening and retains dirty state when 
         if (!success) assert.equal(c.dirty(), true);
     }
 });
+
+
+function assertAbsent(doc, text) {
+    const recovered = recoveredText(doc);
+    assert.ok(!recovered.includes(text), `${text} plaintext must not survive`);
+    assert.ok(!recovered.includes(Buffer.from(text).toString('hex').toUpperCase()), `${text} encoded text must not survive`);
+}
+async function selectivePdf() {
+    const doc = await PDFDocument.create();
+    const first = doc.addPage([200, 300]); first.drawText('PAGE-ONE-ONLY');
+    const second = doc.addPage([300, 400]); second.drawText('PAGE-TWO-SECRET');
+    const link = doc.context.register(doc.context.obj({ Type: 'Annot', Subtype: 'Link',
+        Rect: [0, 0, 10, 10], Dest: [second.ref, PDFName.of('Fit')], Contents: PDFString.of('OMITTED-LINK') }));
+    first.node.set(PDFName.of('Annots'), doc.context.obj([link]));
+    doc.setTitle('ORIGINAL-METADATA');
+    await doc.attach(Buffer.from('ORIGINAL-ATTACHMENT'), 'original.txt');
+    const field = doc.getForm().createTextField('visible'); field.setText('VISIBLE-FIELD');
+    field.addToPage(first, { x: 5, y: 5, width: 100, height: 20 });
+    return Buffer.from(await doc.save());
+}
+
+test('selected-page exports and deleted-page saves exclude omitted streams and cross-page references', async () => {
+    const input = await selectivePdf();
+    const result = await PDFDocument.load(await apply(input, { pages: [{ src: 'main', index: 0, rotate: 90 }],
+        objects: [{ page: 0, type: 'text', text: 'SELECTED-NOTE', x: 10, y: 50 }] }));
+    assert.equal(result.getPageCount(), 1); assert.equal(result.getPage(0).getRotation().angle, 90);
+    assert.deepEqual(result.getPage(0).getSize(), { width: 200, height: 300 });
+    for (const text of ['PAGE-TWO-SECRET', 'OMITTED-LINK', 'ORIGINAL-METADATA', 'ORIGINAL-ATTACHMENT']) assertAbsent(result, text);
+    const streams = recoveredText(result);
+    for (const text of ['PAGE-ONE-ONLY', 'VISIBLE-FIELD', 'SELECTED-NOTE']) assert.ok(streams.includes(Buffer.from(text).toString('hex').toUpperCase()));
+    assert.equal(result.getForm().getFields().length, 0);
+});
+
+test('actual split API writes only the selected page content into each exported part', async t => {
+    const dir = await temporary(t), library = path.join(dir, 'library'), output = path.join(dir, 'split');
+    await fs.mkdir(library); await fs.mkdir(output);
+    const original = path.join(library, 'source.pdf'), input = await selectivePdf(); await fs.writeFile(original, input);
+    access.configure({ libraryRoots: () => [library], recentFiles: async () => [] });
+    const pdf = require('../modules/scriptorium/pdfFiles');
+    pdf.register({ removeHandler() {}, handle() {} }, { dataDir: () => path.join(dir, 'data'),
+        dialog: { showOpenDialog: async () => ({ canceled: false, filePaths: [output] }) } });
+    const event = { sender: { id: 9003, once() {} } };
+    const opened = await pdf._act(event, { command: 'read', path: original });
+    const split = await pdf._act(event, { command: 'split', path: original, fingerprint: opened.fingerprint,
+        parts: [{ name: 'first', plan: { pages: [{ src: 'main', index: 0 }] } },
+            { name: 'second', plan: { pages: [{ src: 'main', index: 1 }] } },
+            { name: 'all', plan: { pages: [{ src: 'main', index: 0 }, { src: 'main', index: 1 }] } }] });
+    assert.equal(split.success, true); assert.equal(split.files.length, 3);
+    for (const [index, file] of split.files.entries()) {
+        const part = await PDFDocument.load(await fs.readFile(file)); assert.equal(part.getPageCount(), index === 2 ? 2 : 1);
+        if (index < 2) assertAbsent(part, index ? 'PAGE-ONE-ONLY' : 'PAGE-TWO-SECRET');
+        if (index === 1) assertAbsent(part, 'VISIBLE-FIELD');
+        assertAbsent(part, 'ORIGINAL-METADATA'); assertAbsent(part, 'ORIGINAL-ATTACHMENT');
+    }
+    assert.deepEqual(await fs.readFile(original), input);
+});
+
+test('merging one imported PDF page excludes unselected imported page content', async () => {
+    const base = await PDFDocument.create(); base.addPage().drawText('BASE-PAGE');
+    const imported = await selectivePdf();
+    const result = await PDFDocument.load(await apply(await base.save(), { sources: { extra: '/synthetic/imported.pdf' },
+        pages: [{ src: 'main', index: 0 }, { src: 'extra', index: 0 }] }, { readSource: async () => imported }));
+    assert.equal(result.getPageCount(), 2); assertAbsent(result, 'PAGE-TWO-SECRET'); assertAbsent(result, 'OMITTED-LINK');
+});
+
+const textSource = require('node:fs').readFileSync(path.join(__dirname, '../ScriptoriumModules/scriptorium-text-view.js'), 'utf8');
+const textWanted = new Set(['open', 'leave', 'save', 'reload', 'setSource']);
+const textFunctions = new Map();
+(function visit(node) {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'FunctionDeclaration' && textWanted.has(node.id.name)) textFunctions.set(node.id.name, textSource.slice(node.start, node.end));
+    for (const child of Object.values(node)) {
+        if (Array.isArray(child)) child.forEach(visit); else if (child && typeof child === 'object') visit(child);
+    }
+})(parse(textSource));
+assert.equal(textFunctions.size, textWanted.size);
+function textFixture() {
+    let value = 'A-TEXT', revision = 1;
+    const reads = [], writes = [], toasts = [];
+    const counters = { cleared: 0 };
+    const cm = { getValue: () => value, setValue: text => { value = text; revision++; c.contentRevision++; }, clearHistory: () => { counters.cleared++; },
+        changeGeneration: () => revision, isClean: token => token === revision, getCursor: () => ({}), getScrollInfo: () => ({}), setCursor() {}, scrollTo() {} };
+    const c = { file: { filePath: '/a.txt', name: 'a.txt', mtime: 1, encoding: 'utf8', generation: 1, saving: false },
+        editor: cm, clean: 1, generation: 1, opening: 0, reloadSequence: 0, contentRevision: 0, loading: false,
+        work: { hidden: false }, conflict: { hidden: true }, document: { body: { classList: { remove() {} } } },
+        UI: { sync() {}, toast: (...args) => toasts.push(args) }, hasLongLine: () => false, isText: file => file.endsWith('.txt'), same: (a,b) => a === b,
+        ensureEditor: () => cm, enter() {}, applyLanguage: async () => {}, refresh() {},
+        showFile: result => { c.file.readOnly = false; c.setSource(result.text); },
+        dirty: () => !cm.isClean(c.clean),
+        read: file => { const gate = deferred(); reads.push({ file, ...gate }); return gate.promise; },
+        api: () => ({ view: async (command, payload) => { if (command === 'save') { writes.push(payload); return { success: true, mtime: c.file.mtime }; } return {}; } }) };
+    vm.createContext(c); vm.runInContext([...textFunctions.values()].join('\n'), c);
+    const response = (file, text, mtime = 2) => ({ success: true, filePath: file, name: file.split('/').pop(), text, mtime, eol: 'lf', encoding: 'utf8', bom: false });
+    return { c, cm, reads, writes, toasts, counters, response, edit: text => { value = text; revision++; c.contentRevision++; }, undoToOriginal: () => { value = 'A-TEXT'; revision = 1; c.contentRevision++; } };
+}
+
+test('a late text reload cannot replace a newly opened file or its metadata, including the same path reopened', async () => {
+    for (const target of ['/b.txt', '/a.txt']) {
+        const f = textFixture(), c = f.c, pending = c.reload(), stale = f.reads.shift();
+        if (target === '/a.txt') c.leave();
+        const opening = c.open(target); f.reads.shift().resolve(f.response(target, 'CURRENT-TEXT', 77)); await opening;
+        const current = c.file, clean = c.clean, cleared = f.counters.cleared;
+        stale.resolve(f.response('/a.txt', 'STALE-TEXT', 33)); await pending;
+        assert.equal(c.file, current); assert.equal(c.file.filePath, target); assert.equal(c.file.mtime, 77);
+        assert.equal(f.cm.getValue(), 'CURRENT-TEXT'); assert.equal(c.clean, clean); assert.equal(f.counters.cleared, cleared);
+        f.edit('CURRENT-TEXT-EDIT'); await c.save(); assert.equal(f.writes.at(-1).text, 'CURRENT-TEXT-EDIT');
+    }
+});
+
+test('text typed after a reload starts remains dirty with its undo history and metadata intact', async () => {
+    for (const discard of [false, true]) {
+        const f = textFixture(), c = f.c;
+        if (discard) f.edit('EARLIER-EDIT');
+        const pending = c.reload({ discard }), request = f.reads.shift(), cleared = f.counters.cleared;
+        f.edit('NEW-EDIT'); request.resolve(f.response('/a.txt', 'OLD-DISK-TEXT', 88)); await pending;
+        assert.equal(f.cm.getValue(), 'NEW-EDIT'); assert.equal(c.file.mtime, 1); assert.equal(c.dirty(), true);
+        assert.equal(f.counters.cleared, cleared);
+    }
+});
+
+test('only the newest unchanged text reload is applied and stale read failures are silent', async () => {
+    const f = textFixture(), c = f.c;
+    const first = c.reload(), older = f.reads.shift(), second = c.reload(), newer = f.reads.shift();
+    older.resolve(f.response('/a.txt', 'OLDER', 20)); await first; assert.equal(f.cm.getValue(), 'A-TEXT');
+    newer.resolve(f.response('/a.txt', 'NEWER', 30)); await second;
+    assert.equal(f.cm.getValue(), 'NEWER'); assert.equal(c.file.mtime, 30); assert.equal(c.dirty(), false);
+    const late = c.reload(), failed = f.reads.shift(); c.leave();
+    failed.resolve({ success: false, error: 'obsolete failure' }); await late; assert.equal(f.toasts.length, 0);
+});
+
+test('a completed save invalidates a pending text reload even when the file mtime is unchanged', async () => {
+    const f = textFixture(), pending = f.c.reload(), request = f.reads.shift();
+    await f.c.save({ force: true }); request.resolve(f.response('/a.txt', 'OLDER-DISK-TEXT')); await pending;
+    assert.equal(f.cm.getValue(), 'A-TEXT'); assert.equal(f.c.file.mtime, 1); assert.equal(f.c.dirty(), false);
+});
+
+test('late text opens cannot override the newest open, a close, or new local edits', async () => {
+    for (const scenario of ['newest-open', 'close', 'local-edit']) {
+        const f = textFixture(), old = f.c.open('/old.txt'), request = f.reads.shift();
+        if (scenario === 'newest-open') {
+            const next = f.c.open('/new.txt'); f.reads.shift().resolve(f.response('/new.txt', 'LATEST')); await next;
+        } else if (scenario === 'close') f.c.leave(); else f.edit('LOCAL-EDIT');
+        request.resolve(f.response('/old.txt', 'OBSOLETE')); await old;
+        if (scenario === 'close') assert.equal(f.c.file, null);
+        else assert.equal(f.cm.getValue(), scenario === 'local-edit' ? 'LOCAL-EDIT' : 'LATEST');
+    }
+});
+
+
+test('editing then undoing during text reload still invalidates the read and preserves redo history', async () => {
+    const f = textFixture(), pending = f.c.reload(), request = f.reads.shift(), cleared = f.counters.cleared;
+    f.edit('TEMPORARY-EDIT'); f.undoToOriginal(); assert.equal(f.c.dirty(), false);
+    request.resolve(f.response('/a.txt', 'REMOTE-TEXT', 90)); await pending;
+    assert.equal(f.cm.getValue(), 'A-TEXT'); assert.equal(f.counters.cleared, cleared); assert.equal(f.c.file.mtime, 1);
+});

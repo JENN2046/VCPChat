@@ -98,7 +98,7 @@ async function save(event, payload = {}) {
         return fs.readFile(source);
     };
     const base = changed ? await baseOf(file, payload.fingerprint) : current;
-    const out = Buffer.from(await (await loadEdit()).apply(base, payload.plan || {}, { readSource }));
+    const out = Buffer.from(await (await loadEdit()).apply(base, payload.plan || {}, { readSource, selectedPagesOnly: payload.pageSelectionOnly === true }));
     let target = file;
     if (payload.saveAs) {
         const result = await deps.dialog.showSaveDialog(deps.ownerOf?.(event), {
@@ -157,7 +157,7 @@ async function split(event, payload = {}) {
     };
     const files = [];
     for (const part of parts) {
-        const out = Buffer.from(await (await loadEdit()).apply(base, part.plan || {}, { readSource }));
+        const out = Buffer.from(await (await loadEdit()).apply(base, part.plan || {}, { readSource, selectedPagesOnly: true }));
         const name = cleanName(part.name, `${path.basename(file, '.pdf')} 第${files.length + 1}份`).replace(/(\.pdf)?$/i, '.pdf');
         const target = await freeName(folder, name);
         await writeAtomically(target, out);

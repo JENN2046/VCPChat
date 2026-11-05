@@ -6,7 +6,7 @@
 //   objects：[{ page: 输出第几页, type: 'text' | 'rect' | 'image' | 'line', ... }]，rotate 是逆时针的角度（和页面转的方向相反，让东西在屏幕上是正的）；
 //   fields：[{ name, value }] 表单里填的值；
 //   stamps：每一页都加的 { pageNumbers: { format, size }, watermark: { text, size, opacity, color } }，按页面显示的方向摆正。
-// 做法：在原文档上直接改（书签、元数据、表单都留着）——先填表，再把页面按计划摘下来重新排（删掉的不再放回去，同一页用两次就复制一份），
+// 做法：完整原地编辑保留原文档；省略页、选页导出、合并和涂黑另建干净文档——先填表，再把页面按计划摘下来重新排（删掉的不再放回去，同一页用两次就复制一份），
 // 再画东西。中文用 fonts.js 找到的系统字体按用到的字嵌进去；页面已经把没字体时的中文画成了图片。
 const { PDFDocument, PDFName, rgb, degrees, StandardFonts, PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup, PDFOptionList } = require('../../../vendor/pdf-lib/pdf-lib.min.js');
 const fontkit = require('../../../vendor/pdf-lib/fontkit.umd.min.js');
@@ -58,17 +58,20 @@ async function apply(bytes, plan = {}, deps = {}) {
         form.updateFieldAppearances(formFont || await fontFor('a'));
     }
 
-    // 涂黑输出不能沿用原对象图；先把仍需显示的表单变为页面内容。
-    // 普通编辑保留表单、书签和元数据；涂黑保存丢弃文档级附带内容和批注。
-    const sanitized = Array.isArray(plan.pages) && plan.pages.some((entry) => entry.blank && entry.image);
+    const original = doc.getPages();
+    const entries = Array.isArray(plan.pages) ? plan.pages : original.map((_page, index) => ({ src: 'main', index }));
+    const retained = new Set(entries.filter((entry) => !entry.blank && (!entry.src || entry.src === 'main')).map((entry) => Number(entry.index)));
+    // 省略页、涂黑、选页导出或合并来源都不能沿用原对象图。
+    // 仅保留最终页的内容和表单外观；完整原地编辑仍保留可编辑表单、书签和元数据。
+    const sanitized = deps.selectedPagesOnly === true || original.some((_page, index) => !retained.has(index))
+        || entries.some((entry) => (entry.blank && entry.image) || (entry.src && entry.src !== 'main'));
     if (sanitized) doc.getForm().flatten();
 
     // 2. 页面：按计划重新排。
-    const original = doc.getPages();
     const used = new Set();
     const loaded = new Map();
     const target = [];
-    for (const entry of Array.isArray(plan.pages) ? plan.pages : original.map((_page, index) => ({ src: 'main', index }))) {
+    for (const entry of entries) {
         let page;
         if (entry.blank) {
             page = doc.addPage([Number(entry.blank.w) || 595.28, Number(entry.blank.h) || 841.89]);

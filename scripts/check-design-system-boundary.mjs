@@ -625,18 +625,20 @@ const allowedSourceDifferences = new Set([
 // Pin exact regular-file Git identities rather than exempting paths/directories.
 // Caller: merged PR #74. Consumer declaration: commit 42a285d3.
 const reviewedSourceBlobs = new Map([
+    // PR #86 selected-page privacy and stale text-read ownership repair; exact source only.
+    ['ScriptoriumModules/scriptorium-text-view.js', '726c6cc258a3ad8edec22960361ca28e57ccb69d'],
     // PR #86 Windows fixture: await observed saved scale; preserve the original assertion.
     ['tests/deskpet-controls.test.mjs', 'ea96efa72b9cdd669c3d6db50f6d23c5fd749dff'],
     // PR #86 PDF save follow-up: exact dialog target grant and serialized edits; no directory grant.
-    ['tests/scriptorium-file-views-electron.test.js', '6a6ebe4d85c2232a271977967b747e31d9ce12e9'],
+    ['tests/scriptorium-file-views-electron.test.js', 'b13e849fc96912cb82d5daf2a0222cc69ffe1976'],
     // PR #86 PDF save follow-up: exact dialog target grant and serialized edits; no directory grant.
-    ['modules/scriptorium/pdfFiles/index.js', '40e12bdc2d5ed0ade36c6e708b3dad310e5161ed'],
+    ['modules/scriptorium/pdfFiles/index.js', '35c044cd1dc71d061152fffb39161d385463e01e'],
     // PR #86 verified review repairs: exact PDF sanitization, CSV and authorized image navigation.
-    ['modules/scriptorium/pdfFiles/edit.js', '60a81a9826a2ae1b913c6d109f64f8b587a3a02e'],
+    ['modules/scriptorium/pdfFiles/edit.js', '96a333156b1165088f749a96fde4e059fe08bc5c'],
     ['modules/scriptorium/sheetFiles/index.js', '2f1d14589c4e3c2e27368b56b16a9d79c2db939d'],
     ['modules/scriptorium/viewFiles/index.js', '9949495f863eeec71ec2d0fbf1a9ecd5b6a1a7a0'],
-    ['ScriptoriumModules/scriptorium-pdf-view.js', 'b095b20df0f9145b954a7b0fbf7fbb1bf9ab7abb'],
-    ['tests/scriptorium-file-safety.test.cjs', 'cd1a461ef4ed22bd93e89122f8b0a9f7f9782b28'],
+    ['ScriptoriumModules/scriptorium-pdf-view.js', '587654a48dc65c035e2ada3bc474480a1a451dce'],
+    ['tests/scriptorium-file-safety.test.cjs', '31ffff2389e6ab771e06b1c434d3cd423dd71766'],
     ['.github/workflows/jso-agent-paired-candidate.yml', '38940cb06947455cc2a5f41b53a4cc314ae9c92c'],
     ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
     // PR #84: reviewed open-before-lookup plan panel, its topic adapter and

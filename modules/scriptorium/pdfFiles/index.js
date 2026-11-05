@@ -14,6 +14,7 @@
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs-extra');
+const { writeAtomically } = require('../atomicReplace');
 // pdf-lib 和 fontkit 共 1.3 MB，只在打开 PDF 时加载。
 let editModule = null;
 const loadEdit = async () => editModule ??= require('./edit');
@@ -68,20 +69,10 @@ async function backup(file, bytes) {
     const tag = crypto.createHash('sha1').update(keyOf(file)).digest('hex').slice(0, 12);
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
     const target = path.join(dir, `${tag}-${stamp}-${path.basename(file)}`);
-    await fs.writeFile(target, bytes);
+    await fs.writeFile(target, bytes, { flag: 'wx', mode: 0o600 });
     const mine = (await fs.readdir(dir)).filter((name) => name.startsWith(`${tag}-`)).sort();
     for (const old of mine.slice(0, Math.max(0, mine.length - 10))) await fs.remove(path.join(dir, old)).catch(() => {});
     return target;
-}
-
-async function writeAtomically(target, bytes) {
-    const temporary = path.join(path.dirname(target), `.${path.basename(target)}.scriptorium-saving-${process.pid}-${Date.now()}`);
-    try {
-        await fs.writeFile(temporary, bytes);
-        await require('../atomicReplace').replaceWith(temporary, target);
-    } finally {
-        await fs.remove(temporary).catch(() => {});
-    }
 }
 
 async function save(event, payload = {}) {

@@ -473,3 +473,115 @@ test('CSV final empty record remains when another cell is edited and saved throu
     assert.deepEqual((await sheets._act(null, { command: 'read', path: file })).sheets[0].rows, [['EDITED'], ['']]);
     assert.ok((await fs.readFile(file, 'utf8')).endsWith('""'));
 });
+
+test('POSIX atomic view saves preserve executable and private modes through the registered handler', { skip: process.platform === 'win32' }, async t => {
+    const dir = await temporary(t); access.configure({ libraryRoots: () => [dir], recentFiles: async () => [] });
+    let handler;
+    views.register({ removeHandler() {}, handle(_name, value) { handler = value; } }, {});
+    const event = { sender: { id: 9006 } };
+    for (const [name, mode] of [['run.sh', 0o700], ['tool.py', 0o750], ['private.txt', 0o600], ['group.txt', 0o640], ['private.excalidraw', 0o600]]) {
+        const file = path.join(dir, name); await fs.writeFile(file, 'original\n'); await fs.chmod(file, mode);
+        const opened = await handler(event, { command: 'read', file });
+        const saved = await handler(event, { command: 'save', file, text: 'updated\n', mtime: opened.mtime, encoding: opened.encoding, bom: opened.bom, eol: opened.eol });
+        assert.equal(saved.success, true); assert.equal((await fs.stat(file)).mode & 0o777, mode, name);
+        assert.equal(await fs.readFile(file, 'utf8'), 'updated\n');
+    }
+});
+
+test('POSIX modes survive HTML, sheet, PDF and Markdown atomic save paths', { skip: process.platform === 'win32' }, async t => {
+    const dir = await temporary(t); access.configure({ libraryRoots: () => [dir], recentFiles: async () => [] });
+    const html = path.join(dir, 'private.html'); await fs.writeFile(html, '<h1>original</h1>'); await fs.chmod(html, 0o640);
+    const pages = require('../modules/scriptorium/webPages');
+    const openedHtml = await pages.readPage(html); assert.equal((await pages.savePage({ ...openedHtml, file: html, text: '<h1>updated</h1>', senderId: 0 })).success, true);
+    assert.equal((await fs.stat(html)).mode & 0o777, 0o640);
+    const csv = path.join(dir, 'private.csv'); await fs.writeFile(csv, 'header\nvalue'); await fs.chmod(csv, 0o600);
+    const openedCsv = await sheets._act(null, { command: 'read', path: csv });
+    await sheets._act(null, { command: 'save', path: csv, rows: [['header'], ['updated']], format: openedCsv.format, mtime: openedCsv.mtime });
+    assert.equal((await fs.stat(csv)).mode & 0o777, 0o600);
+    const pdf = require('../modules/scriptorium/pdfFiles'), pdfPath = path.join(dir, 'p'.repeat(180) + '.pdf');
+    const doc = await PDFDocument.create(); doc.addPage(); await fs.writeFile(pdfPath, await doc.save()); await fs.chmod(pdfPath, 0o600);
+    pdf.register({ removeHandler() {}, handle() {} }, { dataDir: () => path.join(dir, 'data') });
+    const event = { sender: { id: 9007, once() {} } }, openedPdf = await pdf._act(event, { command: 'read', path: pdfPath });
+    await pdf._act(event, { command: 'save', path: pdfPath, fingerprint: openedPdf.fingerprint });
+    assert.equal((await fs.stat(pdfPath)).mode & 0o777, 0o600);
+    for (const name of await fs.readdir(path.join(dir, 'data', 'scriptorium-pdf-backup'))) assert.equal((await fs.stat(path.join(dir, 'data', 'scriptorium-pdf-backup', name))).mode & 0o777, 0o600);
+    const md = path.join(dir, 'private.md'); await fs.writeFile(md, '# original\n'); await fs.chmod(md, 0o600);
+    const markdown = require('../modules/scriptorium/markdownFiles'), deps = { dataDir: () => path.join(dir, 'AppData') };
+    const openedMd = await markdown.read(md, deps); await markdown.save(null, { filePath: md, bytes: openedMd.bytes }, deps);
+    assert.equal((await fs.stat(md)).mode & 0o777, 0o600);
+});
+
+test('atomic writer creates a private temporary before content and preserves target rwx before rename', { skip: process.platform === 'win32' }, async t => {
+    const dir = await temporary(t), target = path.join(dir, 'private.sh'); await fs.writeFile(target, 'old'); await fs.chmod(target, 0o700);
+    const native = require('node:fs').promises, originalOpen = native.open, originalRename = native.rename;
+    let sawWrite = false, sawRename = false;
+    native.open = async function(file, ...args) {
+        const handle = await originalOpen.call(this, file, ...args);
+        if (path.dirname(String(file)) === dir && String(file).includes('.scriptorium-writing-')) {
+            assert.equal(args[0], 'wx'); assert.equal((await fs.stat(file)).mode & 0o077, 0, 'temporary never exposes contents to group/other');
+            const write = handle.writeFile.bind(handle);
+            handle.writeFile = async data => { assert.equal((await fs.stat(file)).mode & 0o077, 0); await write(data); assert.equal((await fs.stat(file)).mode & 0o077, 0); sawWrite = true; };
+        }
+        return handle;
+    };
+    native.rename = async function(from, to) {
+        if (to === target) { assert.equal(await fs.readFile(target, 'utf8'), 'old'); assert.equal((await fs.stat(from)).mode & 0o777, 0o700); sawRename = true; }
+        return originalRename.call(this, from, to);
+    };
+    try { await require('../modules/scriptorium/atomicReplace').writeAtomically(target, 'new'); }
+    finally { native.open = originalOpen; native.rename = originalRename; }
+    assert.equal(sawWrite && sawRename, true); assert.equal(await fs.readFile(target, 'utf8'), 'new');
+    assert.deepEqual(await fs.readdir(dir), ['private.sh']);
+});
+
+test('atomic writer failures leave the old file and mode intact and remove only owned temporaries', async t => {
+    const dir = await temporary(t), target = path.join(dir, 'original.txt'); await fs.writeFile(target, 'original');
+    if (process.platform !== 'win32') await fs.chmod(target, 0o600);
+    const native = require('node:fs').promises, originalOpen = native.open, originalRename = native.rename;
+    const scenarios = process.platform === 'win32' ? ['rename-EIO', 'rename-EPERM'] : ['rename-EIO', 'rename-EPERM', 'chmod'];
+    for (const scenario of scenarios) {
+        let renames = 0;
+        native.open = async function(file, ...args) {
+            const handle = await originalOpen.call(this, file, ...args);
+            if (scenario === 'chmod' && path.dirname(String(file)) === dir) handle.chmod = async () => { throw Object.assign(new Error('controlled chmod failure'), { code: 'EPERM' }); };
+            return handle;
+        };
+        native.rename = async function(from, to) {
+            if (to !== target) return originalRename.call(this, from, to);
+            renames++; throw Object.assign(new Error('controlled rename failure'), { code: scenario === 'rename-EPERM' ? 'EPERM' : 'EIO' });
+        };
+        try { await assert.rejects(require('../modules/scriptorium/atomicReplace').writeAtomically(target, 'replacement')); }
+        finally { native.open = originalOpen; native.rename = originalRename; }
+        assert.equal(await fs.readFile(target, 'utf8'), 'original');
+        if (process.platform !== 'win32') assert.equal((await fs.stat(target)).mode & 0o777, 0o600);
+        assert.equal(renames, scenario === 'rename-EPERM' ? 3 : scenario === 'chmod' ? 0 : 1);
+        assert.deepEqual(await fs.readdir(dir), ['original.txt']);
+    }
+});
+
+test('atomic writer never cleans a temporary that it failed to create exclusively', async t => {
+    const dir = await temporary(t), target = path.join(dir, 'original.txt'); await fs.writeFile(target, 'original');
+    const native = require('node:fs').promises, originalOpen = native.open; let foreign;
+    native.open = async function(file, ...args) {
+        if (path.dirname(String(file)) !== dir) return originalOpen.call(this, file, ...args);
+        foreign = String(file); await fs.writeFile(foreign, 'foreign'); throw Object.assign(new Error('controlled collision'), { code: 'EEXIST' });
+    };
+    try { await assert.rejects(require('../modules/scriptorium/atomicReplace').writeAtomically(target, 'replacement')); }
+    finally { native.open = originalOpen; }
+    assert.equal(await fs.readFile(foreign, 'utf8'), 'foreign'); assert.equal(await fs.readFile(target, 'utf8'), 'original');
+});
+
+test('new atomic destinations keep the caller umask policy', { skip: process.platform === 'win32' }, async t => {
+    const dir = await temporary(t), target = path.join(dir, 'new.txt'), mask = process.umask();
+    await require('../modules/scriptorium/atomicReplace').writeAtomically(target, 'new');
+    assert.equal((await fs.stat(target)).mode & 0o777, 0o666 & ~mask); assert.equal(process.umask(), mask);
+});
+
+
+test('atomic temporary names do not depend on a long valid destination basename', { skip: process.platform === 'win32' }, async t => {
+    const dir = await temporary(t), target = path.join(dir, 'x'.repeat(220) + '.txt');
+    await fs.writeFile(target, 'old'); await fs.chmod(target, 0o600);
+    await require('../modules/scriptorium/atomicReplace').writeAtomically(target, 'new');
+    assert.equal(await fs.readFile(target, 'utf8'), 'new'); assert.equal((await fs.stat(target)).mode & 0o777, 0o600);
+    assert.deepEqual(await fs.readdir(dir), [path.basename(target)]);
+});

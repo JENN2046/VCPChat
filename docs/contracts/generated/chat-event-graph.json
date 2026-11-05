@@ -8173,7 +8173,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1252,
+          "line": 1222,
           "kind": "event-listener"
         },
         {
@@ -8431,7 +8431,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1252,
+          "line": 1222,
           "kind": "event-listener",
           "match": "docxWindow.on('closed'"
         },
@@ -9663,7 +9663,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 763,
+          "line": 746,
           "kind": "event-listener"
         },
         {
@@ -9947,7 +9947,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 763,
+          "line": 746,
           "kind": "event-listener",
           "match": "response.on('data'"
         },
@@ -13725,22 +13725,22 @@
         },
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 282,
+          "line": 276,
           "kind": "event-listener"
         },
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 40,
+          "line": 41,
           "kind": "event-listener"
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 133,
+          "line": 123,
           "kind": "event-listener"
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 268,
+          "line": 258,
           "kind": "event-listener"
         },
         {
@@ -13856,25 +13856,25 @@
         },
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 282,
+          "line": 276,
           "kind": "event-listener",
           "match": "contents.once('destroyed'"
         },
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 40,
+          "line": 41,
           "kind": "event-listener",
           "match": "sender.once?.('destroyed'"
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 133,
+          "line": 123,
           "kind": "event-listener",
           "match": "sender.once('destroyed'"
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 268,
+          "line": 258,
           "kind": "event-listener",
           "match": "sender.once('destroyed'"
         },
@@ -14070,7 +14070,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 170,
+          "line": 171,
           "kind": "event-listener"
         },
         {
@@ -14124,7 +14124,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 170,
+          "line": 171,
           "kind": "event-listener",
           "match": "contents.on('did-fail-load'"
         },
@@ -14646,14 +14646,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1335,
+          "line": 1305,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1335,
+          "line": 1305,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:choose-open'"
         },
@@ -14677,14 +14677,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1358,
+          "line": 1328,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1358,
+          "line": 1328,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:fonts-list'"
         },
@@ -14701,12 +14701,12 @@
       "producers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1213,
+          "line": 1183,
           "kind": "event-send"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1246,
+          "line": 1216,
           "kind": "event-send"
         },
         {
@@ -14725,13 +14725,13 @@
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1213,
+          "line": 1183,
           "kind": "event-send",
           "match": "docxWindow.webContents.send('docx:open-path-request'"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1246,
+          "line": 1216,
           "kind": "event-send",
           "match": "docxWindow.webContents.send('docx:open-path-request'"
         },
@@ -14761,14 +14761,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1339,
+          "line": 1309,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1339,
+          "line": 1309,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:read-external-resource'"
         },
@@ -14792,14 +14792,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1337,
+          "line": 1307,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1337,
+          "line": 1307,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:read-path'"
         },
@@ -14823,14 +14823,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1353,
+          "line": 1323,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1353,
+          "line": 1323,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:recent-list'"
         },
@@ -14854,14 +14854,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1350,
+          "line": 1320,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1350,
+          "line": 1320,
           "kind": "event-listener",
           "match": "ipcMain.handle('docx:save'"
         },
@@ -15416,7 +15416,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 771,
+          "line": 754,
           "kind": "event-listener"
         },
         {
@@ -15493,7 +15493,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 771,
+          "line": 754,
           "kind": "event-listener",
           "match": "response.on('end'"
         },
@@ -15792,12 +15792,12 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 781,
+          "line": 764,
           "kind": "event-listener"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 784,
+          "line": 767,
           "kind": "event-listener"
         },
         {
@@ -15827,17 +15827,17 @@
         },
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 328,
+          "line": 322,
           "kind": "event-listener"
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 117,
+          "line": 107,
           "kind": "event-listener"
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 255,
+          "line": 245,
           "kind": "event-listener"
         },
         {
@@ -16159,13 +16159,13 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 781,
+          "line": 764,
           "kind": "event-listener",
           "match": "response.on('error'"
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 784,
+          "line": 767,
           "kind": "event-listener",
           "match": "request.on('error'"
         },
@@ -16201,19 +16201,19 @@
         },
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 328,
+          "line": 322,
           "kind": "event-listener",
           "match": "watcher.on('error'"
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 117,
+          "line": 107,
           "kind": "event-listener",
           "match": "watcher.on('error'"
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 255,
+          "line": 245,
           "kind": "event-listener",
           "match": "watcher.on('error'"
         },
@@ -26991,7 +26991,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1331,
+          "line": 1301,
           "kind": "event-listener"
         }
       ],
@@ -27004,7 +27004,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1331,
+          "line": 1301,
           "kind": "event-listener",
           "match": "ipcMain.handle('open-docx-window'"
         },
@@ -29370,7 +29370,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1242,
+          "line": 1212,
           "kind": "event-listener"
         },
         {
@@ -29506,7 +29506,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1242,
+          "line": 1212,
           "kind": "event-listener",
           "match": "docxWindow.once('ready-to-show'"
         },
@@ -31192,14 +31192,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1332,
+          "line": 1302,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1332,
+          "line": 1302,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:agent-call'"
         }
@@ -31210,7 +31210,7 @@
       "producers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 189,
+          "line": 190,
           "kind": "event-send"
         }
       ],
@@ -31224,7 +31224,7 @@
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 189,
+          "line": 190,
           "kind": "event-send",
           "match": "docxWindow.webContents.send('scriptorium:agent-request'"
         },
@@ -31248,14 +31248,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1334,
+          "line": 1304,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1334,
+          "line": 1304,
           "kind": "event-listener",
           "match": "ipcMain.on('scriptorium:agent-response'"
         },
@@ -31279,14 +31279,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1336,
+          "line": 1306,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1336,
+          "line": 1306,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:choose-import'"
         },
@@ -31310,14 +31310,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1352,
+          "line": 1322,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1352,
+          "line": 1322,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:document-library'"
         },
@@ -31372,14 +31372,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1351,
+          "line": 1321,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1351,
+          "line": 1321,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:export-rich-document'"
         },
@@ -31435,14 +31435,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 375,
+          "line": 369,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 375,
+          "line": 369,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:markdown-file'"
         }
@@ -31460,14 +31460,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 373,
+          "line": 367,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/markdownFiles/index.js",
-          "line": 373,
+          "line": 367,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:markdown-link'"
         },
@@ -31485,14 +31485,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 282,
+          "line": 272,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 282,
+          "line": 272,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:page'"
         }
@@ -31522,7 +31522,7 @@
       "producers": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 246,
+          "line": 236,
           "kind": "event-send"
         }
       ],
@@ -31536,7 +31536,7 @@
       "evidence": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 246,
+          "line": 236,
           "kind": "event-send",
           "match": "sender.send('scriptorium:page-changed'"
         },
@@ -31554,14 +31554,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 257,
+          "line": 248,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 257,
+          "line": 248,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:pdf'"
         }
@@ -31579,14 +31579,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1340,
+          "line": 1310,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1340,
+          "line": 1310,
           "kind": "event-listener",
           "match": "ipcMain.handle(\n        'scriptorium:resolve-font-stylesheet'"
         },
@@ -31610,14 +31610,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1345,
+          "line": 1315,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1345,
+          "line": 1315,
           "kind": "event-listener",
           "match": "ipcMain.handle(\n        'scriptorium:resolve-font-url'"
         },
@@ -31635,14 +31635,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/sheetFiles/index.js",
-          "line": 266,
+          "line": 260,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/sheetFiles/index.js",
-          "line": 266,
+          "line": 260,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:sheet'"
         }
@@ -31660,14 +31660,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1354,
+          "line": 1324,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1354,
+          "line": 1324,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:style-packs-load'"
         },
@@ -31691,14 +31691,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1355,
+          "line": 1325,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1355,
+          "line": 1325,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:style-packs-save'"
         },
@@ -31722,14 +31722,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1356,
+          "line": 1326,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1356,
+          "line": 1326,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:svg-assets-load'"
         },
@@ -31753,14 +31753,14 @@
       "consumers": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1357,
+          "line": 1327,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 1357,
+          "line": 1327,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:svg-assets-save'"
         },
@@ -31778,14 +31778,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 168,
+          "line": 158,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 168,
+          "line": 158,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:view'"
         }
@@ -31796,7 +31796,7 @@
       "producers": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 109,
+          "line": 99,
           "kind": "event-send"
         }
       ],
@@ -31810,7 +31810,7 @@
       "evidence": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 109,
+          "line": 99,
           "kind": "event-send",
           "match": "sender.send('scriptorium:view-changed'"
         },
@@ -34676,7 +34676,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 783,
+          "line": 766,
           "kind": "event-listener"
         },
         {
@@ -34694,7 +34694,7 @@
         },
         {
           "file": "modules/ipc/docxHandlers.js",
-          "line": 783,
+          "line": 766,
           "kind": "event-listener",
           "match": "request.on('timeout'"
         },
@@ -37849,7 +37849,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 156,
+          "line": 157,
           "kind": "event-listener"
         }
       ],
@@ -37862,7 +37862,7 @@
         },
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 156,
+          "line": 157,
           "kind": "event-listener",
           "match": "appApi.on('web-contents-created'"
         }
@@ -38284,14 +38284,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 160,
+          "line": 161,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/webPages/index.js",
-          "line": 160,
+          "line": 161,
           "kind": "event-listener",
           "match": "contents.on('will-frame-navigate'"
         }

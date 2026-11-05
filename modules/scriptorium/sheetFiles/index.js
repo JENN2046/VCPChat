@@ -12,7 +12,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 const { decodeText, encodeText, encodingLabel } = require('../textEncoding');
-const { replaceWith } = require('../atomicReplace');
+const { writeAtomically } = require('../atomicReplace');
 
 let deps = null;
 const SHEET = /\.(csv|tsv|xlsx|xlsm)$/i;
@@ -237,13 +237,7 @@ async function save(payload) {
     const data = payload.format
         ? encodeText(writeDelimited(payload.rows, payload.format), payload.format)
         : await writeWorkbook(await fs.readFile(resolved), payload.changes || []);
-    const temporary = `${resolved}.scriptorium-writing-${process.pid}-${Date.now()}`;
-    try {
-        await fs.writeFile(temporary, data);
-        await replaceWith(temporary, resolved);
-    } finally {
-        await fs.remove(temporary).catch(() => {});
-    }
+    await writeAtomically(resolved, data);
     const after = await fs.stat(resolved);
     return { success: true, mtime: after.mtimeMs, size: after.size };
 }

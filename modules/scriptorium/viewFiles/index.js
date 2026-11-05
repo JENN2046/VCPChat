@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const { kindOf } = require('../fileTypes');
-const { replaceWith } = require('../atomicReplace');
+const { writeAtomically } = require('../atomicReplace');
 const { allowed } = require('../fileAccess');
 const { decodeText, encodeText } = require('../textEncoding');
 
@@ -46,16 +46,6 @@ async function readText(file) {
     await Promise.resolve(deps?.rememberRecentFile?.(resolved)).catch(() => {});
     return { success: true, filePath: resolved, name: path.basename(resolved), text: text.replace(/\r\n/g, '\n'),
         eol: /\r\n/.test(text) ? 'crlf' : 'lf', encoding, bom, mtime: stat.mtimeMs, size: stat.size };
-}
-
-async function writeAtomically(target, data) {
-    const temporary = `${target}.scriptorium-writing-${process.pid}-${Date.now()}`;
-    try {
-        await fs.promises.writeFile(temporary, data);
-        await replaceWith(temporary, target);
-    } finally {
-        await fs.promises.rm(temporary, { force: true }).catch(() => {});
-    }
 }
 
 async function saveText(payload, senderId) {

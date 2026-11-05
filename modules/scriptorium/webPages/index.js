@@ -14,6 +14,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { writeAtomically } = require('../atomicReplace');
 const { protocol } = require('electron');
 // main.js 启动时就会加载本文件：以下模块依赖 jszip、fs-extra、iconv-lite，用到时才加载。
 const rootOf = (...args) => require('../markdownFiles').rootOf(...args);
@@ -200,17 +201,6 @@ async function readPage(file) {
         success: true, filePath: resolved, name: path.basename(resolved), url, root,
         text: text.replace(/\r\n/g, '\n'), eol: /\r\n/.test(text) ? 'crlf' : 'lf', encoding, bom, mtime: stat.mtimeMs, size: stat.size,
     };
-}
-
-// 先写同一文件夹里的临时文件，再一步替换（atomicReplace.js），写入中断时原文件仍完好。
-async function writeAtomically(target, data) {
-    const temporary = `${target}.scriptorium-writing-${process.pid}-${Date.now()}`;
-    try {
-        await fs.promises.writeFile(temporary, data);
-        await require('../atomicReplace').replaceWith(temporary, target);
-    } finally {
-        await fs.promises.rm(temporary, { force: true }).catch(() => {});
-    }
 }
 
 // 保存回原文件。文件被别处修改过（修改时间不一致）时不保存，交由页面询问；force 时照常保存。

@@ -37,6 +37,7 @@ async function writeFixtures() {
     pdf.addPage([300, 400]).drawText('FIRST-PAGE-ONLY');
     pdf.addPage([300, 400]).drawText('SECOND-PAGE-ONLY');
     fs.writeFileSync(file('two.pdf'), await pdf.save());
+    if (process.platform !== 'win32') for (const [name, mode] of [['note.md', 0o600], ['plain.txt', 0o700], ['table.csv', 0o600], ['other-table.csv', 0o600], ['empty-tail.csv', 0o600], ['other-page.html', 0o600], ['two.pdf', 0o600]]) fs.chmodSync(file(name), mode);
 }
 
 function registerWindowIpc() {
@@ -114,6 +115,13 @@ app.whenReady().then(async () => {
         registerWindowIpc();
         require('../modules/ipc/docxHandlers').initialize({ mainWindow: null, openChildWindows: [], projectRoot, appDataRoot: dataRoot });
         webPages.installProtocol();
+        if (process.platform !== 'win32') {
+            const nativePath = file('private-project.vdocx');
+            const opened = await require('../modules/scriptorium/markdownFiles').read(file('note.md'), { dataDir: () => path.join(dataRoot, 'AppData') });
+            fs.writeFileSync(nativePath, Buffer.from(opened.bytes)); fs.chmodSync(nativePath, 0o600);
+            await require('../modules/ipc/docxHandlers').writeProjectArtifact(nativePath, opened.bytes);
+            assert.equal(fs.statSync(nativePath).mode & 0o777, 0o600, '原生文稿原子写入保留权限');
+        }
 
         windowRef = new BrowserWindow({
             width: 1440,
@@ -159,6 +167,7 @@ app.whenReady().then(async () => {
         await pressCtrl('s');
         await untilFile('plain.txt', (bytes) => bytes.toString('utf8') === '新增一行\n第一行\n第二行\n', '文本保存');
         await until(`document.getElementById('save-state').textContent === '已保存'`, '文本已保存状态');
+        if (process.platform !== 'win32') assert.equal(fs.statSync(file('plain.txt')).mode & 0o777, 0o700);
 
         // 未保存的修改：打开别的文件前用原有的对话框询问；留在此处时不切换，舍弃修改时不写入文件。
         await page(`${textEditor}.replaceRange('不保存的修改\\n', { line: 0, ch: 0 }); return true;`);
@@ -229,6 +238,7 @@ app.whenReady().then(async () => {
         await pressCtrl('s');
         await untilFile('empty-tail.csv', bytes => bytes.toString('utf8') === 'EDITED\n""', '修改另一格后保留末尾空记录');
         await until('!window.ScriptoriumTableView.doc().dirty', 'CSV 已保存');
+        if (process.platform !== 'win32') assert.equal(fs.statSync(file('empty-tail.csv')).mode & 0o777, 0o600);
         await open('table.csv');
         await until(`window.ScriptoriumTableView.doc()?.filePath === ${JSON.stringify(file('table.csv'))}`, '返回表格 A');
 
@@ -299,6 +309,7 @@ app.whenReady().then(async () => {
             await pressCtrl('s');
             await untilFile('other-page.html', bytes => bytes.toString('utf8').startsWith('<!-- LOCAL-HTML -->') && !bytes.toString('utf8').includes('网页正文'), '网页 B 保存不含 A 内容');
             await until('!window.ScriptoriumWebPage.doc().dirty', '网页已保存');
+            if (process.platform !== 'win32') assert.equal(fs.statSync(file('other-page.html')).mode & 0o777, 0o600);
         } finally { webRead.restore(); }
 
         // 图片
@@ -319,6 +330,7 @@ app.whenReady().then(async () => {
         assert.equal(saved.getPageCount(), 2);
         assert.equal(saved.getPage(0).getRotation().angle, 90);
         assert.equal(saved.getPage(1).getRotation().angle, 0);
+        if (process.platform !== 'win32') assert.equal(fs.statSync(file('two.pdf')).mode & 0o777, 0o600);
 
         await until(`!window.ScriptoriumPdfView.doc().dirty && !window.ScriptoriumPdfView.doc().saving`, 'PDF 保存并重载完成');
 

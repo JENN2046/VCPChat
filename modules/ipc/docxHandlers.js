@@ -13,6 +13,7 @@ const { PRELOAD_ROLES, resolveAppPreload } = require('../services/preloadPaths')
 const scriptoriumImportService = require('../services/scriptoriumImportService');
 // Markdown、网页、PDF、表格、文本等文件原位打开（modules/scriptorium）。
 const fileViews = require('../scriptorium/fileViews');
+const { writeAtomically } = require('../scriptorium/atomicReplace');
 const {
     ScriptoriumFontCacheService,
 } = require('../services/scriptoriumFontCacheService');
@@ -444,16 +445,7 @@ async function writeStylePacks(_event, packs = []) {
         throw new Error('高级样式库超过 20 MB 持久化上限。');
     }
     await fs.ensureDir(path.dirname(stylePackFilePath));
-    const temporaryPath =
-        `${stylePackFilePath}.writing-${process.pid}-${Date.now()}`;
-    try {
-        await fs.writeFile(temporaryPath, content, 'utf8');
-        await fs.move(temporaryPath, stylePackFilePath, {
-            overwrite: true,
-        });
-    } finally {
-        await fs.remove(temporaryPath).catch(() => {});
-    }
+    await writeAtomically(stylePackFilePath, content);
     return {
         success: true,
         count: packs.length,
@@ -492,16 +484,7 @@ async function writeSvgAssetPacks(_event, packs = []) {
         throw new Error('SVG 资产库超过 20 MB 持久化上限。');
     }
     await fs.ensureDir(path.dirname(svgAssetFilePath));
-    const temporaryPath =
-        `${svgAssetFilePath}.writing-${process.pid}-${Date.now()}`;
-    try {
-        await fs.writeFile(temporaryPath, content, 'utf8');
-        await fs.move(temporaryPath, svgAssetFilePath, {
-            overwrite: true,
-        });
-    } finally {
-        await fs.remove(temporaryPath).catch(() => {});
-    }
+    await writeAtomically(svgAssetFilePath, content);
     return {
         success: true,
         count: packs.length,
@@ -936,14 +919,7 @@ async function atomicWrite(filePath, bytes) {
     if (data.length > MAX_DOCUMENT_BYTES) throw new Error('文档超过 100 MB 安全上限。');
 
     await fs.ensureDir(path.dirname(resolved));
-    const temporaryPath = `${resolved}.vcp-writing-${process.pid}-${Date.now()}`;
-    try {
-        await fs.writeFile(temporaryPath, data);
-        await fs.move(temporaryPath, resolved, { overwrite: true });
-    } finally {
-        await fs.remove(temporaryPath).catch(() => {});
-    }
-
+    await writeAtomically(resolved, data);
     const stat = await fs.stat(resolved);
     await rememberRecentFile(resolved);
     return {
@@ -991,13 +967,7 @@ async function atomicWriteExport(filePath, data) {
     if (!bytes.length) throw new Error('拒绝导出空文档。');
     if (bytes.length > MAX_DOCUMENT_BYTES) throw new Error('导出文档超过 100 MB 安全上限。');
     await fs.ensureDir(path.dirname(resolved));
-    const temporaryPath = `${resolved}.vcp-exporting-${process.pid}-${Date.now()}`;
-    try {
-        await fs.writeFile(temporaryPath, bytes);
-        await fs.move(temporaryPath, resolved, { overwrite: true });
-    } finally {
-        await fs.remove(temporaryPath).catch(() => {});
-    }
+    await writeAtomically(resolved, bytes);
     const stat = await fs.stat(resolved);
     return {
         success: true,

@@ -12,7 +12,7 @@ const nativeFs = require('node:fs');
 const fs = require('fs-extra');
 const JSZip = require('jszip');
 const { decodeText, encodeText } = require('../textEncoding');
-const { replaceWith } = require('../atomicReplace');
+const { writeAtomically } = require('../atomicReplace');
 
 const EXTENSIONS = new Set(['.md', '.markdown']);
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -191,13 +191,7 @@ async function sourceOf(projectBytes) {
 // 先写同一文件夹里的临时文件，再一步替换原文件（atomicReplace.js），中途断电不会留下半份文件。
 async function replaceFile(target, bytes) {
     await fs.ensureDir(path.dirname(target));
-    const temporary = path.join(path.dirname(target), `.${path.basename(target)}.scriptorium-saving-${process.pid}-${Date.now()}`);
-    try {
-        await nativeFs.promises.writeFile(temporary, bytes);
-        await replaceWith(temporary, target);
-    } finally {
-        await nativeFs.promises.rm(temporary, { force: true }).catch(() => {});
-    }
+    await writeAtomically(target, bytes);
 }
 
 // 保存一份从 .md 打开的文稿。另存为时可以选择 .md 或 .vdocx（转为文稿工程，按原有流程保存）。

@@ -673,8 +673,8 @@ const reviewedSourceBlobs = new Map([
     ['tests/side-pane-plan-detail.test.mjs', '5603a27d3604ffc1ce0a72713022466f2ea129d5'],
     // ProjectForge upstream integration: selection ownership, retryable reads and opaque manual iframe.
     ['ProjectForgemodules/projectforge.js', '4a7a495a5d640e52bbd942fe44416ccd505f35fa'],
-    ['ProjectForgemodules/projectforge-blueprint.js', '6d1551968515fff43811afbc7e2622612362c8ab'],
-    ['tests/projectforge-blueprint.test.cjs', '1d853121af2eeb67cbb5592d35eda5f80c207908'],
+    ['ProjectForgemodules/projectforge-blueprint.js', 'f467c4a4c7650fbf00717bd1b193a6d53d35c100'],
+    ['tests/projectforge-blueprint.test.cjs', 'b17a7355f38e3d51d773f1e2f8f60119150657f5'],
     // PR #87: reject checkpoint restore continuations after board ownership changes.
     ['ScriptoriumModules/scriptorium-board-lineage.js', '6ad5ef23c035b7e87216ebc0cccee5ecc0378e16'],
 ]);

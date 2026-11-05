@@ -3181,9 +3181,9 @@
           "path": "ProjectForgemodules/projectforge-blueprint.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6d1551968515fff43811afbc7e2622612362c8ab",
-          "size": 12717,
-          "sha256": "2a37546310147329fe5606c18fea82c3d46e8699b7e608e01f02f646e45664d3",
+          "blob": "f467c4a4c7650fbf00717bd1b193a6d53d35c100",
+          "size": 13607,
+          "sha256": "5a40989e065684d2fb686d855ea6d80dd2cdeb6b99d50b460b40444135f3d8ed",
           "kind": "source"
         },
         {
@@ -15538,9 +15538,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "bcb4bdfc5dc523669a4a2c07c362a3ced18cf385",
+          "blob": "8f1baff786e0161a0546673d3ff19b2524dfddeb",
           "size": 52108,
-          "sha256": "cc8a5cc791014888059f5f86f192e0ad1891028157bf8f52617ef69736d9b41a",
+          "sha256": "236af79aefefef10a8854b3a0642ff7d6d0efeb877d84f6d1920a2342281a32b",
           "kind": "source"
         },
         {
@@ -18445,9 +18445,9 @@
           "path": "tests/projectforge-blueprint.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "1d853121af2eeb67cbb5592d35eda5f80c207908",
-          "size": 6929,
-          "sha256": "6bd4c94ebeffe1be1aaf616a2109a40e3fe607d16049097e317cfbfe7d68ebbb",
+          "blob": "b17a7355f38e3d51d773f1e2f8f60119150657f5",
+          "size": 8541,
+          "sha256": "d24a40a6e5b9e9c5b1de9ec334df822f2e20b9d3e7227c83791af5025e0b9429",
           "kind": "source"
         },
         {
@@ -27842,9 +27842,9 @@
           "path": "ProjectForgemodules/projectforge-blueprint.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "6d1551968515fff43811afbc7e2622612362c8ab",
-          "size": 12717,
-          "sha256": "2a37546310147329fe5606c18fea82c3d46e8699b7e608e01f02f646e45664d3",
+          "blob": "f467c4a4c7650fbf00717bd1b193a6d53d35c100",
+          "size": 13607,
+          "sha256": "5a40989e065684d2fb686d855ea6d80dd2cdeb6b99d50b460b40444135f3d8ed",
           "kind": "source"
         },
         {
@@ -38030,9 +38030,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "bcb4bdfc5dc523669a4a2c07c362a3ced18cf385",
+          "blob": "8f1baff786e0161a0546673d3ff19b2524dfddeb",
           "size": 52108,
-          "sha256": "cc8a5cc791014888059f5f86f192e0ad1891028157bf8f52617ef69736d9b41a",
+          "sha256": "236af79aefefef10a8854b3a0642ff7d6d0efeb877d84f6d1920a2342281a32b",
           "kind": "source"
         },
         {
@@ -41657,9 +41657,9 @@
           "path": "tests/projectforge-blueprint.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "1d853121af2eeb67cbb5592d35eda5f80c207908",
-          "size": 6929,
-          "sha256": "6bd4c94ebeffe1be1aaf616a2109a40e3fe607d16049097e317cfbfe7d68ebbb",
+          "blob": "b17a7355f38e3d51d773f1e2f8f60119150657f5",
+          "size": 8541,
+          "sha256": "d24a40a6e5b9e9c5b1de9ec334df822f2e20b9d3e7227c83791af5025e0b9429",
           "kind": "source"
         },
         {

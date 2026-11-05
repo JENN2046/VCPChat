@@ -1,6 +1,6 @@
 // ProjectForgemodules/projectforge-blueprint.js
 // 工程画布动态渲染器（二期）：把 v 工程数据库实时投影成泳道画布。
-// 数据源：state.detail（get-project 全量，selectProject/changed 回调负责刷新）+ getBatchNodes 节点级补拉（带缓存）。
+// 数据源：state.detail（get-project 最近最多 200 批次，selectProject/changed 回调负责刷新）+ getBatchNodes 节点级补拉（带缓存）。
 // 实时生长：onProjectForgeChanged → scheduleAutoRefresh → renderBlueprint(force) → diff 出新节点加 pop 动画。
 // 重建不丢阅读位置：renderBlueprint 先 bpCaptureScroll 记录视口顶端泳道锚点，离屏渲染替换后 bpRestoreScroll 对齐。
 // 依赖 projectforge.js 的全局符号：state / escapeHtml / call / api / openNode / STATUS_LABEL（加载顺序在本文件之前）。
@@ -206,6 +206,13 @@ async function renderBlueprintDynamic(host, projectId) {
     const created = detail.project?.created_at;
     const durationTxt = created && st.lastAt ? bpDuration(new Date(st.lastAt) - new Date(created)) : '-';
     const statusTxt = STATUS_LABEL[detail.project?.status] || detail.project?.status || '-';
+    const windowLimited = timeline.length >= 200;
+    const oldestAt = timeline[0]?.created_at;
+    const scopeHtml = '<p class="muted bp-scope">当前画布：最近 ' + timeline.length + ' 个批次，统计仅含已加载节点。' +
+        (windowLimited ? '可能还有更早记录。<button type="button" class="btn" data-bp-history>搜索更早历史</button>' : '') +
+        (fetchFail ? '另有 ' + fetchFail + ' 个批次拉取失败，请刷新重试。' : '') + '</p>';
+    const shownAdded = flat.reduce((sum, n) => sum + (Number(n.added) || 0), 0);
+    const shownRemoved = flat.reduce((sum, n) => sum + (Number(n.removed) || 0), 0);
 
     const lanesHtml = [...lanes.entries()].map(([file, nodes]) => {
         const laneAdded = nodes.reduce((s, n) => s + (Number(n.added) || 0), 0);
@@ -226,19 +233,23 @@ async function renderBlueprintDynamic(host, projectId) {
             '<div class="bp-stats">' +
                 '<span class="bp-chip">节点<b>' + flat.length + '</b></span>' +
                 '<span class="bp-chip">文件<b>' + lanes.size + '</b></span>' +
-                '<span class="bp-chip">' + bpDeltaHtml(st.added, st.removed) + '</span>' +
+                '<span class="bp-chip">' + bpDeltaHtml(shownAdded, shownRemoved) + '</span>' +
                 '<span class="bp-chip">返工<b>' + rollbackCount + '</b></span>' +
                 (externalCount ? '<span class="bp-chip bp-warn-chip">外部动刀<b>' + externalCount + '</b></span>' : '') +
-                '<span class="bp-chip">耗时<b>' + escapeHtml(durationTxt) + '</b></span>' +
+                '<span class="bp-chip">工程耗时<b>' + escapeHtml(durationTxt) + '</b></span>' +
                 '<span class="bp-live"><span class="bp-live-dot"></span>实时投影 · 施工变动自动生长</span>' +
             '</div>' +
-            '<div class="bp-canvas">' + lanesHtml + '</div>' +
+            scopeHtml + '<div class="bp-canvas">' + lanesHtml + '</div>' +
             '<div class="bp-foot">' +
                 '<span>数据源：v 工程数据库实时投影（GetProject + GetBatchNodes），零编造。</span>' +
                 '<span>验收状态：' + escapeHtml(statusTxt) + '</span>' +
             '</div>' +
         '</div>';
 
+    host.querySelector('[data-bp-history]')?.addEventListener('click', () => {
+        if (state.currentId !== projectId) return;
+        historyByFilters(oldestAt ? { until: oldestAt } : {});
+    });
     flat.forEach(n => cache.rendered.add(n.id));
     cache.booted = true;
 

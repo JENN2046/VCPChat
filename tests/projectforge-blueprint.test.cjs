@@ -21,19 +21,20 @@ function fixture(overrides = {}) {
   const dom = new JSDOM('<button class="tab active" data-tab="overview"></button><main id="pane-blueprint"></main><div id="history-results"></div>');
   const state = {currentId: 'project-a', detail: {project: {status: 'active', stats: {}},
     timeline: [{id: 1, reason: 'batch reason'}], todos: []}};
-  const opened = [];
+  const opened = [], histories = [];
   const api = {projectForgeGetBlueprint: async () => ({exists: false}),
     projectForgeGetBatch: async () => ({nodes: [{id: 7, file_path: 'src/main.js', op: 'edit'}]}), ...overrides};
   const context = vm.createContext({document: dom.window.document, state, api,
     renderProjectList() {}, showProjectView() {}, renderHeader() {}, renderOverview() {},
     renderTimeline() {}, renderFiles() {}, renderReport() {}, switchTab() {}, toast() {},
+    historyByFilters: filters => histories.push(filters),
     $: id => dom.window.document.getElementById(id),
     escapeHtml: value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c])),
     call: async value => value, openNode: id => opened.push(id), STATUS_LABEL: {active: '进行中'}});
   vm.runInContext(drawing + '\nlet bpRenderSeq = 0, projectDetailSequence = 0;\n' + renderer.slice(node.start, node.end) +
     '\n' + renderer.slice(selectNode.start, selectNode.end) +
     '\nglobalThis.render = renderBlueprint;globalThis.select = selectProject;', context);
-  return {dom, context, state, opened, pane: dom.window.document.querySelector('main')};
+  return {dom, context, state, opened, histories, pane: dom.window.document.querySelector('main')};
 }
 
 test('dynamic blueprint renders source nodes, batch reasons, readable TODOs and node actions', async t => {
@@ -118,4 +119,31 @@ test('a switched project rejects the previous detail response', async t => {
   const pending = f.context.select('project-a'); f.state.currentId = 'project-b';
   gate.resolve({...initial, revision: 'old-a'}); await pending;
   assert.equal(f.state.detail, initial);
+});
+
+
+test('capped blueprint exposes its scope and opens older history with consistent local totals', async t => {
+  const f = fixture(); t.after(() => f.dom.window.close());
+  f.state.detail.timeline = Array.from({length: 200}, (_, i) => ({id: 201 - i,
+    created_at: '2026-11-05T01:00:00.000Z', reason: 'recent'}));
+  f.state.detail.project.stats = {added: 999999, removed: 888888};
+  f.context.api.projectForgeGetBatch = async (_project, id) => ({nodes: [
+    {id, file_path: 'recent.js', op: 'edit', added: 1, removed: 2}]});
+  await f.context.render();
+  assert.match(f.pane.querySelector('.bp-scope').textContent, /最近 200 个批次/);
+  assert.match(f.pane.textContent, /可能还有更早记录/);
+  assert.doesNotMatch(f.pane.textContent, /999999|888888/);
+  assert.equal(f.pane.querySelector('.bp-stats .plus').textContent, '+200');
+  assert.equal(f.pane.querySelector('.bp-stats .minus').textContent, '−400');
+  f.pane.querySelector('[data-bp-history]').click();
+  assert.equal(f.histories.length, 1);
+  assert.equal(f.histories[0].until, '2026-11-05T01:00:00.000Z');
+  f.state.currentId = 'project-b'; f.pane.querySelector('[data-bp-history]').click();
+  assert.equal(f.histories.length, 1);
+});
+
+test('small blueprints do not claim older history is omitted', async t => {
+  const f = fixture(); t.after(() => f.dom.window.close()); await f.context.render();
+  assert.equal(f.pane.querySelector('[data-bp-history]'), null);
+  assert.match(f.pane.querySelector('.bp-scope').textContent, /最近 1 个批次/);
 });

@@ -91,11 +91,13 @@
     // 刚放上去、接着打字的字块：打完不另记一笔（撤销时连放带打一起撤）。
     let fresh = null;
     function amend(change) {
+        if (!S || S.saving) return;
         change();
         S.stateId = uid('s');
         refresh();
     }
     function commit(change) {
+        if (!S || S.saving) return;
         S.history.push({ snap: snapshot(), id: S.stateId });
         if (S.history.length > 200) S.history.shift();
         S.future = [];
@@ -104,7 +106,7 @@
         refresh();
     }
     function undo() {
-        if (!S?.history.length) return;
+        if (!S?.history.length || S.saving) return;
         finishEditing(false);
         S.future.push({ snap: snapshot(), id: S.stateId });
         const prev = S.history.pop();
@@ -114,7 +116,7 @@
         refresh();
     }
     function redo() {
-        if (!S?.future.length) return;
+        if (!S?.future.length || S.saving) return;
         finishEditing(false);
         S.history.push({ snap: snapshot(), id: S.stateId });
         const next = S.future.pop();
@@ -592,6 +594,7 @@
 
     // 改字：在 contenteditable 里打，离开时收下。
     function startEditing(id, { selectAll = false, isNew = false } = {}) {
+        if (!S || S.saving) return;
         const item = findObject(id);
         if (!item || (item.type !== 'text' && item.type !== 'cover')) return;
         select(id);
@@ -647,6 +650,7 @@
     }
     // 新建后一个字没打就走了：当作没加过（也不留撤销记录）。
     function removeQuietly(id) {
+        if (!S || S.saving) return;
         const index = S.history.length - 1;
         S.objects = S.objects.filter((item) => item.id !== id);
         if (index >= 0 && !S.history[index].snap.objects.some((item) => item.id === id)) {
@@ -675,7 +679,7 @@
         return item;
     }
     pagesHost.addEventListener('pointerdown', (event) => {
-        if (!S || event.button !== 0) return;
+        if (!S || S.saving || event.button !== 0) return;
         const pageEl = event.target.closest('.scriptorium-pdf-page');
         if (!pageEl) return;
         if (event.target.closest('.scriptorium-pdf-field')) return;
@@ -724,6 +728,7 @@
     });
     // 拖着挪、拖右下角改大小（图片、签名按原来的比例；文字按比例改字号）。
     function dragObject(id, event, resize) {
+        const state = S;
         const item = findObject(id);
         if (!item) return;
         finishEditing(true);
@@ -735,6 +740,7 @@
         let moved = false;
         el.setPointerCapture(event.pointerId);
         const move = (moveEvent) => {
+            if (S !== state || state.saving) return;
             const dx = (moveEvent.clientX - start.x) / zoom;
             const dy = (moveEvent.clientY - start.y) / zoom;
             if (!moved && Math.abs(dx) + Math.abs(dy) < 2 / zoom) return;
@@ -766,6 +772,7 @@
             el.removeEventListener('pointermove', move);
             el.removeEventListener('pointerup', up);
             el.removeEventListener('pointercancel', up);
+            if (S !== state || state.saving) return;
             if (!moved || !el._next) return;
             const next = el._next;
             commit(() => Object.assign(item, { x: next.x, y: next.y, w: next.w, h: next.h, size: next.size ?? item.size }));
@@ -777,6 +784,7 @@
     }
     // 拖出一块（方框、高亮、改字的方块）。点一下没拖：给一个默认大小。
     function dragBox(entry, pageEl, point, event, type) {
+        const state = S;
         const ghost = make('div', `scriptorium-pdf-obj ${type} ghost`);
         const el = elements.get(entry.id);
         el.objs.append(ghost);
@@ -785,6 +793,7 @@
         draw();
         pageEl.setPointerCapture(event.pointerId);
         const move = (moveEvent) => {
+            if (S !== state || state.saving) return;
             const now = pointIn(pageEl, moveEvent);
             box = { x: Math.min(point.x, now.x), y: Math.min(point.y, now.y), w: Math.abs(now.x - point.x), h: Math.abs(now.y - point.y) };
             draw();
@@ -794,6 +803,7 @@
             pageEl.removeEventListener('pointerup', up);
             pageEl.removeEventListener('pointercancel', up);
             ghost.remove();
+            if (S !== state || state.saving) return;
             if (box.w < 4 && box.h < 4) box = { x: point.x, y: point.y - 10, w: type === 'mark' ? 80 : 120, h: type === 'mark' ? 14 : 40 };
             const item = { page: entry.id, type, ...box };
             clampTo(entry, item);
@@ -1929,67 +1939,85 @@
         return canvas.toDataURL('image/jpeg', 0.92);
     }
     async function save({ saveAs = false, force = false } = {}) {
-        if (!S) return false;
+        if (!S || S.saving) return false;
+        // 收下仍聚焦的原生表单输入和文字块，再锁住这次保存的完整计划。
+        document.activeElement?.blur?.();
         finishEditing(true);
         if (!saveAs && !dirty() && !force) return true;
         const state = S;
         state.saving = true;
-        UI.sync?.();
-        let result;
+        work.inert = true;
         try {
-            result = await api().pdf('save', { path: state.filePath, plan: await planOf(state), fingerprint: state.fingerprint, saveAs, force });
-        } catch (error) {
-            result = { success: false, error: error.message };
-        }
-        state.saving = false;
-        if (result?.conflict) {
-            if (S === state) showConflict();
             UI.sync?.();
-            return false;
-        }
-        if (!result?.success) {
-            if (!result?.canceled) UI.toast(`未能保存：${result?.error || '写入失败'}`, 'error', 6000);
+            let result;
+            try {
+                result = await api().pdf('save', { path: state.filePath, plan: await planOf(state), fingerprint: state.fingerprint, saveAs, force });
+            } catch (error) {
+                result = { success: false, error: error.message };
+            }
+            if (result?.conflict) {
+                if (S === state) showConflict();
+                return false;
+            }
+            if (!result?.success) {
+                if (!result?.canceled) UI.toast(`未能保存：${result?.error || '写入失败'}`, 'error', 6000);
+                return false;
+            }
+            if (saveAs && !same(state.filePath, result.filePath)) {
+                // 切换到新文件前才暂时标为已保存，避免重复询问；切换失败须保留旧稿的未保存状态。
+                const savedId = state.savedId;
+                state.savedId = state.stateId;
+                if (S === state) {
+                    try {
+                        if (!(await session()?.openPath?.(result.filePath))) {
+                            state.savedId = savedId;
+                            return false;
+                        }
+                    } catch (error) {
+                        state.savedId = savedId;
+                        UI.toast(`已另存，但未能打开：${error.message}`, 'error', 6000);
+                        return false;
+                    }
+                }
+                UI.toast(`已另存为：${result.filePath.split(/[\\/]/).pop()}`);
+                return true;
+            }
+            UI.toast(saveAs ? '已另存为。' : state.saved ? '已保存。' : '已保存。保存前的原文件已备份到 AppData。');
+            state.saved = true;
+            if (S !== state) return true;
+            // 写入和重新载入是同一次操作，重载完成前仍不允许编辑或发起第二次保存。
+            return await reload({ discard: true, quiet: true, fromSave: true });
+        } finally {
+            state.saving = false;
+            work.inert = Boolean(S?.saving);
             UI.sync?.();
-            return false;
         }
-        if (saveAs) {
-            // 另存为：原文件不动，接着在新文件上改（改动已经写在新文件里了）。
-            state.savedId = state.stateId;
-            if (S === state) await session()?.openPath?.(result.filePath);
-            UI.toast(`已另存为：${result.filePath.split(/[\\/]/).pop()}`);
-            return true;
-        }
-        UI.toast(state.saved ? '已保存。' : '已保存。保存前的原文件已备份到 AppData。');
-        state.saved = true;
-        if (S !== state) return true;
-        // 放上去的东西已经写进文件：重新读一遍，在新的文件上接着改（撤销记录清掉）。
-        await reload({ discard: true, quiet: true });
-        return true;
     }
-    async function reload({ discard = false, quiet = false } = {}) {
-        if (!S) return;
-        if (dirty() && !discard) return;
+    async function reload({ discard = false, quiet = false, fromSave = false } = {}) {
+        if (!S || (S.saving && !fromSave)) return false;
+        if (dirty() && !discard) return false;
         const state = S;
         const result = await read(state.filePath);
-        if (S !== state) return;
+        if (S !== state) return false;
         if (!result?.success) {
             if (!quiet) UI.toast(`未能重新读取：${result?.error || ''}`, 'error', 5000);
-            return;
+            return false;
         }
         let next;
         try {
             next = await build(result);
         } catch (error) {
             UI.toast(passwordProblem(error) || `无法解析这份 PDF：${error.message}`, 'error', 6000);
-            return;
+            return false;
         }
-        if (S !== state) { destroy(next); return; }
+        if (S !== state) { destroy(next); return false; }
         next.saved = state.saved;
         next.scroll = scroller.scrollTop;
         next.zoom = zoom;
         destroy(state);
         S = next;
         enter();
+        return true;
     }
     function showConflict() {
         conflict.hidden = false;
@@ -2097,6 +2125,7 @@
         const key = event.key.toLowerCase();
         const mod = (event.ctrlKey || event.metaKey) && !event.altKey;
         const stop = () => { event.preventDefault(); event.stopImmediatePropagation(); };
+        if (S.saving) { stop(); return; }
         if (mod && key === 's') { stop(); void save({ saveAs: event.shiftKey }); return; }
         if (mod && key === 'f') { stop(); findInput.focus(); findInput.select(); return; }
         if (mod && (key === '=' || key === '+')) { stop(); setZoom(zoom + 0.1); return; }

@@ -114,3 +114,134 @@ test('image navigation lists only authorized siblings and never grants the surro
     access.configure({ libraryRoots: () => [dir] });
     assert.equal((await handler(event, { command: 'image', file: result.filePath })).siblings.length, 3);
 });
+
+
+test('PDF Save As authorizes only the successfully written dialog destination for reopening', async t => {
+    const dir = await temporary(t);
+    const library = path.join(dir, 'library');
+    const outside = path.join(dir, 'outside');
+    await fs.mkdir(library); await fs.mkdir(outside);
+    const original = path.join(library, 'original.pdf');
+    const doc = await PDFDocument.create(); doc.addPage();
+    const bytes = Buffer.from(await doc.save()); await fs.writeFile(original, bytes);
+    access.configure({ libraryRoots: () => [library], recentFiles: async () => [] });
+    const pdf = require('../modules/scriptorium/pdfFiles');
+    let selection = { canceled: true };
+    const recent = [];
+    pdf.register({ removeHandler() {}, handle() {} }, {
+        dataDir: () => path.join(dir, 'data'),
+        dialog: { showSaveDialog: async () => selection },
+        rememberRecentFile: async file => recent.push(file),
+    });
+    const event = { sender: { id: 9002, once() {} } };
+    const opened = await pdf._act(event, { command: 'read', path: original });
+    const payload = { command: 'save', path: original, fingerprint: opened.fingerprint, saveAs: true };
+    const canceled = path.join(outside, 'canceled.pdf');
+    selection = { canceled: true, filePath: canceled };
+    assert.equal((await pdf._act(event, payload)).canceled, true);
+    assert.equal(await access.allowed(canceled), false);
+    const failed = path.join(outside, 'missing', 'failed.pdf');
+    selection = { canceled: false, filePath: failed };
+    await assert.rejects(pdf._act(event, payload));
+    assert.equal(await access.allowed(failed), false);
+    selection = { canceled: false, filePath: path.join(outside, 'new') };
+    const saved = await pdf._act(event, payload);
+    assert.equal(saved.filePath, path.join(outside, 'new.pdf'));
+    assert.equal(await access.allowed(saved.filePath), true);
+    assert.equal(recent.includes(saved.filePath), true);
+    assert.equal((await pdf._act(event, { command: 'read', path: saved.filePath })).success, true);
+    assert.deepEqual(await fs.readFile(original), bytes);
+    const neighbor = path.join(outside, 'neighbor.pdf'); await fs.writeFile(neighbor, bytes);
+    assert.equal(await access.allowed(neighbor), false);
+    await assert.rejects(pdf._act(event, { command: 'read', path: neighbor }), /不在文库/);
+});
+
+// Load the real renderer operation/mutation functions; defer each asynchronous
+// boundary to reproduce the save/edit/reload race without replacing its logic.
+const vm = require('node:vm');
+const { parse } = require('@babel/parser');
+const renderer = require('node:fs').readFileSync(path.join(__dirname, '../ScriptoriumModules/scriptorium-pdf-view.js'), 'utf8');
+const wanted = new Set(['amend', 'commit', 'undo', 'redo', 'save', 'reload']);
+const functions = new Map();
+function collect(node) {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'FunctionDeclaration' && wanted.has(node.id.name)) functions.set(node.id.name, renderer.slice(node.start, node.end));
+    for (const child of Object.values(node)) {
+        if (Array.isArray(child)) child.forEach(collect);
+        else if (child && typeof child === 'object') collect(child);
+    }
+}
+collect(parse(renderer));
+assert.equal(functions.size, wanted.size);
+function deferred() {
+    let resolve; const promise = new Promise(r => { resolve = r; });
+    return { promise, resolve };
+}
+const turn = () => new Promise(resolve => setImmediate(resolve));
+function saveFixture() {
+    const plan = deferred(), response = deferred(), read = deferred(), built = deferred(), opened = deferred();
+    const model = () => ({ objects: ['submitted'], history: [{ snap: {}, id: 'earlier' }], future: [{ snap: {}, id: 'later' }],
+        stateId: 'edited', savedId: 'original', filePath: '/synthetic/original.pdf', fingerprint: 'fingerprint', saving: false });
+    let serial = 0, calls = 0;
+    const original = model();
+    const c = { S: original, work: { inert: false }, document: { activeElement: { blur() {} } },
+        UI: { sync() {}, toast() {} }, scroller: { scrollTop: 0 }, zoom: 1,
+        api: () => ({ pdf: async () => { calls++; return response.promise; } }),
+        session: () => ({ openPath: () => opened.promise }), planOf: () => plan.promise,
+        read: () => read.promise, build: () => built.promise,
+        finishEditing() {}, refresh() {}, select() {}, enter() {}, destroy() {}, showConflict() {},
+        passwordProblem: () => '', same: (a,b) => a === b, uid: () => `revision-${++serial}`,
+        snapshot: () => ({ objects: [...c.S.objects] }), restore: snap => { c.S.objects = [...(snap.objects || [])]; },
+        dirty: () => c.S.stateId !== c.S.savedId };
+    vm.createContext(c); vm.runInContext([...functions.values()].join('\n'), c);
+    return { c, original, model, plan, response, read, built, opened, calls: () => calls };
+}
+
+test('PDF save serializes edits and duplicate saves through plan, write and reload completion', async () => {
+    const f = saveFixture(), c = f.c;
+    const saving = c.save();
+    const blocked = () => {
+        const id = c.S.stateId, history = c.S.history.length;
+        c.commit(() => c.S.objects.push('late')); c.amend(() => c.S.objects.push('late'));
+        c.undo(); c.redo();
+        assert.equal(c.S.stateId, id); assert.equal(c.S.history.length, history);
+        assert.deepEqual([...c.S.objects], ['submitted']);
+        assert.equal(c.S.saving, true); assert.equal(c.work.inert, true);
+    };
+    blocked();
+    assert.equal(await c.save(), false, 'a duplicate save must not start');
+    f.plan.resolve({}); await turn(); blocked(); assert.equal(f.calls(), 1);
+    f.response.resolve({ success: true, filePath: f.original.filePath }); await turn(); blocked();
+    assert.equal(await c.reload({ discard: true }), false, 'manual reload must not overtake save');
+    f.read.resolve({ success: true }); await turn(); blocked();
+    const next = f.model(); next.objects = []; next.stateId = next.savedId = 'saved';
+    f.built.resolve(next); assert.equal(await saving, true);
+    assert.equal(f.original.saving, false); assert.equal(c.work.inert, false);
+    c.commit(() => c.S.objects.push('after-save'));
+    assert.deepEqual([...c.S.objects], ['after-save']); assert.equal(c.dirty(), true);
+});
+
+test('PDF failed, canceled and conflicting saves release the edit lock without clearing changes', async () => {
+    for (const response of [{ success: false, error: 'synthetic failure' }, { canceled: true }, { conflict: true }]) {
+        const f = saveFixture(), c = f.c; f.plan.resolve({}); f.response.resolve(response);
+        assert.equal(await c.save(), false);
+        assert.equal(c.S.saving, false); assert.equal(c.work.inert, false);
+        assert.equal(c.S.savedId, 'original'); assert.equal(c.dirty(), true);
+        c.commit(() => c.S.objects.push('retry-edit'));
+        assert.deepEqual([...c.S.objects], ['submitted', 'retry-edit']);
+    }
+});
+
+test('PDF Save As keeps the lock through reopening and retains dirty state when reopening fails', async () => {
+    for (const success of [true, false]) {
+        const f = saveFixture(), c = f.c; f.plan.resolve({});
+        const saving = c.save({ saveAs: true });
+        f.response.resolve({ success: true, filePath: '/synthetic/new.pdf' }); await turn();
+        assert.equal(c.S.saving, true); assert.equal(c.work.inert, true);
+        c.commit(() => c.S.objects.push('late'));
+        assert.deepEqual([...c.S.objects], ['submitted']);
+        f.opened.resolve(success); assert.equal(await saving, success);
+        assert.equal(c.S.saving, false); assert.equal(c.work.inert, false);
+        if (!success) assert.equal(c.dirty(), true);
+    }
+});

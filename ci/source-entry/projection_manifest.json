@@ -3658,9 +3658,9 @@
           "path": "ScriptoriumModules/scriptorium-pdf-view.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cc9e3f9f6298619592aa24357d664195180ed6ef",
-          "size": 107089,
-          "sha256": "38f657e054da818c6663d32a91635702239ad4262e2d1b8a3eade775b01bec40",
+          "blob": "b095b20df0f9145b954a7b0fbf7fbb1bf9ab7abb",
+          "size": 108612,
+          "sha256": "d17fa2776cf3332a65b6379ff62e75ad7011b9aa970461e0181a0a927054ddb1",
           "kind": "source"
         },
         {
@@ -11560,9 +11560,9 @@
           "path": "modules/scriptorium/pdfFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "29fd07c97b10888643d896c433d6548a668db151",
-          "size": 14127,
-          "sha256": "93bc4bf73cbe0f5c43fcf8915154c02eaf9f27ba0d1f4ad045da3514fecbce58",
+          "blob": "40e12bdc2d5ed0ade36c6e708b3dad310e5161ed",
+          "size": 14408,
+          "sha256": "83350f47f87ecb5334d874af34a937f7ec3c20da90058f342364c659ccf58bf2",
           "kind": "source"
         },
         {
@@ -15502,9 +15502,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "976adc2d490265f1612026f9b7d0981868c0957f",
-          "size": 48475,
-          "sha256": "a3b8da26c997808fb09c145c7d5fd50016b8ef967b6c9aa305f91fed49b6dc87",
+          "blob": "26d129bb0697bb700ec3626de2a5533fd54b1058",
+          "size": 48869,
+          "sha256": "e6177b10cf636dc9c921d85c3767d2926623805f314a85bcd501c19c324f5749",
           "kind": "source"
         },
         {
@@ -18445,18 +18445,18 @@
           "path": "tests/scriptorium-file-safety.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8555027533b3be74ed58a17451b7c2febaa841da",
-          "size": 6742,
-          "sha256": "1e0ff7a37641b9fb7105322397197d18e2d7e02ce241048467e6db0f7263f82e",
+          "blob": "cd1a461ef4ed22bd93e89122f8b0a9f7f9782b28",
+          "size": 14455,
+          "sha256": "5aa3d32cedb2d1b732fc53a5096c6372fb7ea43781095052345c3ecd5ff82463",
           "kind": "source"
         },
         {
           "path": "tests/scriptorium-file-views-electron.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1160e077b38edfe7c65b059b2c7d7c7cd616c6f8",
-          "size": 13639,
-          "sha256": "33b11ec534a614b72f2f82d27a12e860d076b48a72b7bd9d99ef22c2009a32dc",
+          "blob": "6a6ebe4d85c2232a271977967b747e31d9ce12e9",
+          "size": 17058,
+          "sha256": "a23f77df64af027fb50ce4ebe5e27e6482e35df4ee0762bc565422cc32c682ab",
           "kind": "source"
         },
         {
@@ -28189,9 +28189,9 @@
           "path": "ScriptoriumModules/scriptorium-pdf-view.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "cc9e3f9f6298619592aa24357d664195180ed6ef",
-          "size": 107089,
-          "sha256": "38f657e054da818c6663d32a91635702239ad4262e2d1b8a3eade775b01bec40",
+          "blob": "b095b20df0f9145b954a7b0fbf7fbb1bf9ab7abb",
+          "size": 108612,
+          "sha256": "d17fa2776cf3332a65b6379ff62e75ad7011b9aa970461e0181a0a927054ddb1",
           "kind": "source"
         },
         {
@@ -31186,9 +31186,9 @@
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "29c34fa50951226e7e786b8271dba819b7664430",
+          "blob": "83f0d763e4d0f1fca0cac0b4e4a1ac0701541182",
           "size": 1099769,
-          "sha256": "d5974a7ec12bcdb273c160a1a69e9e106140e465ec7c2a66ce23b0c9615e66dc",
+          "sha256": "c53629669c1261088fe5a7cb1519750155bfc7941c0adfa6f4de0e2b6f8cb6df",
           "kind": "source"
         },
         {
@@ -34264,9 +34264,9 @@
           "path": "modules/scriptorium/pdfFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "29fd07c97b10888643d896c433d6548a668db151",
-          "size": 14127,
-          "sha256": "93bc4bf73cbe0f5c43fcf8915154c02eaf9f27ba0d1f4ad045da3514fecbce58",
+          "blob": "40e12bdc2d5ed0ade36c6e708b3dad310e5161ed",
+          "size": 14408,
+          "sha256": "83350f47f87ecb5334d874af34a937f7ec3c20da90058f342364c659ccf58bf2",
           "kind": "source"
         },
         {
@@ -37873,9 +37873,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "976adc2d490265f1612026f9b7d0981868c0957f",
-          "size": 48475,
-          "sha256": "a3b8da26c997808fb09c145c7d5fd50016b8ef967b6c9aa305f91fed49b6dc87",
+          "blob": "26d129bb0697bb700ec3626de2a5533fd54b1058",
+          "size": 48869,
+          "sha256": "e6177b10cf636dc9c921d85c3767d2926623805f314a85bcd501c19c324f5749",
           "kind": "source"
         },
         {
@@ -41563,18 +41563,18 @@
           "path": "tests/scriptorium-file-safety.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "8555027533b3be74ed58a17451b7c2febaa841da",
-          "size": 6742,
-          "sha256": "1e0ff7a37641b9fb7105322397197d18e2d7e02ce241048467e6db0f7263f82e",
+          "blob": "cd1a461ef4ed22bd93e89122f8b0a9f7f9782b28",
+          "size": 14455,
+          "sha256": "5aa3d32cedb2d1b732fc53a5096c6372fb7ea43781095052345c3ecd5ff82463",
           "kind": "source"
         },
         {
           "path": "tests/scriptorium-file-views-electron.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "1160e077b38edfe7c65b059b2c7d7c7cd616c6f8",
-          "size": 13639,
-          "sha256": "33b11ec534a614b72f2f82d27a12e860d076b48a72b7bd9d99ef22c2009a32dc",
+          "blob": "6a6ebe4d85c2232a271977967b747e31d9ce12e9",
+          "size": 17058,
+          "sha256": "a23f77df64af027fb50ce4ebe5e27e6482e35df4ee0762bc565422cc32c682ab",
           "kind": "source"
         },
         {

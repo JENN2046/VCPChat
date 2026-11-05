@@ -110,8 +110,13 @@ async function save(event, payload = {}) {
         await backup(file, current);
     }
     await writeAtomically(target, out);
-    allow(sender, target);
     const stat = await fs.stat(target);
+    allow(sender, target);
+    if (payload.saveAs) {
+        // 只授权主进程另存对话框选中并成功写入的最终文件，不授权其目录。
+        require('../fileAccess').grant(target);
+        await Promise.resolve().then(() => deps?.rememberRecentFile?.(target)).catch(() => {});
+    }
     return { success: true, filePath: target, fingerprint: fingerprint(out), mtime: stat.mtimeMs, size: stat.size };
 }
 

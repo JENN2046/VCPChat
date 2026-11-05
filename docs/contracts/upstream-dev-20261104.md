@@ -35,3 +35,12 @@ CSV detection counts delimiters outside quotes across up to 32 complete logical 
 
 
 The first hosted review-repair run correctly rejected a stale generated event graph: the sheet/view IPC call sites moved after the code changes. This refusal was reproduced locally. Regeneration changes only ten line references for existing sheet/view events; the 956 events, 770 scanned files, 110 registered sites and zero undiscovered sites are unchanged. Exact generated-file identities and all six manifest pins are refreshed together; no event contract or IPC permission is added.
+
+
+## PDF save follow-up review
+
+Two additional findings on 47de2d3b were reproduced before repair. A successful Save As outside the library could not be read back because PDF-local write permission did not grant shared file access. After successful atomic write and stat, Save As now grants only the final dialog-selected PDF path and records it as recent; cancellation, failed writes and neighboring paths remain unauthorized.
+
+The renderer now serializes plan creation, write and reload/reopen as one save operation. It flushes focused input first, keeps the view inert and mutation/undo/redo/manual-reload/repeated-save paths blocked until completion, and releases the lock in finally. Existing pointer gestures retain their state owner and cannot mutate a replacement document after reload. A failed Save As reopen restores the original dirty marker; saving to the existing path uses the normal reload path.
+
+The existing file-safety regression uses the real main-process PDF API and renderer operation functions with deferred plan/write/read/build/open boundaries. The existing real Electron file-views test adds a delayed native Save As dialog, attempts edit/undo/redo/page rotation and a duplicate save while pending, opens the resulting file outside the library through the actual session route, and proves that editing/undo work afterward. The generated graph refresh changes only the PDF handler's two line references, not event names or contracts. Exact source identities and all six manifest pins are refreshed together.

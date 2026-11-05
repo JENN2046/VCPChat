@@ -194,6 +194,51 @@ app.whenReady().then(async () => {
         assert.equal(saved.getPage(0).getRotation().angle, 90);
         assert.equal(saved.getPage(1).getRotation().angle, 0);
 
+        await until(`!window.ScriptoriumPdfView.doc().dirty && !window.ScriptoriumPdfView.doc().saving`, 'PDF 保存并重载完成');
+
+        // 实际保存链：另存对话框停留期间禁止编辑/撤销/重复保存，写入后切到文库外新 PDF。
+        const exportedDir = path.join(dataRoot, 'pdf-exports');
+        fs.mkdirSync(exportedDir);
+        const exported = path.join(exportedDir, 'new.pdf');
+        const fileAccess = require('../modules/scriptorium/fileAccess');
+        assert.equal(await fileAccess.allowed(exported), false);
+        const { dialog } = require('electron');
+        const originalDialog = dialog.showSaveDialog;
+        let releaseDialog, dialogCalls = 0;
+        const dialogGate = new Promise(resolve => { releaseDialog = resolve; });
+        dialog.showSaveDialog = async () => { dialogCalls++; await dialogGate; return { canceled: false, filePath: exported }; };
+        try {
+            await page(`const v = window.ScriptoriumPdfView, id = v._state().pages[0].id;
+                v._do.add({ page: id, type: 'rect', x: 10, y: 10, w: 30, h: 20, color: [1, 0, 0] });
+                window.pdfBeforeSaving = v._state(); window.pdfSavePending = v.save({ saveAs: true }); return true;`);
+            await until(`window.ScriptoriumPdfView.doc().saving && document.querySelector('.scriptorium-pdf-work').inert`, 'PDF 保存锁定');
+            for (let tries = 0; !dialogCalls && tries < 100; tries++) await delay(50);
+            assert.equal(dialogCalls, 1);
+            const locked = await page(`const v = window.ScriptoriumPdfView, before = window.pdfBeforeSaving;
+                v._do.add({ page: before.pages[0].id, type: 'rect', x: 50, y: 50, w: 20, h: 20, color: [0, 0, 0] });
+                v._do.undo(); v._do.redo(); v._do.rotatePages(1);
+                const duplicate = await v.save();
+                return { before, after: v._state(), duplicate };`);
+            assert.equal(locked.duplicate, false);
+            assert.deepEqual(locked.after.objects, locked.before.objects);
+            assert.deepEqual(locked.after.pages, locked.before.pages);
+            assert.equal(locked.after.history, locked.before.history);
+            releaseDialog();
+            await until(`window.ScriptoriumPdfView.doc()?.filePath === ${JSON.stringify(exported)} && !window.ScriptoriumPdfView.doc().saving && !window.ScriptoriumPdfView.doc().dirty`, '另存后打开文库外 PDF', 20000);
+            assert.equal(await page('return await window.pdfSavePending;'), true);
+            assert.equal(await fileAccess.allowed(exported), true);
+            assert.equal(await fileAccess.allowed(path.join(exportedDir, 'neighbor.pdf')), false);
+            assert.equal(await page(`return document.querySelector('.scriptorium-pdf-work').inert;`), false);
+            assert.equal((await PDFDocument.load(fs.readFileSync(exported))).getPage(0).getRotation().angle, 90);
+            // 新文件仍可继续编辑和撤销；操作锁没有遗留。
+            assert.deepEqual(await page(`const v = window.ScriptoriumPdfView;
+                v._do.add({ page: v._state().pages[0].id, type: 'rect', x: 20, y: 20, w: 10, h: 10, color: [0, 0, 0] });
+                const dirty = v.doc().dirty; v._do.undo(); return [dirty, v.doc().dirty];`), [true, false]);
+        } finally {
+            releaseDialog();
+            dialog.showSaveDialog = originalDialog;
+        }
+
         assert.deepEqual(errors, [], '页面没有报错');
         console.log('Scriptorium file views Electron test passed');
         app.exit(0);

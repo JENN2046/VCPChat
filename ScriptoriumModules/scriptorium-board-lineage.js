@@ -142,12 +142,15 @@
             return promise;
         }
         async function restore(id) {
+            const expectedEpoch = epoch;
             return serial(async () => {
+                if (expectedEpoch !== epoch) return false;
                 const target = records.find((record) => record.id === id);
                 if (!target?.snapshot) throw new Error('刻点没有快照。');
                 if (!window.confirm(`回溯到“${target.name}”？当前状态会先保留为新刻点。`)) return false;
                 add({ name: '回溯前备份', source: 'human', status: 'applied', snapshot: context.snapshot() });
                 await context.restore(target.snapshot);
+                if (expectedEpoch !== epoch) return false;
                 add({ name: `已回溯 · ${target.name}`, source: 'human', status: 'applied', snapshot: context.snapshot(),
                     operation: { type: 'restore', targetId: id } });
                 return context.save();

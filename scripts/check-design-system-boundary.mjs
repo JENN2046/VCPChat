@@ -641,7 +641,7 @@ const reviewedSourceBlobs = new Map([
     // PR #86 remaining file-view read ownership and corresponding exact regressions.
     ['tests/scriptorium-cdn-localization-electron.test.js', '431e9066c47b1835d54452f202f198219d8175aa'],
     ['tests/scriptorium-board-electron.test.js', 'b514bb7a1ef2fc8f4f7bfbb54e5f2f1fd1fac46a'],
-    ['tests/scriptorium-read-races.test.cjs', '56b82cd4eaa44eabe26cc480acd931152689de91'],
+    ['tests/scriptorium-read-races.test.cjs', 'd5c3ccc072e34778df659f742c4febf2953d0e37'],
     ['ScriptoriumModules/scriptorium.js', '09e4759404c06957a3f2a31782ce709218bdbab7'],
     ['ScriptoriumModules/scriptorium-web-page.js', '2171ce4952d6b5c667ad0b91c3143e023a57594d'],
     ['ScriptoriumModules/scriptorium-table-view.js', 'f3ef840600bae217c84221fbce90aa1819643276'],
@@ -672,9 +672,11 @@ const reviewedSourceBlobs = new Map([
     ['modules/ui-system/side-pane/tab-types/plan-detail.js', '3bbf461867a1a9076f8f4daa9bd71078a09caa52'],
     ['tests/side-pane-plan-detail.test.mjs', '5603a27d3604ffc1ce0a72713022466f2ea129d5'],
     // ProjectForge upstream integration: selection ownership, retryable reads and opaque manual iframe.
-    ['ProjectForgemodules/projectforge.js', '5d5e91183ddecf8d09ae9b5aed4cdcf6a12964cd'],
+    ['ProjectForgemodules/projectforge.js', '4a7a495a5d640e52bbd942fe44416ccd505f35fa'],
     ['ProjectForgemodules/projectforge-blueprint.js', '6d1551968515fff43811afbc7e2622612362c8ab'],
-    ['tests/projectforge-blueprint.test.cjs', '784b8ba4a3177832826a4e965e5c68f45d068083'],
+    ['tests/projectforge-blueprint.test.cjs', '1d853121af2eeb67cbb5592d35eda5f80c207908'],
+    // PR #87: reject checkpoint restore continuations after board ownership changes.
+    ['ScriptoriumModules/scriptorium-board-lineage.js', '6ad5ef23c035b7e87216ebc0cccee5ecc0378e16'],
 ]);
 function isReviewedSourceDifference(file) {
     const reviewed = reviewedSourceBlobs.get(file);

@@ -14,6 +14,7 @@ const state = {
     diffView: null,
     diffWrap: localStorage.getItem(DIFF_WRAP_KEY) === '1',
 };
+let projectDetailSequence = 0;
 
 const $ = id => document.getElementById(id);
 
@@ -236,14 +237,21 @@ function showProjectView(show) {
 }
 
 async function selectProject(projectId, { keepTab = false } = {}) {
+    const request = ++projectDetailSequence;
     state.currentId = projectId;
     renderProjectList();
     try {
-        state.detail = await call(api.projectForgeGetProject(projectId));
+        const detail = await call(api.projectForgeGetProject(projectId));
+        if (request !== projectDetailSequence || state.currentId !== projectId) return;
+        state.detail = detail;
     } catch (error) {
-        toast(`读取工程失败：${error.message}`, 'error');
+        if (request === projectDetailSequence && state.currentId === projectId) toast(`读取工程失败：${error.message}`, 'error');
         return;
     }
+    // Detail can refresh while the canvas is off-tab. Invalidate its cached
+    // projection and any in-flight render before the next blueprint visit.
+    delete $('pane-blueprint').dataset.loadedFor;
+    bpRenderSeq += 1;
     showProjectView(true);
     renderHeader();
     renderOverview();

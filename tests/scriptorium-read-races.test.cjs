@@ -104,6 +104,45 @@ test('board: lineage edits after scene application remain dirty relative to the 
     assert.equal(f.current().savedMeta, 0); assert.equal(f.c.lineage.revision(), 1);
     assert.equal(f.c.dirty, true);
 });
+
+function lineageFixture() {
+    const { JSDOM } = require('jsdom');
+    const dom = new JSDOM('<main></main>');
+    dom.window.confirm = () => true;
+    const entered = deferred(), release = deferred(), saves = [], errors = [];
+    let scene = { value: 'A' };
+    const c = { window: dom.window, document: dom.window.document,
+        localStorage: { getItem: () => null, setItem() {} }, crypto: require('node:crypto').webcrypto };
+    vm.createContext(c);
+    vm.runInContext(fs.readFileSync(path.join(__dirname, '../ScriptoriumModules/scriptorium-board-lineage.js'), 'utf8'), c);
+    const lineage = dom.window.ScriptoriumBoardLineage.create({parent: dom.window.document.querySelector('main'),
+        snapshot: () => ({ ...scene }), revision: () => scene.value, changed() {}, apply() {},
+        restore: async data => { scene = { ...data }; entered.resolve(); await release.promise; },
+        save: async () => { saves.push({ ...scene }); return true; }, error: error => errors.push(error.message)});
+    return { dom, lineage, entered, release, saves, errors,
+        setScene: value => { scene = { value }; }, scene: () => scene,
+        clickRestore: () => [...dom.window.document.querySelectorAll('button')].find(button => button.textContent === '回溯').click() };
+}
+
+test('board: checkpoint restoration cannot append history or save a replacement board', async t => {
+    const f = lineageFixture(); t.after(() => f.dom.window.close());
+    f.lineage.load({records: [{id: 'a', name: 'A checkpoint', status: 'applied', snapshot: {value: 'A-saved'}}]});
+    f.clickRestore(); await f.entered.promise;
+    f.setScene('B-unsaved');
+    f.lineage.load({records: [{id: 'b', name: 'B checkpoint', status: 'applied', snapshot: {value: 'B-saved'}}]});
+    f.release.resolve(); await turn();
+    assert.equal(f.scene().value, 'B-unsaved'); assert.equal(f.saves.length, 0);
+    assert.deepEqual(Array.from(f.lineage.history().records, record => record.id), ['b']);
+    assert.deepEqual(f.errors, []);
+});
+
+test('board: checkpoint restoration on the same board still records and saves', async t => {
+    const f = lineageFixture(); t.after(() => f.dom.window.close());
+    f.lineage.load({records: [{id: 'a', name: 'A checkpoint', status: 'applied', snapshot: {value: 'A-saved'}}]});
+    f.clickRestore(); await f.entered.promise; f.release.resolve(); await turn();
+    assert.equal(f.scene().value, 'A-saved'); assert.equal(f.saves.length, 1);
+    assert.equal(f.lineage.history().records.length, 3); assert.deepEqual(f.errors, []);
+});
 test('pdf: edits made while the replacement PDF is being built are not overwritten', async () => {
     const f = fixture('pdf', { delayedBuild: true }), pending = f.c.reload({ discard: true }), read = f.reads.shift();
     read.resolve(f.response('a', 'DISK')); await turn(); f.edit('EDIT-DURING-BUILD');

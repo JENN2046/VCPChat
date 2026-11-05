@@ -1876,18 +1876,18 @@
           "path": "Flowlockmodules/flowlock-integration.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "31bb69eb4e478269faebd583191578b41ff766b9",
-          "size": 15751,
-          "sha256": "7ab540256fc92e17e45e56d8b34934507faa9d89b487ca073dca940ab34aa3df",
+          "blob": "ed4a1fb9fec52c6b7d868750d4035d066c896434",
+          "size": 15888,
+          "sha256": "a73e9638ef9d74e103b452729238d721f17052825fd9ad94ac1795af7926d4eb",
           "kind": "source"
         },
         {
           "path": "Flowlockmodules/flowlock-protocol.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5feb159070a64e79d369356da48746c7fc8024b2",
-          "size": 17425,
-          "sha256": "cf2c16af259ac557caa4c5483220db6e3966670e184999a2af956aee717cdd56",
+          "blob": "e5134f3ae9927a6de2448aab75ea7503f71bbde5",
+          "size": 17493,
+          "sha256": "91996cbc1ba522939a1effada3747f5462558b0811753c47ecaa91990d503ef9",
           "kind": "source"
         },
         {
@@ -1903,9 +1903,9 @@
           "path": "Flowlockmodules/flowlock.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5787de1fa72fcf5a7224bea51ce86a1aced29c79",
-          "size": 34361,
-          "sha256": "dc66532d08d4df57681cbe33a39325226efcf72b7e24126a66cd98e6564cf461",
+          "blob": "dc4b0b67c373da0f5c8e38dbcc189f3816c436b4",
+          "size": 35116,
+          "sha256": "1cae1e92b0cbcae4274b36c0890eb88cb0c5550a22585deabb293d8b73056f26",
           "kind": "source"
         },
         {
@@ -1939,27 +1939,27 @@
           "path": "Gamemodules/doudizhu/index.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "af8228833d6fb33134fdf37ecd278b47f45dd488",
-          "size": 2158,
-          "sha256": "1b81488d21e09135f1608670e7c7ebf0ca10661c580a34db2e00f8646df9eb81",
+          "blob": "bca85ef117941c058cc1f31743c38e75fe5bf2dd",
+          "size": 4906,
+          "sha256": "88d455b4722b80df96076dca8865ec1694fcfd184f9ff4efd5463aa484211507",
           "kind": "source"
         },
         {
           "path": "Gamemodules/doudizhu/style.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "f5ce06e9e84bcf4ffd7ba9089cadd59f90a67b34",
-          "size": 1676,
-          "sha256": "f1ae9552c00345b44a7b218560b7903e3343147909b69cc9a08bcc1392d4d844",
+          "blob": "76676bac74ca2c07968f2331a8f767a377e802c7",
+          "size": 6496,
+          "sha256": "84480e12715d9632d3a982193f62c4d4011c4d0b9a683a1a687c0081c4b5d66e",
           "kind": "source"
         },
         {
           "path": "Gamemodules/doudizhu/ui.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "635311380dd4070eec700ff07cb1592924c01fbb",
-          "size": 10358,
-          "sha256": "dcaa2059a520a3c268e3124313afac7fcde242d3e51eead04b38ecf72654cba9",
+          "blob": "49a8c67e8968c49a841772c5ed185d65b3e163b6",
+          "size": 30723,
+          "sha256": "f9beda20dcd54d4d94dbc9c2d7a134a10f84b91e3a4e9262e252fd891eb6bd1a",
           "kind": "source"
         },
         {
@@ -2479,9 +2479,9 @@
           "path": "Groupmodules/gameSessionOrchestrator.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d777adc6ef1186c6f307a830d7591375606aaafc",
-          "size": 4286,
-          "sha256": "350c8ced5ee324330bfcaac5b95b26d6111831cbe5c442474c5df303dfbe138b",
+          "blob": "4dcdfe9b827a6c46cab9ecd64d28e548d9f560b0",
+          "size": 4403,
+          "sha256": "e27cef20e34554e48fdd0920f1aa8c4a4f75dbea33aa1f4417f79118ee279774",
           "kind": "source"
         },
         {
@@ -3178,6 +3178,15 @@
           "kind": "source"
         },
         {
+          "path": "ProjectForgemodules/projectforge-blueprint.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6d1551968515fff43811afbc7e2622612362c8ab",
+          "size": 12717,
+          "sha256": "2a37546310147329fe5606c18fea82c3d46e8699b7e608e01f02f646e45664d3",
+          "kind": "source"
+        },
+        {
           "path": "ProjectForgemodules/projectforge-git.js",
           "mode": "100644",
           "type": "blob",
@@ -3208,27 +3217,27 @@
           "path": "ProjectForgemodules/projectforge.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "15d8298b63e7ff4f44b40e496ff785a2a8f53f59",
-          "size": 35007,
-          "sha256": "0b1ef57ed4b1d34e1941362e1c312c77f779593a32b27c73e1e710787fea0c6e",
+          "blob": "3003b04af03733cd1e389c679892a60dfb2d6411",
+          "size": 42489,
+          "sha256": "115a381b249ebc458312f736e042a2b22d39984fd302a2907b52d5dedde81c7e",
           "kind": "source"
         },
         {
           "path": "ProjectForgemodules/projectforge.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "1eca4cf417c24a82fa00aa13e5e44417c1d8216f",
-          "size": 16382,
-          "sha256": "619fa7727dd8f23b8eab8112dcaf8bd529326f7db1091b4c4b71a63e50126203",
+          "blob": "53f1f16312c970b4017c3a715a62308cda7cf5e1",
+          "size": 16722,
+          "sha256": "7334ab35ee931ab1427b882a1aede9d98d9eda88de83bf240a76c251ec231f1f",
           "kind": "source"
         },
         {
           "path": "ProjectForgemodules/projectforge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4be83d013e6b7851d24786f2dcfb0282347a5dee",
-          "size": 38011,
-          "sha256": "3afa80696e677bef9e78d4c142105ea2635c06a592112d090f0f278f53713b00",
+          "blob": "5d5e91183ddecf8d09ae9b5aed4cdcf6a12964cd",
+          "size": 40987,
+          "sha256": "3b8547d3eb19c7ac125211982e21eb159d59989ff0b1bb93e62f1ffaab148d7f",
           "kind": "source"
         },
         {
@@ -3376,12 +3385,39 @@
           "kind": "source"
         },
         {
+          "path": "ScriptoriumModules/scriptorium-board-html.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a695474ff70f9edfd417fe31702cf182f5c4dd80",
+          "size": 6000,
+          "sha256": "0b1abed7b5e5e4fbe774d75cee38d5d6a29fecad9ea3ab7732ab12866870e68a",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-board-lineage.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dfb54882b3b22919004f843d5d68022f177a8eb8",
+          "size": 9510,
+          "sha256": "e11cce2e713415c02c2a248628286070de101eb68ff0ddd657b2652d04a4cecf",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-board-model.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "00005c89e415ab8baa69b09f4c9f609590a45217",
+          "size": 3773,
+          "sha256": "b5e20962216fb28f8c69b714fb107ac7e831cd1b0ecfd0dcd5f3393850fd558d",
+          "kind": "source"
+        },
+        {
           "path": "ScriptoriumModules/scriptorium-board.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "dc10a20404b8b3c0f7ca15bd675c0387ef224cde",
-          "size": 44164,
-          "sha256": "c1f94212d9cadafda2ca9d1c338dfa4aab742401344f356262ff14f50dc783bb",
+          "blob": "1131bd1a731de2213c258147ff93fa849adf886c",
+          "size": 56381,
+          "sha256": "f9b7c22a411b37cdf84827a458d2085cb4f967944bf5f21027d1abba86ab7a46",
           "kind": "source"
         },
         {
@@ -3469,18 +3505,18 @@
           "path": "ScriptoriumModules/scriptorium-file-agent.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "91a6b5d3450ef006b8bedab6d09504526f0f6e77",
-          "size": 6047,
-          "sha256": "dfb473c8f1312be7ed784c1fecafaf4f36e412ffd00aa615e76f399232e8471f",
+          "blob": "9b48d67fb6e7962eecfa3047575cb38b9f2195ab",
+          "size": 6508,
+          "sha256": "899c57e1bb9b4095a8389f0101fbe2ebf9b436584525468de9f9848439f69da0",
           "kind": "source"
         },
         {
           "path": "ScriptoriumModules/scriptorium-file-views.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "3b22ad2222220ba316e1304c312677245dcc85b7",
-          "size": 22210,
-          "sha256": "7c656d86700f2ebaf718e439a847e6cbb91f80115cd1fc05ca2448335a7c367f",
+          "blob": "af806c5ef1062f5db34c92f9fe15d5282de923c9",
+          "size": 25261,
+          "sha256": "7824522c38a353e625f05d0b1c00b34a2127e8c8a2f8ca94c66be3326ae77b5e",
           "kind": "source"
         },
         {
@@ -3568,9 +3604,9 @@
           "path": "ScriptoriumModules/scriptorium-library.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "e4ee38483675c2c16015a97489cc8faf69c59c6c",
-          "size": 9628,
-          "sha256": "d9e9a3820180e2362e4bf537e74727e40d683f5d73bff144658a56d75980daca",
+          "blob": "34768a7231672cb5ffeafba73d9b0b5f2d274bd6",
+          "size": 9731,
+          "sha256": "30ee32885629361d839adcfb41c2c24399ff2c01b23174d513faae92be699ed2",
           "kind": "source"
         },
         {
@@ -3847,9 +3883,9 @@
           "path": "ScriptoriumModules/scriptorium.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "e854bfdff037c8de806131bb22642c7020bae891",
-          "size": 69875,
-          "sha256": "2c208cc7307955aa0e222567b32f3880fee6de5362b60823ae46cac58c02e0e8",
+          "blob": "47cb8d1cd22c60809979c6a1ad4e87c1bb44dbb8",
+          "size": 70041,
+          "sha256": "2d8f3d37da8b4ff3435a6b9014c606b8604e72d18d7a48438e6cd052185691ab",
           "kind": "source"
         },
         {
@@ -5491,7 +5527,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/E11-V\u5de5\u7a0b\u5373\u65f6\u65bd\u5de5\u534f\u4f5c\u56fe.jpg",
+          "path": "assets/E11-V工程即时施工协作图.jpg",
           "mode": "100644",
           "type": "blob",
           "blob": "6a38e27701455601b7b53c4c16078b3132778b7c",
@@ -7777,7 +7813,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/AI\u8bb0\u5fc6.gif",
+          "path": "assets/iconset/VChatOfficial/AI记忆.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "fc47ac99370ae8004f1fc1d756723d2c63011697",
@@ -7786,7 +7822,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/AI\u8bb0\u5fc6.png",
+          "path": "assets/iconset/VChatOfficial/AI记忆.png",
           "mode": "100644",
           "type": "blob",
           "blob": "c2146fc1dd9a6ee0e7ef17ce03086c5e7373c0f2",
@@ -7831,7 +7867,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u4e3b\u9898.gif",
+          "path": "assets/iconset/VChatOfficial/主题.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "a2ad64ccdd05df782d21a3a0aae426ed1be76b84",
@@ -7840,7 +7876,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u4e3b\u9898.png",
+          "path": "assets/iconset/VChatOfficial/主题.png",
           "mode": "100644",
           "type": "blob",
           "blob": "b901eab65f591136337a2ef4a40c1ff57f9feb25",
@@ -7849,7 +7885,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u4eba\u7c7b\u7b14\u8bb0.gif",
+          "path": "assets/iconset/VChatOfficial/人类笔记.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "ebba46b95c9d396409762635b9f32c7e0a79e5f1",
@@ -7858,7 +7894,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u4eba\u7c7b\u7b14\u8bb0.png",
+          "path": "assets/iconset/VChatOfficial/人类笔记.png",
           "mode": "100644",
           "type": "blob",
           "blob": "ecaa7f90247035f2768faa0d87f613a261a99ffb",
@@ -7867,7 +7903,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u4fe1\u606f\u6d41.gif",
+          "path": "assets/iconset/VChatOfficial/信息流.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "de3fb1411cc4768b39aa792e05a45805a6465f3b",
@@ -7876,7 +7912,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u4fe1\u606f\u6d41.png",
+          "path": "assets/iconset/VChatOfficial/信息流.png",
           "mode": "100644",
           "type": "blob",
           "blob": "0e0f4664c7189c980788febff978ed431517fcf6",
@@ -7885,7 +7921,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u534f\u540c.png",
+          "path": "assets/iconset/VChatOfficial/协同.png",
           "mode": "100644",
           "type": "blob",
           "blob": "054af328bb49c0c0498d41580c70c0ffe5bb0539",
@@ -7894,7 +7930,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u5de5\u5177\u7bb1.gif",
+          "path": "assets/iconset/VChatOfficial/工具箱.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "dba6be67e2eec1f6c020a99ac95d5416900eb92d",
@@ -7903,7 +7939,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u5de5\u5177\u7bb1.png",
+          "path": "assets/iconset/VChatOfficial/工具箱.png",
           "mode": "100644",
           "type": "blob",
           "blob": "3f9925f0d4c701d3e5ab1edb2b9c3dc4fc2b57a6",
@@ -7912,7 +7948,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u6570\u636e\u5e93.gif",
+          "path": "assets/iconset/VChatOfficial/数据库.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "a93f84dc3e89acd43755721483900398b0ec8948",
@@ -7921,7 +7957,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u6570\u636e\u5e93.png",
+          "path": "assets/iconset/VChatOfficial/数据库.png",
           "mode": "100644",
           "type": "blob",
           "blob": "57692d7f223376525491adac06f501b3bdad3409",
@@ -7930,7 +7966,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u7ffb\u8bd1.png",
+          "path": "assets/iconset/VChatOfficial/翻译.png",
           "mode": "100644",
           "type": "blob",
           "blob": "c9ebd35509335c24b4390c56597a45e6a5722185",
@@ -7939,7 +7975,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u8bba\u575b.gif",
+          "path": "assets/iconset/VChatOfficial/论坛.gif",
           "mode": "100644",
           "type": "blob",
           "blob": "62e53cfe1d3d0b014c4db0324ebbd39f28751d17",
@@ -7948,7 +7984,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u8bba\u575b.png",
+          "path": "assets/iconset/VChatOfficial/论坛.png",
           "mode": "100644",
           "type": "blob",
           "blob": "5be134173a970823db27e4f83022e995993592d9",
@@ -7957,7 +7993,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/iconset/VChatOfficial/\u97f3\u4e50.png",
+          "path": "assets/iconset/VChatOfficial/音乐.png",
           "mode": "100644",
           "type": "blob",
           "blob": "3629637a191728366d11e364bc2b1d519e428fcd",
@@ -8362,7 +8398,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/\u6625\u4fe1.jpg",
+          "path": "assets/wallpaper/春信.jpg",
           "mode": "100644",
           "type": "blob",
           "blob": "03bfe414f595cd460a03dce5d4f05acb1e7ffca6",
@@ -8371,7 +8407,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/\u6708\u5f71.jpg",
+          "path": "assets/wallpaper/月影.jpg",
           "mode": "100644",
           "type": "blob",
           "blob": "10f6c16958d433c481a6fbbab79d58fd166cf332",
@@ -8380,7 +8416,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/\u6a31\u591c\u5012\u5f71.png",
+          "path": "assets/wallpaper/樱夜倒影.png",
           "mode": "100644",
           "type": "blob",
           "blob": "7da03d934b40531ac070ec182d18e7456fcaf092",
@@ -8389,7 +8425,7 @@
           "kind": "source"
         },
         {
-          "path": "assets/wallpaper/\u7eff\u5f71\u732b\u54aa.png",
+          "path": "assets/wallpaper/绿影猫咪.png",
           "mode": "100644",
           "type": "blob",
           "blob": "c2f1ad9d43482d2da04a498d693d4557fae03798",
@@ -8398,7 +8434,7 @@
           "kind": "source"
         },
         {
-          "path": "audio_engine/IRPreset/ADX5000\u9884\u8bbe.wav",
+          "path": "audio_engine/IRPreset/ADX5000预设.wav",
           "mode": "100644",
           "type": "blob",
           "blob": "1e2b3d5b8cf343eefa4ba849b12626b5a12e6818",
@@ -8407,7 +8443,7 @@
           "kind": "source"
         },
         {
-          "path": "audio_engine/IRPreset/\u97f3\u9891IR\u8109\u51b2\u9884\u8bbe\u653e\u5728\u8fd9.txt",
+          "path": "audio_engine/IRPreset/音频IR脉冲预设放在这.txt",
           "mode": "100644",
           "type": "blob",
           "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
@@ -8461,7 +8497,7 @@
           "kind": "static-native"
         },
         {
-          "path": "audio_engine/audio_server_x86\u517c\u5bb9\u7248.exe",
+          "path": "audio_engine/audio_server_x86兼容版.exe",
           "mode": "100644",
           "type": "blob",
           "blob": "17890ccd866829d1af0c62774bb3d970ed63d79b",
@@ -8527,9 +8563,9 @@
           "path": "docs/chat-kernel-consumer-report.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "fc35dafa0f63739c1f351ca01a1b4bd0975caf8f",
-          "size": 738914,
-          "sha256": "1fc062335ca7b75a37f92e13657c0a30d2ff4d8357057e512f7a2b9d65c5d788",
+          "blob": "ae8d4fdfbeecbee87b8bc5b39cbfd49eea099382",
+          "size": 765353,
+          "sha256": "7e002f056a43ac45cd6e376533d5d79f6cde3050f11f40d92de1c35a775b1443",
           "kind": "source"
         },
         {
@@ -9796,9 +9832,9 @@
           "path": "modules/emotion/emotionTags.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "348e3f891e109ecb32c91abc467e4c1705f95a37",
-          "size": 10210,
-          "sha256": "b1f844c7b3b8b361ae7f803127c0913c925acad0927e67e57e3fee6608f410b9",
+          "blob": "f72b36bfe3691423f7ba73f19a482884162374c3",
+          "size": 11226,
+          "sha256": "ab9de875b65f875eb351efdd2b31eb844241ea5d160e6e19269cb24087a77a5e",
           "kind": "source"
         },
         {
@@ -9859,9 +9895,9 @@
           "path": "modules/game/doudizhu/cards.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa80601c10df06b1b84f90b0aa42abc8d1074446",
-          "size": 4032,
-          "sha256": "6a5b04ddffbce146896f76cc797290319784879a4be04f35039d5f36b9bc6197",
+          "blob": "565ae184916fe502d55896ee5f52a37034426274",
+          "size": 7202,
+          "sha256": "0cade09cb72438ad108932e8db259334be845e8958a783cf2f9fa6688966cbf4",
           "kind": "source"
         },
         {
@@ -9877,9 +9913,9 @@
           "path": "modules/game/doudizhu/rules.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "94466fa057cffa0a50e13d55ae7012e9cc6fcf0d",
-          "size": 7177,
-          "sha256": "415b063db775ffaae4d9ef9d74e15cab9b4c4fe20b3915787d0c1871e9b26a41",
+          "blob": "91549c4b3e652414cb583da4f5e2422cd3ef3d3e",
+          "size": 8236,
+          "sha256": "601af6dfd74cfb91fa1c0fd961e53edb1aef71cfdb95f38e6cd0f9feb258537c",
           "kind": "source"
         },
         {
@@ -9895,9 +9931,9 @@
           "path": "modules/game/gameRuntime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3c4195cc11dd26e6a81ae0309b9fbd808eca0d18",
-          "size": 5806,
-          "sha256": "834e5090b25bd60b293e551f118ecb59458ef413919da45d06d40330bb3f5daa",
+          "blob": "5ed782c6ffb1939e46dfecd2a64060c35c32b404",
+          "size": 10923,
+          "sha256": "6da2824f496074c4e8226c1398fe72760603010a4ad9e4650a2d5a8cb0cfcd48",
           "kind": "source"
         },
         {
@@ -9913,9 +9949,9 @@
           "path": "modules/game/gameToolAdapter.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8bab3409755b12af5257da326c55c55697c5e678",
-          "size": 3944,
-          "sha256": "84d10a5ef1b9cdaf82032500895bf4758338687adc9e96f658edc433b3498317",
+          "blob": "ba4c17ffcfecf9428ee02ef981ecce3a36523765",
+          "size": 3947,
+          "sha256": "55c16bb8a46c88b642aaa8cd322872b0e832a8b01bd5f1b9ce5833aaf8ad2dc9",
           "kind": "source"
         },
         {
@@ -10111,9 +10147,9 @@
           "path": "modules/ipc/docxHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b96186e688321546e9313e389a165077721ce155",
-          "size": 52442,
-          "sha256": "2270289a09b5badc2521a0662ed463e2893aebc4b5279159cf4e768a7f11a4f5",
+          "blob": "01a5a12ffd806d59ed528ca092243b3fbb34df04",
+          "size": 53022,
+          "sha256": "994185b437994e082cb424c73ee8b5cde5d557426b31ce03492ccc54d8da1646",
           "kind": "source"
         },
         {
@@ -10165,9 +10201,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aaaf81b6ba33d0a067c5cbcef22344469d38e34a",
-          "size": 10454,
-          "sha256": "9759ff64663b2ccd73fad1112c1059060f491acfffa8f8dcc4300d588a7b9b8c",
+          "blob": "3bc18b78514e01cdb318c12c1a7f79d9744e936f",
+          "size": 12331,
+          "sha256": "89fea87cdd6367812f98c495c2397fa8da9f6278103a03421f5d441df4f45a52",
           "kind": "source"
         },
         {
@@ -10183,9 +10219,9 @@
           "path": "modules/ipc/groupChatHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b773b42cfb85b7325cb93805d235fa89b3c6aebb",
-          "size": 13309,
-          "sha256": "47b672b7ca9f674679501f3c0f66c5fb451b556de5d90f5dda327b4e1a814dec",
+          "blob": "07dbe2cf9c49185bb841a4628bd569f8bba0ba38",
+          "size": 16630,
+          "sha256": "a6772660417187c27ae9860809ba5bfe0f1c32db568e2b182e1855bf3844afcd",
           "kind": "source"
         },
         {
@@ -10282,9 +10318,9 @@
           "path": "modules/ipc/projectForgeHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0f48776f556eedcf573da095019ef7a7bf6ad82c",
-          "size": 6410,
-          "sha256": "ae30b31cd49a106b00b19812ded5682c0ca01cb8ca5a627b579cea467b65efe4",
+          "blob": "353e00145c9f23a94163bee3e61beb30a3192d46",
+          "size": 7005,
+          "sha256": "12ef5aedcb4464175a4ffb2af1f03bca7ee9b1f3947b5b5c7281fedfd5046853",
           "kind": "source"
         },
         {
@@ -11587,18 +11623,18 @@
           "path": "modules/scriptorium/viewFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4d44aff675e0a9a5f18e796e495062eaacf9441",
-          "size": 9226,
-          "sha256": "2dc977ed8850ca08c9218cf16bc2811461a64839635c81c082e5b24f68cf5f3a",
+          "blob": "1f6e82f029d3cd2d4e921bf1507b74044e82f72a",
+          "size": 13612,
+          "sha256": "de9f23e2575ad0e3544c30bf127e914336c28418e0d42a5a4686204935a90a2c",
           "kind": "source"
         },
         {
           "path": "modules/scriptorium/webPages/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ca68b35149937ffaf54978c17beffbce972e49c1",
-          "size": 15047,
-          "sha256": "aeb21faf8a24e6acb0526e5da8d1faa499b75be6230ff8a8a3c18cec6f1f58da",
+          "blob": "81446c5ab7b580bc26ce4a8113e831fb51992249",
+          "size": 16436,
+          "sha256": "b6dce73376813d6ad47a24c238d327cd824cfdea2e2d6bdd535993a3565081df",
           "kind": "source"
         },
         {
@@ -11749,9 +11785,9 @@
           "path": "modules/services/gameService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f39c985cc9073bb3b0b0fdab62f29aac86b8299c",
-          "size": 10715,
-          "sha256": "f21c5c92913e2909924c40e7a7fa2fbcd26905b6f1b58904306a9e67690ff459",
+          "blob": "aa83343726ed03869b73e0f0f542608067b68e9a",
+          "size": 14458,
+          "sha256": "799b990cdad943276d36d0e22ce584cb2beb0a9f76878b4059ede0485914856b",
           "kind": "source"
         },
         {
@@ -14494,9 +14530,9 @@
           "path": "preloads/api/game.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "83e1f156dcfb182ad6d75d459a66a07b5e39428b",
-          "size": 903,
-          "sha256": "37cdff0075b63f98793db8d09b3ac588c1ea98b6a939d6ce0ddc37689d5ced9a",
+          "blob": "ce4b21697614e2348ba3726418038e0b35fd9494",
+          "size": 1024,
+          "sha256": "642c5198baf99ad43607c31794e93e6dbf02748c04ac05157cac5cd0bdc17130",
           "kind": "source"
         },
         {
@@ -14584,9 +14620,9 @@
           "path": "preloads/api/projectForge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9360ae38df62d9d146eebbadd4e2ea5baeba63f5",
-          "size": 2962,
-          "sha256": "e03a03d70b372245010ae25a4ecd0db059d5913a0c64c9ebb8240537ce80fb7b",
+          "blob": "9bf5c242db35e425588fcaf63e6b0f977c990e5d",
+          "size": 3048,
+          "sha256": "246346ce9dd4fb44fc480f32bca1aa0356008c34b1e09ec261571e0bad018a99",
           "kind": "source"
         },
         {
@@ -15502,9 +15538,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ac97cfae62fdc661cbcc34c7212d456faf8b97c8",
-          "size": 51169,
-          "sha256": "c48e7cb39a59464f1baa61ecefeb683d35111ad13654ac3085fc1dd2f718ee8e",
+          "blob": "b140602431eedfcc6c67048b0203ed50e8ea323d",
+          "size": 51921,
+          "sha256": "85787844d3de2b63fd55438b6090f674787f909814aa36a83e3dd5a28f832f64",
           "kind": "source"
         },
         {
@@ -16723,7 +16759,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u51b0\u706b\u9b54\u6b4c.css",
+          "path": "styles/themes/themes冰火魔歌.css",
           "mode": "100644",
           "type": "blob",
           "blob": "0844c22b4ea6cf0c4530283e5e3e5c38b767854d",
@@ -16732,7 +16768,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u5361\u63d0\u897f\u4e9a.css",
+          "path": "styles/themes/themes卡提西亚.css",
           "mode": "100644",
           "type": "blob",
           "blob": "01b2ac289977927c38824882f3371157424900a1",
@@ -16741,7 +16777,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u591c\u6a31\u732b\u8bed.css",
+          "path": "styles/themes/themes夜樱猫语.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4a82db3d6776eef5f109e70ff44f86267cf5f074",
@@ -16750,7 +16786,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u661f\u548f\u4e0e\u72fc\u55e5.css",
+          "path": "styles/themes/themes星咏与狼嗥.css",
           "mode": "100644",
           "type": "blob",
           "blob": "03a678702c9c09fdb534f11ce0fc9c20250397cf",
@@ -16759,7 +16795,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u661f\u6e0a\u96ea\u5883.css",
+          "path": "styles/themes/themes星渊雪境.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e987a60adab5bb2b7543007cfe9230cbfaf0ca5e",
@@ -16768,7 +16804,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u6708\u5f71\u6625\u4fe1.css",
+          "path": "styles/themes/themes月影春信.css",
           "mode": "100644",
           "type": "blob",
           "blob": "338c727291ff198249f1428b0d261f236dd574c5",
@@ -16777,7 +16813,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u6781\u7b80Aero.css",
+          "path": "styles/themes/themes极简Aero.css",
           "mode": "100644",
           "type": "blob",
           "blob": "3b4fc059d395395f3125844201d9a8c0fbccd1bf",
@@ -16786,7 +16822,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u718a\u718a\u5047\u65e5.css",
+          "path": "styles/themes/themes熊熊假日.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e3bbe7d87b8d43778780dc5903bdbc94848f0051",
@@ -16795,7 +16831,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u74f7\u4e0e\u9526.css",
+          "path": "styles/themes/themes瓷与锦.css",
           "mode": "100644",
           "type": "blob",
           "blob": "a9a173bfd433e0b7de916779f680051f66487615",
@@ -16804,7 +16840,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7ae5\u8da3\u68a6\u5883.css",
+          "path": "styles/themes/themes童趣梦境.css",
           "mode": "100644",
           "type": "blob",
           "blob": "69cb1521dcc8d3c76a3edb24d33da176b3020dcc",
@@ -16813,7 +16849,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7b2c\u4e00\u9002\u683c\u8005.css",
+          "path": "styles/themes/themes第一适格者.css",
           "mode": "100644",
           "type": "blob",
           "blob": "af66c3e161590b6b25193707bf42d368187abc7c",
@@ -16822,7 +16858,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7eb8\u58a8\u4e0e\u673a\u82af.css",
+          "path": "styles/themes/themes纸墨与机芯.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c49004e55b0e228e9e0d94ae4e119f82ccfebc48",
@@ -16831,7 +16867,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7eef\u7ea2\u5929\u7a79.css",
+          "path": "styles/themes/themes绯红天穹.css",
           "mode": "100644",
           "type": "blob",
           "blob": "ab57cfcae201eb336fe22db7fdea859cc3ee9033",
@@ -16840,7 +16876,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u8d64\u4e0e\u767d\u663c.css",
+          "path": "styles/themes/themes赤与白昼.css",
           "mode": "100644",
           "type": "blob",
           "blob": "81d187914e217aa0adc6a0bfdc12aaed126f888f",
@@ -16849,7 +16885,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9178\u6027\u7384\u6b66.css",
+          "path": "styles/themes/themes酸性玄武.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4deeee641c6ec5b664b1af44dcaa0a619a6e7fbf",
@@ -16858,7 +16894,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u96ea\u5883\u6668\u660f.css",
+          "path": "styles/themes/themes雪境晨昏.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4d9bd63f828a24511e97ed39c763c380f96d7ea0",
@@ -16867,7 +16903,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9713\u8679\u5496\u5561.css",
+          "path": "styles/themes/themes霓虹咖啡.css",
           "mode": "100644",
           "type": "blob",
           "blob": "cb0c5f1c13a0bceb58fcf407def44ed278d14847",
@@ -16876,7 +16912,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9759\u8c27\u68ee\u5cad.css",
+          "path": "styles/themes/themes静谧森岭.css",
           "mode": "100644",
           "type": "blob",
           "blob": "1c9c0af822e656f9a181a7dad3846eec61ea0b5a",
@@ -16885,7 +16921,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9ed1\u66dc\u4e0e\u661f\u706b.css",
+          "path": "styles/themes/themes黑曜与星火.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
@@ -16894,7 +16930,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9ed1\u767d\u7b80\u7ea6.css",
+          "path": "styles/themes/themes黑白简约.css",
           "mode": "100644",
           "type": "blob",
           "blob": "2c278bcf9aa6412649f4c41b5954bae5e34da53a",
@@ -17860,9 +17896,9 @@
           "path": "tests/deskpet-stream.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e84ed4833ed85f604e796700e4ba94f6cd1a5a73",
-          "size": 10013,
-          "sha256": "f08315c20de2b7bcaf497d5540ad0dd0e00bd5063edc61fd88897f7d256615e3",
+          "blob": "0045d37b4ff9f81b9e77ca58334d7b26e16712aa",
+          "size": 10089,
+          "sha256": "2933c1839f2d1ee4fc65d8520b8ff624e4914daacbb3df03a6cf0b74a4e402e0",
           "kind": "source"
         },
         {
@@ -17947,6 +17983,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/doudizhu-auto-pass.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6c2dbd533dc1bd4a40496af83f405eb1d2de9393",
+          "size": 8962,
+          "sha256": "9610c0bb73c5d2e1c0093f23f9f3dc81f624f09e0e0935d9fa823e3f09a2708d",
+          "kind": "source"
+        },
+        {
           "path": "tests/embedded-app-controller.test.js",
           "mode": "100644",
           "type": "blob",
@@ -17986,9 +18031,9 @@
           "path": "tests/flowlock-timestamp-bindings.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "188246dbcf10318a9b62799b62f9cac9f2e1497b",
-          "size": 4434,
-          "sha256": "1ddcdedb9aa9a726a7a15fa66841788b2c41ebe26deafaf7f4f92eff7bea39f7",
+          "blob": "f0fde7cb246fcfebf74927f50eebe531f1e54784",
+          "size": 5596,
+          "sha256": "a6d1829456767a191e040711983fa75309353c6e90299ca1fe2488ff77379afb",
           "kind": "source"
         },
         {
@@ -18004,9 +18049,18 @@
           "path": "tests/game-launcher.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "69d9fe3ee611e7496d924b8f61fce96a3dbe9eac",
-          "size": 10884,
-          "sha256": "7c74f7429bb0142803b346f7d57339385a5a6782d49e791c9188b2903ea71d9f",
+          "blob": "efd117ad80cfe500a9e42add3ae4517108252b02",
+          "size": 10896,
+          "sha256": "345d325564287cebe8e0fff6289f9db70d2f2df3f5c220663afe42336ff514cc",
+          "kind": "source"
+        },
+        {
+          "path": "tests/game-spectator-models.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7b9a3d14901742a910cc27535f0919c2685d821b",
+          "size": 22299,
+          "sha256": "9de7edbcedc1624b2653a6e1ceadd455eeb37453435e82eda91738b96b00d806",
           "kind": "source"
         },
         {
@@ -18373,9 +18427,9 @@
           "path": "tests/project-forge-eval.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "56bfbe564ad17ff804d7b522e921865b2e21ed55",
-          "size": 26992,
-          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f",
+          "blob": "bed739380c98c26e5b84ae994144b965654a8b8d",
+          "size": 27127,
+          "sha256": "fbe1aa62c858742e7ecf15675b42789e3403c6dd171513d202fa2e95cf06ef00",
           "kind": "source"
         },
         {
@@ -18385,6 +18439,15 @@
           "blob": "64739c92385dfe82aef797e9e8efb5d800aedf5c",
           "size": 7887,
           "sha256": "09813383267989e791349a2933dab35d4dd8d388659b1c91e7428e4cddb21483",
+          "kind": "source"
+        },
+        {
+          "path": "tests/projectforge-blueprint.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "784b8ba4a3177832826a4e965e5c68f45d068083",
+          "size": 4635,
+          "sha256": "6b84cb742edcbda3e255a7995517b1102116af5e71a2dfe82f971535aff4655d",
           "kind": "source"
         },
         {
@@ -18427,9 +18490,18 @@
           "path": "tests/scriptorium-board-electron.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "304ef2792480f9f244089751a82f4d82941bd315",
-          "size": 12970,
-          "sha256": "11b7553e9b704234de696267d4ed885286c809a76bc7e0c2d28a6533c521f123",
+          "blob": "b514bb7a1ef2fc8f4f7bfbb54e5f2f1fd1fac46a",
+          "size": 22932,
+          "sha256": "8c09a62fd1abcd4171d022bdf0c4cefe247f422784f8df4478eb4fd2866283c6",
+          "kind": "source"
+        },
+        {
+          "path": "tests/scriptorium-board-model.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b30b57c5cf6a862f81c2c7ab7d1df1bb87ad7b70",
+          "size": 1702,
+          "sha256": "4b21251e7094b7b4c791348b89681ec95bbcfd1cae8f5a2b6dd88e6c08e550d8",
           "kind": "source"
         },
         {
@@ -18445,18 +18517,18 @@
           "path": "tests/scriptorium-collaborator.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "803cdfd99fc19b14d4dc1e696cf019f988b53b2f",
-          "size": 27502,
-          "sha256": "c00ba2f5bc73c0a9a952b0597bff12ab17befa46c261e3fa694773d67e8d7d51",
+          "blob": "5a7ed4b91ad1ff3253680897482a8879124e5886",
+          "size": 27524,
+          "sha256": "8790468a26e40e5df3cf41834fffb74495dce70dd59b9e6f927193aebb6a4530",
           "kind": "source"
         },
         {
           "path": "tests/scriptorium-file-safety.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "07de3d2fee7c6450119334acbe3f5618347bedef",
-          "size": 48839,
-          "sha256": "ebae75bef70216302b4e8db70a4559263a9e7920b59f789894ffcf51ea867096",
+          "blob": "3b9398b5a7022416fc76960560b13b3dc5a0ecd6",
+          "size": 49187,
+          "sha256": "b46b8172a207a3afed0b476f99ce5784d34e1dc74bf152945609a32d0f28243e",
           "kind": "source"
         },
         {
@@ -18490,9 +18562,9 @@
           "path": "tests/scriptorium-read-races.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "50f93f4601f146976beb9c1224fa7f3825788249",
-          "size": 20400,
-          "sha256": "583d877c7025681495c9808e211f17e3248aa80e586d161805c9700259da0e2b",
+          "blob": "56b82cd4eaa44eabe26cc480acd931152689de91",
+          "size": 21552,
+          "sha256": "c9c4c31bab4c3ae07786b8f9a6d97fbea2f877f1d08860aeae6ec084dc94724e",
           "kind": "source"
         },
         {
@@ -24445,7 +24517,7 @@
           "format": "PE"
         },
         {
-          "path": "audio_engine/audio_server_x86\u517c\u5bb9\u7248.exe",
+          "path": "audio_engine/audio_server_x86兼容版.exe",
           "mode": "100644",
           "type": "blob",
           "blob": "17890ccd866829d1af0c62774bb3d970ed63d79b",
@@ -24583,20 +24655,20 @@
             "ScriptoriumModules/font-name-diagnostics.json",
             "ScriptoriumModules/founder-font-conversion-check.json",
             "ScriptoriumModules/founder-font-summary.json",
-            "assets/E1-Vchat\u4e3b\u754c\u9762.jpg",
-            "assets/E10-\u6d6a\u6f6e\u8bed\u4e49\u5bfb\u5740\u53ef\u89c6\u5316\u60ac\u6d6e\u7a97.jpg",
-            "assets/E2-Vchat\u4e3b\u754c\u9762.jpg",
-            "assets/E3-VCP\u684c\u9762.jpg",
-            "assets/E4-\u97f3\u4e50\u64ad\u653e\u5668.jpg",
-            "assets/E5-V\u6587\u574a.jpg",
-            "assets/E6-\u7ec8\u7aef\u4e0e\u65e5\u5fd7.jpg",
-            "assets/E7-\u5212\u8bcd\u5c0f\u52a9\u624b\u5e94\u7528\u4e8eVscode\u7f16\u7a0b\u89e3\u91ca\u548c\u8f85\u52a9\u751f\u6210\u4ee3\u7801.jpg",
-            "assets/E8-\u57fa\u4e8e\u6d6a\u6f6e\u7684\u8bed\u4e49\u7ea7\u8bb0\u5fc6\u5173\u8054\u53ef\u89c6\u5316\u795e\u7ecf\u4e91\u56fe.jpg",
-            "assets/E9-Agent\u8bba\u575b\u4e0e\u7559\u8a00\u677f\u7cfb\u7edf.jpg",
+            "assets/E1-Vchat主界面.jpg",
+            "assets/E10-浪潮语义寻址可视化悬浮窗.jpg",
+            "assets/E2-Vchat主界面.jpg",
+            "assets/E3-VCP桌面.jpg",
+            "assets/E4-音乐播放器.jpg",
+            "assets/E5-V文坊.jpg",
+            "assets/E6-终端与日志.jpg",
+            "assets/E7-划词小助手应用于Vscode编程解释和辅助生成代码.jpg",
+            "assets/E8-基于浪潮的语义级记忆关联可视化神经云图.jpg",
+            "assets/E9-Agent论坛与留言板系统.jpg",
             "audio_engine/.env",
             ".editorconfig",
             ".yarnrc.yml",
-            "assets/E1.5-Vchat\u524d\u7aef\u5e94\u7528\u7fa4.jpg"
+            "assets/E1.5-Vchat前端应用群.jpg"
           ],
           "ignore_components": [
             "node_modules",
@@ -25220,8 +25292,8 @@
           "tree": "f41414598adac088a5acaadd1dcda8ad27fa32cc"
         },
         "upstream": {
-          "commit": "ce9882266782ffdd7b958bbf79d8db70480047c0",
-          "tree": "f1d0c425d1e33e36cf5dd44e524144575da6b1b0"
+          "commit": "2fc8fc985a6184f1e8163a41a4b5611a70cd249f",
+          "tree": "862033fb55492ab84e1cba8006964f4e8daac4ac"
         }
       }
     },
@@ -26465,18 +26537,18 @@
           "path": "Flowlockmodules/flowlock-integration.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "31bb69eb4e478269faebd583191578b41ff766b9",
-          "size": 15751,
-          "sha256": "7ab540256fc92e17e45e56d8b34934507faa9d89b487ca073dca940ab34aa3df",
+          "blob": "ed4a1fb9fec52c6b7d868750d4035d066c896434",
+          "size": 15888,
+          "sha256": "a73e9638ef9d74e103b452729238d721f17052825fd9ad94ac1795af7926d4eb",
           "kind": "source"
         },
         {
           "path": "Flowlockmodules/flowlock-protocol.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5feb159070a64e79d369356da48746c7fc8024b2",
-          "size": 17425,
-          "sha256": "cf2c16af259ac557caa4c5483220db6e3966670e184999a2af956aee717cdd56",
+          "blob": "e5134f3ae9927a6de2448aab75ea7503f71bbde5",
+          "size": 17493,
+          "sha256": "91996cbc1ba522939a1effada3747f5462558b0811753c47ecaa91990d503ef9",
           "kind": "source"
         },
         {
@@ -26492,9 +26564,9 @@
           "path": "Flowlockmodules/flowlock.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "5787de1fa72fcf5a7224bea51ce86a1aced29c79",
-          "size": 34361,
-          "sha256": "dc66532d08d4df57681cbe33a39325226efcf72b7e24126a66cd98e6564cf461",
+          "blob": "dc4b0b67c373da0f5c8e38dbcc189f3816c436b4",
+          "size": 35116,
+          "sha256": "1cae1e92b0cbcae4274b36c0890eb88cb0c5550a22585deabb293d8b73056f26",
           "kind": "source"
         },
         {
@@ -26528,27 +26600,27 @@
           "path": "Gamemodules/doudizhu/index.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "af8228833d6fb33134fdf37ecd278b47f45dd488",
-          "size": 2158,
-          "sha256": "1b81488d21e09135f1608670e7c7ebf0ca10661c580a34db2e00f8646df9eb81",
+          "blob": "bca85ef117941c058cc1f31743c38e75fe5bf2dd",
+          "size": 4906,
+          "sha256": "88d455b4722b80df96076dca8865ec1694fcfd184f9ff4efd5463aa484211507",
           "kind": "source"
         },
         {
           "path": "Gamemodules/doudizhu/style.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "f5ce06e9e84bcf4ffd7ba9089cadd59f90a67b34",
-          "size": 1676,
-          "sha256": "f1ae9552c00345b44a7b218560b7903e3343147909b69cc9a08bcc1392d4d844",
+          "blob": "76676bac74ca2c07968f2331a8f767a377e802c7",
+          "size": 6496,
+          "sha256": "84480e12715d9632d3a982193f62c4d4011c4d0b9a683a1a687c0081c4b5d66e",
           "kind": "source"
         },
         {
           "path": "Gamemodules/doudizhu/ui.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "635311380dd4070eec700ff07cb1592924c01fbb",
-          "size": 10358,
-          "sha256": "dcaa2059a520a3c268e3124313afac7fcde242d3e51eead04b38ecf72654cba9",
+          "blob": "49a8c67e8968c49a841772c5ed185d65b3e163b6",
+          "size": 30723,
+          "sha256": "f9beda20dcd54d4d94dbc9c2d7a134a10f84b91e3a4e9262e252fd891eb6bd1a",
           "kind": "source"
         },
         {
@@ -27068,9 +27140,9 @@
           "path": "Groupmodules/gameSessionOrchestrator.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "d777adc6ef1186c6f307a830d7591375606aaafc",
-          "size": 4286,
-          "sha256": "350c8ced5ee324330bfcaac5b95b26d6111831cbe5c442474c5df303dfbe138b",
+          "blob": "4dcdfe9b827a6c46cab9ecd64d28e548d9f560b0",
+          "size": 4403,
+          "sha256": "e27cef20e34554e48fdd0920f1aa8c4a4f75dbea33aa1f4417f79118ee279774",
           "kind": "source"
         },
         {
@@ -27767,6 +27839,15 @@
           "kind": "source"
         },
         {
+          "path": "ProjectForgemodules/projectforge-blueprint.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6d1551968515fff43811afbc7e2622612362c8ab",
+          "size": 12717,
+          "sha256": "2a37546310147329fe5606c18fea82c3d46e8699b7e608e01f02f646e45664d3",
+          "kind": "source"
+        },
+        {
           "path": "ProjectForgemodules/projectforge-git.js",
           "mode": "100644",
           "type": "blob",
@@ -27797,27 +27878,27 @@
           "path": "ProjectForgemodules/projectforge.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "15d8298b63e7ff4f44b40e496ff785a2a8f53f59",
-          "size": 35007,
-          "sha256": "0b1ef57ed4b1d34e1941362e1c312c77f779593a32b27c73e1e710787fea0c6e",
+          "blob": "3003b04af03733cd1e389c679892a60dfb2d6411",
+          "size": 42489,
+          "sha256": "115a381b249ebc458312f736e042a2b22d39984fd302a2907b52d5dedde81c7e",
           "kind": "source"
         },
         {
           "path": "ProjectForgemodules/projectforge.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "1eca4cf417c24a82fa00aa13e5e44417c1d8216f",
-          "size": 16382,
-          "sha256": "619fa7727dd8f23b8eab8112dcaf8bd529326f7db1091b4c4b71a63e50126203",
+          "blob": "53f1f16312c970b4017c3a715a62308cda7cf5e1",
+          "size": 16722,
+          "sha256": "7334ab35ee931ab1427b882a1aede9d98d9eda88de83bf240a76c251ec231f1f",
           "kind": "source"
         },
         {
           "path": "ProjectForgemodules/projectforge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "4be83d013e6b7851d24786f2dcfb0282347a5dee",
-          "size": 38011,
-          "sha256": "3afa80696e677bef9e78d4c142105ea2635c06a592112d090f0f278f53713b00",
+          "blob": "5d5e91183ddecf8d09ae9b5aed4cdcf6a12964cd",
+          "size": 40987,
+          "sha256": "3b8547d3eb19c7ac125211982e21eb159d59989ff0b1bb93e62f1ffaab148d7f",
           "kind": "source"
         },
         {
@@ -27947,12 +28028,39 @@
           "kind": "source"
         },
         {
+          "path": "ScriptoriumModules/scriptorium-board-html.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a695474ff70f9edfd417fe31702cf182f5c4dd80",
+          "size": 6000,
+          "sha256": "0b1abed7b5e5e4fbe774d75cee38d5d6a29fecad9ea3ab7732ab12866870e68a",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-board-lineage.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dfb54882b3b22919004f843d5d68022f177a8eb8",
+          "size": 9510,
+          "sha256": "e11cce2e713415c02c2a248628286070de101eb68ff0ddd657b2652d04a4cecf",
+          "kind": "source"
+        },
+        {
+          "path": "ScriptoriumModules/scriptorium-board-model.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "00005c89e415ab8baa69b09f4c9f609590a45217",
+          "size": 3773,
+          "sha256": "b5e20962216fb28f8c69b714fb107ac7e831cd1b0ecfd0dcd5f3393850fd558d",
+          "kind": "source"
+        },
+        {
           "path": "ScriptoriumModules/scriptorium-board.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "dc10a20404b8b3c0f7ca15bd675c0387ef224cde",
-          "size": 44164,
-          "sha256": "c1f94212d9cadafda2ca9d1c338dfa4aab742401344f356262ff14f50dc783bb",
+          "blob": "1131bd1a731de2213c258147ff93fa849adf886c",
+          "size": 56381,
+          "sha256": "f9b7c22a411b37cdf84827a458d2085cb4f967944bf5f21027d1abba86ab7a46",
           "kind": "source"
         },
         {
@@ -28040,18 +28148,18 @@
           "path": "ScriptoriumModules/scriptorium-file-agent.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "91a6b5d3450ef006b8bedab6d09504526f0f6e77",
-          "size": 6047,
-          "sha256": "dfb473c8f1312be7ed784c1fecafaf4f36e412ffd00aa615e76f399232e8471f",
+          "blob": "9b48d67fb6e7962eecfa3047575cb38b9f2195ab",
+          "size": 6508,
+          "sha256": "899c57e1bb9b4095a8389f0101fbe2ebf9b436584525468de9f9848439f69da0",
           "kind": "source"
         },
         {
           "path": "ScriptoriumModules/scriptorium-file-views.css",
           "mode": "100644",
           "type": "blob",
-          "blob": "3b22ad2222220ba316e1304c312677245dcc85b7",
-          "size": 22210,
-          "sha256": "7c656d86700f2ebaf718e439a847e6cbb91f80115cd1fc05ca2448335a7c367f",
+          "blob": "af806c5ef1062f5db34c92f9fe15d5282de923c9",
+          "size": 25261,
+          "sha256": "7824522c38a353e625f05d0b1c00b34a2127e8c8a2f8ca94c66be3326ae77b5e",
           "kind": "source"
         },
         {
@@ -28139,9 +28247,9 @@
           "path": "ScriptoriumModules/scriptorium-library.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "e4ee38483675c2c16015a97489cc8faf69c59c6c",
-          "size": 9628,
-          "sha256": "d9e9a3820180e2362e4bf537e74727e40d683f5d73bff144658a56d75980daca",
+          "blob": "34768a7231672cb5ffeafba73d9b0b5f2d274bd6",
+          "size": 9731,
+          "sha256": "30ee32885629361d839adcfb41c2c24399ff2c01b23174d513faae92be699ed2",
           "kind": "source"
         },
         {
@@ -28418,9 +28526,9 @@
           "path": "ScriptoriumModules/scriptorium.html",
           "mode": "100644",
           "type": "blob",
-          "blob": "e854bfdff037c8de806131bb22642c7020bae891",
-          "size": 69875,
-          "sha256": "2c208cc7307955aa0e222567b32f3880fee6de5362b60823ae46cac58c02e0e8",
+          "blob": "47cb8d1cd22c60809979c6a1ad4e87c1bb44dbb8",
+          "size": 70041,
+          "sha256": "2d8f3d37da8b4ff3435a6b9014c606b8604e72d18d7a48438e6cd052185691ab",
           "kind": "source"
         },
         {
@@ -29210,9 +29318,9 @@
           "path": "VCPDistributedServer/Plugin/ScriptoriumCollaborator/ScriptoriumCollaboratorService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ad48c30b416194f8cce872871c3cb698c3fdfa9d",
-          "size": 39932,
-          "sha256": "db830d69f90f6d6ebdb88967f5ed37145ad205b9ede2111e5244a3546ef2e26c",
+          "blob": "ffdc69fccd0b68c1fa88786f9611ff0109fec149",
+          "size": 41131,
+          "sha256": "9d837e644b88d62f96fb736c05776cf638697dd21258c32fefff874e4db897a3",
           "kind": "source"
         },
         {
@@ -31163,9 +31271,9 @@
           "path": "docs/chat-kernel-consumer-report.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "fc35dafa0f63739c1f351ca01a1b4bd0975caf8f",
-          "size": 738914,
-          "sha256": "1fc062335ca7b75a37f92e13657c0a30d2ff4d8357057e512f7a2b9d65c5d788",
+          "blob": "ae8d4fdfbeecbee87b8bc5b39cbfd49eea099382",
+          "size": 765353,
+          "sha256": "7e002f056a43ac45cd6e376533d5d79f6cde3050f11f40d92de1c35a775b1443",
           "kind": "source"
         },
         {
@@ -31217,18 +31325,18 @@
           "path": "docs/contracts/chat-contracts.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "5021fc514170bb853dacab371dce799523cd7feb",
-          "size": 66078,
-          "sha256": "e82077d90717a61c4e988a4060ee33ebbe5e1a242304648023d5cfcc9fdaf40d",
+          "blob": "e4a0958d4b9384d418c61324573c7dabd5cde00f",
+          "size": 66230,
+          "sha256": "0e0f7f5c37d6ef4e889aeee533b62bf1ce0486dcdf513c27b916bb4f8538bf4e",
           "kind": "source"
         },
         {
           "path": "docs/contracts/generated/chat-event-graph.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "c8d68db6f9a5e97f1708fdca93e8667a557fbd20",
-          "size": 1099767,
-          "sha256": "c3e4bf71f3b3a0e4087cd8ef3aa9a74b943913e59e5a4e1e167f445b6d9867b9",
+          "blob": "c781322c1f1cceb9eb95eba53b235f31916b8b39",
+          "size": 1101667,
+          "sha256": "a1557b5cc89868f1cea1d73326811fbede87b1a53170e7b25e5c0049c97c2375",
           "kind": "source"
         },
         {
@@ -32549,9 +32657,9 @@
           "path": "modules/emotion/emotionTags.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "348e3f891e109ecb32c91abc467e4c1705f95a37",
-          "size": 10210,
-          "sha256": "b1f844c7b3b8b361ae7f803127c0913c925acad0927e67e57e3fee6608f410b9",
+          "blob": "f72b36bfe3691423f7ba73f19a482884162374c3",
+          "size": 11226,
+          "sha256": "ab9de875b65f875eb351efdd2b31eb844241ea5d160e6e19269cb24087a77a5e",
           "kind": "source"
         },
         {
@@ -32612,9 +32720,9 @@
           "path": "modules/game/doudizhu/cards.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aa80601c10df06b1b84f90b0aa42abc8d1074446",
-          "size": 4032,
-          "sha256": "6a5b04ddffbce146896f76cc797290319784879a4be04f35039d5f36b9bc6197",
+          "blob": "565ae184916fe502d55896ee5f52a37034426274",
+          "size": 7202,
+          "sha256": "0cade09cb72438ad108932e8db259334be845e8958a783cf2f9fa6688966cbf4",
           "kind": "source"
         },
         {
@@ -32630,9 +32738,9 @@
           "path": "modules/game/doudizhu/rules.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "94466fa057cffa0a50e13d55ae7012e9cc6fcf0d",
-          "size": 7177,
-          "sha256": "415b063db775ffaae4d9ef9d74e15cab9b4c4fe20b3915787d0c1871e9b26a41",
+          "blob": "91549c4b3e652414cb583da4f5e2422cd3ef3d3e",
+          "size": 8236,
+          "sha256": "601af6dfd74cfb91fa1c0fd961e53edb1aef71cfdb95f38e6cd0f9feb258537c",
           "kind": "source"
         },
         {
@@ -32648,9 +32756,9 @@
           "path": "modules/game/gameRuntime.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "3c4195cc11dd26e6a81ae0309b9fbd808eca0d18",
-          "size": 5806,
-          "sha256": "834e5090b25bd60b293e551f118ecb59458ef413919da45d06d40330bb3f5daa",
+          "blob": "5ed782c6ffb1939e46dfecd2a64060c35c32b404",
+          "size": 10923,
+          "sha256": "6da2824f496074c4e8226c1398fe72760603010a4ad9e4650a2d5a8cb0cfcd48",
           "kind": "source"
         },
         {
@@ -32666,9 +32774,9 @@
           "path": "modules/game/gameToolAdapter.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "8bab3409755b12af5257da326c55c55697c5e678",
-          "size": 3944,
-          "sha256": "84d10a5ef1b9cdaf82032500895bf4758338687adc9e96f658edc433b3498317",
+          "blob": "ba4c17ffcfecf9428ee02ef981ecce3a36523765",
+          "size": 3947,
+          "sha256": "55c16bb8a46c88b642aaa8cd322872b0e832a8b01bd5f1b9ce5833aaf8ad2dc9",
           "kind": "source"
         },
         {
@@ -32864,9 +32972,9 @@
           "path": "modules/ipc/docxHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b96186e688321546e9313e389a165077721ce155",
-          "size": 52442,
-          "sha256": "2270289a09b5badc2521a0662ed463e2893aebc4b5279159cf4e768a7f11a4f5",
+          "blob": "01a5a12ffd806d59ed528ca092243b3fbb34df04",
+          "size": 53022,
+          "sha256": "994185b437994e082cb424c73ee8b5cde5d557426b31ce03492ccc54d8da1646",
           "kind": "source"
         },
         {
@@ -32909,9 +33017,9 @@
           "path": "modules/ipc/gameHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "aaaf81b6ba33d0a067c5cbcef22344469d38e34a",
-          "size": 10454,
-          "sha256": "9759ff64663b2ccd73fad1112c1059060f491acfffa8f8dcc4300d588a7b9b8c",
+          "blob": "3bc18b78514e01cdb318c12c1a7f79d9744e936f",
+          "size": 12331,
+          "sha256": "89fea87cdd6367812f98c495c2397fa8da9f6278103a03421f5d441df4f45a52",
           "kind": "source"
         },
         {
@@ -32927,9 +33035,9 @@
           "path": "modules/ipc/groupChatHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "b773b42cfb85b7325cb93805d235fa89b3c6aebb",
-          "size": 13309,
-          "sha256": "47b672b7ca9f674679501f3c0f66c5fb451b556de5d90f5dda327b4e1a814dec",
+          "blob": "07dbe2cf9c49185bb841a4628bd569f8bba0ba38",
+          "size": 16630,
+          "sha256": "a6772660417187c27ae9860809ba5bfe0f1c32db568e2b182e1855bf3844afcd",
           "kind": "source"
         },
         {
@@ -33026,9 +33134,9 @@
           "path": "modules/ipc/projectForgeHandlers.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "0f48776f556eedcf573da095019ef7a7bf6ad82c",
-          "size": 6410,
-          "sha256": "ae30b31cd49a106b00b19812ded5682c0ca01cb8ca5a627b579cea467b65efe4",
+          "blob": "353e00145c9f23a94163bee3e61beb30a3192d46",
+          "size": 7005,
+          "sha256": "12ef5aedcb4464175a4ffb2af1f03bca7ee9b1f3947b5b5c7281fedfd5046853",
           "kind": "source"
         },
         {
@@ -34331,18 +34439,18 @@
           "path": "modules/scriptorium/viewFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f4d44aff675e0a9a5f18e796e495062eaacf9441",
-          "size": 9226,
-          "sha256": "2dc977ed8850ca08c9218cf16bc2811461a64839635c81c082e5b24f68cf5f3a",
+          "blob": "1f6e82f029d3cd2d4e921bf1507b74044e82f72a",
+          "size": 13612,
+          "sha256": "de9f23e2575ad0e3544c30bf127e914336c28418e0d42a5a4686204935a90a2c",
           "kind": "source"
         },
         {
           "path": "modules/scriptorium/webPages/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "ca68b35149937ffaf54978c17beffbce972e49c1",
-          "size": 15047,
-          "sha256": "aeb21faf8a24e6acb0526e5da8d1faa499b75be6230ff8a8a3c18cec6f1f58da",
+          "blob": "81446c5ab7b580bc26ce4a8113e831fb51992249",
+          "size": 16436,
+          "sha256": "b6dce73376813d6ad47a24c238d327cd824cfdea2e2d6bdd535993a3565081df",
           "kind": "source"
         },
         {
@@ -34475,9 +34583,9 @@
           "path": "modules/services/gameService.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "f39c985cc9073bb3b0b0fdab62f29aac86b8299c",
-          "size": 10715,
-          "sha256": "f21c5c92913e2909924c40e7a7fa2fbcd26905b6f1b58904306a9e67690ff459",
+          "blob": "aa83343726ed03869b73e0f0f542608067b68e9a",
+          "size": 14458,
+          "sha256": "799b990cdad943276d36d0e22ce584cb2beb0a9f76878b4059ede0485914856b",
           "kind": "source"
         },
         {
@@ -37202,9 +37310,9 @@
           "path": "preloads/api/game.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "83e1f156dcfb182ad6d75d459a66a07b5e39428b",
-          "size": 903,
-          "sha256": "37cdff0075b63f98793db8d09b3ac588c1ea98b6a939d6ce0ddc37689d5ced9a",
+          "blob": "ce4b21697614e2348ba3726418038e0b35fd9494",
+          "size": 1024,
+          "sha256": "642c5198baf99ad43607c31794e93e6dbf02748c04ac05157cac5cd0bdc17130",
           "kind": "source"
         },
         {
@@ -37292,9 +37400,9 @@
           "path": "preloads/api/projectForge.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "9360ae38df62d9d146eebbadd4e2ea5baeba63f5",
-          "size": 2962,
-          "sha256": "e03a03d70b372245010ae25a4ecd0db059d5913a0c64c9ebb8240537ce80fb7b",
+          "blob": "9bf5c242db35e425588fcaf63e6b0f977c990e5d",
+          "size": 3048,
+          "sha256": "246346ce9dd4fb44fc480f32bca1aa0356008c34b1e09ec261571e0bad018a99",
           "kind": "source"
         },
         {
@@ -37913,9 +38021,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "ac97cfae62fdc661cbcc34c7212d456faf8b97c8",
-          "size": 51169,
-          "sha256": "c48e7cb39a59464f1baa61ecefeb683d35111ad13654ac3085fc1dd2f718ee8e",
+          "blob": "b140602431eedfcc6c67048b0203ed50e8ea323d",
+          "size": 51921,
+          "sha256": "85787844d3de2b63fd55438b6090f674787f909814aa36a83e3dd5a28f832f64",
           "kind": "source"
         },
         {
@@ -39143,7 +39251,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u51b0\u706b\u9b54\u6b4c.css",
+          "path": "styles/themes/themes冰火魔歌.css",
           "mode": "100644",
           "type": "blob",
           "blob": "0844c22b4ea6cf0c4530283e5e3e5c38b767854d",
@@ -39152,7 +39260,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u5361\u63d0\u897f\u4e9a.css",
+          "path": "styles/themes/themes卡提西亚.css",
           "mode": "100644",
           "type": "blob",
           "blob": "01b2ac289977927c38824882f3371157424900a1",
@@ -39161,7 +39269,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u591c\u6a31\u732b\u8bed.css",
+          "path": "styles/themes/themes夜樱猫语.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4a82db3d6776eef5f109e70ff44f86267cf5f074",
@@ -39170,7 +39278,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u661f\u548f\u4e0e\u72fc\u55e5.css",
+          "path": "styles/themes/themes星咏与狼嗥.css",
           "mode": "100644",
           "type": "blob",
           "blob": "03a678702c9c09fdb534f11ce0fc9c20250397cf",
@@ -39179,7 +39287,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u661f\u6e0a\u96ea\u5883.css",
+          "path": "styles/themes/themes星渊雪境.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e987a60adab5bb2b7543007cfe9230cbfaf0ca5e",
@@ -39188,7 +39296,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u6708\u5f71\u6625\u4fe1.css",
+          "path": "styles/themes/themes月影春信.css",
           "mode": "100644",
           "type": "blob",
           "blob": "338c727291ff198249f1428b0d261f236dd574c5",
@@ -39197,7 +39305,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u6781\u7b80Aero.css",
+          "path": "styles/themes/themes极简Aero.css",
           "mode": "100644",
           "type": "blob",
           "blob": "3b4fc059d395395f3125844201d9a8c0fbccd1bf",
@@ -39206,7 +39314,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u718a\u718a\u5047\u65e5.css",
+          "path": "styles/themes/themes熊熊假日.css",
           "mode": "100644",
           "type": "blob",
           "blob": "e3bbe7d87b8d43778780dc5903bdbc94848f0051",
@@ -39215,7 +39323,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u74f7\u4e0e\u9526.css",
+          "path": "styles/themes/themes瓷与锦.css",
           "mode": "100644",
           "type": "blob",
           "blob": "a9a173bfd433e0b7de916779f680051f66487615",
@@ -39224,7 +39332,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7ae5\u8da3\u68a6\u5883.css",
+          "path": "styles/themes/themes童趣梦境.css",
           "mode": "100644",
           "type": "blob",
           "blob": "69cb1521dcc8d3c76a3edb24d33da176b3020dcc",
@@ -39233,7 +39341,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7b2c\u4e00\u9002\u683c\u8005.css",
+          "path": "styles/themes/themes第一适格者.css",
           "mode": "100644",
           "type": "blob",
           "blob": "af66c3e161590b6b25193707bf42d368187abc7c",
@@ -39242,7 +39350,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7eb8\u58a8\u4e0e\u673a\u82af.css",
+          "path": "styles/themes/themes纸墨与机芯.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c49004e55b0e228e9e0d94ae4e119f82ccfebc48",
@@ -39251,7 +39359,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u7eef\u7ea2\u5929\u7a79.css",
+          "path": "styles/themes/themes绯红天穹.css",
           "mode": "100644",
           "type": "blob",
           "blob": "ab57cfcae201eb336fe22db7fdea859cc3ee9033",
@@ -39260,7 +39368,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u8d64\u4e0e\u767d\u663c.css",
+          "path": "styles/themes/themes赤与白昼.css",
           "mode": "100644",
           "type": "blob",
           "blob": "81d187914e217aa0adc6a0bfdc12aaed126f888f",
@@ -39269,7 +39377,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9178\u6027\u7384\u6b66.css",
+          "path": "styles/themes/themes酸性玄武.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4deeee641c6ec5b664b1af44dcaa0a619a6e7fbf",
@@ -39278,7 +39386,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u96ea\u5883\u6668\u660f.css",
+          "path": "styles/themes/themes雪境晨昏.css",
           "mode": "100644",
           "type": "blob",
           "blob": "4d9bd63f828a24511e97ed39c763c380f96d7ea0",
@@ -39287,7 +39395,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9713\u8679\u5496\u5561.css",
+          "path": "styles/themes/themes霓虹咖啡.css",
           "mode": "100644",
           "type": "blob",
           "blob": "cb0c5f1c13a0bceb58fcf407def44ed278d14847",
@@ -39296,7 +39404,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9759\u8c27\u68ee\u5cad.css",
+          "path": "styles/themes/themes静谧森岭.css",
           "mode": "100644",
           "type": "blob",
           "blob": "1c9c0af822e656f9a181a7dad3846eec61ea0b5a",
@@ -39305,7 +39413,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9ed1\u66dc\u4e0e\u661f\u706b.css",
+          "path": "styles/themes/themes黑曜与星火.css",
           "mode": "100644",
           "type": "blob",
           "blob": "c54f7d9c7d8562cf80abd2951fb4a5be9d9702f3",
@@ -39314,7 +39422,7 @@
           "kind": "source"
         },
         {
-          "path": "styles/themes/themes\u9ed1\u767d\u7b80\u7ea6.css",
+          "path": "styles/themes/themes黑白简约.css",
           "mode": "100644",
           "type": "blob",
           "blob": "2c278bcf9aa6412649f4c41b5954bae5e34da53a",
@@ -40559,9 +40667,9 @@
           "path": "tests/deskpet-stream.test.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "e84ed4833ed85f604e796700e4ba94f6cd1a5a73",
-          "size": 10013,
-          "sha256": "f08315c20de2b7bcaf497d5540ad0dd0e00bd5063edc61fd88897f7d256615e3",
+          "blob": "0045d37b4ff9f81b9e77ca58334d7b26e16712aa",
+          "size": 10089,
+          "sha256": "2933c1839f2d1ee4fc65d8520b8ff624e4914daacbb3df03a6cf0b74a4e402e0",
           "kind": "source"
         },
         {
@@ -40682,6 +40790,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/doudizhu-auto-pass.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6c2dbd533dc1bd4a40496af83f405eb1d2de9393",
+          "size": 8962,
+          "sha256": "9610c0bb73c5d2e1c0093f23f9f3dc81f624f09e0e0935d9fa823e3f09a2708d",
+          "kind": "source"
+        },
+        {
           "path": "tests/embedded-app-controller.test.js",
           "mode": "100644",
           "type": "blob",
@@ -40739,9 +40856,9 @@
           "path": "tests/flowlock-timestamp-bindings.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "188246dbcf10318a9b62799b62f9cac9f2e1497b",
-          "size": 4434,
-          "sha256": "1ddcdedb9aa9a726a7a15fa66841788b2c41ebe26deafaf7f4f92eff7bea39f7",
+          "blob": "f0fde7cb246fcfebf74927f50eebe531f1e54784",
+          "size": 5596,
+          "sha256": "a6d1829456767a191e040711983fa75309353c6e90299ca1fe2488ff77379afb",
           "kind": "source"
         },
         {
@@ -40775,9 +40892,18 @@
           "path": "tests/game-launcher.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "69d9fe3ee611e7496d924b8f61fce96a3dbe9eac",
-          "size": 10884,
-          "sha256": "7c74f7429bb0142803b346f7d57339385a5a6782d49e791c9188b2903ea71d9f",
+          "blob": "efd117ad80cfe500a9e42add3ae4517108252b02",
+          "size": 10896,
+          "sha256": "345d325564287cebe8e0fff6289f9db70d2f2df3f5c220663afe42336ff514cc",
+          "kind": "source"
+        },
+        {
+          "path": "tests/game-spectator-models.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7b9a3d14901742a910cc27535f0919c2685d821b",
+          "size": 22299,
+          "sha256": "9de7edbcedc1624b2653a6e1ceadd455eeb37453435e82eda91738b96b00d806",
           "kind": "source"
         },
         {
@@ -41504,9 +41630,9 @@
           "path": "tests/project-forge-eval.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "56bfbe564ad17ff804d7b522e921865b2e21ed55",
-          "size": 26992,
-          "sha256": "4d2312cba83d4c15e45821b6a89e88a39a86c0be070da128bf393fc4c18cb88f",
+          "blob": "bed739380c98c26e5b84ae994144b965654a8b8d",
+          "size": 27127,
+          "sha256": "fbe1aa62c858742e7ecf15675b42789e3403c6dd171513d202fa2e95cf06ef00",
           "kind": "source"
         },
         {
@@ -41516,6 +41642,15 @@
           "blob": "64739c92385dfe82aef797e9e8efb5d800aedf5c",
           "size": 7887,
           "sha256": "09813383267989e791349a2933dab35d4dd8d388659b1c91e7428e4cddb21483",
+          "kind": "source"
+        },
+        {
+          "path": "tests/projectforge-blueprint.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "784b8ba4a3177832826a4e965e5c68f45d068083",
+          "size": 4635,
+          "sha256": "6b84cb742edcbda3e255a7995517b1102116af5e71a2dfe82f971535aff4655d",
           "kind": "source"
         },
         {
@@ -41585,9 +41720,18 @@
           "path": "tests/scriptorium-board-electron.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "304ef2792480f9f244089751a82f4d82941bd315",
-          "size": 12970,
-          "sha256": "11b7553e9b704234de696267d4ed885286c809a76bc7e0c2d28a6533c521f123",
+          "blob": "b514bb7a1ef2fc8f4f7bfbb54e5f2f1fd1fac46a",
+          "size": 22932,
+          "sha256": "8c09a62fd1abcd4171d022bdf0c4cefe247f422784f8df4478eb4fd2866283c6",
+          "kind": "source"
+        },
+        {
+          "path": "tests/scriptorium-board-model.test.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b30b57c5cf6a862f81c2c7ab7d1df1bb87ad7b70",
+          "size": 1702,
+          "sha256": "4b21251e7094b7b4c791348b89681ec95bbcfd1cae8f5a2b6dd88e6c08e550d8",
           "kind": "source"
         },
         {
@@ -41603,18 +41747,18 @@
           "path": "tests/scriptorium-collaborator.test.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "803cdfd99fc19b14d4dc1e696cf019f988b53b2f",
-          "size": 27502,
-          "sha256": "c00ba2f5bc73c0a9a952b0597bff12ab17befa46c261e3fa694773d67e8d7d51",
+          "blob": "5a7ed4b91ad1ff3253680897482a8879124e5886",
+          "size": 27524,
+          "sha256": "8790468a26e40e5df3cf41834fffb74495dce70dd59b9e6f927193aebb6a4530",
           "kind": "source"
         },
         {
           "path": "tests/scriptorium-file-safety.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "07de3d2fee7c6450119334acbe3f5618347bedef",
-          "size": 48839,
-          "sha256": "ebae75bef70216302b4e8db70a4559263a9e7920b59f789894ffcf51ea867096",
+          "blob": "3b9398b5a7022416fc76960560b13b3dc5a0ecd6",
+          "size": 49187,
+          "sha256": "b46b8172a207a3afed0b476f99ce5784d34e1dc74bf152945609a32d0f28243e",
           "kind": "source"
         },
         {
@@ -41648,9 +41792,9 @@
           "path": "tests/scriptorium-read-races.test.cjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "50f93f4601f146976beb9c1224fa7f3825788249",
-          "size": 20400,
-          "sha256": "583d877c7025681495c9808e211f17e3248aa80e586d161805c9700259da0e2b",
+          "blob": "56b82cd4eaa44eabe26cc480acd931152689de91",
+          "size": 21552,
+          "sha256": "c9c4c31bab4c3ae07786b8f9a6d97fbea2f877f1d08860aeae6ec084dc94724e",
           "kind": "source"
         },
         {
@@ -44345,7 +44489,7 @@
           "kind": "source"
         },
         {
-          "path": "\u542f\u52a8Vchat.vbs",
+          "path": "启动Vchat.vbs",
           "mode": "100644",
           "type": "blob",
           "blob": "3f74df291d21232542005ebea68c6e6d90121bcd",
@@ -45257,8 +45401,8 @@
           "tree": "f41414598adac088a5acaadd1dcda8ad27fa32cc"
         },
         "upstream": {
-          "commit": "ce9882266782ffdd7b958bbf79d8db70480047c0",
-          "tree": "f1d0c425d1e33e36cf5dd44e524144575da6b1b0"
+          "commit": "2fc8fc985a6184f1e8163a41a4b5611a70cd249f",
+          "tree": "862033fb55492ab84e1cba8006964f4e8daac4ac"
         }
       }
     }
@@ -45279,18 +45423,18 @@
     "VCPDistributedServer/Plugin/VCPEverything/.env",
     "VCPDistributedServer/Plugin/WaitingForUrReply/config.env",
     "VCPDistributedServer/config.env",
-    "assets/E1-Vchat\u4e3b\u754c\u9762.jpg",
-    "assets/E10-\u6d6a\u6f6e\u8bed\u4e49\u5bfb\u5740\u53ef\u89c6\u5316\u60ac\u6d6e\u7a97.jpg",
-    "assets/E2-Vchat\u4e3b\u754c\u9762.jpg",
-    "assets/E3-VCP\u684c\u9762.jpg",
-    "assets/E4-\u97f3\u4e50\u64ad\u653e\u5668.jpg",
-    "assets/E5-V\u6587\u574a.jpg",
-    "assets/E6-\u7ec8\u7aef\u4e0e\u65e5\u5fd7.jpg",
-    "assets/E7-\u5212\u8bcd\u5c0f\u52a9\u624b\u5e94\u7528\u4e8eVscode\u7f16\u7a0b\u89e3\u91ca\u548c\u8f85\u52a9\u751f\u6210\u4ee3\u7801.jpg",
-    "assets/E8-\u57fa\u4e8e\u6d6a\u6f6e\u7684\u8bed\u4e49\u7ea7\u8bb0\u5fc6\u5173\u8054\u53ef\u89c6\u5316\u795e\u7ecf\u4e91\u56fe.jpg",
-    "assets/E9-Agent\u8bba\u575b\u4e0e\u7559\u8a00\u677f\u7cfb\u7edf.jpg",
+    "assets/E1-Vchat主界面.jpg",
+    "assets/E10-浪潮语义寻址可视化悬浮窗.jpg",
+    "assets/E2-Vchat主界面.jpg",
+    "assets/E3-VCP桌面.jpg",
+    "assets/E4-音乐播放器.jpg",
+    "assets/E5-V文坊.jpg",
+    "assets/E6-终端与日志.jpg",
+    "assets/E7-划词小助手应用于Vscode编程解释和辅助生成代码.jpg",
+    "assets/E8-基于浪潮的语义级记忆关联可视化神经云图.jpg",
+    "assets/E9-Agent论坛与留言板系统.jpg",
     "audio_engine/.env",
-    "assets/E1.5-Vchat\u524d\u7aef\u5e94\u7528\u7fa4.jpg"
+    "assets/E1.5-Vchat前端应用群.jpg"
   ],
   "denied_blobs": [
     "04201831b3f850b195afbcd5225cc6bfc8d6eebb",

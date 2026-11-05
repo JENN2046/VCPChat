@@ -8,6 +8,8 @@ const crypto = require('node:crypto');
 const ES = require('../VCPDistributedServer/Plugin/ProjectForge/evalSymbol');
 const { runProcess } = require('../VCPDistributedServer/Plugin/ProjectForge/evalProcess');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-eval-test-'));
+// Keep canvas regressions in the existing workbench entry without changing its command.
+require('./projectforge-blueprint.test.cjs');
 test.after(async () => { await ES.cleanup(); fs.rmSync(tmp, { recursive: true, force: true }); });
 function fixture(name, text) {
     const file = path.join(tmp, name);

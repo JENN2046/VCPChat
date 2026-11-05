@@ -1542,13 +1542,13 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/gameHandlers.js",
-        "line": 167,
+        "line": 174,
         "kind": "event-listener",
         "match": "ipcMain.handle(channel"
       },
       {
         "file": "modules/ipc/gameHandlers.js",
-        "line": 225,
+        "line": 261,
         "kind": "event-listener",
         "match": "ipcMain.handle(channel"
       }
@@ -1653,7 +1653,8 @@
       }
     ],
     "evidence": [
-      "2026-10-26: reviewed the sender guard, fixed registration call sites and matching power-monitor disposal."
+      "2026-10-26: reviewed the sender guard, fixed registration call sites and matching power-monitor disposal.",
+      "Source review of existing upstream main 38b3c883 and petContext.fromMain sender identity check; exact operations only, with no event wildcard."
     ]
   }
 ]

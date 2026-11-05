@@ -625,19 +625,23 @@ const allowedSourceDifferences = new Set([
 // Pin exact regular-file Git identities rather than exempting paths/directories.
 // Caller: merged PR #74. Consumer declaration: commit 42a285d3.
 const reviewedSourceBlobs = new Map([
+    // Native ProjectForge window: load CodeMirror's simple-mode dependency before Rust mode.
+    ['ProjectForgemodules/projectforge.html', '53f1f16312c970b4017c3a715a62308cda7cf5e1'],
+    // Preserve explicit-start IPC registration while adapting the new upstream game fixture.
+    ['tests/game-spectator-models.test.js', '7b9a3d14901742a910cc27535f0919c2685d821b'],
     // PR #86 accepted Markdown versions and destination resource metadata.
     ['ScriptoriumModules/scriptorium-document-store.js', '9db5e734ba0199bdd460403d710e230a8dc811c5'],
     // PR #86 sparse coordinates and native form-value raster regression.
     ['tests/scriptorium-pdf-form-raster.test.cjs', '636b77ff51c4ec31c757e19cad2292ec16be14fc'],
     // PR #86 atomic saves: preserve existing rwx, create private owned temporaries.
-    ['modules/scriptorium/webPages/index.js', 'ca68b35149937ffaf54978c17beffbce972e49c1'],
+    ['modules/scriptorium/webPages/index.js', '81446c5ab7b580bc26ce4a8113e831fb51992249'],
     ['modules/scriptorium/markdownFiles/index.js', '101e1d75cc03efb20d4726f15484169f50f2750c'],
     ['modules/scriptorium/atomicReplace.js', '236c521a049420902eb415b9e09ab5e8f4ba20de'],
-    ['modules/ipc/docxHandlers.js', 'b96186e688321546e9313e389a165077721ce155'],
+    ['modules/ipc/docxHandlers.js', '01a5a12ffd806d59ed528ca092243b3fbb34df04'],
     // PR #86 remaining file-view read ownership and corresponding exact regressions.
     ['tests/scriptorium-cdn-localization-electron.test.js', '431e9066c47b1835d54452f202f198219d8175aa'],
-    ['tests/scriptorium-board-electron.test.js', '304ef2792480f9f244089751a82f4d82941bd315'],
-    ['tests/scriptorium-read-races.test.cjs', '50f93f4601f146976beb9c1224fa7f3825788249'],
+    ['tests/scriptorium-board-electron.test.js', 'b514bb7a1ef2fc8f4f7bfbb54e5f2f1fd1fac46a'],
+    ['tests/scriptorium-read-races.test.cjs', '56b82cd4eaa44eabe26cc480acd931152689de91'],
     ['ScriptoriumModules/scriptorium.js', '09e4759404c06957a3f2a31782ce709218bdbab7'],
     ['ScriptoriumModules/scriptorium-web-page.js', '2171ce4952d6b5c667ad0b91c3143e023a57594d'],
     ['ScriptoriumModules/scriptorium-table-view.js', 'f3ef840600bae217c84221fbce90aa1819643276'],
@@ -645,7 +649,7 @@ const reviewedSourceBlobs = new Map([
     ['ScriptoriumModules/scriptorium-markdown-file.js', '6f66b6ecc5cd1322b0933a27223bb98935a8cc7f'],
     ['ScriptoriumModules/scriptorium-image-view.js', 'fd7e6b45407dff1155fb4c02937a6a28b0e3145a'],
     ['ScriptoriumModules/scriptorium-file-views.js', '7b2b79dd155fd1263dc1ffc32c5f445b9edf9fd5'],
-    ['ScriptoriumModules/scriptorium-board.js', 'dc10a20404b8b3c0f7ca15bd675c0387ef224cde'],
+    ['ScriptoriumModules/scriptorium-board.js', '1131bd1a731de2213c258147ff93fa849adf886c'],
     // PR #86 selected-page privacy and stale text-read ownership repair; exact source only.
     ['ScriptoriumModules/scriptorium-text-view.js', '56b82fa9a335aed9f38bac2df0b6da4969745426'],
     // PR #86 Windows fixture: await observed saved scale; preserve the original assertion.
@@ -657,9 +661,9 @@ const reviewedSourceBlobs = new Map([
     // PR #86 verified review repairs: exact PDF sanitization, CSV and authorized image navigation.
     ['modules/scriptorium/pdfFiles/edit.js', '755be7b8d6d393a29096edbe6720372f3803b664'],
     ['modules/scriptorium/sheetFiles/index.js', '5a684772701c5d6d790425d40386b7a673240069'],
-    ['modules/scriptorium/viewFiles/index.js', 'f4d44aff675e0a9a5f18e796e495062eaacf9441'],
+    ['modules/scriptorium/viewFiles/index.js', '1f6e82f029d3cd2d4e921bf1507b74044e82f72a'],
     ['ScriptoriumModules/scriptorium-pdf-view.js', '44b62717c355e22227a237cafdb3447d62bccb61'],
-    ['tests/scriptorium-file-safety.test.cjs', '07de3d2fee7c6450119334acbe3f5618347bedef'],
+    ['tests/scriptorium-file-safety.test.cjs', '3b9398b5a7022416fc76960560b13b3dc5a0ecd6'],
     ['.github/workflows/jso-agent-paired-candidate.yml', '38940cb06947455cc2a5f41b53a4cc314ae9c92c'],
     ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
     // PR #84: reviewed open-before-lookup plan panel, its topic adapter and
@@ -667,6 +671,10 @@ const reviewedSourceBlobs = new Map([
     ['modules/ui-system/side-pane/planDetailSideProvider.js', '632ad8b643df23934e692cf273ab3ec59fbf01c5'],
     ['modules/ui-system/side-pane/tab-types/plan-detail.js', '3bbf461867a1a9076f8f4daa9bd71078a09caa52'],
     ['tests/side-pane-plan-detail.test.mjs', '5603a27d3604ffc1ce0a72713022466f2ea129d5'],
+    // ProjectForge upstream integration: selection ownership, retryable reads and opaque manual iframe.
+    ['ProjectForgemodules/projectforge.js', '5d5e91183ddecf8d09ae9b5aed4cdcf6a12964cd'],
+    ['ProjectForgemodules/projectforge-blueprint.js', '6d1551968515fff43811afbc7e2622612362c8ab'],
+    ['tests/projectforge-blueprint.test.cjs', '784b8ba4a3177832826a4e965e5c68f45d068083'],
 ]);
 function isReviewedSourceDifference(file) {
     const reviewed = reviewedSourceBlobs.get(file);

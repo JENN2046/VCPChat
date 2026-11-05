@@ -13735,7 +13735,7 @@
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 130,
+          "line": 133,
           "kind": "event-listener"
         },
         {
@@ -13868,7 +13868,7 @@
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 130,
+          "line": 133,
           "kind": "event-listener",
           "match": "sender.once('destroyed'"
         },
@@ -15832,7 +15832,7 @@
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 114,
+          "line": 117,
           "kind": "event-listener"
         },
         {
@@ -16207,7 +16207,7 @@
         },
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 114,
+          "line": 117,
           "kind": "event-listener",
           "match": "watcher.on('error'"
         },
@@ -31635,14 +31635,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/sheetFiles/index.js",
-          "line": 247,
+          "line": 261,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/sheetFiles/index.js",
-          "line": 247,
+          "line": 261,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:sheet'"
         }
@@ -31778,14 +31778,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 165,
+          "line": 168,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 165,
+          "line": 168,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:view'"
         }
@@ -31796,7 +31796,7 @@
       "producers": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 106,
+          "line": 109,
           "kind": "event-send"
         }
       ],
@@ -31810,7 +31810,7 @@
       "evidence": [
         {
           "file": "modules/scriptorium/viewFiles/index.js",
-          "line": 106,
+          "line": 109,
           "kind": "event-send",
           "match": "sender.send('scriptorium:view-changed'"
         },

@@ -3,7 +3,7 @@
 // 通信名 scriptorium:sheet，命令如下：
 // - read：先经过 fileAccess.allowed，上限 50 MB。
 //   .csv / .tsv 识别 UTF-8（含或不含 BOM）、UTF-16，均不是时按 GB18030 读取（中文 Windows 上 Excel 保存的 csv 为此编码）；
-//   .tsv 以制表符分隔，.csv 按第一行逗号与分号的数量判断分隔符。.xlsx 使用 exceljs，每张工作表一张表，单元格取显示文字
+//   .tsv 以制表符分隔，.csv 按完整记录中引号外的分隔符数量判断分隔符。.xlsx 使用 exceljs，每张工作表一张表，单元格取显示文字
 //   （公式取结果，日期按 YYYY-MM-DD 书写）。每张最多 5 万行、500 列，超出部分截去并提示。读过的文件记入最近打开。
 // - save：.csv / .tsv 整张写回，分隔符、编码、BOM、换行和是否全部加引号均与原文件一致。.xlsx 只写修改过的单元格，
 //   样式、合并、列宽和其他工作表保持不变；含有图表、透视表、宏等 exceljs 无法写回的部分时不允许修改（lockReason）。
@@ -62,17 +62,31 @@ function parseDelimited(text, delimiter) {
 function writeDelimited(rows, { delimiter = ',', eol = '\n', endsWithNewline = true, everyQuoted = false } = {}) {
     const field = (value) => {
         const text = String(value ?? '');
-        return everyQuoted || text.includes(delimiter) || /["\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+        return everyQuoted || text.includes(delimiter) || /[",;\t\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
     };
     const body = rows.map((row) => row.map(field).join(delimiter)).join(eol);
     return endsWithNewline && rows.length ? body + eol : body;
 }
 function delimiterOf(text, ext) {
     if (ext === '.tsv') return '\t';
-    const first = text.slice(0, text.search(/\r?\n|$/));
-    const count = (ch) => first.split(ch).length - 1;
-    const best = [',', ';', '\t'].sort((a, b) => count(b) - count(a))[0];
-    return count(best) ? best : ',';
+    // 只统计引号外的分隔符，并跨完整逻辑记录取样（字段内可含换行、双引号）。
+    const counts = new Map([[',', 0], [';', 0], ['\t', 0]]);
+    let quoted = false;
+    let records = 0;
+    for (let i = 0; i < text.length && records < 32; i += 1) {
+        const ch = text[i];
+        if (ch === '"') {
+            if (quoted && text[i + 1] === '"') i += 1;
+            else quoted = !quoted;
+        } else if (!quoted) {
+            if (counts.has(ch)) counts.set(ch, counts.get(ch) + 1);
+            else if (ch === '\r' || ch === '\n') {
+                records += 1;
+                if (ch === '\r' && text[i + 1] === '\n') i += 1;
+            }
+        }
+    }
+    return [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a))[0];
 }
 
 const pad = (n) => String(n).padStart(2, '0');

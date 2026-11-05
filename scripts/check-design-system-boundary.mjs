@@ -625,6 +625,12 @@ const allowedSourceDifferences = new Set([
 // Pin exact regular-file Git identities rather than exempting paths/directories.
 // Caller: merged PR #74. Consumer declaration: commit 42a285d3.
 const reviewedSourceBlobs = new Map([
+    // PR #86 verified review repairs: exact PDF sanitization, CSV and authorized image navigation.
+    ['modules/scriptorium/pdfFiles/edit.js', '60a81a9826a2ae1b913c6d109f64f8b587a3a02e'],
+    ['modules/scriptorium/sheetFiles/index.js', '2f1d14589c4e3c2e27368b56b16a9d79c2db939d'],
+    ['modules/scriptorium/viewFiles/index.js', '9949495f863eeec71ec2d0fbf1a9ecd5b6a1a7a0'],
+    ['ScriptoriumModules/scriptorium-pdf-view.js', 'cc9e3f9f6298619592aa24357d664195180ed6ef'],
+    ['tests/scriptorium-file-safety.test.cjs', '8555027533b3be74ed58a17451b7c2febaa841da'],
     ['.github/workflows/jso-agent-paired-candidate.yml', '38940cb06947455cc2a5f41b53a4cc314ae9c92c'],
     ['docs/TRUSTED_ACTION_V1_CONSUMER.md', '75b306b4e4bc4715d0c20d2ece3c3f4693e370a6'],
     // PR #84: reviewed open-before-lookup plan panel, its topic adapter and

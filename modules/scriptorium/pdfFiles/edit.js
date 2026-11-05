@@ -8,7 +8,7 @@
 //   stamps：每一页都加的 { pageNumbers: { format, size }, watermark: { text, size, opacity, color } }，按页面显示的方向摆正。
 // 做法：在原文档上直接改（书签、元数据、表单都留着）——先填表，再把页面按计划摘下来重新排（删掉的不再放回去，同一页用两次就复制一份），
 // 再画东西。中文用 fonts.js 找到的系统字体按用到的字嵌进去；页面已经把没字体时的中文画成了图片。
-const { PDFDocument, rgb, degrees, StandardFonts, PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup, PDFOptionList } = require('../../../vendor/pdf-lib/pdf-lib.min.js');
+const { PDFDocument, PDFName, rgb, degrees, StandardFonts, PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup, PDFOptionList } = require('../../../vendor/pdf-lib/pdf-lib.min.js');
 const fontkit = require('../../../vendor/pdf-lib/fontkit.umd.min.js');
 const { cjkFont } = require('./fonts');
 
@@ -58,6 +58,11 @@ async function apply(bytes, plan = {}, deps = {}) {
         form.updateFieldAppearances(formFont || await fontFor('a'));
     }
 
+    // 涂黑输出不能沿用原对象图；先把仍需显示的表单变为页面内容。
+    // 普通编辑保留表单、书签和元数据；涂黑保存丢弃文档级附带内容和批注。
+    const sanitized = Array.isArray(plan.pages) && plan.pages.some((entry) => entry.blank && entry.image);
+    if (sanitized) doc.getForm().flatten();
+
     // 2. 页面：按计划重新排。
     const original = doc.getPages();
     const used = new Set();
@@ -77,7 +82,11 @@ async function apply(bytes, plan = {}, deps = {}) {
         } else {
             const file = plan.sources?.[entry.src];
             if (!file) throw new Error('要合并的 PDF 已找不到。');
-            if (!loaded.has(entry.src)) loaded.set(entry.src, await PDFDocument.load(await deps.readSource(file), { ignoreEncryption: false }));
+            if (!loaded.has(entry.src)) {
+                const source = await PDFDocument.load(await deps.readSource(file), { ignoreEncryption: false });
+                if (sanitized) source.getForm().flatten();
+                loaded.set(entry.src, source);
+            }
             [page] = await doc.copyPages(loaded.get(entry.src), [entry.index]);
         }
         if (entry.rotate !== undefined) page.setRotation(degrees(((Number(entry.rotate) % 360) + 360) % 360));
@@ -152,6 +161,14 @@ async function apply(bytes, plan = {}, deps = {}) {
                 page.drawText(text, { x: at.x, y: at.y, size, font, color: color(stamps.pageNumbers.color, [0.35, 0.35, 0.35]), rotate: degrees(frame.rot) });
             }
         }
+    }
+    if (sanitized) {
+        // removePage 只摘页面，不删除其间接对象。新文档只复制最终页，
+        // 不带原 catalog / metadata / attachments；批注可反向引用已移除页，不能复制。
+        for (const page of target) page.node.delete(PDFName.of('Annots'));
+        const output = await PDFDocument.create({ updateMetadata: false });
+        for (const page of await output.copyPages(doc, doc.getPageIndices())) output.addPage(page);
+        return output.save();
     }
     return doc.save();
 }

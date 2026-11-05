@@ -81,9 +81,12 @@ async function imageInfo(file) {
     if (!stat.isFile()) throw new Error(`找不到这个${what}。`);
     const dir = path.dirname(resolved);
     const entries = await fs.promises.readdir(dir, { withFileTypes: true }).catch(() => []);
-    const siblings = entries.filter((entry) => entry.isFile() && kindOf(entry.name) === kind)
+    const candidates = entries.filter((entry) => entry.isFile() && kindOf(entry.name) === kind)
         .map((entry) => path.join(dir, entry.name))
         .sort((a, b) => a.localeCompare(b, 'zh-CN', { numeric: true }));
+    // 打开一个文件不授予整个文件夹权限；导航只展示现有授权可打开的目标。
+    const permitted = await Promise.all(candidates.map((candidate) => allowed(candidate)));
+    const siblings = candidates.filter((_candidate, index) => permitted[index]);
     await Promise.resolve(deps?.rememberRecentFile?.(resolved)).catch(() => {});
     return { success: true, filePath: resolved, name: path.basename(resolved), size: stat.size, mtime: stat.mtimeMs, siblings };
 }

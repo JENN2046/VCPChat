@@ -334,9 +334,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8451b49912675d7cfdd7c2cdbaaf58ef88f2953a",
-          "size": 32902,
-          "sha256": "19269653e45fd8adf8c050271a2fc6ba2aa30548d1bc6bbf8518398983b0d9a2",
+          "blob": "1a27146c14b1861ed741e8d3fbee5670d12d209d",
+          "size": 32941,
+          "sha256": "fd428b7f8ca5452d035ec6b6b897f36483d82de1336adb8be46535cdd7d87508",
           "kind": "source"
         },
         {
@@ -3658,9 +3658,9 @@
           "path": "ScriptoriumModules/scriptorium-pdf-view.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "dcaf5a8c2cdb3b798df251290e048d872a43b864",
-          "size": 107038,
-          "sha256": "3902b219a0c43767236e4f9a0a8723099344cf087bf405a88b4f8f7cf70386fd",
+          "blob": "cc9e3f9f6298619592aa24357d664195180ed6ef",
+          "size": 107089,
+          "sha256": "38f657e054da818c6663d32a91635702239ad4262e2d1b8a3eade775b01bec40",
           "kind": "source"
         },
         {
@@ -11542,9 +11542,9 @@
           "path": "modules/scriptorium/pdfFiles/edit.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a48ec9532063f2122a96f3f1933a63f96a742c0b",
-          "size": 12196,
-          "sha256": "99876acac3fdd7480c48377850058d3c1c44126c6b8dab9f5e7ba71d4220e95e",
+          "blob": "60a81a9826a2ae1b913c6d109f64f8b587a3a02e",
+          "size": 13200,
+          "sha256": "34659741095121a179509b927c908d34073c32e882c559545fadfaa820f717cf",
           "kind": "source"
         },
         {
@@ -11569,9 +11569,9 @@
           "path": "modules/scriptorium/sheetFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "adad8bb022b3647cacd3a77ebe8f96be4f8f3358",
-          "size": 12994,
-          "sha256": "649ceb98516063ad30c72585af710b6ef9b6d1d7da297691f63a57a95c8d0eca",
+          "blob": "2f1d14589c4e3c2e27368b56b16a9d79c2db939d",
+          "size": 13565,
+          "sha256": "b380d29243d31080f91510d9d620403e15ebfc85494a34e7b2224dd6b8b31cf7",
           "kind": "source"
         },
         {
@@ -11587,9 +11587,9 @@
           "path": "modules/scriptorium/viewFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a4299d07c182ce3c3c5274c4415e11757e296b3d",
-          "size": 9280,
-          "sha256": "b9ab99ba4317a5b5746d93b2f53795dfedc9c1580318d13a17230794e97a68fa",
+          "blob": "9949495f863eeec71ec2d0fbf1a9ecd5b6a1a7a0",
+          "size": 9562,
+          "sha256": "0d82209ec8328cf4f0f7b7b7c43b184703ba6088075756a5062bb8bd60242732",
           "kind": "source"
         },
         {
@@ -14332,9 +14332,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8451b49912675d7cfdd7c2cdbaaf58ef88f2953a",
-          "size": 32902,
-          "sha256": "19269653e45fd8adf8c050271a2fc6ba2aa30548d1bc6bbf8518398983b0d9a2",
+          "blob": "1a27146c14b1861ed741e8d3fbee5670d12d209d",
+          "size": 32941,
+          "sha256": "fd428b7f8ca5452d035ec6b6b897f36483d82de1336adb8be46535cdd7d87508",
           "kind": "source"
         },
         {
@@ -15502,9 +15502,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "200c9df62963c14b7ddc1a4479a148c4e4d9a023",
-          "size": 47912,
-          "sha256": "32f9da6686bf1d32c6a33c2c7dc93b1e07e444a3df88675b30825465d17c0a4e",
+          "blob": "976adc2d490265f1612026f9b7d0981868c0957f",
+          "size": 48475,
+          "sha256": "a3b8da26c997808fb09c145c7d5fd50016b8ef967b6c9aa305f91fed49b6dc87",
           "kind": "source"
         },
         {
@@ -18439,6 +18439,15 @@
           "blob": "803cdfd99fc19b14d4dc1e696cf019f988b53b2f",
           "size": 27502,
           "sha256": "c00ba2f5bc73c0a9a952b0597bff12ab17befa46c261e3fa694773d67e8d7d51",
+          "kind": "source"
+        },
+        {
+          "path": "tests/scriptorium-file-safety.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8555027533b3be74ed58a17451b7c2febaa841da",
+          "size": 6742,
+          "sha256": "1e0ff7a37641b9fb7105322397197d18e2d7e02ce241048467e6db0f7263f82e",
           "kind": "source"
         },
         {
@@ -25155,6 +25164,14 @@
             "tests/single-chat-request-orchestrator.test.js",
             "tests/workspace-prompt-placeholders.test.js"
           ]
+        },
+        {
+          "name": "reviewed-pr86-scriptorium-file-safety",
+          "files": [
+            "tests/scriptorium-file-safety.test.cjs",
+            "vendor/pdf-lib/pdf-lib.min.js",
+            "vendor/pdf-lib/fontkit.umd.min.js"
+          ]
         }
       ],
       "source_context": {
@@ -28172,9 +28189,9 @@
           "path": "ScriptoriumModules/scriptorium-pdf-view.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "dcaf5a8c2cdb3b798df251290e048d872a43b864",
-          "size": 107038,
-          "sha256": "3902b219a0c43767236e4f9a0a8723099344cf087bf405a88b4f8f7cf70386fd",
+          "blob": "cc9e3f9f6298619592aa24357d664195180ed6ef",
+          "size": 107089,
+          "sha256": "38f657e054da818c6663d32a91635702239ad4262e2d1b8a3eade775b01bec40",
           "kind": "source"
         },
         {
@@ -34229,9 +34246,9 @@
           "path": "modules/scriptorium/pdfFiles/edit.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a48ec9532063f2122a96f3f1933a63f96a742c0b",
-          "size": 12196,
-          "sha256": "99876acac3fdd7480c48377850058d3c1c44126c6b8dab9f5e7ba71d4220e95e",
+          "blob": "60a81a9826a2ae1b913c6d109f64f8b587a3a02e",
+          "size": 13200,
+          "sha256": "34659741095121a179509b927c908d34073c32e882c559545fadfaa820f717cf",
           "kind": "source"
         },
         {
@@ -34256,9 +34273,9 @@
           "path": "modules/scriptorium/sheetFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "adad8bb022b3647cacd3a77ebe8f96be4f8f3358",
-          "size": 12994,
-          "sha256": "649ceb98516063ad30c72585af710b6ef9b6d1d7da297691f63a57a95c8d0eca",
+          "blob": "2f1d14589c4e3c2e27368b56b16a9d79c2db939d",
+          "size": 13565,
+          "sha256": "b380d29243d31080f91510d9d620403e15ebfc85494a34e7b2224dd6b8b31cf7",
           "kind": "source"
         },
         {
@@ -34274,9 +34291,9 @@
           "path": "modules/scriptorium/viewFiles/index.js",
           "mode": "100644",
           "type": "blob",
-          "blob": "a4299d07c182ce3c3c5274c4415e11757e296b3d",
-          "size": 9280,
-          "sha256": "b9ab99ba4317a5b5746d93b2f53795dfedc9c1580318d13a17230794e97a68fa",
+          "blob": "9949495f863eeec71ec2d0fbf1a9ecd5b6a1a7a0",
+          "size": 9562,
+          "sha256": "0d82209ec8328cf4f0f7b7b7c43b184703ba6088075756a5062bb8bd60242732",
           "kind": "source"
         },
         {
@@ -36992,9 +37009,9 @@
           "path": "package.json",
           "mode": "100644",
           "type": "blob",
-          "blob": "8451b49912675d7cfdd7c2cdbaaf58ef88f2953a",
-          "size": 32902,
-          "sha256": "19269653e45fd8adf8c050271a2fc6ba2aa30548d1bc6bbf8518398983b0d9a2",
+          "blob": "1a27146c14b1861ed741e8d3fbee5670d12d209d",
+          "size": 32941,
+          "sha256": "fd428b7f8ca5452d035ec6b6b897f36483d82de1336adb8be46535cdd7d87508",
           "kind": "source"
         },
         {
@@ -37856,9 +37873,9 @@
           "path": "scripts/check-design-system-boundary.mjs",
           "mode": "100644",
           "type": "blob",
-          "blob": "200c9df62963c14b7ddc1a4479a148c4e4d9a023",
-          "size": 47912,
-          "sha256": "32f9da6686bf1d32c6a33c2c7dc93b1e07e444a3df88675b30825465d17c0a4e",
+          "blob": "976adc2d490265f1612026f9b7d0981868c0957f",
+          "size": 48475,
+          "sha256": "a3b8da26c997808fb09c145c7d5fd50016b8ef967b6c9aa305f91fed49b6dc87",
           "kind": "source"
         },
         {
@@ -41543,6 +41560,15 @@
           "kind": "source"
         },
         {
+          "path": "tests/scriptorium-file-safety.test.cjs",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8555027533b3be74ed58a17451b7c2febaa841da",
+          "size": 6742,
+          "sha256": "1e0ff7a37641b9fb7105322397197d18e2d7e02ce241048467e6db0f7263f82e",
+          "kind": "source"
+        },
+        {
           "path": "tests/scriptorium-file-views-electron.test.js",
           "mode": "100644",
           "type": "blob",
@@ -43262,6 +43288,24 @@
           "kind": "source"
         },
         {
+          "path": "vendor/pdf-lib/fontkit.umd.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6edced82767174487d50fa4592ecd2d1fd5000d3",
+          "size": 758440,
+          "sha256": "d8df561b9fba98e24f2e5130e40948809281bbbc55a20c412359f1a0a5eb35a6",
+          "kind": "source"
+        },
+        {
+          "path": "vendor/pdf-lib/pdf-lib.min.js",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "edb12c72cdaa11b608eb5967cf1531892b7f3b31",
+          "size": 525099,
+          "sha256": "0f9a5cad07941f0826586c94e089d89b918c46e5c17cf2d5a3c6f666e3bc694f",
+          "kind": "source"
+        },
+        {
           "path": "vendor/pixi-unsafe-eval.min.js",
           "mode": "100644",
           "type": "blob",
@@ -44386,6 +44430,7 @@
             "tests/non-streaming-event-consumer.test.mjs",
             "tests/notification-change-audit.test.js",
             "tests/owned-preload-subscription.test.mjs",
+            "tests/scriptorium-file-safety.test.cjs",
             "tests/stability-log.test.js",
             "tests/stream-consumer-registry.test.mjs",
             "tests/stream-coordinator.test.mjs",
@@ -45113,6 +45158,14 @@
             "tests/side-pane-emotion-robustness.test.mjs",
             "tests/single-chat-request-orchestrator.test.js",
             "tests/workspace-prompt-placeholders.test.js"
+          ]
+        },
+        {
+          "name": "reviewed-pr86-scriptorium-file-safety",
+          "files": [
+            "tests/scriptorium-file-safety.test.cjs",
+            "vendor/pdf-lib/pdf-lib.min.js",
+            "vendor/pdf-lib/fontkit.umd.min.js"
           ]
         }
       ],

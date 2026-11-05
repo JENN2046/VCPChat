@@ -29144,6 +29144,15 @@
           "kind": "static-native"
         },
         {
+          "path": "VCPDistributedServer/Plugin/ProjectForge/blueprints/.gitignore",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c96a04f008ee21e260b28f7701595ed59e2839e3",
+          "size": 13,
+          "sha256": "5c89a8a9c5af258d02d0bfd3582c75963bea53baa1f5f5132662b80020a63452",
+          "kind": "source"
+        },
+        {
           "path": "VCPDistributedServer/Plugin/ProjectForge/engine.js",
           "mode": "100644",
           "type": "blob",

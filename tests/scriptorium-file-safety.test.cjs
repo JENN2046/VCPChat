@@ -400,3 +400,76 @@ test('editing then undoing during text reload still invalidates the read and pre
     request.resolve(f.response('/a.txt', 'REMOTE-TEXT', 90)); await pending;
     assert.equal(f.cm.getValue(), 'A-TEXT'); assert.equal(f.counters.cleared, cleared); assert.equal(f.c.file.mtime, 1);
 });
+
+test('PDF recovery: Save As restores deleted or moved originals and includes unsaved edits', async t => {
+    const dir = await temporary(t), library = path.join(dir, 'library'), output = path.join(dir, 'recovered');
+    await fs.mkdir(library); await fs.mkdir(output);
+    access.configure({ libraryRoots: () => [library], recentFiles: async () => [] });
+    const pdf = require('../modules/scriptorium/pdfFiles');
+    let destination, dialogCalls = 0;
+    pdf.register({ removeHandler() {}, handle() {} }, { dataDir: () => path.join(dir, 'data'),
+        dialog: { showSaveDialog: async () => { dialogCalls++; return { canceled: false, filePath: destination }; } } });
+    const event = { sender: { id: 9004, once() {} } };
+    for (const scenario of ['deleted', 'moved']) {
+        const original = path.join(library, `${scenario}.pdf`), doc = await PDFDocument.create();
+        doc.addPage().drawText(`OPENED-${scenario}`); await fs.writeFile(original, await doc.save());
+        const opened = await pdf._act(event, { command: 'read', path: original });
+        if (scenario === 'moved') await fs.rename(original, path.join(library, 'moved-elsewhere.pdf')); else await fs.unlink(original);
+        const payload = { command: 'save', path: original, fingerprint: opened.fingerprint,
+            plan: { objects: [{ page: 0, type: 'text', text: 'UNSAVED-EDIT', x: 10, y: 50 }] } };
+        await assert.rejects(pdf._act(event, payload), /另存为/);
+        await assert.rejects(pdf._act(event, { ...payload, force: true }), /另存为/);
+        destination = path.join(output, `${scenario}.pdf`);
+        const result = await pdf._act(event, { ...payload, saveAs: true }); assert.equal(result.success, true);
+        const recovered = await PDFDocument.load(await fs.readFile(destination));
+        for (const text of [`OPENED-${scenario}`, 'UNSAVED-EDIT']) assert.ok(recoveredText(recovered).includes(Buffer.from(text).toString('hex').toUpperCase()));
+        assert.equal(await access.allowed(destination), true);
+        assert.equal((await pdf._act(event, { command: 'read', path: destination })).success, true);
+        await assert.rejects(fs.stat(original));
+    }
+    assert.equal(dialogCalls, 2);
+});
+
+test('PDF recovery: a missing or different-file cache fingerprint cannot be substituted', async t => {
+    const dir = await temporary(t), library = path.join(dir, 'library'); await fs.mkdir(library);
+    access.configure({ libraryRoots: () => [library], recentFiles: async () => [] });
+    const pdf = require('../modules/scriptorium/pdfFiles'); let dialogCalls = 0;
+    pdf.register({ removeHandler() {}, handle() {} }, { dataDir: () => path.join(dir, 'data'), dialog: { showSaveDialog: async () => { dialogCalls++; return { canceled: true }; } } });
+    const event = { sender: { id: 9005, once() {} } };
+    const original = path.join(library, 'original.pdf'), other = path.join(library, 'other.pdf');
+    for (const [file, text] of [[original, 'ORIGINAL'], [other, 'OTHER']]) {
+        const doc = await PDFDocument.create(); doc.addPage().drawText(text); await fs.writeFile(file, await doc.save());
+    }
+    await pdf._act(event, { command: 'read', path: original });
+    const otherRead = await pdf._act(event, { command: 'read', path: other }); await fs.unlink(original);
+    for (const fingerprint of [otherRead.fingerprint, '0'.repeat(64)]) await assert.rejects(pdf._act(event, { command: 'save', path: original, saveAs: true, fingerprint }));
+    assert.equal(dialogCalls, 0);
+});
+
+test('CSV quoted-empty final records survive parsing and write/reparse without phantom rows', () => {
+    const cases = [
+        ['""', [['']]], ['header\n""', [['header'], ['']]], ['header\r\n""', [['header'], ['']]],
+        ['header\n""\n', [['header'], ['']]], ['""\n""', [[''], ['']]],
+        ['header\n\n', [['header'], ['']]], ['header\n', [['header']]], ['', []], ['\n', [['']]],
+        ['header,other\nvalue,""', [['header', 'other'], ['value', '']]],
+    ];
+    for (const [text, expected] of cases) {
+        const parsed = sheets.parseDelimited(text, ','); assert.deepEqual(parsed.rows, expected, JSON.stringify(text));
+        const written = sheets.writeDelimited(expected, { delimiter: ',', eol: /\r\n/.test(text) ? '\r\n' : '\n',
+            everyQuoted: parsed.everyQuoted, endsWithNewline: /[\r\n]$/.test(text) });
+        assert.deepEqual(sheets.parseDelimited(written, ',').rows, expected, `round trip ${JSON.stringify(text)}`);
+    }
+    assert.equal(sheets.writeDelimited([['a', '', '']], { endsWithNewline: false }), 'a,,', 'ordinary sparse rows keep their existing representation');
+});
+
+test('CSV final empty record remains when another cell is edited and saved through the real sheet API', async t => {
+    const dir = await temporary(t), file = path.join(dir, 'empty-tail.csv');
+    access.configure({ libraryRoots: () => [dir], recentFiles: async () => [] });
+    await fs.writeFile(file, 'header\n""');
+    const opened = await sheets._act(null, { command: 'read', path: file });
+    assert.deepEqual(opened.sheets[0].rows, [['header'], ['']]);
+    opened.sheets[0].rows[0][0] = 'EDITED';
+    await sheets._act(null, { command: 'save', path: file, rows: opened.sheets[0].rows, format: opened.format, mtime: opened.mtime });
+    assert.deepEqual((await sheets._act(null, { command: 'read', path: file })).sheets[0].rows, [['EDITED'], ['']]);
+    assert.ok((await fs.readFile(file, 'utf8')).endsWith('""'));
+});

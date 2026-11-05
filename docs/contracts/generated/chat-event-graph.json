@@ -13730,7 +13730,7 @@
         },
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 38,
+          "line": 40,
           "kind": "event-listener"
         },
         {
@@ -13862,7 +13862,7 @@
         },
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 38,
+          "line": 40,
           "kind": "event-listener",
           "match": "sender.once?.('destroyed'"
         },
@@ -31554,14 +31554,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 255,
+          "line": 257,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/pdfFiles/index.js",
-          "line": 255,
+          "line": 257,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:pdf'"
         }
@@ -31635,14 +31635,14 @@
       "consumers": [
         {
           "file": "modules/scriptorium/sheetFiles/index.js",
-          "line": 261,
+          "line": 266,
           "kind": "event-listener"
         }
       ],
       "evidence": [
         {
           "file": "modules/scriptorium/sheetFiles/index.js",
-          "line": 261,
+          "line": 266,
           "kind": "event-listener",
           "match": "ipcMain.handle('scriptorium:sheet'"
         }

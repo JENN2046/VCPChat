@@ -26,6 +26,7 @@ function parseDelimited(text, delimiter) {
     const rows = [];
     let row = [];
     let cell = '';
+    let recordStarted = false;
     let quoted = false;
     let truncated = false;
     let everyQuoted = true; // 全加引号的文件存回时也全加
@@ -37,11 +38,13 @@ function parseDelimited(text, delimiter) {
                 if (text[i + 1] === '"') { cell += '"'; i += 1; } else quoted = false;
             } else cell += ch;
         } else if (ch === '"' && cell === '') {
+            recordStarted = true;
             quoted = true;
         } else if (ch === delimiter) {
             endField(i);
             row.push(cell);
             cell = '';
+            recordStarted = true;
         } else if (ch === '\n' || ch === '\r') {
             endField(i);
             if (ch === '\r' && text[i + 1] === '\n') i += 1;
@@ -49,10 +52,11 @@ function parseDelimited(text, delimiter) {
             rows.push(row);
             row = [];
             cell = '';
+            recordStarted = false;
             if (rows.length >= MAX_ROWS) { truncated = i < text.length - 1; break; }
-        } else cell += ch;
+        } else { cell += ch; recordStarted = true; }
     }
-    if (!truncated && (cell !== '' || row.length)) {
+    if (!truncated && (recordStarted || cell !== '' || row.length)) {
         endField(text.length);
         row.push(cell);
         rows.push(row);
@@ -64,7 +68,8 @@ function writeDelimited(rows, { delimiter = ',', eol = '\n', endsWithNewline = t
         const text = String(value ?? '');
         return everyQuoted || text.includes(delimiter) || /[",;\t\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
     };
-    const body = rows.map((row) => row.map(field).join(delimiter)).join(eol);
+    // 单列空记录必须显式写为引号，不能在无结尾换行时消失。
+    const body = rows.map((row) => row.length === 1 && String(row[0] ?? '') === '' ? '""' : row.map(field).join(delimiter)).join(eol);
     return endsWithNewline && rows.length ? body + eol : body;
 }
 function delimiterOf(text, ext) {

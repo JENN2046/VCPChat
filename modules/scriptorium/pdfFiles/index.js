@@ -24,11 +24,13 @@ const keyOf = (file) => (process.platform === 'win32' ? path.resolve(file).toLow
 const fingerprint = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');
 const isPdf = (file) => /\.pdf$/i.test(String(file || ''));
 const MAX_BYTES = 200 * 1024 * 1024;
-// 页面读过的原样（按指纹）：磁盘上的文件后来被别处改了，另存为时照页面打开的那一版改，不拿改过的去套页面的计划。只留最近几份。
+// 页面读过的原样（按原路径和指纹）：磁盘上的文件后来被别处改了，另存为时照页面打开的那一版改，不拿改过的去套页面的计划。只留最近几份。
 const readCopies = new Map();
-function keepCopy(hash, bytes) {
-    readCopies.delete(hash);
-    readCopies.set(hash, bytes);
+const copyKey = (file, hash) => `${keyOf(file)}:${hash}`;
+function keepCopy(file, bytes) {
+    const key = copyKey(file, fingerprint(bytes));
+    readCopies.delete(key);
+    readCopies.set(key, bytes);
     while (readCopies.size > 6) readCopies.delete(readCopies.keys().next().value);
 }
 
@@ -51,7 +53,7 @@ async function read(sender, file) {
     if (!(await require('../fileAccess').allowed(resolved))) throw new Error('这份 PDF 不在文库或最近打开的文件中，文坊不打开。');
     const bytes = await fs.readFile(resolved);
     allow(sender, resolved);
-    keepCopy(fingerprint(bytes), bytes);
+    keepCopy(resolved, bytes);
     await Promise.resolve(deps?.rememberRecentFile?.(resolved)).catch(() => {});
     return {
         success: true, filePath: resolved, name: path.basename(resolved), bytes: new Uint8Array(bytes), fingerprint: fingerprint(bytes),
@@ -87,8 +89,8 @@ async function save(event, payload = {}) {
     const file = path.resolve(String(payload.path || ''));
     if (!isPdf(file) || !allowed(sender, file)) throw new Error('只能保存本页面打开的 PDF。');
     const current = await fs.readFile(file).catch(() => null);
-    if (!current) throw new Error('磁盘上已找不到这份 PDF（已被删除或移走），请使用“另存为”保存。');
-    const changed = Boolean(payload.fingerprint) && fingerprint(current) !== payload.fingerprint;
+    if (!current && !payload.saveAs) throw new Error('磁盘上已找不到这份 PDF（已被删除或移走），请使用“另存为”保存。');
+    const changed = !current || (Boolean(payload.fingerprint) && fingerprint(current) !== payload.fingerprint);
     if (!payload.saveAs && !payload.force && changed) {
         // 不抛错：页面要分得清“冲突”和别的失败（抛出去的错过了 IPC 只剩一句话）。
         return { success: false, conflict: true, error: '这份 PDF 在打开后已被别处修改，未覆盖。请重新载入，或另存为新文件。' };
@@ -124,7 +126,7 @@ async function save(event, payload = {}) {
 async function baseOf(file, hash) {
     const current = await fs.readFile(file).catch(() => null);
     if (current && (!hash || fingerprint(current) === hash)) return current;
-    const copy = hash && readCopies.get(hash);
+    const copy = hash && readCopies.get(copyKey(file, hash));
     if (!copy) throw new Error('打开时的版本已不存在，请重新载入后再修改。');
     return copy;
 }

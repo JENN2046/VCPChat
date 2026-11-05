@@ -28,6 +28,7 @@ async function writeFixtures() {
     fs.writeFileSync(file('other.txt'), '另一个文件\n');
     fs.writeFileSync(file('table.csv'), '名称,数量\n甲,1\n乙,2\n');
     fs.writeFileSync(file('other-table.csv'), 'OTHER,QTY\nB,9\n');
+    fs.writeFileSync(file('empty-tail.csv'), 'header\n""');
     fs.writeFileSync(file('page.html'), '<!doctype html><html><head><meta charset="utf-8"><title>网页</title></head><body><h1>网页正文</h1></body></html>');
     fs.writeFileSync(file('other-page.html'), '<!doctype html><html><head><meta charset="utf-8"></head><body><h1>第二网页</h1></body></html>');
     fs.writeFileSync(file('dot.png'), PNG);
@@ -217,6 +218,20 @@ app.whenReady().then(async () => {
         await until(`document.body.classList.contains('scriptorium-table-mode') && window.ScriptoriumTableView._state()?.rows === 2`, '表格打开');
         assert.equal(await page(`return document.querySelector('.outline-header h2').textContent;`), '工作表');
 
+        await open('empty-tail.csv');
+        await until(`window.ScriptoriumTableView.doc()?.filePath === ${JSON.stringify(file('empty-tail.csv'))}`, '带末尾空记录的 CSV 打开');
+        assert.ok((await page('return window.ScriptoriumTableView.agent.text();')).includes('2 行'));
+        await page(`document.querySelector('.scriptorium-table-headerchk').click();
+            const cell = document.querySelector('.scriptorium-table-row[data-at="0"] .c[data-col="0"]');
+            cell.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+            const input = document.querySelector('.scriptorium-table-editor'); input.value = 'EDITED';
+            input.dispatchEvent(new Event('input', { bubbles: true })); return true;`);
+        await pressCtrl('s');
+        await untilFile('empty-tail.csv', bytes => bytes.toString('utf8') === 'EDITED\n""', '修改另一格后保留末尾空记录');
+        await until('!window.ScriptoriumTableView.doc().dirty', 'CSV 已保存');
+        await open('table.csv');
+        await until(`window.ScriptoriumTableView.doc()?.filePath === ${JSON.stringify(file('table.csv'))}`, '返回表格 A');
+
         let tableRead = holdTextRead('table.csv', { extra: true });
         try {
             await page('window.tableReloadPending = window.ScriptoriumTableView.reload(); return true;');
@@ -370,6 +385,28 @@ app.whenReady().then(async () => {
                 assert.ok(!all.includes(omitted) && !all.includes(Buffer.from(omitted).toString('hex').toUpperCase()));
             }
         } finally { dialog.showOpenDialog = originalOpenDialog; }
+
+        // 当前 PDF 被移走后，使用打开时的缓存和未保存改动另存，并实际切到新文件。
+        const recovered = path.join(exportedDir, 'recovered.pdf');
+        await page(`const view = window.ScriptoriumPdfView;
+            view._do.add({ page: view._state().pages[0].id, type: 'text', text: 'RECOVERED-EDIT', size: 12,
+                x: 20, y: 30, w: 120, h: 18, color: [0, 0, 0] }); return true;`);
+        fs.unlinkSync(exported);
+        const previousSaveDialog = dialog.showSaveDialog;
+        dialog.showSaveDialog = async () => ({ canceled: false, filePath: recovered });
+        try {
+            assert.equal(await page('return await window.ScriptoriumPdfView.save({ saveAs: true });'), true);
+            assert.equal(await page('return window.ScriptoriumPdfView.doc().filePath;'), recovered);
+            assert.equal(await page('return window.ScriptoriumPdfView.doc().dirty;'), false);
+            assert.equal(fs.existsSync(exported), false, '普通原路径没有被隐式重建');
+            const { PDFRawStream, decodePDFRawStream } = require('../vendor/pdf-lib/pdf-lib.min.js');
+            const doc = await PDFDocument.load(fs.readFileSync(recovered));
+            const streams = doc.context.enumerateIndirectObjects().map(([, object]) => {
+                if (!(object instanceof PDFRawStream)) return '';
+                try { return Buffer.from(decodePDFRawStream(object).decode()).toString('latin1'); } catch { return ''; }
+            }).join('\n');
+            assert.ok(streams.includes(Buffer.from('RECOVERED-EDIT').toString('hex').toUpperCase()));
+        } finally { dialog.showSaveDialog = previousSaveDialog; }
 
         assert.deepEqual(errors, [], '页面没有报错');
         console.log('Scriptorium file views Electron test passed');

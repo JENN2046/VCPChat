@@ -47,7 +47,7 @@ test('runtime configuration registers every game IPC once without launching game
     assert.equal(runtimeApi.configureRuntime(options), first);
     assert.equal(constructions, 1);
     const channels = ['launch', 'resources', 'remove-resources', 'records', 'record',
-        'agents', 'create', 'next', 'observe', 'submit', 'continue', 'stop'];
+        'agents', 'create', 'next', 'observe', 'submit', 'continue', 'stop', 'settings'];
     assert.deepEqual([...registered.keys()].sort(), channels.map(name => `vcp-game:${name}`).sort());
     const records = registered.get('vcp-game:records');
     assert.deepEqual((await records(sender())).records, ['synthetic']);

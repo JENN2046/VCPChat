@@ -21,6 +21,7 @@ const CHANNELS = [
     'project-forge:revert-file',
     'project-forge:delete-project',
     'project-forge:accept-project',
+    'project-forge:get-blueprint',
 ];
 
 // 工程变更推送的订阅主题：V工程窗口、主窗口的状态面板和侧栏有人在看时才订阅，推送只发给订阅了的窗口
@@ -130,6 +131,13 @@ function initialize({ workspaceService = null, subscriptions = null, ipcMain: in
     }));
     ipcMain.handle('project-forge:delete-project', wrap((projectId, signature) => forge().deleteProject(projectId, signature), true));
     ipcMain.handle('project-forge:accept-project', wrap((projectId, signature) => forge().acceptProject(projectId, signature), true));
+    // 工程图纸：探测 blueprints/{projectId}.html 是否存在（Agent 工程收尾时生成），返回相对路径供渲染端 iframe 使用
+    ipcMain.handle('project-forge:get-blueprint', wrap((projectId) => {
+        const id = String(projectId || '').trim();
+        if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw new Error('非法工程 ID。');
+        const relPath = `VCPDistributedServer/Plugin/ProjectForge/blueprints/${id}.html`;
+        return { exists: fs.existsSync(path.join(PLUGIN_DIR, 'blueprints', `${id}.html`)), relPath };
+    }));
 }
 
 async function cleanupForQuit() {

@@ -480,11 +480,14 @@ test('POSIX atomic view saves preserve executable and private modes through the 
     views.register({ removeHandler() {}, handle(_name, value) { handler = value; } }, {});
     const event = { sender: { id: 9006 } };
     for (const [name, mode] of [['run.sh', 0o700], ['tool.py', 0o750], ['private.txt', 0o600], ['group.txt', 0o640], ['private.excalidraw', 0o600]]) {
-        const file = path.join(dir, name); await fs.writeFile(file, 'original\n'); await fs.chmod(file, mode);
+        const board = name.endsWith('.excalidraw');
+        const original = board ? JSON.stringify({type: 'excalidraw', elements: [], appState: {viewBackgroundColor: '#ffffff'}, files: {}}) : 'original\n';
+        const updated = board ? JSON.stringify({type: 'excalidraw', elements: [], appState: {viewBackgroundColor: '#eeeeee'}, files: {}}) : 'updated\n';
+        const file = path.join(dir, name); await fs.writeFile(file, original); await fs.chmod(file, mode);
         const opened = await handler(event, { command: 'read', file });
-        const saved = await handler(event, { command: 'save', file, text: 'updated\n', mtime: opened.mtime, encoding: opened.encoding, bom: opened.bom, eol: opened.eol });
+        const saved = await handler(event, { command: 'save', file, text: updated, mtime: opened.mtime, encoding: opened.encoding, bom: opened.bom, eol: opened.eol });
         assert.equal(saved.success, true); assert.equal((await fs.stat(file)).mode & 0o777, mode, name);
-        assert.equal(await fs.readFile(file, 'utf8'), 'updated\n');
+        assert.equal(await fs.readFile(file, 'utf8'), updated);
     }
 });
 
